@@ -2,7 +2,7 @@
 
 日期：2026-05-18
 总控窗口：AlembicWorkspace
-状态：待验收；Alembic、AlembicPlugin、AlembicDashboard 已完成并回填证据
+状态：已验收；核心代码路径通过，残留收口进入下一计划
 
 ## 目标
 
@@ -292,5 +292,5 @@ rg -n "full-ide|alembic-mcp|setup:mcp|install:cursor|install:vscode|build:vscode
 
 ### 总控验收
 
-- 状态：待验收
-- 结论：`Alembic`、`AlembicPlugin`、`AlembicDashboard` 三个执行窗口均已回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议；`AlembicCore`、`AlembicAgent`、`BiliDili` 保持观察且未改源码。下一步由总控运行跨仓库复核命令并决定是否归档。
+- 状态：已验收
+- 结论：`Alembic`、`AlembicPlugin`、`AlembicDashboard` 三个执行窗口均已回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议；`AlembicCore`、`AlembicAgent`、`BiliDili` 保持观察且未改源码。总控复核通过 workspace 文档验证、派发覆盖、`git diff --check`、`Alembic npm run build:check`、`AlembicPlugin npm run build:check`、`AlembicDashboard npm run build`。核心代码路径验收通过，但跨仓库残留扫描发现 README_CN、config、templates、file-change VSCode heartbeat、Plugin runtime Dashboard artifact 等收尾项，已新建下一计划 `docs/workspace/alembic-codex-only-residual-runtime-docs-closeout-workspace-plan-2026-05-18.md`。

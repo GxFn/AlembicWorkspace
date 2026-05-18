@@ -8,8 +8,16 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-codex-only-host-agent-mode-workspace-plan-2026-05-18.md](alembic-codex-only-host-agent-mode-workspace-plan-2026-05-18.md) | 待验收 | 直接放弃 Alembic 主包多 IDE Agent 默认 / 支持路径，只保留 Codex 插件宿主 Agent 线与 Alembic internal AI 线；`Alembic`、`AlembicPlugin`、`AlembicDashboard` 已完成并回填证据，等待总控复核。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 待验收 | 当前无需要发送领取提示词的窗口；三个执行窗口已完成，`AlembicCore`、`AlembicAgent`、`BiliDili` 观察不发。 |
+| 当前计划 | [alembic-multi-project-control-wave-1-runtime-control-foundation-plan-2026-05-18.md](alembic-multi-project-control-wave-1-runtime-control-foundation-plan-2026-05-18.md) | 待启动 | Wave 1 只发送给 `Alembic`，实现 Project Runtime Control Foundation。 |
+| 当前需求目录 | [alembic-multi-project-control-redesign](../requirement-designs/alembic-multi-project-control-redesign/) | 调研完成 | 保存本次重新开始的原始计划书、需求设计和代码实现依赖调研。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 待启动 | 发送给 `Alembic`；其它窗口阻塞 / 观察 / 无任务。 |
+| 目标阶段确认 | [alembic-multi-project-control-redesign-goal-stage-confirmation-2026-05-18.md](alembic-multi-project-control-redesign-goal-stage-confirmation-2026-05-18.md) | 已确认 | 用户已确认多项目控制最终目标和阶段顺序。 |
+| 需求目标与分阶段确认流程 | [../goal-stage-confirmation/process.md](../goal-stage-confirmation/process.md) | 长期流程 | 规定较大目标必须先在 `docs/requirement-designs/` 完成需求设计，再确认最终目标和分阶段，最后派发窗口。 |
+| 需求目标与分阶段确认模板 | [../goal-stage-confirmation/template.md](../goal-stage-confirmation/template.md) | 长期模板 | 用于每个新目标创建任务级确认文档，确认前发送名单必须为无。 |
+| 需求设计文档模板 | [requirement-design-template.md](../requirement-designs/requirement-design-template.md) | 长期模板 | 用于需求目录中的 `requirement-design`，保存于 `docs/requirement-designs/<需求名>/`。 |
+| 需求到 Wave 执行流程 | [requirement-to-wave-execution-flow.md](requirement-to-wave-execution-flow.md) | 长期流程 | 固化原始计划书、需求设计、代码依赖调研、目标阶段确认、用户确认、wave 执行计划和提示词发送的成熟路线。 |
+| 最终目标与阶段路线图 | [alembic-final-goal-stage-roadmap.md](alembic-final-goal-stage-roadmap.md) | 长期路线图 | 只作为产品方向背景；具体任务仍需创建任务级目标阶段确认文档。 |
+| Plugin first 增强契约 | [alembic-plugin-first-enhancement-contract.md](alembic-plugin-first-enhancement-contract.md) | 长期契约 | 规定 `AlembicPlugin` 作为 Codex host agent 入口，`Alembic` 作为本地增强底座，安装 Alembic 后增强 daemon / HTTP / Dashboard / internal AI 能力。 |
 | 本地源码 resolver / script 契约 | [alembic-local-source-resolver-script-contract.md](alembic-local-source-resolver-script-contract.md) | 长期契约 | 统一本地源码 resolver 优先级、repo-local script 边界、portable runtime 例外和 BiliDili 默认不进入日常流程的规则。 |
 | Workspace 文档归档规则 | [workspace-doc-archive-policy.md](workspace-doc-archive-policy.md) | 长期规则 | 规定 `docs/workspace/` 当前入口、历史 wave 归档目录、归档条件和 `scripts/archive-workspace-docs.mjs` 使用方式。 |
 | 分阶段迁移指挥长期模板 | [phased-migration-command-template.md](phased-migration-command-template.md) | 长期模板 | 用于真实代码挖掘、阶段拆分、一波一阶段推进、窗口分派、验收和下一波计划。 |
@@ -32,12 +40,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>已完成 | 已删除主包多 IDE Agent 默认 / 支持路径，保留 CLI / daemon / Dashboard / HTTP / internal AI；执行记录见 [../Alembic/alembic-codex-only-internal-ai-main-cleanup-2026-05-18.md](../Alembic/alembic-codex-only-internal-ai-main-cleanup-2026-05-18.md)。 |
-| `AlembicPlugin`<br>已完成 | Codex 插件 cold-start / rescan 主路径已切成 Codex 宿主 Agent 线；执行记录见 [../AlembicPlugin/alembic-plugin-codex-host-agent-single-line-2026-05-18.md](../AlembicPlugin/alembic-plugin-codex-host-agent-single-line-2026-05-18.md)。 |
-| `AlembicDashboard`<br>已完成 | 已删除可见 IDE / Cursor / VSCode / Copilot 等文案，改成 Codex host agent + Alembic internal AI 两线；执行记录见当前计划回填区。 |
-| `AlembicCore`<br>观察中 | 不派发；观察 host-agent contract 是否阻塞 Plugin 收束。 |
-| `AlembicAgent`<br>观察中 | 不派发；保留为 Alembic internal AI runtime。 |
-| `BiliDili`<br>观察中 | 不派发；必要时只作为只读 smoke 目标。 |
+| `Alembic`<br>待启动 | 读取 Wave 1 执行计划，完成 Project Runtime Control Foundation，并回填执行文档。 |
+| `AlembicCore`<br>阻塞 | 等待 Alembic 阶段 1 证明字段和 scope 模型后再沉淀 contract。 |
+| `AlembicPlugin`<br>阻塞 | 等待 Alembic projects API / Core contract 后处理 hostProject mismatch。 |
+| `AlembicDashboard`<br>阻塞 | 等待 Alembic projects API / handoff 字段后处理项目列表和切换。 |
+| `AlembicAgent`<br>观察中 | 当前无执行任务；只在 internal AI isolation 发现真实缺口时派发。 |
+| `BiliDili`<br>无任务 | 当前不做真实项目 smoke；稳定后才按只读验证考虑。 |
 
 ## 状态枚举
 

@@ -6,6 +6,10 @@ Agent 可以制定目标、计划和任务分配，但目标和计划必须服�
 
 Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳接口，不得把迁移、整理、重构、优化、插件化或仓库拆分解释成削减功能。
 
+所有进入本流程的用户需求都必须按完整功能模块对待：要明确用户目标、真实使用场景、输入输出、状态变化、边界、调用链、验证方式和完成定义。需求不明确时，必须先在原始计划书和需求设计文档里列出确认问题，等待用户确认；不得进入派发或实现。
+
+不得只做抽象接口、空 provider、空 adapter、无真实调用方的 glue code、只连线不产生功能闭环的代码连接，或只为“未来可能需要”创建无业务语义的中间层。任何新增抽象都必须服务于明确功能模块，并有真实生产方、消费方、数据流和验证证据。
+
 当 Agent 的计划涉及删减、替换、降级、延期、只做部分、只搭框架、只保留接口、暂不接入或改变完整范围时，必须先向用户确认。
 
 不要在旧工作区或旧克隆路径下工作；当前统一以本 workspace 内的 Alembic 系列仓库和明确纳入 workspace 的真实测试项目为准。
@@ -13,10 +17,16 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 ## 总控定位
 
 - `AlembicWorkspace` 是跨仓库计划、任务分配、阶段验收、边界记录和迁移状态的总控工作区。
+- 总控窗口是工作空间的大脑，不是机械派发表。收到用户需求后，必须先分析功能本质、用户场景、完整能力边界和真实完成定义；再挖掘本 workspace 内真实代码、文档、测试、构建和发布链路；根据需求类型判断是否需要联网查找官方文档、成熟项目或业界最佳实践；最后才拆解实现方案、阶段顺序和窗口任务。
+- 是否联网由需求判断：若需求涉及通用架构模式、安全 / 权限、多项目 / 多租户控制、后台进程、协议、发布链路、平台规则、外部标准或用户明确要求最佳实践，且本地代码不足以支撑设计，应联网调研并优先引用官方文档、主流项目源码 / 文档或权威资料；若需求完全是本地代码验收、既有实现收口或文档治理，可以不联网，但应在计划里说明理由。
+- 外部调研不能替代本地代码事实。实现方案必须同时满足用户目标、真实代码结构、现有模块边界和验证可行性；不要因为业界实践看起来更“标准”就忽略 Alembic 当前系统的真实连通性。
 - 本 workspace 下的 Alembic 子仓库包括 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 和 `AlembicPlugin`；真实测试项目包括 `BiliDili`。
 - `BiliDili` 默认不进入 Alembic 日常开发、迁移、清理、发布或依赖收口分派；只有任务明确需要真实 iOS/Swift 项目扫描、接入、复现、回归验证或 BiliDili 自身产品维护时，才把它纳入执行窗口。
+- 产品和模块长期路线遵循 `Plugin first, Alembic install enhances`：`AlembicPlugin` 是 Codex host agent 入口，`Alembic` 是本地增强底座。具体边界以 `docs/workspace/alembic-plugin-first-enhancement-contract.md` 为准。
+- `host agent` 表示外部宿主 Agent 能力来源；当前默认语境是 Codex host agent。不要把 `host agent` 与 `AlembicAgent` 或 Alembic internal AI 混用。
 - workspace 根目录不承载产品源码包，不作为 npm package、CLI、Dashboard、Plugin 或 Agent runtime 发布。
 - workspace 根目录可以作为 `GxFn/AlembicWorkspace` 总控文档仓库，但只跟踪 workspace 自己的说明、计划、验收、索引和协作文档；不得把 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili` 等子源码仓库加入本仓库的 git 跟踪、submodule 或 gitlink。子仓库源码改动必须在各自仓库独立提交。
+- 只有主控窗口可以提交 AlembicWorkspace 仓库里的文档、脚本、模板或 skill 资产。其它执行窗口可以按当前总控文档授权新建或回填 `docs/workspace/`、`docs/<Repo>/` 等 workspace 文档，但不得自行对 AlembicWorkspace 仓库执行 git add / commit / push；完成后只回填路径、状态和证据，由主控窗口验收后统一提交 workspace 仓库。
 - workspace 可以保管总控通用能力，例如 `scripts/`、`skills/`、`templates/` 下的验证脚本、分派模板、文档模板、Codex skill 草案或跨窗口协作工具。此类能力必须服务于工作区总控、文档治理、验证或协作，不得复制或替代子仓库产品实现。
 - workspace 通用脚本默认应是 repo-neutral、参数化、无密钥、无用户绝对路径、无网络依赖；如果脚本会写入子仓库，必须有当前总控文档明确授权，并优先让对应子仓库窗口执行。
 - workspace 内的 `skills/` 是可复用 skill 资产或草案的保管位置，不代表自动安装或自动启用；若某个 skill 需要安装到 Codex runtime、插件包或子仓库，必须在文档中明确安装位置、消费方和同步方式。
@@ -30,6 +40,8 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 ## 文档存储提示
 
 - AlembicWorkspace 作为统一计划指挥中心产生的长期文档，优先写到 workspace 根目录的 `docs/workspace/`。
+- `docs/requirement-designs/` 专门保存用户较大需求的原始计划书和需求设计文档；不要把具体 wave 派发、执行验收或回填堆到这里。
+- `docs/goal-stage-confirmation/` 专门保存“需求目标 + 分阶段确认”的长期流程和模板；具体某次任务的目标阶段确认文档仍写到 `docs/workspace/` 并从索引挂载。
 - `docs/workspace/index.md` 是 workspace 级唯一总控入口。所有跨仓库计划、当前状态、任务分派、文档挂载、验收索引和历史迁移入口都必须能从这个索引追踪到。
 - 新建长期迁移、计划、验收、扫描、边界和跨仓库任务文档时，除非已经明确属于某个子仓库专项目录，否则统一写到 `docs/workspace/`。
 - 新建或续写 workspace 级文档后，必须同步更新 `docs/workspace/index.md`，把文档挂载到对应的当前计划、执行阶段、仓库窗口或历史归档条目。
@@ -48,7 +60,7 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 - `AlembicAgent`：Agent runtime、AI provider、tool system、策略、上下文、memory、prompt、执行循环和宿主工具编排。
 - `AlembicDashboard`：前端 UI、API client、前端状态、路由、样式、可视化和前端测试。
 - `AlembicPlugin`：Codex MCP、Skill、channel/marketplace、插件 runtime、安装验证和 Codex 宿主适配。
-- `Alembic`：主产品壳、CLI、daemon、HTTP/API、Dashboard server、native/IDE、平台能力和本地完整体验。
+- `Alembic`：本地增强底座、CLI、daemon、HTTP/API、Dashboard server、ProjectRegistry、file monitor、JobStore、internal AI jobs、平台能力和本地安装 / dev / release。
 - `BiliDili`：用于 Alembic 真实场景验证的 iOS/Swift 测试项目。它不是 Alembic 产品源码仓库，不承载 Alembic runtime、Core、Agent、Plugin 或 Dashboard 的实现；默认不参与 Alembic 日常开发流程，只有当任务明确涉及真实项目接入、扫描、验证、示例消费或测试场景时，才把任务分配给它。
 
 不要把一个仓库的职责迁到另一个仓库来“简化”边界。边界调整必须有真实调用方、替代入口和验证证据。不要为了测试 Alembic 而改坏 `BiliDili` 的真实产品结构、业务行为、UI、网络、登录、播放或模块边界。
@@ -60,11 +72,25 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 - 不要把 `vendor/*` 子仓库当普通目录随手改散；如果必须在 vendor 内修源仓库能力，也要按独立源仓库 commit 处理，并同步回源仓库。若本轮采用本地源码模式，默认不触碰 `vendor/*`。
 - 跨仓库接入和删除必须分阶段记录。不要在一个阶段里混合“复制、接入、删除、修测试、发布脚本调整”到不可回滚的大改动。
 - 外层删除必须满足三件事：import 扫描无遗留、替代入口已接入、代表性 build/check/lint/smoke 已通过。
-- 删除计划只删除被替代的重复实现；不得删除 CLI、daemon、HTTP/API、Dashboard、Codex MCP、Skill、channel、release、native/IDE 或平台适配等仍属于对应仓库的能力。
+- 删除计划只删除被替代的重复实现；不得删除 CLI、daemon、HTTP/API、Dashboard、Codex MCP、Skill、channel、release、本地增强底座或平台适配等仍属于对应仓库的能力。
 
 ## 文档驱动执行规则
 
+- 成熟需求到执行路线固定为：原始计划书 → 用户确认 → 需求设计 → 深度代码实现依赖调研 → 任务级目标阶段确认 → 用户确认 → 新建 / 激活 wave 执行计划 → 只发送当前可推进窗口 → 回填 / 验收 / 下一波。长期流程规则见 `docs/workspace/requirement-to-wave-execution-flow.md`。
+- 用户发布较大目标后，必须先在 `docs/requirement-designs/<需求名>/` 新建需求目录，只保存原始计划书 `original-plan-YYYY-MM-DD.md`，并与用户商量确认原始计划书。原始计划书未确认前，不开始目标定义、阶段设计、需求设计文档或窗口派发。
+- 用户确认原始计划书后，才按用户需求调研真实代码、功能逻辑、模块边界和跨仓库连通性，形成 `requirement-design-YYYY-MM-DD.md`；再基于该需求设计文档创建任务级“最终目标 + 分阶段确认”文档，等待用户确认后再派发执行窗口。长期产品路线只作为背景，不能替代用户当前任务的目标确认。
+- 对跨仓库、运行时、项目控制、发布链路、模块边界、删除清理或其它复杂需求，需求设计完成后必须继续做深度代码实现依赖调研，并在需求目录下保存 `code-implementation-dependency-research-YYYY-MM-DD.md` 或等价调研附件；没有足够代码证据前，不得把阶段候选写成最终分派。
+- 需求设计文档是目标阶段确认前的必经文档，模板为 `docs/requirement-designs/requirement-design-template.md`；它必须记录已确认的原始计划书、需求目标、调研范围、真实代码事实、实现方案、差距分析、分阶段步骤和待确认问题。若原始计划书尚未确认，需求设计文档只能是未生效草案，不能作为派发依据。
+- 需求设计文档必须把需求落成完整功能模块：写清用户场景、功能闭环、输入输出、状态 / 数据变化、生产方、消费方、验证命令和完成标准。若这些内容缺失，状态只能是等待确认，不能派发执行。
+- 需求设计文档中的阶段只能是候选方向，不能作为当前 wave 派发依据；最终阶段顺序必须来自代码实现依赖调研和任务级目标阶段确认。
+- 任务拆分不得只分配“抽象连接”“接口占位”“空 adapter”“无调用方 provider”“只改类型不落功能”的任务；如果某一阶段确实只做 contract，也必须有明确消费窗口、下一阶段消费方式和 targeted verification。
+- 需求目标与分阶段确认流程以 `docs/goal-stage-confirmation/process.md` 为准；确认文档模板以 `docs/goal-stage-confirmation/template.md` 为准。
+- 任务级确认文档必须写清：用户原始目标、对应需求设计文档、总控理解、最终完成定义、非目标、影响窗口、producer / consumer 依赖链、阶段计划、当前阶段判断、验证策略、风险和确认问题。
+- 用户确认前，当前总控文档和 `workspace-current-status.md` 必须保持 `暂停` 或等待确认口径，`发送给` 必须为 `无`；不要输出执行窗口可复制提示词，也不要把候选窗口标为 `待启动`。
+- 用户确认后，才能新建或激活具体 wave 执行计划；目标阶段确认文档只记录用户确认和阶段路线，不继续承载所有执行细节。激活 wave 后，`docs/workspace/index.md` 当前计划应切到 wave 执行计划，并只把当前无上游阻塞、发送后能实际推进的窗口改为 `待启动`。
+- 如果用户中途新增目标、改变约束，或总控发现当前计划缺少最终完成定义 / 阶段顺序 / 依赖判断，必须先暂停派发并重新确认任务级目标阶段，不要在旧派发口径上继续追加任务。
 - 每个阶段完成后，必须在执行文档中回填：完成范围、文件/模块变化、提交 hash、验证命令、验证结果、遗留风险和下一窗口任务。
+- 执行窗口回填 workspace 文档后，不得自行提交 AlembicWorkspace 仓库；workspace 文档提交只能由主控窗口在验收、去重、修正索引和确认无空转后统一完成。
 - 任务状态只使用 `待启动`、`执行中`、`待验收`、`阻塞`、`已完成`、`暂停`、`观察中`、`无任务`；状态含义以 `docs/workspace/index.md` 为准。
 - 若用户口头更新状态，应先记录为“用户口径更新”或“总控状态快照”；没有验证证据前，不要把下一阶段标记为完成。
 - 如果某个窗口仍有未提交工作区改动，只能记录为执行中或待封口，不能作为可删除或可进入下一阶段的证据。
@@ -74,6 +100,11 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 - 如果后续读取代码发现新的关联仓库、vendor 子仓库、插件资源、Dashboard 产物、runtime 包或发布链路会受影响，必须追加到任务分派中，不能只处理最先被用户点名的仓库。
 - 分派给其他窗口的任务必须可执行：包含目标、范围、禁止事项、验证命令、回填要求、文档动作、文档保存位置和文档挂载入口。
 - 对于跨仓库总控文档，挂载入口优先是 `docs/workspace/` 下的当前主计划或索引；对于单仓库专项执行文档，保存位置可以是 `docs/<仓库名>/`，但仍必须在 `docs/workspace/` 的总控入口中留下链接或引用关系。
+- 制定分派表时必须区分“最终覆盖窗口”和“当前可派发窗口”：最终会参与某条链路的仓库可以写入覆盖表，但只有当前无上游依赖、发送后能直接推进的窗口才能标为 `待启动` 并进入提示词发送名单。
+- 每次分派前必须先判断 producer / consumer 依赖链：产出 contract、类型、artifact、API、schema、发布物或迁移证据的窗口是上游；消费这些结果的窗口在上游完成前必须标为 `阻塞` 或 `观察中`，不得为了并行而提前派发。
+- 依赖上游提交、接口或文档证据的窗口，只有在上游回填提交 hash、完成范围和验证结果后，才能由总控改为 `待启动`。不要让下游窗口猜字段、复制临时 contract、提前做 fallback 或空跑验证。
+- 每次输出可复制提示词前，必须同时人工核对 `发送给` 名单与依赖链是否一致；`check-dispatch-coverage` 只能检查覆盖和状态规则，不能替代总控对先后顺序的判断。
+- 每次新建 / 激活目标阶段确认或 wave 执行计划后，必须运行 `node scripts/verify-workspace-docs.mjs --all-workspace`、`node scripts/check-dispatch-coverage.mjs` 和 `git diff --check`；如果只改长期文档且当前计划未变化，也至少运行 workspace docs verification 和 `git diff --check`。
 
 ## 统一窗口分派提示词
 
