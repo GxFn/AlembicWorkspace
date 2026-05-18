@@ -1,6 +1,6 @@
-# Codex Progressive Chain Validation Skill
+# Progressive Chain Validation Skill
 
-Development source: https://github.com/GxFn/codex-progressive-chain-validation-skill.git
+Development source: https://github.com/GxFn/progressive-chain-validation.git
 
 Current observed upstream HEAD: `a6c371c8b123fc79f218d362cd6bae61a0679d61`
 
@@ -24,5 +24,7 @@ Intended use:
 
 Current contents:
 
-- This directory currently records the development slot and upstream source.
-- Add or sync the actual `SKILL.md` here when active development starts.
+- This directory records the development slot and upstream source after the
+  repository rename.
+- The upstream repository stores the skill package under
+  `progressive-chain-validation/`.
