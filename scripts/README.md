@@ -13,5 +13,21 @@ Scripts in this directory should:
 
 Current scripts:
 
+- `collect-repo-status.mjs`: summarizes branch, HEAD, dirty state,
+  untracked files, and latest commit for each workspace child repository.
 - `check-workspace-boundary.mjs`: verifies that child source repositories and
   local noise files are not tracked by the workspace Git repository.
+- `verify-workspace-docs.mjs`: checks the workspace index, current control
+  plan, required sections, Markdown links, and completed document references.
+- `check-dispatch-coverage.mjs`: verifies that the current control plan covers
+  every expected window and that the declared copyable prompt send list matches
+  task statuses.
+
+Suggested pre-acceptance sequence:
+
+```bash
+node scripts/check-workspace-boundary.mjs
+node scripts/collect-repo-status.mjs
+node scripts/verify-workspace-docs.mjs
+node scripts/check-dispatch-coverage.mjs
+```
