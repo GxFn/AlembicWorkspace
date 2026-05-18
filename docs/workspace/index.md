@@ -8,7 +8,8 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 无任务 | 当前没有待启动、执行中、待验收或阻塞的总控任务；不要向任何窗口发送领取任务提示词。 |
+| 当前计划 | [alembic-dev-link-global-environment-workspace-plan-2026-05-18.md](alembic-dev-link-global-environment-workspace-plan-2026-05-18.md) | 已完成 | `Alembic` 的 `npm run dev:link` 已可一键构建本地 Core / Agent / Dashboard / 主包并更新全局 `alembic` / `alembic-mcp`；执行记录见 [../Alembic/alembic-dev-link-global-environment-2026-05-18.md](../Alembic/alembic-dev-link-global-environment-2026-05-18.md)。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 已完成 | dev link 全局环境计划已完成；当前不需要继续发送窗口提示词。 |
 | 本地源码 resolver / script 契约 | [alembic-local-source-resolver-script-contract.md](alembic-local-source-resolver-script-contract.md) | 长期契约 | 统一本地源码 resolver 优先级、repo-local script 边界、portable runtime 例外和 BiliDili 默认不进入日常流程的规则。 |
 | Workspace 文档归档规则 | [workspace-doc-archive-policy.md](workspace-doc-archive-policy.md) | 长期规则 | 规定 `docs/workspace/` 当前入口、历史 wave 归档目录、归档条件和 `scripts/archive-workspace-docs.mjs` 使用方式。 |
 | 分阶段迁移指挥长期模板 | [phased-migration-command-template.md](phased-migration-command-template.md) | 长期模板 | 用于真实代码挖掘、阶段拆分、一波一阶段推进、窗口分派、验收和下一波计划。 |
@@ -31,12 +32,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicCore`<br>无任务 | 当前无 Core 执行任务。 |
-| `AlembicAgent`<br>无任务 | 当前无 Agent 执行任务。 |
-| `Alembic`<br>无任务 | 当前无 Alembic 执行任务。 |
+| `AlembicCore`<br>观察中 | 本轮不改 Core；由 Alembic dev link 调用现有 Core build。 |
+| `AlembicAgent`<br>观察中 | 本轮不改 Agent；Alembic dev link 需要主动构建本地 Agent dist。 |
+| `Alembic`<br>已完成 | 已实现 `npm run dev:link` 一键构建并更新本地全局 Alembic 环境。 |
 | `AlembicPlugin`<br>无任务 | 当前无 Plugin 执行任务。 |
-| `AlembicDashboard`<br>无任务 | 当前无 Dashboard 执行任务。 |
-| `BiliDili`<br>无任务 | 当前不涉及真实测试项目。 |
+| `AlembicDashboard`<br>观察中 | 本轮不改 Dashboard；Alembic dev link 需要构建并复制 Dashboard 静态产物。 |
+| `BiliDili`<br>观察中 | 只作为全局 Alembic 命令的真实项目只读 smoke 目标，不修改项目。 |
 
 ## 状态枚举
 

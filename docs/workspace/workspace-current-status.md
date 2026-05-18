@@ -2,13 +2,16 @@
 
 更新日期：2026-05-18
 总控窗口：AlembicWorkspace
-状态：无任务
+状态：已完成
 
 ## 状态摘要
 
-当前没有正在执行、待启动、待验收或阻塞的总控任务。刚完成的 Wave 3B facade readiness / consumer replacement workspace 文档已归档到 `docs/workspace/archive/2026-05/facade-readiness/`。
+当前 `Alembic dev:link` 全局环境计划已完成：
 
-保留在 `docs/workspace/` 根层级的文档只作为当前入口、长期规则、契约或近期背景；单仓库执行记录继续保留在对应 `docs/<Repo>/` 目录中。
+- 当前计划：[alembic-dev-link-global-environment-workspace-plan-2026-05-18.md](alembic-dev-link-global-environment-workspace-plan-2026-05-18.md)
+- 执行窗口：`Alembic`
+- 执行记录：[../Alembic/alembic-dev-link-global-environment-2026-05-18.md](../Alembic/alembic-dev-link-global-environment-2026-05-18.md)
+- 发送判断：当前不再发送窗口提示词，其它窗口保持观察或无任务。
 
 ## 窗口分派
 
@@ -16,21 +19,19 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicCore`<br>无任务 | 当前无 Core 执行任务；最近完成 Wave 3B facade readiness 与 3B-Core-2。 |
-| `AlembicAgent`<br>无任务 | 当前无 Agent 执行任务。 |
-| `Alembic`<br>无任务 | 当前无 Alembic 执行任务；最近完成 Wave 3B consumer replacement。 |
-| `AlembicPlugin`<br>无任务 | 当前无 Plugin 执行任务；最近完成 Wave 3B consumer replacement。 |
-| `AlembicDashboard`<br>无任务 | 当前无 Dashboard 执行任务。 |
-| `BiliDili`<br>无任务 | 当前不涉及真实测试项目。 |
+| `AlembicCore`<br>观察中 | 本轮不改 Core；由 Alembic dev link 调用现有 Core build。 |
+| `AlembicAgent`<br>观察中 | 本轮不改 Agent；Alembic dev link 需要主动构建本地 Agent dist。 |
+| `Alembic`<br>已完成 | 已实现 `npm run dev:link` 一键构建并更新本地全局 Alembic 环境。 |
+| `AlembicPlugin`<br>无任务 | 本轮不涉及 Codex plugin runtime、channel、marketplace 或 plugin cache。 |
+| `AlembicDashboard`<br>观察中 | 本轮不改 Dashboard；Alembic dev link 需要构建并复制 Dashboard 静态产物。 |
+| `BiliDili`<br>观察中 | 只作为全局 Alembic 命令的真实项目只读 smoke 目标，不修改项目。 |
 
 ## 可复制提示词
 
-当前没有需要发送的领取任务提示词；不要向任何窗口发送任务，避免空转。
+发送给：无，Alembic 本轮已完成；不再生成新的领取提示词。
+
+不发送给：`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili`。
 
 ## 回填区
 
-- 最近归档：`docs/workspace/archive/2026-05/facade-readiness/`
-- 归档文件：
-  - `alembic-core-facade-readiness-wave-3b-consumer-plan-2026-05-18.md`
-  - `alembic-core-facade-readiness-wave-3b-core-plan-2026-05-18.md`
-- 后续启动新任务时，在 `docs/workspace/` 新建新的总控计划，并把 `docs/workspace/index.md` 当前总控入口第一行切到新计划。
+- 当前计划回填入口：`docs/workspace/alembic-dev-link-global-environment-workspace-plan-2026-05-18.md` 的“回填区 / Alembic”。
