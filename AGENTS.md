@@ -17,6 +17,10 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 - `BiliDili` 默认不进入 Alembic 日常开发、迁移、清理、发布或依赖收口分派；只有任务明确需要真实 iOS/Swift 项目扫描、接入、复现、回归验证或 BiliDili 自身产品维护时，才把它纳入执行窗口。
 - workspace 根目录不承载产品源码包，不作为 npm package、CLI、Dashboard、Plugin 或 Agent runtime 发布。
 - workspace 根目录可以作为 `GxFn/AlembicWorkspace` 总控文档仓库，但只跟踪 workspace 自己的说明、计划、验收、索引和协作文档；不得把 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili` 等子源码仓库加入本仓库的 git 跟踪、submodule 或 gitlink。子仓库源码改动必须在各自仓库独立提交。
+- workspace 可以保管总控通用能力，例如 `scripts/`、`skills/`、`templates/` 下的验证脚本、分派模板、文档模板、Codex skill 草案或跨窗口协作工具。此类能力必须服务于工作区总控、文档治理、验证或协作，不得复制或替代子仓库产品实现。
+- workspace 通用脚本默认应是 repo-neutral、参数化、无密钥、无用户绝对路径、无网络依赖；如果脚本会写入子仓库，必须有当前总控文档明确授权，并优先让对应子仓库窗口执行。
+- workspace 内的 `skills/` 是可复用 skill 资产或草案的保管位置，不代表自动安装或自动启用；若某个 skill 需要安装到 Codex runtime、插件包或子仓库，必须在文档中明确安装位置、消费方和同步方式。
+- 新增通用能力时，必须在对应目录 README 或当前总控文档中写清：用途、适用范围、调用方式、验证方式、禁止事项和维护归属。
 - 本窗口拥有统一调度权：可以根据真实代码、文档、构建链路和模块边界，判断任意 Alembic 子仓库或真实测试项目窗口是否需要承担任务，并在总控文档中直接分配给 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili` 或其它当前 workspace 内相关窗口。
 - 分配任务时不需要等待用户逐一指定仓库；如果某项变更会影响多个仓库，必须主动识别所有受影响窗口并给出执行、观察、等待或无需处理的明确判断，避免遗漏仓库被遗忘处理。
 - 跨仓库任务必须优先通过文档明确目标、边界、执行窗口、验收命令、删除候选、禁止事项和回填证据。
