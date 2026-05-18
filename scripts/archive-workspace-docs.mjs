@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const workspaceRoot = process.cwd();
@@ -89,6 +89,9 @@ function firstCurrentPlanPath(indexContent) {
   for (const line of currentSection.split("\n")) {
     const cells = splitMarkdownRow(line);
     if (cells.length < 2 || cells[0] === "类型" || cells[0].startsWith("---")) {
+      continue;
+    }
+    if (cells[2] === "已完成") {
       continue;
     }
     const match = cells[1].match(/\[[^\]]+]\(([^)]+)\)/);
@@ -208,7 +211,24 @@ function trimArchivedRowsFromIndex(content, archivedTargets) {
 function archiveSummaryRow({ monthValue, topicValue, archiveDir, fileCount }) {
   const key = archiveKey(monthValue, topicValue);
   const archiveTarget = relativePosix(workspaceDocsDir, archiveDir);
-  return `| \`${key}\` | [${topicValue}](${archiveTarget}/) | 最近归档 ${fileCount} 个 workspace 文档；当前索引只保留目录入口。 |`;
+  return `| \`${key}\` | [${topicValue}](${archiveTarget}/) | 已归档 ${fileCount} 个 workspace 文档；当前索引只保留目录入口。 |`;
+}
+
+function countMarkdownFiles(directory) {
+  if (!existsSync(directory)) {
+    return 0;
+  }
+  let count = 0;
+  for (const entry of readdirSync(directory)) {
+    const absolutePath = path.join(directory, entry);
+    const stat = statSync(absolutePath);
+    if (stat.isDirectory()) {
+      count += countMarkdownFiles(absolutePath);
+    } else if (entry.endsWith(".md")) {
+      count += 1;
+    }
+  }
+  return count;
 }
 
 function upsertArchiveSummary(content, row) {
@@ -348,7 +368,9 @@ if (issues.length === 0) {
       }
     }
     for (const group of summaryGroups.values()) {
-      nextIndexContent = upsertArchiveSummary(nextIndexContent, archiveSummaryRow(group));
+      const pendingMoves = plannedMoves.filter(({ to }) => path.dirname(to) === group.archiveDir).length;
+      const fileCount = Math.max(countMarkdownFiles(group.archiveDir) + pendingMoves, group.fileCount ?? 0);
+      nextIndexContent = upsertArchiveSummary(nextIndexContent, archiveSummaryRow({ ...group, fileCount }));
     }
   }
 

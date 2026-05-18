@@ -26,7 +26,9 @@ Current scripts:
   control documents into `docs/workspace/archive/YYYY-MM/<topic>/`, rewrites
   index links, removes archived rows from the current index table, and adds a
   compact archive summary entry only when `--apply` is provided. Use
-  `--keep-index-rows` only when a historical row must remain visible.
+  `--keep-index-rows` only when a historical row must remain visible. The
+  script protects active first-row plans, but completed first-row plans can be
+  archived once a new current or idle status entry is ready.
 
 Suggested pre-acceptance sequence:
 

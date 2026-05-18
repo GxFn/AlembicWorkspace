@@ -1,8 +1,8 @@
 # Alembic Local Source Resolver And Script Contract
 
-日期：2026-05-18
+更新日期：2026-05-18
 总控窗口：AlembicWorkspace
-状态：当前生效契约
+状态：长期契约
 
 本文定义 AlembicWorkspace 内多仓库本地源码引入、脚本解析和 portable snapshot 的统一契约。契约只有这一份，保存于 `docs/workspace/`；各仓库只保存执行记录，不重复发明规则。
 

@@ -2,7 +2,7 @@
 
 日期：2026-05-18
 窗口：AlembicPlugin
-状态：待验收
+状态：已完成
 提交：`f185e95127411b9b6fcac6df43709be9b1ccee54`
 补丁提交：`8f48fd1d2b56e0136919414d68e7da93b1707141`
 最终收口提交：`e4211907c870f1c6d044c3606e94c014f927c05a`
@@ -66,5 +66,5 @@
 
 ## 下一步建议
 
-- 总控可把 AlembicPlugin 记为待验收：代码提交、目标扫描、构建、定向单测、agent-free report、Codex plugin verify/smoke 均已补齐；完整 lint/check/unit 的剩余失败为既有债务。
+- 总控已把 AlembicPlugin 记为已完成：代码提交、目标扫描、构建、定向单测、agent-free report、Codex plugin verify/smoke 均已补齐；完整 lint/check/unit 的剩余失败为既有债务。
 - 另开独立清理波处理 AlembicPlugin 既有 lint debt 与非本轮 unit failures，避免和 facade replacement 混在同一提交。

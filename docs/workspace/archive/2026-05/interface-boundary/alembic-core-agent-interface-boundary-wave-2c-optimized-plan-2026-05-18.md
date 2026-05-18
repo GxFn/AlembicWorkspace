@@ -21,7 +21,7 @@
 - `AlembicPlugin` 提交 `70eaf130d96f5e61a53dfbdb19c24ff13eb80410`。
 - `AlembicPlugin` runtime 快照提交 `09d4ac611408098d6ec3e88d1899d802510aadb5`。
 - `AlembicAgent` 提交 `0b86fdf55e3f927a1a5384c2b14cd97c8bb0daaf`。
-- 统一契约已写入 `docs/workspace/alembic-local-source-resolver-script-contract-2026-05-18.md`。
+- 统一契约已写入 `docs/workspace/alembic-local-source-resolver-script-contract.md`。
 
 因此优化后的 Wave 2C 不再派发“切本地源码入口”任务，也不做例行 vendor 指针同步。它只聚焦 Core / Agent interface boundary 的外层消费验收。
 

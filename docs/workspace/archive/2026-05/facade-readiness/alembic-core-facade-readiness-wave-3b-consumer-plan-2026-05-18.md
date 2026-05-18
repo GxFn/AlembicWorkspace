@@ -2,7 +2,7 @@
 
 日期：2026-05-18
 总控窗口：AlembicWorkspace
-状态：执行中
+状态：已完成
 
 ## 总控验收结论
 
@@ -14,7 +14,11 @@ Core 完成提交：`75fac5642b6da736a00667539a720172d23b85c3`
 
 Core 3B-Core-2 更新：`AlembicCore` 已在提交 `9506dca8ebcd0d59a208a640c7c373d8efd26a7c` 补齐 `@alembic/core/types` workflow type-only facade 和 `@alembic/core/search` individual signal runtime exports。Alembic / AlembicPlugin 的 `types/workflows` residual 与 Plugin `SearchRanking.test.ts` Core facade 阻塞可以解除；下一步应派消费层继续收口，不再派 Core。
 
-Plugin 收口更新：`AlembicPlugin` 已在提交 `e4211907c870f1c6d044c3606e94c014f927c05a` 删除最后 1 个 `@alembic/core/types/workflows` code residual，并确认 `SearchRanking.test.ts` + `ContentImpactAnalyzer.test.ts` 77 tests passed；本波目标旧 deep specifier 负向扫描为 0。
+Plugin 收口更新：`AlembicPlugin` 已在提交 `e4211907c870f1c6d044c3606e94c014f927c05a` 删除最后 1 个 `@alembic/core/types/workflows` code residual，并确认 `SearchRanking.test.ts` + `ContentImpactAnalyzer.test.ts` 77 tests passed；本波目标旧 deep specifier 负向扫描为 0。总控已复核通过，Plugin 本波记为已完成。
+
+Alembic 收口更新：`Alembic` 已在提交 `3c8239cc7fa7428518f8d51436e52c52bdcca5c5` 删除剩余 9 个 `@alembic/core/types/workflows` code residual 和 1 个 boundary allowlist residual；本波目标旧 deep specifier 负向扫描为 0。`lint:consumer-core-imports`、`lint:core-import-boundary`、`build:check`、目标相关 112 tests 和 `git diff --check` 均通过；完整 `lint` / `check` / `test:unit` 剩余失败为既有债务或宿主 sandbox 限制。
+
+总控最终复核：`Alembic` 和 `AlembicPlugin` 本波目标旧 deep specifier 负向扫描均为 0；`npm run report:public-api-closeout` 已显示本波 `shared / infrastructure/config / types / service/candidate` replacement readiness 收口为 `readyRefs=0/0`。当前剩余 closeout refs 属于下一批 `service/knowledge`、`service/evolution`、`core/capability`、`infrastructure/signal` 等消费层组，不是 Wave 3B residual。
 
 复核命令：
 
@@ -25,6 +29,8 @@ Plugin 收口更新：`AlembicPlugin` 已在提交 `e4211907c870f1c6d044c3606e94
 | `npm run smoke:public-api` | 通过；`Imported 75 exact public API entrypoints.` |
 | `npm run build:check` | 通过。 |
 | `npm run check` | 通过；60 test files / 919 tests passed；Biome checked 415 files；存在既有 `Could not access 'HEAD'` 提示但退出码为 0。 |
+| Consumer 目标旧 specifier 负向扫描 | 通过；Alembic 与 AlembicPlugin 本波目标旧 deep specifier 均 0 命中。 |
+| `npm run report:public-api-closeout` 最终复核 | 通过；replacement readiness `readyRefs=0/0`；剩余 `closeoutRefs` 属于下一批 consumer-replace-first 组。 |
 | `git diff --check` | 通过。 |
 | `git -C AlembicCore status --short` | 干净。 |
 
@@ -88,8 +94,8 @@ Plugin 收口更新：`AlembicPlugin` 已在提交 `e4211907c870f1c6d044c3606e94
 | 窗口 / 状态 | 任务 |
 | --- | --- |
 | `AlembicCore`<br>已完成 | 3B-Core-2 已完成：`@alembic/core/types` re-export workflow contract 类型，`@alembic/core/search` re-export individual signal classes；提交 `9506dca8ebcd0d59a208a640c7c373d8efd26a7c`。 |
-| `AlembicPlugin`<br>待验收 | 已删除剩余 `@alembic/core/types/workflows` residual，确认 `SearchRanking.test.ts` 不再因 Core facade 缺口失败，并复跑本波验证；完整 lint/check/unit 剩余失败为既有债务，等待总控复核。 |
-| `Alembic`<br>待启动 | Core 阻塞已解除；删除剩余 `@alembic/core/types/workflows` residual，更新 allowlist/reference limits，并复跑本波验证。 |
+| `AlembicPlugin`<br>已完成 | 已删除剩余 `@alembic/core/types/workflows` residual，确认 `SearchRanking.test.ts` 不再因 Core facade 缺口失败，并复跑本波验证；完整 lint/check/unit 剩余失败为既有债务，已通过总控复核。 |
+| `Alembic`<br>已完成 | 已删除剩余 `@alembic/core/types/workflows` residual，更新 allowlist/reference limits，并复跑本波验证；完整 lint/check/unit 剩余失败为既有债务或宿主 sandbox 限制。 |
 | `AlembicAgent`<br>观察中 | Agent Core imports 已 stable-only；消费层完成后总控只复核 scan，不派执行任务。 |
 | `AlembicDashboard`<br>无任务 | 本波不涉及 Dashboard UI/API client。 |
 | `BiliDili`<br>无任务 | 当前是 Alembic / AlembicPlugin Core import 收敛，不涉及真实测试项目。 |
@@ -171,35 +177,31 @@ Plugin 收口更新：`AlembicPlugin` 已在提交 `e4211907c870f1c6d044c3606e94
 
 ## 可复制分派提示词
 
-当前优先发送给：`Alembic`。
+当前无需要继续发送的执行窗口；不要发送领取任务提示词，避免空转。
 
 `AlembicCore` 3B-Core-2 已完成：`@alembic/core/types` 已 re-export `types/workflows.ts` 的 workflow contract 类型，`@alembic/core/search` 已 re-export individual signal classes；Core 提交 `9506dca8ebcd0d59a208a640c7c373d8efd26a7c`。
 
 `AlembicPlugin` 已补非阻塞 residual：`test/unit/ContentImpactAnalyzer.test.ts` 的 `@alembic/core/shared/recipe-tokens` 已收敛到 `@alembic/core/shared`；Core 缺口解除后，最后 1 个 `@alembic/core/types/workflows` residual 已收敛到 `@alembic/core/types`，提交 `e4211907c870f1c6d044c3606e94c014f927c05a`。
 
-暂不发送窗口：`AlembicCore`（3B-Core-2 已完成）、`AlembicPlugin`（执行完成，待总控验收）、`AlembicAgent`、`AlembicDashboard`、`BiliDili`
-
-```text
-读取 docs/workspace/alembic-core-facade-readiness-wave-3b-consumer-plan-2026-05-18.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
-```
+暂不发送窗口：`AlembicCore`（3B-Core-2 已完成）、`AlembicPlugin`（已完成）、`Alembic`（已完成）、`AlembicAgent`、`AlembicDashboard`、`BiliDili`
 
 ## 回填区
 
 ### Alembic
 
-- 状态：待启动
-- 完成范围：已完成 Alembic 主仓库可安全替换的 Wave 3B consumer imports：`shared/*` 收敛到 `@alembic/core/shared` / `@alembic/core/workspace` / `@alembic/core/search`；`infrastructure/config/*` 收敛到 `@alembic/core/config`；`service/candidate/*` 收敛到 `@alembic/core/service/candidate`；`types/reactive-evolution` 与 `types/snapshot-views` 收敛到 `@alembic/core/types`；同步 static imports、dynamic import、`vi.mock` / `vi.doMock` / `vi.doUnmock`；收紧 `config/core-import-boundary.json`。`types/workflows` residual 此前因 Core facade 缺口保留，当前 Core 阻塞已解除，待 Alembic 继续清理。
+- 状态：已完成
+- 完成范围：已完成 Alembic 主仓库 Wave 3B consumer imports：`shared/*` 收敛到 `@alembic/core/shared` / `@alembic/core/workspace` / `@alembic/core/search`；`infrastructure/config/*` 收敛到 `@alembic/core/config`；`service/candidate/*` 收敛到 `@alembic/core/service/candidate`；`types/reactive-evolution`、`types/snapshot-views` 与 `types/workflows` 收敛到 `@alembic/core/types`，其中 workflow contract 保持 type-only import；同步 static imports、dynamic import、`vi.mock` / `vi.doMock` / `vi.doUnmock`；收紧 `config/core-import-boundary.json`，删除 `@alembic/core/types/workflows` residual allowlist；未触碰 vendor、release、portable runtime、npm publish 或远程指针。
 - 执行记录：`docs/Alembic/alembic-core-facade-consumer-replacement-wave-3b-2026-05-18.md`
-- 提交 hash：`64f30f68ffce13c350ca9c328e511e087ded3246`
-- 验证命令：`npm run lint:consumer-core-imports`；`npm run lint:core-import-boundary`；`npm run build:check`；`npm run test:unit -- test/unit/BootstrapTerminalToolset.test.ts test/unit/KnowledgeAPI.test.ts test/unit/TestMode.test.ts test/unit/ProjectPaths.test.ts test/unit/folder-names.test.ts test/unit/ContentImpactAnalyzer.test.ts`；`npm run lint`；`npm run test:unit`；`npm run test:unit -- test/unit/DecayDetector.test.ts`；`npm run check`；`node scripts/core-source-command.mjs lint-consumer-imports --format=json`；目标旧 specifier 负向扫描；`git diff --check`；`git status --short`。
-- 验证结果：`lint:consumer-core-imports` 通过，455 files / 599 imports / issue 0；`lint:core-import-boundary` 通过；`build:check` 通过；目标相关单测 6 files / 105 tests 通过；Core consumer JSON scan issue 0，`stable-public=417`、`provisional-public=64`、`transitional-internal=118`、`referencesScanned=599`；除 `@alembic/core/types/workflows` 外，本波目标旧 deep specifier 0 命中；`git diff --check` 通过；Alembic 仓库提交后干净。
-- 未通过项：`npm run lint` 命中既有非本轮 lint errors（`lib/bootstrap.ts`、`lib/cli/AiScanService.ts`、`lib/cli/deploy/FileManifest.ts`、`scripts/verify-context-api.ts`）；`npm run test:unit` 受非目标/环境问题阻断（`SandboxNetworkProxy.test.ts` 的 `listen EPERM 127.0.0.1`、`TerminalAdapter.test.ts` 的 `sandbox-exec Operation not permitted`、`DecayDetector.test.ts` 的既有 `symbol_drift` 断言失败）；`npm run check` 在 lint 阶段被上述既有 lint errors 阻断。
-- 遗留风险：Core facade 缺口已由提交 `9506dca8ebcd0d59a208a640c7c373d8efd26a7c` 解除；Alembic 仍需在本仓库内删除 9 个 `@alembic/core/types/workflows` 代码 imports 和 1 个 boundary allowlist residual，并复跑验证后才能标为完成。
-- 下一步建议：Alembic 把 residual imports 切到 `@alembic/core/types`，删除 allowlist residual，并复跑本波验证。
+- 提交 hash：`64f30f68ffce13c350ca9c328e511e087ded3246`；最终收口提交 `3c8239cc7fa7428518f8d51436e52c52bdcca5c5`
+- 验证命令：`npm run lint:consumer-core-imports`；`npm run lint:core-import-boundary`；`npm run build:check`；`npm run test:unit -- test/unit/WorkflowResultPersistence.test.ts test/unit/BootstrapTerminalToolset.test.ts test/unit/KnowledgeAPI.test.ts test/unit/TestMode.test.ts test/unit/ProjectPaths.test.ts test/unit/folder-names.test.ts test/unit/ContentImpactAnalyzer.test.ts`；`npm run lint`；`npm run test:unit`；`npm run check`；`node scripts/core-source-command.mjs lint-consumer-imports --format=json`；目标旧 specifier 负向扫描；`git diff --check`；`git status --short`。
+- 验证结果：`lint:consumer-core-imports` 通过，455 files / 599 imports / issue 0；`lint:core-import-boundary` 通过；`build:check` 通过；目标相关单测 7 files / 112 tests 通过；Core consumer JSON scan issue 0，`stable-public=417`、`provisional-public=70`、`transitional-internal=112`、`referencesScanned=599`；本波目标旧 deep specifier 0 命中，包括 `@alembic/core/types/workflows`；`git diff --check` 通过；Alembic 仓库提交后干净。
+- 未通过项：`npm run lint` 命中既有非本轮 lint errors（`lib/bootstrap.ts`、`lib/cli/AiScanService.ts`、`lib/cli/deploy/FileManifest.ts`、`scripts/verify-context-api.ts`），14 errors / 295 warnings / 25 infos；`npm run test:unit` 受非目标/环境问题阻断，3 files failed / 148 passed，20 tests failed / 2261 passed / 2 errors，失败集中在 `SandboxNetworkProxy.test.ts` 的 `listen EPERM 127.0.0.1`、`TerminalAdapter.test.ts` 的 `sandbox-exec Operation not permitted`、`DecayDetector.test.ts` 的既有 `symbol_drift` 断言；`npm run check` 在 typecheck 通过后被既有 lint errors 阻断。
+- 遗留风险：本波目标 residual 已清零；`@alembic/core/types` 仍是 provisional public facade，workflow contract 必须继续保持 `import type`；完整 lint/check/unit 失败属于既有债务或宿主 sandbox 限制，需独立波次处理。
+- 下一步建议：Alembic 本波完成；总控已复跑 Core closeout report，确认 Wave 3B consumer refs 已收口，剩余 refs 属于下一批 consumer-replace-first 组。
 
 ### AlembicPlugin
 
-- 状态：待验收
+- 状态：已完成
 - 完成范围：已完成 AlembicPlugin Wave 3B consumer imports：`shared/*` 收敛到 `@alembic/core/shared` / `@alembic/core/search`；`infrastructure/config/*` 收敛到 `@alembic/core/config`；`service/candidate/*` 收敛到 `@alembic/core/service/candidate`；`types/reactive-evolution`、`types/snapshot-views` 和 `types/workflows` 收敛到 `@alembic/core/types`，其中 workflow contract 保持 type-only import；同步 static imports、dynamic import、`vi.mock` / `vi.doMock`；收紧 `config/core-import-boundary-allowlist.json`。总控复核发现的 `test/unit/ContentImpactAnalyzer.test.ts` `@alembic/core/shared/recipe-tokens` residual 已收敛到 `@alembic/core/shared`；Core 3B-Core-2 后最后 1 个 `types/workflows` residual 已清零。本波未刷新 portable runtime、未更新 vendor、未运行 release / marketplace / publish 链路。
 - 执行记录：`docs/AlembicPlugin/alembic-plugin-core-facade-consumer-replacement-wave-3b-2026-05-18.md`
 - 提交 hash：`f185e95127411b9b6fcac6df43709be9b1ccee54`；补丁提交 `8f48fd1d2b56e0136919414d68e7da93b1707141`；最终收口提交 `e4211907c870f1c6d044c3606e94c014f927c05a`
@@ -208,7 +210,7 @@ Plugin 收口更新：`AlembicPlugin` 已在提交 `e4211907c870f1c6d044c3606e94
 - 已解除阻塞项：Core 重复 `IncrementalPlan` re-export、`@alembic/core/types` workflow contract 缺口和 `@alembic/core/search` individual signal 缺口已由 Core 提交 `9506dca8ebcd0d59a208a640c7c373d8efd26a7c` 修复；Plugin 已用 `SearchRanking.test.ts` 51 tests passed 复核 search facade。
 - 未通过项：`npm run lint` 命中既有 Biome debt（`lib/bootstrap.ts` non-null assertion、`lib/cli/SetupService.ts` console 等，8 errors / 123 warnings / 29 infos）；`npm run test:unit` 剩余 5 files / 7 tests failed，88 files / 1456 tests passed，失败集中不再包含 `SearchRanking`；`npm run check` 在 `typecheck` 通过后被既有 lint errors 阻断。
 - 遗留风险：本波目标 residual 已清零；`@alembic/core/types` 仍是 provisional public facade，Plugin 侧 workflow contract 必须继续保持 `import type`；完整 lint/check/unit 失败属于既有债务，需独立波次处理。
-- 下一步建议：AlembicPlugin 本波进入总控待验收；下一步只需总控复核证据，另开独立清理波处理既有 lint debt 与非本轮 unit failures；仍不刷新 portable runtime / vendor / release artifact。
+- 下一步建议：AlembicPlugin 本波总控验收通过；既有 lint debt 与非本轮 unit failures 可另开独立清理波处理；仍不刷新 portable runtime / vendor / release artifact。
 
 ### AlembicCore
 
@@ -219,7 +221,7 @@ Plugin 收口更新：`AlembicPlugin` 已在提交 `e4211907c870f1c6d044c3606e94
 - 验证命令：`npm run build`；`npm run build:check`；`npm run lint:public-api-boundary`；`npm run smoke:public-api`；`npm run report:public-api-closeout`；`npm run lint`；`npm run check`；AlembicPlugin search facade smoke；AlembicPlugin `SearchRanking.test.ts`；Alembic type declaration smoke；`git diff --check`；`git status --short`。
 - 验证结果：全部通过。Core public API boundary 仍为 136 exports，75 exact / 61 wildcard，stable 17 / provisional 21 / transitional 98；smoke imported 75 exact entrypoints；closeout report 当前只剩 `@alembic/core/types/workflows -> @alembic/core/types` readiness `6/6`；Core check 中 60 test files / 919 tests passed，保留既有 `Could not access 'HEAD'` 提示但退出码为 0；AlembicPlugin `SearchRanking.test.ts` 51 tests passed；Core 提交后工作区干净。
 - 遗留风险：`@alembic/core/types` 仍是 provisional public facade，消费层替换必须继续保持 `import type`；本次不删除 Core wildcard exports，不触碰 vendor / portable runtime / release artifact。
-- 下一步建议：继续派 `Alembic` 删除 `@alembic/core/types/workflows` residual、收紧 allowlist/reference limits，并由总控复核 `AlembicPlugin` 本轮待验收证据。
+- 下一步建议：Wave 3B-Consumer 已完成；下一波可围绕 Core closeout report 剩余 consumer-replace-first 组另建计划。
 
 ### AlembicAgent
 

@@ -4,7 +4,7 @@
 总控窗口：AlembicWorkspace
 状态：已完成
 
-本文验收 `docs/workspace/alembic-local-source-import-unification-workspace-plan-2026-05-18.md`，并挂载统一契约 `docs/workspace/alembic-local-source-resolver-script-contract-2026-05-18.md`。
+本文验收 `docs/workspace/alembic-local-source-import-unification-workspace-plan-2026-05-18.md`，并挂载统一契约 `docs/workspace/alembic-local-source-resolver-script-contract.md`。
 
 ## 1. 验收结论
 

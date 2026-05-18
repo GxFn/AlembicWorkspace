@@ -8,7 +8,7 @@
 
 验收入口：
 
-- 统一契约：`docs/workspace/alembic-local-source-resolver-script-contract-2026-05-18.md`
+- 统一契约：`docs/workspace/alembic-local-source-resolver-script-contract.md`
 - 验收总结：`docs/workspace/alembic-local-source-import-unification-acceptance-summary-2026-05-18.md`
 
 总控规则：
