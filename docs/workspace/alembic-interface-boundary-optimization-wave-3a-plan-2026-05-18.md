@@ -2,7 +2,7 @@
 
 日期：2026-05-18
 总控窗口：AlembicWorkspace
-状态：执行中
+状态：已完成
 
 ## 背景
 
@@ -49,10 +49,10 @@
 
 | 窗口 | 状态 | 任务 | 文档动作 | 保存位置 | 挂载入口 | 回填位置 | 验证命令 | 阻塞/依赖 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `AlembicCore` | 待启动 | 建立 Core public API closeout inventory：按真实 consumer 将 98 transitional / 61 wildcard 分类为 `promote-to-stable`、`keep-provisional`、`consumer-replace-first`、`no-consumer-deprecate-candidate`、`must-keep-transitional`；实现第一批确定性治理动作，至少包含 no-growth gate 或收紧 policy 的代码变化，并给 Alembic / Plugin 反馈缺 facade 清单。不要删除仍被 consumer 使用的 export。 | 新建 | `docs/AlembicCore/alembic-core-public-api-closeout-wave-3a-2026-05-18.md` | 本文“窗口分派”；`docs/workspace/index.md` 当前入口 | 本文“回填区 / AlembicCore” | `npm run lint:public-api-boundary`；`npm run smoke:public-api`；`npm run build:check`；`node scripts/lint-consumer-core-imports.mjs ../AlembicAgent --config ../AlembicAgent/config/core-import-boundary.json --format=json`；Alembic / Plugin consumer scan；必要时 `npm run check` | Alembic / Plugin 的 consumer reduction 会反馈 facade 缺口；Core 不等它们完成即可先做 inventory 和 no-growth gate。 |
+| `AlembicCore` | 已完成 | 已建立 Core public API closeout inventory：将 98 transitional / 61 wildcard 分类为 `promote-to-stable=0`、`keep-provisional=18`、`consumer-replace-first=21`、`no-consumer-deprecate-candidate=46`、`must-keep-transitional=13`；落地 no-growth gate 和 report script；给 Alembic / Plugin 回填 existing stable 替换建议与缺 facade 清单。未删除任何 export。 | 已新建 | `docs/AlembicCore/alembic-core-public-api-closeout-wave-3a-2026-05-18.md` | 本文“窗口分派”；`docs/workspace/index.md` 当前入口 | 本文“回填区 / AlembicCore” | `npm run lint:public-api-boundary`；`npm run report:public-api-closeout`；`npm run smoke:public-api`；`npm run build:check`；AlembicAgent / Alembic / Plugin consumer scan；`npm run lint`；`npm run check`；`git diff --check`；`git status --short` | 已提交 `4679f004c923ab32ad2b5407f6c9dfa7561c840e`；Alembic / Plugin 可继续 consumer reduction。 |
 | `AlembicAgent` | 已完成 | 已完成 Agent public contract hardening：15 个 exact exports 增加 contract matrix；补 deep/dist/src/three-level import negative gate；明确 `tools/v2`、`tools/terminal`、`service/runtime/memory/context` 的 Agent-owned contract 与 host-owned adapter 边界；未新增 public subpath，未迁入 host adapter。 | 已新建 | `docs/AlembicAgent/alembic-agent-public-contract-hardening-wave-3a-2026-05-18.md` | 本文“窗口分派”；`docs/workspace/index.md` 当前入口 | 本文“回填区 / AlembicAgent” | `npm run lint:public-api-boundary`；`npm run smoke:public-imports`；`npm run check`；`git diff --check`；`git status --short` | 已提交 `b541c9eaa342dcb085834cfbe36e506c5904c43f`；外层 consumer reduction 仍由 Alembic / Plugin 窗口执行。 |
 | `Alembic` | 已完成 | Alembic consumer boundary reduction 已完成：将全部 `@alembic/core/domain/dimension*` transitional imports 替换为稳定 `@alembic/core/dimensions`，收紧 `config/core-import-boundary.json`，保持 Agent duplicate / Tool V2 duplicate / terminal duplicate 均为 0，并反馈剩余 Core facade 缺口。 | 已新建 | `docs/Alembic/alembic-core-agent-consumer-boundary-reduction-wave-3a-2026-05-18.md` | 本文“窗口分派”；`docs/workspace/index.md` 当前入口；Alembic 执行记录 | 本文“回填区 / Alembic” | `npm run lint:core-import-boundary`；`npm run lint:agent-extraction-boundary`；`npm run build:check`；`npm run check`；Agent public import smoke；负向扫描 `file:vendor/AlembicCore` 默认入口 | 已提交 `6dc3a875c2ef14be7a3b9a2fa6a9990b6c441c31`；下一批 service/evolution、service/knowledge、candidate、repository 替换等待 Core facade 决策。 |
-| `AlembicPlugin` | 待启动 | Plugin Core consumer boundary reduction：基于当前 517 Core imports，替换已有 stable facade 可覆盖的 transitional imports，收紧 `config/core-import-boundary-allowlist.json` reference limits；保持 `@alembic/agent` 0 依赖、root registry publish disabled、embedded runtime `file:vendor/AlembicCore` 例外不被误删；把缺 Core facade 的调用点反馈给 Core。 | 新建 | `docs/AlembicPlugin/alembic-plugin-core-consumer-boundary-reduction-wave-3a-2026-05-18.md` | 本文“窗口分派”；`docs/workspace/index.md` 当前入口 | 本文“回填区 / AlembicPlugin” | `npm run lint:core-import-boundary`；`npm run report:agent-extraction-boundary`；`npm run verify:release-package-boundary`；`npm run verify:codex-plugin`；必要时 `npm run build:check` / `npm run check`；负向扫描 `@alembic/agent` | 可先处理已有 stable 替代项；需要 Core 新 facade 的项等待 Core commit。不得恢复 root npm package 发布。 |
+| `AlembicPlugin` | 已完成 | Plugin Core consumer boundary reduction 已完成：基于 517 Core imports，将 knowledge/domain、memory repository、source-ref type、dimension helper 等已有 stable facade 覆盖的 imports 替换为稳定入口，收紧 `config/core-import-boundary-allowlist.json`，保持 `@alembic/agent` 0 依赖、root registry publish disabled、embedded runtime `file:vendor/AlembicCore` 例外不变，并反馈剩余 Core facade 缺口。 | 已新建 | `docs/AlembicPlugin/alembic-plugin-core-consumer-boundary-reduction-wave-3a-2026-05-18.md` | 本文“窗口分派”；`docs/workspace/index.md` 当前入口；Plugin 执行记录 | 本文“回填区 / AlembicPlugin” | `npm run lint:core-import-boundary`；`npm run report:agent-extraction-boundary`；`npm run verify:release-package-boundary`；`npm run verify:codex-plugin`；`npm run smoke:codex-plugin`；`npm run build:check`；`npm run check`；focused unit tests；负向扫描 `@alembic/agent` | 已提交 `170f52a407914ebf1d484e269980c40cc6eee90c`；下一批 service/knowledge、service/evolution、candidate、repository/config 替换等待 Core facade 决策。 |
 | `AlembicDashboard` | 观察中 | 本轮不改 Dashboard。仅当 Alembic / Plugin 的 API client 或 Dashboard build source 因边界改动失败时追加任务。 | 无需新建 | 无 | 本文“窗口分派” | 本文“回填区 / AlembicDashboard” | 无 | 观察窗口，不发送提示词。 |
 | `BiliDili` | 无任务 | 当前是 Alembic 多仓库接口边界治理，不涉及真实 iOS/Swift 项目验证。 | 无需新建 | 无 | 本文“窗口分派” | 本文“回填区 / BiliDili” | 无 | 不发送提示词。 |
 
@@ -78,9 +78,9 @@
 
 ## 可复制提示词
 
-发送给：`AlembicCore`、`AlembicPlugin`
+发送给：无
 
-已完成且当前不再发送：`AlembicAgent`、`Alembic`
+已完成且当前不再发送：`AlembicCore`、`AlembicAgent`、`Alembic`、`AlembicPlugin`
 
 不发送窗口：`AlembicDashboard`、`BiliDili`
 
@@ -92,13 +92,13 @@
 
 ### AlembicCore
 
-- 状态：
-- 完成范围：
-- 提交 hash：
-- 验证命令：
-- 验证结果：
-- 遗留风险：
-- 下一步建议：
+- 状态：已完成
+- 完成范围：在 `config/public-api-boundary.json` 增加 closeout schema、manual category seed 和 no-growth 上限；在 `scripts/public-api-boundary-policy.mjs` 增加 closeout category / schema 校验；在 `scripts/check-public-api-boundary.mjs` 将 `transitional-internal <= 98` 与 `wildcardExports <= 61` 纳入 `lint:public-api-boundary`；新增 `scripts/report-public-api-closeout.mjs` 和 `npm run report:public-api-closeout`，从 package exports、Core policy 与 sibling consumer scan 生成可复现 inventory；完整分类 98 个 closeout exports：0 promote、18 keep-provisional、21 consumer-replace-first、46 no-consumer-deprecate-candidate、13 must-keep-transitional；未删除任何 export，未新增薄 facade。
+- 提交 hash：`4679f004c923ab32ad2b5407f6c9dfa7561c840e`（`Add public API closeout inventory`）
+- 验证命令：`npm run lint:public-api-boundary`；`npm run report:public-api-closeout`；`node scripts/report-public-api-closeout.mjs --format=json`；`node scripts/lint-consumer-core-imports.mjs ../AlembicAgent --config ../AlembicAgent/config/core-import-boundary.json --format=json`；`node scripts/lint-consumer-core-imports.mjs ../Alembic --config ../Alembic/config/core-import-boundary.json --format=json`；`node scripts/lint-consumer-core-imports.mjs ../AlembicPlugin --config ../AlembicPlugin/config/core-import-boundary-allowlist.json --format=json`；`npm run smoke:public-api`；`npm run build:check`；`npm run lint`；`npm run check`；`git diff --check`；`git status --short`
+- 验证结果：全部通过。`lint:public-api-boundary` 输出 136 exports classified、75 exact / 61 wildcard、stable 17 / provisional 21 / transitional 98，并确认 closeout no-growth 为 transitional `98 <= 98`、wildcard `61 <= 61`。`report:public-api-closeout` 输出 98 closeout exports，consumer scan issue 0；AlembicAgent 为 216 files / 48 imports / stable 48 / transitional 0；Alembic 为 455 files / 598 imports / stable 412 / provisional 7 / transitional 179；AlembicPlugin 为 320 files / 507 imports / stable 360 / provisional 8 / transitional 139。`smoke:public-api` imported 75 exact public API entrypoints。`build:check`、Biome lint、`check` 均通过；`check` 中 60 test files / 919 tests passed，保留既有 `error: Could not access 'HEAD'` 输出但退出码为 0。Core 提交后工作区干净。
+- 遗留风险：`consumer-replace-first` 仍需 Alembic / AlembicPlugin 先替换已有 stable facade 或回填缺 facade；`no-consumer-deprecate-candidate` 仍不能立即删除，后续需要 release 兼容窗口与下游负向扫描；AST、Drizzle/migrations、repository bootstrap/sync 仍为 `must-keep-transitional`。
+- 下一步建议：Alembic 与 AlembicPlugin 已完成本轮第一批 stable facade 替换，下一批等待 Core facade 决策。后续可先继续复核 `@alembic/core/config`、`@alembic/core/workspace`、`@alembic/core/search`、`@alembic/core/memory` / `@alembic/core/repositories`、`@alembic/core/knowledge` 已覆盖的 imports；无法替换的 `KnowledgeSyncService`、`SourceRefReconciler`、`ConfidenceRouter`、`EvolutionGateway`、`SimilarityService`、`CapabilityProbe`、`shared/errors`、`shared/schemas`、`developer-identity`、`test-mode`、`types/*` 回填给 Core 下一波做最小 facade 判断。
 
 ### AlembicAgent
 
@@ -122,13 +122,13 @@
 
 ### AlembicPlugin
 
-- 状态：
-- 完成范围：
-- 提交 hash：
-- 验证命令：
-- 验证结果：
-- 遗留风险：
-- 下一步建议：
+- 状态：已完成
+- 完成范围：AlembicPlugin 已将 `@alembic/core/domain/knowledge/FieldSpec`、`UnifiedValidator`、`domain/knowledge/values/*` 替换为稳定 `@alembic/core/knowledge`；将 `MemoryRepositoryImpl` 替换为稳定 `@alembic/core/memory`；将 SourceRef 测试类型断言替换为 `SourceRefRepository` from `@alembic/core/repositories`；将 `recipeDimensionIdOrUnknown` 替换为稳定 `@alembic/core/dimensions`；删除已失效的 `RecipeReadinessChecker` deep mock；收紧 `config/core-import-boundary-allowlist.json`，删除 13 个已替换或已无命中的旧 transitional specifier / limit，更新当前 scan 计数为 507 imports / 79 unique specifiers。
+- 提交 hash：`170f52a407914ebf1d484e269980c40cc6eee90c`
+- 验证命令：`npm run lint:core-import-boundary`；`npm run report:agent-extraction-boundary`；`npm run verify:release-package-boundary`；`npm run verify:codex-plugin`；`npm run smoke:codex-plugin`；`npm run build:check`；`npm run check`；`npm run test:unit -- test/unit/KnowledgeAPI.test.ts test/unit/KnowledgeEntry.test.ts test/unit/RecipeImpactPlanner.test.ts`；`rg -n "@alembic/agent" package.json package-lock.json lib bin config scripts plugins test channels .github`；`rg -n "@alembic/core/(domain/dimension|domain/knowledge/(FieldSpec|RecipeReadinessChecker|UnifiedValidator|values)|repository/memory/MemoryRepository|repository/sourceref/RecipeSourceRefRepository)" lib test bin scripts config`；`git diff --check`
+- 验证结果：Core import boundary 通过，320 files / 507 imports / issue 0，stable-public 360、provisional-public 8、transitional-internal 139；agent extraction boundary 通过，agent / AI / tool boundary imports 全 0；release package boundary 通过，root registry publish disabled，root package private，embedded runtime dependency 保持 `file:vendor/AlembicCore`；Codex plugin verify 通过；Codex plugin smoke 通过，install / stdio / npxRuntime passed；build:check 通过；`npm run check` 退出 0，仍有既有 Biome warning/info；focused unit tests 3 files / 107 tests passed；`@alembic/agent` 负向扫描 0 命中；已替换 deep imports 负向扫描 0 命中；`git diff --check` 通过。
+- 遗留风险：`service/knowledge`、`service/evolution`、`service/candidate`、repository/database implementation constructors、config/shared helper deep paths 仍有 transitional/provisional imports；当前 Core stable facade 尚未覆盖这些 Plugin host wiring contract，不能在 Plugin 单侧强行替换。`runtime.tgz` 未刷新，因为本轮源码 import 收敛未改变 portable runtime artifact 口径，且 verify/smoke 已通过。
+- 下一步建议：等待 AlembicCore Wave 3A closeout inventory / facade 决策后，再按 Core 给出的 stable promotion 或 keep-transitional 判断做下一批 Plugin consumer replacement；继续保持 agent-free、artifact-only release 边界，不恢复 root npm registry publish，不引入 `@alembic/agent`。
 
 ### AlembicDashboard
 
