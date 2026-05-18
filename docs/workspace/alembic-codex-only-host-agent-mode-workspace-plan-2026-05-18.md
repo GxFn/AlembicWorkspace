@@ -2,7 +2,7 @@
 
 日期：2026-05-18
 总控窗口：AlembicWorkspace
-状态：执行中；AlembicDashboard 已完成可见文案收束
+状态：待验收；Alembic、AlembicPlugin、AlembicDashboard 已完成并回填证据
 
 ## 目标
 
@@ -67,8 +67,8 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | 直接删除主包多 IDE Agent 默认 / 支持路径，保留 CLI / daemon / Dashboard / HTTP / internal AI，并让 setup 默认成为无 IDE 交付的数据初始化。 |
-| `AlembicPlugin`<br>待启动 | 把 Codex 插件 cold-start / rescan 主路径切成 Codex 宿主 Agent 线，避免默认推荐或要求 internal AI Provider。 |
+| `Alembic`<br>已完成 | 已删除主包多 IDE Agent 默认 / 支持路径，保留 CLI / daemon / Dashboard / HTTP / internal AI，并让 setup 默认成为无 IDE 交付的数据初始化。 |
+| `AlembicPlugin`<br>已完成 | Codex 插件 cold-start / rescan 主路径已切成 Codex 宿主 Agent 线，避免默认推荐或要求 internal AI Provider。 |
 | `AlembicDashboard`<br>已完成 | 已更新可见文案和帮助页，删除 IDE / Cursor / VSCode / Copilot / Trae / Qoder / Claude Code 项目交付叙述，改成 Codex host agent + Alembic internal AI 两线。 |
 | `AlembicCore`<br>观察中 | 本轮不改 Core；只观察是否有 host-agent contract 阻塞 Plugin 收束。 |
 | `AlembicAgent`<br>观察中 | 本轮不改 Agent；它是 Alembic internal AI 线的执行 runtime。 |
@@ -246,25 +246,28 @@ rg -n "full-ide|alembic-mcp|setup:mcp|install:cursor|install:vscode|build:vscode
 
 ## 可复制分派提示词
 
-发送给：`Alembic`
+发送给：无
 
-`AlembicPlugin`、`AlembicDashboard` 已完成本轮任务并回填证据。
+`Alembic`、`AlembicPlugin`、`AlembicDashboard` 已完成本轮任务并回填证据；当前进入总控验收，不再发送领取提示词。
 
 ```text
-读取 docs/workspace/alembic-codex-only-host-agent-mode-workspace-plan-2026-05-18.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
+当前无可发送执行窗口。
 ```
 
-不发送给：`AlembicCore`、`AlembicAgent`、`BiliDili`。
+不发送给：`Alembic`、`AlembicPlugin`、`AlembicDashboard`、`AlembicCore`、`AlembicAgent`、`BiliDili`。
 
 ## 回填区
 
 ### Alembic
 
-- 状态：待启动
-- 执行记录：待回填
-- 提交 hash：待回填
-- 验证结果：待回填
-- 遗留风险：待回填
+- 状态：已完成
+- 执行记录：`docs/Alembic/alembic-codex-only-internal-ai-main-cleanup-2026-05-18.md`
+- 完成范围：删除 Alembic 主包传统多 IDE Agent 默认 / 支持路径，包括 `FileDeployer` / `FileManifest`、`UpgradeService`、`CursorDeliveryPipeline`、delivery service/repository、外部 cold-start/rescan workflow、`alembic-mcp` bin、通用 IDE MCP server 入口、VSCode extension 资源、Cursor / Claude Code 模板、IDE install/setup scripts、`cursor-rules` / `mirror` / 传统 IDE `upgrade` CLI 和相关单测；`alembic setup` 收束为无 IDE 交付的数据初始化；README、CLI help、status / setup summary 改为 Codex Plugin 外部宿主入口与 Alembic internal AI 入口；`dev:link` / `dev:verify` 不再要求全局 `alembic-mcp`。
+- 提交 hash：`61621b18089898277c6ccee127162b0fd702eec9`
+- 验证结果：`npm run build:check` 通过；`npm run build` 通过，`dist/bin` 仅保留 `cli.js` / `api-server.js` / `daemon-server.js`；`npm run dev:link -- --dry-run --verbose` 通过；`npm run dev:link -- --skip-install --verbose` 通过；`npm run dev:link -- --verbose` 通过，验证全局 `alembic --version` 且不再要求 `alembic-mcp`；`command -v alembic-mcp` 无输出；`npm run dev:verify` 通过；`npm run lint:agent-extraction-boundary` 通过；`npm run lint:core-import-boundary` 通过；`git diff --check` 通过；目标负向扫描 0 命中；package manifest / lockfile 对 `@modelcontextprotocol`、`alembic-mcp`、`mcp-server` 扫描 0 命中；setup smoke 通过且未生成传统编辑器 Agent 目录；本轮修改文件的 `npx biome check --diagnostic-level=error` 通过。
+- 负向扫描剩余命中：Alembic 主仓库目标扫描 0 命中；历史归档文档未纳入本轮删除扫描。
+- 遗留风险：`lib/external/mcp/handlers/**` 与 `lib/external/mcp/tools.ts` 仍保留内部 handler / tool schema 历史目录命名，但已无通用 IDE MCP server、MCP SDK dependency 或 `alembic-mcp` bin；`npm run release:package-guard` 仍因 dev manifest / lockfile 使用 `@alembic/core: file:../AlembicCore` 与 `@alembic/agent: file:../AlembicAgent` 被既有 publish staging guard 阻断；`npm run check` 的 `typecheck` 通过，但 repo-wide Biome lint 仍被既有非空断言 / `any` 旧债阻断。
+- 下一步建议：总控运行跨仓库负向扫描和文档验收；如后续要彻底消除内部 `external/mcp` 命名误读，应单独制定兼容改名计划，不在本轮扩大删除范围。
 
 ### AlembicPlugin
 
@@ -289,5 +292,5 @@ rg -n "full-ide|alembic-mcp|setup:mcp|install:cursor|install:vscode|build:vscode
 
 ### 总控验收
 
-- 状态：待执行窗口回填后验收
-- 结论：待回填
+- 状态：待验收
+- 结论：`Alembic`、`AlembicPlugin`、`AlembicDashboard` 三个执行窗口均已回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议；`AlembicCore`、`AlembicAgent`、`BiliDili` 保持观察且未改源码。下一步由总控运行跨仓库复核命令并决定是否归档。
