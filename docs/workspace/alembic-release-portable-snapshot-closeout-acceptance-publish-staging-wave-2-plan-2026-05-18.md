@@ -20,33 +20,33 @@
 
 工作区状态：
 
-- `AlembicCore`：clean，HEAD `abcf84f chore: add core release readiness guard`
-- `AlembicAgent`：clean，HEAD `019022b Guard agent package release manifest`
-- `Alembic`：clean，HEAD `9813101 chore: guard main release package boundary`
+- `AlembicCore`：clean，HEAD `9174c51 chore: add core release workflow`
+- `AlembicAgent`：clean，HEAD `f9d020f Add agent publish staging preview`
+- `Alembic`：clean，HEAD `7f68d43 chore: stage alembic npm publish package`
 - `AlembicPlugin`：clean，HEAD `6883aff chore: disable root registry publish for plugin release`
 - `AlembicPlugin/plugins/alembic-codex`：clean，HEAD `dbbeb3a build: make codex runtime artifact-only`
+- `AlembicDashboard`：clean，HEAD `7143a7c Remove skills recommendation UI`
+- `BiliDili`：clean，HEAD `40f9754 更新 agents.md`
 
 总控实际运行命令：
 
 | 窗口 | 命令 | 结果 |
 | --- | --- | --- |
-| `AlembicCore` | `npm run release:check` | 通过；`@alembic/core@0.1.0`，source commit `abcf84f27d23cae0fbefbb4d7a327f5aae7f1caf`，pack entries 716，working tree dirty `no`。 |
-| `AlembicAgent` | `npm run release:package-guard` | 预期失败；阻断 `package.json` 与 root lockfile 中的 `@alembic/core=file:../AlembicCore`。 |
-| `AlembicAgent` | `npm run smoke:public-imports` | 通过；15 public subpaths imported。 |
-| `Alembic` | `npm run release:package-guard` | 预期失败；阻断 `@alembic/agent=file:../AlembicAgent`、`@alembic/core=file:../AlembicCore`、lockfile local links 和 `alembic-ai` 包名归属未确认。 |
-| `Alembic` | workflow YAML parse | 通过；`.github/workflows/ci.yml` 和 `.github/workflows/release.yml` 可解析。 |
+| Workspace | `node scripts/collect-repo-status.mjs` | 通过；`AlembicCore`、`AlembicAgent`、`Alembic`、`AlembicPlugin` 均 clean；`AlembicDashboard` clean 观察；`BiliDili` clean 无任务。 |
+| Workspace | `node scripts/verify-workspace-docs.mjs` | 通过；当前总控文档、索引、必备章节和 66 个 Markdown 链接可解析。 |
+| Workspace | `node scripts/check-dispatch-coverage.mjs` | 通过；发送名单为空，已完成/观察/无任务窗口均不再发送提示词。 |
+| `AlembicCore` | `npm run release:check` | 通过；`@alembic/core@0.1.0`，source commit `9174c5173a7313b916b89b7c605ea2afdd874269`，pack entries 717，working tree dirty `no`。 |
+| `AlembicAgent` | `npm run release:pack-preview` | 通过；staging package `@alembic/agent@0.1.0`，`@alembic/core` registry dependency `0.1.0`，Core source commit `9174c5173a7313b916b89b7c605ea2afdd874269`，Agent source commit `f9d020f9ebaf95499bbd6e9afbdecafa0615a865`，entryCount 407，`agentWorkingTreeDirty: false`。 |
+| `AlembicAgent` | `npm run release:package-guard` | 预期失败；阻断 root dev manifest / lockfile 中的 `@alembic/core=file:../AlembicCore`，提示应使用 staged publish package。 |
+| `Alembic` | `npm run release:staging:pack` | 通过；staging package `alembic-ai@0.1.0`，registry dependencies `@alembic/core@0.1.0` / `@alembic/agent@0.1.0`，source commits Core `9174c5173a7313b916b89b7c605ea2afdd874269`、Agent `f9d020f9ebaf95499bbd6e9afbdecafa0615a865`，entryCount 525。 |
+| `Alembic` | `npm run release:package-guard` | 预期失败；阻断 root dev package / lockfile 中的 `file:../AlembicCore` 和 `file:../AlembicAgent`，确认 dev root 不能直接 publish。 |
 | `AlembicPlugin` | `npm run verify:release-package-boundary` | 通过；root registry publish 为 disabled，embedded runtime dependency 为 `file:vendor/AlembicCore`，embedded Core source 为 `9174c5173a7313b916b89b7c605ea2afdd874269`。 |
 | `AlembicPlugin` | `node scripts/verify-release-package-boundary.mjs --publish` | 预期失败；明确阻断 AlembicPlugin root registry publication，只允许 Codex plugin artifact / portable runtime artifact 链路。 |
-| `AlembicPlugin` | `npm run verify:codex-plugin` | 通过；`./runtime.tgz -> alembic-ai@0.1.2`。 |
-| `AlembicPlugin` | `npm run verify:codex-channel` | 通过；channel package registry 为 `portable-artifact`，artifact 指向 `plugins/alembic-codex/runtime.tgz`。 |
-| `AlembicPlugin` | `npm run smoke:codex-plugin` | 通过；install / stdio / npxRuntime 均 passed。 |
-| `AlembicPlugin` | workflow YAML parse | 通过；`.github/workflows/ci.yml` 和 `.github/workflows/release.yml` 可解析。 |
-| `AlembicPlugin` | root publish / fallback / Agent package negative scan | 通过；root publish 命令、全局 `alembic-ai` fallback、`npm view alembic-ai`、`dist-tags`、`@alembic/agent`、旧 publish 脚本名均 0 命中。 |
-| 跨仓库 | release boundary `rg` scan | 通过；`file:../...` 只保留在 root dev package/lockfile 并被 hard gate 捕获；`file:vendor/AlembicCore` 只保留在 Plugin embedded runtime 允许例外中。 |
+| `AlembicPlugin` | package/channel/workflow `rg` scan | 通过；root `package.json` 为 private；`prepublishOnly` 指向 disabled guard；channel registry 为 `portable-artifact`；embedded runtime 保留 `@alembic/core: file:vendor/AlembicCore` 和 source metadata；未发现 `@alembic/agent` package dependency。 |
 
 总控修正：
 
-- `docs/AlembicAgent/alembic-agent-release-package-boundary-2026-05-18.md` 中的 Core baseline 已从旧 `b904b66907e16e61f29a6dc0eeedc59231ddfb53` 修正为当前验收基线 `abcf84f27d23cae0fbefbb4d7a327f5aae7f1caf`。
+- 本次复验发现并修正了本节旧 release-boundary 复验记录中的过期 HEAD / 旧 gate 结果；下方 Wave 2 回填区和窗口分派表已保持当前 `9174c51` / `f9d020f` / `7f68d43` / `6883aff` 口径。
 
 ## 架构判断
 

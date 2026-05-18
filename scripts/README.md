@@ -22,6 +22,9 @@ Current scripts:
 - `check-dispatch-coverage.mjs`: verifies that the current control plan covers
   every expected window and that the declared copyable prompt send list matches
   task statuses.
+- `archive-workspace-docs.mjs`: dry-run by default; moves completed workspace
+  control documents into `docs/workspace/archive/YYYY-MM/<topic>/` and rewrites
+  index links only when `--apply` is provided.
 
 Suggested pre-acceptance sequence:
 
@@ -30,4 +33,10 @@ node scripts/check-workspace-boundary.mjs
 node scripts/collect-repo-status.mjs
 node scripts/verify-workspace-docs.mjs
 node scripts/check-dispatch-coverage.mjs
+```
+
+Archive dry-run example:
+
+```bash
+node scripts/archive-workspace-docs.mjs --topic interface-boundary --file docs/workspace/example-completed-plan.md
 ```
