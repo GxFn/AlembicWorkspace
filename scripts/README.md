@@ -23,8 +23,10 @@ Current scripts:
   every expected window and that the declared copyable prompt send list matches
   task statuses.
 - `archive-workspace-docs.mjs`: dry-run by default; moves completed workspace
-  control documents into `docs/workspace/archive/YYYY-MM/<topic>/` and rewrites
-  index links only when `--apply` is provided.
+  control documents into `docs/workspace/archive/YYYY-MM/<topic>/`, rewrites
+  index links, removes archived rows from the current index table, and adds a
+  compact archive summary entry only when `--apply` is provided. Use
+  `--keep-index-rows` only when a historical row must remain visible.
 
 Suggested pre-acceptance sequence:
 
@@ -39,4 +41,10 @@ Archive dry-run example:
 
 ```bash
 node scripts/archive-workspace-docs.mjs --topic interface-boundary --file docs/workspace/example-completed-plan.md
+```
+
+Index-only pruning example:
+
+```bash
+node scripts/archive-workspace-docs.mjs --prune-index-only --apply
 ```

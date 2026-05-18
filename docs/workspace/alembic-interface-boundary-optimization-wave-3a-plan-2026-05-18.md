@@ -88,6 +88,33 @@
 读取 docs/workspace/alembic-interface-boundary-optimization-wave-3a-plan-2026-05-18.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
 ```
 
+## 总控复验
+
+日期：2026-05-18
+结论：通过。Wave 3A 四个任务窗口均已完成，当前不再发送执行提示词。
+
+复验命令：
+
+- Workspace：`node scripts/verify-workspace-docs.mjs --all-workspace`；`node scripts/check-dispatch-coverage.mjs`；`node scripts/check-workspace-boundary.mjs`；`node scripts/collect-repo-status.mjs`
+- AlembicCore：`npm run lint:public-api-boundary`；`npm run report:public-api-closeout`；`npm run smoke:public-api`
+- AlembicAgent：`npm run lint:public-api-boundary`；`npm run smoke:public-imports`
+- Alembic：`npm run lint:core-import-boundary`；`npm run lint:agent-extraction-boundary`；`rg -n '@alembic/core/domain/dimension' lib test bin scripts config -g '*.ts' -g '*.js' -g '*.mjs' -g '*.json'`
+- AlembicPlugin：`npm run lint:core-import-boundary`；`npm run report:agent-extraction-boundary`；`npm run verify:release-package-boundary`；`rg -n '@alembic/agent' package.json package-lock.json lib bin config scripts plugins test channels .github`；`rg -n '@alembic/core/(domain/dimension|domain/knowledge/(FieldSpec|RecipeReadinessChecker|UnifiedValidator|values)|repository/memory/MemoryRepository|repository/sourceref/RecipeSourceRefRepository)' lib test bin scripts config`
+
+复验结果：
+
+- Workspace 文档、分派覆盖和工作空间边界均通过；当前计划为本文；发送提示词名单为空。
+- 六个仓库工作区均干净：`Alembic` `6dc3a875c2ef`、`AlembicCore` `4679f004c923`、`AlembicAgent` `b541c9eaa342`、`AlembicPlugin` `170f52a40791`、`AlembicDashboard` `7143a7ca610a`、`BiliDili` `40f97542c9c5`。
+- Core public API no-growth gate 通过：136 exports，75 exact / 61 wildcard，stable 17 / provisional 21 / transitional 98；closeout inventory 为 98 exports，分类保持 0 / 18 / 21 / 46 / 13。
+- Agent public surface 通过：15 exact exports / 0 wildcard；public smoke imported 15 public subpaths，并拒绝 5 个 forbidden subpaths。
+- Alembic Core consumer boundary 通过：455 files / 598 imports / issue 0；Agent extraction boundary 通过，local Agent duplicate、generic Tool V2 duplicate、terminal duplicate 均为 0；旧 dimension deep import 负向扫描 0 命中。
+- AlembicPlugin Core consumer boundary 通过：320 files / 507 imports / issue 0；agent extraction report 中 agent / AI / tool boundary imports 全 0；release package boundary 仍为 artifact-only，root registry publish disabled，embedded runtime dependency 保持 `file:vendor/AlembicCore`；`@alembic/agent` 和已替换 Core deep import 负向扫描均 0 命中。
+
+总控判断：
+
+- 本轮达到验收标准：Core 有可复现 closeout inventory 和 no-growth gate；Agent public contract 有 matrix 和 negative gate；Alembic / Plugin 都减少了至少一批可安全替换的 Core transitional consumer imports，并保持各自禁止边界不回退。
+- 剩余工作不是本轮未完成项，而是下一波输入：`service/knowledge`、`service/evolution`、`service/candidate`、repository/database constructors、config/shared helpers 等仍需要 Core 决定稳定 facade、provisional keep 或 transitional keep。
+
 ## 回填区
 
 ### AlembicCore
@@ -133,7 +160,7 @@
 ### AlembicDashboard
 
 - 状态：观察中
-- 观察结论：
+- 观察结论：本轮没有 Alembic / AlembicPlugin API client 或 Dashboard build source 变更要求；总控未发现需要 Dashboard 执行的实际任务，保持观察，不发送提示词。
 
 ### BiliDili
 

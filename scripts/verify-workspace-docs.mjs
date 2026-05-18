@@ -8,6 +8,7 @@ const indexPath = path.join(workspaceRoot, "docs/workspace/index.md");
 const args = process.argv.slice(2);
 const json = args.includes("--json");
 const allWorkspace = args.includes("--all-workspace");
+const validStatuses = ["待启动", "执行中", "待验收", "阻塞", "已完成", "暂停", "观察中", "无任务"];
 
 function getArgValue(name) {
   const eq = args.find((arg) => arg.startsWith(`${name}=`));
@@ -167,14 +168,30 @@ function parseDispatchRows(planContent) {
   const rows = [];
   for (const line of dispatch.split("\n")) {
     const cells = splitMarkdownRow(line);
-    if (cells.length < 8 || cells[0] === "窗口" || cells[0].startsWith("---")) {
+    if (
+      cells.length < 2 ||
+      cells[0] === "窗口" ||
+      cells[0] === "窗口 / 状态" ||
+      cells[0].startsWith("---")
+    ) {
       continue;
     }
+
+    if (cells.length === 2) {
+      rows.push({
+        window: cells[0].match(/`([^`]+)`/)?.[1] ?? cells[0].replace(/<br\s*\/?>/gi, " ").trim(),
+        status: validStatuses.find((candidate) => cells[0].includes(candidate)) ?? "",
+        docAction: "",
+        savePath: "",
+      });
+      continue;
+    }
+
     rows.push({
       window: cells[0].replaceAll("`", ""),
       status: cells[1],
-      docAction: cells[3],
-      savePath: cells[4].replaceAll("`", ""),
+      docAction: cells[3] ?? "",
+      savePath: (cells[4] ?? "").replaceAll("`", ""),
     });
   }
   return rows;

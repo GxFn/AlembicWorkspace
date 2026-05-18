@@ -14,9 +14,9 @@ const requiredWindows = [
   "BiliDili",
 ];
 const validStatuses = new Set(["待启动", "执行中", "待验收", "阻塞", "已完成", "暂停", "观察中", "无任务"]);
-const sendEligibleStatuses = new Set(["待启动", "执行中", "待验收"]);
+const sendEligibleStatuses = new Set(["待启动", "执行中"]);
 const blockedStatus = "阻塞";
-const noSendStatuses = new Set(["已完成", "暂停", "观察中", "无任务"]);
+const noSendStatuses = new Set(["待验收", "已完成", "暂停", "观察中", "无任务"]);
 
 const args = process.argv.slice(2);
 const json = args.includes("--json");
@@ -92,15 +92,35 @@ function parseDispatchRows(content) {
   const rows = [];
   for (const line of dispatchSection.split("\n")) {
     const cells = splitMarkdownRow(line);
-    if (cells.length < 6 || cells[0] === "窗口" || cells[0].startsWith("---")) {
+    if (
+      cells.length < 2 ||
+      cells[0] === "窗口" ||
+      cells[0] === "窗口 / 状态" ||
+      cells[0].startsWith("---")
+    ) {
       continue;
     }
+
+    if (cells.length === 2) {
+      const window = cells[0].match(/`([^`]+)`/)?.[1] ?? cells[0].replace(/<br\s*\/?>/gi, " ").trim();
+      const status = [...validStatuses].find((candidate) => cells[0].includes(candidate)) ?? "";
+      rows.push({
+        window,
+        status,
+        task: cells[1],
+        docAction: "",
+        savePath: "",
+        raw: cells,
+      });
+      continue;
+    }
+
     rows.push({
       window: cells[0].replaceAll("`", ""),
       status: cells[1],
       task: cells[2],
-      docAction: cells[3],
-      savePath: cells[4],
+      docAction: cells[3] ?? "",
+      savePath: cells[4] ?? "",
       raw: cells,
     });
   }

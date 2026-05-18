@@ -7,11 +7,14 @@
 
 保持 `docs/workspace/` 可持续：当前计划和近期入口容易读取，已完成的历史 wave 可以稳定归档，不因手动移动导致链接断裂或当前入口丢失。
 
+归档同时要控制 `docs/workspace/index.md` 体积：当前总控入口只保留当前计划、近期正在执行/待验收的入口、长期规则/模板和必要的近期背景。已归档的历史文档不继续逐条堆在当前总表里，而是压缩到归档摘要入口。
+
 ## 目录规则
 
 - `docs/workspace/index.md` 永远留在原位，是唯一总控入口。
 - 当前正在执行的总控文档留在 `docs/workspace/` 根层级。
 - 刚完成且后续仍可能马上回看的总控文档可以短期留在 `docs/workspace/` 根层级。
+- `docs/workspace/index.md` 的“当前总控入口”不做完整历史清单；归档后的历史入口只保留在“历史归档摘要”中。
 - 已完成且不再作为当前入口的历史总控文档归档到：
 
 ```text
@@ -55,7 +58,7 @@ docs/workspace/archive/YYYY-MM/<topic>/
 node scripts/archive-workspace-docs.mjs --topic interface-boundary --file docs/workspace/alembic-core-agent-interface-boundary-wave-2c-optimized-plan-2026-05-18.md
 ```
 
-真正移动文件：
+真正移动文件并压缩 `docs/workspace/index.md`：
 
 ```bash
 node scripts/archive-workspace-docs.mjs --topic interface-boundary --file docs/workspace/alembic-core-agent-interface-boundary-wave-2c-optimized-plan-2026-05-18.md --apply
@@ -70,6 +73,23 @@ node scripts/archive-workspace-docs.mjs \
   --file docs/workspace/alembic-agent-cutover-plugin-cleanup-wave-4-deletion-plan-2026-05-17.md \
   --apply
 ```
+
+默认行为：
+
+- 移动 `--file` 指定的 workspace 文档到归档目录。
+- 重写还需要保留的 Markdown 链接。
+- 从 `docs/workspace/index.md` 的“当前总控入口”移除这些归档文档对应的逐条历史行。
+- 在 `docs/workspace/index.md` 的“历史归档摘要”保留 topic 级目录入口。
+
+如确实需要保留逐条历史行，可追加 `--keep-index-rows`，但默认不建议使用。
+
+只压缩已经归档过的旧索引行、不移动文件：
+
+```bash
+node scripts/archive-workspace-docs.mjs --prune-index-only --apply
+```
+
+该命令会从“当前总控入口”移除已指向 `archive/` 的历史行，并在“历史归档摘要”保留 topic 级目录入口。
 
 归档后必须运行：
 
