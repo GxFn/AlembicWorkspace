@@ -74,7 +74,7 @@
 | 窗口 | 状态 | 任务 | 文档动作 | 保存位置 | 挂载入口 | 回填位置 | 验证命令 | 阻塞/依赖 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `AlembicCore` | 已完成 | 已补齐 `@alembic/core` release workflow / playbook：保留 `release:check`；新增 `workflow_dispatch` dry-run release staging 与 `v*` tag publish 入口；记录 source commit、pack contents、npm provenance / registry 前置条件；`RELEASE-PLAYBOOK.md` 已进入 pack contents。 | 已新建 | `docs/AlembicCore/alembic-core-release-workflow-wave-2-2026-05-18.md` | 本文“窗口分派” | 本文“回填区 / AlembicCore” | `npm run check`；`npm run build`；`npm run smoke:public-api`；`npm run release:check`；workflow YAML parse；`npm --cache <writable-temp-cache> pack --dry-run --json` | 已提交 `9174c5173a7313b916b89b7c605ea2afdd874269`；真实 npm publish 仍依赖 `NPM_TOKEN`、OIDC provenance 和 registry 权限。 |
-| `AlembicAgent` | 待启动 | 新增 Agent publish staging manifest / pack preview。开发 `package.json` 继续 `@alembic/core: file:../AlembicCore`；staging manifest 必须替换为 registry `@alembic/core` 版本并记录 Core source commit；root `prepack` hard gate 继续保留，不能为了 staging 破坏日常 dev manifest。 | 新建 | `docs/AlembicAgent/alembic-agent-publish-staging-wave-2-2026-05-18.md` | 本文“窗口分派” | 本文“回填区 / AlembicAgent” | `npm run check`；`npm run smoke:public-imports`；`npm run release:package-guard` 预期失败；新增 staging pack/verify 命令通过；`npm pack --dry-run` 在 staging 目录通过 | 依赖 Core release baseline；不得复制 Core 源码进 Agent。 |
+| `AlembicAgent` | 已完成 | 已新增 Agent publish staging manifest / pack preview。开发 `package.json` 继续 `@alembic/core: file:../AlembicCore`；staging manifest 使用 registry `@alembic/core@0.1.0`，并记录 Core source commit；root `prepack` hard gate 继续保留。 | 已新建 | `docs/AlembicAgent/alembic-agent-publish-staging-wave-2-2026-05-18.md` | 本文“窗口分派” | 本文“回填区 / AlembicAgent” | `npm run check`；`npm run smoke:public-imports`；`npm run release:package-guard` 预期失败；`npm run release:pack-preview`；`npm --cache tmp/npm-cache pack --dry-run` 预期失败 | 已提交 `f9d020f9ebaf95499bbd6e9afbdecafa0615a865`；真实 publish 仍依赖 registry 权限、版本唯一性和后续 release workflow/orchestration。 |
 | `Alembic` | 待启动 | 作为 `alembic-ai` owner，新增/调整 publish staging manifest / pack preview。开发 `package.json` 继续 local-source-first；staging manifest 必须使用 registry `@alembic/core` 与 `@alembic/agent`，并记录 Core / Agent source commits；release workflow 应发布 staging package，而不是 dev root。 | 新建 | `docs/Alembic/alembic-ai-publish-staging-wave-2-2026-05-18.md` | 本文“窗口分派” | 本文“回填区 / Alembic” | `npm run build:check`；`npm run check` 或范围内等价命令；`npm run release:package-guard` 预期失败；新增 staging pack/verify 命令通过；workflow YAML parse；`npm pack --dry-run` 在 staging 目录通过 | 依赖 Core / Agent release baseline；不得改回 vendor 日常入口。 |
 | `AlembicPlugin` | 待启动 | 退出 root npm registry publish 链路，改为只产出 Codex 插件产物和 portable runtime artifact。移除或禁用 release workflow 的 root `npm publish`；更新 `prepublishOnly`、release playbook 和 package boundary 文案，明确 `runtime.tgz` 是插件 artifact，不是 registry npm package。embedded runtime 继续 `file:vendor/AlembicCore` 且 source metadata 必须保留。 | 新建 | `docs/AlembicPlugin/alembic-plugin-artifact-release-no-npm-wave-2-2026-05-18.md` | 本文“窗口分派” | 本文“回填区 / AlembicPlugin” | `npm run build:check`；`npm run prepare:codex-plugin-runtime`；`npm run verify:codex-plugin`；`npm run verify:release-package-boundary`；`npm run smoke:codex-plugin` 按范围运行；workflow YAML parse；负向扫描 root `npm publish` | 不得删除 embedded `vendor/AlembicCore` 例外，不得重新引入 `@alembic/agent`，不得发布 root npm package。 |
 | `AlembicDashboard` | 观察中 | 本轮不改 Dashboard 源码，只作为 Alembic / AlembicPlugin release workflow sibling build source。 | 无需新建 | 无 | 本文“窗口分派” | 本文“回填区 / AlembicDashboard” | 无 | 若外层 workflow 发现 Dashboard build source 需要调整，再追加任务。 |
@@ -91,9 +91,9 @@
 
 ## 可复制提示词
 
-发送给：`AlembicAgent`、`Alembic`、`AlembicPlugin`
+发送给：`Alembic`、`AlembicPlugin`
 
-已完成且当前不再发送：`AlembicCore`
+已完成且当前不再发送：`AlembicCore`、`AlembicAgent`
 
 ```text
 读取 docs/workspace/alembic-release-portable-snapshot-closeout-acceptance-publish-staging-wave-2-plan-2026-05-18.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
@@ -115,13 +115,13 @@
 
 ### AlembicAgent
 
-- 状态：
-- 完成范围：
-- 提交 hash：
-- 验证命令：
-- 验证结果：
-- 遗留风险：
-- 下一步建议：
+- 状态：已完成
+- 完成范围：新增 `scripts/stage-agent-publish-package.mjs`，生成 `tmp/release/@alembic-agent` publish staging package；根 `package.json` 继续保留 `@alembic/core: file:../AlembicCore` 日常开发入口和 root `prepack` hard gate；staging manifest 将 `@alembic/core` 替换为 registry specifier `0.1.0`，并在 staging `package.json` 的 `alembicRelease` 字段和 `.alembic-source.json` 中记录 Agent / Core source commit；新增 `release:stage` / `release:pack-preview`；补 `README.md` 说明 package 范围和 staging 入口。未复制 Core 源码，未修改其它仓库。
+- 提交 hash：`f9d020f9ebaf95499bbd6e9afbdecafa0615a865`（`Add agent publish staging preview`）
+- 验证命令：`npm run release:pack-preview`；`npm run release:package-guard`；`npm --cache tmp/npm-cache pack --dry-run`；`npm run check`；`npm run smoke:public-imports`；`git diff --check`；`git status --short`
+- 验证结果：`npm run release:pack-preview` 通过，staging package `@alembic/agent@0.1.0` pack entries 407，`@alembic/core` registry dependency 为 `0.1.0`，Core source commit `9174c5173a7313b916b89b7c605ea2afdd874269`，提交后 Agent source commit `f9d020f9ebaf95499bbd6e9afbdecafa0615a865` 且 `agentWorkingTreeDirty: false`；`npm run release:package-guard` 预期失败并阻断 root `file:../AlembicCore`；`npm --cache tmp/npm-cache pack --dry-run` 预期失败并触发 root `prepack` hard gate；`npm run check` 通过，9 test files / 37 tests，Biome 仍显示 23 条既有 warning；`npm run smoke:public-imports` 通过，15 public subpaths imported；`git diff --check` 通过；Agent 工作区干净。
+- 遗留风险：本轮没有真实 npm publish；真实发布仍依赖 `@alembic/core@0.1.0` registry 可用、`@alembic/agent` 包权限、版本唯一性、npm token/OIDC provenance 和后续 release workflow/orchestration。当前版本仍为 `0.1.0`，若 registry 已有同版本，发布前需要升版本。`release:pack-preview` 要求相邻 Core 工作区干净，否则会阻断以避免记录不精确的 Core source commit。
+- 下一步建议：`Alembic` 窗口可消费 Agent staging baseline，生成 `alembic-ai` staging manifest 并记录 Core / Agent source commits；后续如要从 preview 升级为真实发布，在 AlembicAgent 增加 release workflow 或由上游 release orchestration 调用 staging package。
 
 ### Alembic
 
