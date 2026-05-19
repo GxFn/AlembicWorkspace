@@ -1,7 +1,7 @@
 # Alembic Multi Project Control Wave 1 Runtime Control Foundation Plan
 
 日期：2026-05-18
-状态：阶段 1 待启动
+状态：阶段 1 已完成，已验收
 维护窗口：AlembicWorkspace
 
 ## 目标
@@ -13,16 +13,16 @@
 ## 上游依据
 
 - 目标阶段确认：[alembic-multi-project-control-redesign-goal-stage-confirmation-2026-05-18.md](alembic-multi-project-control-redesign-goal-stage-confirmation-2026-05-18.md)
-- 需求设计：[../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md](../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md)
-- 代码实现依赖调研：[../requirement-designs/alembic-multi-project-control-redesign/code-implementation-dependency-research-2026-05-18.md](../requirement-designs/alembic-multi-project-control-redesign/code-implementation-dependency-research-2026-05-18.md)
-- Alembic 执行回填文档：[../Alembic/alembic-multi-project-control-wave-1-runtime-control-foundation-2026-05-18.md](../Alembic/alembic-multi-project-control-wave-1-runtime-control-foundation-2026-05-18.md)
+- 需求设计：[../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md](../../../../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md)
+- 代码实现依赖调研：[../requirement-designs/alembic-multi-project-control-redesign/code-implementation-dependency-research-2026-05-18.md](../../../../requirement-designs/alembic-multi-project-control-redesign/code-implementation-dependency-research-2026-05-18.md)
+- Alembic 执行回填文档：[../Alembic/alembic-multi-project-control-wave-1-runtime-control-foundation-2026-05-18.md](../../../../Alembic/alembic-multi-project-control-wave-1-runtime-control-foundation-2026-05-18.md)
 
 ## 窗口分派
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | 领取并完成 Wave 1：实现 Project Runtime Control Foundation、只读 projects summary / inspect 起点、selected / active state 基础和真实 runtime scope 聚合。 |
-| `AlembicCore`<br>阻塞 | 等待 Alembic Wave 1 给出真实字段和 scope 模型后再沉淀 Core contract；当前不发送。 |
+| `Alembic`<br>已完成 | 已完成 Wave 1 并通过总控功能完整性验收。 |
+| `AlembicCore`<br>阻塞 | 等待 Wave 2 执行计划启动后沉淀 Core contract；当前不在本计划发送。 |
 | `AlembicPlugin`<br>阻塞 | 等待 Alembic projects API / selected state contract 后再处理 hostProject mismatch；当前不发送。 |
 | `AlembicDashboard`<br>阻塞 | 等待 Alembic projects API / handoff 字段后再做项目列表和切换；当前不发送。 |
 | `AlembicAgent`<br>观察中 | 当前无执行任务；只在 Alembic 发现 internal AI projectRoot / dataRoot 隔离缺口时参与。 |
@@ -89,33 +89,59 @@ npm run test -- --runInBand
 - 是否避免 Core 空 contract 和下游提前消费。
 - selected / active state 是否独立于 per-project dataRoot，且不会污染任一项目。
 - jobs、file monitor、internal AI 和 Dashboard handoff 是否被纳入 scope 设计。
+- 功能完整性检查：必须能通过真实 CLI 或 HTTP API 入口查看真实 registry 项目 summary / inspect / status-all；summary 必须来自真实 resolver / daemon state / workspace facts，而不是静态数据或只改类型；如果只有 service 雏形但没有用户或下游可调用入口，不能验收为完成。
+- 如果 Alembic 只做了最小连接或内部类型雏形，必须补一轮非最小完整实现：补齐 CLI / HTTP 真实入口、真实 registry / daemon 数据、状态变化、可执行验证和后续消费字段后，再允许 Core / Plugin / Dashboard 进入下游。
 
 ## 可复制提示词
 
-发送给：`Alembic`
+发送给：无
 
 ```text
 读取 docs/workspace/alembic-multi-project-control-wave-1-runtime-control-foundation-plan-2026-05-18.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
 ```
 
-不发送给：`AlembicCore`、`AlembicPlugin`、`AlembicDashboard`、`AlembicAgent`、`BiliDili`。
+不发送给：`Alembic`（已完成）、`AlembicCore`（阻塞）、`AlembicPlugin`（阻塞）、`AlembicDashboard`（阻塞）、`AlembicAgent`（观察中）、`BiliDili`（无任务）。
 
 ## 回填区
 
 ### Alembic
 
-- 状态：待启动
-- 执行文档：[../Alembic/alembic-multi-project-control-wave-1-runtime-control-foundation-2026-05-18.md](../Alembic/alembic-multi-project-control-wave-1-runtime-control-foundation-2026-05-18.md)
+- 状态：已完成
+- 执行文档：[../Alembic/alembic-multi-project-control-wave-1-runtime-control-foundation-2026-05-18.md](../../../../Alembic/alembic-multi-project-control-wave-1-runtime-control-foundation-2026-05-18.md)
 - 完成范围：
-- 提交 hash：
+  - 新增 `ProjectRuntimeControl` repo-local foundation，基于 Core registry / resolver、daemon paths、Alembic `DaemonSupervisor.status()`、daemon health、job files 和 workspace AI settings 聚合真实 project runtime scope summary。
+  - 新增 `/api/v1/projects` HTTP route，覆盖 list / status-all / current / inspect / select / clear selected state。
+  - 新增 `alembic projects list/status/inspect/current/select/clear` CLI 命令组，作为 `ghost list` 之外的多项目 control plane 起点。
+  - selected state 持久化到全局 registry 目录 `runtime-control.json`，不写入任一项目 dataRoot；active runtime project 从 selected project 的真实 daemon ready 状态派生。
+- 提交 hash：`5802057e99e87a6b3fc0282fc59bfc7eb0bfd175`
 - 验证命令：
+  - `npm run build:check`
+  - `npm run test -- test/unit/ProjectRuntimeControl.test.ts test/unit/DaemonSupervisor.test.ts test/unit/JobStore.test.ts`
+  - `npm run test:unit -- test/unit/ProjectRuntimeControl.test.ts test/unit/DaemonSupervisor.test.ts test/unit/JobStore.test.ts`
+  - `npm run lint:consumer-core-imports`
+  - `npx biome check --diagnostic-level=error lib/daemon/ProjectRuntimeControl.ts lib/http/routes/projects.ts lib/http/HttpServer.ts bin/cli.ts test/unit/ProjectRuntimeControl.test.ts`
+  - `git -C Alembic diff --check`
+  - `git -C Alembic diff --check HEAD~1..HEAD`
 - 验证结果：
+  - `npm run build:check`：通过。
+  - `npm run test -- test/unit/ProjectRuntimeControl.test.ts test/unit/DaemonSupervisor.test.ts test/unit/JobStore.test.ts`：通过，3 个测试文件、12 个测试通过。
+  - `npm run test:unit -- test/unit/ProjectRuntimeControl.test.ts test/unit/DaemonSupervisor.test.ts test/unit/JobStore.test.ts`：通过，3 个测试文件、12 个测试通过。
+  - `npm run lint:consumer-core-imports`：通过，扫描 419 个文件、562 个 `@alembic/core` imports。
+  - `npx biome check --diagnostic-level=error ...`：通过。
+  - `git -C Alembic diff --check`：通过。
+  - `git -C Alembic diff --check HEAD~1..HEAD`：通过。
 - 遗留风险：
+  - 本波不实现 start / stop / open-dashboard / switch orchestration；`select` 只更新全局 selected state，不启动或停止 daemon。
+  - active runtime project 当前为 derived state：只有 selected project 的真实 daemon ready 时才标记 active。
+  - jobs summary 为只读文件扫描，避免 status-all 为缺失项目创建 job 目录；后续 job 控制必须在目标项目 runtime scope 内显式执行。
 - 建议下一步：
+  - 总控先验收 Alembic fields / scope 模型；通过后可启动 AlembicCore 沉淀 `ProjectRuntimeTarget`、`ProjectConnectionState`、`ProjectRuntimeScopeSummary`、`ProjectRuntimeControlState`。
+  - 下一波 Alembic 可补 start / stop / open-dashboard / handoff 编排，并保持“不在同一 ServiceContainer 内切项目”的边界。
+  - Plugin / Dashboard 继续等待 Core contract 或 Alembic API 稳定；当前未发现 Agent 需要提前介入的 internal AI 隔离缺口。
 
 ### 总控验收
 
-- 状态：未验收
-- 验收时间：
-- 验收结论：
-- 下一波建议：
+- 状态：已通过
+- 验收时间：2026-05-19
+- 验收结论：通过；未发现最小实现，功能完整性检查通过。总控补跑 `build:check`、focused tests、core import lint、`npm run build` 和临时 `ALEMBIC_HOME` CLI smoke 均通过。
+- 下一波建议：启动 Wave 2 `AlembicCore` contract sedimentation。

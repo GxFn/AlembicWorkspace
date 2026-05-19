@@ -13,9 +13,9 @@
 
 ## 原始计划书
 
-- 需求目录：[../requirement-designs/alembic-multi-project-control-redesign/](../requirement-designs/alembic-multi-project-control-redesign/)
-- 原始计划书：[../requirement-designs/alembic-multi-project-control-redesign/original-plan-2026-05-18.md](../requirement-designs/alembic-multi-project-control-redesign/original-plan-2026-05-18.md)
-- 需求设计文档：[../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md](../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md)
+- 需求目录：[../requirement-designs/alembic-multi-project-control-redesign/](../../../../requirement-designs/alembic-multi-project-control-redesign/)
+- 原始计划书：[../requirement-designs/alembic-multi-project-control-redesign/original-plan-2026-05-18.md](../../../../requirement-designs/alembic-multi-project-control-redesign/original-plan-2026-05-18.md)
+- 需求设计文档：[../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md](../../../../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md)
 - 目标阶段确认：[alembic-multi-project-control-redesign-goal-stage-confirmation-2026-05-18.md](alembic-multi-project-control-redesign-goal-stage-confirmation-2026-05-18.md)
 - 当前状态：已确认，需求设计完成，等待目标阶段确认
 

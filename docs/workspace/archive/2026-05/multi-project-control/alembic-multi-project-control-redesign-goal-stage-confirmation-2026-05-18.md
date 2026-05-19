@@ -14,10 +14,10 @@ Codex 插件作为入口，AlembicPlugin 从 Codex host agent 当前项目上下
 
 ## 前置文档
 
-- 原始计划书：[../requirement-designs/alembic-multi-project-control-redesign/original-plan-2026-05-18.md](../requirement-designs/alembic-multi-project-control-redesign/original-plan-2026-05-18.md)
-- 需求设计文档：[../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md](../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md)
-- 底层能力依赖调研：[../requirement-designs/alembic-multi-project-control-redesign/bottom-capability-dependency-research-2026-05-18.md](../requirement-designs/alembic-multi-project-control-redesign/bottom-capability-dependency-research-2026-05-18.md)
-- 代码实现依赖调研：[../requirement-designs/alembic-multi-project-control-redesign/code-implementation-dependency-research-2026-05-18.md](../requirement-designs/alembic-multi-project-control-redesign/code-implementation-dependency-research-2026-05-18.md)
+- 原始计划书：[../requirement-designs/alembic-multi-project-control-redesign/original-plan-2026-05-18.md](../../../../requirement-designs/alembic-multi-project-control-redesign/original-plan-2026-05-18.md)
+- 需求设计文档：[../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md](../../../../requirement-designs/alembic-multi-project-control-redesign/requirement-design-2026-05-18.md)
+- 底层能力依赖调研：[../requirement-designs/alembic-multi-project-control-redesign/bottom-capability-dependency-research-2026-05-18.md](../../../../requirement-designs/alembic-multi-project-control-redesign/bottom-capability-dependency-research-2026-05-18.md)
+- 代码实现依赖调研：[../requirement-designs/alembic-multi-project-control-redesign/code-implementation-dependency-research-2026-05-18.md](../../../../requirement-designs/alembic-multi-project-control-redesign/code-implementation-dependency-research-2026-05-18.md)
 
 ## 总控理解
 

@@ -1,6 +1,6 @@
 # AlembicWorkspace 总控索引
 
-更新日期：2026-05-18
+更新日期：2026-05-19
 
 本文件是 AlembicWorkspace 的唯一总控入口。`docs/workspace/` 根层级只保留当前状态、长期规则、长期契约、长期模板和正在执行的总控计划；已完成的 workspace 计划进入 `archive/`，单仓库执行记录留在对应 `docs/<Repo>/` 目录，不在这里逐条堆叠。
 
@@ -8,10 +8,9 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-multi-project-control-wave-1-runtime-control-foundation-plan-2026-05-18.md](alembic-multi-project-control-wave-1-runtime-control-foundation-plan-2026-05-18.md) | 待启动 | Wave 1 只发送给 `Alembic`，实现 Project Runtime Control Foundation。 |
+| 当前计划 | [alembic-plugin-dashboard-artifact-removal-workspace-plan-2026-05-19.md](alembic-plugin-dashboard-artifact-removal-workspace-plan-2026-05-19.md) | 已完成 | `AlembicPlugin` 已完成并通过总控验收：内嵌 Dashboard artifact 构建 / 打包 / 托管链路已移除，只保留 Dashboard URL handoff。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 已完成 | `AlembicPlugin` 已完成；`Alembic` / `AlembicDashboard` 继续观察，当前无新执行窗口。 |
 | 当前需求目录 | [alembic-multi-project-control-redesign](../requirement-designs/alembic-multi-project-control-redesign/) | 调研完成 | 保存本次重新开始的原始计划书、需求设计和代码实现依赖调研。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 待启动 | 发送给 `Alembic`；其它窗口阻塞 / 观察 / 无任务。 |
-| 目标阶段确认 | [alembic-multi-project-control-redesign-goal-stage-confirmation-2026-05-18.md](alembic-multi-project-control-redesign-goal-stage-confirmation-2026-05-18.md) | 已确认 | 用户已确认多项目控制最终目标和阶段顺序。 |
 | 需求目标与分阶段确认流程 | [../goal-stage-confirmation/process.md](../goal-stage-confirmation/process.md) | 长期流程 | 规定较大目标必须先在 `docs/requirement-designs/` 完成需求设计，再确认最终目标和分阶段，最后派发窗口。 |
 | 需求目标与分阶段确认模板 | [../goal-stage-confirmation/template.md](../goal-stage-confirmation/template.md) | 长期模板 | 用于每个新目标创建任务级确认文档，确认前发送名单必须为无。 |
 | 需求设计文档模板 | [requirement-design-template.md](../requirement-designs/requirement-design-template.md) | 长期模板 | 用于需求目录中的 `requirement-design`，保存于 `docs/requirement-designs/<需求名>/`。 |
@@ -25,9 +24,9 @@
 后续启动新任务时，在 `docs/workspace/` 新建 workspace 级总控文档，并把本表第一行切到新计划；任务完成并归档后，再切回当前状态文档。
 
 ## 历史归档摘要
-
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/multi-project-control` | [multi-project-control](archive/2026-05/multi-project-control/) | 已归档 9 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/facade-readiness` | [facade-readiness](archive/2026-05/facade-readiness/) | 已归档 2 个 workspace 文档；Wave 3B Core facade readiness / consumer replacement。 |
 | `2026-05/release-portable-snapshot-closeout` | [release-portable-snapshot-closeout](archive/2026-05/release-portable-snapshot-closeout/) | 已归档 2 个 workspace 文档；release / portable snapshot closeout 与 publish staging。 |
 | `2026-05/interface-boundary` | [interface-boundary](archive/2026-05/interface-boundary/) | 已归档 7 个 workspace 文档；接口边界优化与消费层收敛历史计划。 |
@@ -40,12 +39,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | 读取 Wave 1 执行计划，完成 Project Runtime Control Foundation，并回填执行文档。 |
-| `AlembicCore`<br>阻塞 | 等待 Alembic 阶段 1 证明字段和 scope 模型后再沉淀 contract。 |
-| `AlembicPlugin`<br>阻塞 | 等待 Alembic projects API / Core contract 后处理 hostProject mismatch。 |
-| `AlembicDashboard`<br>阻塞 | 等待 Alembic projects API / handoff 字段后处理项目列表和切换。 |
-| `AlembicAgent`<br>观察中 | 当前无执行任务；只在 internal AI isolation 发现真实缺口时派发。 |
-| `BiliDili`<br>无任务 | 当前不做真实项目 smoke；稳定后才按只读验证考虑。 |
+| `AlembicPlugin`<br>已完成 | 已完成 Plugin 内嵌 Dashboard artifact 链路移除；执行记录见 [../AlembicPlugin/alembic-plugin-dashboard-artifact-removal-2026-05-19.md](../AlembicPlugin/alembic-plugin-dashboard-artifact-removal-2026-05-19.md)。 |
+| `Alembic`<br>观察中 | 当前已具备 Dashboard 运行与服务链路；本轮未证明缺少稳定 handoff contract。 |
+| `AlembicDashboard`<br>观察中 | 当前不改前端源码；本轮无需正式 Dashboard release asset 契约任务。 |
+| `AlembicCore`<br>无任务 | Dashboard artifact ownership removal 不涉及 Core API 或共享内核。 |
+| `AlembicAgent`<br>无任务 | 不涉及 Agent runtime / AI provider / tool system。 |
+| `BiliDili`<br>无任务 | 不涉及真实 iOS 测试项目。 |
 
 ## 状态枚举
 
