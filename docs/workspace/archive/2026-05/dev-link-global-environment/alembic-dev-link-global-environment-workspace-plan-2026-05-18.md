@@ -153,7 +153,7 @@ alembic daemon status --dir ../BiliDili --json
 
 - 状态：已完成
 - 完成范围：新增 `scripts/dev-link.mjs`，将 `npm run dev:link` 升级为一键编排；覆盖 AlembicCore、AlembicAgent、Alembic 主包、Dashboard 静态产物、全局安装、全局命令 smoke 和 daemon 检测；新增 `build:self`，调整 `dev:verify` 为 `--verify-only`。
-- 修改文件：`package.json`、`scripts/dev-link.mjs`；执行记录见 [../Alembic/alembic-dev-link-global-environment-2026-05-18.md](../Alembic/alembic-dev-link-global-environment-2026-05-18.md)。
+- 修改文件：`package.json`、`scripts/dev-link.mjs`；执行记录见 [../Alembic/alembic-dev-link-global-environment-2026-05-18.md](../../../../Alembic/alembic-dev-link-global-environment-2026-05-18.md)。
 - 提交 hash：`c5aa3061fad6346d0e45fa2dbea5ea39baf7d316`
 - 验证命令：`npm run dev:link -- --dry-run --verbose`；`npm run dev:link -- --skip-install --verbose`；`npm run dev:link -- --verbose`；`npm run dev:verify`；`npm run build:check`；`npx biome check scripts/dev-link.mjs`；`npm run lint`；`npm run check`；`test -f dashboard/dist/index.html && echo dashboard-dist-ok`；`alembic ai status --dir ../BiliDili`；`alembic daemon status --dir ../BiliDili --json`；`git diff --check`；`git status --short`。
 - 验证结果：dev link dry-run、skip-install、完整全局安装、dev verify、build:check、脚本 Biome、Dashboard 产物检查、BiliDili 只读 smoke、diff check 均通过；全局 `alembic` / `alembic-mcp` / `alembic-ai` package 指向当前 Alembic 仓库，`alembic --version` 为 `0.1.0`，未检测到正在运行的 Alembic daemon；Alembic、AlembicAgent、AlembicDashboard、BiliDili 状态均干净。`npm run lint` 和 `npm run check` 仍被既有 lint debt 阻断，错误集中在 `lib/bootstrap.ts`、`lib/cli/AiScanService.ts`、`lib/cli/deploy/FileManifest.ts`、`scripts/verify-context-api.ts`。

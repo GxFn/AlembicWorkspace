@@ -122,7 +122,7 @@ rg -n "build:dashboard|dashboard/dist|vendor/AlembicDashboard|resolveDashboardSo
 
 ## 回填区
 
-- `AlembicPlugin`：已完成。执行记录见 [../AlembicPlugin/alembic-plugin-dashboard-artifact-removal-2026-05-19.md](../AlembicPlugin/alembic-plugin-dashboard-artifact-removal-2026-05-19.md)。
+- `AlembicPlugin`：已完成。执行记录见 [../AlembicPlugin/alembic-plugin-dashboard-artifact-removal-2026-05-19.md](../../../../AlembicPlugin/alembic-plugin-dashboard-artifact-removal-2026-05-19.md)。
   - 完成范围：移除 `build:dashboard`、`scripts/build-dashboard.mjs`、`vendor/AlembicDashboard`、Plugin package / runtime / smoke / verify 对 Dashboard dist 的依赖；embedded daemon 不再 mount Dashboard 静态资源；`alembic_codex_dashboard` 无本机 Dashboard daemon 时失败关闭。
   - 提交 hash：AlembicPlugin `6ecd003023434c26c46f02f761a40294b0280812`；AlembicCodex `f46e3e577d4218769f6431930876a467359e14cb`。
   - 验证命令：`npm run build:check`、`npm run lint -- --diagnostic-level=error`、`npm run verify:codex-plugin`、`npm run verify:codex-channel`、`npm run smoke:codex-plugin`、`npm run smoke:codex-plugin -- --daemon --no-npx-runtime`、`npm run verify:release-package-boundary`、`npm run test:unit`、targeted vitest、`git submodule status`、`git diff --check`、负向扫描。

@@ -249,7 +249,7 @@ Workspace: git diff --check
 ### AlembicCore
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicCore/alembic-module-boundary-foundation-wave-1-core-contracts-2026-05-18.md`](../AlembicCore/alembic-module-boundary-foundation-wave-1-core-contracts-2026-05-18.md)
+- 执行记录：[`docs/AlembicCore/alembic-module-boundary-foundation-wave-1-core-contracts-2026-05-18.md`](../../../../AlembicCore/alembic-module-boundary-foundation-wave-1-core-contracts-2026-05-18.md)
 - 提交 hash：`58e21d64fc47e8c96b2885ac23b2d32460317497`
 - 完成范围：
   - 新增 `@alembic/core/daemon` runtime / capability / file monitor headless contract。
@@ -276,7 +276,7 @@ Workspace: git diff --check
 ### Alembic
 
 - 状态：已完成
-- 执行记录：[`docs/Alembic/alembic-module-boundary-foundation-wave-1-runtime-monitor-2026-05-18.md`](../Alembic/alembic-module-boundary-foundation-wave-1-runtime-monitor-2026-05-18.md)
+- 执行记录：[`docs/Alembic/alembic-module-boundary-foundation-wave-1-runtime-monitor-2026-05-18.md`](../../../../Alembic/alembic-module-boundary-foundation-wave-1-runtime-monitor-2026-05-18.md)
 - 提交 hash：`6b601b43a5b3a31a2f1af2687e4824500504a28a`
 - 完成范围：
   - 新增 `lib/daemon/RuntimeBoundary.ts`，集中声明 Alembic 本地 runtime / capability 边界：`local-alembic` route、workspace contract、daemon state contract、Dashboard handoff、file monitor owner、JobStore owner、internal AI owner。
@@ -301,7 +301,7 @@ Workspace: git diff --check
 ### AlembicPlugin
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicPlugin/alembic-module-boundary-foundation-wave-1-plugin-adapters-2026-05-18.md`](../AlembicPlugin/alembic-module-boundary-foundation-wave-1-plugin-adapters-2026-05-18.md)
+- 执行记录：[`docs/AlembicPlugin/alembic-module-boundary-foundation-wave-1-plugin-adapters-2026-05-18.md`](../../../../AlembicPlugin/alembic-module-boundary-foundation-wave-1-plugin-adapters-2026-05-18.md)
 - 提交 hash：
   - AlembicPlugin：`bdd98989b11fe6f8aa143913418a99fc37df4a67`
   - embedded Codex runtime 子仓库：`014d014fc6474b8ca5514687caf04d34aee1529c`
@@ -337,7 +337,7 @@ Workspace: git diff --check
 ### AlembicAgent
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicAgent/alembic-module-boundary-foundation-wave-1-internal-runtime-2026-05-18.md`](../AlembicAgent/alembic-module-boundary-foundation-wave-1-internal-runtime-2026-05-18.md)
+- 执行记录：[`docs/AlembicAgent/alembic-module-boundary-foundation-wave-1-internal-runtime-2026-05-18.md`](../../../../AlembicAgent/alembic-module-boundary-foundation-wave-1-internal-runtime-2026-05-18.md)
 - 提交 hash：`e043122efb55c050a33cc06b9a6067ce685593c6`
 - 完成范围：
   - 新增 `AgentRuntimeBoundary` public contract，由 `@alembic/agent/runtime` 导出。
@@ -366,7 +366,7 @@ Workspace: git diff --check
 ### AlembicDashboard
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicDashboard/alembic-module-boundary-foundation-wave-1-frontend-contract-2026-05-18.md`](../AlembicDashboard/alembic-module-boundary-foundation-wave-1-frontend-contract-2026-05-18.md)
+- 执行记录：[`docs/AlembicDashboard/alembic-module-boundary-foundation-wave-1-frontend-contract-2026-05-18.md`](../../../../AlembicDashboard/alembic-module-boundary-foundation-wave-1-frontend-contract-2026-05-18.md)
 - 提交 hash：`d537a6cdddc3b34b869bd3b7b355d15003b20588`
 - 完成范围：
   - `src/types.ts` 新增 `RuntimeBoundary` view model，覆盖 project identity、runtime route、daemon capability、file monitor、jobs、internal AI provider config 和可选 host-agent route。

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const workspaceRoot = process.cwd();
@@ -48,6 +48,42 @@ function stripMarkdownLinkTarget(target) {
     clean = clean.slice(0, hashIndex);
   }
   return clean;
+}
+
+function splitMarkdownLinkTarget(target) {
+  let clean = target.trim();
+  const wrapped = clean.startsWith("<") && clean.endsWith(">");
+  if (wrapped) {
+    clean = clean.slice(1, -1);
+  }
+  const hashIndex = clean.indexOf("#");
+  return {
+    wrapped,
+    pathPart: hashIndex >= 0 ? clean.slice(0, hashIndex) : clean,
+    hashPart: hashIndex >= 0 ? clean.slice(hashIndex) : "",
+  };
+}
+
+function isExternalTarget(target) {
+  return /^[a-z][a-z0-9+.-]*:/i.test(target) || target.trim().startsWith("#");
+}
+
+function rewriteMovedMarkdownLinks(content, from, to) {
+  return content.replace(/(!?\[[^\]]*]\()([^)]+)(\))/g, (match, prefix, rawTarget, suffix) => {
+    if (isExternalTarget(rawTarget)) {
+      return match;
+    }
+
+    const { wrapped, pathPart, hashPart } = splitMarkdownLinkTarget(rawTarget);
+    if (!pathPart || path.isAbsolute(pathPart)) {
+      return match;
+    }
+
+    const oldAbsoluteTarget = path.resolve(path.dirname(from), pathPart);
+    const nextRelativeTarget = relativePosix(path.dirname(to), oldAbsoluteTarget);
+    const nextTarget = `${nextRelativeTarget}${hashPart}`;
+    return `${prefix}${wrapped ? `<${nextTarget}>` : nextTarget}${suffix}`;
+  });
 }
 
 function splitMarkdownRow(line) {
@@ -379,7 +415,9 @@ if (issues.length === 0) {
       mkdirSync(targetDir, { recursive: true });
     }
     for (const { from, to } of plannedMoves) {
-      renameSync(from, to);
+      const movedContent = rewriteMovedMarkdownLinks(readFileSync(from, "utf8"), from, to);
+      writeFileSync(to, movedContent);
+      unlinkSync(from);
     }
     writeFileSync(indexPath, nextIndexContent);
   }

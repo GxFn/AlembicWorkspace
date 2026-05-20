@@ -9,7 +9,7 @@
 
 Wave 3A 已完成 provider 链路：`AlembicCore` 把 `dataRootSource`、`runtimeDir`、`workspaceMode` 等字段上提为 canonical runtime project identity contract；`Alembic` daemon health 已消费 Core contract 输出同一份 canonical identity，并把 `runtimeBoundary` 限定为 Alembic-owned attribution / Dashboard handoff 摘要。
 
-本波对应长期路线图的阶段 3：Plugin / Dashboard consumer 收敛。最终目标和阶段完成定义必须先以任务级确认文档为准：[alembic-plugin-first-runtime-boundary-goal-stage-confirmation-2026-05-18.md](alembic-plugin-first-runtime-boundary-goal-stage-confirmation-2026-05-18.md)。
+本波对应长期路线图的阶段 3：Plugin / Dashboard consumer 收敛。最终目标和阶段完成定义必须先以任务级确认文档为准：[alembic-plugin-first-runtime-boundary-goal-stage-confirmation-2026-05-18.md](../plugin-first-enhancement/alembic-plugin-first-runtime-boundary-goal-stage-confirmation-2026-05-18.md)。
 
 本文暂时保留为确认后可启用的候选计划。用户确认任务级最终目标与阶段计划前，不派发 `AlembicPlugin` 或 `AlembicDashboard`。
 

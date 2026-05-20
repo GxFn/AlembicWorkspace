@@ -209,7 +209,7 @@ git diff --check
 ### Alembic
 
 - 状态：已完成
-- 执行记录：[`docs/Alembic/alembic-ai-source-boundary-provider-status-2026-05-18.md`](../Alembic/alembic-ai-source-boundary-provider-status-2026-05-18.md)
+- 执行记录：[`docs/Alembic/alembic-ai-source-boundary-provider-status-2026-05-18.md`](../../../../Alembic/alembic-ai-source-boundary-provider-status-2026-05-18.md)
 - 提交 hash：`f6b7f2f429e4873a4a1184a65c81477e84ff4e38`
 - 完成范围：
   - `bin/cli.ts` 的 `status --json` 不再把未配置 AI provider fallback 为 `host-agent`；未配置或 `none` provider 输出 `aiProvider: null`、`aiModel: null`。
@@ -232,7 +232,7 @@ git diff --check
 ### AlembicPlugin
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicPlugin/alembic-ai-source-boundary-plugin-enhancement-2026-05-18.md`](../AlembicPlugin/alembic-ai-source-boundary-plugin-enhancement-2026-05-18.md)
+- 执行记录：[`docs/AlembicPlugin/alembic-ai-source-boundary-plugin-enhancement-2026-05-18.md`](../../../../AlembicPlugin/alembic-ai-source-boundary-plugin-enhancement-2026-05-18.md)
 - 提交 hash：
   - AlembicPlugin：`3a82f2c9e29e2cfe4e6b3fad87cfc83c29a1b223`
   - Codex plugin runtime artifact：`344e7c54362df287a1378a5da1f4d8b694fdee71`
@@ -273,7 +273,7 @@ git diff --check
 ### AlembicAgent
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicAgent/alembic-ai-source-boundary-agent-runtime-2026-05-18.md`](../AlembicAgent/alembic-ai-source-boundary-agent-runtime-2026-05-18.md)
+- 执行记录：[`docs/AlembicAgent/alembic-ai-source-boundary-agent-runtime-2026-05-18.md`](../../../../AlembicAgent/alembic-ai-source-boundary-agent-runtime-2026-05-18.md)
 - 提交 hash：
   - `7dbf724f2f2ac1dea526c671da67d73122b3dc23` - `Align agent source defaults`
   - `07ec864e8878fc0eaa233365dc27fddab949a228` - `Align agent gateway source identity`
@@ -305,7 +305,7 @@ git diff --check
 ### AlembicDashboard
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicDashboard/alembic-ai-source-boundary-dashboard-labels-2026-05-18.md`](../AlembicDashboard/alembic-ai-source-boundary-dashboard-labels-2026-05-18.md)
+- 执行记录：[`docs/AlembicDashboard/alembic-ai-source-boundary-dashboard-labels-2026-05-18.md`](../../../../AlembicDashboard/alembic-ai-source-boundary-dashboard-labels-2026-05-18.md)
 - 提交 hash：`26369661193fb42d9f7db0d7df6440a01cab656e`
 - 完成范围：
   - 新增 `src/utils/sourceLabels.ts` 作为 Dashboard 共享 source label helper，统一 `host-agent`、`alembic-agent`、`host-edit`、旧 `ide-agent` / `ide-edit` 兼容来源和现有 domain source。

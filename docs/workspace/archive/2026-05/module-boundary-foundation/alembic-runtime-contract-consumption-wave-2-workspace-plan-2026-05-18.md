@@ -40,9 +40,9 @@ Wave 1 已完成模块边界的第一层落位：`AlembicCore` 提供 runtime / 
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>已完成 | 已对齐 `/api/v1/daemon/health` 到 Core runtime/capability contract，并补稳定 project identity / file monitor / jobs / Dashboard handoff 字段；执行记录见 [alembic-runtime-contract-consumption-wave-2-daemon-health-2026-05-18.md](../Alembic/alembic-runtime-contract-consumption-wave-2-daemon-health-2026-05-18.md)。 |
-| `AlembicPlugin`<br>已完成 | 已让 route/status/diagnostics 消费 Alembic daemon health、Core summary 与 runtimeBoundary fallback；执行记录见 [alembic-runtime-contract-consumption-wave-2-plugin-route-2026-05-18.md](../AlembicPlugin/alembic-runtime-contract-consumption-wave-2-plugin-route-2026-05-18.md)。 |
-| `AlembicDashboard`<br>已完成 | 已对齐前端 runtime view model 到 Alembic daemon health；只展示 route/capability/project identity，不实现后端策略；执行记录见 [alembic-runtime-contract-consumption-wave-2-dashboard-view-2026-05-18.md](../AlembicDashboard/alembic-runtime-contract-consumption-wave-2-dashboard-view-2026-05-18.md)。 |
+| `Alembic`<br>已完成 | 已对齐 `/api/v1/daemon/health` 到 Core runtime/capability contract，并补稳定 project identity / file monitor / jobs / Dashboard handoff 字段；执行记录见 [alembic-runtime-contract-consumption-wave-2-daemon-health-2026-05-18.md](../../../../Alembic/alembic-runtime-contract-consumption-wave-2-daemon-health-2026-05-18.md)。 |
+| `AlembicPlugin`<br>已完成 | 已让 route/status/diagnostics 消费 Alembic daemon health、Core summary 与 runtimeBoundary fallback；执行记录见 [alembic-runtime-contract-consumption-wave-2-plugin-route-2026-05-18.md](../../../../AlembicPlugin/alembic-runtime-contract-consumption-wave-2-plugin-route-2026-05-18.md)。 |
+| `AlembicDashboard`<br>已完成 | 已对齐前端 runtime view model 到 Alembic daemon health；只展示 route/capability/project identity，不实现后端策略；执行记录见 [alembic-runtime-contract-consumption-wave-2-dashboard-view-2026-05-18.md](../../../../AlembicDashboard/alembic-runtime-contract-consumption-wave-2-dashboard-view-2026-05-18.md)。 |
 | `AlembicCore`<br>观察中 | 本波不主动改 Core；等待消费者证明 canonical contract 缺口。 |
 | `AlembicAgent`<br>观察中 | 本波不主动改 Agent；保持 internal AI runtime boundary，等待 Alembic 消费反馈。 |
 | `BiliDili`<br>无任务 | 本波仍是模块划分前期开发，不做真实项目 smoke。 |
@@ -188,7 +188,7 @@ Workspace: git diff --check
 ### Alembic
 
 - 状态：已完成
-- 执行记录：[`docs/Alembic/alembic-runtime-contract-consumption-wave-2-daemon-health-2026-05-18.md`](../Alembic/alembic-runtime-contract-consumption-wave-2-daemon-health-2026-05-18.md)
+- 执行记录：[`docs/Alembic/alembic-runtime-contract-consumption-wave-2-daemon-health-2026-05-18.md`](../../../../Alembic/alembic-runtime-contract-consumption-wave-2-daemon-health-2026-05-18.md)
 - 提交 hash：`9ea629fc03a3e5de2d2c449ada6ca77dbeccb45c`
 - 完成范围：
   - `/api/v1/daemon/health` 改为使用 `@alembic/core/daemon` 的 `createAlembicRuntimeCapabilities()` 与 `createAlembicRuntimeHealthData()` 构建 canonical `enhancement` / `capabilities` / project identity 主体字段。
@@ -213,7 +213,7 @@ Workspace: git diff --check
 ### AlembicPlugin
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicPlugin/alembic-runtime-contract-consumption-wave-2-plugin-route-2026-05-18.md`](../AlembicPlugin/alembic-runtime-contract-consumption-wave-2-plugin-route-2026-05-18.md)
+- 执行记录：[`docs/AlembicPlugin/alembic-runtime-contract-consumption-wave-2-plugin-route-2026-05-18.md`](../../../../AlembicPlugin/alembic-runtime-contract-consumption-wave-2-plugin-route-2026-05-18.md)
 - 提交 hash：
   - AlembicPlugin：`61144ef8e3d26f25596d46d01fb311642ab7c93b`
   - embedded Codex runtime 子仓库：`be01059d3f6dfc9f3980f09b10a701edc31baa37`
@@ -250,7 +250,7 @@ Workspace: git diff --check
 ### AlembicDashboard
 
 - 状态：已完成
-- 执行记录：[`docs/AlembicDashboard/alembic-runtime-contract-consumption-wave-2-dashboard-view-2026-05-18.md`](../AlembicDashboard/alembic-runtime-contract-consumption-wave-2-dashboard-view-2026-05-18.md)
+- 执行记录：[`docs/AlembicDashboard/alembic-runtime-contract-consumption-wave-2-dashboard-view-2026-05-18.md`](../../../../AlembicDashboard/alembic-runtime-contract-consumption-wave-2-dashboard-view-2026-05-18.md)
 - 提交 hash：`77d48fd5753f90c0f7af24d50c256451c4f30037`
 - 完成范围：
   - `RuntimeBoundary` 前端 view model 扩展为可消费 Alembic daemon health 的 project identity、route、capability、file monitor、jobs、internal AI 与 Dashboard handoff 字段。

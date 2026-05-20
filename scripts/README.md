@@ -14,7 +14,8 @@ Scripts in this directory should:
 Current scripts:
 
 - `collect-repo-status.mjs`: summarizes branch, HEAD, dirty state,
-  untracked files, and latest commit for each workspace child repository.
+  upstream, ahead / behind counts, untracked files, and latest commit for each
+  workspace child repository.
 - `check-workspace-boundary.mjs`: verifies that child source repositories and
   local noise files are not tracked by the workspace Git repository.
 - `verify-workspace-docs.mjs`: checks the workspace index, current control
@@ -22,21 +23,34 @@ Current scripts:
 - `check-dispatch-coverage.mjs`: verifies that the current control plan covers
   every expected window and that the declared copyable prompt send list matches
   task statuses.
+- `check-runtime-residue.mjs`: read-only check for Alembic daemon, Dashboard
+  dev server, and Codex MCP process residue. It does not start, stop, or kill
+  anything; use `--strict` only when a clean runtime surface is required.
+- `verify-control-center.mjs`: one-command control-center verification that
+  runs boundary, repo status, workspace docs, dispatch coverage, and
+  `git diff --check`. Add `--with-runtime` for a read-only runtime residue
+  report, or `--strict-runtime` to fail when Alembic daemon / Dashboard dev
+  residue is present.
 - `archive-workspace-docs.mjs`: dry-run by default; moves completed workspace
   control documents into `docs/workspace/archive/YYYY-MM/<topic>/`, rewrites
-  index links, removes archived rows from the current index table, and adds a
-  compact archive summary entry only when `--apply` is provided. Use
-  `--keep-index-rows` only when a historical row must remain visible. The
-  script protects active first-row plans, but completed first-row plans can be
-  archived once a new current or idle status entry is ready.
+  relative links inside moved documents, rewrites index links, removes archived
+  rows from the current index table, and adds a compact archive summary entry
+  only when `--apply` is provided. Use `--keep-index-rows` only when a
+  historical row must remain visible. The script protects active first-row
+  plans, but completed first-row plans can be archived once a new current or
+  idle status entry is ready.
 
 Suggested pre-acceptance sequence:
 
 ```bash
-node scripts/check-workspace-boundary.mjs
-node scripts/collect-repo-status.mjs
-node scripts/verify-workspace-docs.mjs
-node scripts/check-dispatch-coverage.mjs
+node scripts/verify-control-center.mjs
+```
+
+Runtime residue check:
+
+```bash
+node scripts/check-runtime-residue.mjs
+node scripts/verify-control-center.mjs --with-runtime
 ```
 
 Archive dry-run example:

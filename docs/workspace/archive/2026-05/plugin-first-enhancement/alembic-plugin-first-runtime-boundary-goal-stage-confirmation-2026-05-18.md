@@ -120,7 +120,7 @@
 
 如果用户确认本文，下一步进入阶段 3：`AlembicCore` / `Alembic` 多项目 contract 与控制面设计。
 
-确认前不发送任何提示词。确认后，应新建多项目 contract / control plane 执行文档；旧候选计划 [alembic-runtime-project-identity-wave-3b-consumer-plan-2026-05-18.md](alembic-runtime-project-identity-wave-3b-consumer-plan-2026-05-18.md) 只能作为历史候选，不应直接启用。
+确认前不发送任何提示词。确认后，应新建多项目 contract / control plane 执行文档；旧候选计划 [alembic-runtime-project-identity-wave-3b-consumer-plan-2026-05-18.md](../module-boundary-foundation/alembic-runtime-project-identity-wave-3b-consumer-plan-2026-05-18.md) 只能作为历史候选，不应直接启用。
 
 ## 验证策略
 

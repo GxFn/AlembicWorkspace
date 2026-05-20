@@ -73,6 +73,11 @@ function inspectRepo(name) {
 
   const branch = runGit(repoPath, ["branch", "--show-current"]) || "(detached)";
   const head = runGit(repoPath, ["rev-parse", "HEAD"]) || "";
+  const upstream = runGit(repoPath, ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]);
+  const aheadBehind = upstream ? runGit(repoPath, ["rev-list", "--left-right", "--count", "HEAD...@{u}"]) : null;
+  const [aheadText, behindText] = aheadBehind ? aheadBehind.split(/\s+/) : ["", ""];
+  const ahead = Number.parseInt(aheadText, 10);
+  const behind = Number.parseInt(behindText, 10);
   const latest = runGit(repoPath, ["log", "-1", "--format=%h %s"]) || "";
   const statusText = runGit(repoPath, ["status", "--porcelain=v1"]) || "";
   const status = parseStatus(statusText);
@@ -82,8 +87,12 @@ function inspectRepo(name) {
     exists: true,
     git: true,
     branch,
+    upstream: upstream || "",
     head: head.slice(0, 12),
     headFull: head,
+    ahead: Number.isFinite(ahead) ? ahead : null,
+    behind: Number.isFinite(behind) ? behind : null,
+    pushed: upstream ? ahead === 0 : null,
     latest,
     ...status,
   };
@@ -94,22 +103,24 @@ function cell(value) {
 }
 
 function printTable(rows) {
-  console.log("| Repo | Branch | HEAD | Dirty | Staged | Unstaged | Untracked | Latest commit |");
-  console.log("| --- | --- | --- | --- | ---: | ---: | ---: | --- |");
+  console.log("| Repo | Branch | Upstream | Ahead | Behind | HEAD | Dirty | Staged | Unstaged | Untracked | Latest commit |");
+  console.log("| --- | --- | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | --- |");
 
   for (const row of rows) {
     if (!row.exists) {
-      console.log(`| ${cell(row.name)} | missing | - | - | 0 | 0 | 0 | - |`);
+      console.log(`| ${cell(row.name)} | missing | - | - | - | - | - | 0 | 0 | 0 | - |`);
       continue;
     }
 
     if (!row.git) {
-      console.log(`| ${cell(row.name)} | not git repo | - | - | 0 | 0 | 0 | - |`);
+      console.log(`| ${cell(row.name)} | not git repo | - | - | - | - | - | 0 | 0 | 0 | - |`);
       continue;
     }
 
     console.log(
-      `| ${cell(row.name)} | ${cell(row.branch)} | ${cell(row.head)} | ${
+      `| ${cell(row.name)} | ${cell(row.branch)} | ${cell(row.upstream || "-")} | ${
+        row.ahead ?? "-"
+      } | ${row.behind ?? "-"} | ${cell(row.head)} | ${
         row.dirty ? "yes" : "no"
       } | ${row.staged} | ${row.unstaged} | ${row.untracked} | ${cell(row.latest)} |`,
     );

@@ -184,7 +184,7 @@ const sendList = rows
   .filter((window) => requiredWindows.includes(window));
 const blocked = rows.filter((row) => row.status === blockedStatus).map((row) => row.window);
 const doNotSend = rows
-  .filter((row) => noSendStatuses.has(row.status))
+  .filter((row) => noSendStatuses.has(row.status) || row.status === blockedStatus)
   .map((row) => row.window)
   .filter((window) => requiredWindows.includes(window));
 

@@ -119,7 +119,7 @@ npm run build:dashboard
 
 ## 回填区
 
-- `Alembic`：已完成。执行记录：[../Alembic/github-actions-failure-recovery-2026-05-19.md](../Alembic/github-actions-failure-recovery-2026-05-19.md)。
+- `Alembic`：已完成。执行记录：[../Alembic/github-actions-failure-recovery-2026-05-19.md](../../../../Alembic/github-actions-failure-recovery-2026-05-19.md)。
   - 完成范围：删除 stale `install:vscode-ext` / `build:vscode-ext` / `package:vscode-ext` CI / release 步骤；API smoke 改验 `/api-spec`；unit job 显式 checkout `progressive-chain-validation` skill；Core 边界测试改为接受 sibling `../AlembicCore`；补 `workflow_dispatch` 用于 recovery。
   - 提交 hash：最终 `29a3c2ea73a710c79caae24dc06fe610e19e6bae`；相关提交链 `291fa3b`、`0602a16`、`4612c48`、`f8ab012`、`29a3c2e`。
   - 完整失败日志摘要：原始 run `26090010486` 在 `Run npm run install:vscode-ext` 报 `Missing script: "install:vscode-ext"`；代码扫描确认 VSCode extension 已删除，判断为 stale workflow。中间 run 暴露的 Biome lint、Dashboard 根路径 smoke、unit skill/Core source 边界问题均已收口。
@@ -127,7 +127,7 @@ npm run build:dashboard
   - 验证结果：本地命令通过；`npm run test:unit` 为 `146` files / `2223` tests；GitHub Actions push run `https://github.com/GxFn/Alembic/actions/runs/26093217101` 通过；手动 recovery run `https://github.com/GxFn/Alembic/actions/runs/26093228278` 通过。
   - 遗留风险：`release.yml` 已同步修复但未发 tag 验证 release workflow；`vendor/AlembicCore` gitlink `e58234c...` 远端不可取，本轮不依赖 vendor，若未来恢复全量 submodule checkout 需单独清理。
   - 下一步建议：Alembic 侧无需继续派发；等待 `AlembicPlugin` 独立回填。
-- `AlembicPlugin`：已完成。执行记录：[../AlembicPlugin/github-actions-failure-recovery-2026-05-19.md](../AlembicPlugin/github-actions-failure-recovery-2026-05-19.md)。
+- `AlembicPlugin`：已完成。执行记录：[../AlembicPlugin/github-actions-failure-recovery-2026-05-19.md](../../../../AlembicPlugin/github-actions-failure-recovery-2026-05-19.md)。
   - 完成范围：补齐完整 checkout log；确认 `plugins/alembic-codex` gitlink `0607fb8b8224cb01f83a51e520570d4f250e1b12` 原先远端不可达；将 AlembicCodex 快进发布到 `main`；将 AlembicPlugin 的 `vendor/AlembicCore` / `vendor/AlembicDashboard` gitlink 改为远端可达 `main/HEAD`；修复 Build & Lint 后暴露的格式问题和 Unit Tests 迁移后失败。
   - 提交 hash：AlembicCodex `0607fb8b8224cb01f83a51e520570d4f250e1b12`；AlembicPlugin `3824290`、`1f0c44f`。
   - 完整失败日志摘要：原始 run `26089289726` 在 `Checkout AlembicPlugin` 执行 `git submodule update --init --force --depth=1` 时报 `not our ref 0607fb8b8224cb01f83a51e520570d4f250e1b12`，导致 `plugins/alembic-codex` 直接 fetch 失败。

@@ -1,6 +1,6 @@
 # AlembicWorkspace 总控索引
 
-更新日期：2026-05-19
+更新日期：2026-05-20
 
 本文件是 AlembicWorkspace 的唯一总控入口。`docs/workspace/` 根层级只保留当前状态、长期规则、长期契约、长期模板和正在执行的总控计划；已完成的 workspace 计划进入 `archive/`，单仓库执行记录留在对应 `docs/<Repo>/` 目录，不在这里逐条堆叠。
 
@@ -8,8 +8,8 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-plugin-dashboard-artifact-removal-workspace-plan-2026-05-19.md](alembic-plugin-dashboard-artifact-removal-workspace-plan-2026-05-19.md) | 已完成 | `AlembicPlugin` 已完成并通过总控验收：内嵌 Dashboard artifact 构建 / 打包 / 托管链路已移除，只保留 Dashboard URL handoff。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 已完成 | `AlembicPlugin` 已完成；`Alembic` / `AlembicDashboard` 继续观察，当前无新执行窗口。 |
+| 当前计划 | [alembic-bootstrap-agent-efficiency-observability-workspace-plan-2026-05-20.md](alembic-bootstrap-agent-efficiency-observability-workspace-plan-2026-05-20.md) | Wave 8 阻塞 | `BiliDili` diagnostics 门禁和历史 job contract 复核通过；新的单维度 rescan 因外部 AI 数据导出安全策略等待用户决策。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | Wave 8 阻塞 | 当前不发送任何窗口；等待用户确认 DeepSeek 单维度复测或本地 / 测试 provider / dry-run 路线。 |
 | 当前需求目录 | [alembic-multi-project-control-redesign](../requirement-designs/alembic-multi-project-control-redesign/) | 调研完成 | 保存本次重新开始的原始计划书、需求设计和代码实现依赖调研。 |
 | 需求目标与分阶段确认流程 | [../goal-stage-confirmation/process.md](../goal-stage-confirmation/process.md) | 长期流程 | 规定较大目标必须先在 `docs/requirement-designs/` 完成需求设计，再确认最终目标和分阶段，最后派发窗口。 |
 | 需求目标与分阶段确认模板 | [../goal-stage-confirmation/template.md](../goal-stage-confirmation/template.md) | 长期模板 | 用于每个新目标创建任务级确认文档，确认前发送名单必须为无。 |
@@ -26,6 +26,12 @@
 ## 历史归档摘要
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/github-actions-failure-recovery` | [github-actions-failure-recovery](archive/2026-05/github-actions-failure-recovery/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/dev-link-global-environment` | [dev-link-global-environment](archive/2026-05/dev-link-global-environment/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/init-convergence-contract` | [init-convergence-contract](archive/2026-05/init-convergence-contract/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/plugin-first-enhancement` | [plugin-first-enhancement](archive/2026-05/plugin-first-enhancement/) | 已归档 3 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/codex-only-host-agent-mode` | [codex-only-host-agent-mode](archive/2026-05/codex-only-host-agent-mode/) | 已归档 3 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/module-boundary-foundation` | [module-boundary-foundation](archive/2026-05/module-boundary-foundation/) | 已归档 4 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/multi-project-control` | [multi-project-control](archive/2026-05/multi-project-control/) | 已归档 9 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/facade-readiness` | [facade-readiness](archive/2026-05/facade-readiness/) | 已归档 2 个 workspace 文档；Wave 3B Core facade readiness / consumer replacement。 |
 | `2026-05/release-portable-snapshot-closeout` | [release-portable-snapshot-closeout](archive/2026-05/release-portable-snapshot-closeout/) | 已归档 2 个 workspace 文档；release / portable snapshot closeout 与 publish staging。 |
@@ -39,12 +45,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>已完成 | 已完成 Plugin 内嵌 Dashboard artifact 链路移除；执行记录见 [../AlembicPlugin/alembic-plugin-dashboard-artifact-removal-2026-05-19.md](../AlembicPlugin/alembic-plugin-dashboard-artifact-removal-2026-05-19.md)。 |
-| `Alembic`<br>观察中 | 当前已具备 Dashboard 运行与服务链路；本轮未证明缺少稳定 handoff contract。 |
-| `AlembicDashboard`<br>观察中 | 当前不改前端源码；本轮无需正式 Dashboard release asset 契约任务。 |
-| `AlembicCore`<br>无任务 | Dashboard artifact ownership removal 不涉及 Core API 或共享内核。 |
-| `AlembicAgent`<br>无任务 | 不涉及 Agent runtime / AI provider / tool system。 |
-| `BiliDili`<br>无任务 | 不涉及真实 iOS 测试项目。 |
+| `BiliDili`<br>阻塞 | Wave 8 diagnostics 门禁和历史 job contract 复核通过；新的单维度 `architecture` rescan 被外部 AI 数据导出安全策略阻塞，等待用户确认路线。 |
+| `AlembicPlugin`<br>已完成 | Wave 7 已通过总控验收：diagnostics stale cwd / `uv_cwd` 分类修复、packaged runtime artifact 和 installed probe 均通过。 |
+| `Alembic`<br>已完成 | Wave 5 代码验收通过：提交 `11a14bbb486fff059a2e3ea42557ca6ff17d810b`；后续复测前再按文档重新启动 / 刷新 daemon。 |
+| `AlembicDashboard`<br>观察中 | Wave 3 前端已通过；当前等待后续 BiliDili 新 job 真实 payload 复测。 |
+| `AlembicAgent`<br>观察中 | Wave 1 producer 已完成；除非 Alembic 复核发现 diagnostics 未真实产出，否则不派发。 |
+| `AlembicCore`<br>无任务 | 当前问题不需要 Core contract 变化；如后续状态 / telemetry contract 下沉到 Core，再重新判断。 |
 
 ## 状态枚举
 
