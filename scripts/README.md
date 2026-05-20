@@ -23,9 +23,17 @@ Current scripts:
 - `check-dispatch-coverage.mjs`: verifies that the current control plan covers
   every expected window and that the declared copyable prompt send list matches
   task statuses.
+- `check-todo-board.mjs`: verifies that plans using the TODO submode contain a
+  `TODO / Backlog` section and idle-window scheduling coverage. Use
+  `--require` when TODO items affect dispatch, parallel scheduling, or the next
+  wave order.
 - `check-runtime-residue.mjs`: read-only check for Alembic daemon, Dashboard
   dev server, and Codex MCP process residue. It does not start, stop, or kill
   anything; use `--strict` only when a clean runtime surface is required.
+- `restart-alembic.mjs`: one-command local Alembic runtime restart for real
+  project testing. It defaults to the workspace `BiliDili` project, calls the
+  Alembic CLI `start --restart --no-open --json`, then prints the active
+  Dashboard URL, daemon pid, and bootstrap status probe.
 - `verify-control-center.mjs`: one-command control-center verification that
   runs boundary, repo status, workspace docs, dispatch coverage, and
   `git diff --check`. Add `--with-runtime` for a read-only runtime residue
@@ -46,11 +54,23 @@ Suggested pre-acceptance sequence:
 node scripts/verify-control-center.mjs
 ```
 
+TODO scheduling plan check:
+
+```bash
+node scripts/check-todo-board.mjs --require
+```
+
 Runtime residue check:
 
 ```bash
 node scripts/check-runtime-residue.mjs
 node scripts/verify-control-center.mjs --with-runtime
+```
+
+Restart local Alembic for `BiliDili`:
+
+```bash
+node scripts/restart-alembic.mjs
 ```
 
 Archive dry-run example:

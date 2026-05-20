@@ -2,28 +2,33 @@
 
 更新日期：2026-05-20
 总控窗口：AlembicWorkspace
-状态：Agent 执行效率与可观测性收口 Wave 8 阻塞，等待用户决策
+状态：Agent 证据记录与阶段链路优化 Wave 9D 阻塞，等待用户确认真实项目数据发送策略
 
 ## 状态摘要
 
-当前主任务是把 `BiliDili` 真实 cold-start 运行暴露的问题统一收口：Agent 执行效率、取消语义、Job / report 可观测性、Dashboard 慢模型进度反馈，以及真实项目回归。
+当前主任务是把 `BiliDili` 真实 cold-start 监控暴露出的证据记录、阶段链路、L4 压缩和运行状态可观测问题做成完整优化链路；当前技术前置 wave 已完成验收，进入 BiliDili 小范围复测前的数据策略确认位：
 
-当前总控计划：[alembic-bootstrap-agent-efficiency-observability-workspace-plan-2026-05-20.md](alembic-bootstrap-agent-efficiency-observability-workspace-plan-2026-05-20.md)
+- `note_finding` 不能降级；它是候选输出前的结构化证据门槛。
+- 探索阶段和 `note_finding` 记录阶段需要分开设置资源与配置；探索中允许提前记录，但最终必须有独立 record-only 阶段兜底。
+
+当前总控计划：[alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md)
 
 关键判断：
 
-- 这不是 UI 小修，也不是单个 cancelled label 修复；重点是减少 Agent 无意义 token / tool 调用，并让用户能看到真实执行状态。
-- `Alembic` Wave 0 已完成取消语义和 compact status；本次 CI recovery 已推送最新提交 `6a13b0bda471447040064c72bc647e6696ed1df2`，新 Actions run `26117931831` 全部通过。
-- `AlembicAgent` Wave 1 已回填 producer schema；总控复核通过。
-- `Alembic` Wave 2 已提交并推送 `cc5b68146c6b6997362c23dce3607dbb2fd78029`，总控验收通过；效率指标已经进入 bootstrap dimension / JobStore / report / compact status。
-- `AlembicDashboard` Wave 3 已经总控验收通过：Jobs / Reports 都消费真实 efficiency payload，并通过 build / route smoke。
-- `BiliDili` Wave 4 小范围真实回归已完成，业务源码保持干净，但功能完整性未通过：真实 API 暴露 compact payload、cancelled progress / summary、Jobs / Reports efficiency 和 Codex plugin runtime pin 问题。
-- `Alembic` Wave 5 已验收通过，提交 `11a14bbb486fff059a2e3ea42557ca6ff17d810b`；总控复核显示当前已运行 61164 daemon 仍是旧行为，因此 BiliDili 复测前必须刷新 daemon。
-- `AlembicPlugin` Wave 5 已验收通过；`PLUGIN_RUNTIME_PIN_MISMATCH` 已消失。BiliDili Wave 6 复测确认当前剩余问题是 diagnostics 对 stale cwd / `uv_cwd` 的误判。
-- `BiliDili` Wave 6 已完成并按门禁停止：业务仓库干净，pin mismatch 已消失，但 diagnostics 仍因 `uv_cwd` 把 npm / npx 判为不可用；总控在有效插件缓存目录直接执行 npm / npx 均正常。
-- `AlembicPlugin` Wave 7 已通过总控验收：diagnostics stale cwd / `uv_cwd` 分类修复、packaged runtime artifact 和 installed probe 均通过。
-- `BiliDili` Wave 8 diagnostics 门禁已通过，daemon refresh 窗口期和历史 job contract 已完成复核；新的单维度 `architecture` rescan 因外部 AI 数据导出安全策略阻塞。
-- 当前不发送任何窗口。下一步需要用户确认：允许把 BiliDili 项目内容发送给当前 DeepSeek provider 做单维度复测，或改用本地 / 测试 provider / dry-run 路线。
+- 这不是放松 QualityGate；`note_finding` 缺失仍然是失败，但失败动作要从 full analyze retry 改为 record-only repair。
+- `AlembicAgent` Wave 9A record repair 主链路已完成并通过总控复跑验证：`npm run build:check`、targeted vitest、`git diff --check`、`npm run check` 均通过。
+- `AlembicAgent` Wave 9A2 已回填并提交 `99f0a9f38a79b3cd1504dc2511d06f0a56e9e5c3`：`SCAN` 已弱化为 no-tool briefing，`VERIFY` 已收窄为 evidence-only，`SUMMARIZE` / forced summary 已增加 abort / timeout / degraded 状态门控。
+- `Alembic` Wave 9B 已通过总控验收并提交 `fd992047d7e998883284143b90c8321b2de25287`：consumer 已接入 `timeout`、`blocked`、`aborted`、`error`、`degraded_no_findings`、`record_repair_incomplete` 状态，不再把 timeout / child-run-error / degraded evidence run 写成正常完成。
+- 总控复跑 `git -C ../AlembicAgent rev-parse HEAD`、`npm run build`、`npm run build:check`、targeted unit tests 和 `git diff --check` 均通过；`npm run lint:repo-boundary` 仍失败在 18 个既有 DB boundary 命中，本轮改动文件不在命中范围。
+- `AlembicDashboard` Wave 9C 已通过总控验收并提交 `b2c62b5e01fad4a256f6815da63b0ef7f34bfe86`：Jobs、Bootstrap progress 和 Signal reports 已消费后端稳定 payload，显示 record repair / degraded / timeout / cancel 等非正常状态，并避免失败类非正常完成计入普通完成。
+- 用户反馈 DeepSeek L4 compact 仍有协议错误；总控判断该问题归属 `AlembicAgent` runtime / provider transcript normalization。
+- `AlembicAgent` Wave 9A3 已通过总控验收并提交 `44dfe1360286e0c6d8074e07cea148ef679b13b2`：L4 compact summary input 和 DeepSeek 发包前会归一化不完整 tool transcript，compact failure 后会冷却一次 preflight，避免同一压力周期反复触发；总控复跑 targeted tests、`build:check`、`check`、`git diff --check` 均通过。
+- `AlembicAgent` Wave 9A4 已通过总控验收并提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`：L4 已从 raw transcript 压缩升级为结构化 memory package 压缩，并补 summary validation、typed memory summary、budget 硬止损与取消后 in-flight compaction 门控；总控复跑 targeted tests、`build:check`、`check`、`git diff --check` 均通过。
+- 旧运行问题 TODO 已并入当前计划：job progress stale、维度状态归类、QualityGate retry、token 硬止损、DeepSeek L4 协议错误、效率指标入 job summary、取消后仍有 compact log。
+- `Alembic` Wave 9E 已通过总控验收并提交 `633ed228d1c0ba9cd04ef431dc4aadac18c3ac06`：job progress 已新增更新时间和 active task 时间戳 / event count / status；非正常 dimension completion 会进入 failed task；Job summary 会聚合 efficiency 和 diagnostics。
+- `AlembicDashboard` Wave 9F 已通过总控验收并提交 `c1aa2c09e6f171192ccfc81a89f392fb5b5c0848`：Jobs 视图已消费 `progress.updatedAt`、`activeTaskUpdatedAt`、`activeTaskEventCount`、`activeTaskStatus`，并展示 summary diagnostics。
+- `BiliDili` 真实复测等待用户确认真实项目外部 AI 数据发送或替代安全路线。
+- `AlembicCore` 和 `AlembicPlugin` 本轮无任务。
 
 ## 窗口分派
 
@@ -31,27 +36,29 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `BiliDili`<br>阻塞 | Wave 8：diagnostics 门禁和历史 job contract 复核通过；新的单维度 `architecture` rescan 被外部 AI 数据导出安全策略阻塞，等待用户确认路线。 |
-| `AlembicPlugin`<br>已完成 | Wave 7 已通过总控验收：diagnostics stale cwd / `uv_cwd` 分类修复、packaged runtime artifact 和 installed probe 均通过。 |
-| `Alembic`<br>已完成 | Wave 5 代码验收通过；后续复测前再按文档重新启动 / 刷新 daemon。 |
-| `AlembicDashboard`<br>观察中 | Wave 3 前端已通过；当前等待后续 BiliDili 新 job 真实 payload 复测。 |
-| `AlembicAgent`<br>观察中 | Wave 1 producer 已完成；除非 Alembic 复核发现 diagnostics 未真实产出，否则不派发。 |
-| `AlembicCore`<br>无任务 | 暂未发现需要 Core contract 变化。 |
+| `AlembicDashboard`<br>已完成 | Wave 9F 已通过总控验收：消费 Alembic Wave 9E 新增 progress freshness 字段，Jobs 页面显示 active task status、event count 和最近 active task update，避免前端仍用旧 job `updatedAt` 误判卡住；提交 `c1aa2c09e6f171192ccfc81a89f392fb5b5c0848`。 |
+| `Alembic`<br>已完成 | Wave 9E 已通过总控验收：已修复 job progress stale、cancel / timeout / child-run-error 分类和 efficiency summary payload；提交 `633ed228d1c0ba9cd04ef431dc4aadac18c3ac06`。 |
+| `AlembicAgent`<br>已完成 | Wave 9A4 已通过总控验收：提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`，L4 memory package、summary validation、typed memory summary、budget hard stop 和 abort 门控已落地。 |
+| `BiliDili`<br>阻塞 | Wave 9D：等待用户确认真实项目外部 AI 数据发送或替代安全路线。 |
+| `AlembicCore`<br>无任务 | 当前优化属于 Agent runtime / Alembic consumer 状态，不需要 Core contract；若 repair status 下沉为共享 contract，再重新判断。 |
+| `AlembicPlugin`<br>无任务 | 当前不涉及 Codex plugin marketplace、MCP skill 或 embedded runtime packaging。 |
 
 ## 可复制提示词
 
-发送给：无。
+发送给：无
 
-当前没有可继续发送的执行窗口。`BiliDili` 已完成门禁与既有 job contract 复核；继续新 rescan 前需要用户确认数据发送策略或替代安全路线。
+不发送给：`AlembicDashboard`（已完成）、`Alembic`（已完成）、`AlembicAgent`（已完成）、`BiliDili`（阻塞，等待用户确认数据策略）、`AlembicCore`（无任务）、`AlembicPlugin`（无任务）。
 
-不发送给：`BiliDili`（阻塞，等待用户决策）、`AlembicPlugin`（Wave 7 已完成）、`Alembic`（Wave 5 已完成）、`AlembicDashboard`（观察中）、`AlembicAgent`（观察中）、`AlembicCore`（无任务）。
+```text
+当前没有可发送给执行窗口的提示词；等待用户确认 BiliDili 真实项目外部 AI 数据发送策略或替代安全路线。
+```
 
 ## 回填区
 
-- 当前计划回填入口：`docs/workspace/alembic-bootstrap-agent-efficiency-observability-workspace-plan-2026-05-20.md` 的“回填区”。
-- `Alembic`：Wave 5 已验收通过，提交 `11a14bbb486fff059a2e3ea42557ca6ff17d810b`；后续复测前再按文档重新启动 / 刷新 daemon。历史 Wave 2 已验收通过，提交 `cc5b68146c6b6997362c23dce3607dbb2fd78029`；Wave 0 已完成，主提交 `c3af481dbda617d3ceb720a452fdf713b9e8aef5`；CI recovery 提交 `6a13b0bda471447040064c72bc647e6696ed1df2`，新 Actions run `https://github.com/GxFn/Alembic/actions/runs/26117931831` 全部通过。
-- `AlembicAgent`：已完成 Wave 1，提交 `ea4c9ecc6fc26629794dda70623269265ab9ac95`。
-- `AlembicDashboard`：Wave 3 已验收通过，提交 `904778f2002b5576c9f14b2d19409d0d81bd0125`。
+- 当前计划回填入口：`docs/workspace/alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md` 的“回填区”。
+- `AlembicAgent`：Wave 9A 已完成并总控部分验收通过，提交 `cce89937b972d6ce17a4b1ed6499ee76e5827001`；Wave 9A2 已完成并通过总控验收，提交 `99f0a9f38a79b3cd1504dc2511d06f0a56e9e5c3`；Wave 9A3 已完成并通过总控验收，提交 `44dfe1360286e0c6d8074e07cea148ef679b13b2`；Wave 9A4 已完成并通过总控验收，提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`，执行记录 `docs/AlembicAgent/alembic-agent-l4-memory-package-wave-9a4-2026-05-20.md`。
+- `Alembic`：Wave 9B 已完成并通过总控验收，提交 `fd992047d7e998883284143b90c8321b2de25287`，执行记录 `docs/Alembic/alembic-agent-evidence-recording-phase-chain-wave-9b-consumer-2026-05-20.md`；Wave 9E 已完成并通过总控验收，提交 `633ed228d1c0ba9cd04ef431dc4aadac18c3ac06`，执行记录 `docs/Alembic/alembic-agent-job-progress-efficiency-wave-9e-2026-05-20.md`。
+- `AlembicDashboard`：Wave 9C 已完成并通过总控验收，提交 `b2c62b5e01fad4a256f6815da63b0ef7f34bfe86`，执行记录 `docs/AlembicDashboard/alembic-agent-evidence-recording-phase-chain-wave-9c-dashboard-2026-05-20.md`；Wave 9F 已完成并通过总控验收，提交 `c1aa2c09e6f171192ccfc81a89f392fb5b5c0848`，执行记录 `docs/AlembicDashboard/alembic-dashboard-job-progress-freshness-wave-9f-2026-05-20.md`。
+- `BiliDili`：阻塞，等待用户确认真实项目外部 AI 数据发送或替代安全路线；本波不修改业务代码。
 - `AlembicCore`：无任务。
-- `AlembicPlugin`：Wave 5 已验收通过；Wave 7 已通过总控验收。Wave 5 执行记录 `docs/AlembicPlugin/alembic-plugin-runtime-pin-cache-refresh-wave-5-2026-05-20.md`；Wave 7 执行记录 `docs/AlembicPlugin/alembic-plugin-diagnostics-cwd-robustness-wave-7-2026-05-20.md`。Wave 7 提交 hash：AlembicPlugin `cfacd28434f2f669bffd5048fc5e4b9c0e95f62c`，AlembicCodex runtime artifact `05c77fffc91d6c991a56308eab3a71cdc3d311ab`。完成范围：diagnostics npm / npx 探测使用稳定 cwd，`uv_cwd` 归类为 `CODEX_STALE_COMMAND_CWD`，不再误报 `NPM_UNAVAILABLE` / `NPX_UNAVAILABLE`，并保持 `PLUGIN_RUNTIME_PIN_MISMATCH` 分类边界；已刷新 packaged runtime artifact 并同步本机 Codex plugin cache。总控复跑 targeted vitest、`npm run check`、`npm run verify:codex-plugin`、`npm run verify:release-package-boundary`、`npm run dev:codex-plugin:probe-installed -- --packaged --project-root ../BiliDili --no-sync`、`git diff --check`、`git -C plugins/alembic-codex diff --check` 均通过。遗留风险：需新会话或重启 MCP 后再在 BiliDili 项目复核真实 diagnostics 工具输出；未启动完整 cold-start。
-- `BiliDili`：Wave 8 已完成 diagnostics 门禁和历史 job contract 复核；新的单维度 `architecture` rescan 被外部 AI 数据导出安全策略阻塞。BiliDili 业务仓库前后干净，HEAD 为 `c37007b39b1d1b891d17d9d5849870a679be8be3`；未产生 BiliDili 代码提交，未启动完整 cold-start。
+- `AlembicPlugin`：无任务。

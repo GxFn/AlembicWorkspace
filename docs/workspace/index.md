@@ -8,13 +8,14 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-bootstrap-agent-efficiency-observability-workspace-plan-2026-05-20.md](alembic-bootstrap-agent-efficiency-observability-workspace-plan-2026-05-20.md) | Wave 8 阻塞 | `BiliDili` diagnostics 门禁和历史 job contract 复核通过；新的单维度 rescan 因外部 AI 数据导出安全策略等待用户决策。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | Wave 8 阻塞 | 当前不发送任何窗口；等待用户确认 DeepSeek 单维度复测或本地 / 测试 provider / dry-run 路线。 |
+| 当前计划 | [alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md) | Wave 9D 阻塞 | `AlembicDashboard` Wave 9F 已通过总控验收；`BiliDili` 真实复测等待用户确认外部 AI 数据发送或替代安全路线。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | Wave 9D 阻塞 | 当前不发送执行提示词；等待用户确认 BiliDili 真实项目数据发送策略。 |
 | 当前需求目录 | [alembic-multi-project-control-redesign](../requirement-designs/alembic-multi-project-control-redesign/) | 调研完成 | 保存本次重新开始的原始计划书、需求设计和代码实现依赖调研。 |
 | 需求目标与分阶段确认流程 | [../goal-stage-confirmation/process.md](../goal-stage-confirmation/process.md) | 长期流程 | 规定较大目标必须先在 `docs/requirement-designs/` 完成需求设计，再确认最终目标和分阶段，最后派发窗口。 |
 | 需求目标与分阶段确认模板 | [../goal-stage-confirmation/template.md](../goal-stage-confirmation/template.md) | 长期模板 | 用于每个新目标创建任务级确认文档，确认前发送名单必须为无。 |
 | 需求设计文档模板 | [requirement-design-template.md](../requirement-designs/requirement-design-template.md) | 长期模板 | 用于需求目录中的 `requirement-design`，保存于 `docs/requirement-designs/<需求名>/`。 |
 | 需求到 Wave 执行流程 | [requirement-to-wave-execution-flow.md](requirement-to-wave-execution-flow.md) | 长期流程 | 固化原始计划书、需求设计、代码依赖调研、目标阶段确认、用户确认、wave 执行计划和提示词发送的成熟路线。 |
+| TODO 与空闲窗口调度规则 | [todo-window-scheduling-policy.md](todo-window-scheduling-policy.md) | 长期流程 | 规定通用 TODO 子模式如何服务需求设计、派发计划、验收滚动、主线 / 可并行判断，并避免空闲窗口空转。 |
 | 最终目标与阶段路线图 | [alembic-final-goal-stage-roadmap.md](alembic-final-goal-stage-roadmap.md) | 长期路线图 | 只作为产品方向背景；具体任务仍需创建任务级目标阶段确认文档。 |
 | Plugin first 增强契约 | [alembic-plugin-first-enhancement-contract.md](alembic-plugin-first-enhancement-contract.md) | 长期契约 | 规定 `AlembicPlugin` 作为 Codex host agent 入口，`Alembic` 作为本地增强底座，安装 Alembic 后增强 daemon / HTTP / Dashboard / internal AI 能力。 |
 | 本地源码 resolver / script 契约 | [alembic-local-source-resolver-script-contract.md](alembic-local-source-resolver-script-contract.md) | 长期契约 | 统一本地源码 resolver 优先级、repo-local script 边界、portable runtime 例外和 BiliDili 默认不进入日常流程的规则。 |
@@ -45,12 +46,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `BiliDili`<br>阻塞 | Wave 8 diagnostics 门禁和历史 job contract 复核通过；新的单维度 `architecture` rescan 被外部 AI 数据导出安全策略阻塞，等待用户确认路线。 |
-| `AlembicPlugin`<br>已完成 | Wave 7 已通过总控验收：diagnostics stale cwd / `uv_cwd` 分类修复、packaged runtime artifact 和 installed probe 均通过。 |
-| `Alembic`<br>已完成 | Wave 5 代码验收通过：提交 `11a14bbb486fff059a2e3ea42557ca6ff17d810b`；后续复测前再按文档重新启动 / 刷新 daemon。 |
-| `AlembicDashboard`<br>观察中 | Wave 3 前端已通过；当前等待后续 BiliDili 新 job 真实 payload 复测。 |
-| `AlembicAgent`<br>观察中 | Wave 1 producer 已完成；除非 Alembic 复核发现 diagnostics 未真实产出，否则不派发。 |
-| `AlembicCore`<br>无任务 | 当前问题不需要 Core contract 变化；如后续状态 / telemetry contract 下沉到 Core，再重新判断。 |
+| `AlembicDashboard`<br>已完成 | Wave 9F 已通过总控验收：消费 Alembic Wave 9E 新增 progress freshness 字段，Jobs 页面显示 active task status、event count 和最近 active task update，避免前端仍用旧 job `updatedAt` 误判卡住；提交 `c1aa2c09e6f171192ccfc81a89f392fb5b5c0848`。 |
+| `Alembic`<br>已完成 | Wave 9E 已通过总控验收：已修复 job progress stale、cancel / timeout / child-run-error 分类和 efficiency summary payload；提交 `633ed228d1c0ba9cd04ef431dc4aadac18c3ac06`。 |
+| `AlembicAgent`<br>已完成 | Wave 9A4 已通过总控验收：提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`，L4 memory package、summary validation、typed memory summary、budget hard stop 和 abort 门控已落地。 |
+| `BiliDili`<br>阻塞 | Wave 9D：等待用户确认真实项目外部 AI 数据发送或替代安全路线。 |
+| `AlembicCore`<br>无任务 | 当前优化属于 Agent runtime / Alembic consumer 状态，不需要 Core contract；若 repair status 下沉为共享 contract，再重新判断。 |
+| `AlembicPlugin`<br>无任务 | 当前不涉及 Codex plugin marketplace、MCP skill 或 embedded runtime packaging。 |
 
 ## 状态枚举
 

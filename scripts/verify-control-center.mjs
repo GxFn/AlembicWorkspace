@@ -28,6 +28,11 @@ const checks = [
     args: ["scripts/check-dispatch-coverage.mjs"],
   },
   {
+    label: "TODO board",
+    command: "node",
+    args: ["scripts/check-todo-board.mjs"],
+  },
+  {
     label: "git diff whitespace",
     command: "git",
     args: ["diff", "--check"],
