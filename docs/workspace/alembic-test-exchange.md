@@ -1,9 +1,9 @@
 # AlembicTest Exchange
 
-状态：Test-2026-05-21-04 已完成，AlembicTest 仓库封口完成
+状态：Test-2026-05-22-01 已完成（测试通过，AlembicTest 仓库封口提交完成）
 维护窗口：AlembicWorkspace
 执行窗口：AlembicTest
-更新日期：2026-05-21
+更新日期：2026-05-22
 
 本文件是总控窗口与 `AlembicTest` 之间的专门测试交流文档。总控只在这里创建测试单、写清目标和验收标准；`AlembicTest` 读取测试单后执行，并在这里回填摘要与证据。详细测试报告保存在 `AlembicTest/docs/`。
 
@@ -11,14 +11,300 @@
 
 ## 当前测试单
 
-`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。`AlembicPlugin` service request 边界修正与 `Test-2026-05-21-02` 均已通过。`AlembicPlugin` prime immediate receipt shout 与 `Test-2026-05-21-03` 已验证 prime 后立即呐喊。当前 `AlembicPlugin` SHOUT-5 可见摘要优化已通过总控验收并刷新本机 Codex plugin cache；`Test-2026-05-21-04` 已完成 BiliDili 真实项目功能复测，总控确认可见呐喊已从 evidenceRefs 清单变成主动、有声量的知识摘要；剩余动作是 `AlembicTest` 提交测试报告、probe 脚本和相关文档变更后回填 commit hash。
+`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。`AlembicPlugin` service request 边界修正与 `Test-2026-05-21-02` 均已通过。`AlembicPlugin` prime immediate receipt shout、可见摘要优化与 `Test-2026-05-21-03` / `Test-2026-05-21-04` 已验证。`Test-2026-05-21-05` 已完成且结论失败，用户确认删除 `/api/v1/mcp/call`。`Test-2026-05-21-06` 已完成 VEC-4R 复测：direct `alembic_search` 已不再走 compat bridge，但 daemon `/api/v1/search` 运行态仍缺 `searchMeta`，测试结论为失败但部分修复通过。用户口径更新 `AlembicPlugin` / `Alembic` VEC-5R 均完成；`Test-2026-05-22-01` 已完成 VEC-5R 后 BiliDili 真实项目复测，结论通过。
 
 | 测试单 | 状态 | 目标 | 执行窗口 | 报告 |
 | --- | --- | --- | --- | --- |
+| Test-2026-05-22-01：BiliDili resident vector search route VEC-5R 复测 | 已完成 | 测试通过；direct `alembic_search(auto)` 已显示 `codexRequestedMode=auto` / `residentRequestMode=semantic`，不再出现 query validation failure；daemon `/api/v1/search` 和 direct `semantic/auto` 均返回 resident searchMeta，`semanticUsed=true` / `vectorUsed=true` / `residentVector.available=true`；prime delivered 与 Codex 可见知识摘要保持；BiliDili 前后干净；AlembicTest 已提交报告 / probe 脚本 / 文档变更，commit `0943ce085a1cb9c84141cc6c85673418c8248e29`。 | `AlembicTest` | [../../AlembicTest/docs/bilidili-resident-vector-search-vec5r-retest-2026-05-22.md](../../AlembicTest/docs/bilidili-resident-vector-search-vec5r-retest-2026-05-22.md) |
+| Test-2026-05-21-06：BiliDili resident vector search route VEC-4R 复测 | 已完成 | 测试失败但部分修复通过；direct `alembic_search auto/semantic` 已离开 `/api/v1/mcp/call` 与 `daemon-mcp-compat-bridge`，并走 Plugin-owned handler；semantic resident metadata 出现但 daemon `/api/v1/search` 运行态仍无 `searchMeta`，无法证明 semantic/vector used；`AlembicTest` 已提交报告 / probe 负向断言 / 文档变更，commit `e6aae4b4fb146213abd7fa2bfae7335f3c47c0ba` | `AlembicTest` | [../../AlembicTest/docs/bilidili-resident-vector-search-vec4r-retest-2026-05-21.md](../../AlembicTest/docs/bilidili-resident-vector-search-vec4r-retest-2026-05-21.md) |
+| Test-2026-05-21-05：BiliDili resident vector search route 真实项目复测 | 已完成 | 测试失败；`alembic_task prime` 成功且边界保持 Plugin-owned，但 direct `alembic_search auto/semantic` 被桥接到不存在的 `POST /api/v1/mcp/call`，daemon `/api/v1/search` 能返回命中但没有 resident telemetry；`AlembicTest` 已提交测试报告 / probe 脚本 / 文档变更，commit `cb1a1c5a9d8f5691d0959b3e0a241c823f5cd8b2` | `AlembicTest` | [../../AlembicTest/docs/bilidili-resident-vector-search-route-test-2026-05-21.md](../../AlembicTest/docs/bilidili-resident-vector-search-route-test-2026-05-21.md) |
 | Test-2026-05-21-04：BiliDili prime readable receipt shout 可见摘要复测 | 已完成 | 功能验收通过；`AlembicTest` 已提交 readable receipt shout 测试报告 / probe 脚本 / 文档变更，commit `60bbd360be147062f834ee881630ca25918663d0` | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md) |
 | Test-2026-05-21-03：BiliDili prime immediate receipt shout 可见行为复测 | 已完成 | 功能验收通过；`AlembicTest` 已提交测试报告 / probe 脚本 / 文档变更，commit `b532cd8bf7c40c8f12b93f91380befdea617d999` | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md) |
 | Test-2026-05-21-02：BiliDili prime shout service boundary 复测 | 已完成 | 功能验收通过；`AlembicTest` 已提交测试报告 / probe 脚本 / 文档变更，commit `af0430ad69b4da50469eeaded8caa77c59e996e5` | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md) |
 | Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 已完成 | 结论为失败：BiliDili Recipes 可读，但 `prime` 未返回 `primeKnowledgeMaterial`；后续复测已转入 Test-2026-05-21-02 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md) |
+
+### Test-2026-05-22-01：BiliDili resident vector search route VEC-5R 复测
+
+状态：已完成（测试通过，AlembicTest 仓库封口提交完成）
+创建日期：2026-05-22
+总控来源：Test-2026-05-21-06 失败后，`AlembicPlugin` 已完成 VEC-5R mode normalization；用户口径更新 `Alembic` 已完成 running daemon telemetry 处理。总控复核本地 `Alembic` 仓库未发现新代码提交，当前用真实项目复测验证运行态。
+执行窗口：AlembicTest
+目标项目：BiliDili（真实测试项目，仅作为目标项目，不是独立执行窗口）
+
+#### 测试目标
+
+- 证明 BiliDili 上下文中 direct `alembic_search(auto)` 不再把 `mode=auto` 原样传给 Alembic `/api/v1/search`，不再出现 `Query parameter validation failed`。
+- 证明 direct `alembic_search(auto)` 的 resident metadata 能同时看出 Codex 原始请求是 `auto`，resident request mode 是 daemon 支持的 `semantic`，例如 `requestedMode=auto` / `residentRequestMode=semantic` / `codexRequestedMode=auto` 或等价字段。
+- 证明 direct `alembic_search(semantic)` 和 daemon `/api/v1/search?mode=semantic` 运行态返回 `searchMeta`，至少包含 route / service / requestedMode / actualMode / semanticUsed / vectorUsed / residentVector / fallbackReason 或等价诊断字段。
+- 证明 semantic/vector 真实使用时有 `semanticUsed=true` 或 `vectorUsed=true`；若运行态仍无法使用真实 vector，必须给出清晰 fallbackReason，不得用空 `searchMeta={}` 或 `residentVector.available=false` 且 reason `null` 通过。
+- 证明 `/api/v1/mcp/call` 和 `daemon-mcp-compat-bridge` 没有回归。
+- 证明 `alembic_task(operation="prime")` 仍保持 Plugin-owned Codex-facing 边界，能返回 delivered `primeKnowledgeMaterial`，Codex 可见响应仍是知识摘要，不默认倾倒 telemetry / evidenceRefs。
+- 证明 BiliDili 真实项目在测试前后 git 状态保持干净。
+
+#### 非目标
+
+- 不重新生成 BiliDili Recipes 或向量数据。
+- 不启动完整 cold-start / rescan；如果 daemon 未 reload 或向量状态阻塞，记录证据，不扩大测试范围。
+- 不修改 BiliDili 业务源码、工程配置、登录、播放、网络、UI 或 Xcode 项目结构。
+- 不刷新本机 Codex plugin cache；cache refresh 是后续 VEC-6 总控动作。
+- 不在 AlembicTest 窗口修复 `AlembicPlugin` 或 `Alembic` 源码；发现问题只回填证据和建议归属。
+
+#### 前置版本
+
+- `AlembicPlugin` VEC-5R：`2c98f69b1388c478bbbb255e487c51fde621cff7`
+- AlembicCodex runtime artifact：`33689ec1cd0266023fab2d7c1bebf7ad6fd59732`
+- `Alembic`：当前本地 HEAD 为 `d725bae3ae6ef9ab168a0a444ad832b6a2fc2f10`；用户口径 VEC-5R 完成但总控未发现新代码提交，因此本测试必须记录 running daemon startedAt、dist mtime、实际 endpoint payload。
+- `AlembicCore` resident telemetry contract：`39bcebe94c451f92e405b0da38d2cbe67e8e0f82`
+- BiliDili Recipes / vector 数据已存在；测试窗口必须记录实际使用的 MCP entry、plugin cache marker、daemon state 和版本。
+
+#### 执行范围
+
+- 触发入口：在 BiliDili 项目上下文中调用 `alembic_codex_status`、`alembic_task(operation="prime")`、`alembic_search(auto)`、`alembic_search(semantic)`。
+- 建议复用并更新 `AlembicTest/scripts/probe-resident-vector-search.mjs`，重点新增对 VEC-5R `residentRequestMode` / `codexRequestedMode` 与 daemon `searchMeta` 的断言。
+- 允许只读探测 daemon `/api/v1/search`，用于区分 Plugin metadata、resident endpoint 和 running daemon telemetry。
+- 禁止写入或修改 BiliDili 仓库受 git 跟踪文件；禁止 cold-start / rescan / 重建向量 / 手动改 plugin dist 或 daemon state。
+
+#### 观察点
+
+- version / runtime：记录 `AlembicPlugin` HEAD、AlembicCodex runtime artifact HEAD、实际 MCP entry、cache marker、Alembic HEAD、daemon process、daemon health `startedAt`、search route dist mtime。
+- direct auto：不得再出现 `Query parameter validation failed`；payload 应显示 resident route attempted，并保留 `auto -> semantic` 的模式转译证据。
+- direct semantic：若 resident result used=true，必须能看到来自 daemon 或 Plugin 保留的 `semanticUsed` / `vectorUsed` / `residentVector`；如果缺失，按失败记录。
+- daemon endpoint：`/api/v1/search` 不应缺失 `searchMeta`；若缺失，按失败记录，并记录是否 running daemon 仍早于 dist / 未 reload。
+- bridge removal：probe 日志、payload、stderr 或显式负向扫描不得出现对 `POST /api/v1/mcp/call` 的调用；若出现，按失败记录。
+- Codex 可见行为：prime 后下一条开发者可见响应仍应由 Codex / 我喊出知识摘要，不默认列 evidenceRefs 或 telemetry dump。
+- BiliDili 状态：测试前后 `git -C ../BiliDili status --short --branch` 应保持一致且干净。
+
+#### 验收标准
+
+- 通过：版本证据匹配 VEC-5R；direct `alembic_search(auto)` 不再触发 daemon query validation failure；resident request mode 转译证据可见；daemon `/api/v1/search` 返回 `searchMeta`；search payload 有 resident semantic/vector metadata 或清晰 fallback；prime delivered 且 Codex 可见呐喊保持摘要；BiliDili 前后干净。
+- 失败：仍请求 `/api/v1/mcp/call`；仍出现 `daemon-mcp-compat-bridge`；`auto` 仍因 `Query parameter validation failed` 降级；daemon `/api/v1/search` 没有 `searchMeta`；semantic/vector used 为空且无 fallbackReason；fallback 被误写成 Plugin embedding failure；BiliDili 被修改。
+- 阻塞：实际 MCP entry 未覆盖 VEC-5R 版本、daemon 不可用、BiliDili Recipes / vector 数据缺失、无法读取 prime/search payload 或无法观察 Codex 可见响应。
+
+#### 建议命令或脚本
+
+```bash
+# 由 AlembicTest 窗口按自身仓库脚本和 Codex 插件测试流程执行；总控不直接运行。
+git -C ../BiliDili status --short --branch
+# 记录实际 MCP entry / plugin cache marker / AlembicPlugin / Alembic / Core 版本。
+# 调用 alembic_codex_status、alembic_task prime、alembic_search auto/semantic，并保存 payload 摘要。
+# 只读探测 daemon /api/v1/search，记录 searchMeta 和 daemon startedAt / dist mtime。
+git -C ../BiliDili status --short --branch
+```
+
+#### 回填要求
+
+- 测试结论：通过。probe 分类为 `resident-success`；VEC-5R 后 direct `alembic_search(auto)` 不再出现 daemon `mode=auto` validation failure，resident metadata 显示 `codexRequestedMode=auto` / `residentRequestMode=semantic`；daemon `/api/v1/search` 和 direct `auto/semantic` 均返回 resident telemetry，`semanticUsed=true` / `vectorUsed=true` / `residentVector.available=true`。
+- 执行范围：只读调用 Alembic Codex MCP stdio runtime 的 `alembic_codex_status`、`alembic_task prime`、`alembic_search auto`、`alembic_search semantic`，并额外只读探测 daemon `/api/v1/search`；未 cold-start、未 rescan、未重建向量、未刷新 cache、未修改 BiliDili。
+- 使用配置：`ALEMBIC_PROJECT_DIR` / `CODEX_WORKSPACE_DIR` 指向 workspace 内 `BiliDili`；MCP entry 使用 workspace `AlembicPlugin/dist/bin/codex-mcp.js`；输出 JSON 为 `AlembicTest/tmp/bilidili-resident-vector-search-vec5r-probe-2026-05-22.json`。
+- 版本证据：`AlembicPlugin` HEAD 为 `2c98f69b1388c478bbbb255e487c51fde621cff7`；AlembicCodex runtime artifact `AlembicPlugin/plugins/alembic-codex` HEAD 为 `33689ec1cd0266023fab2d7c1bebf7ad6fd59732`；`Alembic` HEAD 为 `d725bae3ae6ef9ab168a0a444ad832b6a2fc2f10`；`AlembicCore` HEAD 为 `39bcebe94c451f92e405b0da38d2cbe67e8e0f82`；cache marker 仍为 `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`，但 `localMcpEntry` 指向 workspace `AlembicPlugin/dist/bin/codex-mcp.js`，本次实际使用 local MCP entry。
+- daemon state / startedAt / dist mtime：`alembic_codex_status` 解析到实际 daemon URL 为 `http://127.0.0.1:53068`，pid `53669`，health ready，`version=0.1.0`，`mode=daemon`，project 指向 BiliDili，schema migration `009_knowledge_dimension_id`，`startedAt=2026-05-21T15:57:55.147Z`；`Alembic/dist/lib/http/routes/search.js` 与 `daemon.js` 文件 mtime 均为 2026-05-21 23:00:37，`AlembicPlugin/dist/bin/codex-mcp.js` 文件 mtime 为 2026-05-22 00:04:12。
+- `prime` payload 摘要：`success=true`；`primeKnowledgeMaterial.status=delivered`；`acceptedKnowledge=5`；`acceptedGuards=3`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=false`；tool list / `nextActions` 不含 `codex_host_response`。
+- direct `alembic_search(auto)` 摘要：`success=true`；requested mode `auto`；actual mode `semantic`；result count `6`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=true`；`searchMeta.residentSearch.route=alembic-resident-service`、`coreRoute=core-search-engine`、`service=alembic-daemon`、`attempted=true`、`available=true`、`used=true`、`codexRequestedMode=auto`、`residentRequestMode=semantic`、`requestedMode=auto`、`actualMode=semantic`、`semanticUsed=true`、`vectorUsed=true`、`fallbackReason=null`；`residentVector.available=true`，stats count `118`、dimension `1024`；代表性命中包括 `@lazy-var-uicomponents`、`@schemerouter-url-decoupling`、`@async-await-repository-bridge`、`@main-thread-ui-dispatch`、`@base-viewcontroller-template`。
+- direct `alembic_search(semantic)` 摘要：`success=true`；requested / actual mode 均为 `semantic`；result count `6`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=true`；resident route `alembic-resident-service`，`coreRoute=core-search-engine`，`service=alembic-daemon`，`attempted=true`、`available=true`、`used=true`、`codexRequestedMode=semantic`、`residentRequestMode=semantic`、`semanticUsed=true`、`vectorUsed=true`、`resultCount=12`、`fallbackReason=null`；`residentVector.available=true`，stats count `118`、dimension `1024`；代表性命中包括 `@base-viewcontroller-template`、`@video-url-preloader-cache`、`@lazy-var-uicomponents`、`@builder-urlrequest-image`、`@session-pool-ignore-urlcache`。
+- daemon `/api/v1/search` 摘要：semantic 查询 `VideoFeedViewController lazy var UI SchemeRouter route guard` 返回 HTTP 200、`success=true`、`actualMode=semantic`、`itemCount=6`；`searchMetaKeys` 包含 `route`、`service`、`coreRoute`、`requestedMode`、`actualMode`、`semanticUsed`、`vectorUsed`、`residentVector`、`vector`、`workspace` 等字段；`route=resident-search`、`service=alembic-daemon`、`coreRoute=core-search-engine`、`semanticUsed=true`、`vectorUsed=true`、`degraded=false`、`residentVector.available=true`；代表性命中包括 `@lazy-var-uicomponents`、`@schemerouter-url-decoupling`、`@async-await-repository-bridge`、`@main-thread-ui-dispatch`、`@base-viewcontroller-template`。
+- `/api/v1/mcp/call` / `daemon-mcp-compat-bridge` 负向证据：probe 对 direct search payload 和 MCP stderr 扫描结果为 `containsMcpCallPath=false`、`containsDaemonCompatBridge=false`。
+- Codex 可见行为：prime 后下一条开发者可见响应先做知识摘要并补充 VEC-5R 证据：`Prime 收到了 BiliDili 的关键约束：5 条 Recipe 和 3 条 Guard 已就位；后续判断先守住 SchemeRouter 解耦、RouteError/RouteResult、AnalyticsMiddleware 注入、lazy var UI、ModuleManager 生命周期和 Protocol 命名后缀。Resident search 的 VEC-5R 证据也到了：auto 已保留 Codex 请求为 auto、resident 请求转成 semantic，daemon 和 direct search 都显示 semanticUsed=true / vectorUsed=true，而且没有 /api/v1/mcp/call 回归。`
+- 是否默认倾倒 evidenceRefs / telemetry：否。可见响应未列长路径清单、逐条 path:line，也未把 resident telemetry 当作可见呐喊主体。
+- BiliDili 状态：测试前 `## main...origin/main`；测试后 `## main...origin/main`；无受 git 跟踪或未跟踪文件变化。
+- 详细报告路径：[../../AlembicTest/docs/bilidili-resident-vector-search-vec5r-retest-2026-05-22.md](../../AlembicTest/docs/bilidili-resident-vector-search-vec5r-retest-2026-05-22.md)
+- `AlembicTest` commit hash：`0943ce085a1cb9c84141cc6c85673418c8248e29`
+- 提交范围：`docs/bilidili-resident-vector-search-vec5r-retest-2026-05-22.md`、`scripts/probe-resident-vector-search.mjs`、`scripts/README.md`；共 3 个文件，记录 Test-2026-05-22-01 VEC-5R 复测报告、probe mode normalization / daemon searchMeta 断言和脚本说明更新。
+- 是否仍有未提交变更：`AlembicTest` 仓库无未提交文件变更，`main` 相对 `origin/main` ahead 3；`BiliDili` 仍为 `## main...origin/main`，无未提交变更；本交换文档回填属于 workspace 总控文档变更，按规则留给主控窗口统一提交。
+- 遗留风险：Codex plugin cache marker 仍是旧 `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`，本次实际使用 workspace local MCP entry；真实安装态 cache refresh 仍属于后续 VEC-6。daemon vector stats 显示 `indexSize=0`，但 searchMeta 已明确 `semanticUsed=true` / `vectorUsed=true` / `residentVector.available=true`，不阻塞本测试通过；若要避免误读，建议产品窗口后续解释或调整该指标语义。本轮未覆盖其它真实项目、cold-start/rescan 后 telemetry 稳定性或刷新后的 Codex plugin cache。
+- 下一步建议：总控可将 Test-2026-05-22-01 标记为通过 / 已完成；继续按 resident vector search 发布计划推进 VEC-6：刷新真实 Codex plugin cache 或发布态验证；可选由 `Alembic` / `AlembicCore` 后续解释 `residentVector.stats.indexSize=0` 的诊断语义。
+
+#### 总控验收与后续分派
+
+- 验收结论：Test-2026-05-22-01 证据充分，按测试通过处理。通过点包括 Plugin `auto -> semantic` resident request mode normalization、daemon `/api/v1/search` `searchMeta` 运行态 telemetry、direct auto/semantic resident metadata、`/api/v1/mcp/call` 负向证据、prime delivered / Codex 可见知识摘要，以及 BiliDili 前后干净。
+- 后续分派：回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-6，由总控处理真实 Codex plugin cache refresh / 发布态验证和 workspace 文档收口。当前不再派发 `AlembicTest`，也不向 `BiliDili`、`AlembicPlugin`、`Alembic`、`AlembicCore` 发送新提示词。
+- 遗留观察：`residentVector.stats.indexSize=0` 只作为后续诊断语义优化观察项，不阻塞本测试通过；真实安装态 cache marker 仍旧，留给 VEC-6 处理。
+
+### Test-2026-05-21-06：BiliDili resident vector search route VEC-4R 复测
+
+状态：已完成（测试失败，AlembicTest 仓库封口提交完成）
+创建日期：2026-05-21
+总控来源：Test-2026-05-21-05 失败后，用户确认删除 `/api/v1/mcp/call`；`AlembicPlugin` / `Alembic` 已完成 VEC-4R 产品修复并通过总控代码复核。
+执行窗口：AlembicTest
+目标项目：BiliDili（真实测试项目，仅作为目标项目，不是独立执行窗口）
+
+#### 测试目标
+
+- 证明 BiliDili 上下文中 direct `alembic_search(auto)` / `alembic_search(semantic)` 不再请求 `POST /api/v1/mcp/call`，也不再返回 `daemon-mcp-compat-bridge`。
+- 证明 direct `alembic_search` 进入 Plugin-owned handler，并通过 ResidentSearchClient 请求 Alembic resident `/api/v1/search`；成功时 payload 中出现 `searchMeta.residentSearch` / `residentVector` 或等价 metadata。
+- 证明 Alembic `/api/v1/search` 运行态返回 `searchMeta`，至少包含 route / service / requestedMode / actualMode / semanticUsed / vectorUsed / residentVector / fallbackReason 或等价诊断字段。
+- 证明 resident service 不可用或请求失败时，Plugin 降级到 embedded baseline search，并把原因写成 resident unavailable / request failure，不误报为 Plugin embedding provider failure。
+- 证明 `alembic_task(operation="prime")` 仍保持 Plugin-owned Codex-facing 边界，能返回 delivered `primeKnowledgeMaterial`，Codex 可见响应仍是知识摘要。
+- 证明 BiliDili 真实项目在测试前后 git 状态保持干净。
+
+#### 非目标
+
+- 不重新生成 BiliDili Recipes 或向量数据。
+- 不启动完整 cold-start / rescan；如果 daemon 或向量状态阻塞，记录阻塞证据，不扩大测试范围。
+- 不修改 BiliDili 业务源码、工程配置、登录、播放、网络、UI 或 Xcode 项目结构。
+- 不刷新本机 Codex plugin cache；cache refresh 是后续 VEC-6 总控动作。
+- 不在 AlembicTest 窗口修复 `AlembicPlugin` 或 `Alembic` 源码；发现问题只回填证据和建议归属。
+
+#### 前置版本
+
+- `AlembicPlugin` VEC-4R：`f46e28179aac306e7fff12fe9d7d68965494c1d8`
+- AlembicCodex runtime artifact：`daec908a340f4dbe60a8cec643efdc126cf9ff77`
+- `Alembic` VEC-4R：`d725bae3ae6ef9ab168a0a444ad832b6a2fc2f10`
+- `AlembicCore` resident telemetry contract：`39bcebe94c451f92e405b0da38d2cbe67e8e0f82`
+- BiliDili Recipes / vector 数据已存在；测试窗口必须记录实际使用的 MCP entry、plugin cache marker、daemon state 和版本。
+
+#### 执行范围
+
+- 触发入口：在 BiliDili 项目上下文中调用 `alembic_codex_status`、`alembic_task(operation="prime")`、`alembic_search(auto)`、`alembic_search(semantic)`。
+- 建议复用并更新 `AlembicTest/scripts/probe-resident-vector-search.mjs`，重点新增对 `/api/v1/mcp/call` 负向路径的断言。
+- 允许只读探测 daemon `/api/v1/search`，用于区分 Plugin handler、resident endpoint 和 telemetry 运行态。
+- 禁止写入或修改 BiliDili 仓库受 git 跟踪文件；禁止 cold-start / rescan / 重建向量 / 手动改 plugin dist 或 daemon state。
+
+#### 观察点
+
+- tool / payload 边界：`serviceBoundary.executionPath` 不应为 `daemon-mcp-compat-bridge`；tool list 和 `nextActions` 不应出现 `codex_host_response`。
+- direct search：`auto` / `semantic` 至少应成功返回 baseline 或 resident 结果；若 resident ready 且有向量数据，至少一个查询应体现 resident route attempted，并给出 semantic/vector used 或清晰 fallbackReason。
+- daemon endpoint：`/api/v1/search` 不应缺失 `searchMeta`；若缺失，按失败记录。
+- bridge removal：probe 日志、payload、stderr 或显式负向扫描不得出现对 `POST /api/v1/mcp/call` 的调用；若出现，按失败记录。
+- Codex 可见行为：prime 后下一条开发者可见响应仍应由 Codex / 我喊出知识摘要，不默认列 evidenceRefs 或 telemetry dump。
+- BiliDili 状态：测试前后 `git -C ../BiliDili status --short --branch` 应保持一致且干净。
+
+#### 验收标准
+
+- 通过：版本证据匹配 VEC-4R；direct `alembic_search` 不再走 `/api/v1/mcp/call`；resident `/api/v1/search` 返回 telemetry；search payload 有 resident metadata 或清晰 baseline fallback；prime delivered 且 Codex 可见呐喊保持摘要；BiliDili 前后干净。
+- 失败：仍请求 `/api/v1/mcp/call`；仍出现 `daemon-mcp-compat-bridge`；direct search 整体失败且无 baseline fallback；daemon `/api/v1/search` 没有 `searchMeta`；fallback 被误写成 Plugin embedding failure；BiliDili 被修改。
+- 阻塞：实际 MCP entry 未覆盖 VEC-4R 版本、daemon 不可用、BiliDili Recipes / vector 数据缺失、无法读取 prime/search payload 或无法观察 Codex 可见响应。
+
+#### 建议命令或脚本
+
+```bash
+# 由 AlembicTest 窗口按自身仓库脚本和 Codex 插件测试流程执行；总控不直接运行。
+git -C ../BiliDili status --short --branch
+# 记录实际 MCP entry / plugin cache marker / AlembicPlugin / Alembic / Core 版本。
+# 调用 alembic_codex_status、alembic_task prime、alembic_search auto/semantic，并保存 payload 摘要。
+git -C ../BiliDili status --short --branch
+```
+
+#### 回填要求
+
+- 测试结论：失败，但 VEC-4R bridge removal 与 direct search Plugin-owned 路由已部分通过。direct `alembic_search(auto)` / `alembic_search(semantic)` 均 `success=true`，未再出现 `/api/v1/mcp/call` 或 `daemon-mcp-compat-bridge`；`semantic` 返回 `searchMeta.residentSearch.route=alembic-resident-service` 且 `available=true` / `used=true`；但 daemon `/api/v1/search` 裸探测仍 `searchMetaKeys=[]`，direct semantic resident inner `searchMeta={}`，没有 `semanticUsed` / `vectorUsed`，因此不能证明真实 vector route 使用。
+- 执行范围：只读调用 Alembic Codex MCP stdio runtime 的 `alembic_codex_status`、`alembic_task prime`、`alembic_search auto`、`alembic_search semantic`，并额外只读探测 daemon `/api/v1/search`；未 cold-start、未 rescan、未重建向量、未刷新 cache、未修改 BiliDili。
+- 使用配置：`ALEMBIC_PROJECT_DIR` / `CODEX_WORKSPACE_DIR` 指向 workspace 内 `BiliDili`；MCP entry 使用 workspace `AlembicPlugin/dist/bin/codex-mcp.js`；输出 JSON 为 `AlembicTest/tmp/bilidili-resident-vector-search-vec4r-probe-2026-05-21.json`。
+- 版本证据：`AlembicPlugin` HEAD 为 `f46e28179aac306e7fff12fe9d7d68965494c1d8`；AlembicCodex runtime artifact `AlembicPlugin/plugins/alembic-codex` HEAD 为 `daec908a340f4dbe60a8cec643efdc126cf9ff77`；`Alembic` HEAD 为 `d725bae3ae6ef9ab168a0a444ad832b6a2fc2f10`；`AlembicCore` HEAD 为 `39bcebe94c451f92e405b0da38d2cbe67e8e0f82`；cache marker 仍为 `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`，但 `localMcpEntry` 指向 workspace `AlembicPlugin/dist/bin/codex-mcp.js`，本次实际使用 local MCP entry。
+- daemon state：health ready，`version=0.1.0`，`mode=daemon`，project 指向 BiliDili，schema migration `009_knowledge_dimension_id`；`ps -axo pid,command` 显示 pid `90465` 运行 `Alembic/dist/bin/daemon-server.js`；daemon health `startedAt=2026-05-21T07:46:15.220Z`，早于 VEC-4R dist 文件 mtime `2026-05-21 23:00:37`，因此裸 `/api/v1/search` 缺少 telemetry 可能是运行中 daemon 尚未重启加载最新 dist。
+- `prime` payload 摘要：`success=true`；`primeKnowledgeMaterial.status=delivered`；`acceptedKnowledge=5`；`acceptedGuards=3`；`hostResponse.action=shout_prime_knowledge_receipt`；`timing=immediate_after_prime`；`requiredBeforeNextAction=true`；`visibility=developer_visible`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=false`；tool list / `nextActions` 不含 `codex_host_response`。
+- direct `alembic_search(auto)` 摘要：`success=true`；actual mode `auto(weighted-fallback,conf=15)`；result count `6`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=true`；`searchMeta.residentSearch.route=alembic-resident-service`、`attempted=true`、`available=false`、`used=false`、reason `Query parameter validation failed`、fallbackReason `vector_service_hybrid_unavailable`；baseline fallback 有结果，代表性命中包括 `@schemerouter-url-decoupling`、`@base-viewcontroller-template`、`@main-thread-ui-dispatch`、`@continuation-once-guard`、`@route-error-eight-cases`。
+- direct `alembic_search(semantic)` 摘要：`success=true`；actual mode `semantic`；result count `6`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=true`；`searchMeta.residentSearch.route=alembic-resident-service`、`attempted=true`、`available=true`、`used=true`、`requestedMode=semantic`、`actualMode=semantic`、`resultCount=12`、fallbackReason `null`；但 `semanticUsed` / `vectorUsed` 未返回，`residentVector.available=false` 且 reason `null`，inner `searchMeta={}`；代表性命中包括 `@base-viewcontroller-template`、`@video-url-preloader-cache`、`@lazy-var-uicomponents`、`@builder-urlrequest-image`、`@session-pool-ignore-urlcache`。
+- daemon `/api/v1/search` 摘要：semantic 查询 `VideoFeedViewController lazy var UI SchemeRouter route guard` 返回 HTTP 200、`success=true`、`actualMode=semantic`、`itemCount=6`；`searchMetaKeys=[]`，无 `route`、`service`、`semanticUsed`、`vectorUsed`、`residentVector` 或 fallbackReason；代表性命中包括 `@lazy-var-uicomponents`、`@schemerouter-url-decoupling`、`@async-await-repository-bridge`、`@main-thread-ui-dispatch`、`@base-viewcontroller-template`。
+- `/api/v1/mcp/call` 负向证据：probe 对 direct search payload 和 MCP stderr 扫描结果为 `containsMcpCallPath=false`、`containsDaemonCompatBridge=false`。
+- Codex 可见行为：prime 后下一条开发者可见响应先做知识摘要并明确分层结论：`Prime 收到了 BiliDili 的关键约束：5 条 Recipe 和 3 条 Guard 已就位；接下来判断会先守住 SchemeRouter 解耦、RouteError/RouteResult、AnalyticsMiddleware 注入、lazy var UI、ModuleManager 生命周期和 Protocol 命名后缀。Resident search 证据留在 payload 中：VEC-4R 已经不再碰 /api/v1/mcp/call，direct search 改为 Plugin-owned；但 daemon /api/v1/search 只读探测仍缺 searchMeta，所以这次结论会更像“部分修复通过、整体测试失败”。`
+- 是否默认倾倒 evidenceRefs / telemetry：否。可见响应未列长路径清单、逐条 path:line，也未把 resident telemetry 当作可见呐喊主体。
+- BiliDili 状态：测试前 `## main...origin/main`；测试后 `## main...origin/main`；无受 git 跟踪或未跟踪文件变化。
+- 详细报告路径：[../../AlembicTest/docs/bilidili-resident-vector-search-vec4r-retest-2026-05-21.md](../../AlembicTest/docs/bilidili-resident-vector-search-vec4r-retest-2026-05-21.md)
+- `AlembicTest` commit hash：`e6aae4b4fb146213abd7fa2bfae7335f3c47c0ba`
+- 提交范围：`docs/bilidili-resident-vector-search-vec4r-retest-2026-05-21.md`、`scripts/probe-resident-vector-search.mjs`、`scripts/README.md`；共 3 个文件，记录 Test-06 VEC-4R 复测报告、probe bridge removal 负向断言和脚本说明更新。
+- 是否仍有未提交变更：`AlembicTest` 仓库无未提交文件变更，`main` 相对 `origin/main` ahead 2；`BiliDili` 仍为 `## main...origin/main`，无未提交变更；本交换文档回填属于 workspace 总控文档变更，按规则留给主控窗口统一提交。
+- 遗留风险：当前 daemon 进程可能未加载 VEC-4R 后的最新 `Alembic/dist`，本次按非目标未重启 daemon；`auto` resident 请求仍因 `Query parameter validation failed` 降级；`semantic` resident available / used 但没有 `semanticUsed` / `vectorUsed`，`residentVector.available=false` 且 reason 为 `null`；cache marker 仍是 SHOUT-5，cache refresh 属于后续 VEC-6。
+- 下一步建议：总控应将 Test-2026-05-21-06 标记为失败 / 待产品或运行态修复；建议 `Alembic` 窗口确认 running daemon 是否需要重启加载 `d725bae3ae6ef9ab168a0a444ad832b6a2fc2f10` 并复核 `/api/v1/search` 是否稳定返回 `searchMeta`；建议 `AlembicPlugin` 窗口确认 `alembic_search(auto)` resident request 的 mode 参数是否要转译，避免 daemon validation failure；修复或刷新运行态后重跑 `AlembicTest/scripts/probe-resident-vector-search.mjs`。
+
+#### 总控验收与后续分派
+
+- 验收结论：Test-2026-05-21-06 证据充分，按失败但部分修复通过处理。通过部分是 VEC-4R bridge removal、Plugin-owned direct search、prime delivered 和 BiliDili 前后干净；失败部分是 daemon `/api/v1/search` 运行态 telemetry 未闭环、direct semantic 无 `semanticUsed` / `vectorUsed`、direct auto resident request mode validation failure。
+- 后续分派：已回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-5R，当前只派发 `AlembicPlugin` / `Alembic`。`AlembicTest` 暂不继续复测，等 VEC-5R 回填后再由总控创建下一张测试单。
+
+### Test-2026-05-21-05：BiliDili resident vector search route 真实项目复测
+
+状态：已完成（测试失败，AlembicTest 仓库封口提交完成）
+创建日期：2026-05-21
+总控来源：resident vector search 发布计划中，`AlembicCore` VEC-1、`Alembic` VEC-1 返工、`AlembicPlugin` VEC-2 / VEC-3 均已通过总控代码复核；需要在 BiliDili 真实项目里验证 Plugin 到 Alembic resident service 的真实 semantic/vector route。
+执行窗口：AlembicTest
+目标项目：BiliDili（真实测试项目，仅作为目标项目，不是独立执行窗口）
+
+#### 测试目标
+
+- 证明在 BiliDili 项目上下文中，当前 `AlembicPlugin` 能通过 Alembic resident service 请求真实 semantic/vector search，而不是继续使用 Plugin 内 misleading placeholder embedding provider。
+- 证明 `alembic_task(operation="prime")` 的 `primeKnowledgeMaterial` / task intent payload 保留 `searchMeta.residentSearch` 或等价 resident route metadata，能看出 `route=alembic-resident-service`、resident service 是否可用、是否使用 semantic/vector、以及 fallbackReason。
+- 证明直接 `alembic_search` 的 `auto` / `semantic` 查询在 resident service 可用且命中时优先返回 resident 结果；resident 不可用或请求失败时，Plugin 降级到 baseline embedded search，并把原因标为 resident enhancement unavailable / resident search failure，而不是误报为 Plugin embedding failure。
+- 证明 Codex receipt shout 仍然是开发者可见的知识摘要，不默认倾倒 evidenceRefs 路径 / 行号，也不把 resident telemetry 当作可见呐喊主体。
+- 证明 `alembic_task prime` 仍为 Plugin-owned Codex-facing 入口，不出现 `codex_host_response` tool，不把 prime 转成 daemon MCP ownership bridge。
+- 证明 BiliDili 真实项目在测试前后 git 状态保持干净。
+
+#### 非目标
+
+- 不重新生成 BiliDili Recipes 或向量数据。
+- 不启动完整 cold-start / rescan；如果 resident service 未 ready 或向量数据缺失，记录阻塞或降级证据，不扩大为冷启动任务。
+- 不修改 BiliDili 业务源码、工程配置、登录、播放、网络、UI 或 Xcode 项目结构。
+- 不刷新本机 Codex plugin cache；cache refresh 是 resident vector search 计划 VEC-5，由总控在真实复测通过后处理。
+- 不在 AlembicTest 窗口修复 `AlembicCore`、`Alembic` 或 `AlembicPlugin` 源码；发现问题只回填证据和建议归属。
+
+#### 前置条件
+
+- BiliDili Recipes 已由测试线生成完成，且当前测试只读取既有知识库和向量状态。
+- `AlembicCore` resident telemetry contract 已完成：commit `39bcebe94c451f92e405b0da38d2cbe67e8e0f82`。
+- `Alembic` resident `/api/v1/search` telemetry 已完成并返工通过：commit `d6526aa0541dc8ce54e10d4efe97366b7646e7bf`、`2cfd935b83241ee72263e18528c9647ded65dec7`。
+- `AlembicPlugin` VEC-2 / VEC-3 已通过总控代码复核：commit `7a81721061bbaaba437343876a56eec62356297a`；AlembicCodex runtime artifact `c160c062e95329ff0126cb98f1a9c36bbd451678`；embedded Core source `39bcebe94c451f92e405b0da38d2cbe67e8e0f82`。
+- 测试窗口必须记录实际使用的 MCP entry、plugin cache marker、runtime artifact 和 daemon 状态；如果 installed cache 尚未覆盖上述 Plugin/runtime 版本，应标为阻塞或使用当前总控计划授权的 workspace local MCP entry，并明确记录入口，不自行刷新 cache。
+
+#### 执行范围
+
+- 触发入口：在 BiliDili 项目上下文中通过 Alembic Codex 插件触发 `alembic_task(operation="prime")`，并用 `alembic_search` 执行至少一次 `auto` 或 `semantic` 查询。
+- 允许操作：读取 BiliDili git 状态、Alembic Codex MCP status、daemon health / capabilities / search response、prime/search payload、Codex 可见响应、Plugin cache marker、相关日志摘要。
+- 禁止操作：不得写入或修改 BiliDili 仓库受 git 跟踪文件；不得冷启动、重扫、重建向量或补造 Recipes；不得手动改 daemon state、cache marker 或 plugin dist 来让测试通过。
+- 建议查询：选择 BiliDili 已有 Recipes 能覆盖的语义，例如 `VideoFeedViewController lazy var UI`、`BaseViewController setupUI bindViewModel`、`video URL preloader cache` 或 `repository protocol struct Sendable`。具体查询可由 AlembicTest 根据现有 probe 脚本选择。
+
+#### 观察点
+
+- 版本证据：记录 `AlembicPlugin` HEAD、AlembicCodex runtime artifact、embedded Core source、Alembic daemon source / version、installed cache marker 或 local MCP entry。
+- daemon / resident service：记录 daemon 是否 ready、project 是否指向 BiliDili、token / endpoint 是否可用、resident search capability 是否暴露、vector stats 或 HNSW 数据是否存在。
+- `prime` payload：记录 `primeKnowledgeMaterial.status`、accepted knowledge / guard 数量、`searchMeta.residentSearch` 或等价 metadata、resident route 是否 attempted / used、fallbackReason。
+- `alembic_search` payload：记录 direct search 的 `searchMeta.residentSearch`、`residentVector.available`、`semanticUsed`、`vectorUsed`、`fallbackReason`、结果来源和命中摘要。
+- fallback 分类：区分 Alembic 不存在、daemon stale、resident unavailable、resident request failure、resident sparse-only、resident vector used；不得把 Alembic 不存在或 resident failure 写成 Plugin embedding provider failure。
+- Codex 可见行为：prime 后下一条开发者可见响应仍应由 Codex / 我喊出知识摘要；不默认列长路径清单、逐条 path:line 或 resident telemetry。
+- 工具边界：tool list 和 `nextActions` 不应出现 `codex_host_response`；`alembic_task prime` 仍应是 Plugin-owned Codex-facing path。
+- 真实项目状态：测试前后 `git -C ../BiliDili status --short --branch` 应保持一致且干净。
+
+#### 验收标准
+
+- 通过：版本证据匹配当前 VEC-2 / VEC-3；BiliDili 上下文能触发 `prime` 和 direct `alembic_search`；当 resident service ready 且有向量数据时，至少一个 semantic/auto 查询体现 resident route success，并能看到 `route=alembic-resident-service` 与 semantic/vector metadata；resident 不可用或请求失败时，baseline search 正常降级且 metadata 清晰；Codex receipt shout 仍是知识摘要；BiliDili 前后干净。
+- 失败：Plugin 仍把 host-managed placeholder embed 当作 executable embedding；`embedAvailable=true` 等 misleading 状态仍出现；resident service ready 且有向量数据但 Plugin 从未尝试 resident search；direct semantic/auto search 没有 resident metadata；fallback 被误写为 Plugin embedding failure；prime 被转到 daemon MCP ownership bridge；BiliDili 被修改。
+- 阻塞：daemon 不可用、BiliDili 向量数据缺失、installed cache 未覆盖目标版本且无法使用 local MCP entry、无法读取 prime/search payload 或无法观察 Codex 可见响应。阻塞时只记录证据和最小下一步，不扩大测试范围。
+
+#### 建议命令或脚本
+
+```bash
+# 由 AlembicTest 窗口按自身仓库脚本和 Codex 插件测试流程执行；总控不直接运行。
+git -C ../BiliDili status --short --branch
+# 读取 Codex plugin cache marker / Skill / runtime dist / AlembicPlugin HEAD，确认实际入口。
+# 在 BiliDili 项目上下文中调用 alembic_codex_status、alembic_task prime、alembic_search auto/semantic，并保存 payload 摘要。
+git -C ../BiliDili status --short --branch
+```
+
+#### 回填要求
+
+- 测试结论：失败。BiliDili 上下文可成功触发 `alembic_task(operation="prime")`，但 direct `alembic_search(auto)` 与 `alembic_search(semantic)` 均未返回 resident route metadata，也没有 baseline fallback 结果；daemon `/api/v1/search` 本体能返回 6 条语义命中，但当前运行态没有 `searchMeta` / `residentVector` telemetry，无法证明 semantic/vector route 真实使用。
+- 执行范围：只读调用 Alembic Codex MCP stdio runtime 的 `alembic_codex_status`、`alembic_task prime`、`alembic_search auto`、`alembic_search semantic`，并额外只读探测 daemon `/api/v1/search`；未 cold-start、未 rescan、未重建向量、未刷新 cache、未修改 BiliDili。
+- 使用配置：`ALEMBIC_PROJECT_DIR` / `CODEX_WORKSPACE_DIR` 指向 workspace 内 `BiliDili`；MCP entry 使用 workspace `AlembicPlugin/dist/bin/codex-mcp.js`；输出 JSON 为 `AlembicTest/tmp/bilidili-resident-vector-search-probe-2026-05-21.json`。
+- 版本证据：`AlembicPlugin` HEAD 为 `7a81721061bbaaba437343876a56eec62356297a`；AlembicCodex runtime artifact `AlembicPlugin/plugins/alembic-codex` HEAD 为 `c160c062e95329ff0126cb98f1a9c36bbd451678`；`AlembicCore` HEAD 为 `39bcebe94c451f92e405b0da38d2cbe67e8e0f82`；`Alembic` HEAD 为 `2cfd935b83241ee72263e18528c9647ded65dec7`；cache marker 仍为 `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`，但 `localMcpEntry` 指向 workspace `AlembicPlugin/dist/bin/codex-mcp.js`，本次实际使用 local MCP entry。
+- daemon 状态证据：health ready，`version=0.1.0`，`mode=daemon`，project 指向 BiliDili，schema migration 为 `009_knowledge_dimension_id`；observed health payload 未暴露 `residentSearch` capability；daemon `/api/v1/search` 可读。
+- `prime` payload 摘要：`success=true`；`primeKnowledgeMaterial.status=delivered`；`acceptedKnowledge=5`；`acceptedGuards=3`；未出现 `searchMeta.residentSearch` / `residentVector`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=false`；tool list / `nextActions` 不含 `codex_host_response`。
+- direct `alembic_search` payload 摘要：`auto` 与 `semantic` 均 `success=false`，message 均为 `Route not found: POST /api/v1/mcp/call`；search payload 的 `serviceBoundary.executionPath=daemon-mcp-compat-bridge`、`owner=alembic-resident-service`、`residentServiceRequested=true`；没有 `searchMeta.residentSearch`、`residentVector`、fallbackReason 或 baseline 结果。
+- daemon `/api/v1/search` 摘要：semantic 查询 `VideoFeedViewController lazy var UI SchemeRouter route guard` 返回 HTTP 200、`success=true`、`actualMode=semantic`、`itemCount=6`；`searchMetaKeys=[]`，无 `route`、`service`、`semanticUsed`、`vectorUsed`、`residentVector` 或 fallbackReason；代表性命中包括 `@lazy-var-uicomponents`、`@schemerouter-url-decoupling`、`@async-await-repository-bridge`、`@main-thread-ui-dispatch`、`@base-viewcontroller-template`。
+- fallback 证据：direct `alembic_search` 没有进入 baseline fallback；失败被归类为 daemon MCP compat bridge route 缺失，不是 Plugin embedding provider failure，也不是 resident sparse-only fallback。
+- Codex 可见行为：prime 后下一条开发者可见响应先做知识摘要并明确归类失败：`Prime 收到了 BiliDili 的 5 条 Recipe 和 3 条 Guard；我后续会先按这些项目约束判断，而不是先散开去读路径清单。最终证据包确认：MCP direct search 被错误桥接到 POST /api/v1/mcp/call，daemon /api/v1/search 能返回 6 条语义命中但没有 resident telemetry，这一轮 Test-05 结论会是失败而不是通过。`
+- 是否默认倾倒 evidenceRefs / telemetry：否。可见响应未列长路径清单、逐条 path:line，也未把 resident telemetry 当作可见呐喊主体。
+- 工具边界：`codex_host_response` 未出现；`alembic_task prime` 仍为 Plugin-owned Codex-facing；direct `alembic_search` 则被错误路由到 daemon MCP compat bridge。
+- BiliDili 状态：测试前 `## main...origin/main`；测试后 `## main...origin/main`；无受 git 跟踪或未跟踪文件变化。
+- 详细报告路径：[../../AlembicTest/docs/bilidili-resident-vector-search-route-test-2026-05-21.md](../../AlembicTest/docs/bilidili-resident-vector-search-route-test-2026-05-21.md)
+- `AlembicTest` commit hash：`cb1a1c5a9d8f5691d0959b3e0a241c823f5cd8b2`
+- 提交范围：`docs/bilidili-resident-vector-search-route-test-2026-05-21.md`、`scripts/probe-resident-vector-search.mjs`、`scripts/README.md`、`package.json`；共 4 个文件，记录 Test-05 resident vector search 测试报告、probe 脚本、脚本说明和 check 命令更新。
+- 是否仍有未提交变更：`AlembicTest` 仓库无未提交文件变更，`main` 相对 `origin/main` ahead 1；`BiliDili` 仍为 `## main...origin/main`，无未提交变更；本交换文档回填属于 workspace 总控文档变更，按规则留给主控窗口统一提交。
+- 遗留风险：本次不允许 cold-start / rescan / cache refresh，未验证重启 daemon 后是否会暴露新的 `/api/v1/search` telemetry；direct `alembic_search` 未进入 baseline fallback，无法验证成功降级路径；daemon semantic 命中没有 `semanticUsed` / `vectorUsed`，不能作为 resident vector success 证据；原始 probe JSON 位于 `AlembicTest/tmp/`，长期报告只保留脱敏摘要。
+- 下一步建议：总控应将 Test-2026-05-21-05 标记为失败 / 待产品修复；建议 `AlembicPlugin` 优先修正 direct `alembic_search` 的 local daemon ready 路由，避免请求当前不存在的 `/api/v1/mcp/call`，并返回 `searchMeta.residentSearch` / `residentVector`；建议 `Alembic` 确认实际 daemon runtime 是否覆盖 `2cfd935b83241ee72263e18528c9647ded65dec7` 的 `/api/v1/search` telemetry；产品修复后再重跑 `AlembicTest/scripts/probe-resident-vector-search.mjs`。
+
+#### 总控验收与后续分派
+
+- 验收结论：Test-2026-05-21-05 证据充分，结论按失败处理，不继续扩大 BiliDili 测试范围。
+- 用户决策：删除 `/api/v1/mcp/call` 兼容桥，而不是修补该 route。
+- 后续分派：已回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-4R，并已由 `AlembicPlugin` / `Alembic` 完成产品修复；当前 Test-2026-05-21-06 已完成复测，结论为失败但部分修复通过。
 
 ### Test-2026-05-21-04：BiliDili prime readable receipt shout 可见摘要复测
 
@@ -373,7 +659,9 @@ git -C ../BiliDili status --short
 
 发送给：无。
 
-Test-2026-05-21-04 已完成并由 `AlembicTest` commit `60bbd360be147062f834ee881630ca25918663d0` 封口。SHOUT-7 用户确认不走 AlembicTest 真实项目测试；当前测试交流文档不再派发测试窗口。
+`Test-2026-05-22-01` 已由 `AlembicTest` 完成复测并封口提交，commit `0943ce085a1cb9c84141cc6c85673418c8248e29`。当前交流文档不再派发 AlembicTest；后续 cache refresh、发布态验证或新一轮真实项目复测应由总控回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) 判断后另行创建测试单。
+
+当前不派发 `AlembicTest`、`AlembicPlugin`、`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 或 `BiliDili`。
 
 ## 统一测试单模板
 

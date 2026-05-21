@@ -1,6 +1,6 @@
 # AlembicPlugin Prime Immediate Receipt Shout
 
-状态：SHOUT-5 已通过总控验收；SHOUT-1/2 已通过总控验收
+状态：SHOUT-7 待总控验收；SHOUT-5 已通过总控验收；SHOUT-1/2 已通过总控验收
 日期：2026-05-21
 对应总控计划：[../workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](../workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)
 
@@ -136,3 +136,50 @@ Immediately after this prime tool result, before any further tool call, code rea
 - 2026-05-21：总控验收 SHOUT-5 通过。验收证据：`lib/external/mcp/handlers/task.ts:280` 的 tool result message 要求 “shout a short knowledge receipt” 并明确 `evidenceRefs` 留在 payload 中；`task.ts:418` 的 delivered 态 `shoutInstruction` 要求 “shout a short, active knowledge receipt”，`task.ts:419` 要求 “Make it feel like a real shout”，`task.ts:420` 明确不要默认列出 evidenceRefs 路径或行号；`task.ts:448-451` 保持 `timing: "immediate_after_prime"`、`requiredBeforeNextAction: true`、`visibility: "developer_visible"`；Skill 与 runtime Skill 均已同步“briefly and actively shout”与不默认 dump paths / line numbers；单元测试覆盖短知识 receipt、旧证据倾倒文案负向断言和 Plugin-owned prime boundary。
 - 2026-05-21：总控已刷新本机 Codex plugin cache。命令：`npm run dev:codex-plugin:refresh`。结果：成功；cache marker `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`，`localMcpEntry=/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/dist/bin/codex-mcp.js`，runtime tarball hash `0f37bf3acaaa31df9d56531bafe46e853feaddd6815f50c9e958bdfa4a8697eb`；cache Skill 已包含 “briefly and actively shout”，cache runtime dist 已包含 “shout a short, active knowledge receipt”。
 - 2026-05-21：下一步已创建 `Test-2026-05-21-04`，交给 `AlembicTest` 在 BiliDili 真实项目中复测可见摘要质量与不默认倾倒 evidenceRefs。
+
+## SHOUT-7 可见主语收紧回填
+
+状态：待总控验收
+
+完成范围：
+
+- `lib/external/mcp/handlers/task.ts` 的 delivered / empty / degraded 三态 tool result message 与 `shoutInstruction` 已明确要求 Codex / first-person 作为开发者可见 receipt 的说话者。
+- delivered 态要求 “Speak as Codex or I” 与 “Use Codex/first-person as the speaker”；empty / degraded 态改成 “I did not receive...” 口径。
+- `hostResponse.reason` 已改成 “As Codex...” 口径，并明确不要让 Alembic prime 成为 recipient / speaker。
+- 保持 `hostResponse.action`、`timing: "immediate_after_prime"`、`requiredBeforeNextAction: true`、`visibility: "developer_visible"` 和 `primeKnowledgeMaterial.evidenceRefs` 结构不变。
+- Alembic Codex Skill 已要求 “shout as Codex or I”，并禁止 “Alembic prime”、prime 或工具 / 流程作为可见 receipt 的 speaker / subject。
+- 已刷新 AlembicCodex runtime artifact：`runtime.tgz`、runtime dist `task.js`、runtime skill 均包含相同主语约束。
+
+提交 Hash：
+
+- AlembicPlugin：`45db3a780759b7e4db24f920acbd56f0b4684d63`
+- AlembicCodex runtime artifact：`2d4d8f0ce2b0a884e88a799be4fba7dffd47626a`
+- 消费的本地 AlembicCore source hash（仅 build/verify 读取，未修改）：`bd9319db72d6fd22f9b3a2ba3a36e279ee117f24`
+
+验证命令 / 结果：
+
+- `npx biome check --write lib/external/mcp/handlers/task.ts test/unit/TaskPrimeKnowledgeMaterial.test.ts test/unit/CodexMcpServer.test.ts`：通过。
+- `npm run test -- test/unit/TaskPrimeKnowledgeMaterial.test.ts test/unit/CodexMcpServer.test.ts`：通过，38 tests passed。
+- `npm run build:check`：通过。
+- `npm run build`：通过。
+- `npm run prepare:codex-plugin-runtime`：通过，刷新 `plugins/alembic-codex/runtime.tgz`。
+- `npm run verify:codex-plugin`：通过。
+- `npm run verify:codex-channel`：通过。
+- `npm run verify:release-package-boundary`：通过，root npm publish 仍禁用，embedded runtime 仍使用 `@alembic/core: file:vendor/AlembicCore` 和 `.alembic-source.json`。
+- `npm run verify:codex-session`：通过，6 tests passed。
+- `rg "Alembic prime (has )?(accepted|received)|Alembic prime 已接收|prime 已接收|Cite evidenceRefs|line number is missing|evidence refs when present|📍" lib plugins/alembic-codex/skills plugins/alembic-codex/runtime/dist/lib/external/mcp/handlers/task.js plugins/alembic-codex/runtime/plugins/alembic-codex/skills/alembic/SKILL.md`：0 命中。
+- `git diff --check`（AlembicPlugin 和 AlembicCodex）：均通过。
+
+边界判断：
+
+- 未修改 BiliDili。
+- 未修改 `Alembic` daemon bridge。
+- 未新增 `codex_host_response` tool。
+- local daemon ready 时 `alembic_task prime` 仍由 Plugin-owned Codex-facing handler 生成 payload。
+- 不需要 Core 共享层下沉。
+- 不创建新的 AlembicTest 真实项目复测单；用户明确 SHOUT-7 只按 Plugin 内部文案 / 契约 / 单元测试自验收口。
+
+后续建议：
+
+- 本机 Codex plugin cache 已在 resident vector search VEC-6 中一并刷新到后续 AlembicPlugin commit `2c98f69b1388c478bbbb255e487c51fde621cff7`，该提交包含 SHOUT-7 主语文案；cache marker `mode=local-mcp`，`.mcp.json` 指向 workspace local MCP entry。
+- 若后续用户仍看到工具名主语，再追加更强的 Skill 示例句或 host receipt schema 约束。

@@ -1,6 +1,6 @@
 # AlembicWorkspace 总控索引
 
-更新日期：2026-05-21
+更新日期：2026-05-22
 
 本文件是 AlembicWorkspace 的唯一总控入口。`docs/workspace/` 根层级只保留当前状态、长期规则、长期契约、模板入口和正在执行的总控计划；通用模板正文统一保存在 `templates/`；已完成的 workspace 计划进入 `archive/`，单仓库执行记录留在对应 `docs/<Repo>/` 目录，不在这里逐条堆叠。
 
@@ -8,10 +8,12 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) | AlembicPlugin 待启动 | prime 后立即呐喊时序已通过 BiliDili 验证；Test-2026-05-21-04 功能验收与封口均已完成；当前只派发 `AlembicPlugin` 修正 Codex 可见呐喊主语。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | AlembicPlugin 待启动，AlembicTest 已完成 | SHOUT-7 要求可见 receipt 主语是 Codex / 我，不是 “Alembic prime”；该项不新增 AlembicTest 真实项目测试。 |
-| AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md](../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md) | 已完成 | 记录 `hostResponse.timing` / `requiredBeforeNextAction` / `visibility`、三态 `shoutInstruction`、SHOUT-5 可见摘要优化、AlembicCodex runtime artifact、验证命令、提交 hash 和总控验收结论。 |
-| 当前测试单 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-21-04：BiliDili prime readable receipt shout 可见摘要复测功能通过，`AlembicTest` 已封口提交。 |
+| 当前计划 | [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) | 已完成 | Test-2026-05-22-01 已通过；Plugin mode normalization 与 Alembic resident vector telemetry 已在 BiliDili 真实项目闭环；本机 Codex plugin cache 已刷新到 AlembicPlugin `2c98f69b1388c478bbbb255e487c51fde621cff7`，workspace 文档已提交。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | resident vector search 发布计划已完成 | 新主线是 Plugin 保持 Codex-facing ownership，Alembic 提供本地 Ollama / HNSW 真实向量检索服务；当前无外部发送窗口，等待下一主线启动。 |
+| AlembicPlugin 执行记录 | [../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md](../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md) | VEC-2/VEC-3/VEC-4R/VEC-5R 已完成 | 记录 HostAiAdapter placeholder embed 修正、ResidentSearchClient、PrimeSearchPipeline / search handler metadata、Skill、runtime artifact、删除 daemon MCP bridge、VEC-5R mode normalization、验证命令和提交 hash。 |
+| 上一计划 | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) | AlembicPlugin 待验收 | prime 后立即呐喊时序已通过 BiliDili 验证；Test-2026-05-21-04 已完成；SHOUT-7 已由 `AlembicPlugin` 回填，待总控验收与后续 cache 刷新。 |
+| AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md](../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md) | SHOUT-7 待验收 | 记录 `hostResponse.timing` / `requiredBeforeNextAction` / `visibility`、三态 `shoutInstruction`、SHOUT-5 可见摘要优化、SHOUT-7 主语收紧、AlembicCodex runtime artifact、验证命令和提交 hash。 |
+| 当前测试交流 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-22-01 已通过并封口，验证 direct auto/semantic 与 daemon `/api/v1/search` 均返回 resident vector telemetry。 |
 | 上一完成计划 | [alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md) | 已完成 | 用户确认 Alembic 应作为常驻服务由 Plugin 按需请求，不做 MCP tool ownership bridge；Plugin service boundary 与 BiliDili 复测均已完成。 |
 | 上一收口计划 | [bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md](bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md) | 已收口 | `Alembic` 已补齐 `/api/v1/mcp/call` 兼容 bridge，但不再作为 Codex-facing prime 主路径。 |
 | 前序完成计划 | [alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md) | 已完成 | V1 `prime -> Codex 自主呐喊` 最小闭环已由 `AlembicPlugin` 回填并通过总控验收。 |
@@ -23,7 +25,7 @@
 | 需求到 Wave 执行流程 | [requirement-to-wave-execution-flow.md](requirement-to-wave-execution-flow.md) | 长期流程 | 固化原始计划书、需求设计、代码依赖调研、目标阶段确认、用户确认、wave 执行计划和提示词发送的成熟路线。 |
 | TODO 与空闲窗口调度规则 | [todo-window-scheduling-policy.md](todo-window-scheduling-policy.md) | 长期流程 | 规定通用 TODO 子模式如何服务需求设计、派发计划、验收滚动、主线 / 可并行判断，并避免空闲窗口空转。 |
 | 全局 TODO 列表 | [global-todo-board.md](global-todo-board.md) | 维护中 | 记录跨计划、跨窗口、暂未进入当前波次或需要长期追踪的待办；当前派发仍以当前计划为准。 |
-| AlembicTest 测试交流文档 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-21-04 功能验收通过并封口提交；SHOUT-7 用户确认不走真实项目测试。 |
+| AlembicTest 测试交流文档 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-22-01 已通过并封口，direct search / daemon telemetry 闭环。 |
 | AlembicTest 测试交流规则 | [alembic-test-exchange-policy.md](alembic-test-exchange-policy.md) | 长期规则 | 规定总控如何创建测试单、派发 `AlembicTest`、验收回填和处理证据不足。 |
 | AlembicTest 测试执行规则 | [../../AlembicTest/docs/testing-operation-policy.md](../../AlembicTest/docs/testing-operation-policy.md) | 长期规则 | 规定总控不直接执行测试操作，真实项目测试、冷启动监控、复现和报告由 `AlembicTest` 承接。 |
 | AlembicTest 测试单模板 | [../../templates/alembic-test-handoff-template.md](../../templates/alembic-test-handoff-template.md) | 长期模板 | 用于生成 `docs/workspace/alembic-test-exchange.md` 中的统一测试单。 |
@@ -59,12 +61,13 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>待启动 | SHOUT-7：收紧 prime receipt shout 的可见主语，让 Codex / 我作为知识接收呐喊的说话者，不要让 “Alembic prime” 作为主语；不新增 AlembicTest 真实项目复测。 |
-| `AlembicTest`<br>已完成 | Test-2026-05-21-04 功能验收通过并封口提交完成，commit `60bbd360be147062f834ee881630ca25918663d0`；SHOUT-7 不新增真实项目测试。 |
-| `Alembic`<br>观察中 | daemon `/api/v1/mcp/call` 兼容 bridge 已完成；当前不承接 Codex-facing prime ownership，后续作为 resident service 被请求。 |
-| `AlembicCore`<br>观察中 | 本轮暂无共享层下沉证据；如 Plugin 回填证明存在真实双向消费方，再评估共享 contract。 |
-| `AlembicAgent`<br>无任务 | 当前是 Codex host agent / Plugin Skill 行为，不涉及 internal AI runtime。 |
-| `AlembicDashboard`<br>无任务 | 当前不涉及 Dashboard UI。 |
+| `AlembicCore`<br>已完成 | 已补 `SearchResponse.searchMeta`、resident search telemetry helper 与 VectorService sparse-only 真实 `vectorUsed` 透传；提交 `39bcebe94c451f92e405b0da38d2cbe67e8e0f82`。 |
+| `Alembic`<br>已完成 | VEC-5R 运行态已由 Test-2026-05-22-01 验收：daemon `/api/v1/search` 返回 `searchMeta`，`semanticUsed=true` / `vectorUsed=true` / `residentVector.available=true`；当前 HEAD `d725bae3ae6ef9ab168a0a444ad832b6a2fc2f10`。 |
+| `AlembicPlugin`<br>已完成 | VEC-5R Plugin 侧已完成并通过真实复测：提交 `2c98f69b1388c478bbbb255e487c51fde621cff7`，AlembicCodex runtime artifact `33689ec1cd0266023fab2d7c1bebf7ad6fd59732`；下一步由总控处理 cache refresh / 发布态验证。 |
+| `AlembicTest`<br>已完成 | Test-2026-05-22-01 已通过并封口，AlembicTest commit `0943ce085a1cb9c84141cc6c85673418c8248e29`；当前无新测试单。 |
+| `AlembicAgent`<br>观察中 | 当前 OllamaProvider / AiFactory 已能提供真实 embed provider；只有 Alembic 侧验证失败才回到 AlembicAgent。 |
+| `AlembicDashboard`<br>无任务 | 本轮不改 Dashboard UI；后续若要展示 vector status，再另开任务。 |
+| `BiliDili`<br>观察中 | 作为 VEC-4 真实项目验证对象；本轮不改产品源码、不派发执行窗口。 |
 
 ## 状态枚举
 
