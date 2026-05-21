@@ -2,7 +2,7 @@
 
 创建日期：2026-05-22
 总控窗口：AlembicWorkspace
-状态：V020-3R 待启动
+状态：V020 总控验收通过，Codex plugin cache 已刷新
 来源 TODO：`GTODO-2026-05-22-011`
 
 ## 用户目标
@@ -93,13 +93,13 @@
 | V020-1 | 已完成 | `AlembicCore` / `AlembicAgent` / `AlembicDashboard` | 上游源 package version 统一为 `0.2.0`，同步 lockfile 和必要测试断言。 | `AlembicCore` / `AlembicAgent` / `AlembicDashboard` 源 package / root lock 均已到 `0.2.0`。 | 否 |
 | V020-1R | 已完成 | `AlembicAgent` | 在 Core 已完成 `0.2.0` 后，刷新 Agent lockfile 中 `../AlembicCore` snapshot 到 `0.2.0` 并补验证。 | 总控复核通过：AlembicAgent `9de2cd97c3f4962a8b19595b76eeb7df00f853f5`，Core snapshot 为 `0.2.0`，目标残留扫描无命中。 | 否 |
 | V020-2 | 已完成 | `Alembic` | 在上游版本完成后，更新 `alembic-ai` 源 manifest / lock / release staging 到 `0.2.0`。 | Alembic 提交 `1656c67484b99bf9326af34102e936f18073b9aa`；执行记录 `docs/Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md`；staging metadata 读取 Core / Agent / Dashboard `0.2.0`；release boundary 验证通过。 | 否 |
-| V020-3 | 待返工 | `AlembicPlugin` | 在上游版本完成后，更新 root/plugin/channel/runtime 到 `0.2.0`，消除 `0.1.1` hardcode / fallback，重新生成 Codex runtime。 | 主体产物已回填并基本通过；总控复核发现 `test/unit/ResidentSearchClient.test.ts:22` 仍有 daemon state fixture `version: '0.1.0'`，属于当前 Alembic 自有测试口径残留。 | 否 |
-| V020-3R | 待启动 | `AlembicPlugin` | 清理 `ResidentSearchClient` daemon state fixture 的 `0.1.0` 残留，补精确残留扫描和 targeted test。 | AlembicPlugin 返工提交 hash、验证命令和残留扫描回填。 | 是 |
-| V020-4 | 阻塞 | `AlembicWorkspace` | 验收 V020-3R，刷新本机 Codex plugin cache 到 `0.2.0`，记录部署缓存证据。 | cache marker、workspace 文档提交。 | 否，等待 Plugin 返工回填后解除 |
+| V020-3 | 已完成 | `AlembicPlugin` | 在上游版本完成后，更新 root/plugin/channel/runtime 到 `0.2.0`，消除 `0.1.1` hardcode / fallback，重新生成 Codex runtime。 | 主体产物已完成：AlembicPlugin `9a2be1f88254fbb5604ce125706185bba77a5ac3`，AlembicCodex runtime artifact `36385f7a89d2e473727b8895c5b72b29a01e2e9f`；V020-3R 已清理后续残留。 | 否 |
+| V020-3R | 已完成 | `AlembicPlugin` | 清理 `ResidentSearchClient` daemon state fixture 的 `0.1.0` 残留，补精确残留扫描和 targeted test。 | AlembicPlugin 返工提交 `441029fdfcd07d85b59df13e6b8e9e2f0c728ae9`；AlembicCodex runtime artifact 提交 `54456b0582b3544d070b65853f6e9d6636f9280d`；总控复核精确扫描无命中。 | 否 |
+| V020-4 | 已完成 | `AlembicWorkspace` | 验收 V020-3R，刷新本机 Codex plugin cache 到 `0.2.0`，记录部署缓存证据。 | cache 已刷新到 `$CODEX_HOME/plugins/cache/gxfn/alembic-codex/0.2.0`；marker `mode=local-mcp`，`gitHead=441029fdfcd07d85b59df13e6b8e9e2f0c728ae9`。 | 否 |
 
 ## 窗口分派
 
-当前只发送 `AlembicPlugin` 做 V020-3R 小返工。总控暂不进入 V020-4 cache refresh，避免把仍含当前 Alembic 自有 `0.1.0` 测试 fixture 的提交作为最终可用版本缓存出去。
+当前不再发送执行窗口；V020 版本统一、Plugin 返工验收和本机 Codex plugin cache refresh 均已完成。
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
@@ -107,8 +107,8 @@
 | `AlembicCore`<br>已完成 | V020-1 总控复核通过：提交 `f30beacedf89abab13b91e87e4686d0db38e7d29`，`@alembic/core` package / lock root 自有版本已统一为 `0.2.0`，目标残留扫描无命中。 |
 | `AlembicAgent`<br>已完成 | V020-1R 总控复核通过：提交 `9de2cd97c3f4962a8b19595b76eeb7df00f853f5`，`package-lock.json` 中 `../AlembicCore` snapshot 已刷新到 `0.2.0`，目标残留扫描无命中。 |
 | `AlembicDashboard`<br>已完成 | V020-1 总控复核通过：提交 `5160a2a0fb164005f1922b8f58f28ca0ec88df56`，私有 `alembic-dashboard` package / lock root 自有版本已统一为 `0.2.0`。 |
-| `AlembicPlugin`<br>待启动 | V020-3R 返工：`test/unit/ResidentSearchClient.test.ts:22` 的 daemon state fixture 仍是 `version: '0.1.0'`；这是当前 Alembic 自有测试口径，不属于第三方依赖或历史文档，需要改为 `0.2.0` 或从当前 package / daemon version 口径派生，并补 targeted test / 残留扫描。 |
-| `AlembicTest`<br>观察中 | 本轮先不创建测试单；如用户需要真实 Codex / BiliDili 复测，在 V020-4 后创建。 |
+| `AlembicPlugin`<br>已完成 | V020-3R 已通过总控复核：`ResidentSearchClient` daemon state fixture 改为从当前 package 版本派生；Codex release playbook `0.1.0` 示例同步改为 `0.2.0` 并重建 runtime artifact；提交 `441029fdfcd07d85b59df13e6b8e9e2f0c728ae9`，AlembicCodex runtime artifact `54456b0582b3544d070b65853f6e9d6636f9280d`，精确残留扫描无命中。 |
+| `AlembicTest`<br>观察中 | 本轮不创建测试单；如用户需要真实 Codex / BiliDili 复测，后续单独创建。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码；只可能作为后续测试对象。 |
 
 ## V020-1 执行要求
@@ -254,9 +254,9 @@
 | V020-TODO-2 | 已完成 | 版本源返工 | P0 | `AlembicAgent` | 刷新 `package-lock.json` 中 `../AlembicCore` snapshot 到 `0.2.0`，让 Agent 当前 lockfile 不再保留 Alembic 自有 `0.1.0` 版本位。 | 是 | 总控复核通过：提交 `9de2cd97c3f4962a8b19595b76eeb7df00f853f5`，Core snapshot 为 `0.2.0`，目标残留扫描无命中。 | `AlembicAgent` |
 | V020-TODO-3 | 已完成 | 版本源 | P1 | `AlembicDashboard` | 私有 `alembic-dashboard` 自有 package version 统一为 `0.2.0`。 | 是 | 总控复核通过：提交 `5160a2a0fb164005f1922b8f58f28ca0ec88df56`，源 package / lock 版本为 `0.2.0`；`package-lock.json` 中第三方 `0.1.0` 不属于本轮自有版本位。 | `AlembicDashboard` |
 | V020-TODO-4 | 已完成 | release staging | P0 | `Alembic` | root / lock / `.release/alembic-ai` 统一为 `0.2.0`，staging dependency replacement 读取上游 `0.2.0`。 | 是 | 提交 `1656c67484b99bf9326af34102e936f18073b9aa`，执行记录 `docs/Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md`；`npm run build:check`、`npm run build`、`npm run release:staging:prepare`、`npm run release:staging:pack`、`npm run release:package-guard`、残留扫描和 `git diff --check` 通过。 | `Alembic` |
-| V020-TODO-5 | 待返工 | Codex plugin runtime | P0 | `AlembicPlugin` | root / plugin manifest / channel / runtime / tests / MCP metadata / cache sync fallback 统一为 `0.2.0`。 | 是 | 主体产物已回填；总控复核发现 `ResidentSearchClient` daemon state fixture 仍为 `0.1.0`。 | `AlembicPlugin` |
-| V020-TODO-5R | 待启动 | 测试版本 fixture | P0 | `AlembicPlugin` | 清理 `test/unit/ResidentSearchClient.test.ts:22` 的 Alembic 自有 `0.1.0` daemon state fixture，并补 targeted test / 精确残留扫描。 | 是 | V020-3 总控复核发现。 | `AlembicPlugin` |
-| V020-TODO-6 | 阻塞 | 部署缓存 | P0 | `AlembicWorkspace` | 验收后刷新本机 Codex plugin cache 到 `0.2.0`，记录 marker 和当前加载路径。 | 是 | 等 `AlembicPlugin` V020-3R 回填后解除。 | `AlembicWorkspace` |
+| V020-TODO-5 | 已完成 | Codex plugin runtime | P0 | `AlembicPlugin` | root / plugin manifest / channel / runtime / tests / MCP metadata / cache sync fallback 统一为 `0.2.0`。 | 是 | 主体产物提交 `9a2be1f88254fbb5604ce125706185bba77a5ac3`、runtime artifact `36385f7a89d2e473727b8895c5b72b29a01e2e9f`；V020-3R 返工后总控复核通过。 | `AlembicPlugin` |
+| V020-TODO-5R | 已完成 | 测试版本 fixture | P0 | `AlembicPlugin` | 清理 `test/unit/ResidentSearchClient.test.ts:22` 的 Alembic 自有 `0.1.0` daemon state fixture，并补 targeted test / 精确残留扫描。 | 是 | 已回填提交 `441029fdfcd07d85b59df13e6b8e9e2f0c728ae9`，runtime artifact `54456b0582b3544d070b65853f6e9d6636f9280d`；总控复核精确扫描无命中。 | `AlembicPlugin` |
+| V020-TODO-6 | 已完成 | 部署缓存 | P0 | `AlembicWorkspace` | 验收后刷新本机 Codex plugin cache 到 `0.2.0`，记录 marker 和当前加载路径。 | 是 | `npm run dev:codex-plugin:local-mcp -- --clean --all-installed` 已成功；cache marker 指向 AlembicPlugin `441029fdfcd07d85b59df13e6b8e9e2f0c728ae9`，mode=`local-mcp`，版本槽位为 `alembic-codex@0.2.0`。 | `AlembicWorkspace` |
 
 ## 空闲窗口调度
 
@@ -266,19 +266,19 @@
 | `AlembicCore` | 已完成 | 否 | V020-1 已通过总控复核。 |
 | `AlembicAgent` | 已完成 | 否 | V020-1R 已通过总控复核。 |
 | `AlembicDashboard` | 已完成 | 否 | V020-1 已通过总控复核。 |
-| `AlembicPlugin` | 待启动 | 是 | 当前唯一返工项：清理 `ResidentSearchClient` 里的 Alembic 自有 `0.1.0` fixture。 |
+| `AlembicPlugin` | 已完成 | 否 | V020-3R 已通过总控复核；cache refresh 已由 V020-4 完成。 |
 | `AlembicTest` | 观察 | 否 | 本轮不是真实项目行为变更；如需复测后续单独建测试单。 |
 | `BiliDili` | 无任务 | 否 | 不改真实项目源码。 |
 
 ## 可复制分派提示词
 
-发送给：`AlembicPlugin`。
+发送给：无。
 
 ```text
-读取 docs/workspace/alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md，按照文档，领取并完成分配给你所在窗口的 V020-3R 返工任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
+无，V020 版本统一与本机 Codex plugin cache refresh 已完成。
 ```
 
-不发送给：`Alembic`（已完成）、`AlembicCore`（已完成）、`AlembicAgent`（已完成）、`AlembicDashboard`（已完成）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
+不发送给：`Alembic`（已完成）、`AlembicCore`（已完成）、`AlembicAgent`（已完成）、`AlembicDashboard`（已完成）、`AlembicPlugin`（已完成）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
 
 ## 验证策略
 
@@ -309,3 +309,5 @@ V020-2 / V020-3 启动后，再补充 Alembic release staging、Plugin runtime�
 - 2026-05-22：`Alembic` V020-2 已完成并回填。完成范围：`package.json` / `package-lock.json` 中 `alembic-ai` root 版本与本地 `../AlembicCore`、`../AlembicAgent` snapshot 统一到 `0.2.0`；重新生成 `.release/alembic-ai`，staging manifest 为 `alembic-ai@0.2.0`，依赖为 `@alembic/core@0.2.0`、`@alembic/agent@0.2.0`，release source metadata 中 `AlembicDashboard` package version 为 `0.2.0`；修正 `release:package-guard`，让它校验 staging publish boundary 而不是误判 root 开发态 file 依赖。提交 hash：`1656c67484b99bf9326af34102e936f18073b9aa`。执行记录：[../Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md](../Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md)。验证：`npm run build:check`、`npm run build`、`npm run release:staging:prepare`、`npm run release:staging:pack`、`npm run release:package-guard`、目标残留扫描、`git diff --check` 均通过；计划 `rg` 负向扫描仅剩第三方 `powershell-utils@0.1.0`，不属于 Alembic 自有版本位。遗留风险：`.release/` 为忽略目录，发布前需按流程重新生成 staging。下一步建议：等待 `AlembicPlugin` V020-3 后进入 V020-4 cache refresh。
 - 2026-05-22：`AlembicPlugin` V020-3 已完成并回填。完成范围：root `alembic-ai@0.2.0`、root lock 和 `../AlembicCore` snapshot 已到 `0.2.0`；Codex plugin manifest / shell package / channel / README / `PLUGIN-SOURCE.json` 已到 `0.2.0`；`CodexMcpServer` version 改为读取 package manifest；cache sync 移除旧 `0.1.1` fallback；相关测试改为从 package / plugin manifest 派生版本；`prepare:codex-plugin-runtime` 已重建 runtime package、runtime shell snapshot、embedded Core package 和 `runtime.tgz`。提交 hash：`9a2be1f88254fbb5604ce125706185bba77a5ac3`；AlembicCodex runtime artifact 提交：`36385f7a89d2e473727b8895c5b72b29a01e2e9f`。执行记录：[../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md](../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md)。验证：`npm run build:check`、`npm run build`、`npm run prepare:codex-plugin-runtime`、`npm run verify:codex-plugin`、`npm run verify:codex-channel`、`npm run verify:release-package-boundary`、`npm run verify:codex-session`、相关单元测试、lint、负向扫描、`git diff --check` 均通过。计划宽松 `rg` 仅剩第三方 `github-from-package@0.0.0` 与 fixture `AFNetworking 4.0.1.2`；但总控复核补扫发现另有 `ResidentSearchClient` daemon state fixture `0.1.0`。遗留风险：本窗口未刷新 `$CODEX_HOME/plugins/cache`，需总控 V020-4 复核后执行 cache refresh。
 - 2026-05-22：总控复核 V020-2 / V020-3。`Alembic` V020-2 通过：实体 manifest 与 staging metadata 均为 `0.2.0`，残留命中仅为第三方 `powershell-utils@0.1.0` / lockfile 第三方 `0.0.0`。`AlembicPlugin` V020-3 主体产物基本通过：root/plugin/channel/runtime/embedded Core 均为 `0.2.0`，工作区干净；但精确扫描命中 `AlembicPlugin/test/unit/ResidentSearchClient.test.ts:22` 的 daemon state fixture `version: '0.1.0'`。该值表示 Alembic daemon state 版本，是当前测试口径中的 Alembic 自有版本残留，不属于第三方依赖或历史文档，因此 V020-4 cache refresh 继续阻塞，当前只派发 `AlembicPlugin` 做 V020-3R 小返工。
+- 2026-05-22：`AlembicPlugin` V020-3R 已完成并回填。完成范围：`test/unit/ResidentSearchClient.test.ts` 的 daemon state fixture 改为从当前 package version 派生；精确扫描同时发现 Codex plugin `RELEASE-PLAYBOOK.md` 及 runtime shell snapshot 仍有 `0.1.0` tag 示例，已同步改为 `0.2.0` 并重新生成 `runtime.tgz`。提交 hash：`441029fdfcd07d85b59df13e6b8e9e2f0c728ae9`；AlembicCodex runtime artifact 提交：`54456b0582b3544d070b65853f6e9d6636f9280d`。执行记录：[../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md](../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md)。验证：`npm run prepare:codex-plugin-runtime`、`npm run test:unit -- test/unit/ResidentSearchClient.test.ts`、V020-3R 精确残留扫描、`npm run verify:codex-plugin`、`npm run verify:codex-channel`、`git diff --check`、`git -C plugins/alembic-codex diff --check` 均通过；精确残留扫描无命中。遗留风险：本窗口未刷新 `$CODEX_HOME/plugins/cache`，需总控 V020-4 复核后执行 cache refresh。
+- 2026-05-22：总控复核 V020-3R 通过并完成 V020-4 cache refresh。复核确认 `AlembicPlugin` 工作区干净，HEAD 为 `441029fdfcd07d85b59df13e6b8e9e2f0c728ae9`；`plugins/alembic-codex` 工作区干净，HEAD 为 `54456b0582b3544d070b65853f6e9d6636f9280d`；V020-3R 精确残留扫描无命中。总控运行 `npm run dev:codex-plugin:local-mcp -- --clean --all-installed` 成功，将本机 Codex plugin cache 刷新到 `$CODEX_HOME/plugins/cache/gxfn/alembic-codex/0.2.0`；cache marker 显示 `mode=local-mcp`、`gitHead=441029fdfcd07d85b59df13e6b8e9e2f0c728ae9`，plugin manifest 为 `alembic-codex@0.2.0`，runtime package 为 `alembic-ai@0.2.0`，embedded `@alembic/core@0.2.0`。本轮不创建 AlembicTest 测试单；如后续需要真实 Codex / BiliDili 行为复测，再单独从测试交流文档派发。
