@@ -1,6 +1,6 @@
 # Alembic Plugin Service Request Boundary Workspace Plan
 
-状态：`AlembicPlugin` 已通过总控验收，`AlembicTest` 待启动复测
+状态：`AlembicTest` 功能验收通过，测试仓库封口执行中
 总控窗口：AlembicWorkspace
 创建日期：2026-05-21
 适用范围：`AlembicPlugin`、`Alembic`、`AlembicCore`、`AlembicTest`
@@ -84,7 +84,7 @@
 - `AlembicPlugin` 是本轮 producer：产出 service request boundary / dispatch 规则，让 Codex-facing task prime 留在 Plugin，并把 Alembic 当作被请求的常驻服务。
 - `Alembic` 是观察窗口：已完成 daemon bridge，当前不继续扩展 prime handler；后续按服务 API / resident service contract 被 Plugin 请求。
 - `AlembicCore` 是观察窗口：仅当 Plugin / Alembic 重复 contract 需要收敛时，才启动共享 schema / builder 下沉。
-- `AlembicTest` 待启动：Plugin 已修正并通过总控验收，领取 Test-2026-05-21-02 后重跑 BiliDili prime shout 插件测试。
+- `AlembicTest` 执行中：Test-2026-05-21-02 功能验收通过；等待 `AlembicTest` 仓库提交测试报告 / probe 脚本 / 文档变更并回填 commit hash 后最终收口。
 
 ## TODO / Backlog
 
@@ -93,7 +93,7 @@
 | SERVICE-1 | 已完成 | 主线修复 | P0 | `AlembicPlugin` | 为 `alembic_task` 建立 Codex-facing ownership：`prime / create / close / fail / record_decision` 不因 local daemon ready 而转发到 `Alembic`，应在 Plugin 侧执行并保留 `primeKnowledgeMaterial` / `hostResponse`。 | 是 | 总控验收通过：Plugin 提交 `c083c3c3c5b690a9b0f9711b3a5abe214bde0109`，runtime artifact 提交 `7a7c5dce492c632e4ee3301f7eb989faec1d5118`。 | `AlembicPlugin` |
 | SERVICE-2 | 已完成 | 主线设计 / 修复 | P0 | `AlembicPlugin` | 建立 service request boundary：区分 Plugin-owned 交互、Plugin 请求 Alembic 常驻服务、Core shared contract；不再用 `requirement: "mcp"` 一刀切选择 local daemon handler。 | 是 | 总控验收通过：`ServiceRequestBoundary` 与 `CodexMcpServer` default 分支已形成真实调用链。 | `AlembicPlugin` |
 | SERVICE-3 | 观察中 | contract | P1 | `AlembicPlugin` / `AlembicCore` | 梳理 `primeKnowledgeMaterial`、evidenceRefs、Recipe projection 是否需要下沉到 Core；只有确认两边都要长期消费时再派发 Core。 | 否 | Plugin 回填：本轮暂不需要 Core 下沉；若后续 resident service 也长期生产相同 payload，再启动 Core schema / builder 下沉。 | `AlembicPlugin` / `AlembicCore` |
-| SERVICE-4 | 待启动 | 复测 | P0 | `AlembicTest` | Plugin service boundary 修正后，重跑 BiliDili prime shout 插件测试，验收 delivered `primeKnowledgeMaterial`、Codex 知识呐喊、BiliDili git 干净。 | 是 | Test-2026-05-21-02 已创建到 [alembic-test-exchange.md](alembic-test-exchange.md)。 | `AlembicTest` |
+| SERVICE-4 | 执行中 | 复测 / 封口 | P0 | `AlembicTest` | Test-2026-05-21-02 功能验收通过：delivered `primeKnowledgeMaterial`、Codex 知识呐喊、BiliDili git 干净均有证据；等待 AlembicTest 仓库封口提交测试报告 / probe 脚本 / 文档变更。 | 是 | `AlembicTest` 仓库仍有未提交变更，需回填 commit hash 后最终收口。 | `AlembicTest` |
 | SERVICE-5 | 观察中 | service contract | P2 | `Alembic` / `AlembicPlugin` / `AlembicCore` | 后续为 Alembic resident service 增加明确 service API / capability / contract version，避免把服务请求退化成 MCP tool ownership bridge；不阻塞 prime 主闭环。 | 否 | 主闭环通过后再判断。 | 待定 |
 
 ## 窗口分派
@@ -102,7 +102,7 @@
 | --- | --- |
 | `AlembicPlugin`<br>已完成 | SERVICE-1/2 已通过总控验收：`alembic_task` ownership 留在 Plugin；新增 service request boundary；目标测试证明 local daemon ready 时 prime 仍返回 Plugin 的 `primeKnowledgeMaterial` / `hostResponse` / `shoutInstruction`。 |
 | `Alembic`<br>观察中 | 已完成 daemon bridge 兼容能力；当前不再扩展 Alembic prime handler，不复制 Plugin 的 host-response / shout 契约；后续作为 resident service 被请求。 |
-| `AlembicTest`<br>待启动 | 领取 [alembic-test-exchange.md](alembic-test-exchange.md) 中 Test-2026-05-21-02，复测 BiliDili prime shout、serviceBoundary、Codex 知识呐喊和 BiliDili git 干净状态。 |
+| `AlembicTest`<br>执行中 | Test-2026-05-21-02 功能验收通过；当前只需封口提交 AlembicTest 仓库里的测试报告、probe 脚本和测试文档变更，并回填 commit hash。 |
 | `AlembicCore`<br>观察中 | Plugin 回填本轮暂不需要下沉；若后续 resident service 也长期生产相同 payload，再评估共享 schema / builder。 |
 | `AlembicAgent`<br>无任务 | 当前是 Codex host agent / Plugin service request 边界，不涉及 AlembicAgent runtime。 |
 | `AlembicDashboard`<br>无任务 | 当前不涉及 Dashboard UI；Dashboard server 仍属于 Alembic-enhanced 能力。 |
@@ -113,7 +113,7 @@
 | --- | --- | --- | --- |
 | `AlembicPlugin` | 已完成 | 总控已验收 SERVICE-1/2，不再发送。 | 否 |
 | `Alembic` | 观察 | bridge 已完成但不再作为 prime 主路径；后续作为 resident service。 | 否 |
-| `AlembicTest` | 待启动 | Plugin service request 边界已验收，可以复测 BiliDili prime shout。 | 是 |
+| `AlembicTest` | 执行中 | 测试功能通过，但 AlembicTest 仓库仍有未提交报告 / 脚本，需要封口提交。 | 是 |
 | `AlembicCore` | 观察 | Plugin 回填本轮暂不需要 Core 下沉。 | 否 |
 | `AlembicAgent` | 无任务 | 不涉及。 | 否 |
 | `AlembicDashboard` | 无任务 | 不涉及。 | 否 |
@@ -135,7 +135,7 @@
 发送给：`AlembicTest`。
 
 ```text
-读取 docs/workspace/alembic-test-exchange.md，领取状态为 `待启动` 且执行窗口为 `AlembicTest` 的测试单；按测试单执行测试，详细报告写入 AlembicTest/docs/，并回填本文的测试结果、证据摘要、报告路径、遗留风险和下一步建议。
+读取 docs/workspace/alembic-test-exchange.md，完成 Test-2026-05-21-02 的 AlembicTest 仓库封口：不要扩大测试范围，优先提交本次测试报告、probe 脚本和相关测试文档变更；提交后回填 AlembicTest commit hash、提交范围、是否仍有未提交变更和遗留风险。
 ```
 
 ## AlembicPlugin 执行要求
@@ -189,3 +189,4 @@ git diff --check
 - 2026-05-21：总控根据用户决策创建本计划。边界调整为：IDE / Codex host agent 深绑定能力不做 MCP tool ownership bridge；`prime -> Codex 知识呐喊` 留在 `AlembicPlugin`；`Alembic` 作为 resident service 被 Plugin 按需请求，已完成的 bridge 仅保留为兼容能力。
 - 2026-05-21：`AlembicPlugin` 已完成 SERVICE-1、SERVICE-2，执行记录：[../AlembicPlugin/alembic-plugin-service-request-boundary-2026-05-21.md](../AlembicPlugin/alembic-plugin-service-request-boundary-2026-05-21.md)。提交 hash：Plugin `c083c3c3c5b690a9b0f9711b3a5abe214bde0109`；AlembicCodex runtime artifact `7a7c5dce492c632e4ee3301f7eb989faec1d5118`。完成范围：新增 `ServiceRequestBoundary`；`CodexMcpServer` default 分支先判定 service boundary；`alembic_task` 的 `prime / create / close / fail / record_decision` 以及未知 operation 校验错误均由 Plugin-owned local handler 执行；local daemon ready 时不再把 `alembic_task prime` 转发到 `/api/v1/mcp/call`；返回 payload 附带 `data.serviceBoundary`。验证：`npm run build:check` 通过；目标测试 3 文件 41 tests 通过；`npm run build` 通过；`npm run prepare:codex-plugin-runtime` 通过；`npm run verify:codex-plugin` 通过；`npm run verify:codex-channel` 通过；`npm run verify:release-package-boundary` 通过；Plugin 与 AlembicCodex `git diff --check` 均通过。关键结果：`primeKnowledgeMaterial` / `hostResponse` / `shoutInstruction` 保留；本轮暂不需要 Core 共享层下沉；总控验收后可以启动 `AlembicTest` BiliDili prime shout 复测。遗留风险：本轮只切断 `alembic_task` ownership bridge，bootstrap / rescan / search / guard / knowledge 等后续 service API 仍需另行设计。
 - 2026-05-21：总控验收 `AlembicPlugin` SERVICE-1/2 通过。代码证据：`AlembicPlugin/lib/codex/ServiceRequestBoundary.ts:1` 将 `prime / create / close / fail / record_decision` 列为 Plugin-owned，未知 `alembic_task` operation 也留在 Plugin 校验；`AlembicPlugin/lib/external/mcp/CodexMcpServer.ts:288` 的 default 分支先解析 service boundary，Plugin-owned 路径进入 `callPluginOwnedTool()`，非 Plugin-owned 路径才进入 `callDaemonTool()`；`AlembicPlugin/lib/external/mcp/CodexMcpServer.ts:930` 使用 embedded Plugin handler tree 执行 Codex-facing tool，并在 `AlembicPlugin/lib/external/mcp/CodexMcpServer.ts:1294` 附加 `data.serviceBoundary`；测试 `AlembicPlugin/test/unit/CodexMcpServer.test.ts:1061` 断言 local daemon ready 时 `alembic_task prime` 不调用 daemon bridge / `fetch` / `supervisor.ensure()`，同时保留 `primeKnowledgeMaterial.hostResponse.action === "shout_prime_knowledge_receipt"` 和 `shoutInstruction`。功能完整性检查结论：真实入口、数据来源、Codex 可见 payload、service boundary 标记、兼容 daemon 路径和失败边界均有代码与测试证据，允许启动 Test-2026-05-21-02 复测。
+- 2026-05-21：总控功能验收 Test-2026-05-21-02 通过。AlembicTest 报告和 probe artifact 显示：BiliDili `alembic_codex_status` 成功，Recipes `79`、sourceRefs `196`；`alembic_task prime` 返回 `success=true`、`primeKnowledgeMaterial.status=delivered`、`acceptedKnowledge=5`、`acceptedGuards=1`、`checks.evidenceRefCount=18`；`hostResponse.action=shout_prime_knowledge_receipt` 且 `required=true`；`shoutInstruction` 存在；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=false`；`nextActions` 不含 `codex_host_response`；daemon bridge 日志无新增 `/api/v1/mcp/call`；BiliDili 测试前后 git 均为 `## main...origin/main`。封口阻塞：`AlembicTest` 仓库仍有未提交测试报告 / 脚本 / 文档变更，需 `AlembicTest` 提交并回填 commit hash 后最终收口。
