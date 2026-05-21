@@ -1,6 +1,6 @@
 # Alembic Codex Recipe Interaction Contract Wave 1
 
-状态：待启动，发送给 `AlembicCore`、`AlembicPlugin`
+状态：已完成
 总控窗口：AlembicWorkspace
 创建日期：2026-05-21
 适用范围：`AlembicCore`、`AlembicPlugin`
@@ -29,6 +29,8 @@
 
 ## 真实代码事实
 
+以下为本 wave 启动时的扫描事实。`AlembicCore` 归属项已在回填区记录的提交中修复；后续窗口执行时，以 TODO / 窗口分派 / 回填区作为当前状态来源。
+
 - Core cold-start 响应仍提示旧工具：`AlembicCore/src/workflows/cold-start/ColdStartPresenters.ts:240` 输出 `knowledge({ action: "submit_batch" })`。
 - Core rescan 响应仍提示旧工具：`AlembicCore/src/workflows/knowledge-rescan/KnowledgeRescanPresenters.ts:207` 输出 `knowledge({ action: "submit" })`。
 - Core Mission Briefing 支持层仍提示旧工具：`AlembicCore/src/workflows/capabilities/execution/external/MissionBriefingSupport.ts:227`、`:228`、`:474`、`:480`。
@@ -50,19 +52,19 @@
 
 | ID | 状态 | 类型 | 严重度 / 优先级 | 归属 | 事项 / TODO | 影响复测 / 派发 | 依赖 / 触发 | 推荐窗口 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| W1-PKS-1 | 待启动 | 交互契约修复 | P0 | `AlembicCore` | 把 Core cold-start、rescan、Mission Briefing 中旧 `knowledge({ action: ... })` / `submit_batch` 全部收敛为真实 `alembic_submit_knowledge({ items: [...] })` 调用说明，并更新 Core 测试。 | 否 | V1 验收后滚动 TODO-PKS-1。 | `AlembicCore` |
-| W1-PKS-2A | 待启动 | 交互契约生产侧 | P0 | `AlembicCore` | 让 `RecipeProductionGateway.pendingSemanticReview` 在返回时能关联真实新 Recipe ID，或提供稳定 created item reference；不得让下游只能猜 title 或填空字符串。 | 否 | TODO-PKS-2；Plugin consumer 依赖此项。 | `AlembicCore` |
-| W1-PKS-2B | 阻塞 | 交互契约消费侧 | P0 | `AlembicPlugin` | 在 Core 回填真实 `newRecipeId` 后，把 `alembic_submit_knowledge` 的 `nextAction.args.decisions[].newRecipeId` 改为真实 ID；当前不让 Plugin 猜字段。 | 否 | 阻塞于 W1-PKS-2A Core 提交和验证回填。 | `AlembicPlugin` |
-| W1-PKS-3 | 待启动 | 策略确认 | P1 | `AlembicCore` | 基于 `host-agent` 已是 Codex 默认写入来源的事实，确认 ConfidenceRouter 是否应把 `host-agent` 作为 trusted source。若实现，必须保留 reasoning / quality / content gates；若不实现，回填明确策略理由。 | 否 | TODO-PKS-3。 | `AlembicCore` |
-| W1-PKS-4 | 待启动 | 可见契约收敛 | P1 | `AlembicPlugin` | 收敛 `alembic_knowledge_lifecycle` 默认可见文案、schema 描述和相关测试，明确默认 Codex agent 只允许 `reactivate`，publish / deprecate / approve / fast_track 需 Dashboard 或 admin 路径。不得扩权。 | 否 | TODO-PKS-4。 | `AlembicPlugin` |
-| W1-PKS-5 | 待启动 | Host response 契约优化 | P2 | `AlembicPlugin` | 调整 prime `nextActions` / payload 表达，把 `codex_host_response` 从真实 MCP tool call 语义中分离或标清；保留 `shoutInstruction` 和开发者可见呐喊动作。 | 否 | TODO-PKS-5。 | `AlembicPlugin` |
+| W1-PKS-1 | 已完成 | 交互契约修复 | P0 | `AlembicCore` | 把 Core cold-start、rescan、Mission Briefing 中旧 `knowledge({ action: ... })` / `submit_batch` 全部收敛为真实 `alembic_submit_knowledge({ items: [...] })` 调用说明，并更新 Core 测试。 | 否 | Core 提交 `bd9319db72d6fd22f9b3a2ba3a36e279ee117f24`。 | `AlembicCore` |
+| W1-PKS-2A | 已完成 | 交互契约生产侧 | P0 | `AlembicCore` | 让 `RecipeProductionGateway.pendingSemanticReview` 在返回时能关联真实新 Recipe ID，或提供稳定 created item reference；不得让下游只能猜 title 或填空字符串。 | 否 | Core 已提供 `pendingSemanticReview[].newRecipeId` / `createdRecipe`。 | `AlembicCore` |
+| W1-PKS-2B | 已完成 | 交互契约消费侧 | P0 | `AlembicPlugin` | 在 Core 回填真实 `newRecipeId` 后，把 `alembic_submit_knowledge` 的 `nextAction.args.decisions[].newRecipeId` 改为真实 ID；当前不让 Plugin 猜字段。 | 否 | Plugin 提交 `8602ae9e71874af389709db680104b2c1ee0edbb`，runtime artifact 提交 `4abb80efca55d37dc39667facdd18e8a35a08cad`；总控验收通过。 | `AlembicPlugin` |
+| W1-PKS-3 | 已完成 | 策略确认 | P1 | `AlembicCore` | 基于 `host-agent` 已是 Codex 默认写入来源的事实，确认 ConfidenceRouter 是否应把 `host-agent` 作为 trusted source。若实现，必须保留 reasoning / quality / content gates；若不实现，回填明确策略理由。 | 否 | Core 已将 `host-agent` 加入 trusted source，仍保留内容 / reasoning / quality / confidence gates。 | `AlembicCore` |
+| W1-PKS-4 | 已完成 | 可见契约收敛 | P1 | `AlembicPlugin` | 收敛 `alembic_knowledge_lifecycle` 默认可见文案、schema 描述和相关测试，明确默认 Codex agent 只允许 `reactivate`，publish / deprecate / approve / fast_track 需 Dashboard 或 admin 路径。不得扩权。 | 否 | Plugin 提交 `b9abdc3efacb7879e34a1af1f8715008f00215d5`，runtime artifact 提交 `0fd5a9d5a90cd27169a87783fb27a013394285ce`；总控验收通过。 | `AlembicPlugin` |
+| W1-PKS-5 | 已完成 | Host response 契约优化 | P2 | `AlembicPlugin` | 调整 prime `nextActions` / payload 表达，把 `codex_host_response` 从真实 MCP tool call 语义中分离或标清；保留 `shoutInstruction` 和开发者可见呐喊动作。 | 否 | Plugin 提交 `b9abdc3efacb7879e34a1af1f8715008f00215d5`，runtime artifact 提交 `0fd5a9d5a90cd27169a87783fb27a013394285ce`；总控验收通过。 | `AlembicPlugin` |
 
 ## 窗口分派
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicCore`<br>待启动 | 执行 W1-PKS-1、W1-PKS-2A、W1-PKS-3：修正 Core briefing 工具名；给 pending semantic review 提供真实新 Recipe ID / stable reference；确认或实现 `host-agent` ConfidenceRouter 策略。 |
-| `AlembicPlugin`<br>待启动 | 执行 W1-PKS-4、W1-PKS-5：收敛 lifecycle 可见契约；修正 prime host-response action 表达。观察 W1-PKS-2B，不得在 Core 回填前猜 `newRecipeId` 字段。 |
+| `AlembicCore`<br>已完成 | 已执行 W1-PKS-1、W1-PKS-2A、W1-PKS-3：修正 Core briefing 工具名；给 pending semantic review 提供真实 `newRecipeId` / `createdRecipe`；实现 `host-agent` ConfidenceRouter trusted 策略。 |
+| `AlembicPlugin`<br>已完成 | 已执行并通过总控验收 W1-PKS-2B、W1-PKS-4、W1-PKS-5：消费 Core `pendingSemanticReview[].newRecipeId` / `createdRecipe.id`；收敛 lifecycle 可见契约；修正 prime host-response action 表达；刷新 Codex runtime artifact。 |
 | `Alembic`<br>无任务 | 当前不涉及 daemon、HTTP/API、Dashboard server、ProjectRegistry 或 internal AI job。 |
 | `AlembicAgent`<br>无任务 | 当前是 Codex host agent MCP / Core workflow 契约，不涉及 AlembicAgent runtime。 |
 | `AlembicDashboard`<br>无任务 | 当前不改 Dashboard UI；lifecycle publish/deprecate 仍通过 Dashboard/admin 路径，不在本 wave 改前端。 |
@@ -72,8 +74,8 @@
 
 | 窗口 | 当前调度 | 理由 | 是否发送 |
 | --- | --- | --- | --- |
-| `AlembicCore` | 待启动 | P0 briefing 工具名与 pending review 生产侧在 Core。 | 是 |
-| `AlembicPlugin` | 待启动 | lifecycle 可见契约与 prime host-response 表达为 Plugin 独立任务。 | 是 |
+| `AlembicCore` | 已完成 | P0 briefing 工具名、pending review 生产侧和 host-agent trust 策略已完成。 | 否 |
+| `AlembicPlugin` | 已完成 | W1-PKS-2B / W1-PKS-4 / W1-PKS-5 已通过总控证据复核。 | 否 |
 | `Alembic` | 无任务 | 当前无本地增强底座变更。 | 否 |
 | `AlembicAgent` | 无任务 | 当前不涉及 AlembicAgent runtime。 | 否 |
 | `AlembicDashboard` | 无任务 | 当前不涉及前端。 | 否 |
@@ -81,10 +83,12 @@
 
 ## 当前执行顺序
 
-发送给：`AlembicCore`、`AlembicPlugin`。
+发送给：无。
 
 不发送给：
 
+- `AlembicCore`：已完成。
+- `AlembicPlugin`：已完成。
 - `Alembic`：无任务。
 - `AlembicAgent`：无任务。
 - `AlembicDashboard`：无任务。
@@ -92,10 +96,10 @@
 
 ## 可复制分派提示词
 
-发送给：`AlembicCore`、`AlembicPlugin`。
+发送给：无。
 
 ```text
-读取 docs/workspace/alembic-codex-recipe-interaction-contract-wave-2026-05-21.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
+当前无可发送窗口；Recipe 交互契约 Wave 1 已完成。
 ```
 
 ## AlembicCore 执行要求
@@ -138,7 +142,7 @@ git diff --check
 
 - 收敛默认 Codex 可见 lifecycle 工具契约，避免误以为默认 agent 可以 publish / deprecate Recipe。
 - 修正 prime payload 中 host-response 动作表达，避免 `codex_host_response` 被误解为真实 MCP tool。
-- 观察 W1-PKS-2B；不得在 Core 未回填真实字段前猜 `newRecipeId`。
+- 消费 Core 已回填的 W1-PKS-2B 字段；不得猜 `newRecipeId`，字段缺失时必须 fail closed 或返回不可执行说明。
 
 范围：
 
@@ -151,7 +155,7 @@ git diff --check
 - 不扩权：默认 Codex agent tier 不允许 publish、deprecate、approve、fast_track。
 - 不实现 Codex agent runtime。
 - 不改 Core 源码或 vendor Core。
-- 不处理 W1-PKS-2B 的完整 nextAction ID 消费，除非 Core 已回填真实字段和验证结果。
+- W1-PKS-2B 只能消费 Core 回填的真实 `newRecipeId` / `createdRecipe.id`，不得按 title 或 index 猜测。
 - 不修改真实测试项目、`AlembicDashboard` 或测试线文档。
 
 验证命令：
@@ -171,3 +175,6 @@ git diff --check
 ## 回填区
 
 - 2026-05-21：用户说明 `AlembicTest` Recipes 仍在生成中，要求总控再做一轮计划分配。总控启动本 wave，仅发送给 `AlembicCore`、`AlembicPlugin`，不新增 `AlembicTest` 测试单。
+- 2026-05-21：`AlembicCore` 已完成 W1-PKS-1、W1-PKS-2A、W1-PKS-3。执行记录：[../AlembicCore/alembic-core-recipe-interaction-contract-wave-1-2026-05-21.md](../AlembicCore/alembic-core-recipe-interaction-contract-wave-1-2026-05-21.md)。提交 hash：`bd9319db72d6fd22f9b3a2ba3a36e279ee117f24`。完成范围：Core cold-start / rescan / Mission Briefing 统一指向 `alembic_submit_knowledge({ items: [...] })`；`RecipeProductionGateway.pendingSemanticReview` 新增真实 `newRecipeId` / `createdRecipe`；`ConfidenceRouter` 默认 trusted sources 加入 `host-agent` 且不绕过内容 / reasoning / quality / confidence gates。验证：`npm run build:check` 通过；目标测试 4 文件 86 tests 通过；`npm run lint` 通过；`git diff --check` 通过；`npm run check` 通过，全量 63 文件 940 tests。Core 当时遗留的 Plugin 消费侧风险已由后续 `AlembicPlugin` 回填关闭。
+- 2026-05-21：`AlembicPlugin` 已完成 W1-PKS-2B、W1-PKS-4、W1-PKS-5，执行记录：[../AlembicPlugin/alembic-plugin-recipe-interaction-contract-wave-1-2026-05-21.md](../AlembicPlugin/alembic-plugin-recipe-interaction-contract-wave-1-2026-05-21.md)。提交 hash：Plugin W1-PKS-4/5 `b9abdc3efacb7879e34a1af1f8715008f00215d5`；Plugin W1-PKS-2B `8602ae9e71874af389709db680104b2c1ee0edbb`；AlembicCodex runtime W1-PKS-4/5 `0fd5a9d5a90cd27169a87783fb27a013394285ce`；AlembicCodex runtime W1-PKS-2B `4abb80efca55d37dc39667facdd18e8a35a08cad`。完成范围：`alembic_submit_knowledge` 的 pending semantic review nextAction 使用真实 `newRecipeId` / `createdRecipe.id`，缺 ID 时返回 `nextActionBlocked`；默认 lifecycle 可见契约只允许 `reactivate`；prime host-response 从 MCP tool 语义中分离；Codex runtime artifact 同步 Core `bd9319db72d6fd22f9b3a2ba3a36e279ee117f24`。验证：`npm run build:check` 通过；目标测试 5 文件 154 tests 通过；`npm run build` 通过；`npm run prepare:codex-plugin-runtime` 通过；`npm run verify:codex-plugin` 通过；`npm run verify:codex-channel` 通过；`npm run verify:release-package-boundary` 通过；Plugin 与 AlembicCodex `git diff --check` 均通过。遗留风险：本 wave 未新增 `AlembicTest` 真实项目复测；总控验收见下一条。
+- 2026-05-21：总控验收通过。代码证据复核：Core workflow 中 `knowledge({ action` / `submit_batch` 旧提示无命中；Plugin `alembic_submit_knowledge` 的 consolidate nextAction 读取 `pendingSemanticReview[].newRecipeId` 或 `createdRecipe.id`，缺失时返回 `nextActionBlocked`；默认 lifecycle schema enum 为 `['reactivate']`，approve / publish / deprecate / fast_track 仍被拒绝或保留在 Dashboard/admin 路径；prime payload 使用 `hostResponse` 表达宿主可见回复动作，测试确认 `nextActions` 不再包含虚构 `codex_host_response` 工具。功能完整性检查通过：Recipe 产出后的 Codex 可见指令、可执行合并 / 拒绝参数、默认权限边界、host response 表达和 portable runtime artifact 均已覆盖；本 wave 不需要新增 `AlembicTest` 真实项目复测。
