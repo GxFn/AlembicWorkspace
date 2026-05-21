@@ -1,6 +1,6 @@
 # AlembicTest Exchange
 
-状态：Test-2026-05-21-02 已完成，AlembicTest 仓库封口完成
+状态：Test-2026-05-21-03 待启动
 维护窗口：AlembicWorkspace
 执行窗口：AlembicTest
 更新日期：2026-05-21
@@ -11,12 +11,98 @@
 
 ## 当前测试单
 
-`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。`AlembicPlugin` 已完成 service request 边界修正并通过总控验收；`Test-2026-05-21-02` 已由 AlembicTest 复测通过并回填，总控功能验收通过，且 AlembicTest 仓库已完成封口提交。
+`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。`AlembicPlugin` service request 边界修正与 `Test-2026-05-21-02` 均已通过。当前 `AlembicPlugin` 已完成并通过总控验收 prime immediate receipt shout；总控已刷新本机 Codex plugin cache，创建 `Test-2026-05-21-03` 交给 `AlembicTest` 验证真实可见行为。
 
 | 测试单 | 状态 | 目标 | 执行窗口 | 报告 |
 | --- | --- | --- | --- | --- |
+| Test-2026-05-21-03：BiliDili prime immediate receipt shout 可见行为复测 | 待启动 | 验证 prime tool result 后下一条开发者可见响应先做 receipt shout，再继续任务；检查 payload 新时序字段、Skill 安装态和 BiliDili git 干净。 | `AlembicTest` | 建议路径：`AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md` |
 | Test-2026-05-21-02：BiliDili prime shout service boundary 复测 | 已完成 | 功能验收通过；`AlembicTest` 已提交测试报告 / probe 脚本 / 文档变更，commit `af0430ad69b4da50469eeaded8caa77c59e996e5` | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md) |
 | Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 已完成 | 结论为失败：BiliDili Recipes 可读，但 `prime` 未返回 `primeKnowledgeMaterial`；后续复测已转入 Test-2026-05-21-02 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md) |
+
+### Test-2026-05-21-03：BiliDili prime immediate receipt shout 可见行为复测
+
+状态：待启动
+创建日期：2026-05-21
+总控来源：`AlembicPlugin` 已完成并通过总控验收 prime immediate receipt shout；需要在 BiliDili 真实项目中验证 Codex 可见行为确实是 prime 后立即呐喊，而不是最终总结时才呐喊。
+执行窗口：AlembicTest
+目标项目：BiliDili（真实测试项目，仅作为目标项目，不是独立执行窗口）
+
+#### 测试目标
+
+- 证明在 BiliDili 项目上下文中触发 `alembic_task(operation="prime")` 后，Codex 的下一条开发者可见响应就是 knowledge receipt shout。
+- 证明该呐喊由 Codex 根据 `primeKnowledgeMaterial` 自主总结，说明接收到哪些 Recipe / Guard / 项目知识、哪些 evidenceRefs 有行号或缺行号，以及 empty / degraded 时不能假装有项目知识。
+- 证明 payload 包含 immediate receipt shout 新时序字段：`hostResponse.action === "shout_prime_knowledge_receipt"`、`timing === "immediate_after_prime"`、`requiredBeforeNextAction === true`、`visibility === "developer_visible"`。
+- 证明 installed Codex plugin cache / Skill / MCP runtime 已覆盖 `AlembicPlugin` 提交 `829f838704159c7ed205f93ecd986c6234173721` 和 AlembicCodex runtime artifact `682e5d32b9442c1caba9df87f61efb8b0835e870`。
+- 证明 BiliDili 真实项目在测试前后 git 状态保持干净。
+
+#### 非目标
+
+- 不重新生成 BiliDili Recipes。
+- 不启动完整 cold-start / rescan。
+- 不修改 BiliDili 业务源码、工程配置、登录、播放、网络、UI 或 Xcode 项目结构。
+- 不验证 publish / deprecate / approve / fast_track 等管理权限。
+- 不把失败定位直接修在 BiliDili；若插件、Skill、runtime 或 Codex host 行为有问题，回填证据后交回对应源仓库。
+
+#### 前置条件
+
+- BiliDili Recipes 已由测试线生成完成。
+- `AlembicPlugin` immediate receipt shout 已通过总控验收：Plugin 提交 `829f838704159c7ed205f93ecd986c6234173721`。
+- AlembicCodex runtime artifact 已刷新：`682e5d32b9442c1caba9df87f61efb8b0835e870`。
+- 总控已刷新本机 Codex plugin cache：cache marker `gitHead=829f838704159c7ed205f93ecd986c6234173721`，`localMcpEntry` 指向 `AlembicPlugin/dist/bin/codex-mcp.js`；cache Skill 已包含 immediate receipt shout 文案，cache runtime dist 已包含 `immediate_after_prime` / `requiredBeforeNextAction`。
+- 测试前记录 BiliDili git 状态；测试后再次记录，确认真实项目未被修改。
+
+#### 执行范围
+
+- 触发入口：在 BiliDili 项目上下文中通过 Codex / Alembic Codex 插件触发 `alembic_task prime`。
+- 允许操作：读取 BiliDili 已生成 Recipes、调用 Alembic Codex 插件 prime、截取 / 保存 MCP payload 摘要、记录 prime tool result 后的下一条 Codex 可见回复、读取插件 / daemon / Codex 相关日志。
+- 禁止操作：不得写入或修改 BiliDili 业务源码；不得启动 cold-start / rescan；不得清理或重建真实项目；不得把测试脚本写回 BiliDili；不得手动补造 Recipes 来让测试通过。
+- 允许读取：BiliDili Recipes、插件 prime 返回 payload、Codex 可见回复、Alembic / plugin runtime 版本和日志、BiliDili git 状态、Codex plugin cache marker 和 Skill 文案。
+- 禁止修改：BiliDili 仓库任何受 git 跟踪文件；如运行时产生缓存或临时文件，必须记录路径、原因和是否影响真实项目。
+
+#### 观察点
+
+- 安装态版本：cache marker `gitHead` 应为 `829f838704159c7ed205f93ecd986c6234173721`；Skill Daily Coding Flow 应包含 immediate receipt shout；runtime dist task 应包含 `immediate_after_prime` 和 `requiredBeforeNextAction`。
+- MCP / plugin payload：`success` 应为 true；`data.primeKnowledgeMaterial.status` 应为 `delivered`、`empty` 或 `degraded`；`hostResponse` 必须包含新时序字段；`shoutInstruction` 必须包含 immediate-before-next-action 语义。
+- Codex 可见行为：prime tool result 后，下一条开发者可见响应必须先声明接收到的知识 / empty / degraded，再继续任何搜索、读代码、编辑、Guard 或最终总结。
+- Codex 呐喊内容：若 delivered，应包含至少若干具体 Recipe / Guard 名称或 trigger、摘要 / actionHint、路径 / 行号证据；若 evidenceRef line 为 null，应如实说明行号缺失。
+- 契约回归：payload 和 nextActions 不应包含 `codex_host_response` tool；`alembic_task prime` 仍应为 `plugin-owned-codex-facing` service boundary。
+- 真实项目状态：BiliDili 测试前后 git 状态应保持干净。
+
+#### 验收标准
+
+- 通过：版本证据匹配最新 Plugin / runtime / cache；BiliDili 上下文成功触发 `prime`；payload 包含 immediate hostResponse 字段；Codex 下一条可见响应先做 receipt shout，再继续任务；无 `codex_host_response` tool；BiliDili 仓库前后不被修改。
+- 失败：Codex 静默继续、先搜索 / 读代码 / 编辑 / Guard / 总结再呐喊，或只在最终总结时提到 prime；payload 缺少 `timing` / `requiredBeforeNextAction` / `visibility`；Skill/cache 仍是旧文案但未按阻塞处理；出现 `codex_host_response` tool；BiliDili 被修改。
+- 阻塞：插件不可用、Codex MCP 无法启动、BiliDili Recipes 未实际可读、cache marker 不是 `829f838704159c7ed205f93ecd986c6234173721`，或无法观察 prime 后下一条可见响应；需记录阻塞点和证据，不扩大测试范围。
+
+#### 建议命令或脚本
+
+```bash
+# 由 AlembicTest 窗口按自身仓库脚本和 Codex 插件测试流程执行；总控不直接运行。
+git -C ../BiliDili status --short --branch
+# 读取 Codex plugin cache marker / Skill / runtime dist 以确认安装态版本。
+# 在 BiliDili 项目上下文中触发 Alembic Codex 插件 prime，并记录 payload / prime 后下一条 Codex 可见回复。
+git -C ../BiliDili status --short --branch
+```
+
+#### 回填要求
+
+- 测试结论：
+- 执行范围：
+- 使用配置：
+- plugin / runtime / Core / Alembic daemon / Codex plugin cache 版本证据：
+- `prime` 调用入口：
+- `prime` payload 摘要：
+- `hostResponse` 新时序字段摘要：
+- `serviceBoundary` 摘要：
+- prime tool result 后的下一条 Codex 可见响应原文或摘要：
+- 是否先呐喊再继续任务：
+- 是否出现 `codex_host_response` tool：
+- BiliDili git 状态前后对比：
+- 关键日志信号：
+- 详细报告路径：建议 `AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md`
+- 遗留风险：
+- 下一步建议：
+- 建议归属窗口：
 
 ### Test-2026-05-21-02：BiliDili prime shout service boundary 复测
 
@@ -180,9 +266,11 @@ git -C ../BiliDili status --short
 
 ## 可复制提示词
 
-发送给：无。
+发送给：`AlembicTest`。
 
-当前没有可发送给 `AlembicTest` 的测试任务。Test-2026-05-21-02 已完成并封口；下一轮需要等 `AlembicPlugin` 完成 [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) 后，由总控创建新的测试单。
+```text
+读取 docs/workspace/alembic-test-exchange.md，按照文档完成 Test-2026-05-21-03：在 BiliDili 真实项目中验证 Alembic Codex prime immediate receipt shout，可见行为必须是 prime tool result 后下一条开发者可见响应先声明接收到的 Recipe / Guard / evidenceRefs，再继续任务；完成后回填测试结论、版本证据、payload 摘要、Codex 可见呐喊原文或摘要、BiliDili git 前后状态、验证命令 / 日志和遗留风险。
+```
 
 ## 统一测试单模板
 

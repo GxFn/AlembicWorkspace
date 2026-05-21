@@ -22,8 +22,8 @@
 
 | ID | 状态 | 类型 | 优先级 | 归属 | 事项 / 目标 | 影响复测 / 派发 | 依赖 / 触发 | 推荐窗口 | 当前挂载 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| GTODO-2026-05-21-001 | 待启动 | 主线实现 | P0 | `AlembicPlugin` | 强化 `primeKnowledgeMaterial.hostResponse`、`shoutInstruction` 和 Skill，让 Codex 在 prime tool result 后立即做开发者可见知识接收呐喊，再继续任务。 | 是 | 当前计划 SHOUT-1/2。 | `AlembicPlugin` | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) |
-| GTODO-2026-05-21-002 | 阻塞 | 真实项目复测 | P0 | `AlembicTest` | Plugin 完成后，在 BiliDili 真实项目中验证 prime 后立即呐喊，而不是最终总结时才呐喊。 | 是 | 等 `AlembicPlugin` 提交 hash、runtime artifact 和总控验收；届时创建 Test-2026-05-21-03。 | `AlembicTest` | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)、[alembic-test-exchange.md](alembic-test-exchange.md) |
+| GTODO-2026-05-21-001 | 已完成 | 主线实现 | P0 | `AlembicPlugin` | 强化 `primeKnowledgeMaterial.hostResponse`、`shoutInstruction` 和 Skill，让 Codex 在 prime tool result 后立即做开发者可见知识接收呐喊，再继续任务。 | 是 | AlembicPlugin commit `829f838704159c7ed205f93ecd986c6234173721`，总控验收通过。 | `AlembicPlugin` | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) |
+| GTODO-2026-05-21-002 | 待启动 | 真实项目复测 | P0 | `AlembicTest` | 在 BiliDili 真实项目中验证 prime 后立即呐喊，而不是最终总结时才呐喊。 | 是 | Test-2026-05-21-03 已创建；本机 Codex plugin cache 已刷新到 Plugin `829f838704159c7ed205f93ecd986c6234173721`。 | `AlembicTest` | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)、[alembic-test-exchange.md](alembic-test-exchange.md) |
 | GTODO-2026-05-21-003 | 观察中 | shared contract | P2 | `AlembicCore` / `AlembicPlugin` | 观察 `PrimeHostResponseInstruction`、evidenceRef projection 或 Recipe projection 是否需要下沉为 Core 共享 contract。 | 否 | 只有出现第二个真实生产方 / 消费方时启动。 | `AlembicCore` | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) |
 | GTODO-2026-05-21-004 | 观察中 | service contract | P2 | `Alembic` / `AlembicPlugin` / `AlembicCore` | 为 Alembic resident service 增加明确 service API / capability / contract version，避免服务请求退化成 MCP tool ownership bridge。 | 否 | prime immediate shout 主闭环完成后再评估。 | 待定 | [alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md) |
 | GTODO-2026-05-21-005 | 观察中 | 证据质量 | P2 | 待定 | 部分 Recipe evidenceRef 只有路径没有行号；后续若要强制行号级证据，需要回到 Recipe / sourceRefs 生成链路补强。 | 否 | Test-2026-05-21-02 风险记录；不阻塞当前 service boundary / immediate shout。 | 待定 | [alembic-test-exchange.md](alembic-test-exchange.md) |
@@ -32,3 +32,4 @@
 ## 最近同步记录
 
 - 2026-05-21：根据用户要求创建全局 TODO 列表。当前主线 TODO 来源为 [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)；后续风险项来源为 Test-2026-05-21-02 和 service request boundary 收口计划。
+- 2026-05-21：`AlembicPlugin` immediate receipt shout 已通过总控验收，GTODO-2026-05-21-001 标为已完成；Test-2026-05-21-03 已创建，GTODO-2026-05-21-002 转为待启动。
