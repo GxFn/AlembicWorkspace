@@ -8,7 +8,7 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md) | 准备中 | 启动 `GTODO-2026-05-21-010`：长线删除 `AlembicPlugin` 旧内置第三方 AI 能力残留；当前 AIP-0 由总控做真实调用方扫描和删除边界设计，发送窗口为无。 |
+| 当前计划 | [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md) | 准备中 | 启动 `GTODO-2026-05-21-010`：长线删除 `AlembicPlugin` 旧内置第三方 AI 能力残留，包含旧 AI 配置 / 状态 / 权限 surfaces；当前 AIP-0 由总控做真实调用方扫描和删除边界设计，发送窗口为无。 |
 | 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 下一主线准备中 | 已归档 prime immediate receipt shout 与 resident vector search release；当前不向实现窗口发送提示词。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md](../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md) | VEC-2/VEC-3/VEC-4R/VEC-5R 已完成 | 记录 HostAiAdapter placeholder embed 修正、ResidentSearchClient、PrimeSearchPipeline / search handler metadata、Skill、runtime artifact、删除 daemon MCP bridge、VEC-5R mode normalization、验证命令和提交 hash。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md](../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md) | SHOUT-7 已完成 | 记录 `hostResponse.timing` / `requiredBeforeNextAction` / `visibility`、三态 `shoutInstruction`、SHOUT-5 可见摘要优化、SHOUT-7 主语收紧、AlembicCodex runtime artifact、验证命令、提交 hash 和总控验收。 |

@@ -11,14 +11,14 @@
 - prime immediate receipt shout 计划已归档到 [archive/2026-05/prime-immediate-receipt-shout/](archive/2026-05/prime-immediate-receipt-shout/)；SHOUT-7 已通过总控验收，用户确认不新增 AlembicTest 复测。
 - resident vector search release 计划已归档到 [archive/2026-05/resident-vector-search-release/](archive/2026-05/resident-vector-search-release/)；Test-2026-05-22-01 通过，Plugin cache 已刷新到 AlembicPlugin `2c98f69b1388c478bbbb255e487c51fde621cff7`。
 
-当前新主线是 [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md)：长线删除 `AlembicPlugin` 中旧内置第三方 AI 能力残留。现阶段是 AIP-0，总控先做真实调用方扫描和删除边界设计，不向实现窗口发送提示词。
+当前新主线是 [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md)：长线删除 `AlembicPlugin` 中旧内置第三方 AI 能力残留。用户已补充确认，Plugin 侧 AI 配置来自早期“整体做成 Codex 插件”的路线；现在产品已改为 Codex 插件 + Alembic 主体模式，所以 Plugin 侧旧 AI 配置 / 状态 / 权限 surfaces 默认进入删除范围。现阶段是 AIP-0，总控先做真实调用方扫描和删除边界设计，不向实现窗口发送提示词。
 
 当前已确认的代码事实：
 
 - `AlembicPlugin/lib/codex/HostAiAdapter.ts` 仍保留 `HostAiProvider` 可执行 provider 外形，包含 `chat()` / `embed()` / `probe()` 等方法。
 - `AiModule` 仍把 `aiProvider` 与 `_embedProvider` 同步进 DI，`KnowledgeModule` 仍把 `_embedProvider || aiProvider` 传给 Core search / indexing。
-- HTTP `/ai/*` routes 与 MCP `alembic_codex_ai_config` 仍提供 AI 配置 / 状态 surfaces；它们可能服务 Alembic resident/internal job，不能在未证明替代入口前直接删除。
-- 当前主闭环是先分清“旧可执行 provider runtime 残留”和“仍有真实消费方的 resident/internal 配置状态”，再决定 `AlembicPlugin` 实现派发。
+- HTTP `/ai/*` routes 与 MCP `alembic_codex_ai_config` 仍提供 AI 配置 / 状态 surfaces；按最新用户口径，这些是重点删除候选，只有短期兼容需要时才允许 fail-closed 边界提示。
+- 当前主闭环是删除 Plugin 旧 AI 配置与 provider runtime 后，Codex prime/search 继续工作，resident vector 增强仍可用，需要 AI 的 Alembic 主体能力回到 Alembic 主体配置入口。
 
 - 当前发送窗口：无。
 - 当前不发送给：`AlembicPlugin`（观察中，等待 AIP-0）、`Alembic`（观察中）、`AlembicCore`（观察中）、`AlembicDashboard`（观察中）、`AlembicTest`（观察中）、`AlembicAgent`（无任务）、`BiliDili`（无任务）。
