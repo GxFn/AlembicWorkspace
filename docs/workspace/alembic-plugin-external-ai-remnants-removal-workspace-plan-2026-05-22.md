@@ -2,7 +2,7 @@
 
 创建日期：2026-05-22
 总控窗口：AlembicWorkspace
-状态：AIP-0 已完成，AIP-1 待启动（当前只派发 AlembicPlugin）
+状态：AIP-1 总控验收通过，主线功能完成
 来源 TODO：`GTODO-2026-05-21-010`
 
 ## 用户目标
@@ -102,23 +102,23 @@
 | 阶段 | 状态 | 主窗口 | 目标 | 输出 / 证据 | 是否可派发 |
 | --- | --- | --- | --- | --- | --- |
 | AIP-0 | 已完成 | `AlembicWorkspace` | 完成真实调用方扫描和删除边界设计，列出删除 / fail-closed / 转交 Alembic 主体候选。 | 当前计划已更新代码证据、窗口状态和 AIP-1 派发条件。 | 否，总控内完成 |
-| AIP-1 | 待启动 | `AlembicPlugin` | 按 AIP-0 结论删除 provider runtime 外形、旧 AI 配置 surfaces、DI provider 注入和相关文案。 | AlembicPlugin commit、执行记录、targeted tests、runtime artifact 刷新。 | 是，当前派发 |
-| AIP-2 | 暂停 | `Alembic` | 只有当 Plugin fail-closed 文案必须引用 Alembic 主体新增入口、CLI 文案或能力字段时启动。 | 对应仓库提交和消费方验证；无必要则明确无任务。 | 待 AIP-1 回填 |
-| AIP-3 | 暂停 | `AlembicTest` | 用户需要真实 Codex / BiliDili 验证时，创建测试单验证 prime/search 仍可用且旧 ai_config 不再作为 Plugin 配置入口。 | `alembic-test-exchange.md` 测试单与回填证据。 | 待产品变更 |
-| AIP-4 | 暂停 | `AlembicWorkspace` | 总控验收、归档、刷新全局 TODO 和索引。 | workspace 文档验证、归档和 commit。 | 待前序完成 |
+| AIP-1 | 已完成 | `AlembicPlugin` | 按 AIP-0 结论删除 provider runtime 外形、旧 AI 配置 surfaces、DI provider 注入和相关文案。 | AlembicPlugin `747b40f2abb2b9d8cb2714656fab164267d1d105`；AlembicCodex runtime `01fb042afe87264ad213dfc13444dc9dc48b77ca`；执行记录见 [../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md)；总控复核通过。 | 否，已完成 |
+| AIP-2 | 无任务 | `Alembic` | 只有当 Plugin fail-closed 文案必须引用 Alembic 主体新增入口、CLI 文案或能力字段时启动。 | 总控验收判断：现有 Plugin fail-closed 与 Alembic 主体边界足够，不需要 Alembic 代码 / 文案补丁。 | 否 |
+| AIP-3 | 暂停 | `AlembicTest` | 用户需要真实 Codex / BiliDili 验证时，创建测试单验证 prime/search 仍可用且旧 ai_config 不再作为 Plugin 配置入口。 | 本轮暂不创建测试单；删除旧 Plugin AI 配置 surface 已由 Plugin unit / codex-session / boundary / runtime 校验覆盖。 | 待用户需要真实验证时再启动 |
+| AIP-4 | 已完成 | `AlembicWorkspace` | 总控验收、刷新全局 TODO 和索引。 | workspace 文档验证通过；本机 Codex plugin cache 尚未刷新，若用户要立即在当前 Codex 插件环境验证，再按既有 cache refresh 流程执行。 | 否，已完成 |
 
 ## 窗口分派
 
-当前阶段进入 AIP-1，只向 `AlembicPlugin` 发送提示词。其它窗口不发送。
+当前阶段为 AIP-1 总控验收通过，当前不再发送领取任务提示词。其它窗口不发送。
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | Alembic 主体保留自己的 internal AI / embedding 配置能力；当前不派发，只有 AIP-1 证明需要主体入口补文案或能力字段才启动。 |
+| `Alembic`<br>无任务 | Alembic 主体保留自己的 internal AI / embedding 配置能力；AIP-1 不需要 Alembic 主体补文案或能力字段。 |
 | `AlembicCore`<br>无任务 | 当前无共享 contract 变更；Plugin 侧删除 `_embedProvider` / `aiProvider` 注入应在 Plugin adapter 层完成，不下沉 Core。 |
 | `AlembicAgent`<br>无任务 | 本主线删除 Plugin 旧第三方 AI 残留，不修改 AlembicAgent runtime；除非扫描发现 Plugin 仍错误引用 Agent provider。 |
 | `AlembicDashboard`<br>无任务 | 用户确认 Plugin 不再直接引用 Dashboard；代码证据也显示 Plugin 只做 Dashboard URL handoff，不构建、不打包、不服务 Dashboard 前端。本轮不派发 Dashboard 源码窗口。 |
-| `AlembicPlugin`<br>待启动 | 当前主实现窗口：删除旧 AI provider runtime / config surfaces / status permission surfaces，并更新 runtime artifact、tests、Skill / README 文案。 |
-| `AlembicTest`<br>观察中 | 当前没有测试单；只有产品变更完成且需要真实 Codex / BiliDili 验证时再创建测试单。 |
+| `AlembicPlugin`<br>已完成 | AIP-1 已完成并通过总控验收：删除旧 AI provider runtime / config surfaces / status permission surfaces，更新 tests、Skill、runtime artifact，回填执行记录。 |
+| `AlembicTest`<br>观察中 | 当前不创建测试单；只有用户需要真实 Codex / BiliDili 验证时再启动。 |
 | `BiliDili`<br>无任务 | 本主线不改真实 iOS 项目源码；只可能作为 AlembicTest 的验证对象。 |
 
 ## TODO / Backlog
@@ -126,38 +126,30 @@
 | ID | 状态 | 类型 | 优先级 | 归属 | 事项 / 目标 | 影响复测 / 派发 | 依赖 / 触发 | 推荐窗口 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | AIP-TODO-1 | 已完成 | 代码调研 | P0 | `AlembicWorkspace` | 扫描 `HostAiAdapter`、`AiModule`、`KnowledgeModule`、HTTP `/ai/*` routes、MCP `alembic_codex_ai_config`、tests 和 release boundary，确认删除 / fail-closed / 转交 Alembic 主体候选。 | 是 | AIP-0 已完成；结论是当前只派发 `AlembicPlugin`。 | `AlembicWorkspace` |
-| AIP-TODO-2 | 待启动 | 删除实现 | P0 | `AlembicPlugin` | 删除可执行 provider runtime 外形、旧 AI 配置 surfaces 和 `_embedProvider` 注入，让 Plugin 不再暴露第三方 AI 配置或执行残留。 | 是 | AIP-TODO-1 已完成，当前派发。 | `AlembicPlugin` |
-| AIP-TODO-3 | 观察中 | 主体入口 | P1 | `Alembic` / `AlembicPlugin` | 如果旧 Plugin AI config 被用户或文档引用，需要改为 fail-closed 并指向 Alembic 主体配置入口；不在 Plugin 继续保存配置。 | 可能 | AIP-1 回填后判断是否需要 Alembic 主体补文案或能力字段。 | 待定 |
+| AIP-TODO-2 | 已完成 | 删除实现 | P0 | `AlembicPlugin` | 删除可执行 provider runtime 外形、旧 AI 配置 surfaces 和 `_embedProvider` 注入，让 Plugin 不再暴露第三方 AI 配置或执行残留。 | 是 | AlembicPlugin `747b40f2abb2b9d8cb2714656fab164267d1d105`；runtime artifact `01fb042afe87264ad213dfc13444dc9dc48b77ca`；总控复核和 targeted unit 通过。 | `AlembicPlugin` |
+| AIP-TODO-3 | 已完成 | 主体入口 | P1 | `Alembic` / `AlembicPlugin` | 如果旧 Plugin AI config 被用户或文档引用，需要改为 fail-closed 并指向 Alembic 主体配置入口；不在 Plugin 继续保存配置。 | 否 | 总控验收判断：Plugin 当前 fail-closed 文案和 Alembic 主体 owner 标识足够，Alembic 主体无需变更。 | 无 |
 | AIP-TODO-4 | 无任务 | UI/API 同步 | P2 | `AlembicDashboard` | 本轮不改 Dashboard 源码；Plugin 已不直接引用 Dashboard，Dashboard 前端 source/build/serving 属于 Alembic/AlembicDashboard，旧 AI 配置删除在 Plugin 内部完成。 | 否 | 若未来 Alembic 主体 Dashboard 自身需要 UX 优化，再另开任务。 | 无 |
-| AIP-TODO-5 | 暂停 | 真实项目验证 | P1 | `AlembicTest` | 在产品变更完成后验证 Codex prime/search 仍可用、receipt shout 仍由 Codex 发声、旧 ai_config 不再作为 Plugin 配置入口。 | 是 | 等产品仓库提交和总控创建测试单；当前不启动。 | `AlembicTest` |
+| AIP-TODO-5 | 暂停 | 真实项目验证 | P1 | `AlembicTest` | 在产品变更完成后验证 Codex prime/search 仍可用、receipt shout 仍由 Codex 发声、旧 ai_config 不再作为 Plugin 配置入口。 | 可选 | 当前不创建测试单；如用户要在真实 Codex / BiliDili 环境复测，再由总控创建 AlembicTest 测试单。 | `AlembicTest` |
 
 ## 空闲窗口调度
 
 | 窗口 | 调度 | 是否发送 | 原因 |
 | --- | --- | --- | --- |
-| `Alembic` | 观察 | 否 | Alembic 主体配置入口保持现状；只有 AIP-1 回填证明需要主体文案或能力字段才启动。 |
+| `Alembic` | 无任务 | 否 | Alembic 主体配置入口保持现状；AIP-1 不需要主体文案或能力字段。 |
 | `AlembicCore` | 无任务 | 否 | 暂无共享 contract 变更证据。 |
 | `AlembicAgent` | 无任务 | 否 | 本主线不改 Agent runtime。 |
 | `AlembicDashboard` | 无任务 | 否 | Plugin 不再直接引用 Dashboard；本轮不改 Dashboard 源码。 |
-| `AlembicPlugin` | 待启动 | 是 | AIP-0 已完成，当前唯一可推进实现窗口。 |
-| `AlembicTest` | 观察 | 否 | 当前无测试单。 |
+| `AlembicPlugin` | 已完成 | 否 | AIP-1 已通过总控验收。 |
+| `AlembicTest` | 观察 | 否 | 当前不创建测试单；用户需要真实验证时再启动。 |
 | `BiliDili` | 无任务 | 否 | 不改真实项目源码。 |
 
 ## 可复制分派提示词
 
-发送给：`AlembicPlugin`。
+发送给：无。
 
-```text
-读取 docs/workspace/alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md，按照 AIP-1 领取并完成分配给 AlembicPlugin 窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
+当前无可复制领取任务提示词；AIP-1 已完成并通过总控验收。
 
-重点边界：删除 AlembicPlugin 旧内置第三方 AI 能力残留，不要恢复或维护 Plugin 侧 AI provider 配置。删除 / 收敛范围包括 HostAiAdapter 可执行 provider 外形、unavailable chat/embed 占位、AiModule/ServiceContainer 的 aiProviderManager/_embedProvider 注入、MCP alembic_codex_ai_config、Preflight 对该 tool 的推荐、AiConfigState/status/diagnostics/daemon health/system health 中的 Plugin AI config 状态、HTTP /ai config/provider/env/workspace-config 写入 surfaces，以及相关 tests/scenarios/runtime artifact。需要保留旧入口时只能 fail-closed，并清楚说明 Plugin 不再配置第三方 AI，需要 AI 的主体能力回到 Alembic 主体入口。
-
-不要改 AlembicDashboard 源码；Plugin 已不直接引用 Dashboard，Dashboard 前端 source/build/serving 属于 Alembic/AlembicDashboard。本轮若遇到 Plugin 内部命名为 DashboardOperations 的兼容 API，只按 AlembicPlugin 内部代码处理。
-
-必须保留 Codex MCP、Skill、channel、marketplace、runtime artifact、prime/search/init/diagnostics、resident vector search client、baseline search、Dashboard URL handoff、Alembic resident enhancement 请求和 Codex host-agent bootstrap/rescan 主路径。
-```
-
-不发送给：`Alembic`（观察中）、`AlembicCore`（无任务）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
+不发送给：`Alembic`（无任务）、`AlembicCore`（无任务）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
 
 ## 验证策略
 
@@ -188,3 +180,5 @@
 - 2026-05-22：总控创建本计划，归档 prime immediate receipt shout 与 resident vector search release 两条完成主线，启动 `GTODO-2026-05-21-010` 的 AIP-0 调研准备。当前发送给无，所有执行窗口保持观察或无任务。
 - 2026-05-22：用户补充确认旧 AI 配置来自“整体做成 Codex 插件”的早期路线；由于 Codex 插件不能使用第三方 AI 扫描项目，产品已改成 Codex 插件 + Alembic 主体模式。因此 Plugin 侧 AI 配置 / 状态 / 权限 surfaces 默认进入删除范围，长期配置归 Alembic 主体。
 - 2026-05-22：AIP-0 总控代码依赖调研完成。确认旧残留真实链路覆盖 `HostAiAdapter`、`AiModule`、`KnowledgeModule`、`VectorModule`、MCP `alembic_codex_ai_config`、Preflight、`AiConfigState`、status/diagnostics/daemon health/system health、HTTP `/ai` config routes、Plugin 内部 `DashboardOperations` 兼容 API、codex-session simulator/analyzer、unit tests 和 runtime dist。用户确认 Plugin 已不直接引用 Dashboard；代码证据显示 Plugin 只做 Dashboard URL handoff，因此本轮不派发 `AlembicDashboard`，当前只派发 `AlembicPlugin` 执行 AIP-1。
+- 2026-05-22：`AlembicPlugin` AIP-1 已完成并推送。完成范围：删除 `HostAiAdapter` / `AiConfigState` / `AiModule`，移除 MCP `alembic_codex_ai_config`，取消 Preflight 对该 tool 的推荐，移除 status / diagnostics / daemon health / system health 中的 Plugin AI config 状态，HTTP `/ai` provider/config/env/workspace-config/chat/agent 旧入口统一 fail-closed，`SearchEngine` / `IndexingPipeline` / `VectorService` 不再注入 Plugin AI / embedding provider，Skill 与 runtime artifact 已同步。提交：AlembicPlugin `747b40f2abb2b9d8cb2714656fab164267d1d105`，AlembicCodex runtime `01fb042afe87264ad213dfc13444dc9dc48b77ca`。验证：targeted unit、`npm run build:check`、`npm run build`、`npm run prepare:codex-plugin-runtime`、`npm run verify:codex-plugin`、`npm run verify:codex-channel`、`npm run verify:release-package-boundary`、`npm run verify:codex-session`、`npm run report:agent-extraction-boundary`、`git diff --check` 均通过。负向扫描 `lib test plugins/alembic-codex/skills README.md` 无命中；`plugins/alembic-codex/runtime` 仅剩 `vendor/AlembicCore/dist/shared/WorkspaceSettingsStore.{js,d.ts}` 中 Core-owned `ALEMBIC_AI_PROVIDER` / `ALEMBIC_EMBED_PROVIDER`，属于 portable runtime Core 快照保留项。执行记录：[../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md)。
+- 2026-05-22：总控验收 AIP-1 通过。复核证据：`AlembicPlugin` 与 AlembicCodex runtime 工作区均干净；`ToolPolicy` 不再暴露 `alembic_codex_ai_config`；`Preflight` 不再读取 Plugin AI config；`CodexMcpServer` 已移除 configure AI 分支；HTTP `/api/v1/ai` provider/config/env/workspace/chat/agent 旧入口统一 410 `PLUGIN_AI_CONFIG_REMOVED`；`ServiceContainer` 不再注册 `AiModule`；`KnowledgeModule` / `VectorModule` 显式传入 `aiProvider: null` / `embedProvider: null`；`EnhancementRoute` 只从 daemon health 读取 `capabilities.internalAi`；embedded plugin daemon health 标记 `pluginConfigRemoved=true`。总控重跑 `npm run test:unit -- --run test/unit/CodexToolPolicy.test.ts test/unit/CodexMcpServer.test.ts test/unit/CodexStatusService.test.ts test/unit/CodexEnhancementRoute.test.ts` 通过，4 files / 52 tests；负向扫描确认 Plugin-owned `lib` / `test` / skills / README 无旧 AI config 命中，runtime 仅剩 Core vendor 常量。AIP-2 Alembic 无任务，AIP-3 暂不创建 AlembicTest 测试单。

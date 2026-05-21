@@ -8,8 +8,9 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md) | AIP-1 待启动 | 启动 `GTODO-2026-05-21-010`：长线删除 `AlembicPlugin` 旧内置第三方 AI 能力残留，包含旧 AI 配置 / 状态 / 权限 surfaces；AIP-0 代码依赖调研已完成，当前只派发 `AlembicPlugin`，发送窗口为 `AlembicPlugin`。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | AIP-1 待启动 | 已归档 prime immediate receipt shout 与 resident vector search release；当前向 `AlembicPlugin` 派发删除旧 AI 残留实现任务。 |
+| 当前计划 | [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md) | 已完成 | 启动 `GTODO-2026-05-21-010`：长线删除 `AlembicPlugin` 旧内置第三方 AI 能力残留；`AlembicPlugin` AIP-1 已完成并通过总控验收，提交 `747b40f2abb2b9d8cb2714656fab164267d1d105`，Codex runtime 子仓库 `01fb042afe87264ad213dfc13444dc9dc48b77ca`。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 已完成 | 已归档 prime immediate receipt shout 与 resident vector search release；`AlembicPlugin` 删除旧 AI 残留实现已完成并通过总控验收，当前不派发新窗口。 |
+| AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md) | AIP-1 已完成 | 记录删除 Plugin 旧 AI provider / config / status surfaces、MCP `alembic_codex_ai_config`、HTTP `/ai` 配置写入、DI provider 注入、Skill / runtime artifact、提交 hash、验证命令和残留扫描。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md](../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md) | VEC-2/VEC-3/VEC-4R/VEC-5R 已完成 | 记录 HostAiAdapter placeholder embed 修正、ResidentSearchClient、PrimeSearchPipeline / search handler metadata、Skill、runtime artifact、删除 daemon MCP bridge、VEC-5R mode normalization、验证命令和提交 hash。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md](../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md) | SHOUT-7 已完成 | 记录 `hostResponse.timing` / `requiredBeforeNextAction` / `visibility`、三态 `shoutInstruction`、SHOUT-5 可见摘要优化、SHOUT-7 主语收紧、AlembicCodex runtime artifact、验证命令、提交 hash 和总控验收。 |
 | 当前测试交流 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-22-01 已通过并封口，验证 direct auto/semantic 与 daemon `/api/v1/search` 均返回 resident vector telemetry。 |
@@ -62,12 +63,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | 保留 resident/internal AI 配置和 embedding 服务能力；当前不派发，只有 AIP-1 证明需要主体入口补文案或能力字段才启动。 |
+| `Alembic`<br>无任务 | 保留 resident/internal AI 配置和 embedding 服务能力；AIP-1 不需要主体入口补文案或能力字段。 |
 | `AlembicCore`<br>无任务 | 暂无共享 contract 变更证据；Plugin 删除旧 provider 注入应在 Plugin adapter 层完成。 |
 | `AlembicAgent`<br>无任务 | 本主线不改 Agent runtime。 |
 | `AlembicDashboard`<br>无任务 | Plugin 已不直接引用 Dashboard；本轮不改 Dashboard 源码。 |
-| `AlembicPlugin`<br>待启动 | 当前主实现窗口：删除旧 AI provider runtime / config surfaces / status permission surfaces，并更新 tests、Skill / README、runtime artifact。 |
-| `AlembicTest`<br>观察中 | 当前无测试单；产品变更完成后再判断是否需要真实 Codex / BiliDili 验证。 |
+| `AlembicPlugin`<br>已完成 | AIP-1 已完成并通过总控验收：删除旧 AI provider runtime / config surfaces / status permission surfaces，并更新 tests、Skill、runtime artifact。 |
+| `AlembicTest`<br>观察中 | 当前不创建测试单；用户需要真实 Codex / BiliDili 验证时再启动。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码，只可能作为后续测试对象。 |
 
 ## 状态枚举
