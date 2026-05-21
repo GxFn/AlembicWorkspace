@@ -54,3 +54,54 @@ package-lock.json:30:      "version": "0.1.0",
 - 等 `AlembicCore` V020-1 完成后刷新 AlembicAgent lockfile 中的 `../AlembicCore` snapshot 到 `0.2.0`。
 - 总控在 Core / Agent / Dashboard 三个上游均待验收后启动 `Alembic` V020-2，确保 publish staging 读取到上游 `0.2.0`。
 - `AlembicPlugin` 继续等待 Core 版本完成后再生成 Codex runtime，避免 embedded Core snapshot 仍带旧版本。
+
+## V020-1R 返工完成
+
+状态：已完成，待总控验收
+
+### 完成范围
+
+- 在 `AlembicCore` 已完成 `@alembic/core@0.2.0` 后，刷新 `package-lock.json` 中 `packages["../AlembicCore"].version`。
+- `@alembic/agent` root package、root lock、`../AlembicCore` lockfile snapshot 均为 `0.2.0`。
+- 未修改 `package.json` dependency spec，继续保持 `@alembic/core` 为 `file:../AlembicCore`。
+- 未修改第三方依赖版本，未修改其它 Alembic 仓库。
+
+### 提交
+
+- AlembicAgent 返工提交 hash：`9de2cd9`
+- 提交信息：`Refresh core snapshot version in agent lockfile`
+
+### 验证命令
+
+```text
+node -e "const l=require('./package-lock.json'); console.log(l.packages['../AlembicCore']?.version)"
+rg -n '"version": "0\\.1\\.0"|@alembic/agent.*0\\.1\\.0|@alembic/core.*0\\.1\\.0' package.json package-lock.json src test scripts
+npm run build
+npm run test
+git diff --check
+```
+
+### 验证结果
+
+- Core snapshot 读取结果为 `0.2.0`。
+- 目标残留扫描无命中。
+- `npm run build` 通过。
+- `npm run test` 通过：19 个测试文件 / 87 个测试用例全部通过。
+- `git diff --check` 通过。
+
+### 残留扫描结果
+
+```text
+无命中
+```
+
+### 遗留风险
+
+- 本窗口只刷新 AlembicAgent lockfile；`Alembic` publish staging、`AlembicPlugin` Codex runtime / channel / cache 仍需下游阶段重新生成并验证。
+- Alembic project knowledge / Guard 仍不可用：`alembic_task prime` 返回 `CODEX_ALEMBIC_KNOWLEDGE_REQUIRED`。
+
+### 下一步建议
+
+- 总控复核 `9de2cd9` 后，可解除 V020-2 / V020-3 对 Agent lockfile 残留的阻塞。
+- `Alembic` V020-2 应读取 Core / Agent / Dashboard 当前 `0.2.0` 版本生成 publish staging。
+- `AlembicPlugin` V020-3 应重新生成 Codex runtime，确认 embedded Core snapshot 和 plugin/channel version 都为 `0.2.0`。
