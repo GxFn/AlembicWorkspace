@@ -1,6 +1,6 @@
 # AlembicTest Exchange
 
-状态：有待启动测试单
+状态：无待启动测试单，Test-2026-05-21-01 已验收为失败，等待 Alembic 修复后复测
 维护窗口：AlembicWorkspace
 执行窗口：AlembicTest
 更新日期：2026-05-21
@@ -11,15 +11,15 @@
 
 ## 当前测试单
 
-当前有 1 个可启动测试单。
+当前没有可启动测试单；`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。下一步进入 [bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md](bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md)，先由 `Alembic` 修复 daemon MCP bridge，修复后再创建 / 启动复测。
 
 | 测试单 | 状态 | 目标 | 执行窗口 | 报告 |
 | --- | --- | --- | --- | --- |
-| Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 待启动 | 在 BiliDili 项目中验证 Alembic Codex 插件 `prime` 注入和 Codex 可见知识呐喊 | `AlembicTest` | 待回填 |
+| Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 已完成 | 结论为失败：BiliDili Recipes 可读，但 `prime` 被 daemon `/api/v1/mcp/call` 404 截断 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md) |
 
 ### Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证
 
-状态：待启动
+状态：已完成
 创建日期：2026-05-21
 总控来源：用户说明 BiliDili 项目的 Recipes 已生成完成，要求在 BiliDili 项目里进行插件测试，检查 `prime` 注入和 Codex 呐喊。
 执行窗口：AlembicTest
@@ -96,10 +96,10 @@ git -C ../BiliDili status --short
 
 ## 可复制提示词
 
-发送给：`AlembicTest`
+发送给：无
 
 ```text
-读取 docs/workspace/alembic-test-exchange.md，领取状态为 `待启动` 且执行窗口为 `AlembicTest` 的测试单；按测试单执行测试，详细报告写入 AlembicTest/docs/，并回填本文的测试结果、证据摘要、报告路径、遗留风险和下一步建议。
+当前没有可发送给 AlembicTest 的测试任务；等待 Alembic 修复 daemon MCP bridge 后再启动复测。
 ```
 
 当本文出现状态为 `待启动` 的测试单时，使用：
@@ -114,4 +114,24 @@ git -C ../BiliDili status --short
 
 ## 回填区
 
-暂无回填。
+### Test-2026-05-21-01 回填
+
+- 测试结论：失败。BiliDili Recipes 和插件 status 读取层通过，但真实 `alembic_task prime` 在 Plugin -> local Alembic daemon MCP bridge 处被 404 截断，未返回 `primeKnowledgeMaterial`，因此无法完成 delivered 知识呐喊验收。
+- 执行范围：通过 AlembicTest 自有脚本启动 Alembic Codex MCP stdio runtime，在 BiliDili 上下文调用 `alembic_codex_status` 和 `alembic_task(operation=prime)`；未启动 cold-start / rescan；未修改 BiliDili 源码。
+- 使用配置：目标项目 `BiliDili`；active file `Sources/Features/VideoFeed/VideoFeedViewController.swift`；language `swift`；prime query 聚焦 VideoFeed/Home、模块边界、Repository、lazy var、SchemeRouter 和 Guard 约束。
+- plugin / runtime / Core 版本证据：AlembicPlugin `8602ae9e71874af389709db680104b2c1ee0edbb`；AlembicCore `bd9319db72d6fd22f9b3a2ba3a36e279ee117f24`；插件 package `alembic-ai@0.1.2`；local daemon version `0.1.0`；当前已安装 Codex plugin cache 标记仍是旧 git head，未在本测试中同步全局插件缓存。
+- `prime` 调用入口：`node AlembicTest/scripts/probe-codex-prime.mjs --output AlembicTest/tmp/bilidili-prime-probe-2026-05-21-escalated.json`。
+- `prime` payload 摘要：status probe 显示 `initialized=true`、`knowledge_ready`、`recipeCount=79`、`sourceRefs=196`、vector `ready`、`alembic_task` 工具可见；prime 返回 `success=false`、`CODEX_MCP_ERROR`、`Route not found: POST /api/v1/mcp/call`。
+- Codex 知识呐喊原文或摘要：因未收到 `primeKnowledgeMaterial`，Codex 只能如实声明“我没有收到 primeKnowledgeMaterial，因此不能声称接收到了 BiliDili 的 Recipe 或 Guard 知识。”这不满足测试单要求的 delivered 知识呐喊。
+- 是否出现 `codex_host_response` tool：MCP tool list 中未出现 `codex_host_response`；但由于 prime payload 缺失，无法验证 `nextActions` payload 层是否正确。
+- BiliDili git 状态前后对比：测试前后均为 `## main...origin/main`，无 tracked/untracked 变更。
+- 关键日志信号：daemon health ready；直接 POST `/api/v1/mcp/call` 返回 404 `NOT_FOUND`；daemon 日志记录 `/api/v1/mcp/call` 404 HTTP 请求。
+- 详细报告路径：[../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md)
+- 遗留风险：Plugin 在 `requirement: "mcp"` 时仅凭 daemon API ready 选择 `local-alembic-daemon`，没有确认 MCP bridge endpoint；本地 daemon health 未声明 MCP bridge capability；实际 Codex installed cache 可能尚未同步到目标提交。
+- 下一步建议：由 `Alembic` 补齐或声明 `/api/v1/mcp/call` bridge；由 `AlembicPlugin` 增加 MCP bridge capability 判断和 fallback/阻塞提示；修复后由 `AlembicTest` 重跑本测试单。
+- 建议归属窗口：`Alembic`、`AlembicPlugin`，修复后回到 `AlembicTest` 复测。
+
+### 总控验收
+
+- 2026-05-21：总控验收 Test-2026-05-21-01 为“失败但有效”。证据满足失败分类：BiliDili Recipes/status 可读，`alembic_task` 可见，MCP tool list 不暴露 `codex_host_response`，BiliDili git 前后干净；但真实 `prime` 被 Plugin -> Alembic daemon `/api/v1/mcp/call` 404 截断，未返回 `primeKnowledgeMaterial`，因此未形成 Codex 知识呐喊闭环。
+- 后续动作：已创建 [bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md](bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md)，当前只发送给 `Alembic` 修复 daemon MCP bridge；`AlembicTest` 等待修复后复测。
