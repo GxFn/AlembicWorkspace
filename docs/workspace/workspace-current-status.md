@@ -22,6 +22,7 @@
 - Skill 与 AlembicCodex runtime artifact 已同步，`plugins/alembic-codex/runtime` 负向扫描仅剩 Core-owned `vendor/AlembicCore` 快照中的 AI env 常量。
 - 提交：AlembicPlugin `747b40f2abb2b9d8cb2714656fab164267d1d105`；AlembicCodex runtime `01fb042afe87264ad213dfc13444dc9dc48b77ca`。
 - 总控复核：targeted unit 4 files / 52 tests 通过；关键负向扫描通过；AIP-2 Alembic 无任务，AIP-3 暂不创建 AlembicTest 测试单。
+- 本机 Codex plugin cache 已刷新：`~/.codex/plugins/cache/gxfn/alembic-codex/0.1.2/.alembic-dev-refresh.json` 记录 `mode=local-mcp`、`gitHead=747b40f2abb2b9d8cb2714656fab164267d1d105`。
 
 - 当前发送窗口：无。
 - 当前不发送给：`Alembic`（无任务）、`AlembicCore`（无任务）、`AlembicDashboard`（无任务）、`AlembicTest`（观察中）、`AlembicAgent`（无任务）、`BiliDili`（无任务）。
@@ -56,4 +57,5 @@
 - AlembicPlugin resident vector 执行记录：[../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md](../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md) 已记录 VEC-2/VEC-3/VEC-4R/VEC-5R/VEC-6 相关证据。
 - 2026-05-22：AIP-0 代码依赖调研完成；当前只派发 `AlembicPlugin`，`AlembicDashboard` 因 Plugin 不直接引用 Dashboard 而标为无任务。
 - 2026-05-22：`AlembicPlugin` AIP-1 已完成并推送。验证通过：targeted unit、`npm run build:check`、`npm run build`、`npm run prepare:codex-plugin-runtime`、`npm run verify:codex-plugin`、`npm run verify:codex-channel`、`npm run verify:release-package-boundary`、`npm run verify:codex-session`、`npm run report:agent-extraction-boundary`、`git diff --check`。执行记录：[../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md)。
-- 2026-05-22：总控验收 AIP-1 通过：复核关键代码删除点、负向扫描和 targeted unit 通过；本轮不启动 `Alembic` / `AlembicDashboard`，也暂不创建 AlembicTest 测试单。本机 Codex plugin cache 尚未刷新到 `747b40f` / `01fb042`。
+- 2026-05-22：总控验收 AIP-1 通过：复核关键代码删除点、负向扫描和 targeted unit 通过；本轮不启动 `Alembic` / `AlembicDashboard`，也暂不创建 AlembicTest 测试单。
+- 2026-05-22：总控按用户要求刷新本机 Codex plugin cache，命令 `npm run dev:codex-plugin:local-mcp -- --clean --all-installed` 成功；cache marker 指向 AlembicPlugin `747b40f2abb2b9d8cb2714656fab164267d1d105`，mode=`local-mcp`。
