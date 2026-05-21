@@ -132,7 +132,7 @@
 
 ## 可复制分派提示词
 
-发送给：无。本计划已完成，后续任务转入 [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)。
+发送给：无。本计划已完成，后续任务转入 [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](archive/2026-05/prime-immediate-receipt-shout/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)。
 
 ## AlembicPlugin 执行要求
 
@@ -187,4 +187,4 @@ git diff --check
 - 2026-05-21：总控验收 `AlembicPlugin` SERVICE-1/2 通过。代码证据：`AlembicPlugin/lib/codex/ServiceRequestBoundary.ts:1` 将 `prime / create / close / fail / record_decision` 列为 Plugin-owned，未知 `alembic_task` operation 也留在 Plugin 校验；`AlembicPlugin/lib/external/mcp/CodexMcpServer.ts:288` 的 default 分支先解析 service boundary，Plugin-owned 路径进入 `callPluginOwnedTool()`，非 Plugin-owned 路径才进入 `callDaemonTool()`；`AlembicPlugin/lib/external/mcp/CodexMcpServer.ts:930` 使用 embedded Plugin handler tree 执行 Codex-facing tool，并在 `AlembicPlugin/lib/external/mcp/CodexMcpServer.ts:1294` 附加 `data.serviceBoundary`；测试 `AlembicPlugin/test/unit/CodexMcpServer.test.ts:1061` 断言 local daemon ready 时 `alembic_task prime` 不调用 daemon bridge / `fetch` / `supervisor.ensure()`，同时保留 `primeKnowledgeMaterial.hostResponse.action === "shout_prime_knowledge_receipt"` 和 `shoutInstruction`。功能完整性检查结论：真实入口、数据来源、Codex 可见 payload、service boundary 标记、兼容 daemon 路径和失败边界均有代码与测试证据，允许启动 Test-2026-05-21-02 复测。
 - 2026-05-21：总控功能验收 Test-2026-05-21-02 通过。AlembicTest 报告和 probe artifact 显示：BiliDili `alembic_codex_status` 成功，Recipes `79`、sourceRefs `196`；`alembic_task prime` 返回 `success=true`、`primeKnowledgeMaterial.status=delivered`、`acceptedKnowledge=5`、`acceptedGuards=1`、`checks.evidenceRefCount=18`；`hostResponse.action=shout_prime_knowledge_receipt` 且 `required=true`；`shoutInstruction` 存在；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=false`；`nextActions` 不含 `codex_host_response`；daemon bridge 日志无新增 `/api/v1/mcp/call`；BiliDili 测试前后 git 均为 `## main...origin/main`。封口阻塞：`AlembicTest` 仓库仍有未提交测试报告 / 脚本 / 文档变更，需 `AlembicTest` 提交并回填 commit hash 后最终收口。
 - 2026-05-21：`AlembicTest` 仓库封口完成，commit `af0430ad69b4da50469eeaded8caa77c59e996e5`。提交范围：`package.json`、`scripts/README.md`、`scripts/probe-codex-prime.mjs`、`docs/bilidili-prime-shout-plugin-test-2026-05-21.md`、`docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md`、`docs/cold-start-bootstrap-analysis-2026-05-21.md`。遗留风险：真实 Codex 已安装插件缓存刷新不属于该测试提交；部分 Recipe evidenceRef 无行号，已如实记录。
-- 2026-05-21：后续主线转入 [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)，目标是让 Codex 在 prime 后立即发出开发者可见知识接收呐喊，再继续任务。
+- 2026-05-21：后续主线转入 [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](archive/2026-05/prime-immediate-receipt-shout/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)，目标是让 Codex 在 prime 后立即发出开发者可见知识接收呐喊，再继续任务。

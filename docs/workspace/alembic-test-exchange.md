@@ -116,7 +116,7 @@ git -C ../BiliDili status --short --branch
 #### 总控验收与后续分派
 
 - 验收结论：Test-2026-05-22-01 证据充分，按测试通过处理。通过点包括 Plugin `auto -> semantic` resident request mode normalization、daemon `/api/v1/search` `searchMeta` 运行态 telemetry、direct auto/semantic resident metadata、`/api/v1/mcp/call` 负向证据、prime delivered / Codex 可见知识摘要，以及 BiliDili 前后干净。
-- 后续分派：回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-6，由总控处理真实 Codex plugin cache refresh / 发布态验证和 workspace 文档收口。当前不再派发 `AlembicTest`，也不向 `BiliDili`、`AlembicPlugin`、`Alembic`、`AlembicCore` 发送新提示词。
+- 后续分派：回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](archive/2026-05/resident-vector-search-release/resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-6，由总控处理真实 Codex plugin cache refresh / 发布态验证和 workspace 文档收口。当前不再派发 `AlembicTest`，也不向 `BiliDili`、`AlembicPlugin`、`Alembic`、`AlembicCore` 发送新提示词。
 - 遗留观察：`residentVector.stats.indexSize=0` 只作为后续诊断语义优化观察项，不阻塞本测试通过；真实安装态 cache marker 仍旧，留给 VEC-6 处理。
 
 ### Test-2026-05-21-06：BiliDili resident vector search route VEC-4R 复测
@@ -209,7 +209,7 @@ git -C ../BiliDili status --short --branch
 #### 总控验收与后续分派
 
 - 验收结论：Test-2026-05-21-06 证据充分，按失败但部分修复通过处理。通过部分是 VEC-4R bridge removal、Plugin-owned direct search、prime delivered 和 BiliDili 前后干净；失败部分是 daemon `/api/v1/search` 运行态 telemetry 未闭环、direct semantic 无 `semanticUsed` / `vectorUsed`、direct auto resident request mode validation failure。
-- 后续分派：已回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-5R，当前只派发 `AlembicPlugin` / `Alembic`。`AlembicTest` 暂不继续复测，等 VEC-5R 回填后再由总控创建下一张测试单。
+- 后续分派：已回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](archive/2026-05/resident-vector-search-release/resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-5R，当前只派发 `AlembicPlugin` / `Alembic`。`AlembicTest` 暂不继续复测，等 VEC-5R 回填后再由总控创建下一张测试单。
 
 ### Test-2026-05-21-05：BiliDili resident vector search route 真实项目复测
 
@@ -304,7 +304,7 @@ git -C ../BiliDili status --short --branch
 
 - 验收结论：Test-2026-05-21-05 证据充分，结论按失败处理，不继续扩大 BiliDili 测试范围。
 - 用户决策：删除 `/api/v1/mcp/call` 兼容桥，而不是修补该 route。
-- 后续分派：已回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-4R，并已由 `AlembicPlugin` / `Alembic` 完成产品修复；当前 Test-2026-05-21-06 已完成复测，结论为失败但部分修复通过。
+- 后续分派：已回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](archive/2026-05/resident-vector-search-release/resident-vector-search-release-workspace-plan-2026-05-21.md) 的 VEC-4R，并已由 `AlembicPlugin` / `Alembic` 完成产品修复；当前 Test-2026-05-21-06 已完成复测，结论为失败但部分修复通过。
 
 ### Test-2026-05-21-04：BiliDili prime readable receipt shout 可见摘要复测
 
@@ -659,7 +659,7 @@ git -C ../BiliDili status --short
 
 发送给：无。
 
-`Test-2026-05-22-01` 已由 `AlembicTest` 完成复测并封口提交，commit `0943ce085a1cb9c84141cc6c85673418c8248e29`。当前交流文档不再派发 AlembicTest；后续 cache refresh、发布态验证或新一轮真实项目复测应由总控回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](resident-vector-search-release-workspace-plan-2026-05-21.md) 判断后另行创建测试单。
+`Test-2026-05-22-01` 已由 `AlembicTest` 完成复测并封口提交，commit `0943ce085a1cb9c84141cc6c85673418c8248e29`。当前交流文档不再派发 AlembicTest；后续 cache refresh、发布态验证或新一轮真实项目复测应由总控回到 [resident-vector-search-release-workspace-plan-2026-05-21.md](archive/2026-05/resident-vector-search-release/resident-vector-search-release-workspace-plan-2026-05-21.md) 判断后另行创建测试单。
 
 当前不派发 `AlembicTest`、`AlembicPlugin`、`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 或 `BiliDili`。
 

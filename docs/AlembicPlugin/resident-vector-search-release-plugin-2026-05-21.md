@@ -3,7 +3,7 @@
 状态：VEC-2/VEC-3/VEC-4R/VEC-5R 已完成并通过总控验收
 执行窗口：AlembicPlugin
 日期：2026-05-21
-对应总控计划：`docs/workspace/resident-vector-search-release-workspace-plan-2026-05-21.md`
+对应总控计划：`docs/workspace/archive/2026-05/resident-vector-search-release/resident-vector-search-release-workspace-plan-2026-05-21.md`
 
 ## 完成范围
 

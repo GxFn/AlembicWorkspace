@@ -3,7 +3,7 @@
 状态：已完成
 窗口：AlembicCore
 日期：2026-05-21
-对应总控计划：`docs/workspace/resident-vector-search-release-workspace-plan-2026-05-21.md`
+对应总控计划：`docs/workspace/archive/2026-05/resident-vector-search-release/resident-vector-search-release-workspace-plan-2026-05-21.md`
 提交 hash：`39bcebe94c451f92e405b0da38d2cbe67e8e0f82`
 
 ## 完成范围

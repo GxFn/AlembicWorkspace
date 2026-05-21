@@ -1,8 +1,8 @@
 # AlembicPlugin Prime Immediate Receipt Shout
 
-状态：SHOUT-7 待总控验收；SHOUT-5 已通过总控验收；SHOUT-1/2 已通过总控验收
+状态：SHOUT-7 已通过总控验收；SHOUT-5 已通过总控验收；SHOUT-1/2 已通过总控验收
 日期：2026-05-21
-对应总控计划：[../workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](../workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)
+对应总控计划：[../workspace/archive/2026-05/prime-immediate-receipt-shout/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](../workspace/archive/2026-05/prime-immediate-receipt-shout/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)
 
 ## 完成范围
 
@@ -139,7 +139,7 @@ Immediately after this prime tool result, before any further tool call, code rea
 
 ## SHOUT-7 可见主语收紧回填
 
-状态：待总控验收
+状态：已通过总控验收
 
 完成范围：
 
@@ -183,3 +183,9 @@ Immediately after this prime tool result, before any further tool call, code rea
 
 - 本机 Codex plugin cache 已在 resident vector search VEC-6 中一并刷新到后续 AlembicPlugin commit `2c98f69b1388c478bbbb255e487c51fde621cff7`，该提交包含 SHOUT-7 主语文案；cache marker `mode=local-mcp`，`.mcp.json` 指向 workspace local MCP entry。
 - 若后续用户仍看到工具名主语，再追加更强的 Skill 示例句或 host receipt schema 约束。
+
+## SHOUT-7 总控验收
+
+状态：已完成
+
+验收结论：通过。`AlembicPlugin` 已把 delivered / empty / degraded 三态 receipt shout 的可见说话者收紧为 Codex / first-person，禁止默认以 “Alembic prime” 或工具流程作为开发者可见主语；单元测试、Skill、runtime artifact 和负向扫描均有回填证据。用户已明确此项不新增 AlembicTest 真实项目复测，本机 Codex plugin cache 已在 resident vector search VEC-6 中刷新到包含 SHOUT-7 的后续提交。
