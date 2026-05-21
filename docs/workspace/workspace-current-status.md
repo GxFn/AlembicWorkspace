@@ -2,22 +2,19 @@
 
 更新日期：2026-05-21
 总控窗口：AlembicWorkspace
-状态：AlembicTest 复测功能通过，测试仓库封口执行中
+状态：Prime immediate receipt shout 派发中，`AlembicPlugin` 待启动
 
 ## 状态摘要
 
-`prime -> Codex 自主呐喊` V1 与 Recipe 生成后 Codex host agent 交互契约 Wave 1 均已验收完成。`AlembicTest` 第一轮 BiliDili prime 插件验证为失败但有效：Recipes/status 可读，`prime` 未返回 `primeKnowledgeMaterial`。`Alembic` 已补齐 `/api/v1/mcp/call` 兼容 bridge；用户随后确认 `Alembic` 作为常驻本地服务，由 `AlembicPlugin` 按需请求服务，不做 Plugin MCP tool ownership bridge。`AlembicPlugin` service request 边界已通过总控验收；`AlembicTest` 第二轮 BiliDili prime shout 复测功能验收通过，但测试仓库仍有未提交报告 / 脚本，当前等待 `AlembicTest` 封口提交。
+`prime -> Codex 自主呐喊` V1、`AlembicPlugin` service request 边界、以及 BiliDili 真实项目 service-boundary 复测都已完成。`AlembicTest` 已封口提交测试证据，commit `af0430ad69b4da50469eeaded8caa77c59e996e5`；当前没有需要发送给 `AlembicTest` 的测试单。
 
-- 当前总控计划：[alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md)。
-- 上一收口计划：[bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md](bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md)，`Alembic` bridge 已完成但不作为 prime 主路径。
-- 当前测试任务：[alembic-test-exchange.md](alembic-test-exchange.md) 中 Test-2026-05-21-02，功能验收通过，等待 `AlembicTest` 仓库封口提交并回填 commit hash。
-- 上一完成计划：[alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md)，V1 `primeKnowledgeMaterial` / `shoutInstruction` 最小闭环已完成。
-- `AlembicTest` 最新回填：BiliDili `alembic_codex_status` 成功，`recipeCount=79`、`sourceRefs=196`；`alembic_task prime` 返回 `success=true`、`primeKnowledgeMaterial.status=delivered`、`acceptedKnowledge=5`、`acceptedGuards=1`、`checks.evidenceRefCount=18`，并包含 `plugin-owned-codex-facing` service boundary。
-- Recipe 交互契约 Wave 1 已完成：Core Mission Briefing 旧工具名、`pendingSemanticReview` 缺真实 `newRecipeId`、`host-agent` 信任策略、Plugin lifecycle 可见文案、prime host-response action 表达均已收口并通过总控验收。
-- route ownership 风险已由 `AlembicPlugin` 修正并通过总控验收：`alembic_task prime` 留在 Plugin，local daemon ready 时不走 `/api/v1/mcp/call`。
-- `AlembicPlugin` 已完成 service request 边界修复并通过总控验收，提交 `c083c3c3c5b690a9b0f9711b3a5abe214bde0109`，AlembicCodex runtime artifact 提交 `7a7c5dce492c632e4ee3301f7eb989faec1d5118`。
-- 发送窗口：`AlembicTest`。
-- 不发送给：`AlembicPlugin`、`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`。
+新的主线是用户确认的“prime 后立即知识接收呐喊”：Codex host agent 拿到 `alembic_task(operation="prime")` 返回的 `primeKnowledgeMaterial` 后，应先向开发者可见说明它接收到了哪些 Recipe / Guard / 证据，再继续搜索、读代码、编辑或最终总结。也就是说，呐喊发生在接受 prime 后的下一个可见动作，而不是任务完成总结时。
+
+- 当前总控计划：[prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)。
+- 上一完成计划：[alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md)，`AlembicPlugin` service request 边界和 Test-2026-05-21-02 均已收口。
+- 当前测试交流：[alembic-test-exchange.md](alembic-test-exchange.md)，Test-2026-05-21-02 已完成；下一轮等 `AlembicPlugin` immediate receipt shout 完成后再创建新测试单。
+- 当前发送窗口：`AlembicPlugin`。
+- 当前不发送给：`AlembicTest`（阻塞，等 Plugin 完成后再测）、`Alembic`（观察中）、`AlembicCore`（观察中）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）。
 
 ## 窗口分派
 
@@ -25,27 +22,25 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>已完成 | 已通过总控验收：[alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md) 的 SERVICE-1/2 完成，`alembic_task` 的 Codex intent lifecycle 留在 Plugin，建立 Plugin 请求 Alembic resident service 的边界规则。 |
-| `Alembic`<br>观察中 | daemon `/api/v1/mcp/call` 兼容 bridge 已完成；当前不派发，不继续复制 Plugin prime 呐喊契约；后续作为 resident service 被请求。 |
-| `AlembicTest`<br>执行中 | Test-2026-05-21-02 功能验收通过；当前只需封口提交 AlembicTest 仓库里的测试报告、probe 脚本和测试文档变更，并回填 commit hash。 |
-| `AlembicCore`<br>观察中 | Plugin 回填本轮暂不需要下沉 `primeKnowledgeMaterial` schema / evidenceRefs builder。 |
-| `AlembicAgent`<br>无任务 | 当前问题是 Codex host agent / Plugin service request 边界，不涉及 internal AI runtime。 |
-| `AlembicDashboard`<br>无任务 | 当前不涉及前端 UI。 |
+| `AlembicPlugin`<br>待启动 | 执行当前计划 SHOUT-1/2：强化 `primeKnowledgeMaterial.hostResponse`、`shoutInstruction` 和 Alembic Codex Skill / runtime artifact，让 Codex 在 prime tool result 后立即做开发者可见知识接收呐喊，再继续后续动作。 |
+| `AlembicTest`<br>阻塞 | 暂不发送；等待 `AlembicPlugin` 回填提交 hash、runtime artifact 和总控验收后，再由总控在测试交流文档创建 BiliDili 真实项目复测单。 |
+| `Alembic`<br>观察中 | daemon `/api/v1/mcp/call` 兼容 bridge 已完成；当前不修改，不承接 Codex-facing prime ownership。 |
+| `AlembicCore`<br>观察中 | 暂无共享层下沉证据；只有 Plugin 回填证明有真实双向消费方时，再考虑 shared contract。 |
+| `AlembicAgent`<br>无任务 | 当前是 Codex host agent / Plugin Skill 行为，不涉及 internal AI runtime。 |
+| `AlembicDashboard`<br>无任务 | 当前不涉及 Dashboard UI。 |
 
 ## 可复制提示词
 
-发送给：`AlembicTest`。
+发送给：`AlembicPlugin`。
 
 ```text
-读取 docs/workspace/alembic-test-exchange.md，完成 Test-2026-05-21-02 的 AlembicTest 仓库封口：不要扩大测试范围，优先提交本次测试报告、probe 脚本和相关测试文档变更；提交后回填 AlembicTest commit hash、提交范围、是否仍有未提交变更和遗留风险。
+读取 docs/workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md，按照文档领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
 ```
 
-不发送给：`AlembicPlugin`（已完成）、`Alembic`（观察中，bridge 已完成）、`AlembicCore`（观察中）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）。
+不发送给：`AlembicTest`（阻塞，等 Plugin 完成后创建新测试单）、`Alembic`（观察中）、`AlembicCore`（观察中）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）。
 
 ## 回填区
 
-- 当前计划回填入口：`docs/workspace/alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md` 的“回填区”。
-- `AlembicTest`：Test-2026-05-21-01 已完成，结论失败；报告见 [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md)。
-- `Alembic`：BRIDGE-1 已回填完成，提交 `83130a6add9806c124d334281a0ec7f219afd33e`；当前不派发。
-- `AlembicPlugin`：SERVICE-1/2 已通过总控验收，执行记录见 [../AlembicPlugin/alembic-plugin-service-request-boundary-2026-05-21.md](../AlembicPlugin/alembic-plugin-service-request-boundary-2026-05-21.md)；提交 hash `c083c3c3c5b690a9b0f9711b3a5abe214bde0109`，AlembicCodex runtime hash `7a7c5dce492c632e4ee3301f7eb989faec1d5118`。
-- `AlembicTest`：Test-2026-05-21-02 功能验收通过；报告见 [../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md)。封口阻塞：`AlembicTest` 仓库仍有未提交测试报告 / 脚本 / 文档变更，需回填 commit hash 后最终收口。
+- 当前计划回填入口：`docs/workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md` 的“回填区”。
+- `AlembicTest`：Test-2026-05-21-02 已完成并封口提交，commit `af0430ad69b4da50469eeaded8caa77c59e996e5`；详细报告见 [../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md)。
+- `AlembicPlugin`：上一轮 service request boundary 已通过总控验收，提交 hash `c083c3c3c5b690a9b0f9711b3a5abe214bde0109`，AlembicCodex runtime hash `7a7c5dce492c632e4ee3301f7eb989faec1d5118`；当前新任务是 immediate receipt shout 时序契约。

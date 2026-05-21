@@ -1,6 +1,6 @@
 # AlembicTest Exchange
 
-状态：Test-2026-05-21-02 功能验收通过，AlembicTest 仓库封口执行中
+状态：Test-2026-05-21-02 已完成，AlembicTest 仓库封口完成
 维护窗口：AlembicWorkspace
 执行窗口：AlembicTest
 更新日期：2026-05-21
@@ -11,16 +11,16 @@
 
 ## 当前测试单
 
-`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。`AlembicPlugin` 已完成 service request 边界修正并通过总控验收；`Test-2026-05-21-02` 已由 AlembicTest 复测通过并回填。总控功能验收通过，但 `AlembicTest` 仓库仍有未提交测试报告 / 脚本，当前等待测试窗口封口提交并回填 commit hash。
+`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。`AlembicPlugin` 已完成 service request 边界修正并通过总控验收；`Test-2026-05-21-02` 已由 AlembicTest 复测通过并回填，总控功能验收通过，且 AlembicTest 仓库已完成封口提交。
 
 | 测试单 | 状态 | 目标 | 执行窗口 | 报告 |
 | --- | --- | --- | --- | --- |
-| Test-2026-05-21-02：BiliDili prime shout service boundary 复测 | 执行中 | 功能验收通过；等待 `AlembicTest` 提交测试报告 / probe 脚本 / 文档变更并回填 commit hash | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md) |
+| Test-2026-05-21-02：BiliDili prime shout service boundary 复测 | 已完成 | 功能验收通过；`AlembicTest` 已提交测试报告 / probe 脚本 / 文档变更，commit `af0430ad69b4da50469eeaded8caa77c59e996e5` | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md) |
 | Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 已完成 | 结论为失败：BiliDili Recipes 可读，但 `prime` 未返回 `primeKnowledgeMaterial`；后续复测已转入 Test-2026-05-21-02 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md) |
 
 ### Test-2026-05-21-02：BiliDili prime shout service boundary 复测
 
-状态：执行中（功能通过，待 AlembicTest 仓库封口提交）
+状态：已完成（功能通过，AlembicTest 仓库封口提交完成）
 创建日期：2026-05-21
 总控来源：`AlembicPlugin` 已完成并通过总控验收 service request 边界修复，需要在 BiliDili 真实项目中复测 `prime` 注入和 Codex 知识呐喊。
 执行窗口：AlembicTest
@@ -180,11 +180,9 @@ git -C ../BiliDili status --short
 
 ## 可复制提示词
 
-发送给：`AlembicTest`
+发送给：无。
 
-```text
-读取 docs/workspace/alembic-test-exchange.md，完成 Test-2026-05-21-02 的 AlembicTest 仓库封口：不要扩大测试范围，优先提交本次测试报告、probe 脚本和相关测试文档变更；提交后回填 AlembicTest commit hash、提交范围、是否仍有未提交变更和遗留风险。
-```
+当前没有可发送给 `AlembicTest` 的测试任务。Test-2026-05-21-02 已完成并封口；下一轮需要等 `AlembicPlugin` 完成 [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) 后，由总控创建新的测试单。
 
 ## 统一测试单模板
 
@@ -194,7 +192,7 @@ git -C ../BiliDili status --short
 
 ### Test-2026-05-21-02 回填
 
-- 测试结论：通过，已完成总控功能验收；当前等待 `AlembicTest` 仓库封口提交。`alembic_task prime` 在 BiliDili 上下文成功返回 delivered `primeKnowledgeMaterial`、`hostResponse`、`shoutInstruction` 和 `serviceBoundary`；Codex 可基于 payload 做知识接收呐喊；BiliDili git 前后保持干净。
+- 测试结论：通过，已完成总控功能验收与 AlembicTest 仓库封口提交。`alembic_task prime` 在 BiliDili 上下文成功返回 delivered `primeKnowledgeMaterial`、`hostResponse`、`shoutInstruction` 和 `serviceBoundary`；Codex 可基于 payload 做知识接收呐喊；BiliDili git 前后保持干净。
 - 执行范围：通过 AlembicTest 自有脚本启动 Alembic Codex MCP stdio runtime，在 BiliDili 上下文调用 `alembic_codex_status` 和 `alembic_task(operation=prime)`；未启动 cold-start / rescan；未修改 BiliDili 源码。
 - 使用配置：目标项目 `BiliDili`；active file `Sources/Features/VideoFeed/VideoFeedViewController.swift`；language `swift`；prime query 聚焦 VideoFeed/Home、模块边界、Repository、lazy var、SchemeRouter 和 Guard 约束。
 - plugin / runtime / Core / Alembic daemon 版本证据：AlembicPlugin `c083c3c3c5b690a9b0f9711b3a5abe214bde0109`；AlembicCore `bd9319db72d6fd22f9b3a2ba3a36e279ee117f24`；Alembic 当前 HEAD `ae52f823d0ab0bb4bbb846c5cdeaed76924e3cf3`；插件 package `alembic-ai@0.1.2`；local daemon `http://127.0.0.1:63030` ready，version `0.1.0`。总控列出的 daemon bridge 修复提交 `83130a6add9806c124d334281a0ec7f219afd33e` 已被当前 Alembic HEAD 后续提交覆盖。
@@ -214,7 +212,10 @@ git -C ../BiliDili status --short
 ### Test-2026-05-21-02 总控功能验收
 
 - 2026-05-21：总控功能验收通过。证据满足测试单通过条件：`prime.success=true`；`primeKnowledgeMaterial.status=delivered`；`acceptedKnowledge=5`；`acceptedGuards=1`；`checks.evidenceRefCount=18`；`hostResponse.action=shout_prime_knowledge_receipt` 且 `required=true`；`shoutInstruction` 存在；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`owner=alembic-plugin`、`residentServiceRequested=false`；`nextActions` 不含 `codex_host_response`；BiliDili 测试前后 `git status --short --branch` 均为 `## main...origin/main`。
-- 封口阻塞：`AlembicTest` 仓库仍有未提交变更：`package.json`、`scripts/README.md`、`scripts/probe-codex-prime.mjs`、`docs/bilidili-prime-shout-plugin-test-2026-05-21.md`、`docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md`、`docs/cold-start-bootstrap-analysis-2026-05-21.md`。因此当前不把 Test-2026-05-21-02 标为最终已完成，只发送 `AlembicTest` 做测试仓库封口提交并回填 commit hash。
+- 2026-05-21：AlembicTest 仓库封口完成，commit `af0430ad69b4da50469eeaded8caa77c59e996e5`。
+- 提交范围：`package.json`、`scripts/README.md`、`scripts/probe-codex-prime.mjs`、`docs/bilidili-prime-shout-plugin-test-2026-05-21.md`、`docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md`、`docs/cold-start-bootstrap-analysis-2026-05-21.md`。
+- 是否仍有未提交变更：AlembicTest 仓库无未提交文件变更；当前 `main` 分支相对 `origin/main` ahead 1，等待后续按总控需要 push。
+- 遗留风险：本次提交只封口 AlembicTest 测试证据和 probe 脚本，不覆盖真实 Codex 已安装插件缓存刷新；如需验证用户实际安装态，仍需单独授权刷新插件 cache 后复测。部分 Recipe evidenceRef 仍无行号，当前测试已如实记录，不阻塞 service boundary 验收。
 
 ### Test-2026-05-21-01 回填
 
@@ -236,7 +237,7 @@ git -C ../BiliDili status --short
 ### 总控验收
 
 - 2026-05-21：总控验收 Test-2026-05-21-01 为“失败但有效”。证据满足失败分类：BiliDili Recipes/status 可读，`alembic_task` 可见，MCP tool list 不暴露 `codex_host_response`，BiliDili git 前后干净；但真实 `prime` 被 Plugin -> Alembic daemon `/api/v1/mcp/call` 404 截断，未返回 `primeKnowledgeMaterial`，因此未形成 Codex 知识呐喊闭环。
-- 后续动作：`Alembic` bridge 修复 wave 已收口；`AlembicPlugin` service request 边界已通过总控验收；当前创建 Test-2026-05-21-02，并发送给 `AlembicTest` 复测。
+- 当时后续动作：`Alembic` bridge 修复 wave 已收口；`AlembicPlugin` service request 边界通过总控验收后，已创建 Test-2026-05-21-02 并发送给 `AlembicTest` 复测。
 
 ### Test-2026-05-21-02 总控创建
 
