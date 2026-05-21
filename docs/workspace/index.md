@@ -8,8 +8,9 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md) | Wave 9D 阻塞 | `AlembicDashboard` Wave 9F 已通过总控验收；`BiliDili` 作为真实项目目标等待用户确认数据策略，确认后由 `AlembicTest` 执行复测。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | Wave 9D 阻塞 | 当前不发送执行提示词；等待用户确认 BiliDili 真实项目数据发送策略，测试操作归 `AlembicTest`。 |
+| 当前计划 | [alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md) | 已完成 | V1 `prime -> Codex 自主呐喊` 最小闭环已由 `AlembicPlugin` 回填并通过总控验收。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 已完成 | 当前发送给无；V1 主线已完成，后续 TODO 暂停，既有测试线持续运行，总控暂不创建新测试单。 |
+| 上一测试线计划 | [alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md) | 测试持续运行 | `AlembicDashboard` Wave 9F 已通过总控验收；既有真实项目复测由 `AlembicTest` 按测试线继续回填，总控当前不直接关注。 |
 | 当前需求目录 | [alembic-multi-project-control-redesign](../requirement-designs/alembic-multi-project-control-redesign/) | 调研完成 | 保存本次重新开始的原始计划书、需求设计和代码实现依赖调研。 |
 | 需求目标与分阶段确认流程 | [../goal-stage-confirmation/process.md](../goal-stage-confirmation/process.md) | 长期流程 | 规定较大目标必须先在 `docs/requirement-designs/` 完成需求设计，再确认最终目标和分阶段，最后派发窗口。 |
 | 需求目标与分阶段确认模板 | [../../templates/goal-stage-confirmation-template.md](../../templates/goal-stage-confirmation-template.md) | 长期模板 | 用于每个新目标创建任务级确认文档，确认前发送名单必须为无。 |
@@ -52,13 +53,13 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicDashboard`<br>已完成 | Wave 9F 已通过总控验收：消费 Alembic Wave 9E 新增 progress freshness 字段，Jobs 页面显示 active task status、event count 和最近 active task update，避免前端仍用旧 job `updatedAt` 误判卡住；提交 `c1aa2c09e6f171192ccfc81a89f392fb5b5c0848`。 |
-| `Alembic`<br>已完成 | Wave 9E 已通过总控验收：已修复 job progress stale、cancel / timeout / child-run-error 分类和 efficiency summary payload；提交 `633ed228d1c0ba9cd04ef431dc4aadac18c3ac06`。 |
-| `AlembicAgent`<br>已完成 | Wave 9A4 已通过总控验收：提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`，L4 memory package、summary validation、typed memory summary、budget hard stop 和 abort 门控已落地。 |
-| `BiliDili`<br>阻塞 | Wave 9D：作为真实项目目标等待用户确认真实项目外部 AI 数据发送或替代安全路线；不直接给 BiliDili 派测试任务。 |
-| `AlembicTest`<br>阻塞 | Wave 9D：等待用户确认数据策略后，执行冷启动监控、复现和验证报告。 |
-| `AlembicCore`<br>无任务 | 当前优化属于 Agent runtime / Alembic consumer 状态，不需要 Core contract；若 repair status 下沉为共享 contract，再重新判断。 |
-| `AlembicPlugin`<br>无任务 | 当前不涉及 Codex plugin marketplace、MCP skill 或 embedded runtime packaging。 |
+| `AlembicPlugin`<br>已完成 | V1 最小闭环已通过总控验收：`alembic_task prime` 返回 `primeKnowledgeMaterial`、路径行号证据和 `shoutInstruction`；提交 `d83683bd23b6027b99c6085943639f2df9868840`，runtime artifact `a76fa073ecabf1a6c1bfd83eeffeb0146892b5e0`。 |
+| `AlembicCore`<br>无任务 | V1 不需要修改 Core search/sourceRef 类型；后续 sourceRef 元数据增强另起任务。 |
+| `Alembic`<br>无任务 | 当前主线不涉及本地增强 daemon、Dashboard server、HTTP/API 或 internal AI job 实现。 |
+| `AlembicAgent`<br>无任务 | 当前主线是 Codex host agent prime 知识接收与公开声明，不涉及 AlembicAgent runtime / provider / tool loop。 |
+| `AlembicDashboard`<br>无任务 | 当前主线不涉及 Dashboard UI 或前端状态消费。 |
+| `BiliDili`<br>无任务 | 当前主线不涉及真实 iOS 项目修改、接入或验证。 |
+| `AlembicTest`<br>无任务 | 当前不创建测试单；既有测试线继续独立运行，本索引不新增测试执行任务。 |
 
 ## 状态枚举
 
