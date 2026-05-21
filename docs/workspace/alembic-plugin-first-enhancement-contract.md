@@ -83,8 +83,15 @@ Alembic 产品路线采用 `Plugin first, Alembic install enhances`：
 
 职责：
 
-- 真实项目测试和 smoke 验证。默认不进入日常 Alembic 开发流程。
-- 只有当任务明确需要真实项目接入、扫描、验证或复现时才派发。
+- 真实项目验证目标。默认不进入日常 Alembic 开发流程。
+- 不直接承接 Alembic 测试执行任务；需要真实项目接入、扫描、验证或复现时，由 `AlembicTest` 使用 BiliDili 执行并回填证据。
+
+### AlembicTest
+
+职责：
+
+- 真实项目测试、smoke 验证、冷启动监控、复现和验证报告。
+- 只承接测试验证和证据整理，不承接产品源码实现。
 
 ## 能力放置规则
 

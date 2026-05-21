@@ -50,11 +50,18 @@
    - 用户可以在需求或派发过程中调整 TODO；总控必须按最新 TODO 重算下一轮需求设计、目标阶段确认、wave 顺序和发送名单。
    - 长期规则见 `docs/workspace/todo-window-scheduling-policy.md`。
 
-9. 输出可复制提示词
+9. 测试验证分派
+   - 需要真实项目测试、冷启动监控、复现、smoke 或回归时，总控不得直接执行测试。
+   - 先在 `docs/workspace/alembic-test-exchange.md` 按统一模板创建测试单，写清目标、范围、禁止事项、观察点和回填要求。
+   - 只有测试单状态为 `待启动`，才把 `AlembicTest` 标为可发送窗口。
+   - `AlembicTest` 回填后，总控只做证据验收和后续分派判断。
+   - 长期规则见 `docs/workspace/alembic-test-exchange-policy.md`。
+
+10. 输出可复制提示词
    - 只输出当前 wave 中应发送窗口的提示词。
    - 状态为 `阻塞`、`观察中`、`无任务`、`暂停`、`已完成`、`待验收` 的窗口不发送。
 
-10. Wave 验收
+11. Wave 验收
    - 总控验收必须检查功能完整性，不能只检查最小接口连接或测试命令通过。
    - 验收时确认真实入口、真实数据来源、真实状态变化、真实消费方、错误 / 边界路径和用户可执行验证。
    - 如果实现只是空壳 API、静态 mock、未被消费的 contract、只改类型 / 导出、或没有用户可用路径，不能标为已完成。
@@ -66,7 +73,7 @@
 - 需求是否是完整功能模块，而不是抽象连接。
 - 需求设计的阶段是否仍然只是候选方向。
 - 是否已有足够代码证据支撑最终阶段顺序。
-- 是否逐一覆盖 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili`。
+- 是否逐一覆盖 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili`、`AlembicTest`。
 - producer / consumer 是否清晰：上游 contract / API / artifact / evidence 未完成前，下游不得猜字段。
 - 验收是否覆盖功能完整性：真实入口、真实数据、真实状态变化、真实消费方、失败路径和用户可操作验证。
 - 如果发现最小实现，是否已经创建非最小完整实现补齐 wave，而不是继续推进下游。
@@ -80,4 +87,5 @@
 - 需求目录保存原始计划书、需求设计、代码实现依赖调研。
 - `docs/workspace/` 保存目标阶段确认、wave 执行计划、当前状态和总控索引。
 - `docs/<Repo>/` 保存单仓库执行回填文档。
+- `templates/` 保存可复用模板；具体执行文档复制模板后落到需求目录或 `docs/workspace/`。
 - `docs/workspace/index.md` 永远指向当前实际入口；确认阶段指向目标阶段确认，执行阶段指向当前 wave 执行计划。

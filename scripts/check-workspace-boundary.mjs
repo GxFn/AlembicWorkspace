@@ -9,6 +9,7 @@ const childRepoPrefixes = [
   "AlembicDashboard/",
   "AlembicPlugin/",
   "BiliDili/",
+  "AlembicTest/",
 ];
 
 const disallowedTrackedPaths = [".DS_Store"];

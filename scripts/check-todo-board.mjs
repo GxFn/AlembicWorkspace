@@ -15,6 +15,7 @@ const requiredWindows = [
   "AlembicDashboard",
   "AlembicPlugin",
   "BiliDili",
+  "AlembicTest",
 ];
 
 function getArgValue(name) {

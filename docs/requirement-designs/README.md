@@ -40,7 +40,7 @@
 
 ## 与总控文档关系
 
-`docs/requirement-designs/` 保存需求级原始计划书和需求设计文档；`docs/goal-stage-confirmation/` 保存长期目标阶段确认流程和模板；`docs/workspace/` 保存当前总控入口、具体目标阶段确认、阶段分派、验收和归档规则。若需求设计文档被拆成可执行 wave，应在 `docs/workspace/index.md` 挂载对应的当前总控文档。
+`docs/requirement-designs/` 保存需求级原始计划书和需求设计文档；`docs/goal-stage-confirmation/` 保存长期目标阶段确认流程；`templates/` 保存可复用模板；`docs/workspace/` 保存当前总控入口、具体目标阶段确认、阶段分派、验收和归档规则。若需求设计文档被拆成可执行 wave，应在 `docs/workspace/index.md` 挂载对应的当前总控文档。
 
 ## 当前需求
 
@@ -48,4 +48,4 @@
 
 ## 模板
 
-- [requirement-design-template.md](requirement-design-template.md)：需求设计文档模板。
+- [../../templates/requirement-design-template.md](../../templates/requirement-design-template.md)：需求设计文档模板。

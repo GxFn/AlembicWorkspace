@@ -25,6 +25,7 @@ repositories and are intentionally ignored here:
 - `AlembicDashboard`
 - `AlembicPlugin`
 - `BiliDili`
+- `AlembicTest`
 
 Do not add those child repositories as files, submodules, or gitlinks in this
 workspace repository. Commit source changes in each child repository separately.

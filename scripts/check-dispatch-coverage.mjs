@@ -12,6 +12,7 @@ const requiredWindows = [
   "AlembicDashboard",
   "AlembicPlugin",
   "BiliDili",
+  "AlembicTest",
 ];
 const validStatuses = new Set(["待启动", "执行中", "待验收", "阻塞", "已完成", "暂停", "观察中", "无任务"]);
 const sendEligibleStatuses = new Set(["待启动", "执行中"]);

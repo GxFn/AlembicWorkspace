@@ -3,7 +3,7 @@
 状态：Wave 9D 阻塞，等待用户确认真实项目数据发送策略
 总控窗口：AlembicWorkspace
 创建日期：2026-05-20
-适用范围：`AlembicAgent`、`Alembic`、`AlembicDashboard`、`BiliDili`
+适用范围：`AlembicAgent`、`Alembic`、`AlembicDashboard`、`BiliDili`、`AlembicTest`
 
 ## 背景
 
@@ -575,13 +575,15 @@ git diff --check
 - 总控复跑 `npm run build` 通过，`git diff --check` 通过；`npm run check` 仍失败在 Dashboard 仓库未配置 `check` script，与执行窗口回填一致。
 - 功能完整性检查通过：Dashboard 只消费 Alembic 后端稳定 payload，不实现 Agent 决策；前端观察面已覆盖 Wave 9E 后端新增字段，可以进入 BiliDili 小范围复测前的用户数据策略确认。
 
-### Wave 9D：BiliDili 小范围真实验证
+### Wave 9D：AlembicTest 小范围真实验证
 
 状态：阻塞，等待用户确认外部 AI 数据发送或改用本地 / 测试 provider
 
 目标：
 
-- 用真实项目验证新链路不会误计完成、不全量重跑、不会修改业务代码。
+- 用户确认数据策略后，由 `AlembicTest` 使用真实项目验证新链路不会误计完成、不全量重跑、不会修改业务代码。
+- 总控不直接执行冷启动、监控或复现脚本，只读取 `AlembicTest` 回填证据。
+- 测试任务与结果通过 [alembic-test-exchange.md](alembic-test-exchange.md) 创建和回填。
 
 任务：
 
@@ -598,7 +600,8 @@ git diff --check
 | `AlembicDashboard`<br>已完成 | Wave 9F 已通过总控验收：消费 Alembic Wave 9E 新增 progress freshness 字段，Jobs 页面显示 active task status、event count 和最近 active task update，避免前端仍用旧 job `updatedAt` 误判卡住；提交 `c1aa2c09e6f171192ccfc81a89f392fb5b5c0848`。 |
 | `Alembic`<br>已完成 | Wave 9E 已通过总控验收：已修复 job progress stale、cancel / timeout / child-run-error 分类和 efficiency summary payload；提交 `633ed228d1c0ba9cd04ef431dc4aadac18c3ac06`。 |
 | `AlembicAgent`<br>已完成 | Wave 9A4 已通过总控验收：提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`，L4 已从 raw transcript 压缩升级为结构化 memory package 压缩，并补 package builder、summary validation、typed memory summary、budget hard stop 与 abort 后 in-flight result 丢弃。 |
-| `BiliDili`<br>阻塞 | Wave 9D：等待用户确认真实项目外部 AI 数据发送或替代安全路线后，才能启动小范围真实复测。 |
+| `BiliDili`<br>阻塞 | Wave 9D：作为真实项目目标等待用户确认真实项目外部 AI 数据发送或替代安全路线；不直接给 BiliDili 派测试任务。 |
+| `AlembicTest`<br>阻塞 | Wave 9D：等待用户确认数据策略后，执行小范围真实复测、冷启动监控、复现和测试证据整理。 |
 | `AlembicCore`<br>无任务 | 当前优化属于 Agent runtime / Alembic consumer 状态，不需要 Core contract。若后续 repair status 下沉为共享 contract，再重新判断。 |
 | `AlembicPlugin`<br>无任务 | 当前不涉及 Codex plugin marketplace、MCP skill 或 embedded runtime packaging。 |
 
@@ -607,12 +610,12 @@ git diff --check
 | ID | 状态 | 类型 | 严重度 / 优先级 | 归属 | 事项 / TODO | 影响复测 / 派发 | 依赖 / 触发 | 推荐窗口 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | TODO-1 | 已完成 | 修复 | P0 | `AlembicAgent` | DeepSeek L4 compact 可能发送孤立 `tool` message，导致协议错误并放大 token 消耗。 | 是 | 总控验收通过：提交 `44dfe1360286e0c6d8074e07cea148ef679b13b2`；targeted tests、`build:check`、`check`、`git diff --check` 通过。 | `AlembicAgent` |
-| TODO-2 | 阻塞 | 验证 | P0 | `BiliDili` | BiliDili 小范围真实复测。 | 是 | 技术前置 wave 已验收通过；等待用户确认真实项目外部 AI 数据发送或替代安全路线。 | `BiliDili` |
+| TODO-2 | 阻塞 | 验证 | P0 | `AlembicTest` / `BiliDili` | BiliDili 小范围真实复测。 | 是 | 技术前置 wave 已验收通过；等待用户确认真实项目外部 AI 数据发送或替代安全路线。 | `AlembicTest` |
 | TODO-3 | 已完成 | 设计 | P1 | `Alembic` | Agent 暴露新的 compact diagnostics / failure status 后，需要判断 Alembic consumer / summary payload 如何接入。 | 否 | Wave 9E 已通过总控验收：Alembic 已稳定 job summary / diagnostics payload。 | `Alembic` |
 | TODO-4 | 已完成 | 修复 | P1 | `AlembicDashboard` | Jobs / Progress / Reports 显示 evidence repair、degraded、timeout、cancel 等非正常状态。 | 否 | 已通过总控验收，提交 `b2c62b5e01fad4a256f6815da63b0ef7f34bfe86`。 | `AlembicDashboard` |
 | TODO-5 | 已完成 | 设计 / 修复 | P0 | `AlembicAgent` | L4 仍以 raw transcript 切片为主输入，设计边界不适合长跑 cold-start；需要升级为结构化 memory package 压缩。 | 是 | Wave 9A4 已通过总控验收：提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`；targeted tests、`build:check`、`check`、`git diff --check` 通过。 | `AlembicAgent` |
 | TODO-6 | 已完成 | 修复 / 可观测 | P1 | `Alembic` | Job 进度状态失真：API 长时间显示 `activeTask=architecture`、`updatedAt` 不变，但日志已进入 retry / timeout / forced summary，Dashboard 会误判卡住。 | 是 | Wave 9E 已通过总控验收：Jobs progress 新增 `updatedAt`、active task 时间戳、event count 和 status；前端消费进入 Wave 9F。 | `Alembic` |
-| TODO-7 | 观察中 | 验证 | P1 | `Alembic` / `AlembicDashboard` / `BiliDili` | 取消 / 失败 / timeout 维度归类要收紧：`child-run-error`、hard timeout、cancelled 不能被当成正常完成或日志写成 `Task completed`。 | 是 | Wave 9B / 9C / 9E / 9F 已完成；等待用户数据策略确认后由 BiliDili 小范围复测验证。 | `BiliDili` |
+| TODO-7 | 观察中 | 验证 | P1 | `Alembic` / `AlembicDashboard` / `AlembicTest` | 取消 / 失败 / timeout 维度归类要收紧：`child-run-error`、hard timeout、cancelled 不能被当成正常完成或日志写成 `Task completed`。 | 是 | Wave 9B / 9C / 9E / 9F 已完成；等待用户数据策略确认后由 AlembicTest 小范围复测验证。 | `AlembicTest` |
 | TODO-8 | 已完成 | 修复 | P0 | `AlembicAgent` | QualityGate retry 太浪费：报告质量合格但缺少 `note_finding` 时不应整段重跑，应进入 record repair / fallback finding。 | 是 | Wave 9A / 9A2 已通过总控验收，record repair 和 phase gating 已落地。 | `AlembicAgent` |
 | TODO-9 | 已完成 | 修复 / 运行控制 | P0 | `AlembicAgent` | Token 预算没有硬止损：session budget 超 130% 仍继续跑，compact 失败和 retry 叠加时应降级、跳过维度或中止当前维度。 | 是 | Wave 9A4 已通过总控验收，runaway budget hard stop 已落地并有 `BudgetController` / `AgentRuntime` tests 覆盖。 | `AlembicAgent` |
 | TODO-10 | 已完成 | 修复 | P0 | `AlembicAgent` | DeepSeek L4 compact 协议错误：孤立 `tool` message 导致 compact 失败并放大 token 消耗。 | 是 | Wave 9A3 已通过总控验收；Wave 9A4 继续修正 L4 输入边界。 | `AlembicAgent` |
@@ -626,7 +629,8 @@ git diff --check
 | `AlembicDashboard` | 已完成 | Wave 9F 已通过总控验收；当前不再派发，避免空转。 | 否 |
 | `Alembic` | 已完成 | Wave 9E 已通过总控验收；当前不再派发，避免空转。 | 否 |
 | `AlembicAgent` | 已完成 | Wave 9A4 已通过总控验收；当前不再派发，避免空转。 | 否 |
-| `BiliDili` | 阻塞 | 等待用户确认外部 AI 数据发送或替代安全路线。 | 否 |
+| `BiliDili` | 阻塞 | 作为真实项目目标等待用户确认外部 AI 数据发送或替代安全路线。 | 否 |
+| `AlembicTest` | 阻塞 | 等待用户确认数据策略；确认后负责复测、监控和验证报告。 | 否 |
 | `AlembicCore` | 无任务 | 当前问题属于 Agent runtime / provider transcript，不需要 Core contract。 | 否 |
 | `AlembicPlugin` | 无任务 | 当前问题不涉及 Codex plugin、MCP skill、channel 或 runtime packaging。 | 否 |
 
@@ -639,7 +643,8 @@ git diff --check
 - `AlembicAgent`：Wave 9A4 已通过总控验收。
 - `Alembic`：Wave 9E 已通过总控验收。
 - `AlembicDashboard`：Wave 9F 已通过总控验收。
-- `BiliDili`：等待用户确认真实项目外部 AI 数据发送或替代安全路线。
+- `BiliDili`：作为真实项目目标等待用户确认真实项目外部 AI 数据发送或替代安全路线。
+- `AlembicTest`：阻塞，等待用户确认数据策略；确认后负责测试验证，不由总控直接执行。
 - `AlembicCore`：无任务。
 - `AlembicPlugin`：无任务。
 
@@ -647,10 +652,10 @@ git diff --check
 
 发送给：无
 
-当前不发送给：`AlembicDashboard`（已完成）、`Alembic`（已完成）、`AlembicAgent`（已完成）、`BiliDili`（阻塞，等待用户确认数据策略）、`AlembicCore`（无任务）、`AlembicPlugin`（无任务）。
+当前不发送给：`AlembicDashboard`（已完成）、`Alembic`（已完成）、`AlembicAgent`（已完成）、`BiliDili`（阻塞，真实项目目标）、`AlembicTest`（阻塞，等待用户确认数据策略）、`AlembicCore`（无任务）、`AlembicPlugin`（无任务）。
 
 ```text
-当前没有可发送给执行窗口的提示词；等待用户确认 BiliDili 真实项目外部 AI 数据发送策略或替代安全路线。
+当前没有可发送给执行窗口的提示词；等待用户确认 BiliDili 真实项目外部 AI 数据发送策略或替代安全路线。确认后应发送给 `AlembicTest`，由测试验证窗口执行复测和监控。
 ```
 
 ## 回填区
@@ -727,7 +732,9 @@ git diff --check
   - Wave 9F 遗留风险：未执行真实 DeepSeek / BiliDili 单维度复测；进入 BiliDili 小范围真实复测前仍需用户确认真实项目外部 AI 数据发送或替代安全路线；如后续 Alembic 下沉更细粒度 L4 validation / hard stop metrics，可再按稳定 contract 增加专门可视化。
   - Wave 9F 下一步建议：不直接启动完整 BiliDili cold-start；等待用户确认真实数据发送策略，再做小范围复测。
 - `BiliDili`：
-  - 状态：阻塞，等待用户确认真实项目外部 AI 数据发送或替代安全路线。
+  - 状态：阻塞，作为真实项目目标等待用户确认真实项目外部 AI 数据发送或替代安全路线；不直接给 BiliDili 派测试任务。
+- `AlembicTest`：
+  - 状态：阻塞，等待用户确认数据策略；确认后负责真实复测、冷启动监控、复现记录和验证报告。
 - `AlembicCore`：
   - 状态：无任务。
 - `AlembicPlugin`：

@@ -2,7 +2,7 @@
 
 状态：长期路线图
 维护窗口：AlembicWorkspace
-适用范围：`AlembicCore`、`Alembic`、`AlembicPlugin`、`AlembicDashboard`、`AlembicAgent`、`BiliDili`
+适用范围：`AlembicCore`、`Alembic`、`AlembicPlugin`、`AlembicDashboard`、`AlembicAgent`、`BiliDili`、`AlembicTest`
 
 本文件只记录长期产品方向。用户发布较大任务目标时，必须另建任务级“最终目标 + 阶段计划确认”文档，等待用户确认后再派发；流程见 [../goal-stage-confirmation/process.md](../goal-stage-confirmation/process.md)。
 
@@ -15,7 +15,8 @@ Alembic 的最终形态是 `Plugin first, Alembic install enhances`：
 - `AlembicCore` 提供 headless canonical contract 和确定性共享能力，避免 Alembic / Plugin / Dashboard 各自复制 runtime shape、project identity、capability 或 source contract。
 - `AlembicDashboard` 是前端产品所有者，只消费 API / capability / runtime identity 并展示状态，不实现 daemon policy、ProjectRegistry、file monitor、JobStore 或 internal AI 决策。
 - `AlembicAgent` 是 Alembic internal AI runtime，负责 AI provider、tool execution、terminal / sandbox、context / memory / prompt、Tool V2；不承接 Plugin 的 Codex host-agent route。
-- `BiliDili` 是真实项目验证目标，默认不进入日常开发，只有需要真实项目 smoke、扫描或接入验证时才派发。
+- `BiliDili` 是真实项目验证目标，默认不进入日常开发，不直接承接 Alembic 测试执行任务。
+- `AlembicTest` 是真实项目 smoke、扫描、接入验证、冷启动监控和复现报告的执行窗口；总控只分派和验收，不直接执行测试。
 
 终局体验：
 
@@ -123,7 +124,7 @@ Alembic 的最终形态是 `Plugin first, Alembic install enhances`：
 - 完成 Alembic daemon health live smoke。
 - 完成 Plugin `alembic_codex_status` / `alembic_codex_dashboard` 轻量 live smoke。
 - 完成 Dashboard project switch / runtime chip / project identity 展示 smoke。
-- 必要时使用 `BiliDili` 做只读真实项目 smoke，不修改真实项目业务代码。
+- 必要时由 `AlembicTest` 使用 `BiliDili` 做只读真实项目 smoke，不修改真实项目业务代码。
 
 当前状态：未启动。
 

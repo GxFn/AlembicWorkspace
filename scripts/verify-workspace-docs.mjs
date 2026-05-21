@@ -125,6 +125,12 @@ function listMarkdownFiles(directory) {
   return files;
 }
 
+function isArchivedWorkspaceDoc(file) {
+  const relativePath = path.relative(workspaceRoot, file);
+  // 归档文档是历史快照，允许保留当时的相对链接和旧验证命令；当前入口、长期规则和模板才参与严格链接校验。
+  return relativePath.startsWith("docs/workspace/archive/");
+}
+
 function checkLinks(files) {
   const issues = [];
   let checked = 0;
@@ -259,7 +265,7 @@ if (currentPlanPath && existsSync(currentPlanPath)) {
 }
 
 const linkFiles = allWorkspace
-  ? listMarkdownFiles(path.join(workspaceRoot, "docs/workspace"))
+  ? listMarkdownFiles(path.join(workspaceRoot, "docs/workspace")).filter((file) => !isArchivedWorkspaceDoc(file))
   : [indexPath, currentPlanPath].filter(Boolean);
 const linkResult = checkLinks([...new Set(linkFiles)]);
 issues.push(...linkResult.issues);
