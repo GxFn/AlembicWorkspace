@@ -1,6 +1,6 @@
 # Prime Immediate Receipt Shout Workspace Plan
 
-状态：`AlembicPlugin` 待启动（prime receipt shout 摘要可读性优化），`AlembicTest` 已完成
+状态：`AlembicPlugin` 已完成，`AlembicTest` 待启动（SHOUT-5 可见摘要复测）
 总控窗口：AlembicWorkspace
 创建日期：2026-05-21
 适用范围：`AlembicPlugin`、`AlembicTest`、`AlembicCore`、`Alembic`
@@ -70,14 +70,15 @@
 | SHOUT-2 | 已完成 | Skill / runtime | P0 | `AlembicPlugin` | 已更新 Alembic Codex Skill / runtime artifact：Daily Coding Flow 明确 prime -> 立即 receipt shout -> 再继续任务；runtime artifact 已刷新。 | 是 | AlembicCodex commit `682e5d32b9442c1caba9df87f61efb8b0835e870`；本机 Codex plugin cache 已刷新到 Plugin `829f838704159c7ed205f93ecd986c6234173721`。 | `AlembicPlugin` |
 | SHOUT-3 | 已完成 | 真实项目复测 | P0 | `AlembicTest` | 在 BiliDili 真实项目里验证 Codex 可见行为：prime 后下一条可见响应是 receipt shout，而不是最终总结时才呐喊。 | 是 | Test-2026-05-21-03 功能验收通过；AlembicTest commit `b532cd8bf7c40c8f12b93f91380befdea617d999`；BiliDili 前后干净。 | `AlembicTest` |
 | SHOUT-4 | 观察中 | shared contract | P2 | `AlembicCore` | 观察是否需要把 `PrimeHostResponseInstruction` / evidence ref projection 下沉为共享类型；本轮没有第二个真实生产方前不启动。 | 否 | Plugin 回填发现重复消费方时再判断。 | `AlembicCore` |
-| SHOUT-5 | 待启动 | 可见摘要优化 | P0 | `AlembicPlugin` | 优化 prime receipt shout 指令：开发者可见内容应像真的呐喊一样有声量地喊出知识摘要；证据路径 / 行号给 Codex 内部使用，不默认倾倒到可见呐喊。 | 是 | 用户 BiliDili 人工验证确认时序正确，但截图显示当前呐喊过度输出 evidenceRefs；代码证据见 `task.ts:421` 与 Skill `alembic/SKILL.md:25`。 | `AlembicPlugin` |
+| SHOUT-5 | 已完成 | 可见摘要优化 | P0 | `AlembicPlugin` | 已优化 prime receipt shout 指令：开发者可见内容改为主动、有声量的短知识摘要；证据路径 / 行号继续保留在 payload 中供 Codex 内部使用，不默认倾倒到可见呐喊。 | 是 | AlembicPlugin commit `58b82f8526d68aef516d68477d7a0e505fc114e9`；AlembicCodex runtime artifact commit `df608057bd274ebb6b39f6a9c0e964f1b8517426`；总控验收通过，本机 Codex plugin cache 已刷新到该提交。 | `AlembicPlugin` |
+| SHOUT-6 | 待启动 | 真实项目复测 | P0 | `AlembicTest` | 在 BiliDili 真实项目中验证 SHOUT-5 后的 Codex 可见呐喊：prime 后下一条响应应主动、有声量地喊出 Recipe / Guard 知识摘要，且不默认倾倒 evidenceRefs 路径 / 行号。 | 是 | Test-2026-05-21-04 已创建；本机 Codex plugin cache marker `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`。 | `AlembicTest` |
 
 ## 窗口分派
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>待启动 | 执行 SHOUT-5：保持 prime 后立即呐喊的时序和结构化 evidenceRefs，但调整 `shoutInstruction` / Skill / 测试，让可见呐喊像真的呐喊一样主动喊出知识摘要，不输出长路径证据清单。 |
-| `AlembicTest`<br>已完成 | Test-2026-05-21-03 已封口，commit `b532cd8bf7c40c8f12b93f91380befdea617d999`；等待 Plugin 完成 SHOUT-5 后再决定是否创建新复测单。 |
+| `AlembicPlugin`<br>已完成 | SHOUT-5 已通过总控验收：保持 prime 后立即呐喊的时序和结构化 evidenceRefs，但调整 `shoutInstruction` / Skill / 测试 / runtime artifact，让可见呐喊主动喊出知识摘要，不输出长路径证据清单；本机 Codex plugin cache 已刷新。 |
+| `AlembicTest`<br>待启动 | 执行 Test-2026-05-21-04：在 BiliDili 真实项目中验证 SHOUT-5 可见摘要效果，重点看 prime 后下一条可见响应是否短、主动、有声量，且不默认倾倒 evidenceRefs。 |
 | `Alembic`<br>观察中 | 不修改 daemon bridge，不承接 Codex-facing prime ownership；后续仍作为 resident service 被 Plugin 按需请求。 |
 | `AlembicCore`<br>观察中 | 本轮不派发；除非 Plugin 实现证明 shared contract 已有真实双向消费需求。 |
 | `AlembicAgent`<br>无任务 | 当前是 Codex host agent / Plugin Skill 行为，不涉及 Alembic internal AI runtime。 |
@@ -87,8 +88,8 @@
 
 | 窗口 | 当前调度 | 理由 | 是否发送 |
 | --- | --- | --- | --- |
-| `AlembicPlugin` | 待启动 | 当前可独立修改指令、Skill 和测试，不需要等待 AlembicTest。 | 是 |
-| `AlembicTest` | 已完成 | Test-2026-05-21-03 已封口；下一轮真实复测等 Plugin 完成后再创建测试单。 | 否 |
+| `AlembicPlugin` | 已完成 | 总控验收通过，本机 Codex plugin cache 已刷新，不再发送。 | 否 |
+| `AlembicTest` | 待启动 | Test-2026-05-21-04 已创建，可以验证真实 BiliDili 场景中的可见摘要呐喊。 | 是 |
 | `Alembic` | 观察 | daemon bridge 已完成且不承接 prime ownership，本轮无需修改。 | 否 |
 | `AlembicCore` | 观察 | 暂无真实双向消费方，不启动共享层下沉。 | 否 |
 | `AlembicAgent` | 无任务 | 不涉及 Alembic internal AI runtime。 | 否 |
@@ -96,11 +97,11 @@
 
 ## 当前执行顺序
 
-发送给：`AlembicPlugin`。
+发送给：`AlembicTest`。
 
 不发送给：
 
-- `AlembicPlugin`：执行 SHOUT-5 可见摘要优化。
+- `AlembicPlugin`：已完成，不再发送。
 - `Alembic`：观察中，daemon bridge 不作为 prime 主路径。
 - `AlembicCore`：观察中，本轮暂无共享层下沉证据。
 - `AlembicAgent`：无任务。
@@ -108,10 +109,10 @@
 
 ## 可复制分派提示词
 
-发送给：`AlembicPlugin`。
+发送给：`AlembicTest`。
 
 ```text
-读取 docs/workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md，按照 SHOUT-5 完成 AlembicPlugin 的 prime receipt shout 摘要可读性优化。目标：保持 prime tool result 后立即 developer-visible receipt shout 的时序、`hostResponse` 字段和 `primeKnowledgeMaterial.evidenceRefs` 结构不变，但调整 `shoutInstruction`、Alembic Codex Skill、相关测试和 runtime artifact，让开发者可见呐喊像真的呐喊一样主动、明确、有声量地喊出简短知识摘要，说明接收到的 Recipe / Guard 约束、模式和后续判断依据；不要默认倾倒 evidenceRefs 路径 / 行号，也不要把“缺少行号”作为可见呐喊重点。证据仍保留在 payload 中供 Codex 后续读代码、复核或在用户要求时引用。禁止修改 BiliDili、Alembic daemon bridge 或新增 `codex_host_response` tool。完成后回填提交 hash、验证命令 / 结果、改动范围、Skill / runtime artifact 是否同步、是否需要总控刷新本机 Codex plugin cache，以及是否需要创建新的 AlembicTest 复测单。
+读取 docs/workspace/alembic-test-exchange.md，按照文档完成 Test-2026-05-21-04：在 BiliDili 真实项目中验证 Alembic Codex prime receipt shout 的可见摘要优化。重点验证 prime tool result 后下一条开发者可见响应是否主动、有声量地喊出 Recipe / Guard 知识摘要、模式和后续判断依据；不要默认倾倒 evidenceRefs 路径 / 行号，也不要把缺少行号当作可见重点。完成后回填测试结论、版本证据、payload 摘要、Codex 可见呐喊原文或摘要、是否默认倾倒 evidenceRefs、BiliDili git 前后状态、验证命令 / 日志和遗留风险。
 ```
 
 ## AlembicPlugin 执行要求
@@ -180,3 +181,17 @@ git diff --check
 - 2026-05-21：`AlembicTest` 回填 Test-2026-05-21-03，总控功能验收通过。关键证据：BiliDili 上下文 `alembic_task prime` 返回 `success=true`、`primeKnowledgeMaterial.status=delivered`、`acceptedKnowledge=5`、`acceptedGuards=1`、`evidenceRefs=18`；`hostResponse.action=shout_prime_knowledge_receipt`、`timing=immediate_after_prime`、`requiredBeforeNextAction=true`、`visibility=developer_visible`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`residentServiceRequested=false`；tool list / `nextActions` 不含 `codex_host_response`；prime tool result 后下一条开发者可见响应先声明收到 5 条 Recipe 和 1 条 Guard，再继续读取 probe JSON、复核 git 和写报告；BiliDili 测试前后 `git status --short --branch` 均为 `## main...origin/main`。当时封口判断：`AlembicTest` 仓库仍有未提交变更 `scripts/README.md`、`scripts/probe-codex-prime.mjs` 和 `docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md`，因此曾发送 `AlembicTest` 做封口提交并回填 commit hash。
 - 2026-05-21：`AlembicTest` 已完成 Test-2026-05-21-03 封口提交，commit `b532cd8bf7c40c8f12b93f91380befdea617d999`，提交范围为测试报告、`scripts/probe-codex-prime.mjs` 和 `scripts/README.md`；`AlembicTest` 与 BiliDili 工作区均干净。
 - 2026-05-21：用户在 BiliDili 新窗口人工验证后确认：Codex 确实能在 prime 后自己立即呐喊，符合预期；但当前可见呐喊包含大量 evidenceRefs 路径 / 行号，开发者不容易一眼看到知识摘要。用户进一步补充：希望 Codex 像真的呐喊那样大声喊出内容。总控据此新增 SHOUT-5，派发 `AlembicPlugin` 优化指令和 Skill：证据继续给 Codex 内部使用，可见呐喊默认用主动、有声量的短知识摘要把内容喊出来。
+- 2026-05-21：`AlembicPlugin` 完成 SHOUT-5 可见摘要优化并回填，等待总控验收。
+  - 完成范围：`lib/external/mcp/handlers/task.ts` 的 delivered 态 `shoutInstruction` 改为要求 Codex “shout a short, active knowledge receipt”，优先喊出接收到的 Recipe / Guard 约束、模式和后续判断依据；tool result `message` 不再把 `sourceRefs` 作为可见路径清单输出。empty / degraded 态继续保持 prime 后立即发声时序，但改为“shout a clear receipt”。`hostResponse` 字段、`timing: "immediate_after_prime"`、`requiredBeforeNextAction: true`、`visibility: "developer_visible"` 和 `primeKnowledgeMaterial.evidenceRefs` 结构保持不变。
+  - Skill / runtime artifact：`plugins/alembic-codex/skills/alembic/SKILL.md` 已同步为“briefly and actively shout”知识摘要，并明确 evidence refs 留在 payload 中按需验证；`npm run prepare:codex-plugin-runtime` 已刷新 AlembicCodex `runtime.tgz`、runtime dist `task.js` 与 runtime Skill。
+  - 提交 hash：AlembicPlugin `58b82f8526d68aef516d68477d7a0e505fc114e9`；AlembicCodex runtime artifact `df608057bd274ebb6b39f6a9c0e964f1b8517426`。
+  - 验证命令：`npx biome check --write lib/external/mcp/handlers/task.ts test/unit/TaskPrimeKnowledgeMaterial.test.ts test/unit/CodexMcpServer.test.ts`；`npm run test -- test/unit/TaskPrimeKnowledgeMaterial.test.ts test/unit/CodexMcpServer.test.ts`；`npm run build:check`；`npm run build`；`npm run prepare:codex-plugin-runtime`；`npm run verify:codex-plugin`；`npm run verify:codex-channel`；`npm run verify:release-package-boundary`；`rg "Cite evidenceRefs|line number is missing|evidence refs when present|📍" lib plugins/alembic-codex/skills plugins/alembic-codex/runtime/dist/lib/external/mcp/handlers/task.js plugins/alembic-codex/runtime/plugins/alembic-codex/skills/alembic/SKILL.md`；`git diff --check`（AlembicPlugin 和 AlembicCodex）。
+  - 验证结果：targeted Biome 通过；targeted vitest 38 tests passed；`build:check` / `build` / runtime prepare 通过；Codex plugin / channel / release package boundary 验证均通过；生产代码、Skill 和 runtime artifact 中旧证据倾倒提示负向扫描 0 命中；两个仓库 `git diff --check` 均通过。
+  - 边界：未修改 BiliDili，未修改 `Alembic` daemon bridge，未新增 `codex_host_response` tool；`CodexMcpServer` 测试仍覆盖 local daemon ready 时 `alembic_task prime` 保持 Plugin-owned Codex-facing 路径。
+  - Core 下沉判断：不需要。当前仍只有 AlembicPlugin 生产并直接面向 Codex host agent 消费该契约，没有第二个真实生产方或稳定共享消费方。
+  - 本机 Codex plugin cache：需要总控验收后刷新。推荐仍由总控运行 `npm run dev:codex-plugin:refresh`，把本机 cache 更新到 AlembicPlugin `58b82f8526d68aef516d68477d7a0e505fc114e9` / AlembicCodex `df608057bd274ebb6b39f6a9c0e964f1b8517426`，再派发真实 Codex 行为复测。
+  - AlembicTest 复测单：建议创建新的 BiliDili 可见行为复测单，重点验证 prime tool result 后的下一条开发者可见响应是否简短、主动、有声量地喊出 Recipe / Guard 摘要，并确认不默认倾倒 evidenceRefs 路径 / 行号。
+  - 遗留风险：单元测试和 artifact 验证只能证明 payload / Skill / runtime 文案与边界；真实可见“呐喊”的语气和摘要质量仍需要 Codex host agent 在 BiliDili 场景中复测确认。
+  - 下一步建议：总控复核提交与文档，刷新本机 Codex plugin cache，然后在 `docs/workspace/alembic-test-exchange.md` 创建新的 AlembicTest 测试单。
+- 2026-05-21：总控验收 `AlembicPlugin` SHOUT-5 通过。代码证据：`AlembicPlugin/lib/external/mcp/handlers/task.ts:280` 的 tool result message 要求 “shout a short knowledge receipt” 并明确把 `evidenceRefs` 留在 payload 中；`task.ts:418` 的 delivered 态 `shoutInstruction` 要求 “shout a short, active knowledge receipt”，`task.ts:419` 要求 “Make it feel like a real shout”，`task.ts:420` 明确不要默认列出 evidenceRefs 路径或行号；`task.ts:448-451` 保持 `timing: "immediate_after_prime"`、`requiredBeforeNextAction: true`、`visibility: "developer_visible"`；`plugins/alembic-codex/skills/alembic/SKILL.md:25` 与 runtime Skill 均要求 “briefly and actively shout” 且不默认 dump paths / line numbers；`test/unit/TaskPrimeKnowledgeMaterial.test.ts:173-205` 覆盖短知识 receipt、负向旧文案和 message 不输出路径；`test/unit/CodexMcpServer.test.ts:1098-1118` 保持 local daemon ready 下 Plugin-owned prime payload 和新字段。负向扫描 `Cite evidenceRefs|line number is missing|evidence refs when present|📍` 对生产代码、Skill 与 runtime artifact 0 命中。`AlembicPlugin` 与 AlembicCodex 工作区均干净。
+- 2026-05-21：总控已刷新本机 Codex plugin cache。命令：`npm run dev:codex-plugin:refresh`。结果：成功；cache marker `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`，`localMcpEntry=/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/dist/bin/codex-mcp.js`，runtime tarball hash `0f37bf3acaaa31df9d56531bafe46e853feaddd6815f50c9e958bdfa4a8697eb`；cache Skill 已包含 “briefly and actively shout”，cache runtime dist 已包含 “shout a short, active knowledge receipt”。允许启动 AlembicTest 真实项目复测 Test-2026-05-21-04。

@@ -1,6 +1,6 @@
 # AlembicPlugin Prime Immediate Receipt Shout
 
-状态：已通过总控验收
+状态：SHOUT-5 已通过总控验收；SHOUT-1/2 已通过总控验收
 日期：2026-05-21
 对应总控计划：[../workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](../workspace/prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)
 
@@ -86,3 +86,53 @@ Immediately after this prime tool result, before any further tool call, code rea
 
 - 2026-05-21：总控验收通过。验收证据：`lib/external/mcp/handlers/task.ts` 的 `PrimeHostResponseInstruction`、`_buildPrimeShoutInstruction()` 和 `_buildPrimeHostResponseInstruction()` 均已体现 immediate-before-next-action 契约；`plugins/alembic-codex/skills/alembic/SKILL.md` 已要求 prime tool result 后下一条可见响应是 receipt shout；`test/unit/TaskPrimeKnowledgeMaterial.test.ts` 覆盖 delivered / empty / degraded 三态字段与文案；`test/unit/CodexMcpServer.test.ts` 覆盖 local daemon ready 时仍保留 Plugin-owned prime payload；runtime artifact commit `682e5d32b9442c1caba9df87f61efb8b0835e870` 已包含 runtime skill 和 dist task 产物。
 - 2026-05-21：总控已刷新本机 Codex plugin cache，cache marker `gitHead=829f838704159c7ed205f93ecd986c6234173721`，可用于后续 AlembicTest 真实 Codex 可见行为复测。
+
+## SHOUT-5 可见摘要优化回填
+
+状态：已通过总控验收
+
+完成范围：
+
+- `lib/external/mcp/handlers/task.ts` 的 delivered 态 `shoutInstruction` 已从 evidenceRefs 引用优先，改为要求 Codex 立即喊出简短、主动、有声量的知识接收摘要：说明接收到的 Recipe / Guard 约束、模式和后续判断依据。
+- `message` 中的 delivered 条目不再附带 `sourceRefs` 路径清单；证据仍保留在 `primeKnowledgeMaterial.acceptedKnowledge[].evidenceRefs` 和 `acceptedGuards[].evidenceRefs` 中，供后续读代码、复核或用户要求引用。
+- empty / degraded 态继续保持 prime tool result 后立即发声的时序，只把可见文案改成 “shout a clear receipt”。
+- `hostResponse` 字段、`timing: "immediate_after_prime"`、`requiredBeforeNextAction: true`、`visibility: "developer_visible"` 和 `receiptId` / `status` 结构未改变。
+- Alembic Codex Skill 与 runtime artifact 已同步：runtime `task.js`、runtime Skill 和 `runtime.tgz` 均包含同样文案。
+
+提交 Hash：
+
+- AlembicPlugin：`58b82f8526d68aef516d68477d7a0e505fc114e9`
+- AlembicCodex runtime artifact：`df608057bd274ebb6b39f6a9c0e964f1b8517426`
+- 消费的本地 AlembicCore source hash（仅 build/verify 读取，未修改）：`bd9319db72d6fd22f9b3a2ba3a36e279ee117f24`
+
+验证命令 / 结果：
+
+- `npx biome check --write lib/external/mcp/handlers/task.ts test/unit/TaskPrimeKnowledgeMaterial.test.ts test/unit/CodexMcpServer.test.ts`：通过。
+- `npm run test -- test/unit/TaskPrimeKnowledgeMaterial.test.ts test/unit/CodexMcpServer.test.ts`：通过，38 tests passed。
+- `npm run build:check`：通过。
+- `npm run build`：通过。
+- `npm run prepare:codex-plugin-runtime`：通过，刷新 `plugins/alembic-codex/runtime.tgz`。
+- `npm run verify:codex-plugin`：通过。
+- `npm run verify:codex-channel`：通过。
+- `npm run verify:release-package-boundary`：通过，root npm publish 仍禁用，embedded runtime 仍使用 `@alembic/core: file:vendor/AlembicCore` 和 `.alembic-source.json`。
+- `rg "Cite evidenceRefs|line number is missing|evidence refs when present|📍" lib plugins/alembic-codex/skills plugins/alembic-codex/runtime/dist/lib/external/mcp/handlers/task.js plugins/alembic-codex/runtime/plugins/alembic-codex/skills/alembic/SKILL.md`：生产代码 / Skill / runtime artifact 0 命中。
+- `git diff --check`（AlembicPlugin 和 AlembicCodex）：均通过。
+
+边界判断：
+
+- 未修改 BiliDili。
+- 未修改 `Alembic` daemon bridge。
+- 未新增 `codex_host_response` tool。
+- local daemon ready 时 `alembic_task prime` 仍由 Plugin-owned Codex-facing handler 生成 payload。
+- 不需要 Core 共享层下沉：当前仍只有 AlembicPlugin 生产并直接面向 Codex host agent 消费该契约。
+
+后续建议：
+
+- 需要总控验收后刷新本机 Codex plugin cache，推荐命令仍为 `npm run dev:codex-plugin:refresh`。
+- 建议创建新的 AlembicTest 复测单，在 BiliDili 场景验证真实 Codex 可见呐喊是否变成简短、有声量的 Recipe / Guard 摘要，并确认不默认倾倒 evidenceRefs 路径 / 行号。
+
+### 总控验收
+
+- 2026-05-21：总控验收 SHOUT-5 通过。验收证据：`lib/external/mcp/handlers/task.ts:280` 的 tool result message 要求 “shout a short knowledge receipt” 并明确 `evidenceRefs` 留在 payload 中；`task.ts:418` 的 delivered 态 `shoutInstruction` 要求 “shout a short, active knowledge receipt”，`task.ts:419` 要求 “Make it feel like a real shout”，`task.ts:420` 明确不要默认列出 evidenceRefs 路径或行号；`task.ts:448-451` 保持 `timing: "immediate_after_prime"`、`requiredBeforeNextAction: true`、`visibility: "developer_visible"`；Skill 与 runtime Skill 均已同步“briefly and actively shout”与不默认 dump paths / line numbers；单元测试覆盖短知识 receipt、旧证据倾倒文案负向断言和 Plugin-owned prime boundary。
+- 2026-05-21：总控已刷新本机 Codex plugin cache。命令：`npm run dev:codex-plugin:refresh`。结果：成功；cache marker `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`，`localMcpEntry=/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/dist/bin/codex-mcp.js`，runtime tarball hash `0f37bf3acaaa31df9d56531bafe46e853feaddd6815f50c9e958bdfa4a8697eb`；cache Skill 已包含 “briefly and actively shout”，cache runtime dist 已包含 “shout a short, active knowledge receipt”。
+- 2026-05-21：下一步已创建 `Test-2026-05-21-04`，交给 `AlembicTest` 在 BiliDili 真实项目中复测可见摘要质量与不默认倾倒 evidenceRefs。
