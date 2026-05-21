@@ -29,9 +29,9 @@ docs/workspace/archive/YYYY-MM/<topic>/
 - `docs/Alembic/`
 - `docs/AlembicPlugin/`
 - `docs/AlembicDashboard/`
-- `docs/BiliDili/`
+- `AlembicTest/docs/`（真实项目测试、复现、回归与证据记录）
 
-这些单仓库目录不跟随 workspace wave 归档移动。
+这些单仓库目录不跟随 workspace wave 归档移动。历史上存在的真实项目协作文档只作为只读背景；新的真实项目操作记录统一进入 `AlembicTest`。
 
 ## 归档条件
 

@@ -325,7 +325,7 @@ npm run build
 | `AlembicAgent`<br>状态 |  |
 | `AlembicDashboard`<br>状态 |  |
 | `AlembicPlugin`<br>状态 |  |
-| `BiliDili`<br>状态 |  |
+| `AlembicTest`<br>状态 |  |
 
 ### 派发细节
 
@@ -334,7 +334,7 @@ npm run build
 - `AlembicAgent`：文档动作；保存位置；挂载入口；回填位置；验证命令；阻塞 / 依赖。
 - `AlembicDashboard`：文档动作；保存位置；挂载入口；回填位置；验证命令；阻塞 / 依赖。
 - `AlembicPlugin`：文档动作；保存位置；挂载入口；回填位置；验证命令；阻塞 / 依赖。
-- `BiliDili`：文档动作；保存位置；挂载入口；回填位置；验证命令；阻塞 / 依赖。
+- `AlembicTest`：测试单动作；保存位置；挂载入口；回填位置；验证命令；阻塞 / 依赖；真实测试项目只作为目标项目。
 
 ## 6. TODO / Backlog
 
@@ -353,7 +353,7 @@ npm run build
 | `AlembicAgent` |  |  |  |
 | `AlembicDashboard` |  |  |  |
 | `AlembicPlugin` |  |  |  |
-| `BiliDili` |  |  |  |
+| `AlembicTest` |  |  |  |
 
 ## 8. 回填模板
 

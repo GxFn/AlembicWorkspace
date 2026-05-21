@@ -20,7 +20,7 @@
 - 直接启动 / 重启 Alembic 测试运行时。
 - 直接点击或触发 cold-start、rescan、clean rebuild。
 - 直接监控 Dashboard、Jobs API、daemon 日志或候选产出。
-- 直接对 `BiliDili` 等真实项目做 smoke、复现或回归。
+- 直接对真实测试项目做 smoke、复现或回归；这些动作必须通过 `AlembicTest` 测试单执行。
 - 在总控窗口内保存测试脚本、测试配置、长期测试报告。
 
 ## AlembicTest 职责
@@ -95,4 +95,3 @@ docs/workspace/alembic-test-exchange.md
 - 真实项目是否保持干净。
 - 详细报告路径。
 - 建议下一步和归属窗口。
-

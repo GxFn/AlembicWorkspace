@@ -63,7 +63,7 @@
 
 ## 当前运行证据
 
-最新 BiliDili cold-start 取消前，日志已经证明至少两个维度走通了 `note_finding` 单维度写入闭环：
+最近一次真实项目 cold-start（当时目标项目为 BiliDili）取消前，日志已经证明至少两个维度走通了 `note_finding` 单维度写入闭环：
 
 - `architecture`：Agent runtime 有真实 tool calls，QualityGate `action=pass`，`memoryFindings=3`。
 - `swift-objc-idiom`：QualityGate `action=pass`，`memoryFindings=3`。

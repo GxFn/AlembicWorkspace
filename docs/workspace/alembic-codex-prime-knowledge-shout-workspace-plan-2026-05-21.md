@@ -35,7 +35,7 @@
 
 - 不在 AlembicPlugin 内实现 Codex agent runtime。
 - 不把 `AlembicAgent` 当作 Codex host agent。
-- 不修改 `BiliDili` 真实项目业务代码。
+- 不修改真实测试项目业务代码；如需真实项目验证，后续只通过 `AlembicTest` 测试单承接。
 - 不创建新的 AlembicTest 测试单；需要产品验证时后续再按测试交流文档单独派发。
 - 不直接把 Recipe publish / deprecate 权限开放给默认 Codex agent tier。
 - 不在本轮实现知识呐喊降噪、增量呐喊、强中弱可信度分级或完整证据片段展示。
@@ -197,7 +197,6 @@ Codex 应做出的呐喊动作：
 | `Alembic`<br>无任务 | 当前主线不涉及本地增强 daemon、Dashboard server、HTTP/API 或 internal AI job 实现。 |
 | `AlembicAgent`<br>无任务 | 当前主线是 Codex host agent prime 知识接收与公开声明，不涉及 AlembicAgent runtime / provider / tool loop。 |
 | `AlembicDashboard`<br>无任务 | 当前主线不涉及 Dashboard UI 或前端状态消费。 |
-| `BiliDili`<br>无任务 | 当前主线不涉及真实 iOS 项目修改、接入或验证。 |
 | `AlembicTest`<br>无任务 | 当前不创建测试单；既有测试线继续独立运行，本文件不新增测试执行任务。 |
 
 ## 空闲窗口调度
@@ -209,7 +208,6 @@ Codex 应做出的呐喊动作：
 | `Alembic` | 无任务 | 当前无 daemon / HTTP / CLI / Dashboard server 变更。 | 否 |
 | `AlembicAgent` | 无任务 | 当前不涉及 AlembicAgent runtime。 | 否 |
 | `AlembicDashboard` | 无任务 | 当前不涉及前端。 | 否 |
-| `BiliDili` | 无任务 | 当前不涉及真实项目。 | 否 |
 | `AlembicTest` | 无任务 | 当前不新增测试单，避免干扰既有持续测试。 | 否 |
 
 ## 当前执行顺序
@@ -223,7 +221,6 @@ Codex 应做出的呐喊动作：
 - `Alembic`：无任务。
 - `AlembicAgent`：无任务。
 - `AlembicDashboard`：无任务。
-- `BiliDili`：无任务。
 - `AlembicTest`：无新测试任务。
 
 ## 可复制分派提示词
@@ -252,7 +249,7 @@ Codex 应做出的呐喊动作：
 - 不固定 Codex 的最终呐喊文案，只提供 `shoutInstruction` 和结构化材料。
 - 不做可见程度限制、delta shout、trust 分级、sourceRef verifiedAt/status 上浮等后续优化。
 - 不把弱证据包装成强证据；没有行号就返回 `line: null` 并让 Codex 如实说明。
-- 不修改 `BiliDili`、`AlembicAgent`、`AlembicDashboard` 或测试线文档。
+- 不修改真实测试项目、`AlembicAgent`、`AlembicDashboard` 或测试线文档。
 
 验证命令：
 

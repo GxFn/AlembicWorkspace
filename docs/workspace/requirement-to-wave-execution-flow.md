@@ -73,7 +73,7 @@
 - 需求是否是完整功能模块，而不是抽象连接。
 - 需求设计的阶段是否仍然只是候选方向。
 - 是否已有足够代码证据支撑最终阶段顺序。
-- 是否逐一覆盖 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili`、`AlembicTest`。
+- 是否逐一覆盖 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicTest`；真实测试项目只作为 `AlembicTest` 的目标项目，不作为独立派发窗口。
 - producer / consumer 是否清晰：上游 contract / API / artifact / evidence 未完成前，下游不得猜字段。
 - 验收是否覆盖功能完整性：真实入口、真实数据、真实状态变化、真实消费方、失败路径和用户可操作验证。
 - 如果发现最小实现，是否已经创建非最小完整实现补齐 wave，而不是继续推进下游。

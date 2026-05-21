@@ -2,14 +2,16 @@
 
 import { execFileSync } from "node:child_process";
 
-const childRepoPrefixes = [
+const protectedWorkspacePrefixes = [
   "Alembic/",
   "AlembicCore/",
   "AlembicAgent/",
   "AlembicDashboard/",
   "AlembicPlugin/",
-  "BiliDili/",
   "AlembicTest/",
+  // Real test project directories are protected paths only; they are not
+  // workspace dispatch windows and all operations must go through AlembicTest.
+  "BiliDili/",
 ];
 
 const disallowedTrackedPaths = [".DS_Store"];
@@ -29,8 +31,8 @@ const tracked = git(["ls-files", "-s"])
 const violations = [];
 
 for (const path of tracked) {
-  if (childRepoPrefixes.some((prefix) => path.startsWith(prefix))) {
-    violations.push(`child repository path is tracked: ${path}`);
+  if (protectedWorkspacePrefixes.some((prefix) => path.startsWith(prefix))) {
+    violations.push(`protected workspace path is tracked: ${path}`);
   }
 
   if (disallowedTrackedPaths.includes(path) || path.endsWith("/.DS_Store")) {

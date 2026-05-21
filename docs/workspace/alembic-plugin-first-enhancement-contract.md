@@ -79,12 +79,12 @@ Alembic 产品路线采用 `Plugin first, Alembic install enhances`：
 
 在第三步确认前，不把删除 Plugin 内嵌 Dashboard dist 作为常规清理任务。
 
-### BiliDili
+### 真实测试项目
 
 职责：
 
 - 真实项目验证目标。默认不进入日常 Alembic 开发流程。
-- 不直接承接 Alembic 测试执行任务；需要真实项目接入、扫描、验证或复现时，由 `AlembicTest` 使用 BiliDili 执行并回填证据。
+- 不直接承接 Alembic 测试执行任务；需要真实项目接入、扫描、验证或复现时，由 `AlembicTest` 使用目标项目执行并回填证据。
 
 ### AlembicTest
 

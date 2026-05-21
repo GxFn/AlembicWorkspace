@@ -10,7 +10,7 @@ Copy the filled section into `docs/workspace/alembic-test-exchange.md`.
 创建日期：YYYY-MM-DD
 总控来源：<关联总控计划或用户请求>
 执行窗口：AlembicTest
-目标项目：<例如 BiliDili / fixture / mock project>
+目标项目：<真实测试项目 / fixture / mock project>
 
 #### 测试目标
 

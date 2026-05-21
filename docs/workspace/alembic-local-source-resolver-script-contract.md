@@ -19,7 +19,7 @@
 
 默认不参与：
 
-- `BiliDili`：只作为真实 iOS/Swift 项目目标，默认不承接 Alembic 测试执行任务。
+- 真实测试项目：只作为 `AlembicTest` 的目标项目，默认不承接 Alembic 测试执行任务。
 - `AlembicTest`：只在真实项目测试、扫描、复现、回归或验证报告需要时纳入；测试脚本和测试配置归它维护。
 
 ## 1. 总原则
@@ -105,7 +105,7 @@
 - 不要为了统一脚本而破坏仓库独立 build/check/release 能力。
 - 不要在 `AlembicPlugin` 引入 `@alembic/agent`。
 - 不要让外层仓库绕过 `@alembic/core` package entry 直接 import Core 源码内部文件。
-- 不要把 `BiliDili` 纳入日常 Alembic 依赖收口、发布或迁移流程。
+- 不要把真实测试项目纳入日常 Alembic 依赖收口、发布或迁移流程。
 - 不要把真实项目测试脚本或测试配置放回 workspace 根 `scripts/`；这些能力归 `AlembicTest`。
 
 ## 7. 当前落地状态

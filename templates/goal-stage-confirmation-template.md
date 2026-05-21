@@ -71,7 +71,7 @@
 | `AlembicAgent`<br>状态 |  |
 | `AlembicDashboard`<br>状态 |  |
 | `AlembicPlugin`<br>状态 |  |
-| `BiliDili`<br>状态 |  |
+| `AlembicTest`<br>状态 |  |
 
 补充说明：
 
@@ -142,7 +142,7 @@
 | `AlembicAgent`<br>暂停 | 等待用户确认本任务目标与阶段计划。 |
 | `AlembicDashboard`<br>暂停 | 等待用户确认本任务目标与阶段计划。 |
 | `AlembicPlugin`<br>暂停 | 等待用户确认本任务目标与阶段计划。 |
-| `BiliDili`<br>暂停 | 等待用户确认本任务目标与阶段计划。 |
+| `AlembicTest`<br>暂停 | 等待用户确认本任务目标与阶段计划；真实测试项目只作为测试目标项目，不作为独立派发窗口。 |
 
 ## 可复制提示词
 
@@ -152,7 +152,7 @@
 等待用户确认任务级最终目标与阶段计划；当前不派发。
 ```
 
-不发送给：`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili`。
+不发送给：`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicTest`。
 
 ## 回填区
 

@@ -16,19 +16,20 @@ Tracked workspace assets:
   assets.
 - `templates/`: reusable document, prompt, and dispatch templates.
 
-The child source repositories inside the workspace are independent Git
-repositories and are intentionally ignored here:
+The child source repositories and the independent test-execution repository
+inside the workspace are intentionally ignored here:
 
 - `Alembic`
 - `AlembicCore`
 - `AlembicAgent`
 - `AlembicDashboard`
 - `AlembicPlugin`
-- `BiliDili`
 - `AlembicTest`
 
 Do not add those child repositories as files, submodules, or gitlinks in this
 workspace repository. Commit source changes in each child repository separately.
+Real test project directories placed in this workspace are also ignored and are
+operated through `AlembicTest`; they are not direct workspace dispatch windows.
 
 Workspace common assets must stay repo-neutral: they may help with planning,
 verification, dispatch, documentation, or local agent workflow, but they must not

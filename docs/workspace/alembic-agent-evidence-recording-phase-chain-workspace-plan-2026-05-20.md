@@ -1,9 +1,11 @@
 # Alembic Agent Evidence Recording And Phase Chain Workspace Plan
 
-状态：Wave 9D 阻塞，等待用户确认真实项目数据发送策略
+状态：测试线持续运行；真实项目复测由 `AlembicTest` 承接
 总控窗口：AlembicWorkspace
 创建日期：2026-05-20
-适用范围：`AlembicAgent`、`Alembic`、`AlembicDashboard`、`BiliDili`、`AlembicTest`
+适用范围：`AlembicAgent`、`Alembic`、`AlembicDashboard`、`AlembicTest`
+
+2026-05-21 总控口径更新：本文中 `BiliDili` 均为历史触发来源或真实目标项目名称，不再表示独立执行窗口。后续任何真实项目 cold-start、smoke、复现、回归或监控，均通过 `AlembicTest` 测试单执行并回填证据。
 
 ## 背景
 
@@ -63,10 +65,10 @@
 - 不降低 QualityGate 的证据要求。
 - 不删除 `note_finding`。
 - 不把无证据 Markdown findings 当作通过。
-- 不要求 `BiliDili` 业务代码做任何修改。
+- 不要求真实目标项目业务代码做任何修改。
 - 不在 `AlembicDashboard` 里实现后端 Agent 决策。
 - 不让 `AlembicCore` 承担 provider / runtime / tool-call 策略。
-- 本波不启动完整 BiliDili cold-start；真实项目复测只在 L4 memory package 稳固、上游修复验收后按小范围门禁进行。
+- 本波不启动完整真实项目 cold-start；真实项目复测只在 L4 memory package 稳固、上游修复验收后按小范围门禁进行。
 
 ## 设计方案
 
@@ -281,7 +283,7 @@ git diff --check
 - 确保 dimension timeout / child-run-error / cancel 不写成正常 completed。
 - 确保 `workingMemoryDistilled.keyFindings`、analysis findings、report status 与 Job summary 一致。
 - 增加小范围 fixture / mock provider / dry-run 回归，先不依赖真实 DeepSeek。
-- 只有用户再次确认外部 AI 数据发送后，才对 `BiliDili` 执行真实单维度复测。
+- 只有用户再次确认外部 AI 数据发送后，才由 `AlembicTest` 对真实目标项目执行真实单维度复测。
 
 文档动作：
 
@@ -338,7 +340,7 @@ git diff --check
 - 用户在 Wave 9C 启动后反馈 DeepSeek L4 compact 仍存在协议错误：`Messages with role 'tool' must be a response to a preceding message with 'tool_calls'`。
 - 总控判断该问题归属 `AlembicAgent` runtime / provider transcript normalization，不属于 Dashboard 或 Alembic consumer。
 - `AlembicDashboard` Wave 9C 已完成并通过总控验收，下一步插入 `AlembicAgent` Wave 9A3 修复 L4 compact 协议合法性。
-- Wave 9A3 已完成并通过总控验收；`BiliDili` 真实 cold-start / rescan 仍等待用户确认真实项目外部 AI 数据发送或替代安全路线。
+- Wave 9A3 已完成并通过总控验收；真实目标项目 cold-start / rescan 仍等待用户确认真实项目外部 AI 数据发送或替代安全路线，并由 `AlembicTest` 承接。
 
 总控验收结论：
 
@@ -375,7 +377,7 @@ git diff --check
 - 如果无法保留完整 assistant(tool_calls)+tool results 回合，应把 tool result 降级为普通 user summary 文本，而不是继续用 `role: "tool"`。
 - 在 DeepSeek transport / provider preflight 增加防线：发送前发现孤立 tool message 时，拒绝或归一化为合法消息，并记录 diagnostics。
 - compact 失败后必须进入可控降级：本轮不要反复触发 L4 compact，不继续扩大 token 浪费；后续可再按阈值和冷却策略尝试。
-- 不修改 Alembic consumer、Dashboard UI、BiliDili 业务代码。
+- 不修改 Alembic consumer、Dashboard UI、真实目标项目业务代码。
 
 验证命令：
 
@@ -434,7 +436,7 @@ git diff --check
 - 保持 9A3 约束：任何情况下不得发送孤立 `tool` message；compact 失败不得在同一压力周期反复触发。
 - 增加预算硬止损：当 session budget 已明显超限、L4 compact / record repair 失败或 retry 叠加导致继续运行只会扩大浪费时，必须把当前维度标记为 degraded / failed / timeout 等明确状态，跳过或中止当前维度，不继续无上限奔跑。
 - 增加取消 / abort 对 L4 的门控：取消后不得继续写入 L4 summary；in-flight compaction / LLM 调用如果不能立刻取消，也必须在返回后识别 run 已取消并丢弃结果，只记录 cancelled / aborted diagnostics。
-- 不修改 `Alembic` consumer、`AlembicDashboard` UI、`AlembicPlugin` 或 `BiliDili` 业务代码。
+- 不修改 `Alembic` consumer、`AlembicDashboard` UI、`AlembicPlugin` 或真实目标项目业务代码。
 
 验证命令：
 
@@ -478,7 +480,7 @@ git diff --check
 
 - 把 Agent / bootstrap 真实运行状态稳定投影到 Alembic Job、Progress、summary 和 Dashboard 可消费 payload，避免页面误判“卡住”或把 cancel / timeout / child-run-error 当作正常完成。
 - 把运行效率信号进入 job summary：tool calls、cache hit、forced summary、nudge / retry、record repair、L4 compaction / validation / hard stop、cancel reason、token / budget pressure。
-- 为下一次 `BiliDili` 小范围真实复测提供可信观察面；在这之前不重新启动完整 cold-start。
+- 为下一次真实项目小范围复测提供可信观察面；在这之前不重新启动完整 cold-start。
 
 范围：
 
@@ -496,8 +498,8 @@ git diff --check
 
 禁止事项：
 
-- 不启动 `BiliDili` 完整 cold-start。
-- 不修改 `BiliDili` 业务代码。
+- 不启动完整真实项目 cold-start。
+- 不修改真实目标项目业务代码。
 - 不把 Dashboard UI 当作状态修复入口；Dashboard 只消费 Alembic 稳定 payload。
 - 不为了快速展示而新增静态 mock、空字段或无法从真实运行产生的数据。
 
@@ -536,7 +538,7 @@ git diff --check
 范围：
 
 - `AlembicDashboard` Jobs API type、Jobs view、evidence status / efficiency 展示周边。
-- 只围绕 Alembic Wave 9E 新增字段和已有 summary diagnostics 展示补齐；不修改 Alembic 后端、不修改 BiliDili。
+- 只围绕 Alembic Wave 9E 新增字段和已有 summary diagnostics 展示补齐；不修改 Alembic 后端、不修改真实目标项目。
 
 任务：
 
@@ -548,8 +550,8 @@ git diff --check
 
 禁止事项：
 
-- 不修改 `Alembic`、`AlembicAgent`、`AlembicPlugin`、`AlembicCore` 或 `BiliDili`。
-- 不启动 BiliDili cold-start。
+- 不修改 `Alembic`、`AlembicAgent`、`AlembicPlugin`、`AlembicCore` 或真实目标项目。
+- 不启动真实项目 cold-start。
 - 不把 Dashboard 做成 Agent 决策层；只展示后端 payload。
 
 验证命令：
@@ -565,7 +567,7 @@ git diff --check
 文档动作：
 
 - 在 `docs/AlembicDashboard/` 新建 `alembic-dashboard-job-progress-freshness-wave-9f-2026-05-20.md`。
-- 从本文“回填区”挂回完成范围、提交 hash、验证命令、验证结果、遗留风险和是否可以进入 BiliDili 小范围复测。
+- 从本文“回填区”挂回完成范围、提交 hash、验证命令、验证结果、遗留风险和是否可以进入真实项目小范围复测。
 
 总控验收结论：
 
@@ -573,7 +575,7 @@ git diff --check
 - `DaemonJobRecord.progress` 类型已支持 `updatedAt`、`activeTaskStartedAt`、`activeTaskUpdatedAt`、`activeTaskEventCount`、`activeTaskStatus`；Jobs 页面“最后事件”优先使用 active task 更新时间，其次用 progress 更新时间，最后回退 job `updatedAt`。
 - `ProgressBlock` 已显示 active task status、event count、active task 最近更新时间和 progress 最近更新时间；summary diagnostics 已展示 status counts、issues、gate failures、timed out stages、forced summary 和 cancel reason。
 - 总控复跑 `npm run build` 通过，`git diff --check` 通过；`npm run check` 仍失败在 Dashboard 仓库未配置 `check` script，与执行窗口回填一致。
-- 功能完整性检查通过：Dashboard 只消费 Alembic 后端稳定 payload，不实现 Agent 决策；前端观察面已覆盖 Wave 9E 后端新增字段，可以进入 BiliDili 小范围复测前的用户数据策略确认。
+- 功能完整性检查通过：Dashboard 只消费 Alembic 后端稳定 payload，不实现 Agent 决策；前端观察面已覆盖 Wave 9E 后端新增字段，可以进入真实项目小范围复测前的用户数据策略确认。
 
 ### Wave 9D：AlembicTest 小范围真实验证
 
@@ -588,7 +590,7 @@ git diff --check
 任务：
 
 - 只做单维度或 fixture 等价验证，不启动完整 cold-start。
-- 验证 BiliDili 业务仓库前后干净。
+- 验证真实目标项目业务仓库前后干净。
 - 验证缺 `note_finding` 时进入 record repair，不重跑完整 analyze。
 - 验证取消后 job status、progress status、summary status 均为 `cancelled`。
 - 验证 timeout / child-run-error 不计为 completed。
@@ -600,7 +602,6 @@ git diff --check
 | `AlembicDashboard`<br>已完成 | Wave 9F 已通过总控验收：消费 Alembic Wave 9E 新增 progress freshness 字段，Jobs 页面显示 active task status、event count 和最近 active task update，避免前端仍用旧 job `updatedAt` 误判卡住；提交 `c1aa2c09e6f171192ccfc81a89f392fb5b5c0848`。 |
 | `Alembic`<br>已完成 | Wave 9E 已通过总控验收：已修复 job progress stale、cancel / timeout / child-run-error 分类和 efficiency summary payload；提交 `633ed228d1c0ba9cd04ef431dc4aadac18c3ac06`。 |
 | `AlembicAgent`<br>已完成 | Wave 9A4 已通过总控验收：提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`，L4 已从 raw transcript 压缩升级为结构化 memory package 压缩，并补 package builder、summary validation、typed memory summary、budget hard stop 与 abort 后 in-flight result 丢弃。 |
-| `BiliDili`<br>阻塞 | Wave 9D：作为真实项目目标等待用户确认真实项目外部 AI 数据发送或替代安全路线；不直接给 BiliDili 派测试任务。 |
 | `AlembicTest`<br>阻塞 | Wave 9D：等待用户确认数据策略后，执行小范围真实复测、冷启动监控、复现和测试证据整理。 |
 | `AlembicCore`<br>无任务 | 当前优化属于 Agent runtime / Alembic consumer 状态，不需要 Core contract。若后续 repair status 下沉为共享 contract，再重新判断。 |
 | `AlembicPlugin`<br>无任务 | 当前不涉及 Codex plugin marketplace、MCP skill 或 embedded runtime packaging。 |
@@ -610,7 +611,7 @@ git diff --check
 | ID | 状态 | 类型 | 严重度 / 优先级 | 归属 | 事项 / TODO | 影响复测 / 派发 | 依赖 / 触发 | 推荐窗口 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | TODO-1 | 已完成 | 修复 | P0 | `AlembicAgent` | DeepSeek L4 compact 可能发送孤立 `tool` message，导致协议错误并放大 token 消耗。 | 是 | 总控验收通过：提交 `44dfe1360286e0c6d8074e07cea148ef679b13b2`；targeted tests、`build:check`、`check`、`git diff --check` 通过。 | `AlembicAgent` |
-| TODO-2 | 阻塞 | 验证 | P0 | `AlembicTest` / `BiliDili` | BiliDili 小范围真实复测。 | 是 | 技术前置 wave 已验收通过；等待用户确认真实项目外部 AI 数据发送或替代安全路线。 | `AlembicTest` |
+| TODO-2 | 阻塞 | 验证 | P0 | `AlembicTest` | 真实目标项目小范围复测。 | 是 | 技术前置 wave 已验收通过；等待用户确认真实项目外部 AI 数据发送或替代安全路线。 | `AlembicTest` |
 | TODO-3 | 已完成 | 设计 | P1 | `Alembic` | Agent 暴露新的 compact diagnostics / failure status 后，需要判断 Alembic consumer / summary payload 如何接入。 | 否 | Wave 9E 已通过总控验收：Alembic 已稳定 job summary / diagnostics payload。 | `Alembic` |
 | TODO-4 | 已完成 | 修复 | P1 | `AlembicDashboard` | Jobs / Progress / Reports 显示 evidence repair、degraded、timeout、cancel 等非正常状态。 | 否 | 已通过总控验收，提交 `b2c62b5e01fad4a256f6815da63b0ef7f34bfe86`。 | `AlembicDashboard` |
 | TODO-5 | 已完成 | 设计 / 修复 | P0 | `AlembicAgent` | L4 仍以 raw transcript 切片为主输入，设计边界不适合长跑 cold-start；需要升级为结构化 memory package 压缩。 | 是 | Wave 9A4 已通过总控验收：提交 `c2d3b5316b28d4d750283c324a2fd2babaa221ce`；targeted tests、`build:check`、`check`、`git diff --check` 通过。 | `AlembicAgent` |
@@ -629,7 +630,6 @@ git diff --check
 | `AlembicDashboard` | 已完成 | Wave 9F 已通过总控验收；当前不再派发，避免空转。 | 否 |
 | `Alembic` | 已完成 | Wave 9E 已通过总控验收；当前不再派发，避免空转。 | 否 |
 | `AlembicAgent` | 已完成 | Wave 9A4 已通过总控验收；当前不再派发，避免空转。 | 否 |
-| `BiliDili` | 阻塞 | 作为真实项目目标等待用户确认外部 AI 数据发送或替代安全路线。 | 否 |
 | `AlembicTest` | 阻塞 | 等待用户确认数据策略；确认后负责复测、监控和验证报告。 | 否 |
 | `AlembicCore` | 无任务 | 当前问题属于 Agent runtime / provider transcript，不需要 Core contract。 | 否 |
 | `AlembicPlugin` | 无任务 | 当前问题不涉及 Codex plugin、MCP skill、channel 或 runtime packaging。 | 否 |
@@ -643,7 +643,6 @@ git diff --check
 - `AlembicAgent`：Wave 9A4 已通过总控验收。
 - `Alembic`：Wave 9E 已通过总控验收。
 - `AlembicDashboard`：Wave 9F 已通过总控验收。
-- `BiliDili`：作为真实项目目标等待用户确认真实项目外部 AI 数据发送或替代安全路线。
 - `AlembicTest`：阻塞，等待用户确认数据策略；确认后负责测试验证，不由总控直接执行。
 - `AlembicCore`：无任务。
 - `AlembicPlugin`：无任务。
@@ -652,10 +651,10 @@ git diff --check
 
 发送给：无
 
-当前不发送给：`AlembicDashboard`（已完成）、`Alembic`（已完成）、`AlembicAgent`（已完成）、`BiliDili`（阻塞，真实项目目标）、`AlembicTest`（阻塞，等待用户确认数据策略）、`AlembicCore`（无任务）、`AlembicPlugin`（无任务）。
+当前不发送给：`AlembicDashboard`（已完成）、`Alembic`（已完成）、`AlembicAgent`（已完成）、`AlembicTest`（阻塞，等待用户确认数据策略）、`AlembicCore`（无任务）、`AlembicPlugin`（无任务）。
 
 ```text
-当前没有可发送给执行窗口的提示词；等待用户确认 BiliDili 真实项目外部 AI 数据发送策略或替代安全路线。确认后应发送给 `AlembicTest`，由测试验证窗口执行复测和监控。
+当前没有可发送给执行窗口的提示词；等待用户确认真实项目外部 AI 数据发送策略或替代安全路线。确认后应发送给 `AlembicTest`，由测试验证窗口执行复测和监控。
 ```
 
 ## 回填区
@@ -668,14 +667,14 @@ git diff --check
   - 验证命令：`npm run build:check`；`npm run test -- test/evidence-recording-phase-chain.test.ts`；`npm run lint`；`npm run test`；`npm run build`；`npm run lint:agent-import-boundary`；`npm run lint:public-api-boundary`；`npm run lint:core-import-boundary`；`git diff --check`；`npm run check`。
   - 验证结果：总控复跑 `npm run build:check`、`npm run test -- test/evidence-recording-phase-chain.test.ts`、`git diff --check`、`npm run check` 均通过；`npm run lint` 仍打印 21 个既有 warning，但命令返回 0。
   - 总控验收结论：record repair 主链路通过；阶段链路收窄未完整完成，因为 `ExplorationStrategies.ts` 未变更，`SCAN / VERIFY / SUMMARIZE` 仍保留原阶段语义，`AgentRuntime.#finalize()` 也未新增 abort / timeout / degraded 下的 forced summary 门控。
-  - 遗留风险：Alembic consumer 尚未接入 `record_repair` / `degraded_no_findings` 状态；fallback evidence validation 当前以既有路径匹配为主；尚未做真实 DeepSeek / BiliDili 单维度外部 AI 复测。
+  - 遗留风险：Alembic consumer 尚未接入 `record_repair` / `degraded_no_findings` 状态；fallback evidence validation 当前以既有路径匹配为主；尚未做真实 DeepSeek / 真实项目单维度外部 AI 复测。
   - 下一步建议：先执行 Wave 9A2，再启动 `Alembic` Wave 9B。
   - Wave 9A2 完成范围：analyst `SCAN` 已改为 no-tool briefing / plan seed，并首轮转入 `EXPLORE`；`VERIFY` 新增 evidence-only tool guard，只允许聚焦 `code.read` / `code.outline`、聚焦实体 `graph.query` 和 memory evidence actions；`SUMMARIZE` / forced summary 增加 abort、stage timeout、`degraded_no_findings`、record repair degraded suppression；diagnostics 区分 `stage_timeout` cancel reason、timed-out stage 和 `degraded_no_findings` degraded 状态；补充 `ExplorationStrategies`、`AgentRuntime` 和 phase-chain tests。
   - Wave 9A2 提交 hash：`99f0a9f38a79b3cd1504dc2511d06f0a56e9e5c3`。
   - Wave 9A2 验证命令：`npm run build:check`；`npm run test -- test/evidence-recording-phase-chain.test.ts`；`npm run test -- ExplorationStrategies`；`npm run test -- AgentRuntime`；`npm run check`；`git diff --check`。
   - Wave 9A2 验证结果：执行窗口回填通过；总控复跑 `npm run build:check`、`npm run test -- test/evidence-recording-phase-chain.test.ts`、`npm run test -- ExplorationStrategies`、`npm run test -- AgentRuntime`、`npm run check`、`git diff --check` 均通过。Biome 仍打印 21 个既有 warning，但命令返回 0。
   - Wave 9A2 总控验收结论：通过。阶段链路和状态门控已经形成真实可用闭环，可以启动 `Alembic` consumer 接入。
-  - Wave 9A2 遗留风险：`Alembic` consumer 尚未接入新的 abort / timeout / degraded semantics；真实 DeepSeek / BiliDili 单维度外部 AI 复测仍等待下游接入和用户确认；`VERIFY` graph guard 若遇到 adapter 非标准实体字段，需要在 consumer / adapter 测试中补充映射。
+  - Wave 9A2 遗留风险：`Alembic` consumer 尚未接入新的 abort / timeout / degraded semantics；真实 DeepSeek / 真实项目单维度外部 AI 复测仍等待下游接入和用户确认；`VERIFY` graph guard 若遇到 adapter 非标准实体字段，需要在 consumer / adapter 测试中补充映射。
   - Wave 9A2 下一步建议：总控验收后启动 `Alembic` Wave 9B，消费 `99f0a9f38a79b3cd1504dc2511d06f0a56e9e5c3`。
   - Wave 9A3 完成范围：新增 Chat Completions tool transcript normalization，完整 assistant `tool_calls` + tool result 回合继续保留，孤立 `tool` message、缺结果的 assistant tool call 和被切片打断的 tool transcript 会转为普通文本；`ContextWindow.compactL4()` 构造合法 summary input 并写回合法近期上下文；`DeepSeekTransport` / `DeepSeekProvider` 发包前增加 preflight normalization；`BudgetController` 在 L4 compact failure 后冷却一次 preflight，避免同一压力周期反复 compact。
   - Wave 9A3 提交 hash：`44dfe1360286e0c6d8074e07cea148ef679b13b2`。
@@ -683,16 +682,16 @@ git diff --check
   - Wave 9A3 验证结果：执行窗口回填通过。`npm run test -- ContextWindow` 通过，1 个测试文件 / 2 个用例；`npm run test -- BudgetController` 通过，1 个测试文件 / 1 个用例；`npm run test -- DeepSeekTransport` 通过，1 个测试文件 / 2 个用例；`npm run build:check` 通过；`npm run check` 通过，完整测试 16 个文件 / 64 个用例通过，Biome 仍打印 21 个既有 warning 但命令返回 0；`git diff --check` 通过。
   - Wave 9A3 总控复跑：`npm run test -- ContextWindow`、`npm run test -- BudgetController`、`npm run test -- DeepSeekTransport`、`npm run build:check`、`npm run check`、`git diff --check` 均通过；`npm run check` 中 Biome 仍打印 21 个既有 warning，但命令返回 0。
   - Wave 9A3 总控验收结论：通过。`ContextWindow.compactL4()`、`DeepSeekTransport`、`DeepSeekProvider` 均有发包前 transcript normalization，孤立 `tool` message 和缺失结果的 assistant tool call 不再进入 Chat Completions payload；compact failure 后有 preflight cooldown，能避免同一压力周期反复触发 L4 compact。
-  - Wave 9A3 遗留风险：preflight normalization 当前只在 AlembicAgent 内记录 warning；如果下游需要展示 compact normalization 次数或失败原因，需要再定义 Alembic / Dashboard 可消费 diagnostics；尚未执行真实 DeepSeek / BiliDili 单维度复测。
-  - Wave 9A3 下一步建议：当前无需立即追加 Alembic / Dashboard diagnostics 消费；解除 BiliDili Wave 9D 的 compact 阻塞，但真实复测仍必须等待用户确认数据策略。
+  - Wave 9A3 遗留风险：preflight normalization 当前只在 AlembicAgent 内记录 warning；如果下游需要展示 compact normalization 次数或失败原因，需要再定义 Alembic / Dashboard 可消费 diagnostics；尚未执行真实 DeepSeek / 真实项目单维度复测。
+  - Wave 9A3 下一步建议：当前无需立即追加 Alembic / Dashboard diagnostics 消费；解除 compact 阻塞，但真实复测仍必须等待用户确认数据策略并由 `AlembicTest` 执行。
   - Wave 9A4 完成范围：新增 `buildL4MemoryPackage()` / `renderL4MemoryPackage()` / `validateL4Summary()` / `formatL4MemorySummary()`，L4 输入从 ActiveContext / evidence refs / key findings / tool call summary / phase diagnostics / recent text 组装结构化 memory package；raw transcript 只以纯文本字段作为补充，不再直接作为 provider 主输入；`ContextWindow.compactL4()` 写回 typed `[[L4 Memory Summary]]` marker 和 metadata；summary validation 阻止缺失 phase、finding、evidence 或 failure state 的摘要写成成功 summary；`BudgetController` 增加 package provider、abort gate、failure pressure tracking 和 runaway budget hard stop；`AgentRuntime` 注入 package 来源，并在 cancellation / hard stop 时停止主 LLM 或 forced summary。
   - Wave 9A4 提交 hash：`c2d3b5316b28d4d750283c324a2fd2babaa221ce`。
   - Wave 9A4 验证命令：`npm run test -- ContextWindow`；`npm run test -- BudgetController`；`npm run test -- l4-memory-package`；`npm run test -- AgentRuntime`；`npm run test -- DeepSeekTransport`；`npm run test -- memory`；`npm run test -- ContextWindow BudgetController l4-memory-package AgentRuntime DeepSeekTransport memory`；`npm run build:check`；`git diff --check`；`npm run check`。
   - Wave 9A4 验证结果：执行窗口回填通过。`ContextWindow` 1 个测试文件 / 4 个用例通过；`BudgetController` 1 个测试文件 / 3 个用例通过；`l4-memory-package` 1 个测试文件 / 2 个用例通过；`AgentRuntime` 1 个测试文件 / 4 个用例通过；`DeepSeekTransport` 1 个测试文件 / 2 个用例通过；`memory` 2 个测试文件 / 6 个用例通过；combined targeted tests 6 个文件 / 19 个用例通过；`npm run build:check`、`git diff --check`、`npm run check` 通过，完整测试 17 个文件 / 71 个用例通过，Biome 仍打印 21 个既有 warning 但命令返回 0。
   - Wave 9A4 总控复跑：`npm run test -- ContextWindow BudgetController l4-memory-package AgentRuntime DeepSeekTransport memory` 通过，6 个测试文件 / 19 个用例；`npm run build:check` 通过；`git diff --check` 通过；`npm run check` 通过，17 个测试文件 / 71 个用例，Biome 仍打印 21 个既有 warning 但命令返回 0。
   - Wave 9A4 总控验收结论：通过。L4 主输入已从 raw transcript 切片升级为结构化 memory package；summary validation、typed memory summary、provider 防线降级、runaway budget hard stop 和 cancel / abort 后 in-flight result 丢弃已经形成真实可用闭环。
-  - Wave 9A4 遗留风险：未执行真实 DeepSeek / BiliDili 单维度复测，仍等待用户确认真实项目外部 AI 数据发送或替代安全路线；memory package 当前主要依赖 `ActiveContext.distill()`、runtime `toolCalls` 和 diagnostics，后续若 L4 执行点可稳定注入完整 `EvidenceCollector.evidenceMap`，可增强 evidence refs 来源；Alembic / Dashboard 尚未消费 L4 validation / hard stop 的细粒度计数或原因。
-  - Wave 9A4 下一步建议：不要直接重跑 BiliDili；先执行 Alembic Wave 9E，修复 job progress stale、非正常状态分类和 efficiency summary payload，再进入小范围真实复测。
+  - Wave 9A4 遗留风险：未执行真实 DeepSeek / 真实项目单维度复测，仍等待用户确认真实项目外部 AI 数据发送或替代安全路线；memory package 当前主要依赖 `ActiveContext.distill()`、runtime `toolCalls` 和 diagnostics，后续若 L4 执行点可稳定注入完整 `EvidenceCollector.evidenceMap`，可增强 evidence refs 来源；Alembic / Dashboard 尚未消费 L4 validation / hard stop 的细粒度计数或原因。
+  - Wave 9A4 下一步建议：不要直接重跑真实项目；先执行 Alembic Wave 9E，修复 job progress stale、非正常状态分类和 efficiency summary payload，再进入小范围真实复测。
 - `Alembic`：
   - 状态：Wave 9B 已完成并通过总控验收；Wave 9E 已完成并通过总控验收。
   - 执行记录：`docs/Alembic/alembic-agent-evidence-recording-phase-chain-wave-9b-consumer-2026-05-20.md`；`docs/Alembic/alembic-agent-job-progress-efficiency-wave-9e-2026-05-20.md`。
@@ -702,7 +701,7 @@ git diff --check
   - 验证结果：Agent HEAD 确认为 `99f0a9f38a79b3cd1504dc2511d06f0a56e9e5c3`；`npm run build` 通过；`npm run build:check` 通过；targeted unit tests 2 个测试文件 / 8 个用例通过；`git diff --check` 通过；`npm run lint:repo-boundary` 失败在 18 个既有 DB boundary 命中，本轮改动文件不在命中范围。
   - 总控验收复跑：`git -C ../AlembicAgent rev-parse HEAD` 输出 `99f0a9f38a79b3cd1504dc2511d06f0a56e9e5c3`；`npm run build`、`npm run build:check`、`npm run test:unit -- test/unit/BootstrapDimensionConsumer.test.ts test/unit/BootstrapSessionExecutionBuilder.test.ts`、`git diff --check` 均通过；`npm run lint:repo-boundary` 仍失败在同一批 18 个既有 DB boundary 命中。
   - 总控验收结论：通过。`timeout`、`blocked`、`aborted`、`error` 会进入 error consumer；`degraded_no_findings` / `record_repair_incomplete` 会在 dimension consumer 中写入非正常 `status`、`reason`、`diagnostics`，并把 `candidateCount` / `created` 归零、禁止挂 submitted candidate，已形成下游 Dashboard 可消费的稳定 payload。
-  - 遗留风险：`lint:repo-boundary` 既有失败项仍需独立清理；未执行真实 DeepSeek / BiliDili 单维度复测，仍等待用户确认外部 AI 数据发送或替代安全路线；Dashboard 若需要稳定枚举，应在 Wave 9C 消费 Alembic 后端 payload 后再判断是否下沉共享 contract。
+  - 遗留风险：`lint:repo-boundary` 既有失败项仍需独立清理；未执行真实 DeepSeek / 真实项目单维度复测，仍等待用户确认外部 AI 数据发送或替代安全路线；Dashboard 若需要稳定枚举，应在 Wave 9C 消费 Alembic 后端 payload 后再判断是否下沉共享 contract。
   - 下一步建议：历史建议已执行；Wave 9E 已通过总控验收，进入 `AlembicDashboard` Wave 9F 消费 progress freshness 字段。
   - Wave 9E 完成范围：`BootstrapEventEmitter` 将 `timeout`、`blocked`、`aborted`、`error`、`degraded_no_findings`、`record_repair_incomplete`、`l4_compaction_failed_budget_exhausted` 等非正常 dimension payload 路由到 failed task；`BootstrapTaskManager` 为 session / task 增加 `updatedAt` 和 task `eventCount`，并在 failed task 保留 result payload；Jobs API progress 新增 `updatedAt`、`activeTaskStartedAt`、`activeTaskUpdatedAt`、`activeTaskEventCount`、`activeTaskStatus`；Jobs API summary 聚合 task diagnostics，包括 status 计数、issues、gateFailures、timedOutStages、degraded、forcedSummary、cancelReason。
   - Wave 9E 提交 hash：`633ed228d1c0ba9cd04ef431dc4aadac18c3ac06`。
@@ -710,8 +709,8 @@ git diff --check
   - Wave 9E 验证结果：`npm run build` 通过；`npm run build:check` 通过；targeted unit tests 5 个测试文件 / 21 个用例通过；focused unit tests 3 个测试文件 / 13 个用例通过；`npm run lint -- --diagnostic-level=error` 通过；`git diff --check` 通过；`npm run lint:repo-boundary` 仍失败在 18 个既有 DB boundary 命中，本轮改动文件不在命中范围。
   - Wave 9E 总控复跑：`npm run build`、`npm run build:check`、`npm run test:unit -- test/unit/BootstrapEventEmitter.test.ts test/unit/BootstrapTaskManager.test.ts test/unit/JobsRoute.test.ts test/unit/BootstrapDimensionConsumer.test.ts test/unit/BootstrapSessionExecutionBuilder.test.ts`、`npm run lint -- --diagnostic-level=error`、`git diff --check` 均通过；`npm run lint:repo-boundary` 仍失败在同一批 18 个既有 DB boundary 命中。
   - Wave 9E 总控验收结论：通过。非正常 dimension payload 进入 failed task，failed task result 被保留，Jobs API 已暴露 progress freshness 和 summary diagnostics，后端观察面可作为 Dashboard 消费输入。
-  - Wave 9E 遗留风险：`lint:repo-boundary` 既有 18 个 DB boundary 命中仍需独立清理；未启动 BiliDili 完整 cold-start，也未修改 BiliDili 业务代码；Dashboard 是否需要更细粒度展示 L4 validation / hard stop 字段，需要等总控验收 payload 稳定后判断。
-  - Wave 9E 下一步建议：启动 `AlembicDashboard` Wave 9F，消费 `progress.updatedAt`、`activeTaskUpdatedAt`、`activeTaskEventCount`、`activeTaskStatus`；BiliDili 小范围真实复测继续等待用户确认数据策略。
+  - Wave 9E 遗留风险：`lint:repo-boundary` 既有 18 个 DB boundary 命中仍需独立清理；未启动完整真实项目 cold-start，也未修改真实目标项目业务代码；Dashboard 是否需要更细粒度展示 L4 validation / hard stop 字段，需要等总控验收 payload 稳定后判断。
+  - Wave 9E 下一步建议：启动 `AlembicDashboard` Wave 9F，消费 `progress.updatedAt`、`activeTaskUpdatedAt`、`activeTaskEventCount`、`activeTaskStatus`；真实项目小范围复测继续等待用户确认数据策略。
 - `AlembicDashboard`：
   - 状态：Wave 9C 已完成并通过总控验收；Wave 9F 已完成并通过总控验收。
   - 执行记录：`docs/AlembicDashboard/alembic-agent-evidence-recording-phase-chain-wave-9c-dashboard-2026-05-20.md`；`docs/AlembicDashboard/alembic-dashboard-job-progress-freshness-wave-9f-2026-05-20.md`。
@@ -721,18 +720,16 @@ git diff --check
   - 验证结果：`npm run build` 通过，完成 `tsc && vite build`，Vite 仍提示 vendor chunk 超过 1500 kB 的既有体积 warning；`npm run check` 未通过，原因是 Dashboard `package.json` 未配置 `check` script；`git diff --check` 通过。
   - 总控验收复跑：`npm run build` 和 `git diff --check` 通过；`npm run check` 仍失败在 missing script。
   - 总控验收结论：通过。Jobs 统计、筛选和候选入口已经区分 evidence failure；Progress / Reports 能显示非正常状态和 diagnostics，不在前端实现 Agent 决策。
-  - 遗留风险：未执行真实 DeepSeek / BiliDili 单维度复测；DeepSeek L4 compact transcript 协议错误仍归属 `AlembicAgent` provider transcript normalization；如果运行时 report 仍未下发 dimension `status` / `diagnostics` 字段，Dashboard 只能展示已有 raw payload，本轮已兼容 Alembic Wave 9B 的 `dimensionStats` 结构。
-  - 下一步建议：历史建议已执行；等待总控验收 Wave 9F 后，再决定是否进入 BiliDili 小范围真实复测。
+  - 遗留风险：未执行真实 DeepSeek / 真实项目单维度复测；DeepSeek L4 compact transcript 协议错误仍归属 `AlembicAgent` provider transcript normalization；如果运行时 report 仍未下发 dimension `status` / `diagnostics` 字段，Dashboard 只能展示已有 raw payload，本轮已兼容 Alembic Wave 9B 的 `dimensionStats` 结构。
+  - 下一步建议：历史建议已执行；等待总控验收 Wave 9F 后，再决定是否进入真实项目小范围复测。
   - Wave 9F 完成范围：扩展 Jobs API type，支持 `progress.updatedAt`、`activeTaskStartedAt`、`activeTaskUpdatedAt`、`activeTaskEventCount`、`activeTaskStatus`；Jobs 页面“最后事件”优先使用 active task 更新时间，其次使用 progress 更新时间，最后回退 job `updatedAt`；`ProgressBlock` 展示 active task status、event count、active task 最近更新时间和 progress 最近更新时间；新增 summary diagnostics 区块，展示 `statuses`、`issues`、`gateFailures`、`timedOutStages`、`forcedSummary`、`cancelReason`。
   - Wave 9F 提交 hash：`c1aa2c09e6f171192ccfc81a89f392fb5b5c0848`。
   - Wave 9F 验证命令：`npm run build`；`npm run check`；`git diff --check`。
   - Wave 9F 验证结果：`npm run build` 通过，完成 `tsc && vite build`，Vite 仍提示 vendor chunk 超过 1500 kB 的既有体积 warning；`npm run check` 未通过，原因是 Dashboard `package.json` 未配置 `check` script；`git diff --check` 通过。
   - Wave 9F 总控复跑：`npm run build` 通过，`git diff --check` 通过；`npm run check` 仍失败在 missing script，与执行窗口回填一致。
   - Wave 9F 总控验收结论：通过。Jobs 页面最后事件已优先使用 active task freshness；progress 区块展示 active task status / event count / active task update / progress update；summary diagnostics 展示 status counts、issues、gate failures、timed out stages、forced summary 和 cancel reason。Dashboard 只消费后端 payload，不承接 Agent 决策。
-  - Wave 9F 遗留风险：未执行真实 DeepSeek / BiliDili 单维度复测；进入 BiliDili 小范围真实复测前仍需用户确认真实项目外部 AI 数据发送或替代安全路线；如后续 Alembic 下沉更细粒度 L4 validation / hard stop metrics，可再按稳定 contract 增加专门可视化。
-  - Wave 9F 下一步建议：不直接启动完整 BiliDili cold-start；等待用户确认真实数据发送策略，再做小范围复测。
-- `BiliDili`：
-  - 状态：阻塞，作为真实项目目标等待用户确认真实项目外部 AI 数据发送或替代安全路线；不直接给 BiliDili 派测试任务。
+  - Wave 9F 遗留风险：未执行真实 DeepSeek / 真实项目单维度复测；进入真实项目小范围复测前仍需用户确认真实项目外部 AI 数据发送或替代安全路线；如后续 Alembic 下沉更细粒度 L4 validation / hard stop metrics，可再按稳定 contract 增加专门可视化。
+  - Wave 9F 下一步建议：不直接启动完整真实项目 cold-start；等待用户确认真实数据发送策略，再做小范围复测。
 - `AlembicTest`：
   - 状态：阻塞，等待用户确认数据策略；确认后负责真实复测、冷启动监控、复现记录和验证报告。
 - `AlembicCore`：
@@ -755,4 +752,4 @@ Wave 9B 回填后，总控必须检查：
 
 - Alembic Job / progress / summary 状态不把 `cancelled`、`timeout`、`child-run-error` 归为 completed。
 - Reports / JobStore / working memory distilled 的 findings 数量和来源一致。
-- mock / fixture 小范围回归通过后，才讨论 BiliDili 真实复测。
+- mock / fixture 小范围回归通过后，才讨论真实目标项目复测。
