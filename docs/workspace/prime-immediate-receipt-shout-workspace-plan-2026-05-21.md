@@ -1,6 +1,6 @@
 # Prime Immediate Receipt Shout Workspace Plan
 
-状态：`AlembicPlugin` 已完成，`AlembicTest` 待启动
+状态：`AlembicPlugin` 已完成，`AlembicTest` 执行中（功能通过，待封口提交）
 总控窗口：AlembicWorkspace
 创建日期：2026-05-21
 适用范围：`AlembicPlugin`、`AlembicTest`、`AlembicCore`、`Alembic`
@@ -62,7 +62,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | SHOUT-1 | 已完成 | 主线实现 | P0 | `AlembicPlugin` | 已强化 `primeKnowledgeMaterial.hostResponse` 与 `shoutInstruction`：增加立即时序字段和文案，让 Codex 在 prime 返回后、任何后续动作前先做开发者可见知识接收呐喊。 | 是 | AlembicPlugin commit `829f838704159c7ed205f93ecd986c6234173721`；总控验收通过。 | `AlembicPlugin` |
 | SHOUT-2 | 已完成 | Skill / runtime | P0 | `AlembicPlugin` | 已更新 Alembic Codex Skill / runtime artifact：Daily Coding Flow 明确 prime -> 立即 receipt shout -> 再继续任务；runtime artifact 已刷新。 | 是 | AlembicCodex commit `682e5d32b9442c1caba9df87f61efb8b0835e870`；本机 Codex plugin cache 已刷新到 Plugin `829f838704159c7ed205f93ecd986c6234173721`。 | `AlembicPlugin` |
-| SHOUT-3 | 待启动 | 真实项目复测 | P0 | `AlembicTest` | 在 BiliDili 真实项目里验证 Codex 可见行为：prime 后下一条可见响应是 receipt shout，而不是最终总结时才呐喊。 | 是 | 总控已创建 `Test-2026-05-21-03`；AlembicPlugin 和本机 Codex plugin cache 均已就绪。 | `AlembicTest` |
+| SHOUT-3 | 执行中 | 真实项目复测 | P0 | `AlembicTest` | 在 BiliDili 真实项目里验证 Codex 可见行为：prime 后下一条可见响应是 receipt shout，而不是最终总结时才呐喊。功能验收已通过，等待 `AlembicTest` 仓库封口提交。 | 是 | Test-2026-05-21-03 回填证据满足通过条件；`AlembicTest` 仍有未提交报告 / probe / 文档变更，需回填 commit hash。 | `AlembicTest` |
 | SHOUT-4 | 观察中 | shared contract | P2 | `AlembicCore` | 观察是否需要把 `PrimeHostResponseInstruction` / evidence ref projection 下沉为共享类型；本轮没有第二个真实生产方前不启动。 | 否 | Plugin 回填发现重复消费方时再判断。 | `AlembicCore` |
 
 ## 窗口分派
@@ -70,7 +70,7 @@
 | 窗口 / 状态 | 任务 |
 | --- | --- |
 | `AlembicPlugin`<br>已完成 | SHOUT-1/2 已通过总控验收：prime host response / shout instruction / Skill 文案 / runtime artifact 均已具备 immediate receipt shout 契约；本机 Codex plugin cache 已刷新到该提交。 |
-| `AlembicTest`<br>待启动 | 执行 Test-2026-05-21-03：在 BiliDili 真实项目中验证 prime 后下一条可见响应就是 knowledge receipt shout，并检查 payload 的 `timing` / `requiredBeforeNextAction` / `visibility`。 |
+| `AlembicTest`<br>执行中 | Test-2026-05-21-03 功能验收通过；当前任务是提交测试报告、probe 脚本和相关测试文档变更，回填 AlembicTest commit hash 与是否仍有未提交变更。 |
 | `Alembic`<br>观察中 | 不修改 daemon bridge，不承接 Codex-facing prime ownership；后续仍作为 resident service 被 Plugin 按需请求。 |
 | `AlembicCore`<br>观察中 | 本轮不派发；除非 Plugin 实现证明 shared contract 已有真实双向消费需求。 |
 | `AlembicAgent`<br>无任务 | 当前是 Codex host agent / Plugin Skill 行为，不涉及 Alembic internal AI runtime。 |
@@ -81,7 +81,7 @@
 | 窗口 | 当前调度 | 理由 | 是否发送 |
 | --- | --- | --- | --- |
 | `AlembicPlugin` | 已完成 | 总控验收通过，不再发送。 | 否 |
-| `AlembicTest` | 待启动 | 上游 Plugin、runtime artifact 和本机 Codex plugin cache 已就绪，可以做真实项目可见行为复测。 | 是 |
+| `AlembicTest` | 执行中 | 真实项目可见行为复测已通过；仍需封口提交测试报告、probe 脚本和相关测试文档变更。 | 是 |
 | `Alembic` | 观察 | daemon bridge 已完成且不承接 prime ownership，本轮无需修改。 | 否 |
 | `AlembicCore` | 观察 | 暂无真实双向消费方，不启动共享层下沉。 | 否 |
 | `AlembicAgent` | 无任务 | 不涉及 Alembic internal AI runtime。 | 否 |
@@ -89,7 +89,7 @@
 
 ## 当前执行顺序
 
-发送给：`AlembicTest`。
+发送给：`AlembicTest`（封口提交）。
 
 不发送给：
 
@@ -101,10 +101,10 @@
 
 ## 可复制分派提示词
 
-发送给：`AlembicTest`。
+发送给：`AlembicTest`（封口提交）。
 
 ```text
-读取 docs/workspace/alembic-test-exchange.md，按照文档完成 Test-2026-05-21-03：在 BiliDili 真实项目中验证 Alembic Codex prime immediate receipt shout，可见行为必须是 prime tool result 后下一条开发者可见响应先声明接收到的 Recipe / Guard / evidenceRefs，再继续任务；完成后回填测试结论、版本证据、payload 摘要、Codex 可见呐喊原文或摘要、BiliDili git 前后状态、验证命令 / 日志和遗留风险。
+读取 docs/workspace/alembic-test-exchange.md，完成 Test-2026-05-21-03 的 AlembicTest 仓库封口：不要扩大测试范围，优先提交本次测试报告、probe 脚本和相关测试文档变更；提交后回填 AlembicTest commit hash、提交范围、是否仍有未提交变更和遗留风险。
 ```
 
 ## AlembicPlugin 执行要求
@@ -170,3 +170,4 @@ git diff --check
   - 下一步建议：总控验收后创建 `Test-2026-05-21-03`，派发 `AlembicTest` 做 BiliDili 真实项目 prime immediate receipt shout 行为复测。
 - 2026-05-21：总控验收 `AlembicPlugin` SHOUT-1/2 通过。代码证据：`AlembicPlugin/lib/external/mcp/handlers/task.ts:79` 的 `PrimeHostResponseInstruction` 已包含 `timing: "immediate_after_prime"`、`requiredBeforeNextAction: true`、`visibility: "developer_visible"`；`task.ts:416` 的三态 `shoutInstruction` 都要求 "Immediately after this prime tool result" 且在任何 further tool call / code reading / edit / Guard / final summary 之前发声；`task.ts:439` 构造的 `hostResponse` 实际填入三项时序字段；`AlembicPlugin/plugins/alembic-codex/skills/alembic/SKILL.md:24` 把 Daily Coding Flow 改成 prime 后下一条可见响应必须是 receipt shout；`AlembicPlugin/test/unit/TaskPrimeKnowledgeMaterial.test.ts:173` 和 `AlembicPlugin/test/unit/CodexMcpServer.test.ts:1098` 均断言新的时序字段和 Plugin-owned 路径。功能完整性检查结论：真实入口、结构化 payload、三态失败 / 空结果说明、Skill 消费方、local daemon ready 下 Plugin ownership、runtime artifact 与测试覆盖均已满足；允许启动 AlembicTest 真实项目复测。
 - 2026-05-21：总控已刷新本机 Codex plugin cache 以便真实 Codex Skill 覆盖本轮变更。命令：`npm run dev:codex-plugin:refresh`。结果：成功；cache marker `gitHead=829f838704159c7ed205f93ecd986c6234173721`，`localMcpEntry=/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/dist/bin/codex-mcp.js`；cache Skill 已包含 immediate receipt shout；cache runtime dist 已包含 `immediate_after_prime` 和 `requiredBeforeNextAction`。刷新后 `AlembicPlugin` 和 `AlembicCodex` 工作区均干净。
+- 2026-05-21：`AlembicTest` 回填 Test-2026-05-21-03，总控功能验收通过。关键证据：BiliDili 上下文 `alembic_task prime` 返回 `success=true`、`primeKnowledgeMaterial.status=delivered`、`acceptedKnowledge=5`、`acceptedGuards=1`、`evidenceRefs=18`；`hostResponse.action=shout_prime_knowledge_receipt`、`timing=immediate_after_prime`、`requiredBeforeNextAction=true`、`visibility=developer_visible`；`serviceBoundary.executionPath=plugin-owned-codex-facing`、`residentServiceRequested=false`；tool list / `nextActions` 不含 `codex_host_response`；prime tool result 后下一条开发者可见响应先声明收到 5 条 Recipe 和 1 条 Guard，再继续读取 probe JSON、复核 git 和写报告；BiliDili 测试前后 `git status --short --branch` 均为 `## main...origin/main`。封口判断：`AlembicTest` 仓库仍有未提交变更 `scripts/README.md`、`scripts/probe-codex-prime.mjs` 和 `docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md`，所以 SHOUT-3 当前保持 `执行中`，只发送 `AlembicTest` 做封口提交并回填 commit hash。

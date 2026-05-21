@@ -1,6 +1,6 @@
 # AlembicTest Exchange
 
-状态：Test-2026-05-21-03 待启动
+状态：Test-2026-05-21-03 执行中
 维护窗口：AlembicWorkspace
 执行窗口：AlembicTest
 更新日期：2026-05-21
@@ -15,13 +15,13 @@
 
 | 测试单 | 状态 | 目标 | 执行窗口 | 报告 |
 | --- | --- | --- | --- | --- |
-| Test-2026-05-21-03：BiliDili prime immediate receipt shout 可见行为复测 | 待启动 | 验证 prime tool result 后下一条开发者可见响应先做 receipt shout，再继续任务；检查 payload 新时序字段、Skill 安装态和 BiliDili git 干净。 | `AlembicTest` | 建议路径：`AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md` |
+| Test-2026-05-21-03：BiliDili prime immediate receipt shout 可见行为复测 | 执行中 | 总控功能验收通过；等待 `AlembicTest` 提交测试报告 / probe 脚本 / 文档变更并回填 commit hash。 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md) |
 | Test-2026-05-21-02：BiliDili prime shout service boundary 复测 | 已完成 | 功能验收通过；`AlembicTest` 已提交测试报告 / probe 脚本 / 文档变更，commit `af0430ad69b4da50469eeaded8caa77c59e996e5` | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md) |
 | Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 已完成 | 结论为失败：BiliDili Recipes 可读，但 `prime` 未返回 `primeKnowledgeMaterial`；后续复测已转入 Test-2026-05-21-02 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md) |
 
 ### Test-2026-05-21-03：BiliDili prime immediate receipt shout 可见行为复测
 
-状态：待启动
+状态：执行中（功能通过，待 AlembicTest 仓库封口提交）
 创建日期：2026-05-21
 总控来源：`AlembicPlugin` 已完成并通过总控验收 prime immediate receipt shout；需要在 BiliDili 真实项目中验证 Codex 可见行为确实是 prime 后立即呐喊，而不是最终总结时才呐喊。
 执行窗口：AlembicTest
@@ -86,23 +86,23 @@ git -C ../BiliDili status --short --branch
 
 #### 回填要求
 
-- 测试结论：
-- 执行范围：
-- 使用配置：
-- plugin / runtime / Core / Alembic daemon / Codex plugin cache 版本证据：
-- `prime` 调用入口：
-- `prime` payload 摘要：
-- `hostResponse` 新时序字段摘要：
-- `serviceBoundary` 摘要：
-- prime tool result 后的下一条 Codex 可见响应原文或摘要：
-- 是否先呐喊再继续任务：
-- 是否出现 `codex_host_response` tool：
-- BiliDili git 状态前后对比：
-- 关键日志信号：
-- 详细报告路径：建议 `AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md`
-- 遗留风险：
-- 下一步建议：
-- 建议归属窗口：
+- 测试结论：通过，已通过总控功能验收，待 `AlembicTest` 仓库封口提交。BiliDili 上下文中 `alembic_task(operation="prime")` 成功返回 `primeKnowledgeMaterial.status=delivered`，且 prime tool result 后下一条开发者可见响应先声明收到的 Recipe / Guard / evidenceRefs，再继续读取 probe JSON、复核 git 和写报告。
+- 执行范围：只读调用 Alembic Codex MCP stdio runtime 的 `alembic_codex_status` 与 `alembic_task prime`；未启动 cold-start / rescan；未修改 BiliDili 业务源码、工程配置、登录、播放、网络、UI 或 Xcode 项目结构。
+- 使用配置：`ALEMBIC_PROJECT_DIR` / `CODEX_WORKSPACE_DIR` 指向 workspace 内 `BiliDili`；MCP entry 使用 cache marker 指向的 workspace `AlembicPlugin/dist/bin/codex-mcp.js`；agent tier；`ALEMBIC_RUNTIME_MODE=plugin`；输出 JSON 为 `AlembicTest/tmp/bilidili-prime-immediate-receipt-shout-probe-2026-05-21.json`。
+- plugin / runtime / Core / Alembic daemon / Codex plugin cache 版本证据：cache marker `.alembic-dev-refresh.json` 显示 `gitHead=829f838704159c7ed205f93ecd986c6234173721`、`localMcpEntry=AlembicPlugin/dist/bin/codex-mcp.js`；`AlembicPlugin` 当前 HEAD `681b8b6db02b0cd82b4e85e91574faa1e4572547` 且包含目标提交 `829f838704159c7ed205f93ecd986c6234173721`；AlembicCodex runtime artifact `AlembicPlugin/plugins/alembic-codex` HEAD 为 `682e5d32b9442c1caba9df87f61efb8b0835e870`；cache Skill 与 runtime Skill 的 `alembic/SKILL.md:25` 已要求 prime 后立即 receipt shout；cache runtime dist 与 workspace Plugin dist 的 `task.js:307,309,310` 含 `immediate_after_prime` / `requiredBeforeNextAction` / `developer_visible`；local daemon status 为 stale，但本次 `serviceBoundary.residentServiceRequested=false`。
+- `prime` 调用入口：`node AlembicTest/scripts/probe-codex-prime.mjs --output AlembicTest/tmp/bilidili-prime-immediate-receipt-shout-probe-2026-05-21.json`，脚本内部调用 `alembic_task` 参数为 `operation=prime`、`activeFile=Sources/Features/VideoFeed/VideoFeedViewController.swift`、`language=swift`。
+- `prime` payload 摘要：`success=true`；`status=delivered`；`acceptedKnowledge=5`；`acceptedGuard=1`；`evidenceRefs=18`；知识包括 `@schemerouter-url-decoupling`、`@route-error-eight-cases`、`@analytics-middleware-tracker`、`@lazy-var-uicomponents`、`@modulemanager-priority-lifecycle`，Guard 为 `@protocol-naming-suffixes`。
+- `hostResponse` 新时序字段摘要：`action=shout_prime_knowledge_receipt`；`receiptId=prime-mpffae1u-1`；`timing=immediate_after_prime`；`required=true`；`requiredBeforeNextAction=true`；`visibility=developer_visible`；`reason` 明确要求此 receipt 必须是 prime tool result 后、任何后续 tool call / code reading / edit / Guard / final summary 前的下一条开发者可见响应。
+- `serviceBoundary` 摘要：`executionPath=plugin-owned-codex-facing`；`owner=alembic-plugin`；`operation=prime`；`tool=alembic_task`；`residentServiceRequested=false`；`sharedContractCandidate=true`。
+- prime tool result 后的下一条 Codex 可见响应原文或摘要：已先声明“收到 5 条 Recipe、1 条 Guard”，列出 SchemeRouter、RouteError、AnalyticsMiddleware、lazy var UI、ModuleManager、Protocol 命名后缀，并说明 `SchemeRoute.swift:8` 有行号，其余多条 evidenceRefs 只有路径无行号，不会伪装精确行号；同时声明 receipt `prime-mpffae1u-1` 已在任何后续验证动作前完成。
+- 是否先呐喊再继续任务：是。probe tool result 后，下一条开发者可见响应就是 receipt shout；之后才继续读取 JSON、复核 BiliDili git 和写报告。
+- 是否出现 `codex_host_response` tool：否。tool list 共 26 个工具，包含 `alembic_task`，不包含 `codex_host_response`；`nextActions` 仅包含可选 `alembic_task(operation=create)`。
+- BiliDili git 状态前后对比：测试前 `## main...origin/main`；测试后 `## main...origin/main`；无受 git 跟踪或未跟踪文件变化。
+- 关键日志信号：MCP stderr tail 为 `Alembic Codex MCP ready — 26 tools`；probe duration `4990ms`；status policy 有 `CODEX_DAEMON_STALE` warning，但本次 prime 由 Plugin-owned path 成功返回，未请求 resident service。
+- 详细报告路径：[../../AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md)
+- 遗留风险：多数 evidenceRefs 只有路径没有行号，payload 和可见呐喊已如实说明，不阻塞本次通过；local Alembic daemon stale 不影响本次 Plugin-owned prime immediate receipt shout，但 Dashboard/daemon handoff 仍需另测；原始 probe JSON 位于 `AlembicTest/tmp/`，长期报告只保留脱敏摘要。
+- 下一步建议：总控验收通过后可关闭 Test-2026-05-21-03；若要提升证据精度，后续交给 Alembic/AlembicCore 知识生成链路补强 evidenceRef 行号；若要验证 Dashboard handoff 或 daemon ready，另建独立测试单。
+- 建议归属窗口：总控验收归 `AlembicWorkspace`；evidenceRef 行号补强建议归 `Alembic` / `AlembicCore`；本测试不建议改 BiliDili。
 
 ### Test-2026-05-21-02：BiliDili prime shout service boundary 复测
 
@@ -266,10 +266,10 @@ git -C ../BiliDili status --short
 
 ## 可复制提示词
 
-发送给：`AlembicTest`。
+发送给：`AlembicTest`（封口提交）。
 
 ```text
-读取 docs/workspace/alembic-test-exchange.md，按照文档完成 Test-2026-05-21-03：在 BiliDili 真实项目中验证 Alembic Codex prime immediate receipt shout，可见行为必须是 prime tool result 后下一条开发者可见响应先声明接收到的 Recipe / Guard / evidenceRefs，再继续任务；完成后回填测试结论、版本证据、payload 摘要、Codex 可见呐喊原文或摘要、BiliDili git 前后状态、验证命令 / 日志和遗留风险。
+读取 docs/workspace/alembic-test-exchange.md，完成 Test-2026-05-21-03 的 AlembicTest 仓库封口：不要扩大测试范围，优先提交本次测试报告、probe 脚本和相关测试文档变更；提交后回填 AlembicTest commit hash、提交范围、是否仍有未提交变更和遗留风险。
 ```
 
 ## 统一测试单模板
@@ -277,6 +277,11 @@ git -C ../BiliDili status --short
 统一模板保存在 [../../templates/alembic-test-handoff-template.md](../../templates/alembic-test-handoff-template.md)。总控创建测试单时，从该模板复制到本文“当前测试单”或新建具体测试单段落；本文只保留当前测试交流状态，不重复维护模板正文。
 
 ## 回填区
+
+### Test-2026-05-21-03 总控功能验收
+
+- 2026-05-21：总控功能验收通过。证据满足测试单通过条件：BiliDili 上下文 `alembic_task prime` 成功；`primeKnowledgeMaterial.status=delivered`；`acceptedKnowledge=5`；`acceptedGuards=1`；`evidenceRefs=18`；`hostResponse.action=shout_prime_knowledge_receipt`；`hostResponse.timing=immediate_after_prime`；`hostResponse.requiredBeforeNextAction=true`；`hostResponse.visibility=developer_visible`；`serviceBoundary.executionPath=plugin-owned-codex-facing`；`residentServiceRequested=false`；tool list / `nextActions` 均不含 `codex_host_response`；prime tool result 后下一条开发者可见响应先声明收到 5 条 Recipe 和 1 条 Guard，再继续读取 JSON、复核 git 和写报告；BiliDili 测试前后 `git status --short --branch` 均为 `## main...origin/main`。
+- 2026-05-21：封口阻塞：`AlembicTest` 仓库仍有未提交变更：`scripts/README.md`、`scripts/probe-codex-prime.mjs`，以及未跟踪报告 `docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md`。因此当前不把 Test-2026-05-21-03 标为最终已完成，只发送 `AlembicTest` 做测试仓库封口提交并回填 commit hash。
 
 ### Test-2026-05-21-02 回填
 
