@@ -8,8 +8,10 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md](alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md) | V020-2 / V020-3 待启动 | 启动 `GTODO-2026-05-22-011`：把 Alembic 自有 package / plugin / release / runtime 版本位统一为 `0.2.0`，并在下游完成后刷新 Codex plugin cache。上游版本源已通过总控复核，当前发送 `Alembic` / `AlembicPlugin`。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | V020-2 / V020-3 待启动 | 当前主线切换到 0.2.0 版本统一；`AlembicCore` / `AlembicAgent` / `AlembicDashboard` 已完成，当前发送 `Alembic` / `AlembicPlugin`。 |
+| 当前计划 | [alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md](alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md) | V020-3R 待启动 | 启动 `GTODO-2026-05-22-011`：把 Alembic 自有 package / plugin / release / runtime 版本位统一为 `0.2.0`，并在下游完成后刷新 Codex plugin cache。总控复核发现 `AlembicPlugin` 仍有 `ResidentSearchClient` daemon state `0.1.0` fixture，当前只返工 `AlembicPlugin`。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | V020-3R 待启动 | 当前主线切换到 0.2.0 版本统一；`Alembic` 已完成，`AlembicPlugin` 需要清理测试 fixture 中最后一个 Alembic 自有旧版本。 |
+| Alembic 执行记录 | [../Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md](../Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md) | V020-2 已完成 | 记录 `alembic-ai@0.2.0` root / lock 更新、publish staging 生成、release package guard 边界修正、提交 hash、验证命令和残留扫描。 |
+| AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md](../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md) | V020-3 待验收 | 记录 `alembic-ai@0.2.0` Codex plugin manifest / channel / runtime artifact、MCP metadata、cache sync fallback、测试断言、提交 hash、验证命令和残留扫描。 |
 | 上一完成计划 | [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md) | 已完成 | `AlembicPlugin` AIP-1 已完成并通过总控验收，提交 `747b40f2abb2b9d8cb2714656fab164267d1d105`，Codex runtime 子仓库 `01fb042afe87264ad213dfc13444dc9dc48b77ca`；本机 plugin cache 已刷新到 `747b40f` local-mcp。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md) | AIP-1 已完成 | 记录删除 Plugin 旧 AI provider / config / status surfaces、MCP `alembic_codex_ai_config`、HTTP `/ai` 配置写入、DI provider 注入、Skill / runtime artifact、提交 hash、验证命令和残留扫描。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md](../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md) | VEC-2/VEC-3/VEC-4R/VEC-5R 已完成 | 记录 HostAiAdapter placeholder embed 修正、ResidentSearchClient、PrimeSearchPipeline / search handler metadata、Skill、runtime artifact、删除 daemon MCP bridge、VEC-5R mode normalization、验证命令和提交 hash。 |
@@ -64,11 +66,11 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | V020-2：更新 `alembic-ai@0.2.0`、lockfile 和 publish staging，确保读取 Core / Agent / Dashboard 的 `0.2.0`。 |
+| `Alembic`<br>已完成 | V020-2 已完成：提交 `1656c67484b99bf9326af34102e936f18073b9aa`，`alembic-ai@0.2.0` root / lock 已更新，publish staging 已读取 Core / Agent / Dashboard 的 `0.2.0`。 |
 | `AlembicCore`<br>已完成 | V020-1 上游版本源已通过总控复核：`@alembic/core` package / lock 自有版本已统一到 `0.2.0`，提交 `f30beacedf89abab13b91e87e4686d0db38e7d29`。 |
 | `AlembicAgent`<br>已完成 | V020-1R 总控复核通过：`package-lock.json` 中 `../AlembicCore` snapshot 已刷新到 `0.2.0`，提交 `9de2cd97c3f4962a8b19595b76eeb7df00f853f5`。 |
 | `AlembicDashboard`<br>已完成 | V020-1 上游版本源已通过总控复核：私有 `alembic-dashboard` package / lock 自有版本已统一到 `0.2.0`，提交 `5160a2a0fb164005f1922b8f58f28ca0ec88df56`。 |
-| `AlembicPlugin`<br>待启动 | V020-3：更新 Codex plugin manifest / channel / runtime / tests / MCP metadata 到 `0.2.0`；本机 cache refresh 留给总控 V020-4。 |
+| `AlembicPlugin`<br>待启动 | V020-3R 返工：清理 `test/unit/ResidentSearchClient.test.ts:22` 的 daemon state `version: '0.1.0'`，补 targeted test 与精确残留扫描；本机 cache refresh 继续留给总控 V020-4。 |
 | `AlembicTest`<br>观察中 | 当前不创建测试单；如用户需要真实 Codex / BiliDili 验证，在 cache refresh 后再启动。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码，只可能作为后续测试对象。 |
 
