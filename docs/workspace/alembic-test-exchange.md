@@ -1,6 +1,6 @@
 # AlembicTest Exchange
 
-状态：无待启动测试单，Test-2026-05-21-01 已验收为失败，等待 Alembic 修复后复测
+状态：无待启动测试单，Test-2026-05-21-01 已验收为失败，等待 AlembicPlugin service request 边界修正后复测
 维护窗口：AlembicWorkspace
 执行窗口：AlembicTest
 更新日期：2026-05-21
@@ -11,11 +11,11 @@
 
 ## 当前测试单
 
-当前没有可启动测试单；`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。下一步进入 [bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md](bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md)，先由 `Alembic` 修复 daemon MCP bridge，修复后再创建 / 启动复测。
+当前没有可启动测试单；`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。下一步进入 [alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md)，先由 `AlembicPlugin` 修正 service request 边界，再创建 / 启动复测。
 
 | 测试单 | 状态 | 目标 | 执行窗口 | 报告 |
 | --- | --- | --- | --- | --- |
-| Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 已完成 | 结论为失败：BiliDili Recipes 可读，但 `prime` 被 daemon `/api/v1/mcp/call` 404 截断 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md) |
+| Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 已完成 | 结论为失败：BiliDili Recipes 可读，但 `prime` 未返回 `primeKnowledgeMaterial`；后续等待 Plugin service request 边界修正 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md) |
 
 ### Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证
 
@@ -99,7 +99,7 @@ git -C ../BiliDili status --short
 发送给：无
 
 ```text
-当前没有可发送给 AlembicTest 的测试任务；等待 Alembic 修复 daemon MCP bridge 后再启动复测。
+当前没有可发送给 AlembicTest 的测试任务；等待 AlembicPlugin 修正 service request 边界后再启动复测。
 ```
 
 当本文出现状态为 `待启动` 的测试单时，使用：
@@ -128,10 +128,10 @@ git -C ../BiliDili status --short
 - 关键日志信号：daemon health ready；直接 POST `/api/v1/mcp/call` 返回 404 `NOT_FOUND`；daemon 日志记录 `/api/v1/mcp/call` 404 HTTP 请求。
 - 详细报告路径：[../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md)
 - 遗留风险：Plugin 在 `requirement: "mcp"` 时仅凭 daemon API ready 选择 `local-alembic-daemon`，没有确认 MCP bridge endpoint；本地 daemon health 未声明 MCP bridge capability；实际 Codex installed cache 可能尚未同步到目标提交。
-- 下一步建议：由 `Alembic` 补齐或声明 `/api/v1/mcp/call` bridge；由 `AlembicPlugin` 增加 MCP bridge capability 判断和 fallback/阻塞提示；修复后由 `AlembicTest` 重跑本测试单。
-- 建议归属窗口：`Alembic`、`AlembicPlugin`，修复后回到 `AlembicTest` 复测。
+- 下一步建议：`Alembic` 已补齐 `/api/v1/mcp/call` 兼容 bridge；后续由 `AlembicPlugin` 修正 service request 边界，让 Codex-facing `alembic_task prime` 留在 Plugin 并保留 `primeKnowledgeMaterial` / `hostResponse` / `shoutInstruction`；修复后由 `AlembicTest` 重跑本测试单。
+- 建议归属窗口：`AlembicPlugin`，修复后回到 `AlembicTest` 复测。
 
 ### 总控验收
 
 - 2026-05-21：总控验收 Test-2026-05-21-01 为“失败但有效”。证据满足失败分类：BiliDili Recipes/status 可读，`alembic_task` 可见，MCP tool list 不暴露 `codex_host_response`，BiliDili git 前后干净；但真实 `prime` 被 Plugin -> Alembic daemon `/api/v1/mcp/call` 404 截断，未返回 `primeKnowledgeMaterial`，因此未形成 Codex 知识呐喊闭环。
-- 后续动作：已创建 [bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md](bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md)，当前只发送给 `Alembic` 修复 daemon MCP bridge；`AlembicTest` 等待修复后复测。
+- 后续动作：`Alembic` bridge 修复 wave 已收口；当前切换到 [alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md)，只发送给 `AlembicPlugin` 修正 service request 边界；`AlembicTest` 等待 Plugin 修复后复测。

@@ -136,11 +136,23 @@ Alembic 产品路线采用 `Plugin first, Alembic install enhances`：
 - Plugin 将重任务交给 Alembic daemon / JobStore / file monitor / internal AI jobs。
 - Alembic 提供 Dashboard server 和多项目 registry；Plugin 继续作为 Codex 入口和任务触发器。
 
+### Resident Service Request 规则
+
+`Plugin first, Alembic install enhances` 不表示所有 Codex MCP tool 都要在本地 Alembic daemon ready 后转发给 Alembic。更准确的模型是：`Alembic` 是常驻本地服务，`AlembicPlugin` 根据需要请求 Alembic 的服务结果；Plugin 不把 Codex-facing MCP tool ownership 交给 Alembic。
+
+- 深度绑定 IDE / Codex host agent 的能力留在 `AlembicPlugin`，例如 Codex tool policy、Skill / marketplace onboarding、`alembic_task prime` 的知识接收与开发者可见呐喊、task intent lifecycle、host-agent bootstrap / rescan 交互契约、默认 lifecycle 可见权限。
+- `Alembic` 只增强确实需要本地长期进程或本地安装能力的场景，例如 Dashboard server、JobStore、ProjectRegistry、WorkspaceResolver、file monitor、internal AI jobs、daemon health、多项目状态和后台增量任务。
+- Recipe / Guard 检索、证据解析、payload schema、source contract 等确定性逻辑若被 Plugin 和 Alembic 长期共同消费，应优先下沉到 `AlembicCore`，而不是在两个仓库维护两份漂移代码。
+- `/api/v1/mcp/call` 只能作为过渡兼容入口；长期优先设计 Plugin 调 Alembic service API，而不是把所有 MCP 工具默认转发给 Alembic handler。
+- Codex-facing envelope、`primeKnowledgeMaterial`、`hostResponse`、`shoutInstruction`、next action 文案和默认权限边界归 `AlembicPlugin` 所有；`Alembic` 不复制这些宿主交互契约。
+
 ## 反模式
 
 - 不再把 `Alembic` 做成另一个和 Plugin 竞争的 IDE 入口。
 - 不在 `AlembicPlugin` 内复制 daemon、watcher、JobStore、ProjectRegistry 或 internal AI runtime。
 - 不在 `Alembic` 内恢复多 IDE Agent 模板、安装命令或专属 delivery pipeline。
+- 不把深度绑定 Codex / IDE Agent 的 Plugin 能力默认桥接到 Alembic，再让 Alembic 复制 Plugin 的 host-response 或 prime 呐喊契约。
+- 不把 Alembic resident service request 退化成 Plugin MCP tool ownership bridge。
 - 不为了边界好看删除仍在被真实调用的能力；删除必须有替代入口、扫描结果和验证证据。
 
 ## 总控执行要求

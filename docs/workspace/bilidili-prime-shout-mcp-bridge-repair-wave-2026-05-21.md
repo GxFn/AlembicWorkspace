@@ -1,6 +1,6 @@
 # BiliDili Prime Shout MCP Bridge Repair Wave
 
-状态：待启动，发送给 `Alembic`
+状态：已收口，方向调整，发送给无
 总控窗口：AlembicWorkspace
 创建日期：2026-05-21
 适用范围：`Alembic`、`AlembicPlugin`、`AlembicTest`
@@ -20,9 +20,19 @@
 
 详细测试报告：[../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md)。
 
-## 本轮目标
+## 总控边界修正
+
+2026-05-21 用户确认：对于深度绑定 IDE / Codex host agent 的 AlembicPlugin 能力，不再把本地 Alembic daemon bridge 作为默认执行路径；先把功能分清楚，只在有必要增强的能力上做桥接与共享层下沉。
+
+因此，本 wave 的 `Alembic` bridge 修复保留为兼容能力和本地增强入口，不再作为 `prime -> Codex 自主呐喊` 的主路径。`primeKnowledgeMaterial`、`hostResponse` 和 `shoutInstruction` 仍归 `AlembicPlugin` 的 Codex-facing 契约所有。
+
+后续当前计划切换到：[alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md)。
+
+## 本轮原目标
 
 让 Alembic 本地 daemon 暴露 Plugin 已经调用的 MCP bridge 入口 `/api/v1/mcp/call`，使 BiliDili 项目上下文中的 `alembic_task prime` 能返回 delivered `primeKnowledgeMaterial`，并让 `AlembicTest` 后续复测可以验证 Codex 知识呐喊。
+
+修正后口径：本 wave 只验收 `/api/v1/mcp/call` 不再 404；不再要求 Alembic daemon 自己承接 `primeKnowledgeMaterial`。BiliDili prime 呐喊复测等待新计划中 `AlembicPlugin` service request 边界修复后再启动。
 
 ## 非目标
 
@@ -44,59 +54,60 @@
 ## Producer / Consumer 依赖
 
 - 当前最小闭环 producer 是 `Alembic`：补齐 daemon MCP bridge route，让现有 `AlembicPlugin` 调用链先跑通。
-- `AlembicPlugin` 当前观察：如果 Alembic 修复后复测仍因 route selection / capability 判断失败，再启动 Plugin hardening；本波不让 Plugin 先做 fallback，以免绕开主断点。
-- `AlembicTest` 当前阻塞：等待 `Alembic` 修复提交和验证后，重跑 Test-2026-05-21-01。
+- `AlembicPlugin` 转入新计划：按用户确认，Codex-facing `prime` 不应默认桥接到 Alembic；下一步修正 service request boundary，让 Plugin 保持 tool ownership 并按需请求 Alembic resident service。
+- `AlembicTest` 当前阻塞：等待新计划中 `AlembicPlugin` 修正 service request 边界后，重跑 Test-2026-05-21-01。
 - `AlembicCore` 当前无任务：MCP bridge capability contract 可作为后续硬化 TODO；本波先不改共享 contract，避免扩大闭环。
 
 ## TODO / Backlog
 
 | ID | 状态 | 类型 | 严重度 / 优先级 | 归属 | 事项 / TODO | 影响复测 / 派发 | 依赖 / 触发 | 推荐窗口 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| BRIDGE-1 | 待启动 | 修复 | P0 | `Alembic` | 在 Alembic 本地 daemon 中补齐 `/api/v1/mcp/call` bridge 路由，兼容 Plugin 当前调用格式 `{ name, args, actor }` 和 daemon token 校验。 | 是 | AlembicTest Test-2026-05-21-01 失败证据。 | `Alembic` |
-| BRIDGE-2 | 阻塞 | 复测 | P0 | `AlembicTest` | 修复后重跑 BiliDili prime shout 插件测试，验收 delivered `primeKnowledgeMaterial`、知识 / Guard / evidence refs、`hostResponse` / `shoutInstruction` 和 BiliDili git 干净性。 | 是 | 等待 `Alembic` BRIDGE-1 提交与验证。 | `AlembicTest` |
-| BRIDGE-3 | 观察中 | 硬化 | P1 | `AlembicPlugin` | 若 Alembic daemon bridge 修复后仍出现 route selection 误判，则增强 `requirement: "mcp"` 的 capability 判断或 404 fail-closed / fallback 提示。 | 否 | 等待 BRIDGE-1 + BRIDGE-2 结果。 | `AlembicPlugin` |
-| BRIDGE-4 | 观察中 | contract | P2 | `AlembicCore` / `Alembic` / `AlembicPlugin` | 后续考虑在 shared runtime capabilities 中显式声明 MCP bridge endpoint / availability，避免只用 `apiAvailable` 推断。 | 否 | 主闭环跑通后再判断是否需要下沉共享 contract。 | `AlembicCore` |
+| BRIDGE-1 | 已完成 | 修复 / 兼容能力 | P0 | `Alembic` | 在 Alembic 本地 daemon 中补齐 `/api/v1/mcp/call` bridge 路由，兼容 Plugin 当前调用格式 `{ name, args, actor }` 和 daemon token 校验。 | 否 | Alembic 回填提交 `83130a6add9806c124d334281a0ec7f219afd33e`。 | `Alembic` |
+| BRIDGE-2 | 暂停 | 复测 | P0 | `AlembicTest` | 原计划在 bridge 后重跑 BiliDili prime shout；现暂停，改由新计划 SERVICE-4 在 Plugin service request 边界修复后复测。 | 是 | 等待新计划 `AlembicPlugin` 修复。 | `AlembicTest` |
+| BRIDGE-3 | 转入新计划 | 硬化 | P1 | `AlembicPlugin` | route selection 不能再按 `requirement: "mcp"` 一刀切；已转入新计划 SERVICE-1/2。 | 是 | 用户确认 IDE Agent 深绑定能力不做 MCP tool ownership bridge。 | `AlembicPlugin` |
+| BRIDGE-4 | 转入新计划 | contract | P2 | `AlembicCore` / `Alembic` / `AlembicPlugin` | Alembic resident service contract / capability version 判断转入新计划 SERVICE-5，且不阻塞 prime 主闭环。 | 否 | 等 Plugin 路由修复后判断。 | 待定 |
 
 ## 窗口分派
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | 执行 BRIDGE-1：在 Alembic 本地 daemon 中补齐 `/api/v1/mcp/call` bridge route，并用最小验证证明 POST 不再 404 且能触发 `alembic_task prime` 或等价 MCP tool handler。 |
-| `AlembicPlugin`<br>观察中 | 当前不派发；等待 Alembic 修复和 AlembicTest 复测结果。若 daemon bridge 仍不可用或 route selection 继续误判，再启动 Plugin hardening。 |
-| `AlembicTest`<br>阻塞 | 等待 Alembic 回填提交和验证后，重跑 Test-2026-05-21-01。当前不发送，避免对已知 404 断点重复测试。 |
-| `AlembicCore`<br>无任务 | 本波先不改 shared runtime capability contract；后续如需要显式 `mcpBridge` capability，再另开 contract 任务。 |
-| `AlembicAgent`<br>无任务 | 当前问题是 Plugin -> Alembic daemon HTTP bridge，不涉及 internal AI runtime。 |
+| `Alembic`<br>已完成 | BRIDGE-1 已完成，保留 `/api/v1/mcp/call` 作为兼容 bridge；当前不继续扩展 Alembic prime handler。 |
+| `AlembicPlugin`<br>转入新计划 | route selection / Codex-facing task ownership 转入 [alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md)。 |
+| `AlembicTest`<br>阻塞 | 等待新计划 Plugin service request 边界修复后再重跑 Test-2026-05-21-01。 |
+| `AlembicCore`<br>观察中 | shared runtime capability / prime material schema 是否下沉，转入新计划观察项。 |
+| `AlembicAgent`<br>无任务 | 当前问题已转为 Plugin service request 边界，不涉及 internal AI runtime。 |
 | `AlembicDashboard`<br>无任务 | 当前不涉及前端 UI。 |
 
 ## 空闲窗口调度
 
 | 窗口 | 当前调度 | 理由 | 是否发送 |
 | --- | --- | --- | --- |
-| `Alembic` | 主线 | 真实断点是 Alembic daemon 没有 `/api/v1/mcp/call` route。 | 是 |
-| `AlembicPlugin` | 观察 | 现有 Plugin 已按固定 endpoint 调用；先让 daemon route 接上。 | 否 |
-| `AlembicTest` | 阻塞 | 等待 Alembic 修复后复测。 | 否 |
-| `AlembicCore` | 无任务 | 本波不改 shared capability contract。 | 否 |
+| `Alembic` | 已完成 | daemon bridge 兼容能力已完成；不再作为 prime 主路径。 | 否 |
+| `AlembicPlugin` | 转入新计划 | 当前实际主线变为 Plugin service request 边界。 | 否 |
+| `AlembicTest` | 阻塞 | 等待 Plugin 修正后复测。 | 否 |
+| `AlembicCore` | 观察 | 等 Plugin 梳理共享层下沉需要。 | 否 |
 | `AlembicAgent` | 无任务 | 不涉及 internal AI runtime。 | 否 |
 | `AlembicDashboard` | 无任务 | 不涉及前端。 | 否 |
 
 ## 当前执行顺序
 
-发送给：`Alembic`。
+发送给：无。
 
 不发送给：
 
-- `AlembicPlugin`：观察中，等待 Alembic 修复和复测结果。
-- `AlembicTest`：阻塞，等待 Alembic 提交后复测。
-- `AlembicCore`：无任务。
+- `AlembicPlugin`：已转入新计划，不在旧 bridge wave 发送。
+- `Alembic`：已完成兼容 bridge。
+- `AlembicTest`：阻塞，等待 Plugin service request 边界修复后复测。
+- `AlembicCore`：观察中。
 - `AlembicAgent`：无任务。
 - `AlembicDashboard`：无任务。
 
 ## 可复制分派提示词
 
-发送给：`Alembic`。
+发送给：无。
 
 ```text
-读取 docs/workspace/bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
+当前旧 bridge wave 已收口，不再发送领取提示词。新的当前计划为 docs/workspace/alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md。
 ```
 
 ## Alembic 执行要求
@@ -144,3 +155,12 @@ git diff --check
 ## 回填区
 
 - 2026-05-21：总控基于 `AlembicTest` Test-2026-05-21-01 失败回填创建本 wave。测试证明 BiliDili Recipes 可读、status 层 ready，但 `alembic_task prime` 失败在 Plugin -> Alembic daemon `/api/v1/mcp/call` 404；本 wave 先派发 `Alembic` 修复最小真实断点。
+- 2026-05-21：`Alembic` 窗口完成 BRIDGE-1。
+  - 完成范围：在 Alembic daemon 中新增 `lib/http/routes/mcp.ts` 并挂载到 `HttpServer` 的 `/api/v1/mcp`；新增 `lib/external/mcp/McpBridgeDispatcher.ts`，通过现有 MCP schema 校验、真实 handler、会话上下文和 actor/source/surface/gateway 语义转发 `{ name, args, actor }`；补充 `test/unit/McpBridgeRoute.test.ts` 覆盖 token 拒绝、`alembic_task prime` 真实 handler 调用和 unknown tool 返回 tool error 而非 route 404。
+  - 提交 hash：`83130a6add9806c124d334281a0ec7f219afd33e`（已推送 `GxFn/Alembic main`）。
+  - 验证命令：`npm run test -- test/unit/McpBridgeRoute.test.ts`；`npm run test -- test/integration/ZodSchemas.test.ts`；`npm run build:check`；`npm run lint -- --diagnostic-level=error`；`git diff --check`。
+  - 验证结果：以上命令均通过；targeted route 测试中 `POST /api/v1/mcp/call` 使用合法 `x-alembic-daemon-token` 返回 200，并进入 `alembic_task prime` handler，缺失 token 返回 401，未知 MCP tool 返回 400 tool error。
+  - `/api/v1/mcp/call` 是否不再 404：是，Alembic daemon 已挂载 `${apiPrefix}/mcp`，targeted 测试证明 `/call` 被路由处理。
+  - 是否可以启动 AlembicTest 复测：按 Alembic 当时回填可以；但总控后续根据用户边界决策暂停 BRIDGE-2，复测改为等待 `AlembicPlugin` service request 边界修正后启动。
+  - 遗留风险：本轮只修复 Alembic daemon bridge 断点；若直接复测，仍可能因 Plugin tool ownership 被 daemon bridge 绕开而拿不到 `primeKnowledgeMaterial`。
+  - 下一步建议：不要直接启动旧 BRIDGE-2；先执行 [alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md)，再由 `AlembicTest` 复测。
