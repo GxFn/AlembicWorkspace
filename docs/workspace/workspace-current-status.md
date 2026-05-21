@@ -2,20 +2,18 @@
 
 更新日期：2026-05-21
 总控窗口：AlembicWorkspace
-状态：Prime 知识呐喊 V1 最小闭环已完成，发送给无
+状态：Recipe 交互契约 Wave 1 待启动，发送给 `AlembicCore`、`AlembicPlugin`
 
 ## 状态摘要
 
-当前主任务线已切到 Codex 通过 `alembic_task prime` 接收知识后，主动向开发者公开声明自己接受到了哪些知识。
+当前主任务线已从 `prime -> Codex 自主呐喊` V1 验收完成，滚动到 Recipe 生成后 Codex host agent 交互契约修复。
 
-- 当前总控计划：[alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md)。
-- 用户已确认 V1 先做闭环：Codex 的呐喊内容先由 Codex 自己决定；可见程度不做限制；源码证据先只做路径 + 行号；后续再优化逻辑。
-- 本轮目标是让 `prime` 返回 `primeKnowledgeMaterial`、路径行号证据和 `shoutInstruction`，让 Codex 自己公开声明接受到的 Recipe / Guard；`AlembicPlugin` 已回填实现并通过总控验收。
-- 发送窗口：无。
-- `AlembicCore` 不启动；V1 可使用现有 `SlimSearchResult.sourceRefs`、`description`、`actionHint` 和 `searchMeta` 完成。
-- 原四个交互问题保留为后续 TODO：Mission Briefing 旧工具名、`pendingSemanticReview` nextAction 缺 `newRecipeId`、`host-agent` 信任阈值策略、lifecycle schema / handler 文案收敛；总控验收新增 `codex_host_response` host-response action 与真实 MCP tool call 区分的 V2 TODO。
-- 上一测试线计划 [alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md) 仍作为历史 / 测试线入口保留；测试窗口按既有节奏持续运行，总控当前不新增关注项。
-- 测试交流入口仍是 [alembic-test-exchange.md](alembic-test-exchange.md)，但当前 `prime` 知识呐喊 V1 不创建 `AlembicTest` 测试单。
+- 当前总控计划：[alembic-codex-recipe-interaction-contract-wave-2026-05-21.md](alembic-codex-recipe-interaction-contract-wave-2026-05-21.md)。
+- 上一完成计划：[alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md)，V1 `primeKnowledgeMaterial` / `shoutInstruction` 最小闭环已完成。
+- 用户说明 `AlembicTest` 那边 Recipes 仍在生成中；本轮不新增测试单，不打断测试窗口。
+- 本 wave 优先修复会直接带偏 Codex 的交互契约：Core Mission Briefing 旧工具名、`pendingSemanticReview` 缺真实 `newRecipeId`、`host-agent` 信任策略确认、Plugin lifecycle 可见文案、prime host-response action 表达。
+- 发送窗口：`AlembicCore`、`AlembicPlugin`。
+- 不发送给：`Alembic`、`AlembicAgent`、`AlembicDashboard`、`BiliDili`、`AlembicTest`。
 
 ## 窗口分派
 
@@ -23,24 +21,27 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>已完成 | V1 最小闭环已通过总控验收：`alembic_task prime` 返回 `primeKnowledgeMaterial`、路径行号证据和 `shoutInstruction`；提交 `d83683bd23b6027b99c6085943639f2df9868840`，runtime artifact `a76fa073ecabf1a6c1bfd83eeffeb0146892b5e0`。 |
-| `AlembicCore`<br>无任务 | V1 不需要修改 Core search/sourceRef 类型；后续 sourceRef 元数据增强另起任务。 |
-| `Alembic`<br>无任务 | 当前主线不涉及本地增强 daemon、Dashboard server、HTTP/API 或 internal AI job 实现。 |
-| `AlembicAgent`<br>无任务 | 当前主线是 Codex host agent prime 知识接收与公开声明，不涉及 AlembicAgent runtime / provider / tool loop。 |
-| `AlembicDashboard`<br>无任务 | 当前主线不涉及 Dashboard UI 或前端状态消费。 |
-| `BiliDili`<br>无任务 | 当前主线不涉及真实 iOS 项目修改、接入或验证。 |
-| `AlembicTest`<br>无任务 | 当前不创建测试单；既有测试线继续独立运行，本状态不新增测试执行任务。 |
+| `AlembicCore`<br>待启动 | 执行 W1-PKS-1、W1-PKS-2A、W1-PKS-3：修正 Core briefing 旧工具名；给 pending semantic review 提供真实新 Recipe ID / stable reference；确认或实现 `host-agent` ConfidenceRouter 策略。 |
+| `AlembicPlugin`<br>待启动 | 执行 W1-PKS-4、W1-PKS-5：收敛 lifecycle 可见契约；修正 prime host-response action 表达。观察 W1-PKS-2B，不得在 Core 回填前猜 `newRecipeId` 字段。 |
+| `Alembic`<br>无任务 | 当前不涉及 daemon、HTTP/API、Dashboard server、ProjectRegistry 或 internal AI job。 |
+| `AlembicAgent`<br>无任务 | 当前是 Codex host agent MCP / Core workflow 契约，不涉及 AlembicAgent runtime。 |
+| `AlembicDashboard`<br>无任务 | 当前不改 Dashboard UI；lifecycle publish/deprecate 仍通过 Dashboard/admin 路径，不在本 wave 改前端。 |
+| `BiliDili`<br>无任务 | 当前不涉及真实 iOS 项目修改或验证。 |
+| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试。 |
 
 ## 可复制提示词
 
-发送给：无。
+发送给：`AlembicCore`、`AlembicPlugin`。
 
-不发送给：`AlembicPlugin`（已完成）、`AlembicCore`（无任务）、`Alembic`（无任务）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）、`BiliDili`（无任务）、`AlembicTest`（无任务）。
+```text
+读取 docs/workspace/alembic-codex-recipe-interaction-contract-wave-2026-05-21.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
+```
 
-当前 V1 闭环已通过总控验收，不再发送领取提示词。
+不发送给：`Alembic`（无任务）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）、`BiliDili`（无任务）、`AlembicTest`（观察中，当前 Recipes 生成继续）。
 
 ## 回填区
 
-- 当前计划回填入口：`docs/workspace/alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md` 的“回填区”。
-- 新任务线：`MAIN-PKS-1` / `MAIN-PKS-2` 已通过总控验收，执行记录 `docs/AlembicPlugin/alembic-plugin-prime-knowledge-shout-v1-2026-05-21.md`；AlembicPlugin 提交 `d83683bd23b6027b99c6085943639f2df9868840`，AlembicCodex runtime artifact `a76fa073ecabf1a6c1bfd83eeffeb0146892b5e0`；总控实跑 targeted tests、build check、diff check 和 handler payload 样例均通过。
-- 上一测试线：`docs/workspace/alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md` 保留为上一测试线计划；既有测试运行不在本轮新增 TODO 范围内。
+- 当前计划回填入口：`docs/workspace/alembic-codex-recipe-interaction-contract-wave-2026-05-21.md` 的“回填区”。
+- `AlembicCore`：待启动，负责 W1-PKS-1、W1-PKS-2A、W1-PKS-3。
+- `AlembicPlugin`：待启动，负责 W1-PKS-4、W1-PKS-5；W1-PKS-2B 阻塞于 Core 回填。
+- `AlembicTest`：观察中；现有 Recipes 生成继续，本轮不创建测试单。

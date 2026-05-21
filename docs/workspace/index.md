@@ -8,8 +8,9 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md) | 已完成 | V1 `prime -> Codex 自主呐喊` 最小闭环已由 `AlembicPlugin` 回填并通过总控验收。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 已完成 | 当前发送给无；V1 主线已完成，后续 TODO 暂停，既有测试线持续运行，总控暂不创建新测试单。 |
+| 当前计划 | [alembic-codex-recipe-interaction-contract-wave-2026-05-21.md](alembic-codex-recipe-interaction-contract-wave-2026-05-21.md) | 待启动 | Recipes 生成期间推进 Codex 交互契约 Wave 1；发送给 `AlembicCore`、`AlembicPlugin`。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 待启动 | 当前发送给 `AlembicCore`、`AlembicPlugin`；`AlembicTest` 继续观察 Recipes 生成，不新增测试单。 |
+| 上一完成计划 | [alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md) | 已完成 | V1 `prime -> Codex 自主呐喊` 最小闭环已由 `AlembicPlugin` 回填并通过总控验收。 |
 | 上一测试线计划 | [alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md) | 测试持续运行 | `AlembicDashboard` Wave 9F 已通过总控验收；既有真实项目复测由 `AlembicTest` 按测试线继续回填，总控当前不直接关注。 |
 | 当前需求目录 | [alembic-multi-project-control-redesign](../requirement-designs/alembic-multi-project-control-redesign/) | 调研完成 | 保存本次重新开始的原始计划书、需求设计和代码实现依赖调研。 |
 | 需求目标与分阶段确认流程 | [../goal-stage-confirmation/process.md](../goal-stage-confirmation/process.md) | 长期流程 | 规定较大目标必须先在 `docs/requirement-designs/` 完成需求设计，再确认最终目标和分阶段，最后派发窗口。 |
@@ -53,13 +54,13 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>已完成 | V1 最小闭环已通过总控验收：`alembic_task prime` 返回 `primeKnowledgeMaterial`、路径行号证据和 `shoutInstruction`；提交 `d83683bd23b6027b99c6085943639f2df9868840`，runtime artifact `a76fa073ecabf1a6c1bfd83eeffeb0146892b5e0`。 |
-| `AlembicCore`<br>无任务 | V1 不需要修改 Core search/sourceRef 类型；后续 sourceRef 元数据增强另起任务。 |
+| `AlembicCore`<br>待启动 | 执行 Recipe 交互契约 Wave 1：修正 Core briefing 旧工具名；给 pending semantic review 提供真实新 Recipe ID / stable reference；确认 `host-agent` ConfidenceRouter 策略。 |
+| `AlembicPlugin`<br>待启动 | 执行 Recipe 交互契约 Wave 1：收敛 lifecycle 可见契约；修正 prime host-response action 表达；观察 `pendingSemanticReview` consumer 侧，不在 Core 回填前猜字段。 |
 | `Alembic`<br>无任务 | 当前主线不涉及本地增强 daemon、Dashboard server、HTTP/API 或 internal AI job 实现。 |
 | `AlembicAgent`<br>无任务 | 当前主线是 Codex host agent prime 知识接收与公开声明，不涉及 AlembicAgent runtime / provider / tool loop。 |
 | `AlembicDashboard`<br>无任务 | 当前主线不涉及 Dashboard UI 或前端状态消费。 |
 | `BiliDili`<br>无任务 | 当前主线不涉及真实 iOS 项目修改、接入或验证。 |
-| `AlembicTest`<br>无任务 | 当前不创建测试单；既有测试线继续独立运行，本索引不新增测试执行任务。 |
+| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试。 |
 
 ## 状态枚举
 
