@@ -1,6 +1,6 @@
 # AlembicWorkspace Current Status
 
-更新日期：2026-05-20
+更新日期：2026-05-21
 总控窗口：AlembicWorkspace
 状态：Agent 证据记录与阶段链路优化 Wave 9D 阻塞，等待用户确认真实项目数据发送策略
 
@@ -10,6 +10,7 @@
 
 - `note_finding` 不能降级；它是候选输出前的结构化证据门槛。
 - 探索阶段和 `note_finding` 记录阶段需要分开设置资源与配置；探索中允许提前记录，但最终必须有独立 record-only 阶段兜底。
+- `note_finding` 口径已固定到 [alembic-note-finding-closure-standard-2026-05-21.md](alembic-note-finding-closure-standard-2026-05-21.md)：必须区分代码连通性、单维度结构化证据闭环和完整 cold-start 产候选闭环。
 
 当前总控计划：[alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md)
 
