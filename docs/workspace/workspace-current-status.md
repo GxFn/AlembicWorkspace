@@ -11,6 +11,7 @@
 新的主线是用户确认的“prime 后立即知识接收呐喊”：Codex host agent 拿到 `alembic_task(operation="prime")` 返回的 `primeKnowledgeMaterial` 后，应先向开发者可见说明它接收到了哪些 Recipe / Guard / 证据，再继续搜索、读代码、编辑或最终总结。也就是说，呐喊发生在接受 prime 后的下一个可见动作，而不是任务完成总结时。
 
 - 当前总控计划：[prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)。
+- 全局 TODO 列表：[global-todo-board.md](global-todo-board.md)，记录跨计划待办；当前派发仍以当前计划为准。
 - 上一完成计划：[alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md)，`AlembicPlugin` service request 边界和 Test-2026-05-21-02 均已收口。
 - 当前测试交流：[alembic-test-exchange.md](alembic-test-exchange.md)，Test-2026-05-21-02 已完成；下一轮等 `AlembicPlugin` immediate receipt shout 完成后再创建新测试单。
 - 当前发送窗口：`AlembicPlugin`。
