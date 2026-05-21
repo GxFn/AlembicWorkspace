@@ -11,7 +11,6 @@ const repoNames = [
   "AlembicAgent",
   "AlembicDashboard",
   "AlembicPlugin",
-  "BiliDili",
 ];
 
 const args = process.argv.slice(2);

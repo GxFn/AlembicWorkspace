@@ -13,7 +13,7 @@
 - 用户说明 `AlembicTest` 那边 Recipes 仍在生成中；本轮不新增测试单，不打断测试窗口。
 - 本 wave 优先修复会直接带偏 Codex 的交互契约：Core Mission Briefing 旧工具名、`pendingSemanticReview` 缺真实 `newRecipeId`、`host-agent` 信任策略确认、Plugin lifecycle 可见文案、prime host-response action 表达。
 - 发送窗口：`AlembicCore`、`AlembicPlugin`。
-- 不发送给：`Alembic`、`AlembicAgent`、`AlembicDashboard`、`BiliDili`、`AlembicTest`。
+- 不发送给：`Alembic`、`AlembicAgent`、`AlembicDashboard`、`AlembicTest`。
 
 ## 窗口分派
 
@@ -26,8 +26,7 @@
 | `Alembic`<br>无任务 | 当前不涉及 daemon、HTTP/API、Dashboard server、ProjectRegistry 或 internal AI job。 |
 | `AlembicAgent`<br>无任务 | 当前是 Codex host agent MCP / Core workflow 契约，不涉及 AlembicAgent runtime。 |
 | `AlembicDashboard`<br>无任务 | 当前不改 Dashboard UI；lifecycle publish/deprecate 仍通过 Dashboard/admin 路径，不在本 wave 改前端。 |
-| `BiliDili`<br>无任务 | 当前不涉及真实 iOS 项目修改或验证。 |
-| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试。 |
+| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试；后续真实测试项目相关操作也由此窗口承接。 |
 
 ## 可复制提示词
 
@@ -37,7 +36,7 @@
 读取 docs/workspace/alembic-codex-recipe-interaction-contract-wave-2026-05-21.md，按照文档，领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
 ```
 
-不发送给：`Alembic`（无任务）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）、`BiliDili`（无任务）、`AlembicTest`（观察中，当前 Recipes 生成继续）。
+不发送给：`Alembic`（无任务）、`AlembicAgent`（无任务）、`AlembicDashboard`（无任务）、`AlembicTest`（观察中，当前 Recipes 生成继续）。
 
 ## 回填区
 

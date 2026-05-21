@@ -14,7 +14,6 @@ const requiredWindows = [
   "AlembicAgent",
   "AlembicDashboard",
   "AlembicPlugin",
-  "BiliDili",
   "AlembicTest",
 ];
 

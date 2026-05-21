@@ -22,7 +22,7 @@
 ## 非目标
 
 - 不改 AlembicTest 当前测试任务，不新增真实项目复测。
-- 不修改 `BiliDili`。
+- 不修改真实测试项目；真实项目相关操作统一通过 `AlembicTest` 承接。
 - 不恢复或引入 AlembicAgent / internal AI / tool runtime 到 `AlembicPlugin`。
 - 不把默认 Codex agent tier 扩权为可直接 publish / deprecate Recipe。
 - 不更新 portable runtime / marketplace / channel，除非 `AlembicPlugin` 实现明确要求并在回填中说明。
@@ -66,8 +66,7 @@
 | `Alembic`<br>无任务 | 当前不涉及 daemon、HTTP/API、Dashboard server、ProjectRegistry 或 internal AI job。 |
 | `AlembicAgent`<br>无任务 | 当前是 Codex host agent MCP / Core workflow 契约，不涉及 AlembicAgent runtime。 |
 | `AlembicDashboard`<br>无任务 | 当前不改 Dashboard UI；lifecycle publish/deprecate 仍通过 Dashboard/admin 路径，不在本 wave 改前端。 |
-| `BiliDili`<br>无任务 | 当前不涉及真实 iOS 项目修改或验证。 |
-| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试。 |
+| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试；后续真实测试项目相关操作也由此窗口承接。 |
 
 ## 空闲窗口调度
 
@@ -78,8 +77,7 @@
 | `Alembic` | 无任务 | 当前无本地增强底座变更。 | 否 |
 | `AlembicAgent` | 无任务 | 当前不涉及 AlembicAgent runtime。 | 否 |
 | `AlembicDashboard` | 无任务 | 当前不涉及前端。 | 否 |
-| `BiliDili` | 无任务 | 当前不涉及真实项目。 | 否 |
-| `AlembicTest` | 观察中 | 既有 Recipes 生成继续，本 wave 不新增测试任务。 | 否 |
+| `AlembicTest` | 观察中 | 既有 Recipes 生成继续，本 wave 不新增测试任务；真实测试项目操作统一由此窗口承接。 | 否 |
 
 ## 当前执行顺序
 
@@ -90,7 +88,6 @@
 - `Alembic`：无任务。
 - `AlembicAgent`：无任务。
 - `AlembicDashboard`：无任务。
-- `BiliDili`：无任务。
 - `AlembicTest`：观察中，当前 Recipes 生成继续，不新增测试单。
 
 ## 可复制分派提示词
@@ -155,7 +152,7 @@ git diff --check
 - 不实现 Codex agent runtime。
 - 不改 Core 源码或 vendor Core。
 - 不处理 W1-PKS-2B 的完整 nextAction ID 消费，除非 Core 已回填真实字段和验证结果。
-- 不修改 `BiliDili`、`AlembicDashboard` 或测试线文档。
+- 不修改真实测试项目、`AlembicDashboard` 或测试线文档。
 
 验证命令：
 

@@ -1,6 +1,6 @@
 # AlembicWorkspace Agent Instructions
 
-**重要**：本 workspace 是 Alembic 系列仓库的统一计划指挥中心，不是单一源码仓库。workspace 内可以放入用于验证 Alembic 的真实测试项目，例如 `BiliDili`；测试项目必须按真实项目保护，不能被当作临时样例或随意改造的沙盒。
+**重要**：本 workspace 是 Alembic 系列仓库的统一计划指挥中心，不是单一源码仓库。workspace 内可以放入用于验证 Alembic 的真实测试项目；测试项目必须按真实项目保护，不能被当作临时样例或随意改造的沙盒。
 
 ## 最重要规则：先走通唯一主闭环
 
@@ -20,7 +20,7 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 
 当 Agent 的计划涉及删减、替换、降级、延期、只做部分、只搭框架、只保留接口、暂不接入或改变完整范围时，必须先向用户确认。
 
-不要在旧工作区或旧克隆路径下工作；当前统一以本 workspace 内的 Alembic 系列仓库和明确纳入 workspace 的真实测试项目为准。
+不要在旧工作区或旧克隆路径下工作；当前统一以本 workspace 内的 Alembic 系列仓库为准。真实测试项目相关操作由独立测试验证窗口承接。
 
 ## 总控定位
 
@@ -28,18 +28,18 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 - 总控窗口是工作空间的大脑，不是机械派发表。收到用户需求后，必须先分析功能本质、用户场景、完整能力边界和真实完成定义；再挖掘本 workspace 内真实代码、文档、测试、构建和发布链路；根据需求类型判断是否需要联网查找官方文档、成熟项目或业界最佳实践；最后才拆解实现方案、阶段顺序和窗口任务。
 - 是否联网由需求判断：若需求涉及通用架构模式、安全 / 权限、多项目 / 多租户控制、后台进程、协议、发布链路、平台规则、外部标准或用户明确要求最佳实践，且本地代码不足以支撑设计，应联网调研并优先引用官方文档、主流项目源码 / 文档或权威资料；若需求完全是本地代码验收、既有实现收口或文档治理，可以不联网，但应在计划里说明理由。
 - 外部调研不能替代本地代码事实。实现方案必须同时满足用户目标、真实代码结构、现有模块边界和验证可行性；不要因为业界实践看起来更“标准”就忽略 Alembic 当前系统的真实连通性。
-- 本 workspace 下的 Alembic 子仓库包括 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 和 `AlembicPlugin`；真实测试项目包括 `BiliDili`；独立测试验证窗口是 `AlembicTest`。
-- `BiliDili` 默认不进入 Alembic 日常开发、迁移、清理、发布或依赖收口分派；只有任务明确需要真实 iOS/Swift 项目扫描、接入、复现、回归验证或 BiliDili 自身产品维护时，才把它纳入执行窗口。
+- 本 workspace 下的 Alembic 子仓库包括 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 和 `AlembicPlugin`；独立测试验证窗口是 `AlembicTest`。
+- 真实测试项目不作为总控直接分派窗口；涉及真实项目扫描、接入、复现、回归验证或项目自身维护时，由总控通过 `AlembicTest` 测试交流文档创建测试 / 操作单，再由 `AlembicTest` 执行和回填证据。
 - 产品和模块长期路线遵循 `Plugin first, Alembic install enhances`：`AlembicPlugin` 是 Codex host agent 入口，`Alembic` 是本地增强底座。具体边界以 `docs/workspace/alembic-plugin-first-enhancement-contract.md` 为准。
 - `host agent` 表示外部宿主 Agent 能力来源；当前默认语境是 Codex host agent。不要把 `host agent` 与 `AlembicAgent` 或 Alembic internal AI 混用。
 - workspace 根目录不承载产品源码包，不作为 npm package、CLI、Dashboard、Plugin 或 Agent runtime 发布。
-- workspace 根目录可以作为 `GxFn/AlembicWorkspace` 总控文档仓库，但只跟踪 workspace 自己的说明、计划、验收、索引和协作文档；不得把 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili`、`AlembicTest` 等子仓库加入本仓库的 git 跟踪、submodule 或 gitlink。子仓库源码、测试脚本和测试文档改动必须在各自仓库独立提交。
+- workspace 根目录可以作为 `GxFn/AlembicWorkspace` 总控文档仓库，但只跟踪 workspace 自己的说明、计划、验收、索引和协作文档；不得把 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicTest` 或真实测试项目子仓库加入本仓库的 git 跟踪、submodule 或 gitlink。子仓库源码、测试脚本和测试文档改动必须在各自仓库独立提交。
 - 只有主控窗口可以提交 AlembicWorkspace 仓库里的文档、脚本、模板或 skill 资产。其它执行窗口可以按当前总控文档授权新建或回填 `docs/workspace/`、`docs/<Repo>/` 等 workspace 文档，但不得自行对 AlembicWorkspace 仓库执行 git add / commit / push；完成后只回填路径、状态和证据，由主控窗口验收后统一提交 workspace 仓库。
 - workspace 可以保管总控通用能力，例如 `scripts/`、`skills/`、`templates/` 下的验证脚本、分派模板、文档模板、Codex skill 草案或跨窗口协作工具。此类能力必须服务于工作区总控、文档治理、验证或协作，不得复制或替代子仓库产品实现。真实项目测试、冷启动监控和复现类脚本归独立 `AlembicTest` 仓库维护，不进入 AlembicWorkspace git 跟踪。
 - workspace 通用脚本默认应是 repo-neutral、参数化、无密钥、无用户绝对路径、无网络依赖；如果脚本会写入子仓库，必须有当前总控文档明确授权，并优先让对应子仓库窗口执行。
 - workspace 内的 `skills/` 是可复用 skill 资产或草案的保管位置，不代表自动安装或自动启用；若某个 skill 需要安装到 Codex runtime、插件包或子仓库，必须在文档中明确安装位置、消费方和同步方式。
 - 新增通用能力时，必须在对应目录 README 或当前总控文档中写清：用途、适用范围、调用方式、验证方式、禁止事项和维护归属。
-- 本窗口拥有统一调度权：可以根据真实代码、文档、构建链路和模块边界，判断任意 Alembic 子仓库、真实测试项目窗口或测试验证窗口是否需要承担任务，并在总控文档中直接分配给 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili`、`AlembicTest` 或其它当前 workspace 内相关窗口。
+- 本窗口拥有统一调度权：可以根据真实代码、文档、构建链路和模块边界，判断任意 Alembic 子仓库或测试验证窗口是否需要承担任务，并在总控文档中直接分配给 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicTest` 或其它当前 workspace 内相关窗口；真实测试项目操作统一分派给 `AlembicTest`。
 - 分配任务时不需要等待用户逐一指定仓库；如果某项变更会影响多个仓库，必须主动识别所有受影响窗口并给出执行、观察、等待或无需处理的明确判断，避免遗漏仓库被遗忘处理。
 - 跨仓库任务必须优先通过文档明确目标、边界、执行窗口、验收命令、删除候选、禁止事项和回填证据。
 - 修改某个子仓库时，先读取该子仓库自己的 `AGENTS.md`；如果根级规则与子仓库规则都适用，采用更严格、更保护真实实现和用户数据的规则。
@@ -54,11 +54,11 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 - `docs/workspace/index.md` 是 workspace 级唯一总控入口。所有跨仓库计划、当前状态、任务分派、文档挂载、验收索引和历史迁移入口都必须能从这个索引追踪到。
 - 新建长期迁移、计划、验收、扫描、边界和跨仓库任务文档时，除非已经明确属于某个子仓库专项目录，否则统一写到 `docs/workspace/`。
 - 新建或续写 workspace 级文档后，必须同步更新 `docs/workspace/index.md`，把文档挂载到对应的当前计划、执行阶段、仓库窗口或历史归档条目。
-- 与某个子仓库强相关的长期协作文档，优先写到 `docs/AlembicCore/`、`docs/AlembicAgent/`、`docs/AlembicDashboard/`、`docs/AlembicPlugin/`、`docs/Alembic/` 或 `docs/BiliDili/`，并从 workspace 总控文档或索引挂回。与独立测试验证窗口强相关的长期测试计划、复现记录和验证报告，优先写到 `AlembicTest/docs/`。
+- 与某个子仓库强相关的长期协作文档，优先写到 `docs/AlembicCore/`、`docs/AlembicAgent/`、`docs/AlembicDashboard/`、`docs/AlembicPlugin/` 或 `docs/Alembic/`，并从 workspace 总控文档或索引挂回。与独立测试验证窗口或真实测试项目强相关的长期测试计划、复现记录和验证报告，优先写到 `AlembicTest/docs/`。
 - `docs/` 根层级不再作为新的总控文档默认落点；除非用户明确要求兼容旧文档位置，否则不要继续把新协作文档散落在 `docs/` 根层级。
 - 已存在于 `docs/` 根层级或其它历史目录的文档可以继续作为背景材料读取；若需要重写、续写或归档，优先在 `docs/workspace/` 建立新的总控入口并标明来源。
 - 子仓库内 `docs/` 只放随源码长期维护的产品文档、发布文档或用户文档；不要把跨仓库协作临时文档散落到子仓库内部。
-- 即使 `BiliDili` 自身包含 `docs/`，开发协作文件、阶段计划、验收记录、扫描结果和 Alembic 验证记录仍统一写入 workspace 顶层 `docs/`，优先使用 `docs/workspace/` 或 `docs/BiliDili/`；`BiliDili/docs/` 只保存必要的长期项目文档。
+- 即使真实测试项目自身包含 `docs/`，开发协作文件、阶段计划、验收记录、扫描结果和 Alembic 验证记录仍统一通过 workspace 总控文档或 `AlembicTest/docs/` 记录；真实测试项目仓库内 `docs/` 只保存必要的长期项目文档。
 - 长期文档不得写入用户本机绝对路径、API key、token 或其它私密信息。
 - 给任意窗口分配任务时，必须明确文档动作、保存位置、挂载入口和回填位置；如果判断无需新建文档，必须说明原因。
 - 文档命名使用小写 kebab-case 和执行日 `YYYY-MM-DD`。具体模板以 `docs/workspace/index.md` 的当前规则为准。
@@ -70,10 +70,9 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 - `AlembicDashboard`：前端 UI、API client、前端状态、路由、样式、可视化和前端测试。
 - `AlembicPlugin`：Codex MCP、Skill、channel/marketplace、插件 runtime、安装验证和 Codex 宿主适配。
 - `Alembic`：本地增强底座、CLI、daemon、HTTP/API、Dashboard server、ProjectRegistry、file monitor、JobStore、internal AI jobs、平台能力和本地安装 / dev / release。
-- `BiliDili`：用于 Alembic 真实场景验证的 iOS/Swift 测试项目。它不是 Alembic 产品源码仓库，不承载 Alembic runtime、Core、Agent、Plugin 或 Dashboard 的实现；默认不参与 Alembic 日常开发流程，只有当任务明确涉及真实项目接入、扫描、验证、示例消费或测试场景时，才把任务分配给它。
-- `AlembicTest`：独立测试验证窗口，承接复现、冒烟、回归、冷启动监控、跨仓库集成验证和证据整理。它不是产品实现仓库；测试发现的问题必须回到对应源仓库修复。
+- `AlembicTest`：独立测试验证窗口，承接真实测试项目操作、复现、冒烟、回归、冷启动监控、跨仓库集成验证和证据整理。它不是产品实现仓库；测试发现的问题必须回到对应源仓库修复。
 
-不要把一个仓库的职责迁到另一个仓库来“简化”边界。边界调整必须有真实调用方、替代入口和验证证据。不要为了测试 Alembic 而改坏 `BiliDili` 的真实产品结构、业务行为、UI、网络、登录、播放或模块边界。
+不要把一个仓库的职责迁到另一个仓库来“简化”边界。边界调整必须有真实调用方、替代入口和验证证据。不要为了测试 Alembic 而改坏真实测试项目的产品结构、业务行为、UI、网络、登录、播放或模块边界。
 
 ## 跨仓库接入规则
 
@@ -113,7 +112,7 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 - 若用户口头更新状态，应先记录为“用户口径更新”或“总控状态快照”；没有验证证据前，不要把下一阶段标记为完成。
 - 如果某个窗口仍有未提交工作区改动，只能记录为执行中或待封口，不能作为可删除或可进入下一阶段的证据。
 - 计划文档中要明确“进入某仓库”“留在某仓库”“删除候选”“不得删除”“反馈给其他窗口”五类结果。
-- 制定跨仓库计划时必须做“窗口覆盖检查”：逐一判断 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`BiliDili` 和 `AlembicTest` 是否需要任务；即使某窗口无需行动，也要在总控判断中说明它是“无任务”“观察中”还是“等待上游/下游”。
+- 制定跨仓库计划时必须做“窗口覆盖检查”：逐一判断 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 和 `AlembicTest` 是否需要任务；即使某窗口无需行动，也要在总控判断中说明它是“无任务”“观察中”还是“等待上游/下游”。真实测试项目只通过 `AlembicTest` 进入覆盖判断。
 - 窗口覆盖检查默认字段、分派模板和命名模板以 `docs/workspace/index.md` 为准。
 - 如果后续读取代码发现新的关联仓库、vendor 子仓库、插件资源、Dashboard 产物、runtime 包或发布链路会受影响，必须追加到任务分派中，不能只处理最先被用户点名的仓库。
 - 分派给其他窗口的任务必须可执行：包含目标、范围、禁止事项、验证命令、回填要求、文档动作、文档保存位置和文档挂载入口。
@@ -144,7 +143,7 @@ Agent 不得把完整实现改成薄实现，不得把成熟能力改成空壳�
 
 ## 测试与验证分派
 
-- 总控窗口不再亲自执行真实项目测试、冷启动、重建、运行时监控、复现脚本、Dashboard 手动验证或 BiliDili 验证；这些测试相关操作统一分派给 `AlembicTest` 或对应执行窗口。
+- 总控窗口不再亲自执行真实项目测试、冷启动、重建、运行时监控、复现脚本、Dashboard 手动验证或真实项目验证；这些测试相关操作统一分派给 `AlembicTest` 或对应执行窗口。
 - 总控可以制定测试目标、验收标准、观察点、风险和回填要求，但必须把测试脚本、测试配置、复现记录和长期验证报告放在 `AlembicTest/` 下，由测试窗口执行。
 - 总控与 `AlembicTest` 的任务和结果交流必须通过专门测试交流文档 `docs/workspace/alembic-test-exchange.md`；不要在普通聊天里口头传递测试范围、结果和下一步判断。
 - 总控创建测试任务时，先按 `templates/alembic-test-handoff-template.md` 填写测试单，再挂入 `docs/workspace/alembic-test-exchange.md`；测试单状态为 `待启动` 时才建议用户发送给 `AlembicTest`。

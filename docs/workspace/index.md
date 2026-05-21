@@ -25,7 +25,7 @@
 | `note_finding` 闭环判定记录 | [alembic-note-finding-closure-standard-2026-05-21.md](alembic-note-finding-closure-standard-2026-05-21.md) | 当前判定标准 | 固定区分代码连通性、单维度 `note_finding` 证据闭环和完整 cold-start 产候选闭环，避免总控口径反复。 |
 | 最终目标与阶段路线图 | [alembic-final-goal-stage-roadmap.md](alembic-final-goal-stage-roadmap.md) | 长期路线图 | 只作为产品方向背景；具体任务仍需创建任务级目标阶段确认文档。 |
 | Plugin first 增强契约 | [alembic-plugin-first-enhancement-contract.md](alembic-plugin-first-enhancement-contract.md) | 长期契约 | 规定 `AlembicPlugin` 作为 Codex host agent 入口，`Alembic` 作为本地增强底座，安装 Alembic 后增强 daemon / HTTP / Dashboard / internal AI 能力。 |
-| 本地源码 resolver / script 契约 | [alembic-local-source-resolver-script-contract.md](alembic-local-source-resolver-script-contract.md) | 长期契约 | 统一本地源码 resolver 优先级、repo-local script 边界、portable runtime 例外和 BiliDili 默认不进入日常流程的规则。 |
+| 本地源码 resolver / script 契约 | [alembic-local-source-resolver-script-contract.md](alembic-local-source-resolver-script-contract.md) | 长期契约 | 统一本地源码 resolver 优先级、repo-local script 边界、portable runtime 例外和真实测试项目默认不进入日常流程的规则。 |
 | Workspace 文档归档规则 | [workspace-doc-archive-policy.md](workspace-doc-archive-policy.md) | 长期规则 | 规定 `docs/workspace/` 当前入口、历史 wave 归档目录、归档条件和 `scripts/archive-workspace-docs.mjs` 使用方式。 |
 | 分阶段迁移指挥长期模板 | [../../templates/phased-migration-command-template.md](../../templates/phased-migration-command-template.md) | 长期模板 | 用于真实代码挖掘、阶段拆分、一波一阶段推进、窗口分派、验收和下一波计划。 |
 
@@ -59,8 +59,7 @@
 | `Alembic`<br>无任务 | 当前主线不涉及本地增强 daemon、Dashboard server、HTTP/API 或 internal AI job 实现。 |
 | `AlembicAgent`<br>无任务 | 当前主线是 Codex host agent prime 知识接收与公开声明，不涉及 AlembicAgent runtime / provider / tool loop。 |
 | `AlembicDashboard`<br>无任务 | 当前主线不涉及 Dashboard UI 或前端状态消费。 |
-| `BiliDili`<br>无任务 | 当前主线不涉及真实 iOS 项目修改、接入或验证。 |
-| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试。 |
+| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试；后续真实测试项目相关操作也由此窗口承接。 |
 
 ## 状态枚举
 
@@ -119,7 +118,6 @@
 | `AlembicAgent`<br>状态 |  |
 | `AlembicDashboard`<br>状态 |  |
 | `AlembicPlugin`<br>状态 |  |
-| `BiliDili`<br>状态 |  |
 | `AlembicTest`<br>状态 |  |
 
 派发细节用列表记录：文档动作、保存位置、挂载入口、回填位置、验证命令、阻塞 / 依赖。
