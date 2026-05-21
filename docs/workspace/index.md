@@ -9,7 +9,8 @@
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
 | 当前计划 | [alembic-codex-recipe-interaction-contract-wave-2026-05-21.md](alembic-codex-recipe-interaction-contract-wave-2026-05-21.md) | 已完成 | Recipes 生成期间推进的 Codex 交互契约 Wave 1 已通过总控验收；`AlembicCore` 与 `AlembicPlugin` 均完成并回填。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 等待下一步 | 当前无可发送窗口；`AlembicCore` / `AlembicPlugin` 已完成，`AlembicTest` 继续观察 Recipes 生成，不新增测试单。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | AlembicTest 待启动 | BiliDili Recipes 已生成完成；当前发送给 `AlembicTest`，验证插件 `prime` 注入与 Codex 知识呐喊。 |
+| 当前测试任务 | [alembic-test-exchange.md](alembic-test-exchange.md) | 待启动 | Test-2026-05-21-01：以 BiliDili 为目标项目验证 Alembic Codex 插件 `prime` 注入和 Codex 知识呐喊。 |
 | 上一完成计划 | [alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md) | 已完成 | V1 `prime -> Codex 自主呐喊` 最小闭环已由 `AlembicPlugin` 回填并通过总控验收。 |
 | 上一测试线计划 | [alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md) | 测试持续运行 | `AlembicDashboard` Wave 9F 已通过总控验收；既有真实项目复测由 `AlembicTest` 按测试线继续回填，总控当前不直接关注。 |
 | 当前需求目录 | [alembic-multi-project-control-redesign](../requirement-designs/alembic-multi-project-control-redesign/) | 调研完成 | 保存本次重新开始的原始计划书、需求设计和代码实现依赖调研。 |
@@ -18,7 +19,7 @@
 | 需求设计文档模板 | [../../templates/requirement-design-template.md](../../templates/requirement-design-template.md) | 长期模板 | 用于需求目录中的 `requirement-design`，保存于 `docs/requirement-designs/<需求名>/`。 |
 | 需求到 Wave 执行流程 | [requirement-to-wave-execution-flow.md](requirement-to-wave-execution-flow.md) | 长期流程 | 固化原始计划书、需求设计、代码依赖调研、目标阶段确认、用户确认、wave 执行计划和提示词发送的成熟路线。 |
 | TODO 与空闲窗口调度规则 | [todo-window-scheduling-policy.md](todo-window-scheduling-policy.md) | 长期流程 | 规定通用 TODO 子模式如何服务需求设计、派发计划、验收滚动、主线 / 可并行判断，并避免空闲窗口空转。 |
-| AlembicTest 测试交流文档 | [alembic-test-exchange.md](alembic-test-exchange.md) | 等待测试任务 | 总控与 `AlembicTest` 之间唯一测试单和结果回填入口；测试任务不再通过总控口头执行。 |
+| AlembicTest 测试交流文档 | [alembic-test-exchange.md](alembic-test-exchange.md) | 待启动测试单 | Test-2026-05-21-01 验证 BiliDili 项目中的插件 `prime` 注入与 Codex 知识呐喊。 |
 | AlembicTest 测试交流规则 | [alembic-test-exchange-policy.md](alembic-test-exchange-policy.md) | 长期规则 | 规定总控如何创建测试单、派发 `AlembicTest`、验收回填和处理证据不足。 |
 | AlembicTest 测试执行规则 | [../../AlembicTest/docs/testing-operation-policy.md](../../AlembicTest/docs/testing-operation-policy.md) | 长期规则 | 规定总控不直接执行测试操作，真实项目测试、冷启动监控、复现和报告由 `AlembicTest` 承接。 |
 | AlembicTest 测试单模板 | [../../templates/alembic-test-handoff-template.md](../../templates/alembic-test-handoff-template.md) | 长期模板 | 用于生成 `docs/workspace/alembic-test-exchange.md` 中的统一测试单。 |
@@ -59,7 +60,7 @@
 | `Alembic`<br>无任务 | 当前主线不涉及本地增强 daemon、Dashboard server、HTTP/API 或 internal AI job 实现。 |
 | `AlembicAgent`<br>无任务 | 当前主线是 Codex host agent prime 知识接收与公开声明，不涉及 AlembicAgent runtime / provider / tool loop。 |
 | `AlembicDashboard`<br>无任务 | 当前主线不涉及 Dashboard UI 或前端状态消费。 |
-| `AlembicTest`<br>观察中 | Recipes 仍在生成中；本 wave 不新增测试单，不打断现有测试；后续真实测试项目相关操作也由此窗口承接。 |
+| `AlembicTest`<br>待启动 | 领取 [alembic-test-exchange.md](alembic-test-exchange.md) 中 Test-2026-05-21-01；以 BiliDili 为目标项目验证插件 `prime` 注入和 Codex 知识呐喊，报告写入 `AlembicTest/docs/` 并回填测试交流文档。 |
 
 ## 状态枚举
 
