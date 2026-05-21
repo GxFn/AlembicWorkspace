@@ -29,7 +29,7 @@
 | GTODO-2026-05-21-005 | 观察中 | 证据质量 | P2 | 待定 | 部分 Recipe evidenceRef 只有路径没有行号；后续若要强制行号级证据，需要回到 Recipe / sourceRefs 生成链路补强。 | 否 | Test-2026-05-21-02 风险记录；不阻塞当前 service boundary / immediate shout。 | 待定 | [alembic-test-exchange.md](alembic-test-exchange.md) |
 | GTODO-2026-05-21-006 | 观察中 | runtime quality | P2 | `AlembicPlugin` | 插件运行时 embedding 因不捆绑 AI execution 降级为 sparse-only；后续可评估是否需要更明确的诊断、配置或安装态说明。 | 否 | Test-2026-05-21-02 风险记录；不阻塞当前主线。 | `AlembicPlugin` | [alembic-test-exchange.md](alembic-test-exchange.md) |
 | GTODO-2026-05-21-007 | 已完成 | 可见摘要优化 | P0 | `AlembicPlugin` | 优化 prime receipt shout：开发者可见内容要像真的呐喊一样有声量地喊出知识摘要，不把 evidenceRefs 路径 / 行号作为主要可见内容倾倒出来。 | 是 | AlembicPlugin commit `58b82f8526d68aef516d68477d7a0e505fc114e9`；AlembicCodex runtime artifact `df608057bd274ebb6b39f6a9c0e964f1b8517426`；总控验收通过，本机 Codex plugin cache 已刷新。 | `AlembicPlugin` | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) |
-| GTODO-2026-05-21-008 | 待启动 | 真实项目复测 | P0 | `AlembicTest` | 在 BiliDili 真实项目中验证 SHOUT-5 后的 Codex 可见呐喊是否主动、有声量地喊出知识摘要，且不默认倾倒 evidenceRefs 路径 / 行号。 | 是 | Test-2026-05-21-04 已创建；本机 Codex plugin cache marker `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`。 | `AlembicTest` | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)、[alembic-test-exchange.md](alembic-test-exchange.md) |
+| GTODO-2026-05-21-008 | 执行中 | 真实项目复测 | P0 | `AlembicTest` | 在 BiliDili 真实项目中验证 SHOUT-5 后的 Codex 可见呐喊是否主动、有声量地喊出知识摘要，且不默认倾倒 evidenceRefs 路径 / 行号。 | 是 | Test-2026-05-21-04 功能验收通过；等待 `AlembicTest` 封口提交测试报告、probe 脚本和相关文档变更并回填 commit hash。 | `AlembicTest` | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md)、[alembic-test-exchange.md](alembic-test-exchange.md) |
 
 ## 最近同步记录
 
@@ -38,3 +38,4 @@
 - 2026-05-21：Test-2026-05-21-03 功能验收通过，GTODO-2026-05-21-002 转为执行中；当前剩余动作是 `AlembicTest` 封口提交测试报告、probe 脚本和相关文档变更。
 - 2026-05-21：Test-2026-05-21-03 已由 `AlembicTest` commit `b532cd8bf7c40c8f12b93f91380befdea617d999` 封口，GTODO-2026-05-21-002 标为已完成；根据用户人工验证反馈新增 GTODO-2026-05-21-007，派发 `AlembicPlugin` 优化可见呐喊摘要，要求像真的呐喊一样有声量地喊出内容。
 - 2026-05-21：`AlembicPlugin` SHOUT-5 已通过总控验收并刷新本机 Codex plugin cache，GTODO-2026-05-21-007 标为已完成；新增 GTODO-2026-05-21-008 / Test-2026-05-21-04，派发 `AlembicTest` 做 BiliDili 可见摘要复测。
+- 2026-05-21：Test-2026-05-21-04 功能验收通过，GTODO-2026-05-21-008 转为执行中；当前剩余动作是 `AlembicTest` 封口提交 readable receipt shout 测试报告、probe 脚本和相关测试文档变更。

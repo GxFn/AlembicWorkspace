@@ -1,6 +1,6 @@
 # AlembicTest Exchange
 
-状态：Test-2026-05-21-04 待启动
+状态：Test-2026-05-21-04 执行中
 维护窗口：AlembicWorkspace
 执行窗口：AlembicTest
 更新日期：2026-05-21
@@ -11,18 +11,18 @@
 
 ## 当前测试单
 
-`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。`AlembicPlugin` service request 边界修正与 `Test-2026-05-21-02` 均已通过。`AlembicPlugin` prime immediate receipt shout 与 `Test-2026-05-21-03` 已验证 prime 后立即呐喊。当前 `AlembicPlugin` SHOUT-5 可见摘要优化已通过总控验收并刷新本机 Codex plugin cache；创建 `Test-2026-05-21-04` 交给 `AlembicTest` 验证真实 BiliDili 场景中可见呐喊是否从 evidenceRefs 清单变成主动、有声量的知识摘要。
+`Test-2026-05-21-01` 已由 AlembicTest 执行并回填，总控验收结论为失败。`Alembic` 已补齐 daemon MCP bridge 兼容能力，但总控根据用户决策调整边界：Alembic 作为 resident service 被 Plugin 按需请求，Codex-facing `prime` 不应做 MCP tool ownership bridge。`AlembicPlugin` service request 边界修正与 `Test-2026-05-21-02` 均已通过。`AlembicPlugin` prime immediate receipt shout 与 `Test-2026-05-21-03` 已验证 prime 后立即呐喊。当前 `AlembicPlugin` SHOUT-5 可见摘要优化已通过总控验收并刷新本机 Codex plugin cache；`Test-2026-05-21-04` 已完成 BiliDili 真实项目功能复测，总控确认可见呐喊已从 evidenceRefs 清单变成主动、有声量的知识摘要；剩余动作是 `AlembicTest` 提交测试报告、probe 脚本和相关文档变更后回填 commit hash。
 
 | 测试单 | 状态 | 目标 | 执行窗口 | 报告 |
 | --- | --- | --- | --- | --- |
-| Test-2026-05-21-04：BiliDili prime readable receipt shout 可见摘要复测 | 待启动 | 验证 SHOUT-5 后 prime tool result 的下一条开发者可见响应是否主动、有声量地喊出 Recipe / Guard 知识摘要，并确认不默认倾倒 evidenceRefs 路径 / 行号。 | `AlembicTest` | 建议路径：`AlembicTest/docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md` |
+| Test-2026-05-21-04：BiliDili prime readable receipt shout 可见摘要复测 | 执行中 | 总控功能验收通过；等待 `AlembicTest` 提交测试报告、probe 脚本和相关测试文档变更，并回填 commit hash。 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md) |
 | Test-2026-05-21-03：BiliDili prime immediate receipt shout 可见行为复测 | 已完成 | 功能验收通过；`AlembicTest` 已提交测试报告 / probe 脚本 / 文档变更，commit `b532cd8bf7c40c8f12b93f91380befdea617d999` | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-immediate-receipt-shout-test-2026-05-21.md) |
 | Test-2026-05-21-02：BiliDili prime shout service boundary 复测 | 已完成 | 功能验收通过；`AlembicTest` 已提交测试报告 / probe 脚本 / 文档变更，commit `af0430ad69b4da50469eeaded8caa77c59e996e5` | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-service-boundary-test-2026-05-21.md) |
 | Test-2026-05-21-01：BiliDili prime 注入与 Codex 知识呐喊插件验证 | 已完成 | 结论为失败：BiliDili Recipes 可读，但 `prime` 未返回 `primeKnowledgeMaterial`；后续复测已转入 Test-2026-05-21-02 | `AlembicTest` | [../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-shout-plugin-test-2026-05-21.md) |
 
 ### Test-2026-05-21-04：BiliDili prime readable receipt shout 可见摘要复测
 
-状态：待启动
+状态：执行中（功能通过，待 AlembicTest 仓库封口提交）
 创建日期：2026-05-21
 总控来源：`AlembicPlugin` SHOUT-5 已通过总控验收并刷新本机 Codex plugin cache；需要在 BiliDili 真实项目中验证 Codex 可见呐喊是否从 evidenceRefs 路径清单转为主动、有声量的知识摘要。
 执行窗口：AlembicTest
@@ -88,26 +88,35 @@ git -C ../BiliDili status --short --branch
 
 #### 回填要求
 
-- 测试结论：
-- 执行范围：
-- 使用配置：
-- plugin / runtime / Core / Alembic daemon / Codex plugin cache 版本证据：
-- `prime` 调用入口：
-- `prime` payload 摘要：
-- `hostResponse` 时序字段摘要：
-- `shoutInstruction` 可见摘要约束摘要：
-- `serviceBoundary` 摘要：
-- prime tool result 后的下一条 Codex 可见响应原文或摘要：
-- 是否先呐喊再继续任务：
-- 是否默认倾倒 evidenceRefs 路径 / 行号：
-- payload 中 evidenceRefs 是否仍保留：
-- 是否出现 `codex_host_response` tool：
-- BiliDili git 状态前后对比：
-- 关键日志信号：
-- 详细报告路径：建议 `AlembicTest/docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md`
-- 遗留风险：
-- 下一步建议：
-- 建议归属窗口：
+- 测试结论：通过，已通过总控功能验收，待 `AlembicTest` 仓库封口提交。BiliDili 上下文中 `alembic_task(operation="prime")` 成功返回 `primeKnowledgeMaterial.status=delivered`；prime tool result 后下一条开发者可见响应先做主动、有声量的 readable receipt shout，再继续读取 JSON、复核 git 和写报告。
+- 执行范围：只读调用 Alembic Codex MCP stdio runtime 的 `alembic_codex_status` 与 `alembic_task prime`；未启动 cold-start / rescan；未修改 BiliDili 业务源码、工程配置、登录、播放、网络、UI 或 Xcode 项目结构。
+- 使用配置：`ALEMBIC_PROJECT_DIR` / `CODEX_WORKSPACE_DIR` 指向 workspace 内 `BiliDili`；MCP entry 使用 cache marker 指向的 workspace `AlembicPlugin/dist/bin/codex-mcp.js`；agent tier；`ALEMBIC_RUNTIME_MODE=plugin`；输出 JSON 为 `AlembicTest/tmp/bilidili-prime-readable-receipt-shout-probe-2026-05-21.json`。
+- plugin / runtime / Core / Alembic daemon / Codex plugin cache 版本证据：cache marker `.alembic-dev-refresh.json` 显示 `gitHead=58b82f8526d68aef516d68477d7a0e505fc114e9`、`localMcpEntry=AlembicPlugin/dist/bin/codex-mcp.js`；`AlembicPlugin` HEAD 为 `58b82f8526d68aef516d68477d7a0e505fc114e9`；AlembicCodex runtime artifact `AlembicPlugin/plugins/alembic-codex` HEAD 为 `df608057bd274ebb6b39f6a9c0e964f1b8517426`；cache Skill 与 runtime Skill 的 `alembic/SKILL.md:25` 包含 `briefly and actively shout` 以及 `do not dump paths or line numbers by default`；cache runtime dist 与 workspace Plugin dist 的 `task.js:281,283` 含 `shout a short, active knowledge receipt` 和 `do not list evidenceRefs paths or line numbers by default`；local daemon status 为 stale，但本次 `serviceBoundary.residentServiceRequested=false`。
+- `prime` 调用入口：`node AlembicTest/scripts/probe-codex-prime.mjs --output AlembicTest/tmp/bilidili-prime-readable-receipt-shout-probe-2026-05-21.json`，脚本内部调用 `alembic_task` 参数为 `operation=prime`、`activeFile=Sources/Features/VideoFeed/VideoFeedViewController.swift`、`language=swift`。
+- `prime` payload 摘要：`success=true`；`status=delivered`；`acceptedKnowledge=5`；`acceptedGuard=1`；`evidenceRefs=18`，且仍保留在 payload；知识包括 `@schemerouter-url-decoupling`、`@route-error-eight-cases`、`@analytics-middleware-tracker`、`@lazy-var-uicomponents`、`@modulemanager-priority-lifecycle`，Guard 为 `@protocol-naming-suffixes`。
+- `hostResponse` 时序字段摘要：`action=shout_prime_knowledge_receipt`；`receiptId=prime-mpfgywqc-1`；`timing=immediate_after_prime`；`required=true`；`requiredBeforeNextAction=true`；`visibility=developer_visible`；`reason` 仍明确要求 receipt 必须是 prime tool result 后、任何后续 tool call / code reading / edit / Guard / final summary 前的下一条开发者可见响应。
+- `shoutInstruction` 可见摘要约束摘要：要求 short / active knowledge receipt，像真正的呐喊一样先说收到的 Recipe / Guard 约束，讲出有用模式、guardrails 和后续判断依据；使用 trigger / actionHint / title / summary 让摘要可读；不默认列 evidenceRefs 路径或行号，不默认点出缺少行号；evidenceRefs 留给后续代码阅读、验证或用户要求引用。
+- `serviceBoundary` 摘要：`executionPath=plugin-owned-codex-facing`；`owner=alembic-plugin`；`operation=prime`；`tool=alembic_task`；`residentServiceRequested=false`；`sharedContractCandidate=true`。
+- prime tool result 后的下一条 Codex 可见响应原文或摘要：`Prime 收到了 BiliDili 的关键知识包：5 条 Recipe 和 1 条 Guard 已就位。接下来判断任何 VideoFeed/Home 相关改动时，我会先守住这些模式：跨 Feature 跳转走 SchemeRouter，不硬耦合页面；路由错误用 RouteError/RouteResult 表达；路由埋点通过闭包注入保持后端解耦；Feature UI 继续用 lazy var 延迟构建；ModuleManager 负责按优先级拆开同步注册和延迟初始化；Protocol 命名按 DI、Repository、Client capability 三层后缀守边界。证据 refs 已保留在 payload 里，需要复核时再展开。`
+- 是否先呐喊再继续任务：是。probe tool result 后，下一条开发者可见响应就是 readable receipt shout；之后才继续读取 JSON、复核 BiliDili git 和写报告。
+- 是否默认倾倒 evidenceRefs 路径 / 行号：否。可见响应未列长路径清单、逐条 path:line，也未把“缺少行号”作为可见重点；probe 检查 `codexVisibleShoutDefaultsDumpEvidenceRefs=false`。
+- payload 中 evidenceRefs 是否仍保留：是。`evidenceRefCount=18`，`payloadEvidenceRefsRetained=true`，供后续复核或用户要求引用时使用。
+- 是否出现 `codex_host_response` tool：否。tool list 共 26 个工具，包含 `alembic_task`，不包含 `codex_host_response`；`nextActions` 仅包含可选 `alembic_task(operation=create)`。
+- BiliDili git 状态前后对比：测试前 `## main...origin/main`；测试后 `## main...origin/main`；无受 git 跟踪或未跟踪文件变化。
+- 关键日志信号：MCP stderr tail 为 `Alembic Codex MCP ready — 26 tools`；probe duration `6711ms`；`shoutInstructionReadable=true`；`shoutInstructionNoDefaultEvidenceDump=true`；status 显示 local daemon stale，但本次 prime 由 Plugin-owned path 成功返回，未请求 resident service。
+- 详细报告路径：[../../AlembicTest/docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md](../../AlembicTest/docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md)
+- 遗留风险：payload 中仍有部分 evidenceRefs 没有行号；SHOUT-5 的验收目标是不把缺行号当作可见重点，当前已通过；local Alembic daemon stale 不影响本次 Plugin-owned prime readable receipt shout，但 Dashboard/daemon handoff 仍需另测；原始 probe JSON 位于 `AlembicTest/tmp/`，长期报告只保留脱敏摘要。
+- 下一步建议：`AlembicTest` 先封口提交本次报告、probe 脚本和测试文档变更并回填 commit hash；若要提升 evidenceRef 精度，后续交给 Alembic/AlembicCore 知识生成链路补强；若要验证 Dashboard handoff 或 daemon ready，另建独立测试单。
+- 建议归属窗口：总控验收归 `AlembicWorkspace`；evidenceRef 行号补强建议归 `Alembic` / `AlembicCore`；本测试不建议改 BiliDili。
+
+#### 总控功能验收
+
+- 验收结论：功能通过，封口未完成。`AlembicTest` 回填的 BiliDili 真实项目复测证明 SHOUT-5 已达成：prime tool result 后下一条开发者可见响应先做主动、有声量的知识摘要呐喊，payload 仍保留 evidenceRefs，但可见响应不默认倾倒路径 / 行号。
+- 关键证据：`primeKnowledgeMaterial.status=delivered`；`acceptedKnowledge=5`；`acceptedGuard=1`；`evidenceRefs=18`；`hostResponse.action=shout_prime_knowledge_receipt`；`timing=immediate_after_prime`；`requiredBeforeNextAction=true`；`visibility=developer_visible`；`serviceBoundary.executionPath=plugin-owned-codex-facing`；`residentServiceRequested=false`。
+- 可见呐喊证据：下一条开发者可见响应先喊出 BiliDili 已收到 5 条 Recipe 和 1 条 Guard，并把 SchemeRouter、RouteError / RouteResult、AnalyticsMiddleware、lazy var UI、ModuleManager、Protocol 命名后缀等约束总结成开发者一眼能懂的摘要；仅说明证据 refs 已保留在 payload 中，需要复核时再展开。
+- 负向证据：`codexVisibleShoutDefaultsDumpEvidenceRefs=false`；可见响应未列长路径清单、逐条 path:line，也未把“缺少行号”作为可见重点；tool list 和 `nextActions` 均未出现 `codex_host_response`。
+- 真实项目状态：BiliDili 测试前后 `git status --short --branch` 均为 `## main...origin/main`，真实项目未被修改。
+- 封口阻塞：`AlembicTest` 仓库仍有未提交变更：`scripts/README.md`、`scripts/probe-codex-prime.mjs`，以及未跟踪报告 `docs/bilidili-prime-readable-receipt-shout-test-2026-05-21.md`。按总控规则，测试单保持 `执行中`，仅发送 `AlembicTest` 做封口提交并回填 commit hash。
 
 ### Test-2026-05-21-03：BiliDili prime immediate receipt shout 可见行为复测
 
@@ -359,10 +368,10 @@ git -C ../BiliDili status --short
 
 ## 可复制提示词
 
-发送给：`AlembicTest`。
+发送给：`AlembicTest`（封口提交）。
 
 ```text
-读取 docs/workspace/alembic-test-exchange.md，按照文档完成 Test-2026-05-21-04：在 BiliDili 真实项目中验证 Alembic Codex prime receipt shout 的可见摘要优化。重点验证 prime tool result 后下一条开发者可见响应是否主动、有声量地喊出 Recipe / Guard 知识摘要、模式和后续判断依据；不要默认倾倒 evidenceRefs 路径 / 行号，也不要把缺少行号当作可见重点。完成后回填测试结论、版本证据、payload 摘要、Codex 可见呐喊原文或摘要、是否默认倾倒 evidenceRefs、BiliDili git 前后状态、验证命令 / 日志和遗留风险。
+读取 docs/workspace/alembic-test-exchange.md，完成 Test-2026-05-21-04 的 AlembicTest 仓库封口：不要扩大测试范围，优先提交本次 readable receipt shout 测试报告、probe 脚本和相关测试文档变更；提交后回填 AlembicTest commit hash、提交范围、是否仍有未提交变更和遗留风险。
 ```
 
 ## 统一测试单模板
