@@ -8,10 +8,10 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) | AlembicTest 执行中 | Test-2026-05-21-03 功能验收通过：BiliDili prime 后下一条开发者可见响应已先做 receipt shout；当前仅等待 `AlembicTest` 仓库封口提交并回填 hash。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | AlembicTest 执行中 | Plugin payload / Skill / runtime / cache 均已就绪且真实可见行为已通过；下一步是 `AlembicTest` 提交测试报告 / probe 脚本 / 文档变更。 |
+| 当前计划 | [prime-immediate-receipt-shout-workspace-plan-2026-05-21.md](prime-immediate-receipt-shout-workspace-plan-2026-05-21.md) | AlembicPlugin 待启动 | prime 后立即呐喊时序已通过 BiliDili 验证；当前派发 `AlembicPlugin` 优化开发者可见呐喊内容，从 evidenceRefs 清单改为一眼可读、有声量的知识摘要。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | AlembicPlugin 待启动 | Test-2026-05-21-03 已完成并封口；用户人工验证确认 Codex 能自己呐喊，下一步优化摘要可读性。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md](../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md) | 已完成 | 记录 `hostResponse.timing` / `requiredBeforeNextAction` / `visibility`、三态 `shoutInstruction`、AlembicCodex runtime artifact、验证命令、提交 hash 和总控验收结论。 |
-| 当前测试单 | [alembic-test-exchange.md](alembic-test-exchange.md) | AlembicTest 执行中 | Test-2026-05-21-03：功能通过，等待 `AlembicTest` 封口提交测试报告、probe 脚本和相关文档变更。 |
+| 当前测试单 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-21-03：功能通过且 `AlembicTest` 已封口提交，commit `b532cd8bf7c40c8f12b93f91380befdea617d999`。 |
 | 上一完成计划 | [alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md) | 已完成 | 用户确认 Alembic 应作为常驻服务由 Plugin 按需请求，不做 MCP tool ownership bridge；Plugin service boundary 与 BiliDili 复测均已完成。 |
 | 上一收口计划 | [bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md](bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md) | 已收口 | `Alembic` 已补齐 `/api/v1/mcp/call` 兼容 bridge，但不再作为 Codex-facing prime 主路径。 |
 | 前序完成计划 | [alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md) | 已完成 | V1 `prime -> Codex 自主呐喊` 最小闭环已由 `AlembicPlugin` 回填并通过总控验收。 |
@@ -23,7 +23,7 @@
 | 需求到 Wave 执行流程 | [requirement-to-wave-execution-flow.md](requirement-to-wave-execution-flow.md) | 长期流程 | 固化原始计划书、需求设计、代码依赖调研、目标阶段确认、用户确认、wave 执行计划和提示词发送的成熟路线。 |
 | TODO 与空闲窗口调度规则 | [todo-window-scheduling-policy.md](todo-window-scheduling-policy.md) | 长期流程 | 规定通用 TODO 子模式如何服务需求设计、派发计划、验收滚动、主线 / 可并行判断，并避免空闲窗口空转。 |
 | 全局 TODO 列表 | [global-todo-board.md](global-todo-board.md) | 维护中 | 记录跨计划、跨窗口、暂未进入当前波次或需要长期追踪的待办；当前派发仍以当前计划为准。 |
-| AlembicTest 测试交流文档 | [alembic-test-exchange.md](alembic-test-exchange.md) | 执行中 | Test-2026-05-21-03 功能验收通过，当前只发送 `AlembicTest` 做测试仓库封口提交。 |
+| AlembicTest 测试交流文档 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-21-03 已封口；当前没有待启动测试单，等待 `AlembicPlugin` 完成 SHOUT-5 后再决定是否新建复测单。 |
 | AlembicTest 测试交流规则 | [alembic-test-exchange-policy.md](alembic-test-exchange-policy.md) | 长期规则 | 规定总控如何创建测试单、派发 `AlembicTest`、验收回填和处理证据不足。 |
 | AlembicTest 测试执行规则 | [../../AlembicTest/docs/testing-operation-policy.md](../../AlembicTest/docs/testing-operation-policy.md) | 长期规则 | 规定总控不直接执行测试操作，真实项目测试、冷启动监控、复现和报告由 `AlembicTest` 承接。 |
 | AlembicTest 测试单模板 | [../../templates/alembic-test-handoff-template.md](../../templates/alembic-test-handoff-template.md) | 长期模板 | 用于生成 `docs/workspace/alembic-test-exchange.md` 中的统一测试单。 |
@@ -59,8 +59,8 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>已完成 | 当前计划 SHOUT-1/2 已通过总控验收；本机 Codex plugin cache 已刷新到 `829f838704159c7ed205f93ecd986c6234173721`。 |
-| `AlembicTest`<br>执行中 | Test-2026-05-21-03 功能验收通过；当前任务是提交测试报告、probe 脚本和相关测试文档变更，回填 AlembicTest commit hash 与是否仍有未提交变更。 |
+| `AlembicPlugin`<br>待启动 | 执行 SHOUT-5：保持 prime 后立即 receipt shout 时序和 evidenceRefs payload，但优化 `shoutInstruction` / Skill / 测试 / runtime artifact，让开发者可见呐喊主动、有声量地喊出知识摘要。 |
+| `AlembicTest`<br>已完成 | Test-2026-05-21-03 已封口，commit `b532cd8bf7c40c8f12b93f91380befdea617d999`；等待 Plugin 完成 SHOUT-5 后再决定是否创建新复测单。 |
 | `Alembic`<br>观察中 | daemon `/api/v1/mcp/call` 兼容 bridge 已完成；当前不承接 Codex-facing prime ownership，后续作为 resident service 被请求。 |
 | `AlembicCore`<br>观察中 | 本轮暂无共享层下沉证据；如 Plugin 回填证明存在真实双向消费方，再评估共享 contract。 |
 | `AlembicAgent`<br>无任务 | 当前是 Codex host agent / Plugin Skill 行为，不涉及 internal AI runtime。 |
