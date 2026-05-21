@@ -8,8 +8,8 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md](alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md) | V020-1 待启动 | 启动 `GTODO-2026-05-22-011`：把 Alembic 自有 package / plugin / release / runtime 版本位统一为 `0.2.0`，并在下游完成后刷新 Codex plugin cache。当前只发送 `AlembicCore` / `AlembicAgent` / `AlembicDashboard` 做上游版本源。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | V020-1 待启动 | 当前主线切换到 0.2.0 版本统一。`Alembic` 与 `AlembicPlugin` 因依赖上游 package version 生成 staging/runtime，暂不发送。 |
+| 当前计划 | [alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md](alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md) | V020-1R 待启动 | 启动 `GTODO-2026-05-22-011`：把 Alembic 自有 package / plugin / release / runtime 版本位统一为 `0.2.0`，并在下游完成后刷新 Codex plugin cache。`AlembicCore` / `AlembicDashboard` 已通过总控复核；当前只返工 `AlembicAgent` lockfile Core snapshot。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | V020-1R 待启动 | 当前主线切换到 0.2.0 版本统一；`AlembicAgent/package-lock.json` 中 `../AlembicCore` snapshot 仍为 `0.1.0`，当前只发送 `AlembicAgent`。 |
 | 上一完成计划 | [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md) | 已完成 | `AlembicPlugin` AIP-1 已完成并通过总控验收，提交 `747b40f2abb2b9d8cb2714656fab164267d1d105`，Codex runtime 子仓库 `01fb042afe87264ad213dfc13444dc9dc48b77ca`；本机 plugin cache 已刷新到 `747b40f` local-mcp。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md) | AIP-1 已完成 | 记录删除 Plugin 旧 AI provider / config / status surfaces、MCP `alembic_codex_ai_config`、HTTP `/ai` 配置写入、DI provider 注入、Skill / runtime artifact、提交 hash、验证命令和残留扫描。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md](../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md) | VEC-2/VEC-3/VEC-4R/VEC-5R 已完成 | 记录 HostAiAdapter placeholder embed 修正、ResidentSearchClient、PrimeSearchPipeline / search handler metadata、Skill、runtime artifact、删除 daemon MCP bridge、VEC-5R mode normalization、验证命令和提交 hash。 |
@@ -64,11 +64,11 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>阻塞 | 等 `AlembicCore` / `AlembicAgent` / `AlembicDashboard` 先统一源版本后，再更新 `alembic-ai@0.2.0`、lockfile 和 publish staging。 |
-| `AlembicCore`<br>待启动 | V020-1 上游版本源：将 `@alembic/core` package / lock 自有版本统一到 `0.2.0` 并回填验证。 |
-| `AlembicAgent`<br>待启动 | V020-1 上游版本源：将 `@alembic/agent` package / lock 自有版本统一到 `0.2.0` 并回填验证。 |
-| `AlembicDashboard`<br>待启动 | V020-1 上游版本源：将私有 `alembic-dashboard` package / lock 自有版本统一到 `0.2.0` 并回填验证。 |
-| `AlembicPlugin`<br>阻塞 | 等 `AlembicCore` 先统一到 `0.2.0` 后，再更新 Codex plugin manifest / channel / runtime / cache。 |
+| `Alembic`<br>阻塞 | 等 `AlembicAgent` V020-1R 修掉 lockfile Core snapshot 后，再更新 `alembic-ai@0.2.0`、lockfile 和 publish staging。 |
+| `AlembicCore`<br>已完成 | V020-1 上游版本源已通过总控复核：`@alembic/core` package / lock 自有版本已统一到 `0.2.0`，提交 `f30beacedf89abab13b91e87e4686d0db38e7d29`。 |
+| `AlembicAgent`<br>待启动 | V020-1R 返工：刷新 `package-lock.json` 中 `../AlembicCore` snapshot，当前仍有 `AlembicAgent/package-lock.json:30` 的 `"version": "0.1.0"`。 |
+| `AlembicDashboard`<br>已完成 | V020-1 上游版本源已通过总控复核：私有 `alembic-dashboard` package / lock 自有版本已统一到 `0.2.0`，提交 `5160a2a0fb164005f1922b8f58f28ca0ec88df56`。 |
+| `AlembicPlugin`<br>阻塞 | 等 `AlembicAgent` V020-1R 完成后，再更新 Codex plugin manifest / channel / runtime / cache。 |
 | `AlembicTest`<br>观察中 | 当前不创建测试单；如用户需要真实 Codex / BiliDili 验证，在 cache refresh 后再启动。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码，只可能作为后续测试对象。 |
 
