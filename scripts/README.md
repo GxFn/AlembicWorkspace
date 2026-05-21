@@ -31,9 +31,27 @@ Current scripts:
   dev server, and Codex MCP process residue. It does not start, stop, or kill
   anything; use `--strict` only when a clean runtime surface is required.
 - `restart-alembic.mjs`: one-command local Alembic runtime restart for real
-  project testing. It defaults to the workspace `BiliDili` project, calls the
-  Alembic CLI `start --restart --no-open --json`, then prints the active
-  Dashboard URL, daemon pid, and bootstrap status probe.
+  project testing. It defaults to the workspace `BiliDili` project, first runs
+  `npm run dev:link` in the Alembic repository to refresh the local global
+  development environment, then calls the Alembic CLI
+  `start --restart --no-open --json`, prints the active Dashboard URL, daemon
+  pid, and compact bootstrap job probe. Use `--monitor` to immediately hand off
+  to the read-only bootstrap monitor after restart. Use `--no-dev-link` only
+  when intentionally testing an already-linked build. Because Alembic must write
+  `~/.asd/runtime-control.json` to register the active runtime, the script
+  preflights that write and should be run with elevated sandbox permissions
+  inside Codex.
+- `monitor-alembic-bootstrap.mjs`: read-only bootstrap monitor for cold-start
+  runs. It never starts, stops, cancels, or kills Alembic; it resolves the
+  current daemon URL/data root, polls the compact jobs API
+  (`/api/v1/jobs?kind=bootstrap&limit=1&compact=true`), counts candidate
+  files, and tails focused log signals such as `coding-standards`,
+  `note_finding`, `QualityGate`, timeout, cancellation, and failed dimensions.
+  It must not call heavyweight Dashboard compatibility endpoints such as
+  `/api/v1/modules/bootstrap/status` for routine monitoring. Inside Codex,
+  standalone localhost polling can be blocked by the sandbox; prefer
+  `restart-alembic.mjs --monitor` with elevated permissions when restarting and
+  watching a real cold start.
 - `verify-control-center.mjs`: one-command control-center verification that
   runs boundary, repo status, workspace docs, dispatch coverage, and
   `git diff --check`. Add `--with-runtime` for a read-only runtime residue
@@ -71,6 +89,18 @@ Restart local Alembic for `BiliDili`:
 
 ```bash
 node scripts/restart-alembic.mjs
+```
+
+Restart local Alembic and monitor cold-start progress:
+
+```bash
+node scripts/restart-alembic.mjs --monitor
+```
+
+Monitor an already-running Alembic cold start:
+
+```bash
+node scripts/monitor-alembic-bootstrap.mjs --watch
 ```
 
 Archive dry-run example:
