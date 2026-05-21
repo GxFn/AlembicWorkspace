@@ -2,30 +2,22 @@
 
 更新日期：2026-05-22
 总控窗口：AlembicWorkspace
-状态：AIP-1 总控验收通过，主线功能完成
+状态：V020-1 待启动
 
 ## 状态摘要
 
-用户确认功能完成，要求进行文档归档并准备下一条 TODO 主线。总控已经把两条完成主线收口为历史归档：
+当前新主线是 [alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md](alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md)：把 Alembic 自有 package / plugin / release staging / Codex runtime 版本位统一为 `0.2.0`，完成后刷新本机 Codex plugin cache。
 
-- prime immediate receipt shout 计划已归档到 [archive/2026-05/prime-immediate-receipt-shout/](archive/2026-05/prime-immediate-receipt-shout/)；SHOUT-7 已通过总控验收，用户确认不新增 AlembicTest 复测。
-- resident vector search release 计划已归档到 [archive/2026-05/resident-vector-search-release/](archive/2026-05/resident-vector-search-release/)；Test-2026-05-22-01 通过，Plugin cache 已刷新到 AlembicPlugin `2c98f69b1388c478bbbb255e487c51fde621cff7`。
+总控已完成 V020-0 扫描，确认当前版本入口：
 
-当前新主线是 [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md)：长线删除 `AlembicPlugin` 中旧内置第三方 AI 能力残留。用户已补充确认，Plugin 侧 AI 配置来自早期“整体做成 Codex 插件”的路线；现在产品已改为 Codex 插件 + Alembic 主体模式，所以 Plugin 侧旧 AI 配置 / 状态 / 权限 surfaces 默认进入删除范围。AIP-0 总控真实调用方扫描已完成；`AlembicPlugin` AIP-1 已完成并通过总控验收。
+- `Alembic` / `AlembicCore` / `AlembicAgent` 当前为 `0.1.0`。
+- `AlembicPlugin` root / Codex plugin manifest / channel / runtime 当前为 `0.1.2`，且还有 `0.1.1` hardcode / fallback 需要在 Plugin 阶段清理。
+- `AlembicDashboard` 是私有 package `3.3.8`；按本次用户口径纳入 Alembic 自有版本统一。
+- `Alembic` publish staging 会读取 Core / Agent / Dashboard 版本；`AlembicPlugin` Codex runtime 会复制 Core package，所以二者必须等上游版本源先完成。
 
-当前已回填的实现事实：
+当前发送窗口：`AlembicCore`、`AlembicAgent`、`AlembicDashboard`。
 
-- `AlembicPlugin` 已删除 `HostAiAdapter` / `AiConfigState` / `AiModule`，移除旧 provider runtime 外形和 Plugin AI config 状态。
-- MCP `alembic_codex_ai_config` 已从 tool policy、annotations、server handler、preflight 推荐和测试场景中移除。
-- HTTP `/ai/*` 的 provider/config/env/workspace-config/chat/agent 旧入口统一 `410 PLUGIN_AI_CONFIG_REMOVED` fail-closed，不再写入 Plugin workspace AI env 或 API key。
-- `SearchEngine` / `IndexingPipeline` / `VectorService` 不再注入 Plugin AI / embedding provider；Codex prime/search 保留 Plugin baseline search，resident vector 增强继续走 Alembic resident service API。
-- Skill 与 AlembicCodex runtime artifact 已同步，`plugins/alembic-codex/runtime` 负向扫描仅剩 Core-owned `vendor/AlembicCore` 快照中的 AI env 常量。
-- 提交：AlembicPlugin `747b40f2abb2b9d8cb2714656fab164267d1d105`；AlembicCodex runtime `01fb042afe87264ad213dfc13444dc9dc48b77ca`。
-- 总控复核：targeted unit 4 files / 52 tests 通过；关键负向扫描通过；AIP-2 Alembic 无任务，AIP-3 暂不创建 AlembicTest 测试单。
-- 本机 Codex plugin cache 已刷新：`~/.codex/plugins/cache/gxfn/alembic-codex/0.1.2/.alembic-dev-refresh.json` 记录 `mode=local-mcp`、`gitHead=747b40f2abb2b9d8cb2714656fab164267d1d105`。
-
-- 当前发送窗口：无。
-- 当前不发送给：`Alembic`（无任务）、`AlembicCore`（无任务）、`AlembicDashboard`（无任务）、`AlembicTest`（观察中）、`AlembicAgent`（无任务）、`BiliDili`（无任务）。
+当前不发送给：`Alembic`（阻塞等待上游版本）、`AlembicPlugin`（阻塞等待 Core 版本）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
 
 ## 窗口分派
 
@@ -33,29 +25,24 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>无任务 | 保留 resident/internal AI 配置和 embedding 服务能力；AIP-1 不需要主体入口补文案或能力字段。 |
-| `AlembicCore`<br>无任务 | 暂无共享 contract 变更证据；Plugin 删除旧 provider 注入应在 Plugin adapter 层完成。 |
-| `AlembicAgent`<br>无任务 | 本主线不改 Agent runtime。 |
-| `AlembicDashboard`<br>无任务 | Plugin 已不直接引用 Dashboard；本轮不改 Dashboard 源码。 |
-| `AlembicPlugin`<br>已完成 | AIP-1 已完成并通过总控验收。执行记录：[../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md)。 |
-| `AlembicTest`<br>观察中 | 当前不创建测试单；用户需要真实 Codex / BiliDili 验证时再启动。 |
-| `BiliDili`<br>无任务 | 不改真实 iOS 项目源码，只可能作为后续测试对象。 |
+| `Alembic`<br>阻塞 | 等 `AlembicCore` / `AlembicAgent` / `AlembicDashboard` 回填后，再更新 root `alembic-ai@0.2.0`、lockfile、publish staging 与 release metadata。 |
+| `AlembicCore`<br>待启动 | V020-1：将 `@alembic/core` 自有版本位从 `0.1.0` 统一为 `0.2.0`，同步 lockfile 和验证结果。 |
+| `AlembicAgent`<br>待启动 | V020-1：将 `@alembic/agent` 自有版本位从 `0.1.0` 统一为 `0.2.0`，同步 lockfile 和验证结果。 |
+| `AlembicDashboard`<br>待启动 | V020-1：将私有 `alembic-dashboard` 自有 package version 从 `3.3.8` 统一为 `0.2.0`，同步 lockfile 和验证结果。 |
+| `AlembicPlugin`<br>阻塞 | 等 `AlembicCore` 回填后再更新 root/plugin/channel/runtime/cache 版本，不提前生成 runtime。 |
+| `AlembicTest`<br>观察中 | 当前不创建测试单；如用户需要真实 Codex / BiliDili 验证，在 V020-4 后创建。 |
+| `BiliDili`<br>无任务 | 不改真实 iOS 项目源码；只可能作为后续测试对象。 |
 
 ## 可复制提示词
 
-发送给：无。
+发送给：`AlembicCore`、`AlembicAgent`、`AlembicDashboard`。
 
 ```text
-当前无可复制派发提示词；AIP-1 已通过总控验收。
+读取 docs/workspace/alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md，按照文档，领取并完成分配给你所在窗口的 V020-1 任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
 ```
 
 ## 回填区
 
-- 当前总控计划：[alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md)。
-- 全局 TODO：[global-todo-board.md](global-todo-board.md) 的 `GTODO-2026-05-21-010` 已完成。
-- AlembicPlugin SHOUT 执行记录：[../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md](../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md) 已记录 SHOUT-7 总控验收。
-- AlembicPlugin resident vector 执行记录：[../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md](../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md) 已记录 VEC-2/VEC-3/VEC-4R/VEC-5R/VEC-6 相关证据。
-- 2026-05-22：AIP-0 代码依赖调研完成；当前只派发 `AlembicPlugin`，`AlembicDashboard` 因 Plugin 不直接引用 Dashboard 而标为无任务。
-- 2026-05-22：`AlembicPlugin` AIP-1 已完成并推送。验证通过：targeted unit、`npm run build:check`、`npm run build`、`npm run prepare:codex-plugin-runtime`、`npm run verify:codex-plugin`、`npm run verify:codex-channel`、`npm run verify:release-package-boundary`、`npm run verify:codex-session`、`npm run report:agent-extraction-boundary`、`git diff --check`。执行记录：[../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md)。
-- 2026-05-22：总控验收 AIP-1 通过：复核关键代码删除点、负向扫描和 targeted unit 通过；本轮不启动 `Alembic` / `AlembicDashboard`，也暂不创建 AlembicTest 测试单。
-- 2026-05-22：总控按用户要求刷新本机 Codex plugin cache，命令 `npm run dev:codex-plugin:local-mcp -- --clean --all-installed` 成功；cache marker 指向 AlembicPlugin `747b40f2abb2b9d8cb2714656fab164267d1d105`，mode=`local-mcp`。
+- 当前总控计划：[alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md](alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md)。
+- 全局 TODO：[global-todo-board.md](global-todo-board.md) 的 `GTODO-2026-05-22-011` 已启动。
+- 2026-05-22：V020-0 总控扫描完成，当前只派发上游源版本窗口；`Alembic` 与 `AlembicPlugin` 在上游回填后进入下一阶段。
