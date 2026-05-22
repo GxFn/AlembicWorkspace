@@ -2,7 +2,7 @@
 
 更新日期：2026-05-22
 总控窗口：AlembicWorkspace
-状态：RFR-6C 待启动（AlembicPlugin）
+状态：RFR-6D 待启动（AlembicPlugin）
 
 ## 状态摘要
 
@@ -24,6 +24,8 @@
 - 用户补充确认长期前提：`Plugin first, Alembic install enhances`。`AlembicPlugin` 是 Codex host agent 入口，`Alembic` 是本地增强底座；Plugin 可以通过请求 Alembic service 工作。因此 RFR-6A 需要把旧功能先分类为 Plugin-owned 请求治理、Alembic service request client、portable compatibility 或旧残留，再做最小真实修正。
 - 用户进一步强调 `AlembicPlugin` 自己也有围绕 Codex / IDE Agent 的自洽闭环，不能把 Plugin 做成空壳 client。RFR-6A 分类顺序修正为：先判断是否属于 Plugin Codex 自洽闭环，再判断 Alembic service request client、portable compatibility 或旧残留。
 - RFR-6B 总控真实代码分析已完成：[repository-split-rfr-6b-real-code-analysis-2026-05-22.md](repository-split-rfr-6b-real-code-analysis-2026-05-22.md)。下一轮不做 package 身份、大面积 HTTP/service/injection/daemon 搬迁、Dashboard HelpView 文案或 service bridge；RFR-6C 只派发 `AlembicPlugin`，处理 HTTP `DashboardOperations` compatibility 命名歧义，同时保留外部 `dashboard.*` operation id 和 HTTP route 行为。
+- RFR-6C 已通过总控验收：[../AlembicPlugin/repository-folder-boundary-rfr-6c-plugin-http-compat-operations-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-rfr-6c-plugin-http-compat-operations-2026-05-22.md)。完成范围：`DashboardOperations` cluster 分类为 Plugin portable HTTP compatibility operation dispatcher，源码迁入 `lib/http/compatibility/operations/`，内部命名收敛为 `DashboardCompatibility*`；外部 `dashboard.*` operation id、HTTP route、operation payload、runtime artifact 路径、Codex MCP tool schema、Skill contract 和 channel/cache 行为保持不变。提交：AlembicPlugin `a535d16e6974fdcba2b643b64dc24c8315c9b51e`，AlembicCodex runtime artifact `85c8fbdc2a94d86a4f721301c42a3fe618c4da76`，`runtime.tgz` SHA-256 `c151d06691c4b631d5b1d249140ca2989300a7c16c935256589e12f4f3513835`；总控复核残留扫描、runtime artifact 状态和提交 diff check 通过。
+- RFR-6D 总控真实代码分析已完成：[repository-split-rfr-6d-real-code-analysis-2026-05-22.md](repository-split-rfr-6d-real-code-analysis-2026-05-22.md)。下一轮不做整个 `service`、整个 `injection` 或整个 `daemon`；RFR-6D 只派发 `AlembicPlugin`，处理 `AgentModule.ts` 命名残留，同时保留 `SkillHooks` 行为和 `skillHooks` service key。
 
 当前发送窗口：`AlembicPlugin`。
 
@@ -35,12 +37,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | RFR-6C 只改 Plugin HTTP compatibility 命名；Alembic 主仓库已完成 RFR-3A，DB boundary lint 继续保持独立 TODO。 |
-| `AlembicCore`<br>观察中 | RFR-6C 不触碰 Core public API / deep import。 |
-| `AlembicAgent`<br>观察中 | RFR-6C 不触碰 Agent。 |
-| `AlembicDashboard`<br>观察中 | RFR-6C 不改 Dashboard HelpView / i18n，也不引入 Dashboard 前端依赖。 |
-| `AlembicPlugin`<br>待启动 | 执行 RFR-6C：分类并处理 HTTP `DashboardOperations` compatibility 命名歧义，保留外部 `dashboard.*` operation id、HTTP route 行为、runtime artifact、Codex MCP tool schema 和 channel/cache 行为。 |
-| `AlembicTest`<br>观察中 | RFR-6C 先由 Plugin 窗口完成 build / unit / runtime verify；暂无真实项目复测单。 |
+| `Alembic`<br>观察中 | RFR-6D 只改 Plugin SkillHooks DI 模块命名；Alembic 主仓库已完成 RFR-3A，DB boundary lint 继续保持独立 TODO。 |
+| `AlembicCore`<br>观察中 | RFR-6D 不触碰 Core public API / deep import。 |
+| `AlembicAgent`<br>观察中 | RFR-6D 不触碰 AlembicAgent 仓库，也不引入 Agent runtime。 |
+| `AlembicDashboard`<br>观察中 | RFR-6D 不改 Dashboard HelpView / i18n，也不引入 Dashboard 前端依赖。 |
+| `AlembicPlugin`<br>待启动 | 执行 RFR-6D：分类并处理 `AgentModule.ts` 命名残留，保留 `skillHooks` service key、SkillHooks load / hook 行为、Codex Skill lifecycle、MCP skill handler 和 runtime artifact 行为。 |
+| `AlembicTest`<br>观察中 | RFR-6D 先由 Plugin 窗口完成 build / unit / runtime verify；暂无真实项目复测单。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
 ## 可复制提示词
@@ -48,7 +50,7 @@
 发送给：`AlembicPlugin`。
 
 ```text
-读取 docs/workspace/repository-folder-boundary-restructure-workspace-plan-2026-05-22.md，按照文档领取并完成 RFR-6C。目标是在 Plugin first, Alembic install enhances 前提下，处理 AlembicPlugin 里 HTTP DashboardOperations compatibility 命名歧义：先分类 `lib/http/dashboard/DashboardOperations.ts`、`lib/http/utils/dashboard-operation.ts` 与 routes/commands/modules 消费方；在保持 HTTP routes、外部 `dashboard.*` operation id、operation payload、runtime artifact、Codex MCP tool schema 和 channel/cache 行为不变的前提下，把源码路径 / 内部命名收敛为更准确的 compatibility / operations 边界。完成后回填执行记录、提交 hash、验证命令、验证结果、runtime artifact hash、残留风险和下一步建议。
+读取 docs/workspace/repository-folder-boundary-restructure-workspace-plan-2026-05-22.md，按照文档领取并完成 RFR-6D。目标是在 Plugin first, Alembic install enhances 前提下，处理 AlembicPlugin 里 `lib/injection/modules/AgentModule.ts` 命名残留：它现在只注册 `SkillHooks`，不承载 Agent runtime、AI provider runtime 或 tools runtime。先分类 `AgentModule.ts`、`ServiceContainer` 消费方、`ServiceMap.skillHooks` 和相关 SkillHooks 消费链；在保留 `skillHooks` service key、SkillHooks load / hook 行为、Codex Skill lifecycle、MCP skill handler 和 runtime artifact 行为不变的前提下，把源码模块命名收敛为 SkillHooks 语义。完成后回填执行记录、提交 hash、验证命令、验证结果、runtime artifact hash、残留风险和下一步建议。
 ```
 
 ## 回填区
@@ -72,3 +74,6 @@
 - 2026-05-22：`AlembicPlugin` 已完成 RFR-6A 并回填，执行记录见 `docs/AlembicPlugin/repository-folder-boundary-rfr-6-plugin-governance-2026-05-22.md`。完成范围：将 `lib/core/{constitution,gateway,permission}` 迁入 `lib/governance/{constitution,gateway,permission}`，将 `#core/*` 改为 `#governance/*`，同步 bootstrap、HTTP、MCP embedded server、DI、targeted unit tests、Vitest alias、AGENTS 和 Codex runtime artifact；未移动 HTTP/service/injection/daemon/external-mcp/codex/plugin shell/channel/vendor/runtime artifact 所在路径。提交：AlembicPlugin `cef5e419440064c056d6b3408cd961fac5047b7a`，AlembicCodex runtime artifact `c6e194d9941d0b5ce7f85b03cfe7fa2adc6c9ed9`，`runtime.tgz` SHA-256 `dc40f72a9d581b0d913104d4b150c3b54d191a2c5067bd71ab5cac1e36db9c76`。验证：build/check、targeted unit、runtime prepare、plugin/channel verify、残留扫描和 diff check 均通过；额外 `npm run lint` 仍失败于既有 Biome 债，后续单独处理。
 - 2026-05-22：总控验收 RFR-6A 通过。复核范围：`git -C AlembicPlugin show --name-status --stat HEAD`、`lib/core/#core` 负向扫描、`#governance/lib/governance` 正向扫描、AlembicCodex runtime artifact 子仓库状态和提交 diff check。功能完整性检查：Plugin governance 仍被 bootstrap、HTTP、MCP embedded server、DI 和 targeted tests 消费，runtime artifact 已同步；未触碰 HTTP/service/injection/daemon/external MCP/codex/plugin shell/channel/vendor/runtime artifact 所在路径。
 - 2026-05-22：总控完成 RFR-6B 真实代码分析，新增 [repository-split-rfr-6b-real-code-analysis-2026-05-22.md](repository-split-rfr-6b-real-code-analysis-2026-05-22.md)。当前进入 RFR-6C，只派发 `AlembicPlugin` 处理 HTTP `DashboardOperations` compatibility 命名歧义；暂不创建 AlembicTest 测试单。
+- 2026-05-22：`AlembicPlugin` 完成 RFR-6C 并回填，执行记录见 `docs/AlembicPlugin/repository-folder-boundary-rfr-6c-plugin-http-compat-operations-2026-05-22.md`。完成范围：`DashboardOperations` / `dashboard-operation` cluster 迁入 `lib/http/compatibility/operations/`，内部命名改为 `DashboardCompatibility*`，保留外部 `dashboard.*` operation id、HTTP route、operation payload、runtime artifact 路径、Codex MCP tool schema 和 channel/cache 行为。提交：AlembicPlugin `a535d16e6974fdcba2b643b64dc24c8315c9b51e`，AlembicCodex runtime artifact `85c8fbdc2a94d86a4f721301c42a3fe618c4da76`，`runtime.tgz` SHA-256 `c151d06691c4b631d5b1d249140ca2989300a7c16c935256589e12f4f3513835`。验证：build:check、targeted unit、build、runtime prepare、plugin/channel verify、残留扫描和 diff check 均通过。当前状态改为 RFR-6C 待验收，暂不创建 AlembicTest 测试单。
+- 2026-05-22：总控验收 RFR-6C 通过。复核范围：AlembicPlugin 提交 `a535d16e6974fdcba2b643b64dc24c8315c9b51e`、AlembicCodex runtime artifact `85c8fbdc2a94d86a4f721301c42a3fe618c4da76`、旧 `http/dashboard` / `DashboardOperations` / `dashboard-operation` import 负向扫描、new compatibility operation 正向扫描、runtime artifact 子仓库状态和提交 diff check。功能完整性检查：外部 `dashboard.*` operation id、HTTP route、operation payload、runtime artifact 路径、Codex MCP tool schema 和 channel/cache 行为保持不变；残留的 `kind: 'dashboard-operation'` 属于 fallback manifest payload 兼容语义，不是源码目录边界残留。
+- 2026-05-22：总控完成 RFR-6D 真实代码分析，新增 [repository-split-rfr-6d-real-code-analysis-2026-05-22.md](repository-split-rfr-6d-real-code-analysis-2026-05-22.md)。当前进入 RFR-6D，只派发 `AlembicPlugin` 处理 `AgentModule.ts` 命名残留；暂不创建 AlembicTest 测试单。
