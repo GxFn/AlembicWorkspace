@@ -22,6 +22,7 @@
 - 用户已确认采用“先做一轮真实修正，然后收集真实代码，再深入分析下一轮”的持续增强节奏。
 - RFR-6A 已激活：只派发 `AlembicPlugin` 处理旧 `lib/core` / `#core/*` governance 命名残留。完成后总控基于真实 diff、runtime artifact 和残留扫描进入 RFR-6B 深入分析下一轮。
 - 用户补充确认长期前提：`Plugin first, Alembic install enhances`。`AlembicPlugin` 是 Codex host agent 入口，`Alembic` 是本地增强底座；Plugin 可以通过请求 Alembic service 工作。因此 RFR-6A 需要把旧功能先分类为 Plugin-owned 请求治理、Alembic service request client、portable compatibility 或旧残留，再做最小真实修正。
+- 用户进一步强调 `AlembicPlugin` 自己也有围绕 Codex / IDE Agent 的自洽闭环，不能把 Plugin 做成空壳 client。RFR-6A 分类顺序修正为：先判断是否属于 Plugin Codex 自洽闭环，再判断 Alembic service request client、portable compatibility 或旧残留。
 
 当前发送窗口：`AlembicPlugin`。
 
@@ -37,7 +38,7 @@
 | `AlembicCore`<br>观察中 | RFR-6A 不触碰 Core public API / deep import。 |
 | `AlembicAgent`<br>观察中 | RFR-6A 不触碰 Agent。 |
 | `AlembicDashboard`<br>观察中 | RFR-6A 不触碰 Dashboard help / i18n，后续基于真实修正结果再判断。 |
-| `AlembicPlugin`<br>待启动 | RFR-6A：在 Plugin first / Alembic install enhances 前提下，处理旧 `lib/core` / `#core/*` governance 命名残留；先分类为 Plugin-owned 请求治理、Alembic service request client、portable compatibility 或旧残留，再回填真实 diff、提交 hash、runtime artifact hash、验证命令和下一轮代码证据。 |
+| `AlembicPlugin`<br>待启动 | RFR-6A：在 Plugin first / Alembic install enhances 前提下，处理旧 `lib/core` / `#core/*` governance 命名残留；先判断是否属于 Plugin Codex 自洽闭环，再分类为 Alembic service request client、portable compatibility 或旧残留，最后回填真实 diff、提交 hash、runtime artifact hash、验证命令和下一轮代码证据。 |
 | `AlembicTest`<br>观察中 | RFR-6A 先由 Plugin 窗口完成 build / unit / runtime verify；暂无真实项目复测单。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
@@ -46,7 +47,7 @@
 发送给：`AlembicPlugin`。
 
 ```text
-读取 docs/workspace/repository-folder-boundary-restructure-workspace-plan-2026-05-22.md，按照文档，领取并完成分配给你所在窗口的 RFR-6A 任务。注意长期前提是 Plugin first, Alembic install enhances：AlembicPlugin 是 Codex host agent 入口，Alembic 是本地增强底座；Plugin 可以请求 Alembic service，所以旧功能必须先分类为 Plugin-owned 请求治理、Alembic service request client、portable compatibility 或真正旧残留，再做最小真实修正。完成后回填完成范围、提交 hash、验证命令、验证结果、runtime artifact hash、残留风险和下一步建议。
+读取 docs/workspace/repository-folder-boundary-restructure-workspace-plan-2026-05-22.md，按照文档，领取并完成分配给你所在窗口的 RFR-6A 任务。注意长期前提是 Plugin first, Alembic install enhances：AlembicPlugin 是 Codex host agent 入口，并围绕 Codex / IDE Agent 保持自己的自洽闭环；Alembic 是本地增强底座，Plugin 可以请求 Alembic service。旧功能必须先判断是否属于 Plugin Codex 自洽闭环，再分类为 Alembic service request client、portable compatibility 或真正旧残留，最后做最小真实修正。完成后回填完成范围、提交 hash、验证命令、验证结果、runtime artifact hash、残留风险和下一步建议。
 ```
 
 ## 回填区
@@ -66,3 +67,4 @@
 - 2026-05-22：总控完成 RFR-6 深度代码审计，新增 [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md)。审计确认 RFR-3A 不是整体收口；下一步推荐先确认 `AlembicPlugin` embedded runtime 分类主线，当前不派发实现窗口。
 - 2026-05-22：用户确认采用“先真实修正，再收集真实代码，再深入分析下一轮”的节奏。总控激活 RFR-6A，只派发 `AlembicPlugin` 处理旧 `lib/core` / `#core/*` governance 命名残留；其它窗口观察，暂不创建 AlembicTest 测试单。
 - 2026-05-22：用户补充确认长期前提：`Plugin first, Alembic install enhances`，Plugin 可以请求 Alembic service 工作。总控修订 RFR-6A 派发口径：旧功能必须先分类为 Plugin-owned 请求治理、Alembic service request client、portable compatibility 或旧残留，不能把 service enhancement 误判为 Plugin 本地永久实现，也不能把 portable compatibility 误删。
+- 2026-05-22：用户进一步强调 `AlembicPlugin` 自己也有围绕 Codex / IDE Agent 的自洽闭环，职责权衡微妙。总控再次修订 RFR-6A：旧功能分类顺序改为先判断是否属于 Plugin Codex 自洽闭环，再判断 Alembic service request client、portable compatibility 或旧残留，避免把 Plugin 做成空壳 client，也避免维护第二套 Alembic。

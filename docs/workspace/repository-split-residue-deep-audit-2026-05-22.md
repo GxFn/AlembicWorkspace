@@ -10,9 +10,9 @@
 
 用户指出：当前各仓库是从一个仓库拆分而来，文件夹定义与层级存在冗余与歧义，功能文件也可能没有完全遵照仓库功能定义；总控不能因为发现一个目标就停止，必须完整深度挖掘真实代码。
 
-本审计补充 RFR-1 / RFR-2 / RFR-3A 的结论：RFR-3A 只完成了 Alembic 主仓库 `lib/core` 命名歧义的一个 bounded context 收敛，并不代表整个拆仓残留已经完成。后续必须把“Plugin-owned Codex 入口 / 请求治理”“Alembic service request client”“portable runtime 兼容实现”“真正可删除残留”“公共 contract 过宽”“文档 / UI 旧口径”分开处理。
+本审计补充 RFR-1 / RFR-2 / RFR-3A 的结论：RFR-3A 只完成了 Alembic 主仓库 `lib/core` 命名歧义的一个 bounded context 收敛，并不代表整个拆仓残留已经完成。后续必须把“Plugin Codex 自洽闭环”“Alembic service request client”“portable runtime 兼容实现”“真正可删除残留”“公共 contract 过宽”“文档 / UI 旧口径”分开处理。
 
-长期前提：产品和模块路线遵循 `Plugin first, Alembic install enhances`。`AlembicPlugin` 是 Codex host agent 入口，`Alembic` 是本地增强底座；Alembic 安装且 service / daemon 可用时，Plugin 可以请求 Alembic 服务来工作。因此旧功能的新认识不能只看“Plugin 本地有没有一套实现”，还要判断它是不是 Alembic service 的 client、无 Alembic 时的 portable compatibility，或者确实已经变成早期拆仓残留。
+长期前提：产品和模块路线遵循 `Plugin first, Alembic install enhances`。`AlembicPlugin` 是 Codex host agent 入口，并围绕 Codex / IDE Agent 拥有自己的自洽闭环；`Alembic` 是本地增强底座，Alembic 安装且 service / daemon 可用时，Plugin 可以请求 Alembic 服务来增强。旧功能的新认识不能只看“Plugin 本地有没有一套实现”，而要先判断它是不是 Plugin Codex 自洽闭环的一部分；如果不是，再判断它是不是 Alembic service 的 client、无 Alembic 时的 portable compatibility，或者确实已经变成早期拆仓残留。
 
 本轮 `alembic_task prime` 未可用：AlembicWorkspace 自身还没有可用 knowledge base，插件返回 `CODEX_ALEMBIC_KNOWLEDGE_REQUIRED`。因此本审计只依据本地真实代码、已有总控文档和仓库边界文件，不把 BiliDili 当前运行态 knowledge 当作 Workspace 证据。
 
@@ -29,7 +29,7 @@
 - Alembic 独有样例：`daemon/ProjectRuntimeControl.ts`、`daemon/RuntimeBoundary.ts`、`governance/*`、`http/routes/projects.ts`、`http/routes/task.ts`、`platform/OpenBrowser.ts`、`sandbox/*`、`tools/adapters/*`。
 - AlembicPlugin 独有样例：`codex/*`、`external/mcp/CodexMcpServer.ts`、`external/mcp/codex/*`、`external/mcp/handlers/bootstrap-external.ts`、`core/constitution/*`、`core/gateway/*`、`core/permission/*`。
 
-判断：`AlembicPlugin/lib` 不是单纯死代码，也不是单纯 Adapter。它包含 Codex-owned 入口、请求 Alembic service 的增强 client、embedded runtime 兼容 HTTP/service/daemon 层、以及拆仓后仍未改名的旧主仓库运行时影子。下一步必须先分类，再迁移或删除。
+判断：`AlembicPlugin/lib` 不是单纯死代码，也不是单纯 Adapter。它包含 Plugin 围绕 Codex / IDE Agent 的自洽闭环、请求 Alembic service 的增强 client、embedded runtime 兼容 HTTP/service/daemon 层、以及拆仓后仍未改名的旧主仓库运行时影子。下一步必须先分类，再迁移或删除。
 
 ### 2. package 身份存在发布语义歧义
 
@@ -55,7 +55,7 @@
 - `AlembicPlugin/scripts/prepare-codex-plugin-runtime.mjs:24-25`：runtime artifact 显式包含 Codex MCP bin 和 daemon-server bin。
 - `AlembicPlugin/scripts/verify-codex-plugin.mjs:200`、`232`、`238-239`：校验 `runtime.tgz`、embedded runtime package name 和 `alembic-codex-mcp` bin。
 
-判断：不能把 Plugin 的 `daemon` / `http` / `service` / `injection` 树直接判定为冗余删除。正确动作是建立服务增强语境下的分类表：Plugin-owned Codex 入口 / 请求治理、Alembic service request client、portable compatibility、deprecation candidate。`resident handoff` 应被视为 service request client 的一种，而不是一套新的 Plugin 主实现。
+判断：不能把 Plugin 的 `daemon` / `http` / `service` / `injection` 树直接判定为冗余删除。正确动作是建立服务增强语境下的分类表：Plugin Codex 自洽闭环、Alembic service request client、portable compatibility、deprecation candidate。`resident handoff` 应被视为 service request client 的一种，而不是一套新的 Plugin 主实现。
 
 ### 4. AlembicPlugin 仍保留旧 `lib/core` 命名
 
@@ -67,7 +67,7 @@
 - `AlembicPlugin/AGENTS.md:106` 仍把 `#core/*` 作为 Plugin 路径别名。
 - `AlembicPlugin/lib/http/HttpServer.ts:15` 仍从 `../core/gateway/GatewayActionRegistry.js` 导入。
 
-判断：这是 RFR-3A 之后最直接的残留。由于 Plugin 的 `core/constitution`、`core/gateway`、`core/permission` 与主仓库治理上下文同源，下一步需要决定它在 Plugin 中的真实角色：若是 Codex 请求治理，应改成 Plugin-local governance；若是 Alembic service request client，应明确 service 请求边界；若是无 Alembic 时的 portable compatibility，应写清保留和降级条件；若已可完全消费 Alembic/Core contract，再规划删除本地副本。不能只因为主仓库已改完就认为 Plugin 自动完成。
+判断：这是 RFR-3A 之后最直接的残留。由于 Plugin 的 `core/constitution`、`core/gateway`、`core/permission` 与主仓库治理上下文同源，下一步需要决定它在 Plugin 中的真实角色：若是 Codex / IDE Agent 自洽闭环中的请求治理，应改成 Plugin-local governance；若是 Alembic service request client，应明确 service 请求边界；若是无 Alembic 时的 portable compatibility，应写清保留和降级条件；若已可完全消费 Alembic/Core contract，再规划删除本地副本。不能只因为主仓库已改完就认为 Plugin 自动完成。
 
 ### 5. Alembic 与 AlembicPlugin MCP surface 已分叉
 
@@ -131,20 +131,20 @@
 
 RFR-3A 不是总完成，只是完成了 Alembic 主仓库一个明确、低风险、可验证的命名歧义。完整深挖后，拆仓残留至少分成六类：
 
-1. `AlembicPlugin` Codex 入口 / Alembic service request client / portable compatibility / Alembic 主 daemon source of truth 的边界未完全显性化。
+1. `AlembicPlugin` Codex 自洽闭环 / Alembic service request client / portable compatibility / Alembic 主 daemon source of truth 的边界未完全显性化。
 2. `AlembicPlugin` 仍保留旧 `lib/core` / `#core/*` governance 命名。
 3. `AlembicPlugin` 和 `Alembic` 同名 package `alembic-ai` 带来发布身份歧义，但当前被 Codex runtime 校验真实消费，不能直接改。
 4. MCP surface 已按路线分叉，但文件名和 Dashboard help 仍可能暗示旧的一套工具。
 5. `AlembicCore` 的 `src/core` / wildcard exports 是 public API 迁移债，应先收敛 deep import。
 6. `AlembicAgent` 是文档路径口径债，`Alembic` DB boundary 是独立 repo-boundary 质量债。
 
-最重要的下一主线不是继续随机搬目录，而是在 Plugin first / Alembic install enhances 前提下，把 `AlembicPlugin` 旧功能分类做实；只有分类表证明某个目录 / route / service 既不是 Plugin-owned 请求治理，也不是 Alembic service request client，也不是 portable compatibility，才能进入删除候选。
+最重要的下一主线不是继续随机搬目录，而是在 Plugin first / Alembic install enhances 前提下，把 `AlembicPlugin` 旧功能分类做实；只有分类表证明某个目录 / route / service 既不是 Plugin Codex 自洽闭环，也不是 Alembic service request client，也不是 portable compatibility，才能进入删除候选。
 
 ## 下一步候选阶段
 
 | 阶段 | 状态 | 主窗口 | 目标 | 是否当前派发 |
 | --- | --- | --- | --- | --- |
-| RFR-6A | 已转执行计划 | `AlembicPlugin` | 第一轮真实修正：在 Plugin first / Alembic install enhances 前提下，处理 Plugin `lib/core` / `#core/*` governance 命名残留；先分类为 Plugin-owned 请求治理 / Alembic service request client / portable compatibility / 旧残留，再做最小真实修正。 | 当前计划已派发 |
+| RFR-6A | 已转执行计划 | `AlembicPlugin` | 第一轮真实修正：在 Plugin first / Alembic install enhances 前提下，处理 Plugin `lib/core` / `#core/*` governance 命名残留；先判断是否属于 Plugin Codex 自洽闭环，再分类为 Alembic service request client / portable compatibility / 旧残留，最后做最小真实修正。 | 当前计划已派发 |
 | RFR-6B | 等待 RFR-6A | `AlembicWorkspace` | 基于 RFR-6A 真实 diff、runtime artifact 和残留扫描，重新分析下一轮对象。重点不是“Plugin 是否复制 Alembic”，而是哪些旧功能应转成 Alembic service request client，哪些保留 portable compatibility，哪些才是旧残留。 | 否 |
 | RFR-6C | 等待 RFR-6B | `AlembicPlugin` / `Alembic` | 明确 Plugin `/api/v1` compatibility routes 与 Alembic daemon HTTP/service 的请求边界；保留真实兼容接口，删除或标记没有消费方的旧 route。 | 否 |
 | RFR-6D | 等待 RFR-6A | `AlembicDashboard` | 对齐 Dashboard HelpView / i18n 中 MCP tool list、internal AI、host-managed 文案，不改变前端架构。 | 否 |
@@ -160,7 +160,7 @@ RFR-3A 不是总完成，只是完成了 Alembic 主仓库一个明确、低风�
 | `AlembicCore`<br>观察中 | Core 当前不启动源码移动；后续先做 public API / deep import 收敛。 |
 | `AlembicAgent`<br>观察中 | Agent 当前不启动源码移动；文档路径口径债可作为低优先级小任务。 |
 | `AlembicDashboard`<br>观察中 | Dashboard 不阻塞 Plugin 分类；后续单独对齐 HelpView / i18n 的 MCP 与 internal AI 文案。 |
-| `AlembicPlugin`<br>待启动 | 当前计划已派发 RFR-6A：先按 Plugin-owned 请求治理 / Alembic service request client / portable compatibility / 旧残留四类重新理解旧 `lib/core`，再做最小真实修正。 |
+| `AlembicPlugin`<br>待启动 | 当前计划已派发 RFR-6A：先判断旧 `lib/core` 是否属于 Plugin Codex 自洽闭环，再按 Alembic service request client / portable compatibility / 旧残留继续分类，最后做最小真实修正。 |
 | `AlembicTest`<br>观察中 | 当前只是代码审计和文档计划，不创建真实项目测试单；等出现 runtime/cache/行为变更再派发。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目。 |
 
@@ -170,7 +170,7 @@ RFR-3A 不是总完成，只是完成了 Alembic 主仓库一个明确、低风�
 
 RFR-6A / 后续修正的完成定义必须至少包括：
 
-- `AlembicPlugin` 真实源码分类表，分类必须覆盖 Plugin-owned 请求治理、Alembic service request client、portable compatibility、旧残留四类；后续扩展时再覆盖 `lib/http`、`lib/service`、`lib/injection`、`lib/daemon`、`lib/core`、`lib/external/mcp` 与 release/runtime scripts。
+- `AlembicPlugin` 真实源码分类表，分类必须覆盖 Plugin Codex 自洽闭环、Alembic service request client、portable compatibility、旧残留四类；后续扩展时再覆盖 `lib/http`、`lib/service`、`lib/injection`、`lib/daemon`、`lib/core`、`lib/external/mcp` 与 release/runtime scripts。
 - 每个分类项写明真实生产方、消费方、是否进入 runtime artifact、是否由 Alembic daemon/Core/Agent/Dashboard source of truth 替代。
 - 删除候选必须有负向 import 扫描、替代入口和 targeted verification。
 - Alembic service request client 项必须写清请求的 Alembic capability、daemon/service 可用性判断、失败/降级语义和 Plugin 可见诊断。
