@@ -2,7 +2,7 @@
 
 创建日期：2026-05-22
 总控窗口：AlembicWorkspace
-状态：RFR-1 待启动
+状态：RFR-1 总控验收通过；RFR-2A 待启动（AlembicPlugin）
 来源 TODO：`GTODO-2026-05-22-012`
 需求目录：[repository-folder-boundary-restructure](../requirement-designs/repository-folder-boundary-restructure/)
 目标阶段确认：[repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md](repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md)
@@ -20,38 +20,77 @@
 - 当前发布 / 安装 / cache 链路：publish staging、Codex channel、plugin cache sync、local-mcp refresh。
 - 当前测试和验证入口：build、typecheck、lint、unit/integration/e2e、release guard、runtime verify。
 
+RFR-1 五个产品仓库清单已通过总控验收：
+
+- `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 源仓库工作区均为干净状态；本轮只新增 workspace 执行记录，没有产品源码迁移。
+- `AlembicCore`、`AlembicAgent`、`AlembicDashboard` 当前目录表达与 public API / runtime / frontend 入口高度绑定，RFR-2/RFR-3 不优先安排源码移动。
+- `Alembic` 主仓库涉及 CLI、daemon、HTTP/API、Dashboard server、release staging、resources、injectable skills 和 vendor/source resolver，实际迁移应晚于 Plugin 并单独开窄波次。
+- `AlembicPlugin` 是 Codex host agent 入口，且 RFR-1 已确认 `lib/codex` 有 Codex-facing 平铺表达可小步收敛；因此 RFR-2A 只启动 `AlembicPlugin`，先做小范围、可验证的 Plugin 内部目录表达优化。
+
 ## 功能完整性护栏
 
-- 第一波只做路径依赖清单和目标层级建议，不移动文件、不改 import、不删目录。
+- RFR-1 只做路径依赖清单和目标层级建议，不移动文件、不改 import、不删目录，已完成。
 - 后续实际迁移必须一仓一波，且每波只有一个主要源码仓库做移动。
 - 任何目录移动都必须更新 package manifest、tsconfig、build/lint/test/release scripts、runtime prepare、cache sync 和文档。
 - `dist/`、`.release/`、`runtime/`、`vendor/`、`plugins/alembic-codex`、`channels/codex`、`.agents` 默认按生成物 / 发布物 / 渠道资产处理，不能当普通源码整理。
 - 不删除仍有真实消费方的能力，不把完整实现变成薄实现。
+- RFR-2A 不移动 `plugins/alembic-codex/`、`channels/codex/`、`.agents/`、`vendor/AlembicCore/`、`plugins/alembic-codex/runtime/` 或 `runtime.tgz` 的路径；如源码改动需要重建 runtime artifact，只重建发布物，不改变发布物所在路径。
 
 ## 阶段计划
 
 | 阶段 | 状态 | 主窗口 | 目标 | 输出 / 证据 | 是否可派发 |
 | --- | --- | --- | --- | --- | --- |
 | RFR-0 | 已完成 | `AlembicWorkspace` | 建立原始计划、需求设计、代码依赖调研和第一波分派计划。 | 需求目录和当前计划已创建。 | 否 |
-| RFR-1 | 待启动 | `Alembic` / `AlembicCore` / `AlembicAgent` / `AlembicDashboard` / `AlembicPlugin` | 各仓库输出路径依赖清单、目标层级建议、禁止移动项和验证矩阵。 | `docs/<Repo>/repository-folder-boundary-inventory-*-2026-05-22.md`。 | 是 |
-| RFR-2 | 阻塞 | `AlembicPlugin` | 根据 RFR-1 验收结果，优先整理 Codex-facing Plugin 目录表达。 | 后续代码提交、runtime artifact、cache verify。 | 否，等待 RFR-1 |
+| RFR-1 | 已完成 | `Alembic` / `AlembicCore` / `AlembicAgent` / `AlembicDashboard` / `AlembicPlugin` | 各仓库输出路径依赖清单、目标层级建议、禁止移动项和验证矩阵。 | `docs/<Repo>/repository-folder-boundary-inventory-*-2026-05-22.md`；五个产品仓库工作区干净。 | 否 |
+| RFR-2A | 待启动 | `AlembicPlugin` | 在 `lib/codex` 内做第一轮 Codex-facing 目录表达优化，优先评估并迁移 runtime/status/diagnostics/preflight 这组平铺文件到更清晰的内部子目录；保持 MCP、plugin shell、channel、runtime artifact 路径不变。 | `docs/AlembicPlugin/repository-folder-boundary-rfr-2-plugin-codex-runtime-2026-05-22.md`、代码提交、验证命令、必要时 runtime artifact hash。 | 是，只发送 `AlembicPlugin` |
+| RFR-2B | 阻塞 | `AlembicPlugin` | 根据 RFR-2A 结果，判断是否继续整理 `lib/external/mcp` 内部 handler 分层。 | 后续代码提交和 MCP / Skill / runtime verify。 | 否，等待 RFR-2A |
 | RFR-3 | 阻塞 | `Alembic` | 根据 RFR-1/RFR-2 结果，整理本地增强底座目录表达。 | 后续代码提交、release staging verify。 | 否，等待 RFR-1/RFR-2 |
 | RFR-4 | 观察中 | `AlembicCore` / `AlembicAgent` / `AlembicDashboard` | 只在 RFR-1 证明有必要且低风险时做内部目录收敛。 | 后续按仓库决定。 | 否 |
 | RFR-5 | 阻塞 | `AlembicWorkspace` / `AlembicTest` | 跨仓库验收、cache refresh、必要时创建真实项目测试单。 | workspace 验收记录和测试单。 | 否 |
 
 ## 窗口分派
 
-当前只发送 RFR-1。所有窗口都只做清单和方案，不做代码移动。
+当前 RFR-1 已通过总控验收。RFR-2A 只派发 `AlembicPlugin`，其它窗口保留为观察 / 阻塞 / 无任务。
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | 读取 `Alembic/AGENTS.md` 后，梳理 `lib/`、`bin/`、`config/`、`scripts/`、`dashboard/`、`resources/`、`injectable-skills/`、`templates/`、`.release/`、`vendor/` 的职责、路径依赖和禁止移动项；输出目标层级建议与验证矩阵。 |
-| `AlembicCore`<br>待启动 | 读取 `AlembicCore/AGENTS.md` 后，梳理 `src/` public exports、resources、scripts、test 和 package root resolver；重点标出哪些 exports 是不可破坏 API。 |
-| `AlembicAgent`<br>待启动 | 读取 `AlembicAgent/AGENTS.md` 后，梳理 `src/agent`、`src/external`、`src/tools`、`config`、release stage 和 public exports；判断是否需要实际目录调整。 |
-| `AlembicDashboard`<br>待启动 | 读取 `AlembicDashboard/AGENTS.md` 后，梳理 Vite 前端目录、API client、socket hooks、i18n、theme、public assets；判断是否需要 feature-based 迁移。 |
-| `AlembicPlugin`<br>待启动 | 读取 `AlembicPlugin/AGENTS.md` 后，梳理 `lib/`、`lib/codex`、`lib/external/mcp`、`plugins/alembic-codex`、`channels/codex`、`.agents`、runtime prepare、cache sync 和 release scripts；输出 Codex-facing 优先迁移方案。 |
+| `Alembic`<br>观察中 | RFR-1 清单已验收；暂不进入源码移动。后续若 RFR-3 启动，只能单独整理本地增强底座中的一个 bounded context，并保护 CLI / daemon / HTTP / Dashboard / release staging。 |
+| `AlembicCore`<br>观察中 | RFR-1 清单已验收；当前不进入源码移动。若未来需要收敛，应先减少 wildcard / transitional exports 和 deep import，而不是直接移动目录。 |
+| `AlembicAgent`<br>观察中 | RFR-1 清单已验收；当前目录结构与 Agent runtime / external AI / tools 边界一致，不安排 RFR-2 实际迁移。 |
+| `AlembicDashboard`<br>观察中 | RFR-1 清单已验收；Dashboard 暂不进入 RFR-2/RFR-3。若未来优化，单独开 Dashboard 波次，从低耦合 View 试点。 |
+| `AlembicPlugin`<br>待启动 | RFR-2A：读取本计划和 `docs/AlembicPlugin/repository-folder-boundary-inventory-plugin-2026-05-22.md`，先复核 `lib/codex` 中 runtime/status/diagnostics/preflight 相关文件的真实 import / tests / runtime 消费链；若能保持功能闭环，则执行最小目录迁移并更新 imports / tests / docs / runtime artifact；若发现会牵动 `lib/external/mcp`、plugin shell、channel、vendor 或 runtime path，停止并回填阻塞，不做空壳兼容层。 |
 | `AlembicTest`<br>观察中 | 当前不创建测试单；RFR-2/RFR-3 实际改代码后再判断是否需要真实 Codex / BiliDili 复测。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
+
+## RFR-2A AlembicPlugin 执行要求
+
+目标：把 `AlembicPlugin` 中已经明确属于 Codex host agent 的 runtime/status/diagnostics/preflight 表达从平铺 `lib/codex` 中小步收敛，形成真实目录边界，而不是创建空 provider 或无消费方 wrapper。
+
+范围：
+
+- 必须先读取 `AlembicPlugin/AGENTS.md`、本计划和 `docs/AlembicPlugin/repository-folder-boundary-inventory-plugin-2026-05-22.md`。
+- 优先候选为 `lib/codex/RuntimeContext.ts`、`lib/codex/StatusService.ts`、`lib/codex/Diagnostics.ts`、`lib/codex/Preflight.ts` 及其直接相关 imports/tests；具体移动集合以真实调用链为准。
+- 允许更新 `lib/codex/index.ts`、相关 unit tests、runtime prepare / verify 脚本中因路径变化产生的引用。
+- 如源码变更会进入 Codex runtime，必须运行 runtime prepare / verify，并回填新的 AlembicCodex runtime artifact hash；如判断无需重建 runtime，必须在回填中说明依据。
+
+禁止事项：
+
+- 不移动 `plugins/alembic-codex/`、`channels/codex/`、`.agents/`、`vendor/AlembicCore/`、`plugins/alembic-codex/runtime/`、`runtime.tgz` 所在路径。
+- 不移动 `lib/external/mcp/`，不改 MCP tool schema / Skill contract，除非 RFR-2A 的 import 更新无法避免；若需要进入 MCP 目录重排，应回填给总控拆成 RFR-2B。
+- 不把完整实现改成薄 wrapper，不新增没有真实调用方的兼容层，不为了目录好看删除诊断、状态、preflight、cache sync 或 runtime verify。
+- 不启动 `Alembic` / `AlembicCore` / `AlembicAgent` / `AlembicDashboard` 的代码迁移。
+
+建议验证命令：
+
+- `npm run build:check`
+- `npm run test:unit -- CodexRuntimeContext CodexStatusService CodexPluginCacheSync`
+- `npm run test:unit -- CodexMcpServer CodexSessionScenarioRunner`
+- `npm run prepare:codex-plugin-runtime`
+- `npm run verify:codex-plugin`
+- `npm run verify:codex-channel`
+- `git diff --check`
+
+若某条命令不存在或不适合当前最小改动，执行窗口可以替换为等价 targeted check，但必须说明替换原因。
 
 ## RFR-1 通用执行要求
 
@@ -91,35 +130,36 @@
 
 | ID | 状态 | 类型 | 优先级 | 归属 | 事项 / 目标 | 影响复测 / 派发 | 依赖 / 触发 | 推荐窗口 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| RFR-TODO-1 | 待启动 | 路径依赖清单 | P0 | `Alembic` | 梳理本地增强底座目录与 release/dashboard/resource 路径依赖。 | 是 | 当前 wave。 | `Alembic` |
-| RFR-TODO-2 | 待启动 | 路径依赖清单 | P0 | `AlembicPlugin` | 梳理 Codex plugin runtime/channel/cache/MCP 路径依赖。 | 是 | 当前 wave。 | `AlembicPlugin` |
-| RFR-TODO-3 | 待启动 | public API 清单 | P1 | `AlembicCore` | 梳理 `src/` 与 package exports，标记不可破坏 public API。 | 是 | 当前 wave。 | `AlembicCore` |
-| RFR-TODO-4 | 待启动 | public API 清单 | P1 | `AlembicAgent` | 梳理 Agent runtime / AI provider / tools exports 与目录边界。 | 是 | 当前 wave。 | `AlembicAgent` |
-| RFR-TODO-5 | 待启动 | 前端目录清单 | P2 | `AlembicDashboard` | 判断 Dashboard 是否需要 feature-based 迁移，列出低风险建议。 | 否 | 当前 wave。 | `AlembicDashboard` |
-| RFR-TODO-6 | 阻塞 | 代码迁移 | P0 | `AlembicPlugin` / `Alembic` | 实际目录移动与 import/script 更新。 | 是 | 等 RFR-1 总控验收。 | 待定 |
+| RFR-TODO-1 | 已完成 | 路径依赖清单 | P0 | `Alembic` | 梳理本地增强底座目录与 release/dashboard/resource 路径依赖。 | 是 | 清单已回填并通过总控验收；暂不进入源码移动。 | `Alembic` |
+| RFR-TODO-2 | 已完成 | 路径依赖清单 | P0 | `AlembicPlugin` | 梳理 Codex plugin runtime/channel/cache/MCP 路径依赖。 | 是 | 清单已回填并通过总控验收。 | `AlembicPlugin` |
+| RFR-TODO-3 | 已完成 | public API 清单 | P1 | `AlembicCore` | 梳理 `src/` 与 package exports，标记不可破坏 public API。 | 是 | 清单已回填并通过总控验收；暂不进入源码移动。 | `AlembicCore` |
+| RFR-TODO-4 | 已完成 | public API 清单 | P1 | `AlembicAgent` | 梳理 Agent runtime / AI provider / tools exports 与目录边界。 | 是 | 清单已回填并通过总控验收；暂不进入源码移动。 | `AlembicAgent` |
+| RFR-TODO-5 | 已完成 | 前端目录清单 | P2 | `AlembicDashboard` | 判断 Dashboard 是否需要 feature-based 迁移，列出低风险建议。 | 否 | 清单已回填并通过总控验收；暂不进入源码移动。 | `AlembicDashboard` |
+| RFR-TODO-6A | 待启动 | 代码迁移 | P0 | `AlembicPlugin` | 在 `lib/codex` 内做 runtime/status/diagnostics/preflight 小范围目录表达优化，更新 imports/tests/runtime artifact。 | 是 | RFR-1 总控验收通过。 | `AlembicPlugin` |
+| RFR-TODO-6B | 阻塞 | 代码迁移 | P0 | `AlembicPlugin` / `Alembic` | 根据 RFR-2A 结果决定是否继续整理 Plugin MCP 内部层级或 Alembic 主仓库 bounded context。 | 是 | 等 RFR-2A 回填。 | 待定 |
 | RFR-TODO-7 | 阻塞 | 真实复测 | P1 | `AlembicTest` | 如 RFR-2/RFR-3 改动影响 Codex plugin 或 resident service，创建真实复测单。 | 是 | 等实际代码迁移。 | `AlembicTest` |
 
 ## 空闲窗口调度
 
 | 窗口 | 调度 | 是否发送 | 原因 |
 | --- | --- | --- | --- |
-| `Alembic` | 待启动 | 是 | 本地增强底座路径敏感，必须先出清单。 |
-| `AlembicCore` | 待启动 | 是 | public exports 范围大，需要先标不可破坏 API。 |
-| `AlembicAgent` | 待启动 | 是 | Agent 结构相对稳定，但需确认是否需要迁移。 |
-| `AlembicDashboard` | 待启动 | 是 | 前端结构低风险，但要覆盖“各仓库”目标。 |
-| `AlembicPlugin` | 待启动 | 是 | 第一优先级后续迁移仓库，必须先出完整路径依赖清单。 |
-| `AlembicTest` | 观察 | 否 | 当前无代码变更，不创建测试单。 |
+| `Alembic` | 观察中 | 否 | RFR-1 清单已验收；主仓库目录迁移等待 Plugin 侧 RFR-2A 结果。 |
+| `AlembicCore` | 观察中 | 否 | RFR-1 清单已验收；当前不做源码移动，后续如需收敛先处理 public API / deep import。 |
+| `AlembicAgent` | 观察中 | 否 | RFR-1 清单已验收；当前目录结构与仓库职责一致，不做源码移动。 |
+| `AlembicDashboard` | 观察中 | 否 | RFR-1 清单已验收；Dashboard 若优化需单独开前端波次。 |
+| `AlembicPlugin` | 待启动 | 是 | RFR-2A 只派发 Plugin，执行 `lib/codex` runtime/status/diagnostics/preflight 小范围目录表达优化。 |
+| `AlembicTest` | 观察中 | 否 | RFR-2A 先由 Plugin 自验证；是否创建真实 Codex / BiliDili 测试单等待代码回填。 |
 | `BiliDili` | 无任务 | 否 | 不改真实项目源码。 |
 
 ## 可复制分派提示词
 
-发送给：`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`。
+发送给：`AlembicPlugin`。
 
 ```text
-读取 docs/workspace/repository-folder-boundary-restructure-workspace-plan-2026-05-22.md，按照文档，领取并完成分配给你所在窗口的 RFR-1 路径依赖清单任务；完成后回填完成范围、文档路径、验证命令、验证结果、遗留风险和下一步建议。
+读取 docs/workspace/repository-folder-boundary-restructure-workspace-plan-2026-05-22.md，按照文档，领取并完成分配给 AlembicPlugin 的 RFR-2A 任务；先复核 `lib/codex` runtime/status/diagnostics/preflight 的真实调用链，能保持功能闭环时再做最小目录迁移并更新 imports、tests、runtime artifact 和执行记录；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
 ```
 
-不发送给：`AlembicTest`（观察中）、`BiliDili`（无任务）。
+不发送给：`Alembic`（观察中）、`AlembicCore`（观察中）、`AlembicAgent`（观察中）、`AlembicDashboard`（观察中）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
 
 ## 总控验证
 
@@ -133,3 +173,9 @@
 ## 回填区
 
 - 2026-05-22：总控创建 RFR 主线。当前 RFR-0 完成，RFR-1 只派发路径依赖清单，不允许代码移动。RFR-2 之后是否实际迁移，以各仓库清单和总控验收为准。
+- 2026-05-22：`AlembicDashboard` RFR-1 已完成，执行记录见 `docs/AlembicDashboard/repository-folder-boundary-inventory-dashboard-2026-05-22.md`。完成范围：读取 Dashboard 仓库规则，扫描 Vite 前端目录、API client、socket hooks、i18n、theme、public assets、配置文件和源码相对 import；未移动文件、未改源码 import、未删目录。文档路径：`docs/AlembicDashboard/repository-folder-boundary-inventory-dashboard-2026-05-22.md`。验证命令：`git status --short`、`rg --files -g '!*node_modules*' -g '!dist/**' -g '!coverage/**'`、`find . -maxdepth 3 -type d -not -path './node_modules*' -not -path './.git*' -not -path './dist*' | sort`、路径依赖 `rg` 扫描、相对 import `rg` 扫描、runtime/API/public asset `rg` 扫描、`git diff --check`。验证结果：确认主要路径依赖集中在 `index.html` -> `/src/main.tsx`、`vite.config.ts` 的 `/api` / `/socket.io` proxy、`src/api.ts` 的 `/api/v1` REST/SSE、`src/lib/socket.ts` 的 `/socket.io`、`public/manifest.json` / `service-worker.js` / `logo.svg`、以及 `src/App.tsx` 对 Views/Modals/Layout 的相对 imports；Dashboard 仓库无源码改动，diff 检查通过。遗留风险：`App.tsx` 聚合度高且无 import alias，大规模 feature-based 迁移会产生较多 import churn；`public/service-worker.js` 有根路径缓存硬编码。下一步建议：Dashboard 暂不进入 RFR-2/RFR-3 实际移动，若后续需要优化，单独开 Dashboard 波次，从低耦合 View 试点并保留旧路径 re-export。
+- 2026-05-22：`Alembic` 窗口完成 RFR-1 路径依赖清单。完成范围：梳理 `lib/`、`bin/`、`config/`、`scripts/`、`dashboard/`、`resources/`、`injectable-skills/`、`templates/`、`.release/`、`dist/`、`vendor/`、`test/` 与 release / workspace source resolver 路径依赖；未移动文件、未改源码 import、未删目录、未重建产物。文档路径：`docs/Alembic/repository-folder-boundary-inventory-main-2026-05-22.md`。验证命令：`git -C Alembic status --short`、`rg -n 'lib/|src/|dist/|\\.release|runtime|vendor/|plugins/alembic-codex|channels/codex|injectable-skills|templates|resources|dashboard|bin/|config/|scripts/' package.json tsconfig.json vitest.config.ts vitest.unit.config.ts biome.json scripts lib bin config test dashboard resources injectable-skills templates .github/workflows`、`git diff --check`。验证结果：通过；`plugins/alembic-codex` 与 `channels/codex` 在 Alembic 当前产品路径中无有效命中。遗留风险：`lib/core/` 与 `@alembic/core` 命名相近、release staging 直接读取 sibling source、`dashboard/dist` 是发布物落点，实际迁移需单独保护。下一步建议：等待其它 RFR-1 清单和总控验收，Alembic 主仓库不建议早于 AlembicPlugin 进入源码移动。
+- 2026-05-22：`AlembicCore` 窗口完成 RFR-1 路径依赖清单。完成范围：梳理 `src/` 顶层 stable facade、package exports、`config/public-api-boundary.json`、`resources/grammars`、public API / release 脚本、`test/` boundary tests 和 `src/shared/package-root.ts`；未移动文件、未改源码 import、未删目录、未重建产物。文档路径：`docs/AlembicCore/repository-folder-boundary-inventory-core-2026-05-22.md`。验证命令：`git -C AlembicCore status --short`、`rg --files package.json package-lock.json tsconfig.json vitest.config.ts biome.json config scripts src test resources RELEASE-PLAYBOOK.md`、`rg -n "lib/|src/|dist/|\\.release|runtime|vendor/|plugins/alembic-codex|channels/codex|injectable-skills|templates|resources|dashboard" package.json tsconfig*.json vitest*.config.* biome.json config scripts src test resources RELEASE-PLAYBOOK.md`、`node -e "const pkg=require('./package.json'); const policy=require('./config/public-api-boundary.json'); ..."`、`git diff --check`。验证结果：通过；确认 exports 总数 136、exact 75、wildcard 61、stable 17、provisional 21，Core 仓库本身无未提交改动。遗留风险：Core wildcard / transitional exports 数量大，`resources/grammars` 是运行时发布资源，`src/workflows/capabilities/**` 是 host agent 知识挖掘闭环能力，后续不宜优先做源码目录移动。下一步建议：RFR-2/RFR-3 优先处理 `AlembicPlugin` / `Alembic`，Core 若继续收敛应先减少 deep import / transitional exports，再考虑目录移动。
+- 2026-05-22：`AlembicAgent` 窗口完成 RFR-1 路径依赖清单。完成范围：读取 AlembicAgent 仓库规则，梳理 `src/agent`、`src/external/ai`、`src/tools`、`src/shared`、`config`、`scripts`、release stage、public exports、private imports、Vitest alias、boundary guard 和测试路径依赖；未移动文件、未改源码 import、未删目录、未重建 `dist` 或 staging artifact。文档路径：`docs/AlembicAgent/repository-folder-boundary-inventory-agent-2026-05-22.md`。验证命令：`git status --short`、`rg -n "lib/|src/|dist/|\\.release|runtime|vendor/|plugins/alembic-codex|channels/codex|injectable-skills|templates|resources|dashboard" package.json tsconfig.json vitest.config.ts biome.json scripts src config test`、`git diff --check`。验证结果：AlembicAgent 仓库无源码改动；路径依赖集中在 package exports/imports、`tsconfig` 的 `src`/`dist`、Vitest alias、boundary config、release scripts、public import smoke、测试 fixtures 和运行时类型命名；未发现 `.release`、`vendor/`、`plugins/alembic-codex`、`channels/codex`、`injectable-skills`、`templates`、`resources` 作为 AlembicAgent 产品路径；diff 检查通过。遗留风险：public exports 和 private import map 已稳定，顶层目录改名风险大于收益；Tool V2 adapter/cache/compressor 不应在没有真实迁移目标时拆分；`release:stage` 依赖 sibling Core source 和 `dist` layout。下一步建议：总控验收时将 AlembicAgent 归为观察中 / 暂不实际迁移，RFR-2/RFR-3 优先处理 AlembicPlugin 或 Alembic。
+- 2026-05-22：`AlembicPlugin` 窗口完成 RFR-1 路径依赖清单。完成范围：读取 AlembicPlugin 仓库规则，梳理 `lib/`、`lib/codex`、`lib/external/mcp`、`bin/`、`config/`、`scripts/`、`plugins/alembic-codex`、`channels/codex`、`.agents`、`injectable-skills`、`templates`、runtime prepare、cache sync、release scripts、Core local/vendor resolver、package imports 和 Vitest alias；未移动文件、未改源码 import、未删目录、未重建 `plugins/alembic-codex/runtime` 或 `runtime.tgz`。文档路径：`docs/AlembicPlugin/repository-folder-boundary-inventory-plugin-2026-05-22.md`。验证命令：`git -C AlembicPlugin status --short --branch`、`rg --files -g '!node_modules/**' -g '!dist/**' -g '!plugins/alembic-codex/runtime/**' -g '!vendor/**'`、路径依赖 `rg` 扫描、历史 `#agent/#tools` import 负向扫描。验证结果：主要路径依赖集中在 root package imports/scripts、Core resolver、runtime prepare、Codex channel/marketplace/plugin shell/cache sync、runtime diagnostics 和 tests；`#agent/`、`#tools/` 只剩删除边界审计标签；AlembicPlugin 源仓库无源码改动。遗留风险：RFR-1 是清单阶段，未跑 build/test/release；`plugins/alembic-codex`、`vendor/AlembicCore`、`runtime.tgz` 需作为子仓库/发布物冻结。下一步建议：RFR-2 若启动 AlembicPlugin，只做小范围 Codex-facing 内部目录表达优化，禁止移动 plugin shell、channel、runtime artifact 和 vendor Core。
+- 2026-05-22：总控验收 RFR-1 通过。复核结果：五个产品仓库均已回填路径依赖清单，`git -C Alembic status --short`、`git -C AlembicCore status --short`、`git -C AlembicAgent status --short`、`git -C AlembicDashboard status --short`、`git -C AlembicPlugin status --short` 均为空；RFR-1 未产生产品源码改动。功能完整性检查：本阶段目标是目录依赖清单和迁移边界，已覆盖入口、生成物、发布物、runtime/cache、public exports、测试/构建入口和禁止移动项，满足进入下一波的证据要求。下一步：只派发 `AlembicPlugin` 执行 RFR-2A，Core / Agent / Dashboard 观察，Alembic 主仓库等待 Plugin 结果，暂不创建 AlembicTest 测试单。
