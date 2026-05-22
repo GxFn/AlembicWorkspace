@@ -2,7 +2,7 @@
 
 创建日期：2026-05-22
 总控窗口：AlembicWorkspace
-状态：RFR-3A 总控验收通过；RFR-5 观察中（无发送窗口）
+状态：RFR-6 深度代码审计完成；等待用户确认下一主线（无发送窗口）
 来源 TODO：`GTODO-2026-05-22-012`
 需求目录：[repository-folder-boundary-restructure](../requirement-designs/repository-folder-boundary-restructure/)
 目标阶段确认：[repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md](repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md)
@@ -27,6 +27,8 @@ RFR-1 五个产品仓库清单已通过总控验收：
 - `Alembic` 主仓库涉及 CLI、daemon、HTTP/API、Dashboard server、release staging、resources、injectable skills 和 vendor/source resolver，实际迁移应晚于 Plugin 并单独开窄波次。
 - `AlembicPlugin` 是 Codex host agent 入口，且 RFR-1 已确认 `lib/codex` 有 Codex-facing 平铺表达可小步收敛；因此 RFR-2A 只启动 `AlembicPlugin`，先做小范围、可验证的 Plugin 内部目录表达优化。
 
+RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md)。本次审计确认 RFR-3A 不是整体收口，只是主仓库 governance bounded context 的一个可验证收敛；拆仓残留仍包括 `AlembicPlugin` embedded runtime 边界、Plugin 旧 `lib/core` 命名、主产品 package 与 Plugin runtime package 身份重叠、MCP surface 分叉与 Dashboard help 旧口径、Core deep export 迁移债、Agent 文档路径口径债和 Alembic DB boundary lint 债。当前不派发窗口，等待用户确认是否以 `AlembicPlugin` embedded runtime 分类作为下一主线。
+
 ## 功能完整性护栏
 
 - RFR-1 只做路径依赖清单和目标层级建议，不移动文件、不改 import、不删目录，已完成。
@@ -47,19 +49,20 @@ RFR-1 五个产品仓库清单已通过总控验收：
 | RFR-3A | 已完成 | `Alembic` | 处理 Alembic 主仓库 `lib/core` 与 `@alembic/core` 命名歧义：已扫描真实 import/alias，并在保持 constitution/gateway/permission 行为不变的前提下，将 host-owned governance 目录收敛为 `lib/governance`。 | `docs/Alembic/repository-folder-boundary-rfr-3-main-governance-2026-05-22.md`；Alembic `07273a64a413c59a8d5b247f098859d9658a1985`；总控补跑 build:check / targeted unit / release package guard / residual scan / diff check 通过；`lint:repo-boundary` 仍有既有 DB boundary 违规，已转独立 TODO。 | 否 |
 | RFR-4 | 观察中 | `AlembicCore` / `AlembicAgent` / `AlembicDashboard` | 只在 RFR-1 证明有必要且低风险时做内部目录收敛。 | 后续按仓库决定。 | 否 |
 | RFR-5 | 观察中 | `AlembicWorkspace` / `AlembicTest` | 跨仓库验收、cache refresh、必要时创建真实项目测试单。当前 RFR-2/RFR-3 只改 Plugin runtime artifact 与 Alembic 内部 imports，尚未判断需要真实项目复测或 cache refresh。 | workspace 验收记录；如后续触发真实复测，再创建测试单。 | 否 |
+| RFR-6 | 已完成 | `AlembicWorkspace` | 根据用户要求继续完整深挖拆仓残留，不因发现主仓库 `lib/core` 一个目标就停止；横向复核 Alembic / Core / Agent / Dashboard / Plugin 真实代码和边界文档。 | [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md)；当前只形成审计和下一主线候选，不派发实现。 | 否 |
 
 ## 窗口分派
 
-当前 RFR-3A 已通过总控验收；暂无新的执行窗口。其它窗口保留为观察 / 无任务，既有 DB boundary lint 失败转入独立 TODO，不混入本轮目录命名波次。
+当前 RFR-6 深度代码审计已完成；暂无新的执行窗口。下一步推荐先确认 `AlembicPlugin` embedded runtime 分类主线，再决定是否派发 RFR-6A。其它窗口保留为观察 / 无任务，既有 DB boundary lint 失败仍为独立 TODO，不混入 Plugin embedded runtime 分类。
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | RFR-3A 已通过总控验收：`lib/core` constitution/gateway/permission 已迁入 `lib/governance`，`#core/*` package imports 已替换为 `#governance/*`，测试和脚本 imports 已更新；后续仅观察是否需要处理既有 DB boundary lint TODO。 |
-| `AlembicCore`<br>观察中 | RFR-1 清单已验收；当前不进入源码移动。若未来需要收敛，应先减少 wildcard / transitional exports 和 deep import，而不是直接移动目录。 |
-| `AlembicAgent`<br>观察中 | RFR-1 清单已验收；当前目录结构与 Agent runtime / external AI / tools 边界一致，不安排 RFR-2 实际迁移。 |
-| `AlembicDashboard`<br>观察中 | RFR-1 清单已验收；Dashboard 暂不进入 RFR-2/RFR-3。若未来优化，单独开 Dashboard 波次，从低耦合 View 试点。 |
-| `AlembicPlugin`<br>观察中 | RFR-2A/RFR-2B 已通过总控验收；当前不继续扩大 MCP handler 分层，后续等 Alembic RFR-3A 回填后再决定是否需要 cache refresh。 |
-| `AlembicTest`<br>观察中 | 当前不创建测试单；RFR-3A 是 Alembic 内部 governance 目录命名和 import 收敛，未触发真实 Codex / BiliDili 复测。 |
+| `Alembic`<br>观察中 | RFR-3A 已通过总控验收；RFR-6 确认 Alembic 主仓库当前剩余重点是独立 DB boundary lint 债，暂不混入下一条 Plugin embedded runtime 主线。 |
+| `AlembicCore`<br>观察中 | RFR-6 确认 Core 的主要问题是 `src/core` / wildcard exports / deep import 迁移债；当前不直接搬源码，后续先做 public API closeout。 |
+| `AlembicAgent`<br>观察中 | RFR-6 确认 Agent public API 较干净，主要是 AGENTS 路径口径与 `src/external/ai` 真实实现不一致；当前不派发。 |
+| `AlembicDashboard`<br>观察中 | RFR-6 确认 Dashboard 不被 Plugin 直接打包，但 HelpView / i18n 的 MCP tool list 和 internal AI 文案可能滞后；后续单独小波次处理。 |
+| `AlembicPlugin`<br>暂停 | 推荐作为下一主线候选：先做 embedded runtime 分类表，再处理旧 `lib/core` / `#core/*`、HTTP compatibility route 和 package 身份歧义；等待用户确认，不直接派发。 |
+| `AlembicTest`<br>观察中 | 当前只是深度代码审计和文档计划，不创建测试单；后续出现 runtime artifact / cache / 用户可见行为变化再派发。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
 ## RFR-2A AlembicPlugin 执行要求
@@ -198,18 +201,20 @@ RFR-1 五个产品仓库清单已通过总控验收：
 | RFR-TODO-6B | 已完成 | 代码迁移 | P0 | `AlembicPlugin` | 整理 `lib/external/mcp/CodexMcpServer.ts` 纯 helper / tool visibility / result / daemon job query 边界，抽入 `lib/external/mcp/codex/` 内部支持目录。 | 是 | AlembicPlugin `7afd689dc1654611b7f9de742aa170a3a9de7fa3` 已通过总控验收；MCP/session targeted unit / plugin verify / channel verify 通过。 | `AlembicPlugin` |
 | RFR-TODO-8 | 已完成 | 代码迁移 | P0 | `Alembic` | 处理主仓库 `lib/core` 与 `@alembic/core` 命名歧义，将 host-owned constitution/gateway/permission bounded context 收敛到更准确目录。 | 是 | Alembic `07273a64a413c59a8d5b247f098859d9658a1985` 已通过总控验收；build:check / targeted unit / release package guard / residual scan / diff check 通过。 | `Alembic` |
 | RFR-TODO-9 | 观察中 | 既有边界债 | P1 | `Alembic` | `npm run lint:repo-boundary` 仍因既有 DB boundary 违规失败，需要后续单独判断是否作为新主线收敛。 | 否，不影响 RFR-3A 目录命名验收；可能影响后续 repo-boundary 质量线。 | RFR-3A 总控验收发现；命中 `daemon.ts`、`CleanupService.ts`、`HitRecorder.ts`、`AuditStore.ts`、`daemon-server.ts` 等非本轮改动文件。 | `Alembic` |
+| RFR-TODO-10 | 暂停 | 下一主线候选 | P0 | `AlembicPlugin` / `AlembicWorkspace` | 建立 `AlembicPlugin` embedded runtime 分类表，区分 Codex-owned、portable compatibility、resident handoff、deprecation candidate，避免把真实兼容层误删或把残留继续当长期能力维护。 | 是，影响后续 Plugin 目录迁移、runtime artifact、cache 和真实 Codex 验证。 | RFR-6 深度审计发现；等待用户确认是否启动 RFR-6A。 | `AlembicPlugin` |
+| RFR-TODO-11 | 观察中 | contract / UI 口径 | P1 | `AlembicDashboard` / `AlembicPlugin` / `Alembic` | 对齐 MCP tool surface 和 Dashboard HelpView / i18n 文案，避免旧 `wiki_plan` / `wiki_finalize` / `knowledge_lifecycle` 口径与实际 Alembic / Plugin 工具分叉产生歧义。 | 否，当前不影响代码运行；影响开发者理解。 | RFR-6 深度审计发现；等待 RFR-6A 分类后决定是否单独派发 Dashboard。 | `AlembicDashboard` |
 | RFR-TODO-7 | 无任务 | 真实复测 | P1 | `AlembicTest` | 如 RFR-2/RFR-3 改动影响 Codex plugin 或 resident service，创建真实复测单。 | 否 | RFR-3A 只改 Alembic 内部 governance 目录命名和 imports，当前不触发真实项目复测。 | `AlembicTest` |
 
 ## 空闲窗口调度
 
 | 窗口 | 调度 | 是否发送 | 原因 |
 | --- | --- | --- | --- |
-| `Alembic` | 观察中 | 否 | RFR-3A 已通过总控验收；既有 DB boundary lint 问题转独立 TODO，不在本波继续扩大。 |
-| `AlembicCore` | 观察中 | 否 | RFR-1 清单已验收；当前不做源码移动，后续如需收敛先处理 public API / deep import。 |
-| `AlembicAgent` | 观察中 | 否 | RFR-1 清单已验收；当前目录结构与仓库职责一致，不做源码移动。 |
-| `AlembicDashboard` | 观察中 | 否 | RFR-1 清单已验收；Dashboard 若优化需单独开前端波次。 |
-| `AlembicPlugin` | 观察中 | 否 | RFR-2A/RFR-2B 已通过总控验收；当前不继续扩大 Plugin MCP handler 分层。 |
-| `AlembicTest` | 观察中 | 否 | 当前无真实项目行为验证单；RFR-3A 未触发真实 Codex / BiliDili 复测。 |
+| `Alembic` | 观察中 | 否 | RFR-6 仅记录 DB boundary lint 债，暂不混入下一条 Plugin embedded runtime 主线。 |
+| `AlembicCore` | 观察中 | 否 | RFR-6 发现的是 public API / deep import 迁移债，需另开 closeout，不直接搬目录。 |
+| `AlembicAgent` | 观察中 | 否 | RFR-6 发现的是文档路径口径债，当前不影响主线。 |
+| `AlembicDashboard` | 观察中 | 否 | RFR-6 发现 HelpView / i18n 口径可能滞后，等待 Plugin 分类后再判断是否派发。 |
+| `AlembicPlugin` | 暂停 | 否 | 推荐下一主线为 embedded runtime 分类，但需要用户确认后再派发 RFR-6A。 |
+| `AlembicTest` | 观察中 | 否 | 当前只是审计文档，无 runtime/cache/真实项目行为变化，不创建测试单。 |
 | `BiliDili` | 无任务 | 否 | 不改真实项目源码。 |
 
 ## 可复制分派提示词
@@ -217,10 +222,10 @@ RFR-1 五个产品仓库清单已通过总控验收：
 发送给：无。
 
 ```text
-当前 RFR-3A 已通过总控验收，暂无新的执行窗口提示词。
+当前 RFR-6 深度代码审计已完成，暂无新的执行窗口提示词。
 ```
 
-不发送给：`Alembic`（观察中）、`AlembicPlugin`（观察中）、`AlembicCore`（观察中）、`AlembicAgent`（观察中）、`AlembicDashboard`（观察中）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
+不发送给：`Alembic`（观察中）、`AlembicPlugin`（暂停）、`AlembicCore`（观察中）、`AlembicAgent`（观察中）、`AlembicDashboard`（观察中）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
 
 ## 总控验证
 
@@ -246,3 +251,4 @@ RFR-1 五个产品仓库清单已通过总控验收：
 - 2026-05-22：总控验收 RFR-2B 通过。复核范围：`git -C AlembicPlugin show --name-status HEAD`、`lib/external/mcp/CodexMcpServer.ts` 导出与 helper import、`lib/external/mcp/codex/*.ts` helper 文件、helper 定义迁移扫描、MCP import 关系扫描、AlembicCodex runtime artifact 子仓库状态。总控补跑验证：`npm run test:unit -- test/unit/CodexMcpServer.test.ts test/unit/CodexSessionScenarioRunner.test.ts` 通过，2 个文件 / 40 个测试；`npm run verify:codex-plugin` 通过；`npm run verify:codex-channel` 通过；`git -C AlembicPlugin diff --check HEAD^ HEAD` 通过。功能完整性检查：MCP server 入口、tool schema、Skill contract、Plugin shell、channel、vendor、runtime artifact 所在路径未移动，满足 RFR-2B 完成定义。下一步：启动 RFR-3A，只派发 `Alembic` 处理主仓库 `lib/core` 命名歧义；暂不创建 AlembicTest 测试单，暂不刷新本机 Codex plugin cache。
 - 2026-05-22：`Alembic` 窗口完成 RFR-3A 并回填，执行记录见 `docs/Alembic/repository-folder-boundary-rfr-3-main-governance-2026-05-22.md`。完成范围：先复核 `lib/core` constitution/gateway/permission 与 `#core/*` package imports 的真实调用链，确认其实际属于 host-owned governance bounded context 后，将 `Constitution`、`ConstitutionValidator`、`Gateway`、`GatewayActionRegistry`、`PermissionManager` 从 `lib/core` 迁入 `lib/governance`；更新 `lib/bootstrap.ts`、DI/HTTP imports、四组 targeted unit tests、`package.json` imports、两个历史 benchmark/stats 脚本和 `AGENTS.md`；删除迁移后为空的 `lib/core` 目录；未移动 CLI、daemon、HTTP route、Dashboard dist、release staging、resources、vendor 或 workspace source resolver。提交 hash：Alembic `07273a64a413c59a8d5b247f098859d9658a1985`。验证命令：`npm run build:check`、`npm run test:unit -- test/unit/Constitution.test.ts test/unit/ConstitutionValidator.test.ts test/unit/Gateway.test.ts test/unit/PermissionManager.test.ts`、`npm run build`、`npm run release:package-guard`、`rg -n "lib/core|#core|\\.\\./core|\\.\\./\\.\\./core" lib test bin scripts package.json tsconfig.json vitest.config.ts vitest.unit.config.ts`、`git diff --check`、`npm run lint:repo-boundary`。验证结果：除 `npm run lint:repo-boundary` 外均通过；负向扫描无输出；`npm run lint:repo-boundary` 仍失败于既有 DB boundary 违规，涉及 `lib/http/routes/daemon.ts`、`lib/service/cleanup/CleanupService.ts`、`lib/service/signal/HitRecorder.ts`、`lib/infrastructure/audit/AuditStore.ts`、`bin/daemon-server.ts` 等，非本轮 governance 目录迁移引入。遗留风险：Core 相关脚本改为消费 `@alembic/core` public exports，后续如 Core export policy 收紧需同步；DB boundary lint 需另开任务判断。下一步建议：总控验收 RFR-3A 后，再决定是否创建 AlembicTest 真实复测单或进入 RFR-5 跨仓库验收。
 - 2026-05-22：总控验收 RFR-3A 通过。复核范围：`git -C Alembic show --name-status HEAD`、`lib/governance` 文件列表、`package.json` imports、`lib/core/#core` 负向扫描、提交 diff check、Alembic 工作区状态。总控补跑验证：`npm run build:check` 通过；`npm run test:unit -- test/unit/Constitution.test.ts test/unit/ConstitutionValidator.test.ts test/unit/Gateway.test.ts test/unit/PermissionManager.test.ts` 通过，4 个文件 / 59 个测试；`npm run release:package-guard` 通过；`rg -n "lib/core|#core|\\.\\./core|\\.\\./\\.\\./core" lib test bin scripts package.json tsconfig.json vitest.config.ts vitest.unit.config.ts` 无输出；`git diff --check HEAD^ HEAD` 通过。`npm run lint:repo-boundary` 仍失败于既有 DB boundary 违规，已记录为 RFR-TODO-9 / 全局 TODO，不阻塞本轮。功能完整性检查：bootstrap、DI、HTTP gateway action registry、targeted tests、package import map 和发布边界检查均覆盖；未触碰 CLI、daemon runtime、HTTP route 行为、Dashboard dist、release staging、resources、vendor、MCP / Plugin contract 或真实项目。当前无发送窗口，暂不创建 AlembicTest 测试单。
+- 2026-05-22：根据用户要求“不因为发现一个目标就停止”，总控完成 RFR-6 深度代码审计，新增 [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md)。审计确认：Alembic 与 AlembicPlugin 仍有 117 个共同 `lib` 相对路径，其中 69 个同名不同内容；Plugin portable runtime 兼容层是真实消费链路，不能按死代码删除；Plugin 仍保留旧 `lib/core` / `#core/*` governance 命名；Alembic 与 Plugin 的 `alembic-ai` package 身份存在发布语义歧义；MCP surface 已分叉但 Dashboard HelpView / i18n 有旧口径风险；Core 的 `src/core` / wildcard exports 是 public API 迁移债；Agent 主要是文档路径口径债；Alembic DB boundary lint 保持独立 TODO。当前无发送窗口，建议下一步先由用户确认是否启动 RFR-6A：`AlembicPlugin` embedded runtime 分类表。

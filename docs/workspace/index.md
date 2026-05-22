@@ -8,8 +8,9 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-3A 已验收 | `GTODO-2026-05-22-012`：RFR-1 / RFR-2A / RFR-2B / RFR-3A 已通过总控验收；当前无发送窗口，既有 DB boundary lint 问题转独立 TODO。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | RFR-3A 已验收 | 当前无发送窗口；`Alembic`、`AlembicPlugin`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 观察，`AlembicTest` 暂不创建测试单。 |
+| 当前计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-6 审计完成 | `GTODO-2026-05-22-012`：RFR-1 / RFR-2A / RFR-2B / RFR-3A 已通过总控验收；RFR-6 已补充完整拆仓残留深度审计，当前无发送窗口，等待用户确认下一主线。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | RFR-6 审计完成 | 当前无发送窗口；推荐下一步先确认 `AlembicPlugin` embedded runtime 分类主线，`AlembicTest` 暂不创建测试单。 |
+| 拆仓残留深度审计 | [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md) | 等待确认 | 记录 Alembic / Core / Agent / Dashboard / Plugin 横向代码证据，确认 Plugin embedded runtime 边界、旧 `lib/core`、package 身份、MCP surface、Dashboard 文案、Core exports、Agent 路径口径和 DB boundary 债。 |
 | 当前需求目录 | [repository-folder-boundary-restructure](../requirement-designs/repository-folder-boundary-restructure/) | RFR-0 已完成 | 保存原始计划、需求设计和代码实现依赖调研；用户已确认按总控建议启动，并要求不能导致功能缺失。 |
 | 目标阶段确认 | [repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md](repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md) | 已确认 | 固定最终完成定义、非目标、影响窗口、producer / consumer 依赖链和 RFR-1 当前允许启动窗口。 |
 | Alembic RFR-1 执行记录 | [../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md](../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md) | 已验收 | 记录 Alembic 主仓库 CLI / daemon / HTTP / Dashboard / release staging / resources / vendor/source resolver 路径依赖和禁止移动项。 |
@@ -77,12 +78,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | RFR-3A 已通过总控验收：`lib/core` governance context 已迁入 `lib/governance`；既有 DB boundary lint 问题转独立 TODO，不在本波继续扩大。 |
-| `AlembicCore`<br>观察中 | RFR-1 清单已验收；当前不做源码移动，后续如需收敛先处理 public API / deep import。 |
-| `AlembicAgent`<br>观察中 | RFR-1 清单已验收；当前目录结构与 Agent runtime / external AI / tools 边界一致，不做源码移动。 |
-| `AlembicDashboard`<br>观察中 | RFR-1 清单已验收；Dashboard 若优化需单独开前端波次。 |
-| `AlembicPlugin`<br>观察中 | RFR-2A / RFR-2B 已通过总控验收；当前不继续扩大 Plugin 侧 MCP handler 结构调整。 |
-| `AlembicTest`<br>观察中 | RFR-3A 是主仓库内部目录命名和 import 收敛，当前不创建真实 Codex / BiliDili 复测单。 |
+| `Alembic`<br>观察中 | RFR-3A 已通过总控验收；RFR-6 将既有 DB boundary lint 问题继续保留为独立 TODO，不混入 Plugin embedded runtime 主线。 |
+| `AlembicCore`<br>观察中 | RFR-6 确认 Core 的主要风险是 `src/core` / wildcard exports / deep import public API 迁移债；当前不做源码移动。 |
+| `AlembicAgent`<br>观察中 | RFR-6 确认 Agent 主要是 AGENTS 路径口径与 `src/external/ai` 真实实现不一致；当前不派发。 |
+| `AlembicDashboard`<br>观察中 | RFR-6 确认 Dashboard 不被 Plugin 直接打包，但 HelpView / i18n 的 MCP / internal AI 口径可能滞后；后续单独处理。 |
+| `AlembicPlugin`<br>暂停 | 推荐下一主线候选：先做 embedded runtime 分类表，再处理旧 `lib/core` / `#core/*`、HTTP compatibility route 和 package 身份歧义；等待用户确认。 |
+| `AlembicTest`<br>观察中 | 当前只是深度审计和计划文档，无 runtime/cache/真实项目行为变化，不创建测试单。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
 ## 状态枚举
