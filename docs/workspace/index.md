@@ -8,11 +8,12 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-3A 待启动 | `GTODO-2026-05-22-012`：RFR-1 / RFR-2A / RFR-2B 已通过总控验收；当前只派发 `Alembic` 收敛主仓库 `lib/core` governance 目录命名歧义。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | RFR-3A 待启动 | 当前发送窗口为 `Alembic`；`AlembicPlugin`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 观察，`AlembicTest` 暂不创建测试单。 |
+| 当前计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-3A 已验收 | `GTODO-2026-05-22-012`：RFR-1 / RFR-2A / RFR-2B / RFR-3A 已通过总控验收；当前无发送窗口，既有 DB boundary lint 问题转独立 TODO。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | RFR-3A 已验收 | 当前无发送窗口；`Alembic`、`AlembicPlugin`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 观察，`AlembicTest` 暂不创建测试单。 |
 | 当前需求目录 | [repository-folder-boundary-restructure](../requirement-designs/repository-folder-boundary-restructure/) | RFR-0 已完成 | 保存原始计划、需求设计和代码实现依赖调研；用户已确认按总控建议启动，并要求不能导致功能缺失。 |
 | 目标阶段确认 | [repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md](repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md) | 已确认 | 固定最终完成定义、非目标、影响窗口、producer / consumer 依赖链和 RFR-1 当前允许启动窗口。 |
 | Alembic RFR-1 执行记录 | [../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md](../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md) | 已验收 | 记录 Alembic 主仓库 CLI / daemon / HTTP / Dashboard / release staging / resources / vendor/source resolver 路径依赖和禁止移动项。 |
+| Alembic RFR-3A 执行记录 | [../Alembic/repository-folder-boundary-rfr-3-main-governance-2026-05-22.md](../Alembic/repository-folder-boundary-rfr-3-main-governance-2026-05-22.md) | 已验收 | 记录 `lib/core` constitution / gateway / permission 迁入 `lib/governance`、`#governance/*` import map、提交 hash、验证命令、残留扫描、既有 DB boundary lint 风险和总控补充验证。 |
 | AlembicCore RFR-1 执行记录 | [../AlembicCore/repository-folder-boundary-inventory-core-2026-05-22.md](../AlembicCore/repository-folder-boundary-inventory-core-2026-05-22.md) | 已验收 | 记录 Core public exports、resources、public API boundary、package root resolver 和不建议立即源码迁移的证据。 |
 | AlembicAgent RFR-1 执行记录 | [../AlembicAgent/repository-folder-boundary-inventory-agent-2026-05-22.md](../AlembicAgent/repository-folder-boundary-inventory-agent-2026-05-22.md) | 已验收 | 记录 Agent runtime、external AI provider、tools、release stage、public exports 和当前观察判断。 |
 | AlembicDashboard RFR-1 执行记录 | [../AlembicDashboard/repository-folder-boundary-inventory-dashboard-2026-05-22.md](../AlembicDashboard/repository-folder-boundary-inventory-dashboard-2026-05-22.md) | 已验收 | 记录 Dashboard Vite entry、API client、socket、public assets、View/Modal 迁移风险和暂不进入 RFR-2/RFR-3 的判断。 |
@@ -76,7 +77,7 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | RFR-3A：复核 `lib/core` constitution / gateway / permission 与 `#core/*` 的真实调用链，在保持功能闭环时把该 host-owned governance bounded context 收敛到更准确的内部目录名，并更新 imports、package imports、tests、执行记录和验证。 |
+| `Alembic`<br>观察中 | RFR-3A 已通过总控验收：`lib/core` governance context 已迁入 `lib/governance`；既有 DB boundary lint 问题转独立 TODO，不在本波继续扩大。 |
 | `AlembicCore`<br>观察中 | RFR-1 清单已验收；当前不做源码移动，后续如需收敛先处理 public API / deep import。 |
 | `AlembicAgent`<br>观察中 | RFR-1 清单已验收；当前目录结构与 Agent runtime / external AI / tools 边界一致，不做源码移动。 |
 | `AlembicDashboard`<br>观察中 | RFR-1 清单已验收；Dashboard 若优化需单独开前端波次。 |
