@@ -8,8 +8,8 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-2B 待启动 | `GTODO-2026-05-22-012`：RFR-2A 已通过总控验收；当前只派发 `AlembicPlugin` 整理 `lib/external/mcp/CodexMcpServer.ts` 纯 helper / tool visibility / result / daemon job query 边界。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | RFR-2B 待启动 | 当前发送窗口为 `AlembicPlugin`；`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 观察，`AlembicTest` 暂不创建测试单。 |
+| 当前计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-3A 待启动 | `GTODO-2026-05-22-012`：RFR-1 / RFR-2A / RFR-2B 已通过总控验收；当前只派发 `Alembic` 收敛主仓库 `lib/core` governance 目录命名歧义。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | RFR-3A 待启动 | 当前发送窗口为 `Alembic`；`AlembicPlugin`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 观察，`AlembicTest` 暂不创建测试单。 |
 | 当前需求目录 | [repository-folder-boundary-restructure](../requirement-designs/repository-folder-boundary-restructure/) | RFR-0 已完成 | 保存原始计划、需求设计和代码实现依赖调研；用户已确认按总控建议启动，并要求不能导致功能缺失。 |
 | 目标阶段确认 | [repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md](repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md) | 已确认 | 固定最终完成定义、非目标、影响窗口、producer / consumer 依赖链和 RFR-1 当前允许启动窗口。 |
 | Alembic RFR-1 执行记录 | [../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md](../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md) | 已验收 | 记录 Alembic 主仓库 CLI / daemon / HTTP / Dashboard / release staging / resources / vendor/source resolver 路径依赖和禁止移动项。 |
@@ -18,6 +18,7 @@
 | AlembicDashboard RFR-1 执行记录 | [../AlembicDashboard/repository-folder-boundary-inventory-dashboard-2026-05-22.md](../AlembicDashboard/repository-folder-boundary-inventory-dashboard-2026-05-22.md) | 已验收 | 记录 Dashboard Vite entry、API client、socket、public assets、View/Modal 迁移风险和暂不进入 RFR-2/RFR-3 的判断。 |
 | AlembicPlugin RFR-1 执行记录 | [../AlembicPlugin/repository-folder-boundary-inventory-plugin-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-inventory-plugin-2026-05-22.md) | 已验收 | 记录 Plugin `lib/codex` / `lib/external/mcp` / Codex shell / channel / runtime artifact / cache sync 路径依赖，并作为 RFR-2A 上游证据。 |
 | AlembicPlugin RFR-2A 执行记录 | [../AlembicPlugin/repository-folder-boundary-rfr-2-plugin-codex-runtime-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-rfr-2-plugin-codex-runtime-2026-05-22.md) | 已验收 | 记录 `lib/codex` runtime/status/diagnostics/preflight 内部目录迁移、AlembicPlugin 提交、AlembicCodex runtime artifact、验证命令、残留扫描和总控补充验证。 |
+| AlembicPlugin RFR-2B 执行记录 | [../AlembicPlugin/repository-folder-boundary-rfr-2-plugin-mcp-helpers-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-rfr-2-plugin-mcp-helpers-2026-05-22.md) | 已验收 | 记录 `CodexMcpServer.ts` helper / tool visibility / result / daemon job query / host handoff 抽取、AlembicPlugin 提交、AlembicCodex runtime artifact、验证命令、残留扫描和总控补充验证。 |
 | 上一完成计划 | [alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md](alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md) | 已完成 | `GTODO-2026-05-22-011` 已完成：Alembic 自有 package / plugin / release / runtime 版本位统一为 `0.2.0`，本机 Codex plugin cache 已刷新到 `alembic-codex@0.2.0`。 |
 | Alembic 执行记录 | [../Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md](../Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md) | V020-2 已完成 | 记录 `alembic-ai@0.2.0` root / lock 更新、publish staging 生成、release package guard 边界修正、提交 hash、验证命令和残留扫描。 |
 | AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md](../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md) | V020-3/V020-3R 已完成 | 记录 `alembic-ai@0.2.0` Codex plugin manifest / channel / runtime artifact、MCP metadata、cache sync fallback、测试断言、V020-3R fixture 返工、提交 hash、验证命令、残留扫描和总控 cache refresh 验收。 |
@@ -75,12 +76,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | RFR-1 清单已验收；主仓库目录迁移等待 Plugin 侧 RFR-2B 结果。 |
+| `Alembic`<br>待启动 | RFR-3A：复核 `lib/core` constitution / gateway / permission 与 `#core/*` 的真实调用链，在保持功能闭环时把该 host-owned governance bounded context 收敛到更准确的内部目录名，并更新 imports、package imports、tests、执行记录和验证。 |
 | `AlembicCore`<br>观察中 | RFR-1 清单已验收；当前不做源码移动，后续如需收敛先处理 public API / deep import。 |
 | `AlembicAgent`<br>观察中 | RFR-1 清单已验收；当前目录结构与 Agent runtime / external AI / tools 边界一致，不做源码移动。 |
 | `AlembicDashboard`<br>观察中 | RFR-1 清单已验收；Dashboard 若优化需单独开前端波次。 |
-| `AlembicPlugin`<br>待启动 | RFR-2B：整理 `lib/external/mcp/CodexMcpServer.ts` 纯 helper / tool visibility / result / daemon job query 边界，并回填代码提交、验证和必要 runtime artifact hash。 |
-| `AlembicTest`<br>观察中 | RFR-2B 先由 Plugin 自验证；是否创建真实 Codex / BiliDili 复测单等待 Plugin 侧结构波次收口。 |
+| `AlembicPlugin`<br>观察中 | RFR-2A / RFR-2B 已通过总控验收；当前不继续扩大 Plugin 侧 MCP handler 结构调整。 |
+| `AlembicTest`<br>观察中 | RFR-3A 是主仓库内部目录命名和 import 收敛，当前不创建真实 Codex / BiliDili 复测单。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
 ## 状态枚举
