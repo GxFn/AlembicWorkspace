@@ -31,6 +31,8 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 
 用户已确认采用“先做一轮真实修正，再收集真实代码，随后深入分析下一轮”的持续增强节奏。RFR-6A 选择最小真实修正点：`AlembicPlugin` 仍保留旧 `lib/core` / `#core/*` governance 命名，而 Alembic 主仓库 RFR-3A 已迁入 `lib/governance` / `#governance/*`。本波只处理 Plugin governance 命名残留，并要求回填真实 diff、runtime artifact、残留扫描和下一轮代码证据；不触碰 Plugin HTTP/service/daemon/injection 大面积兼容层。
 
+RFR-6A 必须建立在长期产品前提上重新认识旧功能：`AlembicPlugin` 是 Codex host agent 入口，`Alembic` 是本地增强底座；Plugin first，Alembic install enhances。也就是说，Plugin 可以通过请求 Alembic service 工作，旧功能不能只按“Plugin 本地有没有实现”来判断。执行窗口需要把旧功能分成四类：Plugin-owned Codex 入口 / 请求治理能力、Alembic service request client、无 Alembic 时的 portable compatibility、真正旧残留或重复实现。只有第四类才进入删除候选；第二类应转成明确的 Alembic service 请求边界；第三类要写清保留条件和降级语义。
+
 ## 功能完整性护栏
 
 - RFR-1 只做路径依赖清单和目标层级建议，不移动文件、不改 import、不删目录，已完成。
@@ -52,8 +54,8 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 | RFR-4 | 观察中 | `AlembicCore` / `AlembicAgent` / `AlembicDashboard` | 只在 RFR-1 证明有必要且低风险时做内部目录收敛。 | 后续按仓库决定。 | 否 |
 | RFR-5 | 观察中 | `AlembicWorkspace` / `AlembicTest` | 跨仓库验收、cache refresh、必要时创建真实项目测试单。当前 RFR-2/RFR-3 只改 Plugin runtime artifact 与 Alembic 内部 imports，尚未判断需要真实项目复测或 cache refresh。 | workspace 验收记录；如后续触发真实复测，再创建测试单。 | 否 |
 | RFR-6 | 已完成 | `AlembicWorkspace` | 根据用户要求继续完整深挖拆仓残留，不因发现主仓库 `lib/core` 一个目标就停止；横向复核 Alembic / Core / Agent / Dashboard / Plugin 真实代码和边界文档。 | [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md)；当前只形成审计和下一主线候选，不派发实现。 | 否 |
-| RFR-6A | 待启动 | `AlembicPlugin` | 第一轮真实修正：处理 Plugin 旧 `lib/core` / `#core/*` governance 命名残留，形成与主仓库一致或更明确的 governance 目录表达，保持行为和 runtime artifact 完整。 | 等待 `AlembicPlugin` 回填执行记录、提交 hash、验证命令、runtime artifact hash、残留扫描和下一轮真实代码证据。 | 是 |
-| RFR-6B | 阻塞 | `AlembicWorkspace` | 基于 RFR-6A 真实 diff 和残留扫描，再深入分析下一轮修正对象：Plugin embedded runtime HTTP/service/injection/daemon 分类、package 身份、MCP / Dashboard 口径或 Core/Agent 后续债。 | 依赖 RFR-6A 回填。 | 否 |
+| RFR-6A | 待启动 | `AlembicPlugin` | 第一轮真实修正：在 Plugin first / Alembic install enhances 前提下，处理 Plugin 旧 `lib/core` / `#core/*` governance 命名残留；确认它是 Plugin-owned 请求治理、Alembic service client、portable compatibility 还是旧残留，再做最小真实修正。 | 等待 `AlembicPlugin` 回填执行记录、提交 hash、验证命令、runtime artifact hash、残留扫描和下一轮真实代码证据。 | 是 |
+| RFR-6B | 阻塞 | `AlembicWorkspace` | 基于 RFR-6A 真实 diff 和残留扫描，在 Plugin 可请求 Alembic service 的前提下重新分析下一轮修正对象：Plugin embedded runtime HTTP/service/injection/daemon、package 身份、MCP / Dashboard 口径或 Core/Agent 后续债。 | 依赖 RFR-6A 回填。 | 否 |
 
 ## 窗口分派
 
@@ -65,7 +67,7 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 | `AlembicCore`<br>观察中 | RFR-6 确认 Core 的主要问题是 `src/core` / wildcard exports / deep import 迁移债；当前不直接搬源码，后续先做 public API closeout。 |
 | `AlembicAgent`<br>观察中 | RFR-6 确认 Agent public API 较干净，主要是 AGENTS 路径口径与 `src/external/ai` 真实实现不一致；当前不派发。 |
 | `AlembicDashboard`<br>观察中 | RFR-6 确认 Dashboard 不被 Plugin 直接打包，但 HelpView / i18n 的 MCP tool list 和 internal AI 文案可能滞后；后续单独小波次处理。 |
-| `AlembicPlugin`<br>待启动 | RFR-6A：处理 Plugin 旧 `lib/core` / `#core/*` governance 命名残留；建议目标为 `lib/governance` / `#governance/*`，如执行窗口判断 `lib/embedded-runtime/governance` 更准确，必须基于真实调用方说明理由。 |
+| `AlembicPlugin`<br>待启动 | RFR-6A：处理 Plugin 旧 `lib/core` / `#core/*` governance 命名残留；必须先按 Plugin-owned 请求治理、Alembic service request client、portable compatibility、旧残留四类重新判断，再选择 `lib/governance`、`lib/embedded-runtime/governance` 或服务请求边界等最小真实修正。 |
 | `AlembicTest`<br>观察中 | 当前不创建测试单；RFR-6A 是 Plugin 内部目录命名和 runtime artifact 完整性验证，先由 Plugin 窗口完成 build / unit / plugin verify / channel verify。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
@@ -73,11 +75,20 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 
 目标：做一轮真实修正，而不是继续停留在审计文档。处理 `AlembicPlugin` 中旧 `lib/core` / `#core/*` governance 命名残留，使 constitution / gateway / permission bounded context 的目录表达与实际职责一致，并为下一轮总控深挖收集真实代码证据。
 
+前提：
+
+- 长期路线固定为 `Plugin first, Alembic install enhances`。
+- `AlembicPlugin` 是 Codex host agent 入口，负责 Codex MCP、Skill、channel、host project 对齐、prime / search / Guard 等 Codex-facing 入口和请求治理。
+- `Alembic` 是本地增强底座。Alembic 安装且 daemon / service 可用时，Plugin 应通过明确 service request 消费 Alembic 的增强能力，而不是复制一套长期主实现。
+- 旧功能的新认识必须先问：这是 Plugin 必须本地拥有的入口 / 请求治理，还是请求 Alembic service 的 client，还是无 Alembic 时的 portable compatibility，还是早期拆仓遗留的重复实现。
+
 范围：
 
 - 必须先读取 `AlembicPlugin/AGENTS.md`、本计划、[repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md) 和 `docs/AlembicPlugin/repository-folder-boundary-inventory-plugin-2026-05-22.md`。
 - 必须先扫描并记录 `lib/core`、`#core/*`、`../core`、constitution/gateway/permission 的真实 imports、tests、scripts、runtime prepare / verify 影响。
+- 必须在执行记录中为每个 `lib/core` 子目录写明分类：Plugin-owned 请求治理 / Alembic service request client / portable compatibility / 旧残留。分类要写真实消费方，不得只按目录名推断。
 - 建议目标目录名为 `lib/governance/`，并将 package import alias 从 `#core/*` 改为 `#governance/*`；如执行窗口认为 Plugin embedded runtime 语境下应使用 `lib/embedded-runtime/governance/`，必须回填真实消费链路和命名理由。
+- 如果发现某项本应通过 Alembic service 提供，不要在 RFR-6A 顺手重写服务请求链路；先记录 service request candidate、当前消费方、缺口和下一轮建议，除非当前 `lib/core` 命名修正无法安全完成。
 - 更新源码 imports、`package.json` imports、测试 imports、必要文档和执行记录。
 - 如源码进入 Codex runtime artifact，必须运行 runtime prepare / verify，并回填 AlembicCodex runtime artifact commit / tarball hash；如判断无需重建 runtime，必须说明依据。
 - 保存执行记录到 `docs/AlembicPlugin/repository-folder-boundary-rfr-6-plugin-governance-2026-05-22.md`，并回填当前计划。
@@ -86,6 +97,7 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 
 - 不移动 `lib/http/`、`lib/service/`、`lib/injection/`、`lib/daemon/`、`lib/external/mcp/`、`lib/codex/`、plugin shell、channel、`.agents/`、`vendor/AlembicCore/`、`plugins/alembic-codex/runtime/` 或 `runtime.tgz` 所在路径。
 - 不删除 HTTP compatibility routes、DashboardOperation compatibility、daemon-server、JobStore、git-diff checkpoint、resident search、prime shout、MCP tools 或 Codex runtime 能力。
+- 不把“Plugin 可请求 Alembic service 的增强能力”误判为 Plugin 必须永久内置，也不把“portable compatibility”误判为死代码。
 - 不把完整实现改成薄 wrapper，不新增无真实调用方的兼容层，不顺手处理 package name、Dashboard help、Core exports 或 Agent 文档路径。
 
 建议验证命令：
@@ -237,8 +249,8 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 | RFR-TODO-6B | 已完成 | 代码迁移 | P0 | `AlembicPlugin` | 整理 `lib/external/mcp/CodexMcpServer.ts` 纯 helper / tool visibility / result / daemon job query 边界，抽入 `lib/external/mcp/codex/` 内部支持目录。 | 是 | AlembicPlugin `7afd689dc1654611b7f9de742aa170a3a9de7fa3` 已通过总控验收；MCP/session targeted unit / plugin verify / channel verify 通过。 | `AlembicPlugin` |
 | RFR-TODO-8 | 已完成 | 代码迁移 | P0 | `Alembic` | 处理主仓库 `lib/core` 与 `@alembic/core` 命名歧义，将 host-owned constitution/gateway/permission bounded context 收敛到更准确目录。 | 是 | Alembic `07273a64a413c59a8d5b247f098859d9658a1985` 已通过总控验收；build:check / targeted unit / release package guard / residual scan / diff check 通过。 | `Alembic` |
 | RFR-TODO-9 | 观察中 | 既有边界债 | P1 | `Alembic` | `npm run lint:repo-boundary` 仍因既有 DB boundary 违规失败，需要后续单独判断是否作为新主线收敛。 | 否，不影响 RFR-3A 目录命名验收；可能影响后续 repo-boundary 质量线。 | RFR-3A 总控验收发现；命中 `daemon.ts`、`CleanupService.ts`、`HitRecorder.ts`、`AuditStore.ts`、`daemon-server.ts` 等非本轮改动文件。 | `Alembic` |
-| RFR-TODO-10 | 执行中 | 真实修正 | P0 | `AlembicPlugin` / `AlembicWorkspace` | RFR-6A 第一轮真实修正：处理 Plugin 旧 `lib/core` / `#core/*` governance 命名残留，并收集真实 diff / runtime artifact / 残留扫描作为下一轮深入分析输入。 | 是，影响后续 Plugin 目录迁移、runtime artifact、cache 和真实 Codex 验证。 | 用户确认采用“先真实修正，再收集真实代码，再深入分析下一轮”的持续增强节奏。 | `AlembicPlugin` |
-| RFR-TODO-12 | 阻塞 | 下一轮分析 | P0 | `AlembicWorkspace` | RFR-6A 完成后，总控基于真实提交 diff、残留扫描和 Plugin 回填，重新判断下一轮修正对象：embedded runtime HTTP/service/injection/daemon 分类、package 身份、MCP / Dashboard 口径或 Core/Agent 后续债。 | 是，决定下一轮派发。 | 依赖 RFR-6A 回填。 | `AlembicWorkspace` |
+| RFR-TODO-10 | 执行中 | 真实修正 | P0 | `AlembicPlugin` / `AlembicWorkspace` | RFR-6A 第一轮真实修正：在 Plugin first / Alembic install enhances 前提下，处理 Plugin 旧 `lib/core` / `#core/*` governance 命名残留，并收集真实 diff / runtime artifact / 残留扫描作为下一轮深入分析输入。 | 是，影响后续 Plugin 目录迁移、runtime artifact、cache 和真实 Codex 验证。 | 用户确认采用“先真实修正，再收集真实代码，再深入分析下一轮”的持续增强节奏；总控补充确认 Plugin 可以请求 Alembic service，旧功能必须在此关系里重新分类。 | `AlembicPlugin` |
+| RFR-TODO-12 | 阻塞 | 下一轮分析 | P0 | `AlembicWorkspace` | RFR-6A 完成后，总控基于真实提交 diff、残留扫描和 Plugin 回填，在 Plugin 可请求 Alembic service 的前提下重新判断下一轮修正对象：embedded runtime HTTP/service/injection/daemon、package 身份、MCP / Dashboard 口径或 Core/Agent 后续债。 | 是，决定下一轮派发。 | 依赖 RFR-6A 回填。 | `AlembicWorkspace` |
 | RFR-TODO-11 | 观察中 | contract / UI 口径 | P1 | `AlembicDashboard` / `AlembicPlugin` / `Alembic` | 对齐 MCP tool surface 和 Dashboard HelpView / i18n 文案，避免旧 `wiki_plan` / `wiki_finalize` / `knowledge_lifecycle` 口径与实际 Alembic / Plugin 工具分叉产生歧义。 | 否，当前不影响代码运行；影响开发者理解。 | RFR-6 深度审计发现；等待 RFR-6A 分类后决定是否单独派发 Dashboard。 | `AlembicDashboard` |
 | RFR-TODO-7 | 无任务 | 真实复测 | P1 | `AlembicTest` | 如 RFR-2/RFR-3 改动影响 Codex plugin 或 resident service，创建真实复测单。 | 否 | RFR-3A 只改 Alembic 内部 governance 目录命名和 imports，当前不触发真实项目复测。 | `AlembicTest` |
 
@@ -250,7 +262,7 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 | `AlembicCore` | 观察中 | 否 | RFR-6A 不触碰 Core public API / deep import。 |
 | `AlembicAgent` | 观察中 | 否 | RFR-6A 不触碰 Agent。 |
 | `AlembicDashboard` | 观察中 | 否 | RFR-6A 不触碰 Dashboard help / i18n，后续基于真实修正结果再判断。 |
-| `AlembicPlugin` | 待启动 | 是 | 当前唯一可推进窗口，执行 Plugin 旧 `lib/core` / `#core/*` governance 命名真实修正。 |
+| `AlembicPlugin` | 待启动 | 是 | 当前唯一可推进窗口，执行 Plugin 旧 `lib/core` / `#core/*` governance 命名真实修正；执行前必须按 Plugin-owned 请求治理 / Alembic service request client / portable compatibility / 旧残留四类重新判断。 |
 | `AlembicTest` | 观察中 | 否 | RFR-6A 先由 Plugin 窗口完成 build / unit / runtime verify；暂无真实项目复测单。 |
 | `BiliDili` | 无任务 | 否 | 不改真实项目源码。 |
 
@@ -259,7 +271,7 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 发送给：`AlembicPlugin`。
 
 ```text
-读取 docs/workspace/repository-folder-boundary-restructure-workspace-plan-2026-05-22.md，按照文档，领取并完成分配给你所在窗口的 RFR-6A 任务；完成后回填完成范围、提交 hash、验证命令、验证结果、runtime artifact hash、残留风险和下一步建议。
+读取 docs/workspace/repository-folder-boundary-restructure-workspace-plan-2026-05-22.md，按照文档，领取并完成分配给你所在窗口的 RFR-6A 任务。注意长期前提是 Plugin first, Alembic install enhances：AlembicPlugin 是 Codex host agent 入口，Alembic 是本地增强底座；Plugin 可以请求 Alembic service，所以旧功能必须先分类为 Plugin-owned 请求治理、Alembic service request client、portable compatibility 或真正旧残留，再做最小真实修正。完成后回填完成范围、提交 hash、验证命令、验证结果、runtime artifact hash、残留风险和下一步建议。
 ```
 
 不发送给：`Alembic`（观察中）、`AlembicCore`（观察中）、`AlembicAgent`（观察中）、`AlembicDashboard`（观察中）、`AlembicTest`（观察中）、`BiliDili`（无任务）。
@@ -290,3 +302,4 @@ RFR-6 深度补充审计已完成，文档见 [repository-split-residue-deep-aud
 - 2026-05-22：总控验收 RFR-3A 通过。复核范围：`git -C Alembic show --name-status HEAD`、`lib/governance` 文件列表、`package.json` imports、`lib/core/#core` 负向扫描、提交 diff check、Alembic 工作区状态。总控补跑验证：`npm run build:check` 通过；`npm run test:unit -- test/unit/Constitution.test.ts test/unit/ConstitutionValidator.test.ts test/unit/Gateway.test.ts test/unit/PermissionManager.test.ts` 通过，4 个文件 / 59 个测试；`npm run release:package-guard` 通过；`rg -n "lib/core|#core|\\.\\./core|\\.\\./\\.\\./core" lib test bin scripts package.json tsconfig.json vitest.config.ts vitest.unit.config.ts` 无输出；`git diff --check HEAD^ HEAD` 通过。`npm run lint:repo-boundary` 仍失败于既有 DB boundary 违规，已记录为 RFR-TODO-9 / 全局 TODO，不阻塞本轮。功能完整性检查：bootstrap、DI、HTTP gateway action registry、targeted tests、package import map 和发布边界检查均覆盖；未触碰 CLI、daemon runtime、HTTP route 行为、Dashboard dist、release staging、resources、vendor、MCP / Plugin contract 或真实项目。当前无发送窗口，暂不创建 AlembicTest 测试单。
 - 2026-05-22：根据用户要求“不因为发现一个目标就停止”，总控完成 RFR-6 深度代码审计，新增 [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md)。审计确认：Alembic 与 AlembicPlugin 仍有 117 个共同 `lib` 相对路径，其中 69 个同名不同内容；Plugin portable runtime 兼容层是真实消费链路，不能按死代码删除；Plugin 仍保留旧 `lib/core` / `#core/*` governance 命名；Alembic 与 Plugin 的 `alembic-ai` package 身份存在发布语义歧义；MCP surface 已分叉但 Dashboard HelpView / i18n 有旧口径风险；Core 的 `src/core` / wildcard exports 是 public API 迁移债；Agent 主要是文档路径口径债；Alembic DB boundary lint 保持独立 TODO。当前无发送窗口，建议下一步先由用户确认是否启动 RFR-6A：`AlembicPlugin` embedded runtime 分类表。
 - 2026-05-22：用户确认采用“先做一轮真实修正，然后收集真实代码，再深入分析下一轮”的持续增强节奏。总控激活 RFR-6A，只派发 `AlembicPlugin`，目标是处理 Plugin 旧 `lib/core` / `#core/*` governance 命名残留；完成后由总控基于真实 diff 和残留扫描启动 RFR-6B 深入分析。当前不派发 Alembic / Core / Agent / Dashboard / Test。
+- 2026-05-22：用户补充确认长期前提：`Plugin first, Alembic install enhances`，`AlembicPlugin` 是 Codex host agent 入口，`Alembic` 是本地增强底座，Plugin 可以通过请求 Alembic service 工作。总控据此修订 RFR-6A：旧功能必须先分类为 Plugin-owned 请求治理、Alembic service request client、portable compatibility 或真正旧残留，不能把 service enhancement 误判为 Plugin 本地永久实现，也不能把 portable compatibility 误删。
