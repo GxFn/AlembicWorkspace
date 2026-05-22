@@ -8,12 +8,12 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-6D 暂停 | `GTODO-2026-05-22-012`：用户修正 Dashboard 不再接入 Plugin；RFR-6D 改为待确认合并清理，确认后发送 `AlembicPlugin` 删除旧 Dashboard HTTP compatibility layer，并同时处理 `AgentModule.ts` 命名残留。 |
+| 当前计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-6D 暂停 | `GTODO-2026-05-22-012`：用户修正 Dashboard 不再接入 Plugin，并要求合并多个小任务；RFR-6D 改为待确认合并清理，确认后发送 `AlembicPlugin` 删除旧 Dashboard / AI / Recipe HTTP compatibility surface，并同时处理 `AgentModule.ts` 命名残留。 |
 | 当前状态 | [workspace-current-status.md](workspace-current-status.md) | RFR-6D 暂停 | 当前发送窗口：无，等待用户确认删除范围；`AlembicTest` 暂不创建测试单。 |
 | 拆仓残留深度审计 | [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md) | RFR-6 已完成 | 记录 Alembic / Core / Agent / Dashboard / Plugin 横向代码证据，确认 Plugin embedded runtime 边界、旧 `lib/core`、package 身份、MCP surface、Dashboard 文案、Core exports、Agent 路径口径和 DB boundary 债。 |
 | RFR-6B 真实代码分析 | [repository-split-rfr-6b-real-code-analysis-2026-05-22.md](repository-split-rfr-6b-real-code-analysis-2026-05-22.md) | 已完成 | 基于 RFR-6A 真实 diff 和残留扫描，确认下一轮不做大面积迁移，优先派发 `AlembicPlugin` 收紧 HTTP `DashboardOperations` compatibility 命名。 |
 | RFR-6D 真实代码分析 | [repository-split-rfr-6d-real-code-analysis-2026-05-22.md](repository-split-rfr-6d-real-code-analysis-2026-05-22.md) | 已完成 | 基于 RFR-6C 后的真实 diff 和残留扫描，确认下一轮不做整个 `service` / `injection` / `daemon`，优先派发 `AlembicPlugin` 收紧 `AgentModule.ts` 为 SkillHooks 语义模块。 |
-| RFR-6D 合并清理分析 | [repository-split-rfr-6d-batch-cleanup-analysis-2026-05-22.md](repository-split-rfr-6d-batch-cleanup-analysis-2026-05-22.md) | 待确认 | 用户修正 Dashboard 不再接入 Plugin 后，补充代码证据并把旧 Dashboard HTTP compatibility operation layer 转为删除候选；建议与 `AgentModule.ts` -> SkillHooks 语义收敛合并成一波。 |
+| RFR-6D 合并清理分析 | [repository-split-rfr-6d-batch-cleanup-analysis-2026-05-22.md](repository-split-rfr-6d-batch-cleanup-analysis-2026-05-22.md) | 待确认 | 用户修正 Dashboard 不再接入 Plugin 后，补充代码证据并把旧 Dashboard HTTP compatibility operation layer、旧 AI/Recipe fail-closed HTTP surface 转为删除候选；建议与 `AgentModule.ts` -> SkillHooks 语义收敛合并成一波。 |
 | 当前需求目录 | [repository-folder-boundary-restructure](../requirement-designs/repository-folder-boundary-restructure/) | RFR-0 已完成 | 保存原始计划、需求设计和代码实现依赖调研；用户已确认按总控建议启动，并要求不能导致功能缺失。 |
 | 目标阶段确认 | [repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md](repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md) | 已确认 | 固定最终完成定义、非目标、影响窗口、producer / consumer 依赖链和 RFR-1 当前允许启动窗口。 |
 | Alembic RFR-1 执行记录 | [../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md](../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md) | 已验收 | 记录 Alembic 主仓库 CLI / daemon / HTTP / Dashboard / release staging / resources / vendor/source resolver 路径依赖和禁止移动项。 |
@@ -87,7 +87,7 @@
 | `AlembicCore`<br>观察中 | RFR-6D 不触碰 Core public API / deep import。 |
 | `AlembicAgent`<br>观察中 | RFR-6D 不触碰 AlembicAgent 仓库，也不引入 Agent runtime。 |
 | `AlembicDashboard`<br>观察中 | RFR-6D 不改 Dashboard 前端；Dashboard 不接入 Plugin，继续消费 Alembic 主仓库 API。 |
-| `AlembicPlugin`<br>暂停 | 等待用户确认 RFR-6D 合并清理：删除旧 Dashboard HTTP compatibility operation layer；清理或重命名受影响 route；同时将 `AgentModule.ts` 收敛为 SkillHooks 语义模块；最后一次性重建 runtime artifact 和验证 plugin/channel。 |
+| `AlembicPlugin`<br>暂停 | 等待用户确认 RFR-6D 合并清理：删除旧 Dashboard HTTP compatibility operation layer；删除旧 `/ai/*` 与 `/recipes/discover-relations` fail-closed HTTP compatibility surface；清理或重命名受影响 route；同时将 `AgentModule.ts` 收敛为 SkillHooks 语义模块；最后一次性重建 runtime artifact 和验证 plugin/channel。 |
 | `AlembicTest`<br>观察中 | 当前不创建测试单；RFR-6D 属于 Plugin 代码边界和 runtime artifact 验证，确认后先由 Plugin 窗口完成 build / unit / runtime verify。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
