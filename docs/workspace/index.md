@@ -8,7 +8,7 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 空闲 | 当前没有执行计划，发送窗口为无；历史记录从长期记录地图查询。 |
+| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 空闲 | 小问题修复 / 清理修复主线已验收并归档；当前无发送窗口，历史记录从长期记录地图查询。 |
 | 当前短期工作区 | [current/](current/) | 短期入口 | 当前状态、活跃 TODO、测试交流和后续执行计划统一放在这里。 |
 | 长期记录地图 | [workspace-record-map.md](workspace-record-map.md) | 长期地图 | 查询历史计划、归档 topic、已完成 TODO、测试历史和证据入口。 |
 | 全局职责功能划分长期契约 | [alembic-repository-responsibility-function-boundary-contract.md](alembic-repository-responsibility-function-boundary-contract.md) | 已生效 | 记录 Alembic 系列仓库职责、功能归属判断、跨仓库交界、后续候选和维护规则。 |
@@ -39,12 +39,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>无任务 | CCIC 主线已完成并归档；本轮不发送。 |
-| `AlembicCore`<br>观察中 | `normalizeLifecycle` additive readiness 已转入 `GTODO-2026-05-23-019`，Plugin / Alembic 主体交流接口后续再慢慢对齐。 |
-| `AlembicAgent`<br>无任务 | CCIC-1 已完成；本波不涉及 AlembicAgent runtime、provider 或 tool system。 |
-| `AlembicDashboard`<br>无任务 | 用户已确认 Dashboard 不再接入 Plugin；Dashboard 不作为 Plugin 兼容保留理由。 |
-| `AlembicPlugin`<br>无任务 | CCIC 主线已完成并归档；本轮不发送。 |
-| `AlembicTest`<br>无任务 | 本轮不操作真实项目；只有后续新主线刷新本机 Codex plugin cache、改变 prime/search/cold-start、daemon HTTP contract 或真实项目路径时再创建测试单。 |
+| `Alembic`<br>无任务 | 小问题修复 / 清理修复已验收；等待新功能目标。 |
+| `AlembicCore`<br>观察中 | `GTODO-2026-05-23-019` 仅在后续 consumer 收敛目标触发时启动。 |
+| `AlembicAgent`<br>观察中 | L4 compaction 当前不处理，低优等待用户再次提及。 |
+| `AlembicDashboard`<br>观察中 | `GTODO-2026-05-23-022` / `GTODO-2026-05-23-023` 等待后续 Dashboard contract typing 或性能目标触发。 |
+| `AlembicPlugin`<br>无任务 | 小问题修复 / 清理修复已验收；等待新功能目标。 |
+| `AlembicTest`<br>无任务 | 当前无测试单；真实项目测试仍通过测试交流文档派发。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
 ## 状态枚举

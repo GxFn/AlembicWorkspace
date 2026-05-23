@@ -33,6 +33,7 @@
 
 | 记录 | 状态 | 归档入口 | 说明 |
 | --- | --- | --- | --- |
+| SFC：小问题修复 / 清理修复 | 已完成 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | 六仓库自检、真实小问题修复、lint / check closeout、Plugin real-project 资产删除和 Alembic Codex-safe unit 命令封口。 |
 | CCIC：能力代码 / 接口清理 | 已完成 | [capability-code-interface-cleanup](archive/2026-05/capability-code-interface-cleanup/) | 能力代码梳理、接口清洁、冗余删除、Plugin 身份和 Alembic MCP 外部入口剪枝。 |
 | RFR：文件夹层级 / 拆仓残留清理 | 已完成 | [repository-folder-boundary-restructure](archive/2026-05/repository-folder-boundary-restructure/) | 文件夹层级重构、Plugin 旧 Dashboard / AI / Recipe compatibility surface 清理。 |
 | GFBD：全局职责功能划分 | 已完成 | [global-function-boundary-design](archive/2026-05/global-function-boundary-design/) | 六窗口证据采集、长期职责契约和功能划分方案的来源记录。 |
@@ -50,6 +51,11 @@
 | `GTODO-2026-05-21-004` 来源 | [plugin-service-request-boundary](archive/2026-05/plugin-service-request-boundary/) | Alembic resident service API / capability / contract version 观察来源。 |
 | `GTODO-2026-05-21-005` 来源 | [test-exchange-history](archive/2026-05/test-exchange-history/) | Recipe evidenceRef 行号级证据观察来源。 |
 | `GTODO-2026-05-23-019` 来源 | [capability-code-interface-cleanup](archive/2026-05/capability-code-interface-cleanup/) | Core `normalizeLifecycle` public export readiness 观察来源。 |
+| `GTODO-2026-05-23-020` 已完成 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | Alembic 新增 Codex sandbox-safe unit test 命令并保留完整 `test:unit`，提交 `69474767c84adc15fccaa9d8a8513bd8ff7f2ee5`。 |
+| `GTODO-2026-05-23-021` 已完成 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | AlembicPlugin 删除 real-project 非逻辑资产，提交 `484174e9d08a2a7a0786c2cc2553de0b2fee5e0c`。 |
+| `GTODO-2026-05-23-022` 来源 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | Dashboard `src/api.ts` 剩余动态 contract `any` 类型化观察来源。 |
+| `GTODO-2026-05-23-023` 来源 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | Dashboard Mermaid async chunk 性能观察来源。 |
+| `GTODO-2026-05-23-024` 来源 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | AlembicAgent L4 compaction 低优等待用户再次提及的来源。 |
 
 ## Test Records
 
@@ -68,6 +74,7 @@
 
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/small-fix-cleanup` | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | 小问题修复 / 清理修复主线：自检、SFC-R1 直接修复、SFC-R2 lint / check closeout、SFC-R3 用户确认项封口。 |
 | `2026-05/agent-evidence-recording-phase-chain` | [agent-evidence-recording-phase-chain](archive/2026-05/agent-evidence-recording-phase-chain/) | Agent evidence recording / phase chain 历史测试线计划。 |
 | `2026-05/prime-knowledge-shout` | [prime-knowledge-shout](archive/2026-05/prime-knowledge-shout/) | Prime 知识呐喊、Recipe 交互契约和 BiliDili bridge repair 历史计划。 |
 | `2026-05/plugin-service-request-boundary` | [plugin-service-request-boundary](archive/2026-05/plugin-service-request-boundary/) | Plugin 请求 Alembic service 的边界收口计划。 |

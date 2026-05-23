@@ -37,5 +37,6 @@
 | [release-portable-snapshot-closeout](release-portable-snapshot-closeout/) | release / portable snapshot closeout 与 publish staging。 |
 | [repository-folder-boundary-restructure](repository-folder-boundary-restructure/) | 仓库文件夹层级、拆仓残留审计和清理记录。 |
 | [resident-vector-search-release](resident-vector-search-release/) | resident vector search 发布与测试记录。 |
+| [small-fix-cleanup](small-fix-cleanup/) | 小问题修复 / 清理修复主线：自检、SFC-R1 直接修复、SFC-R2 lint / check closeout、SFC-R3 用户确认项封口。 |
 | [test-exchange-history](test-exchange-history/) | 历史测试交流正文。 |
 | [version-unification](version-unification/) | 0.2.0 版本统一和缓存刷新记录。 |
