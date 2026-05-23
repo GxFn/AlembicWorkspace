@@ -20,6 +20,10 @@ Current scripts:
   local noise files are not tracked by the workspace Git repository.
 - `verify-workspace-docs.mjs`: checks the workspace index, current control
   plan, required sections, Markdown links, and completed document references.
+- `check-workspace-current-layout.mjs`: verifies that short-term workspace docs
+  live under `docs/workspace/current/`, that the current index target points
+  there, and that active docs/scripts/templates do not reference the old
+  root-level short-term paths.
 - `check-dispatch-coverage.mjs`: verifies that the current control plan covers
   every expected window, that the declared copyable prompt send list matches
   task statuses, and that sendable prompts require reading `AGENTS.md` plus an
@@ -46,11 +50,25 @@ Current scripts:
 - `archive-workspace-docs.mjs`: dry-run by default; moves completed workspace
   control documents into `docs/workspace/archive/YYYY-MM/<topic>/`, rewrites
   relative links inside moved documents, rewrites index links, removes archived
-  rows from the current index table, and adds a compact archive summary entry
-  only when `--apply` is provided. Use `--keep-index-rows` only when a
+  rows from the current index table, and adds / updates a topic entry in
+  `docs/workspace/workspace-record-map.md` only when `--apply` is provided. Use
+  `--keep-index-rows` only when a
   historical row must remain visible. The script protects active first-row
   plans, but completed first-row plans can be archived once a new current or
   idle status entry is ready.
+- `compact-workspace-index.mjs`: dry-run by default; compacts historical rows
+  from `docs/workspace/index.md` into a topic manifest under
+  `docs/workspace/archive/YYYY-MM/<topic>/index.md`, and updates
+  `docs/workspace/workspace-record-map.md`. Use this after moving old documents, or
+  when old execution rows still clutter the current index.
+- `archive-global-todo-board.mjs`: dry-run by default; moves completed global
+  TODO rows and old sync records from `docs/workspace/current/global-todo-board.md` to
+  `docs/workspace/archive/YYYY-MM/global-todo/`, keeping the active board small.
+- `generate-archive-topic-summaries.mjs`: dry-run by default; creates or
+  refreshes `index.md` summary files for the archive root, month folders, and
+  every `docs/workspace/archive/YYYY-MM/<topic>/` folder, preserving historical
+  body files as evidence snapshots while giving each archive folder a readable
+  map.
 
 Suggested pre-acceptance sequence:
 
@@ -86,7 +104,16 @@ node scripts/verify-control-center.mjs --with-runtime
 Archive dry-run example:
 
 ```bash
-node scripts/archive-workspace-docs.mjs --topic interface-boundary --file docs/workspace/example-completed-plan.md
+node scripts/archive-workspace-docs.mjs --topic interface-boundary --file docs/workspace/current/example-completed-plan.md
+```
+
+Workspace archive cleanup sequence:
+
+```bash
+node scripts/archive-workspace-docs.mjs --topic example-topic --file docs/workspace/current/example-completed-plan.md --apply
+node scripts/compact-workspace-index.mjs --topic example-topic --match 'example-topic|EXAMPLE' --apply
+node scripts/archive-global-todo-board.mjs --apply
+node scripts/generate-archive-topic-summaries.mjs --apply
 ```
 
 Index-only pruning example:

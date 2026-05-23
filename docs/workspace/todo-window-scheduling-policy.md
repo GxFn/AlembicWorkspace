@@ -18,7 +18,7 @@
 - 总控验收发现下游还不能继续，需要先修复上游，同时仍有其它窗口可做独立补齐。
 - 当前 wave 之外出现新的问题，但不应打断已经执行中的窗口。
 
-如果 TODO 仍处于需求设计或代码调研阶段，写入对应 `docs/requirement-designs/<需求名>/requirement-design-YYYY-MM-DD.md`。如果 TODO 已经影响目标阶段确认、wave 派发或下一波执行顺序，写入当前 `docs/workspace/` 总控文档，并同步维护 `空闲窗口调度`。
+如果 TODO 仍处于需求设计或代码调研阶段，写入对应 `docs/requirement-designs/<需求名>/requirement-design-YYYY-MM-DD.md`。如果 TODO 已经影响目标阶段确认、wave 派发或下一波执行顺序，写入当前 `docs/workspace/current/` 总控文档，并同步维护 `空闲窗口调度`。
 
 ## TODO / Backlog
 
@@ -62,7 +62,7 @@ TODO 列表必须写进当前总控文档，而不是只写在最终回复里。
 
 ## 空闲窗口调度
 
-当 TODO 已经影响目标阶段确认、wave 派发或下一波执行顺序时，必须在当前 `docs/workspace/` 总控文档中维护空闲窗口调度。推荐字段：
+当 TODO 已经影响目标阶段确认、wave 派发或下一波执行顺序时，必须在当前 `docs/workspace/current/` 总控文档中维护空闲窗口调度。推荐字段：
 
 | 窗口 | 当前调度 | 理由 | 是否发送 |
 | --- | --- | --- | --- |

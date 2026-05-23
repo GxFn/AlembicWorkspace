@@ -25,6 +25,11 @@ const checks = [
     args: ["scripts/verify-workspace-docs.mjs", "--all-workspace"],
   },
   {
+    label: "current layout",
+    command: "node",
+    args: ["scripts/check-workspace-current-layout.mjs"],
+  },
+  {
     label: "dispatch coverage",
     command: "node",
     args: ["scripts/check-dispatch-coverage.mjs"],

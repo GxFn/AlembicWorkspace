@@ -1,7 +1,7 @@
 # AlembicTest Handoff Template
 
 Use this template when the control center needs `AlembicTest` to run a test.
-Copy the filled section into `docs/workspace/alembic-test-exchange.md`.
+Copy the filled section into `docs/workspace/current/alembic-test-exchange.md`.
 
 ````text
 ### Test-<编号>：<测试名称>

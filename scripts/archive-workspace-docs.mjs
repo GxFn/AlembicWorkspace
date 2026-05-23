@@ -6,6 +6,7 @@ import path from "node:path";
 const workspaceRoot = process.cwd();
 const workspaceDocsDir = path.join(workspaceRoot, "docs/workspace");
 const indexPath = path.join(workspaceDocsDir, "index.md");
+const recordMapPath = path.join(workspaceDocsDir, "workspace-record-map.md");
 const args = process.argv.slice(2);
 const apply = args.includes("--apply");
 const json = args.includes("--json");
@@ -244,9 +245,9 @@ function trimArchivedRowsFromIndex(content, archivedTargets) {
   };
 }
 
-function archiveSummaryRow({ monthValue, topicValue, archiveDir, fileCount }) {
+function archiveSummaryRow({ monthValue, topicValue, archiveDir, fileCount, baseDir = workspaceDocsDir }) {
   const key = archiveKey(monthValue, topicValue);
-  const archiveTarget = relativePosix(workspaceDocsDir, archiveDir);
+  const archiveTarget = relativePosix(baseDir, archiveDir);
   return `| \`${key}\` | [${topicValue}](${archiveTarget}/) | 已归档 ${fileCount} 个 workspace 文档；当前索引只保留目录入口。 |`;
 }
 
@@ -268,7 +269,7 @@ function countMarkdownFiles(directory) {
 }
 
 function upsertArchiveSummary(content, row) {
-  const heading = "历史归档摘要";
+  const heading = "Archive Topics";
   const section = sectionRange(content, heading);
   const summarySection = [
     `## ${heading}`,
@@ -317,6 +318,44 @@ function upsertArchiveSummary(content, row) {
     .replace(/^\s*/, "")}`;
 }
 
+function recordMapSkeleton() {
+  return [
+    "# Workspace Record Map",
+    "",
+    "状态：长期记录清单",
+    "维护窗口：AlembicWorkspace",
+    `更新日期：${new Date().toISOString().slice(0, 10)}`,
+    "",
+    "本文是 AlembicWorkspace 的长期记录地图。当前开发区不直接散链到具体归档文件；需要历史细节时，从本文查询。",
+    "",
+    "## Archive Topics",
+    "",
+    "| 归档主题 | 目录 | 说明 |",
+    "| --- | --- | --- |",
+  ].join("\n");
+}
+
+function ensureIndexArchiveCatalogEntry(content) {
+  if (content.includes("workspace-record-map.md")) {
+    return content;
+  }
+
+  const range = sectionRange(content, "当前总控入口");
+  if (!range) {
+    return content;
+  }
+
+  const lines = content.slice(range.start, range.end).split("\n");
+  const row = "| 长期记录地图 | [workspace-record-map.md](workspace-record-map.md) | 长期地图 | 查询历史计划、归档 topic、已完成 TODO、测试历史和证据入口。 |";
+  const separatorIndex = lines.findIndex((line) => {
+    const cells = splitMarkdownRow(line);
+    return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+  });
+  const insertAt = separatorIndex >= 0 ? separatorIndex + 1 : lines.length;
+  lines.splice(insertAt, 0, row);
+  return `${content.slice(0, range.start)}${lines.join("\n")}${content.slice(range.end)}`;
+}
+
 const topic = normalizeTopic(getArgValue("--topic") ?? "");
 const month = getArgValue("--month") ?? "2026-05";
 const files = getArgValues("--file");
@@ -330,7 +369,7 @@ if (!topic && files.length > 0) {
 }
 
 if (files.length === 0 && !pruneIndexOnly) {
-  issues.push("Missing --file <docs/workspace/file.md>; repeat --file for multiple docs");
+  issues.push("Missing --file <docs/workspace/current/file.md>; repeat --file for multiple docs");
 }
 
 const indexContent = existsSync(indexPath) ? readFileSync(indexPath, "utf8") : "";
@@ -366,6 +405,9 @@ for (const file of files) {
 
 if (issues.length === 0) {
   let nextIndexContent = indexContent;
+  let nextArchiveCatalogContent = existsSync(recordMapPath)
+    ? readFileSync(recordMapPath, "utf8")
+    : recordMapSkeleton();
   const archivedTargets = new Set(plannedMoves.map(({ to }) => to));
   const summaryGroups = new Map();
 
@@ -406,7 +448,13 @@ if (issues.length === 0) {
     for (const group of summaryGroups.values()) {
       const pendingMoves = plannedMoves.filter(({ to }) => path.dirname(to) === group.archiveDir).length;
       const fileCount = Math.max(countMarkdownFiles(group.archiveDir) + pendingMoves, group.fileCount ?? 0);
-      nextIndexContent = upsertArchiveSummary(nextIndexContent, archiveSummaryRow({ ...group, fileCount }));
+      nextArchiveCatalogContent = upsertArchiveSummary(
+        nextArchiveCatalogContent,
+        archiveSummaryRow({ ...group, fileCount, baseDir: path.dirname(recordMapPath) }),
+      );
+    }
+    if (summaryGroups.size > 0) {
+      nextIndexContent = ensureIndexArchiveCatalogEntry(nextIndexContent);
     }
   }
 
@@ -420,6 +468,10 @@ if (issues.length === 0) {
       unlinkSync(from);
     }
     writeFileSync(indexPath, nextIndexContent);
+    if (trimIndex && summaryGroups.size > 0) {
+      mkdirSync(path.dirname(recordMapPath), { recursive: true });
+      writeFileSync(recordMapPath, nextArchiveCatalogContent);
+    }
   }
 }
 

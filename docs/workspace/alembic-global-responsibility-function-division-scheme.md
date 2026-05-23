@@ -21,7 +21,7 @@
 
 - 当前职责契约：[alembic-repository-responsibility-function-boundary-contract.md](alembic-repository-responsibility-function-boundary-contract.md)。
 - Plugin first 路线：[alembic-plugin-first-enhancement-contract.md](alembic-plugin-first-enhancement-contract.md)。
-- GFBD 总控计划：[global-function-boundary-design-workspace-plan-2026-05-22.md](global-function-boundary-design-workspace-plan-2026-05-22.md)。
+- GFBD 总控计划：从 [workspace-record-map.md](workspace-record-map.md#recent-mainlines) 的 GFBD 归档入口查询。
 - Alembic 证据：[../Alembic/global-function-boundary-evidence-main-2026-05-22.md](../Alembic/global-function-boundary-evidence-main-2026-05-22.md)。
 - AlembicCore 证据：[../AlembicCore/global-function-boundary-evidence-core-2026-05-22.md](../AlembicCore/global-function-boundary-evidence-core-2026-05-22.md)。
 - AlembicAgent 证据：[../AlembicAgent/global-function-boundary-evidence-agent-2026-05-22.md](../AlembicAgent/global-function-boundary-evidence-agent-2026-05-22.md)。
@@ -187,7 +187,7 @@ Codex / 开发者
 - 测试单执行、真实项目复测、smoke、回归、probe。
 - Restart / monitor / clean / report 等测试脚本。
 - `AlembicTest/docs/` 下的测试报告和证据。
-- 通过 [alembic-test-exchange.md](alembic-test-exchange.md) 与总控交接。
+- 通过 [alembic-test-exchange.md](current/alembic-test-exchange.md) 与总控交接。
 
 不应拥有：
 

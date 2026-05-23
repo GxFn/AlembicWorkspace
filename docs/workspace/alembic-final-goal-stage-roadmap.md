@@ -178,7 +178,7 @@ Alembic 的最终形态是 `Plugin first, Alembic install enhances`：
 
 ## 当前定位
 
-当前任务派发已暂停，等待用户确认任务级目标阶段文档：[alembic-plugin-first-runtime-boundary-goal-stage-confirmation-2026-05-18.md](archive/2026-05/plugin-first-enhancement/alembic-plugin-first-runtime-boundary-goal-stage-confirmation-2026-05-18.md)。
+当前任务派发已暂停；历史任务级目标阶段文档从 [workspace-record-map.md](workspace-record-map.md#archive-topics) 的 `plugin-first-enhancement` 归档主题查询。
 
 确认前当前计划发送给：
 

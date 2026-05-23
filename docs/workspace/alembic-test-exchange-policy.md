@@ -38,7 +38,7 @@
 统一测试交流文档是：
 
 ```text
-docs/workspace/alembic-test-exchange.md
+docs/workspace/current/alembic-test-exchange.md
 ```
 
 这个文档用于：
@@ -58,7 +58,7 @@ docs/workspace/alembic-test-exchange.md
 ## 测试流程
 
 1. 总控判断需要测试，但不直接测试。
-2. 总控在 `docs/workspace/alembic-test-exchange.md` 新建或更新测试单。
+2. 总控在 `docs/workspace/current/alembic-test-exchange.md` 新建或更新测试单。
 3. 总控把测试单状态设为 `待启动`，并在当前总控计划 / index 中把 `AlembicTest` 改为可发送。
 4. 用户把统一提示词发送给 `AlembicTest` 窗口。
 5. `AlembicTest` 按测试单执行，详细记录写入 `AlembicTest/docs/`。

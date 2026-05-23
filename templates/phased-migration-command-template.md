@@ -405,13 +405,13 @@ npm run build
 ## 11. 当前可复制分派提示词
 
 ```text
-先读取 AGENTS.md、docs/workspace/<this-doc>.md，以及你所在窗口/目标仓库的 AGENTS.md；先明确声明当前窗口定位和本轮仓库职责，再按照文档领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
+先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/<this-doc>.md，以及你所在窗口/目标仓库的 AGENTS.md；先明确声明当前窗口定位和本轮仓库职责，再按照文档领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
 ```
 ````
 
 ## 3. 单阶段执行记录模板
 
-适合放在 `docs/<Repo>/` 或 `docs/workspace/`：
+适合放在 `docs/<Repo>/`；如果是 workspace 级短期执行记录，则放在 `docs/workspace/current/`：
 
 ````markdown
 # <Topic> <Repo> Phase N
@@ -587,8 +587,8 @@ npm run build
 
 ## 6. 总控使用流程
 
-1. 读 `AGENTS.md` 和当前 `docs/workspace/index.md`。
-2. 找到当前总控入口和相关历史文档。
+1. 读 `AGENTS.md`、`docs/workspace/index.md` 和 `docs/workspace/current/workspace-current-status.md`。
+2. 找到当前总控入口、短期执行文档和相关历史文档。
 3. 跑工作区状态、import、入口、路由、exports、runtime packaging 和验证命令扫描。
 4. 先写真实代码基线和阶段拆分理由，再写或更新分阶段迁移总控文档。
 5. 更新 `docs/workspace/index.md`。
@@ -613,7 +613,7 @@ npm run build
 
 ## 8. 来源文档
 
-本模板主要参考今天以下文档的结构和经验：
+本模板主要参考早期以下文档的结构和经验；列表保留的是历史路径，不代表新建短期总控文档仍放在 `docs/workspace/` 根层级：
 
 - `docs/AlembicOld/alembic-core-public-api-boundary-construction-plan-2026-05-17.md`
 - `docs/AlembicOld/alembic-core-stage-14-outer-convergence-and-finalization-plan-2026-05-17.md`

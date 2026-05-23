@@ -28,18 +28,18 @@
    - 外部调研是否需要由总控判断；需要时引用官方文档或权威来源，不需要时写明理由。
 
 5. 目标阶段确认
-   - 基于需求设计和深度代码证据，在 `docs/workspace/` 创建任务级目标阶段确认文档。
+   - 基于需求设计和深度代码证据，在 `docs/workspace/current/` 创建任务级目标阶段确认文档。
    - 目标阶段确认文档必须写清最终完成定义、非目标、影响窗口、依赖链、阶段计划、验证策略和确认问题。
-   - 用户确认前，确认文档和 `workspace-current-status.md` 都必须保持不派发；发送给为无。
+   - 用户确认前，确认文档和 `current/workspace-current-status.md` 都必须保持不派发；发送给为无。
 
 6. 用户确认目标阶段
    - 在确认文档回填用户确认。
    - 仍不要把确认文档当作长期执行文档堆叠所有 wave。
 
 7. 创建第一波执行计划
-   - 用户确认后，新建或激活 `docs/workspace/<topic>-wave-N-...-plan-YYYY-MM-DD.md`。
+   - 用户确认后，新建或激活 `docs/workspace/current/<topic>-wave-N-...-plan-YYYY-MM-DD.md`。
    - 把 `docs/workspace/index.md` 当前计划第一行切到 wave 执行计划。
-   - `workspace-current-status.md` 同步成当前 wave 状态。
+   - `current/workspace-current-status.md` 同步成当前 wave 状态。
    - 只把当前无上游阻塞、发送后能推进的窗口标为 `待启动` 或 `执行中`。
    - 派发前先识别下一处真实阻塞点，并把阻塞点之前同阶段、同窗口、同边界、同验证链路下可推进的主线动作和可关闭 TODO 组成任务包；不要每次只派最小一小步。
    - 任务包至少写清阶段目标、主线动作、合并 TODO、明确不包含事项、阻塞 / 依赖、验证命令、回填要求，以及执行前置硬规则：读取目标仓库 `AGENTS.md` 并明确当前窗口定位 / 仓库职责。模板见 `templates/workspace-task-package-template.md`。
@@ -55,7 +55,7 @@
 
 9. 测试验证分派
    - 需要真实项目测试、冷启动监控、复现、smoke 或回归时，总控不得直接执行测试。
-   - 先在 `docs/workspace/alembic-test-exchange.md` 按统一模板创建测试单，写清目标、范围、禁止事项、观察点和回填要求。
+   - 先在 `docs/workspace/current/alembic-test-exchange.md` 按统一模板创建测试单，写清目标、范围、禁止事项、观察点和回填要求。
    - 只有测试单状态为 `待启动`，才把 `AlembicTest` 标为可发送窗口。
    - `AlembicTest` 回填后，总控只做证据验收和后续分派判断。
    - 长期规则见 `docs/workspace/alembic-test-exchange-policy.md`。
@@ -96,7 +96,8 @@
 ## 文档关系
 
 - 需求目录保存原始计划书、需求设计、代码实现依赖调研。
-- `docs/workspace/` 保存目标阶段确认、wave 执行计划、当前状态和总控索引。
+- `docs/workspace/current/` 保存目标阶段确认、wave 执行计划、当前状态、活跃 TODO 和当前测试交流面。
+- `docs/workspace/` 根层级保存唯一索引、长期规则、长期契约和长期记录地图。
 - `docs/<Repo>/` 保存单仓库执行回填文档。
-- `templates/` 保存可复用模板；具体执行文档复制模板后落到需求目录或 `docs/workspace/`。
+- `templates/` 保存可复用模板；具体执行文档复制模板后落到需求目录或 `docs/workspace/current/`。
 - `docs/workspace/index.md` 永远指向当前实际入口；确认阶段指向目标阶段确认，执行阶段指向当前 wave 执行计划。

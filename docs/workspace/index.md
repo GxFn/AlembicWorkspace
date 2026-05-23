@@ -2,61 +2,17 @@
 
 更新日期：2026-05-23
 
-本文件是 AlembicWorkspace 的唯一总控入口。`docs/workspace/` 根层级只保留当前状态、长期规则、长期契约、模板入口和正在执行的总控计划；通用模板正文统一保存在 `templates/`；已完成的 workspace 计划进入 `archive/`，单仓库执行记录留在对应 `docs/<Repo>/` 目录，不在这里逐条堆叠。
+本文件是 AlembicWorkspace 的唯一总控入口。`docs/workspace/` 根层级只保留长期规则、长期契约、模板入口、长期记录地图和唯一索引；当前状态、活跃 TODO、测试交流和正在执行的总控计划统一放在 `docs/workspace/current/`；通用模板正文统一保存在 `templates/`；已完成的 workspace 计划进入 `archive/`，单仓库执行记录留在对应 `docs/<Repo>/` 目录，不在这里逐条堆叠。
 
 ## 当前总控入口
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [capability-code-interface-cleanup-workspace-plan-2026-05-22.md](capability-code-interface-cleanup-workspace-plan-2026-05-22.md) | CCIC-3 待启动 | `GTODO-2026-05-22-018` 执行中：第三波发送给 `AlembicCore`、`Alembic`、`AlembicPlugin`，分别处理 Core high-reference facade readiness、Alembic resident tool handler 命名迁移第一片、Plugin audit 双轨 contract 收敛。 |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | CCIC-3 待启动 | 当前发送窗口：`AlembicCore`、`Alembic`、`AlembicPlugin`；不发送给 `AlembicAgent`、`AlembicDashboard`、`AlembicTest`、`BiliDili`。 |
+| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 空闲 | 当前没有执行计划，发送窗口为无；历史记录从长期记录地图查询。 |
+| 当前短期工作区 | [current/](current/) | 短期入口 | 当前状态、活跃 TODO、测试交流和后续执行计划统一放在这里。 |
+| 长期记录地图 | [workspace-record-map.md](workspace-record-map.md) | 长期地图 | 查询历史计划、归档 topic、已完成 TODO、测试历史和证据入口。 |
 | 全局职责功能划分长期契约 | [alembic-repository-responsibility-function-boundary-contract.md](alembic-repository-responsibility-function-boundary-contract.md) | 已生效 | 记录 Alembic 系列仓库职责、功能归属判断、跨仓库交界、后续候选和维护规则。 |
 | 全局职责功能划分方案 | [alembic-global-responsibility-function-division-scheme.md](alembic-global-responsibility-function-division-scheme.md) | 长期方案 | 基于长期契约和六份 GFBD 证据，设计能力分层、能力流、归属判断步骤、跨仓库连接方式和开发者可读检查卡。 |
-| 上一完成计划 | [global-function-boundary-design-workspace-plan-2026-05-22.md](global-function-boundary-design-workspace-plan-2026-05-22.md) | GFBD-2 已完成 | `GTODO-2026-05-22-017` 已完成：六个窗口证据已验收，长期职责契约已生效。 |
-| Alembic GFBD-1 执行记录 | [../Alembic/global-function-boundary-evidence-main-2026-05-22.md](../Alembic/global-function-boundary-evidence-main-2026-05-22.md) | 已验收 | 记录 Alembic 本地增强底座、CLI / daemon / HTTP / Dashboard server、Core/Agent/Dashboard/Plugin 交界、删除/下沉/不得移动候选和验证结果。 |
-| Alembic CCIC-P1-A 执行记录 | [../Alembic/capability-code-interface-cleanup-main-2026-05-22.md](../Alembic/capability-code-interface-cleanup-main-2026-05-22.md) | 已验收 | 记录 Alembic DB boundary lint 修复、database infrastructure helper、`lib/external/mcp` 消费方盘点、提交 hash 和验证结果。 |
-| Alembic CCIC-P2-A 执行记录 | [../Alembic/capability-code-interface-cleanup-main-ccic-2-2026-05-23.md](../Alembic/capability-code-interface-cleanup-main-ccic-2-2026-05-23.md) | 已验收 | 记录 Alembic scripts Core deep import replacement、`lib/external/mcp` resident handler 分类表、提交 hash 和验证结果。 |
-| AlembicCore GFBD-1 执行记录 | [../AlembicCore/global-function-boundary-evidence-core-2026-05-22.md](../AlembicCore/global-function-boundary-evidence-core-2026-05-22.md) | 已验收 | 记录 Core 共享 Headless 内核、public API boundary、resources/grammars、host-agent workflow contract、consumer import boundary、删除/下沉/不得移动候选和验证结果。 |
-| AlembicCore CCIC-1 执行记录 | [../AlembicCore/capability-code-interface-cleanup-core-2026-05-22.md](../AlembicCore/capability-code-interface-cleanup-core-2026-05-22.md) | 已验收 | 记录 Core public API / deep import closeout 分类、consumer-replace-first、no-consumer-deprecate-candidate、must-keep 项和下一波 consumer replacement 建议。 |
-| AlembicCore CCIC-2 执行记录 | [../AlembicCore/capability-code-interface-cleanup-core-ccic-2-2026-05-23.md](../AlembicCore/capability-code-interface-cleanup-core-ccic-2-2026-05-23.md) | 已验收 | 记录 Core project-intelligence facade readiness、provider / Agent runtime 口径清洁、提交 hash 和验证结果。 |
-| AlembicAgent GFBD-1 执行记录 | [../AlembicAgent/global-function-boundary-evidence-agent-2026-05-22.md](../AlembicAgent/global-function-boundary-evidence-agent-2026-05-22.md) | 已验收 | 记录 internal agent runtime、AI provider、tool system、memory/context/prompt、Core 消费边界、host agent 语义区分和验证结果。 |
-| AlembicAgent CCIC-P1-G 执行记录 | [../AlembicAgent/capability-code-interface-cleanup-agent-2026-05-22.md](../AlembicAgent/capability-code-interface-cleanup-agent-2026-05-22.md) | 已验收 | 记录 AlembicAgent internal runtime / Codex host agent / MCP-like adapter 口径清洁、提交 hash 和验证结果。 |
-| AlembicDashboard GFBD-1 执行记录 | [../AlembicDashboard/global-function-boundary-evidence-dashboard-2026-05-22.md](../AlembicDashboard/global-function-boundary-evidence-dashboard-2026-05-22.md) | 已验收 | 记录 Dashboard Vite/React UI、API client、runtime DTO、Help/i18n 文案债、Alembic API 消费边界和验证结果。 |
-| AlembicDashboard CCIC-P1-D 执行记录 | [../AlembicDashboard/capability-code-interface-cleanup-dashboard-2026-05-22.md](../AlembicDashboard/capability-code-interface-cleanup-dashboard-2026-05-22.md) | 已验收 | 记录 Dashboard host-managed consumer parser、Help/i18n 口径清洁、旧固定数量负向扫描、提交 hash 和验证结果。 |
-| AlembicPlugin GFBD-1 执行记录 | [../AlembicPlugin/global-function-boundary-evidence-plugin-2026-05-22.md](../AlembicPlugin/global-function-boundary-evidence-plugin-2026-05-22.md) | 已验收 | 记录 Codex host agent 入口、MCP / Skill / channel / runtime artifact、resident service client、portable runtime 例外、HOST_AI_MANAGED 候选、删除/下沉/不得移动候选和验证结果。 |
-| AlembicPlugin CCIC-P1-P 执行记录 | [../AlembicPlugin/capability-code-interface-cleanup-plugin-2026-05-22.md](../AlembicPlugin/capability-code-interface-cleanup-plugin-2026-05-22.md) | 已验收 | 记录 Plugin host-managed AI 边界 canonical 字段、legacy `HOST_AI_MANAGED` / `hostManaged` 兼容、无消费方私有残留删除、runtime artifact、提交 hash 和验证结果。 |
-| AlembicPlugin CCIC-P2-P 执行记录 | [../AlembicPlugin/capability-code-interface-cleanup-plugin-ccic-2-2026-05-23.md](../AlembicPlugin/capability-code-interface-cleanup-plugin-ccic-2-2026-05-23.md) | 已验收 | 记录 Plugin repo-boundary DB 访问收敛、database infrastructure helper、runtime artifact、提交 hash、验证结果和 AuditStore / AuditRepository 判断。 |
-| AlembicTest GFBD-1 执行记录 | [../../AlembicTest/docs/global-function-boundary-evidence-test-2026-05-22.md](../../AlembicTest/docs/global-function-boundary-evidence-test-2026-05-22.md) | 已验收 | 记录 AlembicTest 测试窗口规则、docs/config/scripts、restart/monitor/probe 边界、真实项目保护和总控测试交接关系。 |
-| 上一完成计划 | [repository-folder-boundary-restructure-workspace-plan-2026-05-22.md](repository-folder-boundary-restructure-workspace-plan-2026-05-22.md) | RFR-6D 已完成 | `GTODO-2026-05-22-012` / `016` 已完成：`AlembicPlugin` RFR-6D 通过总控验收，旧 Dashboard / AI / Recipe HTTP compatibility surface 已删除，`AgentModule.ts` 已收敛为 `SkillHooksModule.ts`。 |
-| 拆仓残留深度审计 | [repository-split-residue-deep-audit-2026-05-22.md](repository-split-residue-deep-audit-2026-05-22.md) | RFR-6 已完成 | 记录 Alembic / Core / Agent / Dashboard / Plugin 横向代码证据，确认 Plugin embedded runtime 边界、旧 `lib/core`、package 身份、MCP surface、Dashboard 文案、Core exports、Agent 路径口径和 DB boundary 债。 |
-| RFR-6B 真实代码分析 | [repository-split-rfr-6b-real-code-analysis-2026-05-22.md](repository-split-rfr-6b-real-code-analysis-2026-05-22.md) | 已完成 | 基于 RFR-6A 真实 diff 和残留扫描，确认下一轮不做大面积迁移，优先派发 `AlembicPlugin` 收紧 HTTP `DashboardOperations` compatibility 命名。 |
-| RFR-6D 真实代码分析 | [repository-split-rfr-6d-real-code-analysis-2026-05-22.md](repository-split-rfr-6d-real-code-analysis-2026-05-22.md) | 已完成 | 基于 RFR-6C 后的真实 diff 和残留扫描，确认下一轮不做整个 `service` / `injection` / `daemon`，优先派发 `AlembicPlugin` 收紧 `AgentModule.ts` 为 SkillHooks 语义模块。 |
-| RFR-6D 合并清理分析 | [repository-split-rfr-6d-batch-cleanup-analysis-2026-05-22.md](repository-split-rfr-6d-batch-cleanup-analysis-2026-05-22.md) | 已完成 | 用户修正 Dashboard 不再接入 Plugin 后，补充代码证据并把旧 Dashboard HTTP compatibility operation layer、旧 AI/Recipe fail-closed HTTP surface 转为删除候选；已与 `AgentModule.ts` -> SkillHooks 语义收敛合并执行并通过总控验收。 |
-| 当前需求目录 | [repository-folder-boundary-restructure](../requirement-designs/repository-folder-boundary-restructure/) | RFR-0 已完成 | 保存原始计划、需求设计和代码实现依赖调研；用户已确认按总控建议启动，并要求不能导致功能缺失。 |
-| 目标阶段确认 | [repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md](repository-folder-boundary-restructure-goal-stage-confirmation-2026-05-22.md) | 已确认 | 固定最终完成定义、非目标、影响窗口、producer / consumer 依赖链和 RFR-1 当前允许启动窗口。 |
-| Alembic RFR-1 执行记录 | [../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md](../Alembic/repository-folder-boundary-inventory-main-2026-05-22.md) | 已验收 | 记录 Alembic 主仓库 CLI / daemon / HTTP / Dashboard / release staging / resources / vendor/source resolver 路径依赖和禁止移动项。 |
-| Alembic RFR-3A 执行记录 | [../Alembic/repository-folder-boundary-rfr-3-main-governance-2026-05-22.md](../Alembic/repository-folder-boundary-rfr-3-main-governance-2026-05-22.md) | 已验收 | 记录 `lib/core` constitution / gateway / permission 迁入 `lib/governance`、`#governance/*` import map、提交 hash、验证命令、残留扫描、既有 DB boundary lint 风险和总控补充验证。 |
-| AlembicCore RFR-1 执行记录 | [../AlembicCore/repository-folder-boundary-inventory-core-2026-05-22.md](../AlembicCore/repository-folder-boundary-inventory-core-2026-05-22.md) | 已验收 | 记录 Core public exports、resources、public API boundary、package root resolver 和不建议立即源码迁移的证据。 |
-| AlembicAgent RFR-1 执行记录 | [../AlembicAgent/repository-folder-boundary-inventory-agent-2026-05-22.md](../AlembicAgent/repository-folder-boundary-inventory-agent-2026-05-22.md) | 已验收 | 记录 Agent runtime、external AI provider、tools、release stage、public exports 和当前观察判断。 |
-| AlembicDashboard RFR-1 执行记录 | [../AlembicDashboard/repository-folder-boundary-inventory-dashboard-2026-05-22.md](../AlembicDashboard/repository-folder-boundary-inventory-dashboard-2026-05-22.md) | 已验收 | 记录 Dashboard Vite entry、API client、socket、public assets、View/Modal 迁移风险和暂不进入 RFR-2/RFR-3 的判断。 |
-| AlembicPlugin RFR-1 执行记录 | [../AlembicPlugin/repository-folder-boundary-inventory-plugin-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-inventory-plugin-2026-05-22.md) | 已验收 | 记录 Plugin `lib/codex` / `lib/external/mcp` / Codex shell / channel / runtime artifact / cache sync 路径依赖，并作为 RFR-2A 上游证据。 |
-| AlembicPlugin RFR-2A 执行记录 | [../AlembicPlugin/repository-folder-boundary-rfr-2-plugin-codex-runtime-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-rfr-2-plugin-codex-runtime-2026-05-22.md) | 已验收 | 记录 `lib/codex` runtime/status/diagnostics/preflight 内部目录迁移、AlembicPlugin 提交、AlembicCodex runtime artifact、验证命令、残留扫描和总控补充验证。 |
-| AlembicPlugin RFR-2B 执行记录 | [../AlembicPlugin/repository-folder-boundary-rfr-2-plugin-mcp-helpers-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-rfr-2-plugin-mcp-helpers-2026-05-22.md) | 已验收 | 记录 `CodexMcpServer.ts` helper / tool visibility / result / daemon job query / host handoff 抽取、AlembicPlugin 提交、AlembicCodex runtime artifact、验证命令、残留扫描和总控补充验证。 |
-| AlembicPlugin RFR-6A 执行记录 | [../AlembicPlugin/repository-folder-boundary-rfr-6-plugin-governance-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-rfr-6-plugin-governance-2026-05-22.md) | 已验收 | 记录 Plugin 旧 `lib/core` / `#core/*` governance 命名收敛、Codex 自洽闭环分类、AlembicPlugin 提交、AlembicCodex runtime artifact、验证命令和残留扫描；总控复核通过。 |
-| AlembicPlugin RFR-6C 执行记录 | [../AlembicPlugin/repository-folder-boundary-rfr-6c-plugin-http-compat-operations-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-rfr-6c-plugin-http-compat-operations-2026-05-22.md) | 已验收 | 记录 HTTP `DashboardOperations` compatibility operation cluster 分类、`lib/http/compatibility/operations/` 迁移、外部 `dashboard.*` operation id 保留、AlembicPlugin 提交、AlembicCodex runtime artifact、验证命令和残留扫描；用户后续确认 Dashboard 不再接入 Plugin，因此该 layer 已转入 RFR-6D 删除候选。 |
-| AlembicPlugin RFR-6D 执行记录 | [../AlembicPlugin/repository-folder-boundary-rfr-6d-plugin-batch-cleanup-2026-05-22.md](../AlembicPlugin/repository-folder-boundary-rfr-6d-plugin-batch-cleanup-2026-05-22.md) | 已验收 | 记录删除旧 Dashboard HTTP compatibility operation layer、旧 `/api/v1/ai/*` 与 `/api/v1/recipes/discover-relations` fail-closed HTTP surface、`AgentModule.ts` -> `SkillHooksModule.ts`、AlembicPlugin 提交、AlembicCodex runtime artifact、验证命令和残留扫描；总控验收通过。 |
-| 上一完成计划 | [alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md](alembic-0-2-0-version-unification-workspace-plan-2026-05-22.md) | 已完成 | `GTODO-2026-05-22-011` 已完成：Alembic 自有 package / plugin / release / runtime 版本位统一为 `0.2.0`，本机 Codex plugin cache 已刷新到 `alembic-codex@0.2.0`。 |
-| Alembic 执行记录 | [../Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md](../Alembic/alembic-0-2-0-version-unification-main-2026-05-22.md) | V020-2 已完成 | 记录 `alembic-ai@0.2.0` root / lock 更新、publish staging 生成、release package guard 边界修正、提交 hash、验证命令和残留扫描。 |
-| AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md](../AlembicPlugin/alembic-0-2-0-version-unification-plugin-2026-05-22.md) | V020-3/V020-3R 已完成 | 记录 `alembic-ai@0.2.0` Codex plugin manifest / channel / runtime artifact、MCP metadata、cache sync fallback、测试断言、V020-3R fixture 返工、提交 hash、验证命令、残留扫描和总控 cache refresh 验收。 |
-| 上一完成计划 | [alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md](alembic-plugin-external-ai-remnants-removal-workspace-plan-2026-05-22.md) | 已完成 | `AlembicPlugin` AIP-1 已完成并通过总控验收，提交 `747b40f2abb2b9d8cb2714656fab164267d1d105`，Codex runtime 子仓库 `01fb042afe87264ad213dfc13444dc9dc48b77ca`；本机 plugin cache 已刷新到 `747b40f` local-mcp。 |
-| AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md](../AlembicPlugin/alembic-plugin-external-ai-remnants-removal-2026-05-22.md) | AIP-1 已完成 | 记录删除 Plugin 旧 AI provider / config / status surfaces、MCP `alembic_codex_ai_config`、HTTP `/ai` 配置写入、DI provider 注入、Skill / runtime artifact、提交 hash、验证命令和残留扫描。 |
-| AlembicPlugin 执行记录 | [../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md](../AlembicPlugin/resident-vector-search-release-plugin-2026-05-21.md) | VEC-2/VEC-3/VEC-4R/VEC-5R 已完成 | 记录 HostAiAdapter placeholder embed 修正、ResidentSearchClient、PrimeSearchPipeline / search handler metadata、Skill、runtime artifact、删除 daemon MCP bridge、VEC-5R mode normalization、验证命令和提交 hash。 |
-| AlembicPlugin 执行记录 | [../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md](../AlembicPlugin/alembic-plugin-prime-immediate-receipt-shout-2026-05-21.md) | SHOUT-7 已完成 | 记录 `hostResponse.timing` / `requiredBeforeNextAction` / `visibility`、三态 `shoutInstruction`、SHOUT-5 可见摘要优化、SHOUT-7 主语收紧、AlembicCodex runtime artifact、验证命令、提交 hash 和总控验收。 |
-| 当前测试交流 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-22-01 已通过并封口，验证 direct auto/semantic 与 daemon `/api/v1/search` 均返回 resident vector telemetry。 |
-| 前序完成计划 | [alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md](alembic-plugin-service-request-boundary-workspace-plan-2026-05-21.md) | 已完成 | 用户确认 Alembic 应作为常驻服务由 Plugin 按需请求，不做 MCP tool ownership bridge；Plugin service boundary 与 BiliDili 复测均已完成。 |
-| 上一收口计划 | [bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md](bilidili-prime-shout-mcp-bridge-repair-wave-2026-05-21.md) | 已收口 | `Alembic` 已补齐 `/api/v1/mcp/call` 兼容 bridge，但不再作为 Codex-facing prime 主路径。 |
-| 前序完成计划 | [alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md](alembic-codex-prime-knowledge-shout-workspace-plan-2026-05-21.md) | 已完成 | V1 `prime -> Codex 自主呐喊` 最小闭环已由 `AlembicPlugin` 回填并通过总控验收。 |
-| 上一测试线计划 | [alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md](alembic-agent-evidence-recording-phase-chain-workspace-plan-2026-05-20.md) | 测试持续运行 | `AlembicDashboard` Wave 9F 已通过总控验收；既有真实项目复测由 `AlembicTest` 按测试线继续回填，总控当前不直接关注。 |
 | 历史需求目录 | [alembic-multi-project-control-redesign](../requirement-designs/alembic-multi-project-control-redesign/) | 调研完成 | 保存多项目控制重设计的原始计划书、需求设计和代码实现依赖调研。 |
 | 需求目标与分阶段确认流程 | [../goal-stage-confirmation/process.md](../goal-stage-confirmation/process.md) | 长期流程 | 规定较大目标必须先在 `docs/requirement-designs/` 完成需求设计，再确认最终目标和分阶段，最后派发窗口。 |
 | 需求目标与分阶段确认模板 | [../../templates/goal-stage-confirmation-template.md](../../templates/goal-stage-confirmation-template.md) | 长期模板 | 用于每个新目标创建任务级确认文档，确认前发送名单必须为无。 |
@@ -64,52 +20,31 @@
 | 任务包派发模板 | [../../templates/workspace-task-package-template.md](../../templates/workspace-task-package-template.md) | 长期模板 | 用于 wave 执行计划，把当前阶段主线动作和可关闭 TODO 合并成可验收任务包。 |
 | 需求到 Wave 执行流程 | [requirement-to-wave-execution-flow.md](requirement-to-wave-execution-flow.md) | 长期流程 | 固化原始计划书、需求设计、代码依赖调研、目标阶段确认、用户确认、wave 执行计划和提示词发送的成熟路线。 |
 | TODO 与空闲窗口调度规则 | [todo-window-scheduling-policy.md](todo-window-scheduling-policy.md) | 长期流程 | 规定通用 TODO 子模式如何服务需求设计、派发计划、验收滚动、主线 / 可并行判断，并避免空闲窗口空转。 |
-| Workspace 脚本索引 | [../../scripts/README.md](../../scripts/README.md) | 长期工具入口 | 记录 workspace 总控脚本，包括文档校验、分派覆盖、TODO board、任务包和归档检查。 |
-| 全局 TODO 列表 | [global-todo-board.md](global-todo-board.md) | 维护中 | 记录跨计划、跨窗口、暂未进入当前波次或需要长期追踪的待办；当前派发仍以当前计划为准。 |
-| AlembicTest 测试交流文档 | [alembic-test-exchange.md](alembic-test-exchange.md) | 已完成 | Test-2026-05-22-01 已通过并封口，direct search / daemon telemetry 闭环。 |
+| Workspace 脚本索引 | [../../scripts/README.md](../../scripts/README.md) | 长期工具入口 | 记录 workspace 总控脚本，包括文档校验、短期区布局、分派覆盖、TODO board、任务包和归档检查。 |
+| 全局 TODO 列表 | [current/global-todo-board.md](current/global-todo-board.md) | 维护中 | 记录跨计划、跨窗口、暂未进入当前波次或需要长期追踪的待办；无当前计划时只作为观察账本。 |
+| AlembicTest 测试交流文档 | [current/alembic-test-exchange.md](current/alembic-test-exchange.md) | 空闲 | 当前无测试单；历史测试从长期记录地图查询。 |
 | AlembicTest 测试交流规则 | [alembic-test-exchange-policy.md](alembic-test-exchange-policy.md) | 长期规则 | 规定总控如何创建测试单、派发 `AlembicTest`、验收回填和处理证据不足。 |
 | AlembicTest 测试执行规则 | [../../AlembicTest/docs/testing-operation-policy.md](../../AlembicTest/docs/testing-operation-policy.md) | 长期规则 | 规定总控不直接执行测试操作，真实项目测试、冷启动监控、复现和报告由 `AlembicTest` 承接。 |
-| AlembicTest 测试单模板 | [../../templates/alembic-test-handoff-template.md](../../templates/alembic-test-handoff-template.md) | 长期模板 | 用于生成 `docs/workspace/alembic-test-exchange.md` 中的统一测试单。 |
-| `note_finding` 闭环判定记录 | [alembic-note-finding-closure-standard-2026-05-21.md](alembic-note-finding-closure-standard-2026-05-21.md) | 当前判定标准 | 固定区分代码连通性、单维度 `note_finding` 证据闭环和完整 cold-start 产候选闭环，避免总控口径反复。 |
+| AlembicTest 测试单模板 | [../../templates/alembic-test-handoff-template.md](../../templates/alembic-test-handoff-template.md) | 长期模板 | 用于生成 `docs/workspace/current/alembic-test-exchange.md` 中的统一测试单。 |
+| `note_finding` 闭环判定标准 | [alembic-note-finding-closure-standard.md](alembic-note-finding-closure-standard.md) | 长期判定标准 | 固定区分代码连通性、单维度 `note_finding` 证据闭环和完整 cold-start 产候选闭环。 |
 | 最终目标与阶段路线图 | [alembic-final-goal-stage-roadmap.md](alembic-final-goal-stage-roadmap.md) | 长期路线图 | 只作为产品方向背景；具体任务仍需创建任务级目标阶段确认文档。 |
 | Plugin first 增强契约 | [alembic-plugin-first-enhancement-contract.md](alembic-plugin-first-enhancement-contract.md) | 长期契约 | 规定 `AlembicPlugin` 作为 Codex host agent 入口，`Alembic` 作为本地增强底座，安装 Alembic 后增强 daemon / HTTP / Dashboard / internal AI 能力。 |
 | 本地源码 resolver / script 契约 | [alembic-local-source-resolver-script-contract.md](alembic-local-source-resolver-script-contract.md) | 长期契约 | 统一本地源码 resolver 优先级、repo-local script 边界、portable runtime 例外和真实测试项目默认不进入日常流程的规则。 |
 | Workspace 文档归档规则 | [workspace-doc-archive-policy.md](workspace-doc-archive-policy.md) | 长期规则 | 规定 `docs/workspace/` 当前入口、历史 wave 归档目录、归档条件和 `scripts/archive-workspace-docs.mjs` 使用方式。 |
 | 分阶段迁移指挥长期模板 | [../../templates/phased-migration-command-template.md](../../templates/phased-migration-command-template.md) | 长期模板 | 用于真实代码挖掘、阶段拆分、一波一阶段推进、窗口分派、验收和下一波计划。 |
 
-后续启动新任务时，在 `docs/workspace/` 新建 workspace 级总控文档，并把本表第一行切到新计划；任务完成并归档后，再切回当前状态文档。
-
-## 历史归档摘要
-| 归档主题 | 目录 | 说明 |
-| --- | --- | --- |
-| `2026-05/prime-immediate-receipt-shout` | [prime-immediate-receipt-shout](archive/2026-05/prime-immediate-receipt-shout/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/resident-vector-search-release` | [resident-vector-search-release](archive/2026-05/resident-vector-search-release/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/github-actions-failure-recovery` | [github-actions-failure-recovery](archive/2026-05/github-actions-failure-recovery/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/agent-efficiency-observability` | [agent-efficiency-observability](archive/2026-05/agent-efficiency-observability/) | 已归档 1 个 workspace 文档；冷启动效率、job 状态和 observability 历史计划，当前只保留目录入口。 |
-| `2026-05/dev-link-global-environment` | [dev-link-global-environment](archive/2026-05/dev-link-global-environment/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/init-convergence-contract` | [init-convergence-contract](archive/2026-05/init-convergence-contract/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/plugin-first-enhancement` | [plugin-first-enhancement](archive/2026-05/plugin-first-enhancement/) | 已归档 3 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/codex-only-host-agent-mode` | [codex-only-host-agent-mode](archive/2026-05/codex-only-host-agent-mode/) | 已归档 3 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/module-boundary-foundation` | [module-boundary-foundation](archive/2026-05/module-boundary-foundation/) | 已归档 4 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/multi-project-control` | [multi-project-control](archive/2026-05/multi-project-control/) | 已归档 9 个 workspace 文档；当前索引只保留目录入口。 |
-| `2026-05/facade-readiness` | [facade-readiness](archive/2026-05/facade-readiness/) | 已归档 2 个 workspace 文档；Wave 3B Core facade readiness / consumer replacement。 |
-| `2026-05/release-portable-snapshot-closeout` | [release-portable-snapshot-closeout](archive/2026-05/release-portable-snapshot-closeout/) | 已归档 2 个 workspace 文档；release / portable snapshot closeout 与 publish staging。 |
-| `2026-05/interface-boundary` | [interface-boundary](archive/2026-05/interface-boundary/) | 已归档 7 个 workspace 文档；接口边界优化与消费层收敛历史计划。 |
-| `2026-05/local-source-import-unification` | [local-source-import-unification](archive/2026-05/local-source-import-unification/) | 已归档 2 个 workspace 文档；本地源码引入统一历史计划。 |
-| `2026-05/redundant-systems-removal` | [redundant-systems-removal](archive/2026-05/redundant-systems-removal/) | 已归档 2 个 workspace 文档；飞书截屏连带、推荐系统、ReverseGuard 等冗余清理。 |
-| `2026-05/feishu-remote-removal` | [feishu-remote-removal](archive/2026-05/feishu-remote-removal/) | 已归档 1 个 workspace 文档；Feishu / Lark remote removal。 |
-| `2026-05/agent-extraction` | [agent-extraction](archive/2026-05/agent-extraction/) | 已归档 9 个 workspace 文档；AlembicAgent 抽取和 Plugin agent-free 历史 wave。 |
+后续启动新任务时，在 `docs/workspace/current/` 新建 workspace 级总控文档，并把本表当前状态行切到新计划；任务完成并归档后，再切回当前状态文档。
 
 ## 窗口覆盖状态
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | 执行 CCIC-P3-A：`lib/external/mcp` resident tool handler 命名迁移第一片，新语义入口 + 内部 consumer replacement + legacy alias。 |
-| `AlembicCore`<br>待启动 | 执行 CCIC-P3-C：high-reference facade readiness，补 `knowledge` / `evolution` / `repositories` / `core/enhancement` 替代入口证据。 |
+| `Alembic`<br>无任务 | CCIC 主线已完成并归档；本轮不发送。 |
+| `AlembicCore`<br>观察中 | `normalizeLifecycle` additive readiness 已转入 `GTODO-2026-05-23-019`，Plugin / Alembic 主体交流接口后续再慢慢对齐。 |
 | `AlembicAgent`<br>无任务 | CCIC-1 已完成；本波不涉及 AlembicAgent runtime、provider 或 tool system。 |
-| `AlembicDashboard`<br>观察中 | 本波不收窄 host-managed parser；Dashboard canonical contract 继续观察，等 Plugin 专门 contract 轮次再启动。 |
-| `AlembicPlugin`<br>待启动 | 执行 CCIC-P3-P：Audit 双轨 contract 收敛，删除无消费方 `AuditRepositoryImpl` 或统一唯一后端，并同步 runtime artifact 判断。 |
-| `AlembicTest`<br>无任务 | 本波不操作真实项目；只有 CCIC-3 改动影响 Codex plugin cache、Dashboard 手动体验或真实项目路径时再创建测试单。 |
+| `AlembicDashboard`<br>无任务 | 用户已确认 Dashboard 不再接入 Plugin；Dashboard 不作为 Plugin 兼容保留理由。 |
+| `AlembicPlugin`<br>无任务 | CCIC 主线已完成并归档；本轮不发送。 |
+| `AlembicTest`<br>无任务 | 本轮不操作真实项目；只有后续新主线刷新本机 Codex plugin cache、改变 prime/search/cold-start、daemon HTTP contract 或真实项目路径时再创建测试单。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
 ## 状态枚举
@@ -127,12 +62,12 @@
 
 ## 文档命名
 
-- 当前入口：`workspace-current-status.md`
+- 当前入口：`current/workspace-current-status.md`
 - 长期模板：保存在 `templates/<topic>-template.md`，不加日期；`docs/workspace/` 只保留模板入口链接。
 - 长期规则 / 契约：`<topic>-policy.md` 或 `<topic>-contract.md`，不加日期。
-- workspace 总控计划：`<topic>-workspace-plan-YYYY-MM-DD.md`
-- 总控状态快照：`<topic>-workspace-status-YYYY-MM-DD.md`
-- 窗口分派表：`<topic>-window-dispatch-YYYY-MM-DD.md`
+- workspace 总控计划：`current/<topic>-workspace-plan-YYYY-MM-DD.md`
+- 总控状态快照：`current/<topic>-workspace-status-YYYY-MM-DD.md`
+- 窗口分派表：`current/<topic>-window-dispatch-YYYY-MM-DD.md`
 - 单仓库阶段记录：`<topic>-<repo>-phase-N-YYYY-MM-DD.md`
 - 边界或扫描记录：`<topic>-<repo>-boundary-YYYY-MM-DD.md`
 
@@ -145,6 +80,8 @@
 ```text
 窗口：
 状态：
+派发时间（北京时间，YYYY-MM-DD HH:mm CST）：
+状态更新时间（北京时间，YYYY-MM-DD HH:mm CST）：
 任务：
 目标：
 范围：
@@ -164,6 +101,8 @@
 ```text
 任务包 ID：
 窗口：
+派发时间（北京时间，YYYY-MM-DD HH:mm CST）：
+状态更新时间（北京时间，YYYY-MM-DD HH:mm CST）：
 阶段目标：
 主线动作：
 合并 TODO：
@@ -189,7 +128,7 @@
 | `AlembicTest`<br>状态 |  |
 | `BiliDili`<br>状态 |  |
 
-派发细节用列表记录：文档动作、保存位置、挂载入口、回填位置、验证命令、阻塞 / 依赖。
+派发细节用列表记录：派发时间（北京时间）、状态更新时间（北京时间）、文档动作、保存位置、挂载入口、回填位置、验证命令、阻塞 / 依赖。
 
 如果读取代码后发现其它关联窗口、vendor 子仓库、插件资源、runtime 包或发布链路受影响，必须追加到覆盖表中。
 
