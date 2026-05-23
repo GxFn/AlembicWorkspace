@@ -5,6 +5,8 @@ import { spawnSync } from "node:child_process";
 const args = process.argv.slice(2);
 const withRuntime = args.includes("--with-runtime");
 const strictRuntime = args.includes("--strict-runtime");
+const requireTodo = args.includes("--require-todo");
+const requireTaskPackages = args.includes("--require-task-packages");
 
 const checks = [
   {
@@ -30,7 +32,12 @@ const checks = [
   {
     label: "TODO board",
     command: "node",
-    args: ["scripts/check-todo-board.mjs"],
+    args: ["scripts/check-todo-board.mjs", ...(requireTodo ? ["--require"] : [])],
+  },
+  {
+    label: "task packages",
+    command: "node",
+    args: ["scripts/check-task-packages.mjs", ...(requireTaskPackages ? ["--require"] : [])],
   },
   {
     label: "git diff whitespace",
@@ -73,6 +80,8 @@ function runCheck(check) {
 
 console.log("AlembicWorkspace control-center verification");
 console.log(`Runtime residue check: ${withRuntime || strictRuntime ? (strictRuntime ? "strict" : "warning") : "skipped"}`);
+console.log(`Required TODO board: ${requireTodo ? "yes" : "no"}`);
+console.log(`Required task packages: ${requireTaskPackages ? "yes" : "no"}`);
 
 const results = checks.map(runCheck);
 const failed = results.filter((result) => !result.ok);

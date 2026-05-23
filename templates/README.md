@@ -15,5 +15,6 @@ paths, secrets, or one-off decisions.
 - [goal-stage-confirmation-template.md](goal-stage-confirmation-template.md)：任务级“最终目标 + 分阶段确认”模板。
 - [phased-migration-command-template.md](phased-migration-command-template.md)：分阶段迁移 / 大型收口指挥模板。
 - [requirement-design-template.md](requirement-design-template.md)：需求设计文档模板。
+- [workspace-task-package-template.md](workspace-task-package-template.md)：总控 wave 派发中的任务包模板，用于把当前阶段主线动作和可关闭 TODO 合并成可验收任务包。
 
 实际执行文档仍写入 `docs/workspace/` 或对应需求目录；模板只作为复制起点，不承载当前状态。

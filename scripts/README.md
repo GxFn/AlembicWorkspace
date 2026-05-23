@@ -21,20 +21,28 @@ Current scripts:
 - `verify-workspace-docs.mjs`: checks the workspace index, current control
   plan, required sections, Markdown links, and completed document references.
 - `check-dispatch-coverage.mjs`: verifies that the current control plan covers
-  every expected window and that the declared copyable prompt send list matches
-  task statuses.
+  every expected window, that the declared copyable prompt send list matches
+  task statuses, and that sendable prompts require reading `AGENTS.md` plus an
+  explicit window / repository positioning statement.
 - `check-todo-board.mjs`: verifies that plans using the TODO submode contain a
   `TODO / Backlog` section and idle-window scheduling coverage. Use
   `--require` when TODO items affect dispatch, parallel scheduling, or the next
   wave order.
+- `check-task-packages.mjs`: verifies that plans using package-based dispatch
+  contain a task-package section with stage goal, mainline actions, merged
+  TODOs, exclusions, blockers / dependencies, verification, and backfill
+  fields, plus the `AGENTS.md` reading and explicit positioning precondition.
+  Use `--require` when TODOs and mainline work are bundled for a wave.
 - `check-runtime-residue.mjs`: read-only check for Alembic daemon, Dashboard
   dev server, and Codex MCP process residue. It does not start, stop, or kill
   anything; use `--strict` only when a clean runtime surface is required.
 - `verify-control-center.mjs`: one-command control-center verification that
   runs boundary, repo status, workspace docs, dispatch coverage, and
-  `git diff --check`. Add `--with-runtime` for a read-only runtime residue
-  report, or `--strict-runtime` to fail when Alembic daemon / Dashboard dev
-  residue is present.
+  `git diff --check`. Add `--require-todo` when TODO scheduling must be
+  present, `--require-task-packages` when package-based dispatch must be
+  present, `--with-runtime` for a read-only runtime residue report, or
+  `--strict-runtime` to fail when Alembic daemon / Dashboard dev residue is
+  present.
 - `archive-workspace-docs.mjs`: dry-run by default; moves completed workspace
   control documents into `docs/workspace/archive/YYYY-MM/<topic>/`, rewrites
   relative links inside moved documents, rewrites index links, removes archived
@@ -50,10 +58,22 @@ Suggested pre-acceptance sequence:
 node scripts/verify-control-center.mjs
 ```
 
+Dispatch plan with TODO and task packages:
+
+```bash
+node scripts/verify-control-center.mjs --require-todo --require-task-packages
+```
+
 TODO scheduling plan check:
 
 ```bash
 node scripts/check-todo-board.mjs --require
+```
+
+Task package dispatch check:
+
+```bash
+node scripts/check-task-packages.mjs --require
 ```
 
 Runtime residue check:

@@ -61,6 +61,16 @@ function sectionContent(content, heading) {
   return next >= 0 ? rest.slice(0, next + 1) : rest;
 }
 
+function dispatchPromptContent(content) {
+  for (const heading of ["可复制分派提示词", "当前可复制分派提示词", "可复制提示词"]) {
+    const section = sectionContent(content, heading);
+    if (section) {
+      return section;
+    }
+  }
+  return "";
+}
+
 function extractFirstLinkTarget(markdown) {
   const match = markdown.match(/\[[^\]]+]\(([^)]+)\)/);
   return match ? match[1] : null;
@@ -153,10 +163,12 @@ if (!planPath || !existsSync(planPath)) {
 
 let rows = [];
 let declaredSendList = null;
+let promptContent = "";
 if (planPath && existsSync(planPath)) {
   const content = read(planPath);
   rows = parseDispatchRows(content);
   declaredSendList = parseDeclaredSendList(content);
+  promptContent = dispatchPromptContent(content);
 
   const byWindow = new Map(rows.map((row) => [row.window, row]));
 
@@ -199,6 +211,15 @@ if (declaredSendList) {
   }
 } else if (sendList.length > 0) {
   warnings.push("plan has send-eligible windows but no `发送给：...` line was found");
+}
+
+if (sendList.length > 0) {
+  if (!/\bAGENTS\.md\b/.test(promptContent)) {
+    issues.push("dispatch prompt must require reading workspace/target repository AGENTS.md before execution");
+  }
+  if (!/定位/.test(promptContent)) {
+    issues.push("dispatch prompt must require the execution window to state its repository/window positioning");
+  }
 }
 
 if (blocked.length > 0) {
