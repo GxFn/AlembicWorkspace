@@ -1,6 +1,6 @@
 # AlembicWorkspace 总控索引
 
-更新日期：2026-05-23
+更新日期：2026-05-24
 
 本文件是 AlembicWorkspace 的唯一总控入口。`docs/workspace/` 根层级只保留长期规则、长期契约、模板入口、长期记录地图和唯一索引；当前状态、活跃 TODO、测试交流和正在执行的总控计划统一放在 `docs/workspace/current/`；通用模板正文统一保存在 `templates/`；已完成的 workspace 计划进入 `archive/`，单仓库执行记录留在对应 `docs/<Repo>/` 目录，不在这里逐条堆叠。
 
@@ -8,8 +8,13 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 空闲 | 小问题修复 / 清理修复主线已验收并归档；当前无发送窗口，历史记录从长期记录地图查询。 |
+| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 第一波待启动 | 当前窗口状态、发送名单和活跃观察项；multi-root ProjectScope 已进入 wave 1，当前发送给 `AlembicCore`。 |
 | 当前短期工作区 | [current/](current/) | 短期入口 | 当前状态、活跃 TODO、测试交流和后续执行计划统一放在这里。 |
+| Multi-root ProjectScope 原始计划书 | [../requirement-designs/multi-root-project-scope/original-plan-2026-05-24.md](../requirement-designs/multi-root-project-scope/original-plan-2026-05-24.md) | 已确认 | 支持“一抽象 Project 对多实体 Folder”，显式绑定多个 folder 后汇总为一个 Alembic 项目。 |
+| Multi-root ProjectScope 代码调研 | [../requirement-designs/multi-root-project-scope/code-implementation-dependency-research-2026-05-24.md](../requirement-designs/multi-root-project-scope/code-implementation-dependency-research-2026-05-24.md) | 已完成 | 基于真实代码确认 Core / Alembic / Plugin / Dashboard / Agent 当前单 `projectRoot` 假设和实现依赖链。 |
+| Multi-root ProjectScope 需求设计 | [../requirement-designs/multi-root-project-scope/requirement-design-2026-05-24.md](../requirement-designs/multi-root-project-scope/requirement-design-2026-05-24.md) | 已形成 | 设计 Project / Folder / controlRoot / Ghost-only storage 数据模型、职责边界、阶段候选和完成定义。 |
+| Multi-root ProjectScope 目标阶段确认 | [current/multi-root-project-scope-goal-stage-confirmation-2026-05-24.md](current/multi-root-project-scope-goal-stage-confirmation-2026-05-24.md) | 已确认 | 用户确认第一波只启动 `AlembicCore`、不做 folder remove / disable、standard 不做兼容 / 降级 / 分叉。 |
+| Multi-root ProjectScope Wave 1 | [current/multi-root-project-scope-wave-1-2026-05-24.md](current/multi-root-project-scope-wave-1-2026-05-24.md) | 待启动 | 第一波只发送给 `AlembicCore`，生产 ProjectScope / Ghost-only storage contract。 |
 | 长期记录地图 | [workspace-record-map.md](workspace-record-map.md) | 长期地图 | 查询历史计划、归档 topic、已完成 TODO、测试历史和证据入口。 |
 | 全局职责功能划分长期契约 | [alembic-repository-responsibility-function-boundary-contract.md](alembic-repository-responsibility-function-boundary-contract.md) | 已生效 | 记录 Alembic 系列仓库职责、功能归属判断、跨仓库交界、后续候选和维护规则。 |
 | 全局职责功能划分方案 | [alembic-global-responsibility-function-division-scheme.md](alembic-global-responsibility-function-division-scheme.md) | 长期方案 | 基于长期契约和六份 GFBD 证据，设计能力分层、能力流、归属判断步骤、跨仓库连接方式和开发者可读检查卡。 |
@@ -22,13 +27,13 @@
 | TODO 与空闲窗口调度规则 | [todo-window-scheduling-policy.md](todo-window-scheduling-policy.md) | 长期流程 | 规定通用 TODO 子模式如何服务需求设计、派发计划、验收滚动、主线 / 可并行判断，并避免空闲窗口空转。 |
 | Workspace 脚本索引 | [../../scripts/README.md](../../scripts/README.md) | 长期工具入口 | 记录 workspace 总控脚本，包括文档校验、短期区布局、分派覆盖、TODO board、任务包和归档检查。 |
 | 全局 TODO 列表 | [current/global-todo-board.md](current/global-todo-board.md) | 维护中 | 记录跨计划、跨窗口、暂未进入当前波次或需要长期追踪的待办；无当前计划时只作为观察账本。 |
-| AlembicTest 测试交流文档 | [current/alembic-test-exchange.md](current/alembic-test-exchange.md) | 空闲 | 当前无测试单；历史测试从长期记录地图查询。 |
 | AlembicTest 测试交流规则 | [alembic-test-exchange-policy.md](alembic-test-exchange-policy.md) | 长期规则 | 规定总控如何创建测试单、派发 `AlembicTest`、验收回填和处理证据不足。 |
 | AlembicTest 测试执行规则 | [../../AlembicTest/docs/testing-operation-policy.md](../../AlembicTest/docs/testing-operation-policy.md) | 长期规则 | 规定总控不直接执行测试操作，真实项目测试、冷启动监控、复现和报告由 `AlembicTest` 承接。 |
 | AlembicTest 测试单模板 | [../../templates/alembic-test-handoff-template.md](../../templates/alembic-test-handoff-template.md) | 长期模板 | 用于生成 `docs/workspace/current/alembic-test-exchange.md` 中的统一测试单。 |
 | `note_finding` 闭环判定标准 | [alembic-note-finding-closure-standard.md](alembic-note-finding-closure-standard.md) | 长期判定标准 | 固定区分代码连通性、单维度 `note_finding` 证据闭环和完整 cold-start 产候选闭环。 |
 | 最终目标与阶段路线图 | [alembic-final-goal-stage-roadmap.md](alembic-final-goal-stage-roadmap.md) | 长期路线图 | 只作为产品方向背景；具体任务仍需创建任务级目标阶段确认文档。 |
 | Plugin first 增强契约 | [alembic-plugin-first-enhancement-contract.md](alembic-plugin-first-enhancement-contract.md) | 长期契约 | 规定 `AlembicPlugin` 作为 Codex host agent 入口，`Alembic` 作为本地增强底座，安装 Alembic 后增强 daemon / HTTP / Dashboard / internal AI 能力。 |
+| 冷启动上下文社区与工具规划调研 | [alembic-cold-start-context-community-tool-use-research-2026-05-24.md](alembic-cold-start-context-community-tool-use-research-2026-05-24.md) | 已完成 | 聚焦 Alembic 冷启动 / prime 中项目工程信息如何组织给 Agent 使用，重点解释 UA 社区划分、邻居关系、可控批次实现逻辑，并提出 Alembic `ContextCommunity / NeighborContext / ToolUsePlan` 中间层建议。 |
 | 本地源码 resolver / script 契约 | [alembic-local-source-resolver-script-contract.md](alembic-local-source-resolver-script-contract.md) | 长期契约 | 统一本地源码 resolver 优先级、repo-local script 边界、portable runtime 例外和真实测试项目默认不进入日常流程的规则。 |
 | Workspace 文档归档规则 | [workspace-doc-archive-policy.md](workspace-doc-archive-policy.md) | 长期规则 | 规定 `docs/workspace/` 当前入口、历史 wave 归档目录、归档条件和 `scripts/archive-workspace-docs.mjs` 使用方式。 |
 | 分阶段迁移指挥长期模板 | [../../templates/phased-migration-command-template.md](../../templates/phased-migration-command-template.md) | 长期模板 | 用于真实代码挖掘、阶段拆分、一波一阶段推进、窗口分派、验收和下一波计划。 |
@@ -39,12 +44,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>无任务 | 小问题修复 / 清理修复已验收；等待新功能目标。 |
-| `AlembicCore`<br>观察中 | `GTODO-2026-05-23-019` 仅在后续 consumer 收敛目标触发时启动。 |
-| `AlembicAgent`<br>观察中 | L4 compaction 当前不处理，低优等待用户再次提及。 |
-| `AlembicDashboard`<br>观察中 | `GTODO-2026-05-23-022` / `GTODO-2026-05-23-023` 等待后续 Dashboard contract typing 或性能目标触发。 |
-| `AlembicPlugin`<br>无任务 | 小问题修复 / 清理修复已验收；等待新功能目标。 |
-| `AlembicTest`<br>无任务 | 当前无测试单；真实项目测试仍通过测试交流文档派发。 |
+| `Alembic`<br>阻塞 | 等待 Core contract。 |
+| `AlembicCore`<br>待启动 | 执行 Wave 1 `MRPS-P1-CORE`。 |
+| `AlembicAgent`<br>观察中 | 等待 Core contract，第一版不扩大 tool root。 |
+| `AlembicDashboard`<br>阻塞 | 等待 Alembic API producer。 |
+| `AlembicPlugin`<br>阻塞 | 等待 Alembic resident ProjectScope producer。 |
+| `AlembicTest`<br>无任务 | 当前无执行任务。 |
 | `BiliDili`<br>无任务 | 不改真实 iOS 项目源码。 |
 
 ## 状态枚举

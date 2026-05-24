@@ -2,7 +2,7 @@
 
 状态：长期记录清单
 维护窗口：AlembicWorkspace
-更新日期：2026-05-23
+更新日期：2026-05-24
 
 本文是 AlembicWorkspace 的长期记录地图。当前开发区只保留当前状态、长期规则、长期契约、当前测试交流面和活跃 TODO；所有短期计划、历史测试交流、已完成 TODO、阶段验收和执行证据都从这里进入归档区。
 
@@ -33,6 +33,10 @@
 
 | 记录 | 状态 | 归档入口 | 说明 |
 | --- | --- | --- | --- |
+| LLM output truncation bug | 已完成 | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | Jobs Timeline `llm.output` 短内容像被截断的完整性标识与展示问题：Agent output completeness metadata、Alembic bridge truncation metadata、Dashboard completeness hints 和 AlembicTest BiliDili test-mode 复测通过；process events recovery / job progress / provider length fixture 转后续 TODO。 |
+| Cold-start project skill delivery | 已完成 | [cold-start-skill-delivery](archive/2026-05/cold-start-skill-delivery/) | 双链路 project skill receipt + Codex 项目级 runtime export：Core contract、Alembic route receipt、Plugin route symlink export、tool visibility 和 BiliDili test-mode runtime delivery 复测通过。 |
+| Scan progress live output | 已完成 | [scan-progress-live-output](archive/2026-05/scan-progress-live-output/) | cold-start / rescan process observability 第一版与旧终端语义补齐 follow-up：Core / Alembic / Agent / Dashboard / AlembicTest 验收通过，live append 严格逐条转入观察 TODO。 |
+| Unified resident service | 已完成 | [unified-resident-service](archive/2026-05/unified-resident-service/) | Plugin -> Alembic 统一 resident service contract：Core contract、Alembic health producer、Plugin unified client、behavior cleanup 和 BiliDili 真实项目集成验证。 |
 | SFC：小问题修复 / 清理修复 | 已完成 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | 六仓库自检、真实小问题修复、lint / check closeout、Plugin real-project 资产删除和 Alembic Codex-safe unit 命令封口。 |
 | CCIC：能力代码 / 接口清理 | 已完成 | [capability-code-interface-cleanup](archive/2026-05/capability-code-interface-cleanup/) | 能力代码梳理、接口清洁、冗余删除、Plugin 身份和 Alembic MCP 外部入口剪枝。 |
 | RFR：文件夹层级 / 拆仓残留清理 | 已完成 | [repository-folder-boundary-restructure](archive/2026-05/repository-folder-boundary-restructure/) | 文件夹层级重构、Plugin 旧 Dashboard / AI / Recipe compatibility surface 清理。 |
@@ -56,11 +60,27 @@
 | `GTODO-2026-05-23-022` 来源 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | Dashboard `src/api.ts` 剩余动态 contract `any` 类型化观察来源。 |
 | `GTODO-2026-05-23-023` 来源 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | Dashboard Mermaid async chunk 性能观察来源。 |
 | `GTODO-2026-05-23-024` 来源 | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | AlembicAgent L4 compaction 低优等待用户再次提及的来源。 |
+| `GTODO-2026-05-23-025` 已完成 | [plugin-devdocs-wiki-removal-2026-05-23.md](../AlembicPlugin/plugin-devdocs-wiki-removal-2026-05-23.md) | AlembicPlugin 删除 Plugin 侧 `alembic-devdocs` / 旧 `alembic_wiki` / Plugin HTTP wiki route 和 Plugin-owned wiki service，提交 `f4efd2561a58562b1686689900ce497a3ff8de83`；AlembicCodex runtime 提交 `628fbad571242ee1891ecb590d0f2133e019b1a6`，runtime sha256 `c5bdbe9b0ace45458da61bd4a270522033626d8cbabcba04aef428bb118ab4bc`。 |
+| `GTODO-2026-05-23-026` 已完成 | [cold-start-skill-delivery](archive/2026-05/cold-start-skill-delivery/) | 冷启动生成 project skills 交付给 Codex 主线完成：`Test-2026-05-24-05` 证明 test mode、MCP tool visibility、Plugin route receipt、symlink-first runtime export、managed marker、runtime load、conflict block、无全局写入、BiliDili git clean 和 Alembic route receipt 均闭合。 |
+| `GTODO-2026-05-23-027` 已完成 | [unified-resident-service](archive/2026-05/unified-resident-service/) | Plugin 与 Alembic 统一 resident service contract 主线完成：Core `b5e3bd5496d8831ae167ecfa79598dd6d792b60b`、Alembic `70917fa509aed03cbd322d1d46acb1eb50f8f0cc`、Plugin Phase 3 `4f58d5e1a1982c13ca307d767e5813ca8e9ea002`、Plugin Phase 4 `139a7edfde8149aba7c6a89c00066928b0cb9a40`、AlembicTest `Test-2026-05-23-01` 通过。 |
+| `GTODO-2026-05-23-028` 已完成 | [scan-progress-live-output](archive/2026-05/scan-progress-live-output/) | cold-start / rescan process observability 第一版完成：`Test-2026-05-24-03` 确认新 Dashboard 未触发 React #31，同一打开页面追加到 38 events，`tool` / `llm.output` / `llm.reflection` rich text 可读。 |
+| `GTODO-2026-05-24-029` 来源 | [scan-progress-live-output](archive/2026-05/scan-progress-live-output/) | live append 批量延迟 / 更细实时性观察来源；不阻塞 `GTODO-2026-05-23-028` / `GTODO-2026-05-24-032` 完成。 |
+| `GTODO-2026-05-24-031` 已完成 | [cold-start-skill-delivery](archive/2026-05/cold-start-skill-delivery/) | Dashboard Timeline UI follow-up 完成：提交 `dc5b446`，固定高度 terminal-like Timeline、bottom scroll、local display cache 和 LLM 默认收起通过总控验收。 |
+| `GTODO-2026-05-24-032` 已完成 | [scan-progress-live-output](archive/2026-05/scan-progress-live-output/) | 冷启动前端过程展示补齐旧终端格式化语义；P5 证明阶段转换 / 短 LLM 默认展示、长内容折叠、颜色可读、active card / summary 均闭合。 |
+| `GTODO-2026-05-24-033` 来源 | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | LOTB-P2 发现 daemon restart 后旧 job events API 返回 0 条；后续需要归口 process events recovery / persistence。 |
+| `GTODO-2026-05-24-034` 来源 | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | LOTB-P2 发现 running job status/progress 长时间停在 `filling/0%`；后续需要对齐 session progress、job summary 和 Dashboard active card。 |
+| `GTODO-2026-05-24-035` 来源 | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | LOTB-P2 未自然触发 provider `finishReason=length`；后续需要 provider length 可控 fixture 或专用 test job。 |
 
 ## Test Records
 
 | 记录 | 归档入口 | 说明 |
 | --- | --- | --- |
+| `Test-2026-05-24-08` | [LLM output completeness test mode report](../../AlembicTest/docs/llm-output-completeness-test-mode-2026-05-24.md) | BiliDili 真实项目 test-mode 复测 Jobs Timeline `llm.output` 输出完整性：短 visible output、tool-call-only、hidden reasoning omission、Alembic bridge truncation 和 Dashboard DOM 展示通过；provider length 自然触发、process events recovery、job progress 转后续 TODO。 |
+| `Test-2026-05-24-05` | [project skill runtime delivery test mode report](../../AlembicTest/docs/project-skill-runtime-delivery-test-mode-2026-05-24.md) | BiliDili 真实项目 test-mode 复测 project skill runtime delivery：`ALEMBIC_TEST_MODE=1` 单维度 `architecture`，Alembic route 产出 `ProjectSkillDeliveryReceipt`，Plugin route 完成 `alembic_project_skill` create/export/load/conflict/no-global-write，BiliDili 最终 git clean。 |
+| `Test-2026-05-24-03` | [live socket append rich content report](../../AlembicTest/docs/live-socket-append-rich-content-retest-2026-05-24.md) | BiliDili 真实项目最小复测 Dashboard live socket append rich content：新 Dashboard 未触发 React #31，同一打开页面无需刷新追加到 38 events，`tool=3`、`llm.output=3`、`llm.reflection=4` 且 rich text 可见；批量延迟转后续观察。 |
+| `Test-2026-05-24-02` | [cold-start process events retest report](../../AlembicTest/docs/cold-start-process-events-retest-2026-05-24.md) | BiliDili 真实项目复测 Phase 1E：events API 真实产出 `llm.input=2`、`tool=1`、`llm.output=1`、`llm.reflection=1`；REST recovery、Jobs timeline 滚动和 Candidates card 通过；Dashboard live socket append rich content 触发 React #31，已转 `AlembicDashboard` 最小修复。 |
+| `Test-2026-05-24-01` | [cold-start process timeline report](../../AlembicTest/docs/cold-start-process-timeline-test-2026-05-24.md) | BiliDili 真实项目验证 cold-start Dashboard process timeline：health、eventsUrl、jobs events API、Jobs timeline、socket append、REST recovery、Candidates cold-start card 和 job details 入口连通；结论 `producer-gap`，`llm.input` / `llm.output` / `llm.reflection` / `tool` 未真实产生。 |
+| `Test-2026-05-23-01` | [unified resident service BiliDili report](../../AlembicTest/docs/unified-resident-service-bilidili-integration-2026-05-23.md) | BiliDili 真实项目验证 Plugin baseline、local Alembic resident enhancement、resident search/vector telemetry、Dashboard handoff、prime shout、job boundary 和旧桥接负向证据，结论通过。 |
 | 历史测试交流正文 | [test-exchange-history](archive/2026-05/test-exchange-history/) | 2026-05-21 至 2026-05-22 的 BiliDili prime / shout / resident vector search 测试单和验收回填。 |
 | AlembicTest 长期报告 | [AlembicTest docs](../../AlembicTest/docs/) | 真实项目测试报告、probe 脚本说明和证据由 AlembicTest 仓库维护。 |
 
@@ -71,9 +91,12 @@
 | 长期判定口径 | [alembic-note-finding-closure-standard.md](alembic-note-finding-closure-standard.md) | [note-finding-closure-standard](archive/2026-05/note-finding-closure-standard/) | 当前长期口径与历史形成过程分离。 |
 
 ## Archive Topics
-
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/llm-output-truncation-bug` | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | Jobs Timeline `llm.output` 短内容像被截断的完整性标识与展示问题。 |
+| `2026-05/scan-progress-live-output` | [scan-progress-live-output](archive/2026-05/scan-progress-live-output/) | 已压缩 20 条历史索引行到 topic manifest；当前索引只保留目录入口。 |
+| `2026-05/cold-start-skill-delivery` | [cold-start-skill-delivery](archive/2026-05/cold-start-skill-delivery/) | 已压缩 4 条历史索引行到 topic manifest；当前索引只保留目录入口。 |
+| `2026-05/unified-resident-service` | [unified-resident-service](archive/2026-05/unified-resident-service/) | 已压缩 4 条历史索引行到 topic manifest；当前索引只保留目录入口。 |
 | `2026-05/small-fix-cleanup` | [small-fix-cleanup](archive/2026-05/small-fix-cleanup/) | 小问题修复 / 清理修复主线：自检、SFC-R1 直接修复、SFC-R2 lint / check closeout、SFC-R3 用户确认项封口。 |
 | `2026-05/agent-evidence-recording-phase-chain` | [agent-evidence-recording-phase-chain](archive/2026-05/agent-evidence-recording-phase-chain/) | Agent evidence recording / phase chain 历史测试线计划。 |
 | `2026-05/prime-knowledge-shout` | [prime-knowledge-shout](archive/2026-05/prime-knowledge-shout/) | Prime 知识呐喊、Recipe 交互契约和 BiliDili bridge repair 历史计划。 |

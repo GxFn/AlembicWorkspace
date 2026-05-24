@@ -1,24 +1,23 @@
 # AlembicTest Exchange
 
-状态：空闲
+更新日期：2026-05-24
 维护窗口：AlembicWorkspace
-执行窗口：AlembicTest
-更新日期：2026-05-23
+状态：无当前可执行测试单
 
-本文件只保留当前测试交流面。没有待启动、执行中、待验收或阻塞测试单时，不在这里保留历史测试记录。
+## 定位
 
-长期流程见 [alembic-test-exchange-policy.md](../alembic-test-exchange-policy.md)。历史测试记录、测试报告和归档入口统一从 [workspace-record-map.md](../workspace-record-map.md#test-records) 查询。
+本文件只保存当前需要 `AlembicTest` 执行或回填的测试单。历史测试交流、测试报告和总控验收入口统一从 [workspace-record-map.md](../workspace-record-map.md#test-records) 查询。
 
 ## 当前测试单
 
-当前无测试单。
+当前无可执行测试单。
 
-## 发送状态
+今日已完成测试：
 
-发送给：无。
+- `Test-2026-05-24-08 / LOTB-P2-Output-Completeness-TestMode`：LLM output completeness 最小真实复测通过，报告见 [AlembicTest docs](../../../AlembicTest/docs/llm-output-completeness-test-mode-2026-05-24.md)，总控归档见 [llm-output-truncation-bug](../archive/2026-05/llm-output-truncation-bug/)。
+- `Test-2026-05-24-05 / CSSD-P4B-TestMode-Test`：project skill runtime delivery 通过，报告见 [AlembicTest docs](../../../AlembicTest/docs/project-skill-runtime-delivery-test-mode-2026-05-24.md)。
+- `Test-2026-05-24-07 / SPSR-P5-TestMode-Readability-Retest`：scan progress semantic readability 通过，报告见 [AlembicTest docs](../../../AlembicTest/docs/scan-progress-semantic-readability-retest-2026-05-24.md)。
 
-## 维护规则
+## 下一步
 
-- 创建新测试任务时，只把当前测试单写入本文。
-- 测试完成并验收后，把测试单摘要归入长期记录地图，再从本文移除。
-- 真实测试报告、probe 脚本和长期测试证据仍归 `AlembicTest` 仓库维护。
+等待用户开启新测试目标后，再按测试交接模板新增测试单。

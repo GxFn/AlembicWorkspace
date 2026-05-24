@@ -16,6 +16,7 @@
 | [agent-extraction](agent-extraction/) | AlembicAgent 抽取和 Plugin agent-free 历史 wave。 |
 | [capability-code-interface-cleanup](capability-code-interface-cleanup/) | 能力代码 / 接口清理主线记录。 |
 | [codex-only-host-agent-mode](codex-only-host-agent-mode/) | Codex-only host agent mode 历史计划。 |
+| [cold-start-skill-delivery](cold-start-skill-delivery/) | 已压缩 4 条历史索引行到 topic manifest；当前索引只保留目录入口。 |
 | [dev-link-global-environment](dev-link-global-environment/) | dev link / global environment 历史计划。 |
 | [facade-readiness](facade-readiness/) | Core facade readiness 历史计划。 |
 | [feishu-remote-removal](feishu-remote-removal/) | Feishu / Lark remote removal。 |
@@ -24,6 +25,7 @@
 | [global-todo](global-todo/) | 已完成全局 TODO 和旧同步记录。 |
 | [init-convergence-contract](init-convergence-contract/) | init convergence contract 历史计划。 |
 | [interface-boundary](interface-boundary/) | 接口边界优化与消费层收敛历史计划。 |
+| [llm-output-truncation-bug](llm-output-truncation-bug/) | Jobs Timeline `llm.output` 短内容像被截断的完整性标识与展示问题。 |
 | [local-source-import-unification](local-source-import-unification/) | 本地源码引入统一历史计划。 |
 | [module-boundary-foundation](module-boundary-foundation/) | module boundary foundation 历史计划。 |
 | [multi-project-control](multi-project-control/) | multi-project control redesign 历史计划。 |
@@ -37,6 +39,8 @@
 | [release-portable-snapshot-closeout](release-portable-snapshot-closeout/) | release / portable snapshot closeout 与 publish staging。 |
 | [repository-folder-boundary-restructure](repository-folder-boundary-restructure/) | 仓库文件夹层级、拆仓残留审计和清理记录。 |
 | [resident-vector-search-release](resident-vector-search-release/) | resident vector search 发布与测试记录。 |
+| [scan-progress-live-output](scan-progress-live-output/) | 已压缩 20 条历史索引行到 topic manifest；当前索引只保留目录入口。 |
 | [small-fix-cleanup](small-fix-cleanup/) | 小问题修复 / 清理修复主线：自检、SFC-R1 直接修复、SFC-R2 lint / check closeout、SFC-R3 用户确认项封口。 |
 | [test-exchange-history](test-exchange-history/) | 历史测试交流正文。 |
+| [unified-resident-service](unified-resident-service/) | 已压缩 4 条历史索引行到 topic manifest；当前索引只保留目录入口。 |
 | [version-unification](version-unification/) | 0.2.0 版本统一和缓存刷新记录。 |

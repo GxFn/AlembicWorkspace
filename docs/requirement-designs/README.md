@@ -44,7 +44,8 @@
 
 ## 当前需求
 
-- [alembic-multi-project-control-redesign/](alembic-multi-project-control-redesign/)：当前活动需求，需求设计完成，等待任务级目标阶段确认。
+- [multi-root-project-scope/](multi-root-project-scope/)：当前活动需求，原始计划书已确认，代码实现依赖调研和需求设计已形成，等待任务级目标阶段确认。
+- [alembic-multi-project-control-redesign/](alembic-multi-project-control-redesign/)：历史多项目控制需求，需求设计完成并作为本次 ProjectScope 设计的背景材料。
 
 ## 模板
 

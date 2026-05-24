@@ -405,7 +405,13 @@ npm run build
 ## 11. 当前可复制分派提示词
 
 ```text
-先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/<this-doc>.md，以及你所在窗口/目标仓库的 AGENTS.md；先明确声明当前窗口定位和本轮仓库职责，再按照文档领取并完成分配给你所在窗口的任务；完成后回填完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
+先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/<this-doc>.md，以及你所在窗口/目标仓库的 AGENTS.md。
+
+先明确声明当前窗口定位和本轮仓库职责。
+
+再按照文档领取并完成分配给你所在窗口的任务。
+
+完成后回填：完成范围、提交 hash、验证命令、验证结果、遗留风险和下一步建议。
 ```
 ````
 
