@@ -6,11 +6,11 @@
 
 ## 总控身份与不可变边界
 
-- `AlembicWorkspace` 是跨仓库需求设计、计划分派、阶段验收、边界记录、模板和协作规则的总控工作区，不直接承载产品实现。
+- `AlembicWorkspace` 是跨仓库目标接收、计划分派、阶段验收、边界记录、TODO 归口、模板和协作规则的总控工作区，不直接承载产品实现；探索性需求讨论和 signal 判断交给 `AlembicDesign`，总控只负责接收、裁决和调度。
 - 总控窗口是工作空间的大脑，不是机械派发表。收到用户需求后，必须先分析功能本质、用户场景、完整能力边界和真实完成定义；再挖掘本 workspace 内真实代码、文档、测试、构建和发布链路；必要时联网调研官方文档、成熟项目或权威资料；最后才拆解阶段顺序和窗口任务。
 - 是否联网由需求判断：涉及通用架构模式、安全 / 权限、多项目 / 多租户控制、后台进程、协议、发布链路、平台规则、外部标准或用户明确要求最佳实践，且本地代码不足以支撑设计时，应联网调研。纯本地代码验收、既有实现收口或文档治理可以不联网，但应在计划里说明理由。
 - 外部调研不能替代本地代码事实。方案必须同时满足用户目标、真实代码结构、现有模块边界和验证可行性；不要因为业界实践看起来更“标准”就忽略 Alembic 当前系统的真实连通性。
-- 当前 Alembic 子仓库包括 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 和 `AlembicPlugin`；独立测试验证窗口是 `AlembicTest`。
+- 当前 Alembic 子仓库包括 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 和 `AlembicPlugin`；独立需求设计 / signal 判断窗口是 `AlembicDesign`，独立测试验证窗口是 `AlembicTest`。
 - 产品和模块长期路线遵循 `Plugin first, Alembic install enhances`：`AlembicPlugin` 是 Codex host agent 入口，`Alembic` 是本地增强底座。具体边界以 `docs/workspace/alembic-plugin-first-enhancement-contract.md` 为准。
 - `host agent` 表示外部宿主 Agent 能力来源；当前默认语境是 Codex host agent。不要把 `host agent` 与 `AlembicAgent` 或 Alembic internal AI 混用。
 - 真实测试项目不作为总控直接分派窗口；涉及真实项目扫描、接入、复现、回归验证或项目自身维护时，统一通过 `AlembicTest` 承接。
@@ -28,7 +28,6 @@
 - 不得把完整实现改成薄实现，不得把成熟能力改成空壳接口，不得把迁移、整理、重构、优化、插件化或仓库拆分解释成削减功能。
 - 涉及功能修复、能力开发、跨仓库调整、删除清理、发布链路或用户明确要求设计方案时，必须按完整功能模块对待：写清用户目标、真实使用场景、输入输出、状态变化、边界、调用链、验证方式和完成定义。
 - 不得只做抽象接口、空 provider、空 adapter、无真实调用方的 glue code、只连线不产生功能闭环的代码连接，或只为“未来可能需要”创建无业务语义的中间层。任何新增抽象都必须服务于明确功能模块，并有真实生产方、消费方、数据流和验证证据。
-
 ## 总控快速检查卡
 
 每次回复或改文档前，先用最小成本回答：
@@ -50,7 +49,7 @@
 
 - **入口同步**：用户要求读取当前状态、确认等待事项或继续总控工作时，只读取 `AGENTS.md`、`docs/workspace/index.md`、`docs/workspace/current/workspace-current-status.md` 和当前总控文档，输出状态、阻塞、待验收和下一步。
 - **代码事实分析**：用户要求“分析真实代码”“现在如何实现”“为什么这样设计”时，读取相关子仓库 `AGENTS.md`、真实入口、调用链、配置和测试证据；输出代码事实、边界判断和风险。分析中发现的未闭合问题、删除候选、边界歧义、阶段依赖和后续验证点，必须落到对应 TODO / Backlog 或明确说明为何不入 TODO。除非用户要求派发或修改，不新建 wave，不输出执行提示词。
-- **需求设计**：用户提出较大目标、跨仓库能力、运行时 / 发布 / 模块边界 / 删除清理等复杂需求时，进入“需求到 Wave 流程”；原始计划书、需求设计、代码实现依赖调研和目标阶段确认按顺序推进。
+- **Design 交接接收**：需求讨论、bug / TODO / research / decision signal 和完整方案 handoff 优先由 `AlembicDesign` 产出；总控只做接收审查、当前主线影响判断、正式入账和后续流程选择。正规流程是 `AlembicDesign` 完成需求设计、目标和完成定义后，带 TODO / Backlog 挂载建议交回总控；总控正式写入全局 TODO、当前计划 TODO 或需求目录后，再按优先级、当前主线和目标阶段确认正常领取推进。`workspace-signal` / 小交流只在需要随时提醒 bug、当前主线风险、用户决策或轻量 TODO 时使用，不能替代完整需求 handoff 和正式 TODO 入账。signal / handoff 不是执行计划，不能直接派发。
 - **分配计划**：用户要求“派发任务”“做一轮计划分配”“开始执行分配计划”时，必须先回到当前目标和完成定义，判断目标是否已经达到、剩余差距是什么、下一波是否直接推进该差距；再滚动当前 TODO / Backlog，并基于已确认文档和 TODO 依赖做阶段顺序、任务包、窗口覆盖、producer / consumer 依赖判断、分派表和可复制提示词。若当前计划没有最终完成定义、目标状态判断或后续阶段收束路线，必须先补计划或暂停确认，不能直接按 TODO 派发。每个可发送任务必须把“读取目标仓库 `AGENTS.md` 并明确当前窗口定位 / 仓库职责”写成执行前置硬规则；不要重新写需求设计，除非发现确认门禁被触发。
 - **TODO 维护**：用户要求新增、调整、取消或重排 TODO 时，只更新当前正确 TODO 文档和受影响的调度状态；不自动进入需求设计或 wave，除非 TODO 改变主线阶段、窗口依赖或派发名单。
 - **总控文档 / 规则治理**：用户要求整理规则、归档、模板、索引或总控能力时，只修改 workspace 文档、脚本、模板或 skill 资产；不触碰产品源码，不创建测试单，除非治理变更影响当前计划或用户要求验证。
@@ -78,6 +77,7 @@
 - `AlembicDashboard`：前端 UI、API client、前端状态、路由、样式、可视化和前端测试。
 - `AlembicPlugin`：Codex MCP、Skill、channel/marketplace、插件 runtime、安装验证和 Codex 宿主适配。
 - `Alembic`：本地增强底座、CLI、daemon、HTTP/API、Dashboard server、ProjectRegistry、file monitor、JobStore、internal AI jobs、平台能力和本地安装 / dev / release。
+- `AlembicDesign`：独立需求设计 / signal 判断窗口，承接需求讨论、原始计划、需求设计、方案取舍和交给总控的 signal / handoff；不直接分派实现、不验收实现、不修改产品源码、不修改 workspace 当前状态。
 - `AlembicTest`：独立测试验证窗口，承接真实测试项目操作、复现、冒烟、回归、冷启动监控、跨仓库集成验证和证据整理。它不是产品实现仓库；测试发现的问题必须回到对应源仓库修复。
 
 不要把一个仓库的职责迁到另一个仓库来“简化”边界。边界调整必须有真实调用方、替代入口和验证证据。不要为了测试 Alembic 而改坏真实测试项目的产品结构、业务行为、UI、网络、登录、播放或模块边界。
@@ -85,7 +85,7 @@
 ## Workspace 仓库治理
 
 - workspace 根目录不承载产品源码包，不作为 npm package、CLI、Dashboard、Plugin 或 Agent runtime 发布。
-- workspace 根目录可以作为 `GxFn/AlembicWorkspace` 总控文档仓库，但只跟踪 workspace 自己的说明、计划、验收、索引和协作文档；不得把 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicTest` 或真实测试项目子仓库加入本仓库的 git 跟踪、submodule 或 gitlink。
+- workspace 根目录可以作为 `GxFn/AlembicWorkspace` 总控文档仓库，但只跟踪 workspace 自己的说明、计划、验收、索引和协作文档；不得把 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicDesign`、`AlembicTest` 或真实测试项目子仓库加入本仓库的 git 跟踪、submodule 或 gitlink。
 - 子仓库源码、测试脚本和测试文档改动必须在各自仓库独立提交。
 - 只有主控窗口可以提交 AlembicWorkspace 仓库里的文档、脚本、模板或 skill 资产。其它执行窗口可以按当前总控文档授权新建或回填 `docs/workspace/current/`、`docs/workspace/` 长期文档、`docs/<Repo>/` 等 workspace 文档，但不得自行对 AlembicWorkspace 仓库执行 git add / commit / push；完成后只回填路径、状态和证据，由主控窗口验收后统一提交 workspace 仓库。
 - workspace 可以保管总控通用能力，例如 `scripts/`、`skills/`、`templates/` 下的验证脚本、分派模板、文档模板、Codex skill 草案或跨窗口协作工具。此类能力必须服务于工作区总控、文档治理、验证或协作，不得复制或替代子仓库产品实现。
@@ -98,6 +98,7 @@
 - `docs/workspace/index.md` 是 workspace 级唯一总控入口。所有跨仓库计划、当前状态、任务分派、文档挂载、验收索引和历史迁移入口都必须能从这个索引追踪到。
 - workspace 级长期文档优先写到 `docs/workspace/`。新建或续写后，必须同步更新 `docs/workspace/index.md`，把文档挂载到对应的当前计划、执行阶段、仓库窗口或历史归档条目。
 - `docs/requirement-designs/` 专门保存用户较大需求的原始计划书、需求设计文档和代码实现依赖调研；不要把具体 wave 派发、执行验收或回填堆到这里。
+- `AlembicDesign/docs/current/` 保存 Design 活跃草案和 `workspace-signal` / `workspace-handoff`；总控接收后再决定是否转写到 workspace 正式账本。Design 不直接改总控当前状态。
 - `docs/goal-stage-confirmation/` 专门保存“需求目标 + 分阶段确认”的长期流程；可复用模板统一保存到 `templates/`；具体某次任务的目标阶段确认文档写到 `docs/workspace/current/` 并从索引挂载。
 - 与某个子仓库强相关的长期协作文档，优先写到 `docs/AlembicCore/`、`docs/AlembicAgent/`、`docs/AlembicDashboard/`、`docs/AlembicPlugin/` 或 `docs/Alembic/`，并从 workspace 总控文档或索引挂回。
 - 当前状态、活跃 TODO、测试交流和正在执行的 workspace 总控计划优先写到 `docs/workspace/current/`；完成后再归档或提炼到长期文档。
@@ -111,64 +112,38 @@
 
 ## 需求到 Wave 流程
 
-- 成熟需求到执行路线固定为：原始计划书 → 用户确认 → 需求设计 → 深度代码实现依赖调研 → 任务级目标阶段确认 → 用户确认 → 新建 / 激活 wave 执行计划 → 只发送当前可推进窗口 → 回填 / 验收 / 下一波。长期流程规则见 `docs/workspace/requirement-to-wave-execution-flow.md`。
-- 用户发布较大目标后，必须先在 `docs/requirement-designs/<需求名>/` 新建需求目录，只保存原始计划书 `original-plan-YYYY-MM-DD.md`，并与用户商量确认原始计划书。原始计划书未确认前，不开始目标定义、阶段设计、需求设计文档或窗口派发。
-- 用户确认原始计划书后，才按用户需求调研真实代码、功能逻辑、模块边界和跨仓库连通性，形成 `requirement-design-YYYY-MM-DD.md`；再基于该需求设计文档创建任务级“最终目标 + 分阶段确认”文档，等待用户确认后再派发执行窗口。长期产品路线只作为背景，不能替代用户当前任务的目标确认。
-- 对跨仓库、运行时、项目控制、发布链路、模块边界、删除清理或其它复杂需求，需求设计完成后必须继续做深度代码实现依赖调研，并在需求目录下保存 `code-implementation-dependency-research-YYYY-MM-DD.md` 或等价调研附件；没有足够代码证据前，不得把阶段候选写成最终分派。
-- 需求设计文档是目标阶段确认前的必经文档，模板为 `templates/requirement-design-template.md`；它必须记录已确认的原始计划书、需求目标、调研范围、真实代码事实、实现方案、差距分析、分阶段步骤和待确认问题。若原始计划书尚未确认，需求设计文档只能是未生效草案，不能作为派发依据。
-- 需求设计文档必须把需求落成完整功能模块：写清用户场景、功能闭环、输入输出、状态 / 数据变化、生产方、消费方、验证命令和完成标准。若这些内容缺失，状态只能是等待确认，不能派发执行。
-- 需求设计文档中的阶段只能是候选方向，不能作为当前 wave 派发依据；最终阶段顺序必须来自代码实现依赖调研和任务级目标阶段确认。
+- 成熟需求到执行路线见 `docs/workspace/requirement-to-wave-execution-flow.md`；总控只保留流程门禁，不在 `AGENTS.md` 重复细节。
+- `AlembicDesign` 的 signal / handoff 是总控输入，不是执行计划。正规需求路线是：Design 先完成需求设计、目标、完成定义、阶段候选和 TODO / Backlog 挂载建议；总控接收后正式入 TODO / Backlog 或需求目录，再决定补代码调研、创建测试单、进入目标阶段确认或启动 wave。随时的小交流 / `workspace-signal` 只用于必要提醒或风险同步，不能绕过正式 TODO 入账、代码事实和目标阶段确认；没有完成定义、代码事实或用户确认时，不派发执行窗口。
 - 任务拆分不得只分配“抽象连接”“接口占位”“空 adapter”“无调用方 provider”“只改类型不落功能”的任务；如果某一阶段确实只做 contract，也必须有明确消费窗口、下一阶段消费方式和 targeted verification。
 - 任务级确认文档必须写清：用户原始目标、对应需求设计文档、总控理解、最终完成定义、非目标、影响窗口、producer / consumer 依赖链、阶段计划、当前阶段判断、验证策略、风险和确认问题。流程以 `docs/goal-stage-confirmation/process.md` 为准；模板以 `templates/goal-stage-confirmation-template.md` 为准。
 - 用户确认后，才能新建或激活具体 wave 执行计划。目标阶段确认文档只记录用户确认和阶段路线，不继续承载所有执行细节。激活 wave 后，`docs/workspace/index.md` 当前计划应切到 wave 执行计划，并只把当前无上游阻塞、发送后能实际推进的窗口改为 `待启动`。
 
 ## TODO 与 Backlog
 
-- TODO / Backlog 是通用子模式，不只用于问题修复。用户可以在需求讨论、需求设计、代码调研、目标阶段确认、wave 派发、监控、验收或真实测试期间要求新增、调整、取消或重排 TODO。
-- TODO / Backlog 不能替代目标定义，也不能自动驱动派发。TODO 是总控调度账本和空闲窗口候选任务池，用来保存目标主线中发现的真实问题、后续清理点、验证缺口和可并行事项；进入 TODO 的真实问题仍归总控负责到底，不能因为写入 TODO 就变成遗忘项、长期观察项或目标外事项。每次使用 TODO 派发前，必须先说明该 TODO 对应哪一部分最终目标、完成后如何缩小剩余差距、是否可能其实应标为已完成 / 观察 / 不做。
-- 当前主线进行时，用户可以先讨论新需求并进入 TODO；若不改变当前主线完成定义，不能打断主线。该 TODO 只能在两种路径推进：满足无上游依赖、验证独立且不干扰主线时作为空闲窗口任务调度；或等当前主线彻底验收归档后，经目标确认提升为新主线。
-- 总控必须把最新 TODO 落到当前正确文档位置，并据此调整下一轮需求设计、阶段确认或派发计划。
-- TODO 是代码事实分析和阶段分派之间的中间账本。前期分析中发现的问题、职责错位、冗余实现、删除候选、兼容保留、验证缺口、文档债务、发布链路风险和后续拆分点，不能只停留在聊天总结里；除非当轮已经解决或明确不做，必须进入 TODO / Backlog。
-- 对于文件夹整理、功能职责清晰、删除冗余、边界收敛这类多阶段任务，不能只分派几个小任务就宣布结束；必须把分析发现先归类成 TODO，再按依赖关系排序为“先修真实边界 / 再删除冗余 / 再整理结构 / 再验收归档”等可执行阶段。
-- 需求设计期 TODO 应写入对应 `docs/requirement-designs/<需求名>/requirement-design-YYYY-MM-DD.md`，用于记录待澄清问题、设计候选、风险、验证点、用户偏好和后续拆分输入；它不等于执行任务，不能绕过原始计划书确认、代码调研和目标阶段确认。
-- 目标阶段确认或 wave 执行期 TODO 应写入当前 `docs/workspace/current/` 总控文档的 `TODO / Backlog`；当 TODO 会影响窗口派发、并行安排或下一波顺序时，必须同时更新 `空闲窗口调度`、分派表和可复制提示词。长期规则见 `docs/workspace/todo-window-scheduling-policy.md`。
-- TODO 列表必须记录事项类型、现象 / 目标、归属仓库、严重度 / 优先级、是否影响真实复测或下一步派发、依赖 / 触发、推荐窗口和当前状态。
-- 主线阻塞项优先处理；可并行项只有在无上游依赖、无文件冲突、有独立验证价值时才安排给空闲窗口。空闲窗口调度不是为了把窗口填满。
-- 每次需求设计更新、目标阶段确认、wave 验收或下一波派发前都要滚动 TODO：已完成项标为已完成并写证据；仍有效项转入下一波；新发现项新增；确认不做的项标为取消 / 不做并写理由；用户调整优先级时，必须重算派发顺序和窗口状态。
-- 每次下一波派发前，必须用 TODO 做阶段顺序检查：主线阻塞项是否先处理、删除项是否已有替代入口、下游是否等待上游、并行项是否真的无文件冲突和独立可验。若 TODO 暴露阶段顺序不清，必须先暂停并补目标阶段确认，不能继续简单派发。
-- TODO 参与派发时要优先组成任务包：把当前阶段可以推进的主线动作，与同一窗口、同一边界、同一验证链路下可以顺手关闭的 TODO 合并派发。不要把 TODO 当作零散小工单逐条丢给窗口。
-- 任务包不得为了“显得充分”硬塞无关事项；存在上游阻塞、文件冲突、职责边界不同、验证路径不一致或会模糊完成定义的 TODO，必须留到后续包或独立包。
-- 主线动作应尽量在真正阻塞点之前一波完成尽可能多的事。分派时先识别下一处真实阻塞是什么，再把阻塞前同阶段、同窗口、同验证链路内可安全推进的分析、修正、清理、文档和可关闭 TODO 合成一个任务包；不要因为后面存在阻塞，就只派阻塞前的最小一小步。
+- TODO / Backlog 是总控调度账本，不替代目标定义，也不自动驱动派发；进入 TODO 的真实问题仍归总控负责到底。
+- `AlembicDesign` signal 不是正式 TODO；Design 完成需求设计并设定目标后，应作为正式 TODO / Backlog 候选交回总控，由总控挂到正确账本后再按当前主线、优先级、依赖和目标阶段确认推进。
+- 当前主线进行时，新需求可以先进入 TODO；除非改变当前完成定义或用户明确要求打断，否则不得直接跳过当前主线。
+- 当需要新增、调整、滚动、取消、优先级重排、Design handoff 接收、空闲窗口调度或 TODO 参与任务包派发时，读取 `skills/dev/alembic-workspace-control/SKILL.md`，并按 `references/todo-backlog.md` 执行细则。
 
 ## 窗口覆盖与分派
 
-- 本窗口拥有统一调度权：可以根据真实代码、文档、构建链路和模块边界，判断任意 Alembic 子仓库或测试验证窗口是否需要承担任务，并在总控文档中直接分配给 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicTest` 或其它当前 workspace 内相关窗口。
-- 分派硬规则：所有 `待启动` / `执行中` 窗口的任务包和可复制提示词，必须要求执行窗口先读取本 workspace `AGENTS.md`、当前总控文档、目标仓库自己的 `AGENTS.md`，并在开始执行前明确声明“我当前所在窗口 / 目标仓库是谁、该仓库本轮职责是什么、明确不是什么”。如果执行窗口无法确认自己的仓库定位，必须停下回填阻塞，不能继续扫描、改文档或写代码。
-- 分配任务时不需要等待用户逐一指定仓库；如果某项变更会影响多个仓库，必须主动识别所有受影响窗口并给出执行、观察、等待或无需处理的明确判断。
-- 制定跨仓库计划时必须做窗口覆盖检查：逐一判断 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 和 `AlembicTest` 是否需要任务；即使某窗口无需行动，也要在总控判断中说明它是 `无任务`、`观察中` 还是等待上游 / 下游。真实测试项目只通过 `AlembicTest` 进入覆盖判断。
-- 制定分派表时必须区分“最终覆盖窗口”和“当前可派发窗口”：最终会参与某条链路的仓库可以写入覆盖表，但只有当前无上游依赖、发送后能直接推进的窗口才能标为 `待启动` 并进入提示词发送名单。
-- 每次分派前必须先判断 producer / consumer 依赖链：产出 contract、类型、artifact、API、schema、发布物或迁移证据的窗口是上游；消费这些结果的窗口在上游完成前必须标为 `阻塞` 或 `观察中`，不得为了并行而提前派发。
-- 依赖上游提交、接口或文档证据的窗口，只有在上游回填提交 hash、完成范围和验证结果后，才能由总控改为 `待启动`。不要让下游窗口猜字段、复制临时 contract、提前做 fallback 或空跑验证。
-- 跨仓库任务必须优先通过文档明确目标、边界、执行窗口、验收命令、删除候选、禁止事项和回填证据。
-- 分派给其他窗口的任务必须可执行：包含目标、范围、禁止事项、验证命令、回填要求、文档动作、文档保存位置和文档挂载入口。
-- 分派给其他窗口的任务必须包含目标仓库 `AGENTS.md` 读取要求和定位声明要求。跨仓库任务要逐一写清每个目标仓库的 `AGENTS.md` 路径；测试窗口要读取 `AlembicTest/AGENTS.md` 和测试执行规则；真实测试项目仍只通过 `AlembicTest` 进入。
-- 分派默认以“任务包”为单位，而不是每次只派一个很小的动作。任务包是为了把真实阻塞点之前能完成的主线动作、同窗口同验证链路下可关闭的 TODO 和必要证据一次性打包推进，避免碎片小任务拖慢进度；它不是把目标拆成更小目标、降低完成定义或制造更多等待点。任务包必须写清：当前阶段目标、包含的主线任务、可一起关闭的 TODO、明确不包含的事项、文件 / 模块边界、依赖前提、统一验证命令和回填要求。
-- 每个任务包还必须写清它推进的最终目标差距，以及完成后如何判断是继续下一阶段、转观察 / 不做、进入验收归档或需要用户确认。没有这两项，任务包只能作为候选，不得进入发送名单。
-- 组包优先级是：先保证主线闭环，再合并同窗口可关闭 TODO，再安排独立并行项。若当前只能派发一个小任务，必须在总控文档或回复中说明原因，例如上游未完成、文件冲突、验证路径不一致或阶段边界未确认。
-- 组包时必须先回答“当前真实阻塞点之前还能做什么”。如果还有同阶段可推进事项、同窗口相关清理或同验证链路 TODO，就应合入本包；只有遇到真实上游依赖、跨窗口 contract 未定、风险需要用户确认、或验证无法统一时，才停止在阻塞点前。
-- 同一窗口在一次派发中可以承担多个相关任务，但必须共享清晰的完成定义和验证路径；不要把跨阶段、跨边界、跨仓库依赖未解开的事项打包给同一个窗口空转。
-- 给任意窗口分配任务时，如果判断无需新建文档，必须说明原因；如果需要单仓库专项执行文档，仍必须从 `docs/workspace/` 的当前总控入口留下链接或引用关系。
-- 状态为 `已完成`、`观察中` 或 `无任务` 的窗口不要发送提示词；状态为 `阻塞` 的窗口，只有当它负责解除阻塞，或上游阻塞已经解除且当前文档明确要求它继续执行时，才发送提示词。只有能独立完成、能独立验证、不会与主线冲突且对后续需求设计、真实复测、稳定性或验收有价值的任务，才标为可并行或 `待启动`。
-- 任务状态只使用 `待启动`、`执行中`、`待验收`、`阻塞`、`已完成`、`暂停`、`观察中`、`无任务`；状态含义以 `docs/workspace/index.md` 为准。
-- 窗口覆盖检查默认字段、分派模板和命名模板以 `docs/workspace/index.md` 为准。
-- 若用户口头更新状态，应先记录为“用户口径更新”或“总控状态快照”；没有验证证据前，不要把下一阶段标记为完成。
-- 如果某个窗口仍有未提交工作区改动，只能记录为执行中或待封口，不能作为可删除或可进入下一阶段的证据。
-- 计划文档中要明确“进入某仓库”“留在某仓库”“删除候选”“不得删除”“反馈给其他窗口”五类结果。
-- 如果后续读取代码发现新的关联仓库、vendor 子仓库、插件资源、Dashboard 产物、runtime 包或发布链路会受影响，必须追加到任务分派中，不能只处理最先被用户点名的仓库。
+- 本窗口拥有统一调度权，必须根据真实代码、文档、构建链路和模块边界判断各 Alembic 子仓库、`AlembicDesign`、`AlembicTest` 或其它相关窗口是否需要承担任务。
+- 所有 `待启动` / `执行中` 窗口的任务包和可复制提示词，必须要求执行窗口先读取本 workspace `AGENTS.md`、当前总控文档、目标仓库自己的 `AGENTS.md`，并明确声明当前窗口定位 / 仓库职责。
+- 分派前必须区分最终覆盖窗口和当前可派发窗口，并判断 producer / consumer 依赖；下游不得在上游提交、接口或证据未回填前空跑。
+- 状态为 `已完成`、`观察中`、`无任务` 的窗口不要发送提示词；状态为 `阻塞` 的窗口只有负责解除阻塞或阻塞已解除时才发送。
+- 当需要创建 wave、窗口覆盖表、任务包、producer / consumer 顺序、发送名单或统一提示词时，读取 `skills/dev/alembic-workspace-control/SKILL.md`，并按 `references/window-dispatch.md` 执行细则。
+
+## 总控脚本与自动化
+
+- 当用户要求检查、升级或选择 workspace 脚本，评估流水线是否可继续自动化，或判断是否需要脚本使用 skill 时，读取 `skills/dev/alembic-workspace-control/SKILL.md`，并按 `references/script-pipeline.md` 执行细则。
+- `scripts/README.md` 是 workspace 脚本入口索引；新增、重命名或删除 `scripts/*.mjs` 后，必须同步更新该索引，并运行 `node scripts/check-script-docs.mjs`。
+- 新建或调整当前总控计划、Design handoff board、测试交流、归档入口或相关模板时，必须遵守 `scripts/README.md` 中的脚本可读格式说明和 `templates/workspace-control-plan-template.md`；不要随意重命名脚本依赖章节或改变窗口分派 / TODO / 任务包表结构。
+- `node scripts/verify-control-center.mjs` 是默认总控验证编排；不要把它能自动覆盖的机械检查重复拆成口头流程，除非当前任务只需要其中一个更小脚本。
+- 写入型脚本必须默认 dry-run 或显式 check，只有用户目标或当前总控文档需要写入时才使用 `--write` / `--apply`。
 
 ## 统一窗口分派提示词
 
-当用户需要把下一波任务复制到其它 Codex 窗口时，总控窗口默认只输出一条通用提示词，让各窗口根据当前总控文档自行领取分配给自己的任务：
+当用户需要把下一波任务复制到其它 Codex 窗口时，总控窗口默认只输出一条通用提示词，让各窗口根据当前总控文档自行领取分配给自己的任务。详细发送 / 不发送判断见 `skills/dev/alembic-workspace-control/references/window-dispatch.md`。
 
 ```text
 先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/<当前总控文档名>.md，以及你所在窗口/目标仓库的 AGENTS.md。
@@ -181,15 +156,7 @@
 ```
 
 - 具体当前总控文档名、执行窗口列表和观察窗口判断，不写入 `AGENTS.md`。这些 wave 级信息必须写在 `docs/workspace/index.md` 和当前总控文档的“可复制分派提示词 / 分派表”章节中。
-- 存在 `待启动` 窗口时，最终回复必须给出对应可复制提示词；没有可发送窗口时，必须明确说明无提示词需要发送。
-- 每次输出可复制提示词前，必须同时人工核对 `发送给` 名单与 producer / consumer 依赖链是否一致；`check-dispatch-coverage` 可以检查覆盖、状态和提示词是否包含 `AGENTS.md` / 定位硬规则，但不能替代总控对先后顺序的判断。
-- 每次输出可复制提示词前，必须检查提示词正文是否同时包含 `AGENTS.md` 和“定位”要求；缺任一项时不得发送，必须先修当前计划或提示词。
-- 提示词应短而可执行。当前总控文档已经写清的目标、边界、风险、禁止事项、验证和回填要求，不要在提示词里重复铺开。
-- 统一提示词只发给当前总控文档中有实际任务、且现在发送后能够推进工作的窗口。不要建议用户给纯观察窗口、等待上游的阻塞窗口或没有本轮动作的窗口发送提示词。
-- 统一提示词是默认路径，不是限制。如果某个窗口存在特殊边界、特殊风险、特殊前置顺序、需要强调不要误删 / 不要回退 / 不要触碰某目录，或当前总控文档中的通用提示词不足以覆盖该窗口任务，总控可以为该窗口单独提供特制提示词。
-- 如果当前总控文档已经把某个窗口的特殊边界、风险、禁止事项、验证和回填要求写清楚，最终回复不需要再输出特制提示词，直接给统一完整提示词即可，让窗口读取文档自行领取。
-- 只有当文档尚未覆盖临时风险，或用户需要立即额外强调某个窗口的特殊事项时，才输出特制提示词。特制提示词必须仍然引用当前总控文档，并明确只补充该窗口需要额外注意的范围、禁止事项、验证或回填要求；不要让用户自己把“通用提示词”和“补充提示词”拼接起来。
-- 最终回复用户时，必须把“发送窗口”和“观察 / 阻塞 / 无任务窗口”区分清楚。
+- 输出提示词前必须确认正文同时包含 `AGENTS.md` 和“定位”要求，并区分“发送窗口”和“观察 / 阻塞 / 无任务窗口”。
 
 ## 验收规则
 
@@ -211,6 +178,7 @@
 - 总控验收时可以读取执行窗口回填的测试证据、提交 hash、日志摘要和验证结果；如果证据不足，应补派 `AlembicTest` 或对应仓库窗口，而不是在总控窗口直接补测。
 - 总控只改文档、脚本或分派规则时，可运行 workspace 文档 / 边界 / 格式校验；这些治理校验不等同于产品测试。若需要产品构建、运行时、冷启动或真实项目验证，必须交给对应窗口。
 - 真实项目测试、冷启动监控和复现类脚本归独立 `AlembicTest` 仓库维护，不进入 AlembicWorkspace git 跟踪。
+- `AlembicTest` 自身的 probe、报告、脚本索引或临时测试资产可以保持未提交状态；只要测试回填证据足够、产品仓库和真实测试项目没有非预期改动，就不得把 `AlembicTest` 未提交测试资产当作总控验收阻塞。提交 hash 可以记录为 `无`。
 - 测试交流规则见 `docs/workspace/alembic-test-exchange-policy.md`；测试执行长期规则见 `AlembicTest/docs/testing-operation-policy.md`；默认测试参数见 `AlembicTest/config/defaults.json`。
 
 ## 跨仓库接入、删除与兼容清理
@@ -237,7 +205,8 @@
 
 ## 验证要求
 
-- 每次新建 / 激活目标阶段确认或 wave 执行计划后，必须运行 `node scripts/verify-workspace-docs.mjs --all-workspace`、`node scripts/check-workspace-current-layout.mjs`、`node scripts/check-dispatch-coverage.mjs` 和 `git diff --check`。
-- 如果当前计划使用 TODO 子模式来影响派发、并行调度或下一波顺序，还必须运行 `node scripts/check-todo-board.mjs --require`。
-- 如果当前计划使用任务包派发、或下一波分派需要把主线动作与 TODO 合并派发，还必须运行 `node scripts/check-task-packages.mjs --require`。
+- 每次新建 / 激活目标阶段确认或 wave 执行计划后，优先运行 `node scripts/verify-control-center.mjs`。
+- 如果当前计划使用 TODO 子模式来影响派发、并行调度或下一波顺序，运行 `node scripts/verify-control-center.mjs --require-todo`。
+- 如果当前计划使用任务包派发、或下一波分派需要把主线动作与 TODO 合并派发，运行 `node scripts/verify-control-center.mjs --require-task-packages`；两者都需要时合并为 `node scripts/verify-control-center.mjs --require-todo --require-task-packages`。
+- 如果修改 workspace 脚本、脚本 README 或脚本 skill 指南，还必须运行 `node scripts/verify-control-center.mjs --with-script-tests`。
 - 如果只改长期文档且当前计划未变化，也至少运行 workspace docs verification 和 `git diff --check`。

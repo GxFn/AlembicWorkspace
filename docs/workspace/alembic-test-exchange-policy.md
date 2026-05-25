@@ -54,6 +54,7 @@ docs/workspace/current/alembic-test-exchange.md
 - `AlembicTest` 是独立仓库，不进入 AlembicWorkspace git 跟踪。
 - `AlembicTest` 可以按测试单回填 workspace 测试交流文档，但不得提交 AlembicWorkspace 仓库。
 - 详细测试报告、脚本配置和测试资产应保存在 `AlembicTest` 仓库内；workspace 交流文档只保留总控需要验收和派发的摘要。
+- `AlembicTest` 自身新增或修改的 probe、报告、脚本索引和临时测试资产不要求每轮提交；只要回填证据足够、产品仓库和真实测试项目没有非预期改动，总控不得把 `AlembicTest` 未提交测试资产当作验收阻塞。提交 hash 可以记录为 `无`。
 
 ## 测试流程
 

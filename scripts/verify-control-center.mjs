@@ -7,6 +7,7 @@ const withRuntime = args.includes("--with-runtime");
 const strictRuntime = args.includes("--strict-runtime");
 const requireTodo = args.includes("--require-todo");
 const requireTaskPackages = args.includes("--require-task-packages");
+const withScriptTests = args.includes("--with-script-tests");
 
 const checks = [
   {
@@ -23,6 +24,16 @@ const checks = [
     label: "workspace docs",
     command: "node",
     args: ["scripts/verify-workspace-docs.mjs", "--all-workspace"],
+  },
+  {
+    label: "script docs",
+    command: "node",
+    args: ["scripts/check-script-docs.mjs"],
+  },
+  {
+    label: "current plan sync",
+    command: "node",
+    args: ["scripts/sync-current-plan.mjs", "--check"],
   },
   {
     label: "current layout",
@@ -59,6 +70,14 @@ if (withRuntime || strictRuntime) {
   });
 }
 
+if (withScriptTests) {
+  checks.push({
+    label: "workspace script tests",
+    command: "node",
+    args: ["--test", "scripts/check-script-docs.test.mjs", "scripts/sync-current-plan.test.mjs"],
+  });
+}
+
 function runCheck(check) {
   console.log(`\n## ${check.label}`);
   console.log(`$ ${[check.command, ...check.args].join(" ")}`);
@@ -87,6 +106,7 @@ console.log("AlembicWorkspace control-center verification");
 console.log(`Runtime residue check: ${withRuntime || strictRuntime ? (strictRuntime ? "strict" : "warning") : "skipped"}`);
 console.log(`Required TODO board: ${requireTodo ? "yes" : "no"}`);
 console.log(`Required task packages: ${requireTaskPackages ? "yes" : "no"}`);
+console.log(`Workspace script tests: ${withScriptTests ? "yes" : "no"}`);
 
 const results = checks.map(runCheck);
 const failed = results.filter((result) => !result.ok);

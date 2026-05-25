@@ -204,7 +204,14 @@ function rowIsProtectedCurrentEntry(line) {
   const cells = splitMarkdownRow(line);
   const type = cells[0] ?? "";
   const status = cells[2] ?? "";
-  return type.includes("当前状态") || type.includes("长期") || status.includes("长期") || status === "已生效";
+  return (
+    type.includes("当前计划") ||
+    type.includes("当前状态") ||
+    type.includes("当前短期工作区") ||
+    type.includes("长期") ||
+    status.includes("长期") ||
+    status === "已生效"
+  );
 }
 
 const month = getArgValue("--month") ?? "2026-05";

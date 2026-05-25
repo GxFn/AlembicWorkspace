@@ -30,9 +30,9 @@ Plugin 在某一个文件夹启动，我们的后台会确认这个文件夹本�
 
 ## 前置需求设计
 
-- 原始计划书：[../../requirement-designs/multi-root-project-scope/original-plan-2026-05-24.md](../../requirement-designs/multi-root-project-scope/original-plan-2026-05-24.md)
-- 需求设计文档：[../../requirement-designs/multi-root-project-scope/requirement-design-2026-05-24.md](../../requirement-designs/multi-root-project-scope/requirement-design-2026-05-24.md)
-- 代码实现依赖调研：[../../requirement-designs/multi-root-project-scope/code-implementation-dependency-research-2026-05-24.md](../../requirement-designs/multi-root-project-scope/code-implementation-dependency-research-2026-05-24.md)
+- 原始计划书：[../../requirement-designs/multi-root-project-scope/original-plan-2026-05-24.md](../../../../requirement-designs/multi-root-project-scope/original-plan-2026-05-24.md)
+- 需求设计文档：[../../requirement-designs/multi-root-project-scope/requirement-design-2026-05-24.md](../../../../requirement-designs/multi-root-project-scope/requirement-design-2026-05-24.md)
+- 代码实现依赖调研：[../../requirement-designs/multi-root-project-scope/code-implementation-dependency-research-2026-05-24.md](../../../../requirement-designs/multi-root-project-scope/code-implementation-dependency-research-2026-05-24.md)
 - 调研结论：现有代码从 Core registry 到 Alembic daemon、Plugin MCP、Dashboard API、Agent tools 都是单 `projectRoot`；必须先下沉 ProjectScope contract，再由 Alembic 生产，Plugin / Dashboard / Agent 消费。
 - 当前已有能力：Ghost dataRoot、ProjectRegistry v1、WorkspaceResolver、Alembic projects snapshot、resident service、Plugin prime/search、project skill runtime export、Dashboard project status、Agent 单 root tool context。
 - 主要缺口：Project / Folder 一对多数据模型、folder -> project resolution、controlRoot、Ghost-only ProjectScope storage、multi-folder cold-start / search / prime 归属、multi-target project skill export。
@@ -192,7 +192,7 @@ Plugin 在某一个文件夹启动，我们的后台会确认这个文件夹本�
 
 ### 确认后第一波
 
-- 启动文档：[multi-root-project-scope-wave-1-2026-05-24.md](multi-root-project-scope-wave-1-2026-05-24.md)
+- 启动文档：[multi-root-project-scope-wave-1-2026-05-24.md](../../../current/multi-root-project-scope-wave-1-2026-05-24.md)
 - 发送窗口：`AlembicCore`
 - 阻塞窗口：`Alembic`、`AlembicPlugin`、`AlembicDashboard`
 - 观察窗口：`AlembicAgent`、`AlembicTest`

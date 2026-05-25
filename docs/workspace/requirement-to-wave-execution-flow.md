@@ -5,10 +5,21 @@
 
 本文档固化从用户需求到第一波执行派发的成熟路线。它不是某一次任务计划，而是总控窗口后续处理较大需求时的默认流程。
 
+探索性需求讨论、方案取舍、bug / TODO / 调研 / 决策 signal 优先由 `AlembicDesign` 承接。正规需求路线是 `AlembicDesign` 完成需求设计、目标和完成定义，并把 TODO / Backlog 挂载建议登记到 `AlembicDesign/docs/current/workspace-handoff-board.md`；`AlembicWorkspace` 通过 `scripts/import-design-handoffs.mjs --write` 自动生成 [current/design-handoff-inbox.md](current/design-handoff-inbox.md)，再正式入全局 TODO、当前计划 TODO 或需求目录，并判断是否继续代码调研、创建测试单、进入目标阶段确认或启动 wave。随时的小交流 / `workspace-signal` 只在确实需要同步 bug、当前主线风险、用户决策、轻量 TODO 或调研发现时使用，不替代 handoff board 和正式 TODO 入账。
+
 ## 成熟路线
+
+0. Design signal / handoff 接收
+   - `AlembicDesign/docs/current/workspace-handoff-board.md` 是正规需求设计完成后的默认清单入口，状态为 `ready-for-workspace` 的条目必须带目标、完成定义、阶段候选和 TODO / Backlog 挂载建议。
+   - `AlembicWorkspace` 运行 `node scripts/import-design-handoffs.mjs --write` 自动校验清单并刷新 `docs/workspace/current/design-handoff-inbox.md`。
+   - `AlembicDesign/docs/current/*-workspace-handoff-YYYY-MM-DD.md` 可用于较完整方案交接，但不是每个需求的硬要求；如果需求设计已包含足够交接信息，handoff board 可以直接引用原始计划和需求设计。
+   - `AlembicDesign/docs/current/*-workspace-signal-YYYY-MM-DD.md` 只用于必要的小交流：bug、TODO、research、decision、current-mainline-risk 或临时 requirement-candidate；不要把每个正规需求进展都拆成 signal。
+   - 总控接收后先判断是否影响当前主线；不影响则正式进入全局 TODO、当前计划 TODO、需求目录或等待当前主线后评估，影响则按阻塞 / 返修 / 待确认处理。
+   - Signal / handoff 不是执行计划，不能直接派发实现窗口。
 
 1. 原始需求进入需求目录
    - 在 `docs/requirement-designs/<需求名>/` 新建 `original-plan-YYYY-MM-DD.md`。
+   - 若来源是 `AlembicDesign` handoff，可由总控复制 / 转写 Design 已确认内容，并保留来源链接。
    - 只记录用户目标、约束、口径和确认问题，不提前拆执行任务。
    - 用户确认前，发送给必须是无。
 
@@ -18,6 +29,7 @@
 
 3. 需求设计
    - 创建 `requirement-design-YYYY-MM-DD.md`。
+   - 若 Design 已有需求设计草案，总控只做接收审查、缺口补齐和 workspace 落点转换；不要在总控重复整段需求讨论。
    - 写清用户场景、完整功能闭环、输入输出、状态变化、生产方、消费方、验证方式和完成定义。
    - 这里可以写阶段候选方向，但不能作为执行派发依据。
    - 如果用户在需求讨论中新增 TODO、风险、设计候选、验证点或优先级调整，先写入需求设计文档的 `TODO / Backlog`；它只是设计输入，不得绕过代码调研和目标阶段确认。

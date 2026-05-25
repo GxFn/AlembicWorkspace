@@ -7,18 +7,21 @@
 
 用户可以在任何阶段要求新增、调整、取消或重排 TODO。总控必须把最新 TODO 落到当前正确文档位置，并用它影响下一轮需求设计、目标阶段确认、执行计划或窗口派发；不得只在最终回复里口头记录。
 
+`AlembicDesign` 可以把讨论中识别出的 bug、TODO、research、decision 或 current-mainline-risk 写成 `workspace-signal` 交回总控。Signal 本身不是正式 TODO；只有总控接收并写入 `global-todo-board`、当前 wave `TODO / Backlog`、测试交流或需求目录后，才进入 workspace 正式账本。
+
 ## 触发条件
 
 只要出现以下任一情况，当前 workspace 总控文档必须新增或更新 TODO：
 
 - 用户在需求讨论中提出待补充点、偏好、风险、验证点、设计候选或后续优化项。
+- `AlembicDesign` 交回 workspace signal，且总控判断需要入账。
 - 用户明确要求调整 TODO 列表、重排优先级、把某项转入下一轮或暂缓。
 - 用户明确反馈一组问题、多个优化点或希望后续统一修复。
 - 真实项目验证暴露多个问题，且其中一部分阻塞主线、一部分可并行。
 - 总控验收发现下游还不能继续，需要先修复上游，同时仍有其它窗口可做独立补齐。
 - 当前 wave 之外出现新的问题，但不应打断已经执行中的窗口。
 
-如果 TODO 仍处于需求设计或代码调研阶段，写入对应 `docs/requirement-designs/<需求名>/requirement-design-YYYY-MM-DD.md`。如果 TODO 已经影响目标阶段确认、wave 派发或下一波执行顺序，写入当前 `docs/workspace/current/` 总控文档，并同步维护 `空闲窗口调度`。
+如果 TODO 仍处于 `AlembicDesign` 讨论阶段，先保留在 Design signal / 设计草案中。总控接收后，若仍处于需求设计或代码调研阶段，写入对应 `docs/requirement-designs/<需求名>/requirement-design-YYYY-MM-DD.md`。如果 TODO 已经影响目标阶段确认、wave 派发或下一波执行顺序，写入当前 `docs/workspace/current/` 总控文档，并同步维护 `空闲窗口调度`。
 
 ## 主线进行时的新需求承接
 

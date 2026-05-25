@@ -21,6 +21,15 @@ Skill assets kept here must:
 - stay focused on workflow guidance, verification, or coordination rather than
   duplicating child repository runtime implementation.
 
+Current drafts:
+
+- `dev/alembic-workspace-control/`: trial extraction for bulky
+  AlembicWorkspace control-center details. It currently holds TODO / Backlog,
+  window dispatch, and workspace script pipeline references that used to live
+  inline in `AGENTS.md` or ad hoc conversation memory. `AGENTS.md` remains the
+  hard boundary source and points to this skill only when those detailed
+  workflows are needed.
+
 Development workflow:
 
 1. Keep active skill work in `skills/dev/<skill-name>/`.

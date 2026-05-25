@@ -2,7 +2,7 @@
 
 状态：长期记录清单
 维护窗口：AlembicWorkspace
-更新日期：2026-05-24
+更新日期：2026-05-25
 
 本文是 AlembicWorkspace 的长期记录地图。当前开发区只保留当前状态、长期规则、长期契约、当前测试交流面和活跃 TODO；所有短期计划、历史测试交流、已完成 TODO、阶段验收和执行证据都从这里进入归档区。
 
@@ -70,11 +70,17 @@
 | `GTODO-2026-05-24-033` 来源 | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | LOTB-P2 发现 daemon restart 后旧 job events API 返回 0 条；后续需要归口 process events recovery / persistence。 |
 | `GTODO-2026-05-24-034` 来源 | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | LOTB-P2 发现 running job status/progress 长时间停在 `filling/0%`；后续需要对齐 session progress、job summary 和 Dashboard active card。 |
 | `GTODO-2026-05-24-035` 来源 | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | LOTB-P2 未自然触发 provider `finishReason=length`；后续需要 provider length 可控 fixture 或专用 test job。 |
+| `GTODO-2026-05-24-036` 已完成待归档 | [multi-root-project-scope-wave-5](archive/2026-05/multi-root-project-scope/multi-root-project-scope-wave-5-2026-05-25.md) | Multi-root ProjectScope 当前硬门禁完成：P7 证明 `Alembic` / `AlembicCore` / `AlembicAgent` / `AlembicPlugin` / `AlembicDashboard` 五个 source folder 同属 `project-scope-a8083fdb335c`，Plugin `health` / `prime` / `search(auto/semantic)` 均成功并带 telemetry，Dashboard 显示 `5 个源文件夹`，source folders 无 runtime 写入；后续归档时移入归档 topic。 |
+| `GTODO-2026-05-25-002` 来源 | [llm-input-optimization-wave-3](archive/2026-05/llm-input-optimization/llm-input-optimization-wave-3-2026-05-25.md) | Test-06 发现 `AlembicAgent/dist` 未刷新；source test-mode 通过但 package/runtime/cold-start 验证前必须刷新并验证 dist。 |
 
 ## Test Records
 
 | 记录 | 归档入口 | 说明 |
 | --- | --- | --- |
+| `Test-2026-05-25-07` | [LLM input Observation Ledger test mode report](../../AlembicTest/docs/llm-input-observation-ledger-test-mode-2026-05-25.md) | Alembic internal Agent LLM 输入 Observation Ledger 最小 test-mode 复测通过：retained `llm.input` 与 provider message 均包含 `## Observation Ledger`，五类 category 均出现，raw debug 字段不进入 provider-facing ledger，scratchpad priority 与 Wave 1/2 regression 均闭合；遗留 `AlembicAgent/dist` 未刷新继续保留为 `GTODO-2026-05-25-002`。 |
+| `Test-2026-05-25-06` | [LLM input layering test mode report](../../AlembicTest/docs/llm-input-layering-test-mode-2026-05-25.md) | Alembic internal Agent LLM 输入 layering 最小 test-mode 复测通过：retained `llm.input` section metadata、provider runtime layer、Record / Produce profile 和 Wave 1 regression 均闭合；遗留 `AlembicAgent/dist` 未刷新转 `GTODO-2026-05-25-002`。 |
+| `Test-2026-05-25-05` | [LLM input Agent correctness test mode report](../../AlembicTest/docs/llm-input-agent-correctness-test-mode-2026-05-25.md) | Alembic internal Agent LLM 输入 correctness 最小 test-mode 复测通过：retained `llm.input` / `llm.output`、无 `[object Promise]`、真实 `code.read({ filePaths })` batch partial failure、SCAN planning / `toolChoice=none` 一致性闭合。 |
+| `Test-2026-05-25-04` | [multi-root ProjectScope P7 report](../../AlembicTest/docs/multi-root-project-scope-agent-folder-coverage-2026-05-25.md) | AlembicWorkspace 多文件夹 ProjectScope 五 source folder 补测通过：`AlembicAgent` 加入同一 ProjectScope，五文件夹 Plugin resident-backed tools、Dashboard folder count 和 source folder no-write 闭合。 |
 | `Test-2026-05-24-08` | [LLM output completeness test mode report](../../AlembicTest/docs/llm-output-completeness-test-mode-2026-05-24.md) | BiliDili 真实项目 test-mode 复测 Jobs Timeline `llm.output` 输出完整性：短 visible output、tool-call-only、hidden reasoning omission、Alembic bridge truncation 和 Dashboard DOM 展示通过；provider length 自然触发、process events recovery、job progress 转后续 TODO。 |
 | `Test-2026-05-24-05` | [project skill runtime delivery test mode report](../../AlembicTest/docs/project-skill-runtime-delivery-test-mode-2026-05-24.md) | BiliDili 真实项目 test-mode 复测 project skill runtime delivery：`ALEMBIC_TEST_MODE=1` 单维度 `architecture`，Alembic route 产出 `ProjectSkillDeliveryReceipt`，Plugin route 完成 `alembic_project_skill` create/export/load/conflict/no-global-write，BiliDili 最终 git clean。 |
 | `Test-2026-05-24-03` | [live socket append rich content report](../../AlembicTest/docs/live-socket-append-rich-content-retest-2026-05-24.md) | BiliDili 真实项目最小复测 Dashboard live socket append rich content：新 Dashboard 未触发 React #31，同一打开页面无需刷新追加到 38 events，`tool=3`、`llm.output=3`、`llm.reflection=4` 且 rich text 可见；批量延迟转后续观察。 |
@@ -93,6 +99,8 @@
 ## Archive Topics
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/llm-input-optimization` | [llm-input-optimization](archive/2026-05/llm-input-optimization/) | 已归档 8 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/multi-root-project-scope` | [multi-root-project-scope](archive/2026-05/multi-root-project-scope/) | 已归档 6 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/llm-output-truncation-bug` | [llm-output-truncation-bug](archive/2026-05/llm-output-truncation-bug/) | Jobs Timeline `llm.output` 短内容像被截断的完整性标识与展示问题。 |
 | `2026-05/scan-progress-live-output` | [scan-progress-live-output](archive/2026-05/scan-progress-live-output/) | 已压缩 20 条历史索引行到 topic manifest；当前索引只保留目录入口。 |
 | `2026-05/cold-start-skill-delivery` | [cold-start-skill-delivery](archive/2026-05/cold-start-skill-delivery/) | 已压缩 4 条历史索引行到 topic manifest；当前索引只保留目录入口。 |

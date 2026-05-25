@@ -7,11 +7,15 @@
 
 需求设计文档必须把需求落成完整功能模块。不要把当前已有能力当成目标上限，也不要只设计抽象接口、空 adapter、空 provider、无调用方 glue code 或只连线不形成用户可用能力的阶段。需求不明确时，把问题写入“待确认问题”，不要进入派发。
 
+需求设计完成后若进入 workspace 当前计划或 wave，后续文档必须使用 `templates/workspace-control-plan-template.md` 并遵守 `scripts/README.md` 的脚本可读格式说明；需求设计本文不直接承载窗口派发。
+
 ## 原始计划书
 
 - 原始计划书：
 - 原始计划书确认状态：
 - 用户确认时间：
+- AlembicDesign 来源 signal / handoff（如有）：
+- Design 接收状态：无 / 已接收 / 需补证 / 待用户确认
 
 ## 用户需求
 

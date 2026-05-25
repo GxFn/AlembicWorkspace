@@ -1,23 +1,25 @@
 # Workspace Current Docs
 
 状态：短期工作区入口
-更新日期：2026-05-24
+更新日期：2026-05-25
 
 ## 定位
 
-本目录只保存当前工作面和短期协作文档。任务完成后，历史正文进入 `docs/workspace/archive/`，长期结论进入 `docs/workspace/` 根层级的规则、契约、路线图或记录地图。
+本目录只保存当前工作面和短期协作文档。人读主入口是当前总控计划；其它文件是 TODO、Design handoff、测试交流或脚本同步面。
+
+已完成的历史 wave、调研和旧目标确认不继续堆在当前区，统一从 [workspace record map](../workspace-record-map.md) 或 [archive](../archive/) 追溯。
 
 ## 当前地图
 
 | 类型 | 文档 | 说明 |
 | --- | --- | --- |
-| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 当前窗口状态、发送名单和活跃观察项。 |
-| 当前需求原始计划 | [../../requirement-designs/multi-root-project-scope/original-plan-2026-05-24.md](../../requirement-designs/multi-root-project-scope/original-plan-2026-05-24.md) | Project / Folder 一对多模型原始计划书已确认。 |
-| 当前代码调研 | [../../requirement-designs/multi-root-project-scope/code-implementation-dependency-research-2026-05-24.md](../../requirement-designs/multi-root-project-scope/code-implementation-dependency-research-2026-05-24.md) | 基于真实代码确认单 `projectRoot` 假设和实现依赖链。 |
-| 当前需求设计 | [../../requirement-designs/multi-root-project-scope/requirement-design-2026-05-24.md](../../requirement-designs/multi-root-project-scope/requirement-design-2026-05-24.md) | ProjectScope 数据模型、职责边界、阶段候选和完成定义。 |
-| 目标阶段确认 | [multi-root-project-scope-goal-stage-confirmation-2026-05-24.md](multi-root-project-scope-goal-stage-confirmation-2026-05-24.md) | 已确认最终目标、阶段顺序和第一波候选。 |
-| 当前 Wave | [multi-root-project-scope-wave-1-2026-05-24.md](multi-root-project-scope-wave-1-2026-05-24.md) | 第一波只发送给 `AlembicCore`，生产 ProjectScope / Ghost-only storage contract。 |
-| 全局 TODO | [global-todo-board.md](global-todo-board.md) | 活跃 / 观察 TODO；已完成项从长期记录地图查询。 |
-| 测试交流 | [alembic-test-exchange.md](alembic-test-exchange.md) | 当前无可执行测试单；历史测试记录从长期记录地图查询。 |
+| 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 短状态快照、发送名单和当前账本入口。 |
+| 当前并行分派 | [artifact-drawer-parallel-dispatch-2026-05-25.md](artifact-drawer-parallel-dispatch-2026-05-25.md) | LLM Wave 6 已验收，Artifact Drawer 已由 `AlembicDashboard` 回填并通过总控验收，当前无可发送窗口。 |
+| Artifact Drawer Dashboard 回填 | [../../AlembicDashboard/timeline-artifact-drawer-optimization-dashboard-2026-05-25.md](../../AlembicDashboard/timeline-artifact-drawer-optimization-dashboard-2026-05-25.md) | `ARTIFACT-DRAWER-P1-DASHBOARD-DRAWER-STACK` 回填与总控验收结论。 |
+| Design Handoff Inbox | [design-handoff-inbox.md](design-handoff-inbox.md) | 脚本从 AlembicDesign handoff board 导入的接收候选；总控再决定是否入账。 |
+| 全局 TODO | [global-todo-board.md](global-todo-board.md) | 活跃 / 观察 TODO；已完成项从长期记录地图或归档查询。 |
+| 测试交流 | [alembic-test-exchange.md](alembic-test-exchange.md) | 当前 AlembicTest 任务和回填证据入口。 |
+| LLM 输入优化归档 | [../archive/2026-05/llm-input-optimization/](../archive/2026-05/llm-input-optimization/) | 已完成调研与 Wave 1-6 历史正文。 |
+| Multi-root ProjectScope 归档 | [../archive/2026-05/multi-root-project-scope/](../archive/2026-05/multi-root-project-scope/) | 已完成目标确认与 Wave 1-5 历史正文。 |
 
 长期入口：[workspace index](../index.md)；历史入口：[workspace record map](../workspace-record-map.md)。

@@ -11,6 +11,48 @@ Scripts in this directory should:
   explicitly assigns that work;
 - report clear pass/fail evidence that can be pasted into workspace docs.
 
+Human-facing document policy:
+
+- Users should normally read only the goal / stage confirmation document and
+  the current workspace control plan with its window task packages.
+- Repeated status surfaces, generated inboxes, format anchors, archive maps,
+  and script verification notes should stay script-owned and short.
+
+Script-readable document format:
+
+- New current plans should start from
+  `templates/workspace-control-plan-template.md` so `workspace-sync`, dispatch,
+  TODO, task-package, prompt, test handoff, and backfill anchors are present
+  before scripts run.
+- Current plans that drive `sync-current-plan.mjs` may include:
+
+```md
+<!-- workspace-sync
+{
+  "status": "<current status>",
+  "indexPlanDescription": "<index current-plan row summary>",
+  "indexStatusDescription": "<index current-status row summary>",
+  "currentIndexType": "当前计划",
+  "currentIndexDescription": "<current index summary>",
+  "indexRows": [],
+  "currentIndexRows": []
+}
+-->
+```
+
+- `workspace-sync` is mechanical metadata only. It must not decide readiness,
+  TODO priority, Design acceptance, window acceptance, or product scope.
+- Keep these section names stable when scripts need to read or sync them:
+  `目标判断`, `任务包`, `TODO / Backlog`, `空闲窗口调度`, `窗口分派`,
+  `可复制分派提示词` / `可复制提示词`, `测试交接`, and `回填区`.
+- Window dispatch tables should keep the narrow form:
+  `| 窗口 / 状态 | 任务 |`.
+- TODO / idle scheduling tables should keep explicit ID, status, owner,
+  effect on dispatch / retest, send decision, and next-step fields.
+- Design handoff inboxes, test exchange docs, current indexes, archive maps,
+  and compact summaries are script or evidence surfaces; keep them concise and
+  link back to the human-facing current plan instead of duplicating it.
+
 Current scripts:
 
 - `collect-repo-status.mjs`: summarizes branch, HEAD, dirty state,
@@ -40,13 +82,32 @@ Current scripts:
 - `check-runtime-residue.mjs`: read-only check for Alembic daemon, Dashboard
   dev server, and Codex MCP process residue. It does not start, stop, or kill
   anything; use `--strict` only when a clean runtime surface is required.
+- `check-script-docs.mjs`: verifies that every workspace `scripts/*.mjs` file
+  is represented in this README, that test scripts appear in the workspace
+  script-test instructions, and that `verify-control-center.mjs` with
+  `--with-script-tests` runs all `*.test.mjs` files. Use `--root <workspace>`
+  for fixture / CI execution and `--json` for machine output.
 - `verify-control-center.mjs`: one-command control-center verification that
-  runs boundary, repo status, workspace docs, dispatch coverage, and
-  `git diff --check`. Add `--require-todo` when TODO scheduling must be
-  present, `--require-task-packages` when package-based dispatch must be
-  present, `--with-runtime` for a read-only runtime residue report, or
+  runs boundary, repo status, workspace docs, script docs, current-plan sync
+  check, dispatch coverage, and `git diff --check`. Add `--require-todo` when
+  TODO scheduling must be present, `--require-task-packages` when package-based
+  dispatch must be present, `--with-runtime` for a read-only runtime residue report,
   `--strict-runtime` to fail when Alembic daemon / Dashboard dev residue is
-  present.
+  present, or `--with-script-tests` to run workspace script unit tests.
+- `sync-current-plan.mjs`: dry-run by default; reads the current plan, plus an
+  optional `<!-- workspace-sync { ... } -->` JSON block, and synchronizes the
+  mechanical current-control surfaces: the first current-plan/current-status
+  rows in `docs/workspace/index.md`, the active plan row in
+  `docs/workspace/current/index.md`, and the status / window-dispatch /
+  copyable-prompt sections in `docs/workspace/current/workspace-current-status.md`.
+  It also supports controlled `indexRows` and `currentIndexRows` in the
+  sync block for extra rows that the total-control plan has already decided.
+  Use `--write` to apply, `--check` to fail when generated surfaces are stale,
+  `--root <workspace>` for fixture / CI execution, and `--json` for machine
+  output. Writes are restricted to workspace docs, use atomic file replacement,
+  and validate workspace-relative row targets. This script does not create
+  TODOs, alter Design handoff status, decide window readiness, accept window
+  backfills, or edit product repositories.
 - `archive-workspace-docs.mjs`: dry-run by default; moves completed workspace
   control documents into `docs/workspace/archive/YYYY-MM/<topic>/`, rewrites
   relative links inside moved documents, rewrites index links, removes archived
@@ -69,6 +130,20 @@ Current scripts:
   every `docs/workspace/archive/YYYY-MM/<topic>/` folder, preserving historical
   body files as evidence snapshots while giving each archive folder a readable
   map.
+- `import-design-handoffs.mjs`: reads
+  `AlembicDesign/docs/current/workspace-handoff-board.md`, validates ready
+  handoff rows, and with `--write` refreshes
+  `docs/workspace/current/design-handoff-inbox.md`. It does not update global
+  TODOs, current plans, or dispatch windows; the control window still decides
+  whether and when to accept each Design handoff. Use `--id <Design Key>` to
+  focus validation on one Design entry and verify its linked docs expose the
+  same `Design Key` metadata.
+- `run-workspace-pipeline-e2e.mjs`: creates a temporary fixture workspace and
+  runs the complete governance-script chain from Design handoff intake through
+  current-plan sync, dispatch / TODO / task-package verification, simulated
+  test completion, archive apply, TODO archive, archive summary generation, and
+  post-archive verification. It never writes product repositories. Use `--keep`
+  to retain the fixture on success and `--json` for machine output.
 
 Suggested pre-acceptance sequence:
 
@@ -80,6 +155,22 @@ Dispatch plan with TODO and task packages:
 
 ```bash
 node scripts/verify-control-center.mjs --require-todo --require-task-packages
+```
+
+Sync current plan metadata into repeated entry documents:
+
+```bash
+node scripts/sync-current-plan.mjs --check
+node scripts/sync-current-plan.mjs --write
+node scripts/verify-control-center.mjs --require-todo --require-task-packages
+```
+
+Workspace script tests:
+
+```bash
+node scripts/check-script-docs.mjs
+node --test scripts/check-script-docs.test.mjs scripts/sync-current-plan.test.mjs
+node scripts/verify-control-center.mjs --with-script-tests
 ```
 
 TODO scheduling plan check:
@@ -99,6 +190,20 @@ Runtime residue check:
 ```bash
 node scripts/check-runtime-residue.mjs
 node scripts/verify-control-center.mjs --with-runtime
+```
+
+Design handoff inbox refresh:
+
+```bash
+node scripts/import-design-handoffs.mjs --write
+node scripts/import-design-handoffs.mjs --id ARTIFACT-DRAWER-2026-05-25 --json
+```
+
+Full governance pipeline fixture:
+
+```bash
+node scripts/run-workspace-pipeline-e2e.mjs
+node scripts/run-workspace-pipeline-e2e.mjs --keep --json
 ```
 
 Archive dry-run example:

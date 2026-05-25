@@ -25,10 +25,12 @@
 | [global-todo](global-todo/) | 已完成全局 TODO 和旧同步记录。 |
 | [init-convergence-contract](init-convergence-contract/) | init convergence contract 历史计划。 |
 | [interface-boundary](interface-boundary/) | 接口边界优化与消费层收敛历史计划。 |
+| [llm-input-optimization](llm-input-optimization/) | 历史归档主题。 |
 | [llm-output-truncation-bug](llm-output-truncation-bug/) | Jobs Timeline `llm.output` 短内容像被截断的完整性标识与展示问题。 |
 | [local-source-import-unification](local-source-import-unification/) | 本地源码引入统一历史计划。 |
 | [module-boundary-foundation](module-boundary-foundation/) | module boundary foundation 历史计划。 |
 | [multi-project-control](multi-project-control/) | multi-project control redesign 历史计划。 |
+| [multi-root-project-scope](multi-root-project-scope/) | 已归档 6 个 workspace 文档；当前索引只保留目录入口。 |
 | [note-finding-closure-standard](note-finding-closure-standard/) | `note_finding` 判定标准历史形成记录。 |
 | [plugin-external-ai-remnants-removal](plugin-external-ai-remnants-removal/) | Plugin 旧外部 AI 能力残留删除计划。 |
 | [plugin-first-enhancement](plugin-first-enhancement/) | Plugin first enhancement 和 runtime boundary 历史计划。 |
