@@ -28,10 +28,10 @@
 
 - 来源类型：用户直接需求 / VAD 主线调整。
 - 来源文档：
-  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
-  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
+  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](../../../current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
 - 用户确认状态：用户确认使用分钟级 heartbeat 跳转，线程 ID 由各窗口单独收集并只保存在本地 ignored runtime，关闭模式后断开后续自动化。
 - 总控接收结论：在 workspace 脚本中补强 unattended target prompt 与 disable-after-arm 断链测试；创建线程登记分派任务。
 - 是否需要目标阶段确认：不新增；属于已确认 VAD 路线内的实现收敛。
@@ -249,7 +249,7 @@ node scripts/visible-dispatch.mjs register --window <你的窗口名> --thread <
   - 不能推出的结论：不能证明所有真实窗口已可无人值守跳转。
   - 停止或不开始条件：若需要真实 thread 投递、Dashboard 手动观察、cold-start 或真实项目证据，后续另开 smoke / 测试任务。
 - 测试单：无。
-- 测试交流入口：[alembic-test-exchange.md](alembic-test-exchange.md)
+- 测试交流入口：[alembic-test-exchange.md](../../../current/alembic-test-exchange.md)
 - 真实项目保护说明：不涉及真实项目；`AlembicTest` 不运行真实项目测试，只本地登记窗口 thread id。
 
 ## 回填区

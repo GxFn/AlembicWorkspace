@@ -28,10 +28,10 @@
 
 - 来源类型：用户直接需求 / VAD 主线调整。
 - 来源文档：
-  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
-  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
+  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](../../../current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
 - 用户确认状态：用户确认将自动化作为一种模式，开启后自动推进，关闭后停止自动推进。
 - 总控接收结论：在 workspace 脚本内实现模式门禁和窗口 finish-chain 工具 payload。
 - 是否需要目标阶段确认：不新增；属于已确认 VAD 路线内的实现调整。
@@ -241,7 +241,7 @@ node scripts/verify-control-center.mjs --require-todo --require-task-packages --
   - 不能推出的结论：不能证明真实多窗口可见唤醒已成功。
   - 停止或不开始条件：若需要真实 thread 投递、Dashboard 手动观察、cold-start 或真实项目证据，另开专项。
 - 测试单：无。
-- 测试交流入口：[alembic-test-exchange.md](alembic-test-exchange.md)
+- 测试交流入口：[alembic-test-exchange.md](../../../current/alembic-test-exchange.md)
 - 真实项目保护说明：不涉及真实项目。
 
 ## 回填区

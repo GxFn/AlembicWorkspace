@@ -15,13 +15,11 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [current/visible-automation-dispatch-unattended-controller-wave-0-2026-05-26.md](current/visible-automation-dispatch-unattended-controller-wave-0-2026-05-26.md) | VAD unattended controller Wave 0 已验证完成 | Visible Automation Dispatch unattended controller Wave 0：增强 VAD 作为总控原流程中的自动化投递 / 回跳层，支持 dispatch group、最后窗口回总控和 automation-goal 总控自我决策。 |
-| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | VAD unattended controller Wave 0 已验证完成 | VAD unattended controller Wave 0 已验证完成：dispatch group、批量 arm、最后窗口 controller-return 和 automation-goal controller skill 已通过总控验证；下一步回到 037 Wave 0 验收。 |
+| 当前计划 | [current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md) | GTODO-2026-05-24-037 已确认为下一主线，Stage 1 代码调研待启动 | GTODO-2026-05-24-037 / Plugin intent knowledge route：VAD 已归档，037 已提升为下一主线；当前先做 Stage 1 代码事实调研与执行计划准备，不派发窗口。 |
+| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | GTODO-2026-05-24-037 已确认为下一主线，Stage 1 代码调研待启动 | VAD 已归档；后续 VAD 问题按 bug / optimization 入 TODO。037 已确认为下一主线，Stage 1 待总控补代码调研与执行计划。 |
 | GTODO 037 Intent Recognition Design | [../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md](../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md) | 已接收 | 037 第一阶段需求设计：prime 快速路径结构化意图、hostTurnMeta、IntentEpisode 连续性和本地 refinement 边界。 |
 | GTODO 037 Intent Knowledge Design | [../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md](../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md) | 已接收 | 037 第二阶段需求设计：IntentSearchPlan、keyword / vector / relation 增强和保留 source refs 的 PrimeInjectionPackage。 |
-| Visible Automation Dispatch 目标阶段确认 | [current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md) | 已确认 | 用户已确认 VAD 第一版边界、自动化模式开关和阶段路线。 |
 | PCVM Alembic nested evidence consumer extraction 回填 | [../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md](../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md) | 总控验收通过 | `Alembic` 提交 ae9531ac3315a4491e22e3df156cb05e13fc0879，修复 nested `metadata.pcvNodeEvidence.nodeId/chainNodeId/sourceRefs` 消费并补 nested-only unit。 |
-| VAD Test-12 | [current/alembic-test-exchange.md](current/alembic-test-exchange.md) | 总控验收通过，结论阻塞 | `AlembicTest` 已执行 single-window visible heartbeat 验证；真实 heartbeat 未触发 claim / complete，测试 heartbeat 已删除并已 record-stop。 |
 | PCVM AlembicAgent N9 evidence producer 回填 | [../AlembicAgent/progressive-chain-validation-n9-observability-linkage-2026-05-25.md](../AlembicAgent/progressive-chain-validation-n9-observability-linkage-2026-05-25.md) | 已完成 | `AlembicAgent` 提交 7ab94575ed9b475dc57253c88738e1f061a3c547，新增 N9 node-local evidence producer、process event compact metadata、quality gate artifact linkage 和 targeted tests。 |
 | PCVM Alembic N9 observability carry 回填 | [../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md](../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md) | 已完成 | `Alembic` 提交 647a42fc9e499fc9bbbd166e1b9db2a9c96f99f9，新增 N9 job process event observability carry、missing-link metadata 和 daemon unit 覆盖。 |
 | PCVM Alembic workflow cleanup | [../Alembic/progressive-chain-validation-workflow-cleanup-2026-05-25.md](../Alembic/progressive-chain-validation-workflow-cleanup-2026-05-25.md) | 总控验收通过 | `Alembic` 提交 92bd976162fb9c1dbc19da1f8afef8756c976c27，清理 `.github/workflows/ci.yml` 与 `.github/workflows/release.yml` 中旧 `Alembic/skills/progressive-chain-validation` path ref。 |
@@ -64,7 +62,7 @@
 | Workspace 脚本索引 | [../../scripts/README.md](../../scripts/README.md) | 长期工具入口 | 记录 workspace 总控脚本和脚本可读文档格式；这些内容默认由脚本 / agent 使用，不作为用户日常主文档。 |
 | Workspace Skill 资产索引 | [../../skills/README.md](../../skills/README.md) | 试验中 | 当前试验 `dev/alembic-workspace-control/`，把 `AGENTS.md` 中 TODO / Backlog、窗口分派、测试验证和脚本流水线细则抽成 skill references。 |
 | 全局 TODO 列表 | [current/global-todo-board.md](current/global-todo-board.md) | 维护中 | 记录跨计划、跨窗口、暂未进入当前波次或需要长期追踪的待办；无当前计划时只作为观察账本。 |
-| 当前测试交流 | [current/alembic-test-exchange.md](current/alembic-test-exchange.md) | VAD Test-12 总控验收通过，结论已收窄 | `AlembicTest` 已执行 single-window visible heartbeat 验证；Wave 5 已裁决该结果只作为目标 heartbeat 后续专项输入，不再阻塞总控自驱 controller baseline。 |
+| 当前测试交流 | [current/alembic-test-exchange.md](current/alembic-test-exchange.md) | 维护中 | 当前无发送给 `AlembicTest` 的测试单；历史 VAD Test-12 证据保留在测试交流和 VAD 归档中。 |
 | AlembicTest 测试交流规则 | [alembic-test-exchange-policy.md](alembic-test-exchange-policy.md) | 长期规则 | 规定总控默认自测，只有真实项目 / cold-start / Dashboard 手动观察 / 运行时监控 / 真实复现回归 / 跨仓库环境证据才派发 `AlembicTest`，并要求总控独立验收回填。 |
 | AlembicTest 测试执行规则 | [../../AlembicTest/docs/testing-operation-policy.md](../../AlembicTest/docs/testing-operation-policy.md) | 长期规则 | 规定真实项目测试、冷启动监控、复现和报告由 `AlembicTest` 承接；不替代总控可自行完成的脚本 / 文档 / probe / 轻量验证。 |
 | AlembicTest 测试单模板 | [../../templates/alembic-test-handoff-template.md](../../templates/alembic-test-handoff-template.md) | 长期模板 | 用于生成真实场景 `AlembicTest` 测试单，必须写清总控不能自测的理由。 |
@@ -84,13 +82,13 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>无任务 | 037 Wave 0 已完成回填，等待总控后续验收，不发送新任务。 |
-| `Alembic`<br>无任务 | 037 Wave 0 已完成回填，等待总控后续验收，不发送新任务。 |
-| `AlembicCore`<br>无任务 | 037 Wave 0 已完成回填，等待总控后续验收，不发送新任务。 |
-| `AlembicAgent`<br>无任务 | 本轮不涉及。 |
-| `AlembicDashboard`<br>无任务 | 本轮不涉及。 |
-| `AlembicTest`<br>无任务 | 本轮不涉及真实测试。 |
-| `BiliDili`<br>无任务 | 不改真实项目源码。 |
+| `Alembic`<br>观察中 | 等 037 Stage 1 代码调研后再判断是否派发。 |
+| `AlembicCore`<br>观察中 | 等真实 contract 下沉需求出现后再判断。 |
+| `AlembicAgent`<br>无任务 | 当前不涉及。 |
+| `AlembicDashboard`<br>观察中 | 当前不做 UI。 |
+| `AlembicPlugin`<br>观察中 | 等 Stage 1 代码调研后再判断是否派发。 |
+| `AlembicTest`<br>无任务 | 当前不涉及真实项目验证。 |
+| `BiliDili`<br>无任务 | 不触碰真实项目。 |
 
 ## 状态枚举
 

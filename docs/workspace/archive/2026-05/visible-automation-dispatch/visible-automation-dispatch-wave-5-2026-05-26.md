@@ -28,10 +28,10 @@
 
 - 来源类型：用户直接需求 / 已确认 VAD 主线续波。
 - 来源文档：
-  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
-  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
+  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](../../../current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
 - 用户确认状态：已确认分钟级延迟、Alembic 系列窗口、不依赖 Lark Remote、普通 Codex 输入关闭；用户确认总控可进入追求目标 / 长期运行模式，并可通过普通 Codex 输入关闭。
 - 总控接收结论：Wave 5 改为总控自驱 controller baseline；目标 heartbeat 投递模型降级为后续能力，不作为本轮阻塞。
 - 是否需要目标阶段确认：已完成；本轮不新增确认门禁。
@@ -196,7 +196,7 @@ node scripts/visible-dispatch.mjs controller-tick --json
   - 不能推出的结论：不能证明多窗口可见唤醒已完成，不能证明 target-thread heartbeat 已可用。
   - 停止或不开始条件：若需求变为真实窗口唤醒或真实项目验证，必须另开对应 wave / 测试单。
 - 测试单：无。
-- 测试交流入口：[alembic-test-exchange.md](alembic-test-exchange.md)
+- 测试交流入口：[alembic-test-exchange.md](../../../current/alembic-test-exchange.md)
 - 真实项目保护说明：不涉及真实项目。
 
 ## 回填区

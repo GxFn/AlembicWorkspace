@@ -13,6 +13,12 @@ Use this skill only inside AlembicWorkspace Visible Automation Dispatch heartbea
 2. Declare the current window identity and target repository responsibility before acting.
 3. Work from the AlembicWorkspace root when running `scripts/visible-dispatch.mjs`.
 
+## Automation Mode Boundary
+
+- This skill applies only to VAD heartbeat instructions and tasks explicitly queued by the current control plan.
+- `mode --enable --write` does not turn every message in the window into unattended automation. If the user starts a Design discussion, total-control discussion, normal Q&A, or single-window development request, follow the latest user input and the relevant `AGENTS.md`; do not claim, finish-chain, or create heartbeats unless the message is a VAD heartbeat task.
+- `mode --disable --write` is the close switch. It stops future finish-chain payloads and stops the local keep-awake process owned by the VAD runtime. A target heartbeat that already woke may record completion once, but must not create another jump after mode is disabled.
+
 ## Role Guard
 
 - Only claim and finish the task for the current window name. Use the exact `--window <current-window>` from the heartbeat payload.

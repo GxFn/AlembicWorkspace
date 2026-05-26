@@ -86,11 +86,17 @@ Current scripts:
   ignored `.workspace-local/visible-dispatch/window-registry.json` and redacts
   them from JSON output, rejects placeholder ids such as
   `current-codex-thread`, and can remove polluted entries with `unregister`, so
-  they should not be copied into tracked docs or committed to GitHub. Target
-  `enqueue --from-plan --group <id> --return-policy controller-last --write`
-  creates a dispatch group, and `arm-batch --group <id> --json` prints all
-  ready target heartbeat payloads so total control can fan out multiple windows
-  in one batch. Target windows can use `finish --window <name> --thread <id>
+  they should not be copied into tracked docs or committed to GitHub. Before
+  starting an automation fan-out, use `preflight --from-plan`, `preflight
+  --group <id>`, `preflight --task <id>`, or `preflight --window <name>` to
+  verify that each registered target thread resolves to a local Codex session
+  file; `arm`, `arm-batch`, and controller-return payload generation reuse the
+  same check and refuse / skip unverified targets before any Codex automation
+  API payload is used. Target `enqueue --from-plan --group <id>
+  --return-policy controller-last --write` creates a dispatch group, and
+  `arm-batch --group <id> --json` prints all ready target heartbeat payloads so
+  total control can fan out multiple windows in one batch. Target windows can
+  use `finish --window <name> --thread <id>
   --backfill <text> --write --chain-next --json` at the end of their work to
   register their current thread, complete the claimed task with evidence, and
   print the next safe wake payload for an already queued / registered window or,
@@ -115,7 +121,15 @@ Current scripts:
   wake payload. If a target heartbeat was already armed before the close switch,
   that target may still wake once, but its finish-chain result is
   `modeDisabled` with no `chain.payload`, so the next window jump no longer
-  carries automation.
+  carries automation. Mode enabled does not make ordinary user discussion,
+  Design work, total-control planning, or single-window development unattended:
+  only heartbeat messages and tasks explicitly queued by the current plan should
+  claim / finish / chain. On macOS, `mode --enable --write` starts a local
+  `caffeinate -dimsu` keep-awake process owned by
+  `.workspace-local/visible-dispatch/state.json`; `mode --disable --write`
+  stops the recorded process. Use `--no-keep-awake` or
+  `CODEX_VAD_KEEP_AWAKE=0` only for dry test surfaces that must not start a
+  keep-awake process.
   The script still does not call Codex automation APIs directly, does not
   accept evidence, does not select new TODOs, and does not write product
   repositories.

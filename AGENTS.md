@@ -138,6 +138,8 @@
 - 当前主线进行时，新需求可以先进入 TODO；除非改变当前完成定义或用户明确要求打断，否则不得直接跳过当前主线。
 - TODO 参与派发时要优先组成任务包，把当前阶段可以推进的主线动作，与同一窗口、同一边界、同一验证链路下可以顺手关闭的 TODO 合并派发。
 - VAD 自动化模式下，脚本输出的下一跳 payload 只是投递信封，不代表当前窗口获得下一窗口职责。总控验收时若发现窗口把下一跳当成自身任务、跨窗口处理 `AlembicTest`、或未按 role guard 执行，必须暂停自动验收并修正脚本 / prompt / AGENTS 规则后再继续。
+- VAD mode enabled 只表示当前总控计划允许无人值守投递 / 回跳，不表示用户在电脑前的普通讨论、Design 需求设计、总控决策讨论或单窗口开发都自动进入无人值守循环。每次仍按最新用户输入和当前窗口职责判断；非 heartbeat / 非当前计划任务不得 claim、续跳或自动关闭。
+- 在 macOS 上，`node scripts/visible-dispatch.mjs mode --enable --write` 会启动本地防睡眠进程，`node scripts/visible-dispatch.mjs mode --disable --write` 必须停止该进程并关闭后续跳转。若防睡眠启动或停止失败，必须报告为自动化就绪风险，不得假装无人值守可靠。
 - VAD 目标窗口只能 claim / finish 自己窗口名对应的任务；如果 `claim --json` 没有返回本窗口任务，必须停止，不得尝试其它窗口名、不得代领、不得验证其它窗口工作。
 - VAD 下一跳 heartbeat 只在 `finish --chain-next --json` 同时返回 `chain.nextAction === "armNext"`、`chain.handoffPolicy === "target-courier"`、`chain.payload.courierAllowed === true`，且当前计划允许 target-window courier delivery 时才能创建。返回 `controllerArm`、`modeDisabled`、`registerWindow`、`wait`、`review`、无 payload 或无 courierAllowed 时，必须停止并回报总控。
 - `AlembicTest` 下一跳默认由总控调起；非 `AlembicTest` 窗口不得创建、处理或验证 `AlembicTest` heartbeat，除非当前计划和 finish JSON 同时显式授权该例外。

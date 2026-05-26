@@ -28,11 +28,11 @@
 
 - 来源类型：用户直接需求 / VAD 主线修复复测。
 - 来源文档：
-  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
-  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
-  - [visible-automation-dispatch-wave-9-2026-05-26.md](visible-automation-dispatch-wave-9-2026-05-26.md)
+  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
+  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](../../../current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
+  - [visible-automation-dispatch-wave-9-2026-05-26.md](../../../current/visible-automation-dispatch-wave-9-2026-05-26.md)
 - 用户确认状态：用户确认继续下一轮。
 - 总控接收结论：创建 Wave 10 真实 5 窗口 heartbeat role-guard smoke，`AlembicTest` 作为真实 thread id gate。
 - 是否需要目标阶段确认：不新增；属于已确认 VAD 路线内的修复复测。

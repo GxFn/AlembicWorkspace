@@ -173,11 +173,75 @@ function writeTwoWindowPlan(root, { planFile = "batch-return-plan.md", planStatu
   );
 }
 
-function run(root, args) {
+function argValues(args, name) {
+  const values = [];
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === name && args[index + 1] && !args[index + 1].startsWith("--")) {
+      values.push(args[index + 1]);
+      index += 1;
+    } else if (arg.startsWith(`${name}=`)) {
+      values.push(arg.slice(name.length + 1));
+    }
+  }
+  return values;
+}
+
+function isPlaceholderThreadId(threadId) {
+  return !threadId || /^current[-_\s]*codex[-_\s]*thread$/i.test(threadId) || /^<.*>$/.test(threadId);
+}
+
+function writeCodexSession(root, threadId, { cwd = root, title = `Fixture ${threadId}` } = {}) {
+  if (isPlaceholderThreadId(threadId)) return;
+  const safe = threadId.replace(/[^a-zA-Z0-9-]/g, "-");
+  writeFile(
+    path.join(root, ".codex/sessions/2026/05/26", `rollout-2026-05-26T00-00-00-${safe}.jsonl`),
+    `{"type":"session_meta","payload":{"id":"${threadId}","cwd":"${cwd}","title":"${title}","source":"test"}}
+{"type":"response.completed","payload":{"type":"response.completed"}}
+`,
+  );
+}
+
+function run(root, args, { autoSession = true } = {}) {
+  if (autoSession) {
+    for (const threadId of argValues(args, "--thread")) {
+      writeCodexSession(root, threadId);
+    }
+  }
   return spawnSync("node", [script, ...args, "--root", root], {
     cwd: root,
     encoding: "utf8",
+    env: { ...process.env, CODEX_HOME: path.join(root, ".codex"), CODEX_VAD_KEEP_AWAKE: "0" },
   });
+}
+
+function runWithKeepAwake(root, args) {
+  return spawnSync("node", [script, ...args, "--root", root], {
+    cwd: root,
+    encoding: "utf8",
+    env: { ...process.env, CODEX_HOME: path.join(root, ".codex"), CODEX_VAD_KEEP_AWAKE: "1" },
+  });
+}
+
+function pidIsRunning(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code === "EPERM";
+  }
+}
+
+function waitForPidExit(pid, timeoutMs = 1000) {
+  const waitBuffer = new Int32Array(new SharedArrayBuffer(4));
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (!pidIsRunning(pid)) {
+      return true;
+    }
+    Atomics.wait(waitBuffer, 0, 0, 25);
+  }
+  return !pidIsRunning(pid);
 }
 
 function readJson(root, relative) {
@@ -206,7 +270,47 @@ test("mode changes require explicit write", () => {
   const written = run(root, ["mode", "--enable", "--write", "--json"]);
   assert.equal(written.status, 0, written.stderr);
   assert.equal(JSON.parse(written.stdout).state.mode, "enabled");
+  assert.equal(JSON.parse(written.stdout).state.keepAwake.enabled, false);
   assert.equal(readJson(root, ".workspace-local/visible-dispatch/state.json").mode, "enabled");
+});
+
+test("mode enable and disable manage the local keep-awake process on macOS", { skip: process.platform !== "darwin" }, () => {
+  const root = makeFixture();
+  const keepAwakeCommand = process.execPath;
+  const keepAwakeArgs = ["-e", "setInterval(() => {}, 1000)"];
+  let keepAwakePid = 0;
+  try {
+    const enable = runWithKeepAwake(root, [
+      "mode",
+      "--enable",
+      "--write",
+      "--json",
+      "--keep-awake-command",
+      keepAwakeCommand,
+      ...keepAwakeArgs.flatMap((arg) => ["--keep-awake-arg", arg]),
+    ]);
+    assert.equal(enable.status, 0, enable.stderr);
+    const enabled = JSON.parse(enable.stdout);
+    assert.equal(enabled.keepAwake.active, true);
+    assert.equal(enabled.keepAwake.command, keepAwakeCommand);
+    assert.ok(enabled.keepAwake.pid > 0);
+    keepAwakePid = enabled.keepAwake.pid;
+
+    const disable = run(root, ["mode", "--disable", "--write", "--json", "--reason", "test close"]);
+    assert.equal(disable.status, 0, disable.stderr);
+    const disabled = JSON.parse(disable.stdout);
+    assert.equal(disabled.state.mode, "disabled");
+    assert.equal(disabled.keepAwake.enabled, false);
+    assert.equal(disabled.keepAwake.active, false);
+    assert.equal(disabled.keepAwake.pid, 0);
+    assert.equal(disabled.keepAwake.stopReason, "test close");
+    assert.equal(waitForPidExit(keepAwakePid), true);
+    keepAwakePid = 0;
+  } finally {
+    if (keepAwakePid && pidIsRunning(keepAwakePid)) {
+      process.kill(keepAwakePid, "SIGTERM");
+    }
+  }
 });
 
 test("registry rejects non-Alembic target windows", () => {
@@ -304,6 +408,46 @@ test("arm outputs a heartbeat payload without calling automation APIs", () => {
   assert.match(parsed.payload.prompt, /codex_app\.automation_update/);
   assert.match(parsed.payload.prompt, /recordArmCommand/);
   assert.match(parsed.payload.prompt, /mode --disable --write/);
+  assert.match(parsed.payload.prompt, /普通讨论/);
+  assert.match(parsed.payload.prompt, /本地防睡眠/);
+});
+
+test("preflight verifies registered target threads resolve to local Codex sessions", () => {
+  const root = makeFixture();
+  run(root, ["register", "--window", "Alembic", "--thread", "thread-visible-1", "--write"]);
+
+  const result = run(root, ["preflight", "--from-plan", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ready, true);
+  assert.equal(parsed.requiredWindowCount, 1);
+  assert.equal(parsed.windows[0].windowName, "Alembic");
+  assert.equal(parsed.windows[0].threadId, "<local-only>");
+  assert.equal(parsed.windows[0].session.found, true);
+  assert.equal(parsed.windows[0].session.sessionStatus, "idle");
+});
+
+test("preflight blocks registered windows whose thread id has no local Codex session", () => {
+  const root = makeFixture();
+  run(root, ["register", "--window", "Alembic", "--thread", "thread-missing-session", "--write"], { autoSession: false });
+
+  const result = run(root, ["preflight", "--from-plan", "--json"]);
+  assert.notEqual(result.status, 0);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ready, false);
+  assert.match(parsed.issues.join("\n"), /No local Codex session was found for Alembic/);
+});
+
+test("arm refuses to print a heartbeat payload for an unverified thread", () => {
+  const root = makeFixture();
+  run(root, ["mode", "--enable", "--write"]);
+  run(root, ["register", "--window", "Alembic", "--thread", "thread-missing-session", "--write"], { autoSession: false });
+  run(root, ["enqueue", "--from-plan", "--write"]);
+
+  const queue = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json");
+  const result = run(root, ["arm", "--task", queue.tasks[0].taskId, "--json"]);
+  assert.notEqual(result.status, 0);
+  assert.match(JSON.parse(result.stdout).error, /No local Codex session was found for Alembic/);
 });
 
 test("arm-batch prepares payloads for every queued task in a dispatch group", () => {
@@ -337,6 +481,31 @@ test("arm-batch prepares payloads for every queued task in a dispatch group", ()
   );
   assert.equal(parsed.payloads.every((item) => item.payload.chainMode === "finish-chain"), true);
   assert.match(parsed.payloads[0].payload.prompt, /returnToController/);
+});
+
+test("arm-batch skips queued tasks whose registered thread lacks a local session", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "visible-dispatch-arm-batch-missing-session-"));
+  writeFile(path.join(root, "AGENTS.md"), "# Fixture\n");
+  writeTwoWindowPlan(root);
+  run(root, ["mode", "--enable", "--write"]);
+  run(root, ["register", "--window", "Alembic", "--thread", "thread-Alembic", "--write"]);
+  run(root, ["register", "--window", "AlembicCore", "--thread", "thread-missing-core", "--write"], { autoSession: false });
+  run(root, [
+    "enqueue",
+    "--from-plan",
+    "--group",
+    "batch-1",
+    "--return-policy",
+    "controller-last",
+    "--write",
+  ]);
+
+  const result = run(root, ["arm-batch", "--group", "batch-1", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.deepEqual(parsed.payloads.map((item) => item.targetWindow), ["Alembic"]);
+  assert.deepEqual(parsed.skipped.map((item) => item.targetWindow), ["AlembicCore"]);
+  assert.match(parsed.skipped[0].reason, /No local Codex session was found for AlembicCore/);
 });
 
 test("record-arm persists automation id and prevents duplicate arming", () => {
@@ -687,6 +856,34 @@ test("prune-history removes old terminal tasks without touching current or activ
         automationId: "auto-old-active",
         status: "active",
       },
+      {
+        runId: "old-group__controller-return__auto-old-controller",
+        taskId: "controller-return:old-group",
+        groupId: "old-group",
+        targetWindow: "AlembicWorkspace",
+        automationId: "auto-old-controller",
+        status: "stopped",
+        runType: "controller-return",
+      },
+    ],
+  });
+  writeJson(root, ".workspace-local/visible-dispatch/dispatch-groups.json", {
+    version: 1,
+    groups: [
+      {
+        groupId: "old-group",
+        controlDoc: "docs/workspace/current/old-plan.md",
+        returnPolicy: "controller-last",
+        status: "returned",
+        taskIds: ["old-blocked__AlembicTest", "old-accepted__Alembic"],
+      },
+      {
+        groupId: "current-group",
+        controlDoc: "docs/workspace/current/plan.md",
+        returnPolicy: "controller-last",
+        status: "returned",
+        taskIds: ["plan__Alembic"],
+      },
     ],
   });
 
@@ -709,6 +906,8 @@ test("prune-history removes old terminal tasks without touching current or activ
     parsed.prunedStoppedAutomationRuns.map((run) => run.automationId),
     ["auto-old-blocked"],
   );
+  assert.deepEqual(parsed.prunedGroups.map((group) => group.groupId), ["old-group"]);
+  assert.deepEqual(parsed.prunedStoppedControllerRuns.map((run) => run.automationId), ["auto-old-controller"]);
 
   const queue = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json");
   assert.deepEqual(
@@ -717,6 +916,8 @@ test("prune-history removes old terminal tasks without touching current or activ
   );
   const runs = readJson(root, ".workspace-local/visible-dispatch/automation-runs.json");
   assert.deepEqual(runs.runs.map((run) => run.runId), ["old-active__auto-old-active"]);
+  const groups = readJson(root, ".workspace-local/visible-dispatch/dispatch-groups.json");
+  assert.deepEqual(groups.groups.map((group) => group.groupId), ["current-group"]);
 });
 
 test("finish registers the current thread, completes evidence, and prepares the next wake payload", () => {
@@ -747,7 +948,7 @@ test("finish registers the current thread, completes evidence, and prepares the 
   const parsed = JSON.parse(finished.stdout);
   assert.equal(parsed.completed.status, "completed");
   assert.equal(parsed.completed.previousStatus, "claimed");
-  assert.equal(parsed.completed.completedByThreadId, "thread-Alembic");
+  assert.equal(parsed.completed.completedByThreadId, "<local-only>");
   assert.equal(parsed.chain.nextAction, "armNext");
   assert.equal(parsed.chain.handoffPolicy, "target-courier");
   assert.equal(parsed.chain.payload.targetThreadId, "thread-AlembicCore");
@@ -758,6 +959,7 @@ test("finish registers the current thread, completes evidence, and prepares the 
   const registry = readJson(root, ".workspace-local/visible-dispatch/window-registry.json");
   assert.equal(registry.windows.find((entry) => entry.windowName === "Alembic").threadId, "thread-Alembic");
   const queue = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json");
+  assert.equal(queue.tasks.find((task) => task.taskId === "fake-todo-round-1__Alembic").completedByThreadId, "thread-Alembic");
   assert.equal(queue.tasks.find((task) => task.taskId === "fake-todo-round-1__Alembic").status, "completed");
 });
 
@@ -833,6 +1035,285 @@ test("controller-last dispatch group returns to total control only after the fin
   assert.equal(statusParsed.group.completedCount, 2);
   const runs = readJson(root, ".workspace-local/visible-dispatch/automation-runs.json");
   assert.equal(runs.runs.some((run) => run.runType === "controller-return"), true);
+});
+
+test("record-return rejects a second active controller return for the same group", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "visible-dispatch-controller-return-duplicate-"));
+  writeFile(path.join(root, "AGENTS.md"), "# Fixture\n");
+  writeTwoWindowPlan(root);
+  run(root, ["mode", "--enable", "--write"]);
+  run(root, ["register", "--window", "AlembicWorkspace", "--thread", "thread-controller", "--write"]);
+  run(root, [
+    "enqueue",
+    "--from-plan",
+    "--group",
+    "batch-return",
+    "--return-policy",
+    "controller-last",
+    "--write",
+  ]);
+
+  for (const windowName of ["Alembic", "AlembicCore"]) {
+    run(root, ["finish", "--window", windowName, "--backfill", `${windowName} done`, "--write", "--chain-next"]);
+  }
+
+  const first = run(root, [
+    "record-return",
+    "--group",
+    "batch-return",
+    "--automation-id",
+    "controller-return-1",
+    "--write",
+    "--json",
+  ]);
+  assert.equal(first.status, 0, first.stderr);
+
+  const duplicate = run(root, [
+    "record-return",
+    "--group",
+    "batch-return",
+    "--automation-id",
+    "controller-return-2",
+    "--write",
+    "--json",
+  ]);
+  assert.notEqual(duplicate.status, 0);
+  assert.match(JSON.parse(duplicate.stdout).error, /already active/);
+});
+
+test("record-stop marks controller-return groups as returned", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "visible-dispatch-controller-return-stop-"));
+  writeFile(path.join(root, "AGENTS.md"), "# Fixture\n");
+  writeTwoWindowPlan(root);
+  run(root, ["mode", "--enable", "--write"]);
+  run(root, ["register", "--window", "AlembicWorkspace", "--thread", "thread-controller", "--write"]);
+  run(root, [
+    "enqueue",
+    "--from-plan",
+    "--group",
+    "batch-return",
+    "--return-policy",
+    "controller-last",
+    "--write",
+  ]);
+  run(root, ["finish", "--window", "Alembic", "--backfill", "Alembic evidence", "--chain-next", "--write"]);
+  run(root, ["finish", "--window", "AlembicCore", "--backfill", "Core evidence", "--chain-next", "--write"]);
+  run(root, ["record-return", "--group", "batch-return", "--automation-id", "controller-return-1", "--write"]);
+
+  const stopped = run(root, [
+    "record-stop",
+    "--automation-id",
+    "controller-return-1",
+    "--reason",
+    "controller return handled",
+    "--write",
+    "--json",
+  ]);
+  assert.equal(stopped.status, 0, stopped.stderr);
+  const parsed = JSON.parse(stopped.stdout);
+  assert.equal(parsed.stoppedGroups[0].status, "returned");
+  assert.equal(parsed.stoppedGroups[0].previousStatus, "return-armed");
+
+  const groupStatus = run(root, ["group-status", "--group", "batch-return", "--json"]);
+  assert.equal(groupStatus.status, 0, groupStatus.stderr);
+  assert.equal(JSON.parse(groupStatus.stdout).group.status, "returned");
+  const cleanup = run(root, ["cleanup", "--json"]);
+  assert.equal(cleanup.status, 0, cleanup.stderr);
+  assert.equal(JSON.parse(cleanup.stdout).activeAutomationRuns.length, 0);
+});
+
+test("record-stop repairs a stale controller-return group after the run was already stopped", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "visible-dispatch-controller-return-repair-"));
+  writeFile(path.join(root, "AGENTS.md"), "# Fixture\n");
+  writeTwoWindowPlan(root);
+  run(root, ["mode", "--enable", "--write"]);
+  run(root, ["register", "--window", "AlembicWorkspace", "--thread", "thread-controller", "--write"]);
+  run(root, [
+    "enqueue",
+    "--from-plan",
+    "--group",
+    "batch-return",
+    "--return-policy",
+    "controller-last",
+    "--write",
+  ]);
+  run(root, ["finish", "--window", "Alembic", "--backfill", "Alembic evidence", "--chain-next", "--write"]);
+  run(root, ["finish", "--window", "AlembicCore", "--backfill", "Core evidence", "--chain-next", "--write"]);
+  run(root, ["record-return", "--group", "batch-return", "--automation-id", "controller-return-1", "--write"]);
+
+  const runs = readJson(root, ".workspace-local/visible-dispatch/automation-runs.json");
+  runs.runs[0].status = "stopped";
+  runs.runs[0].previousStatus = "active";
+  runs.runs[0].stoppedAt = "2026-05-26T00:00:00.000Z";
+  runs.runs[0].stopReason = "controller return handled";
+  writeJson(root, ".workspace-local/visible-dispatch/automation-runs.json", runs);
+
+  const repaired = run(root, [
+    "record-stop",
+    "--automation-id",
+    "controller-return-1",
+    "--reason",
+    "controller return handled",
+    "--write",
+    "--json",
+  ]);
+  assert.equal(repaired.status, 0, repaired.stderr);
+  const parsed = JSON.parse(repaired.stdout);
+  assert.equal(parsed.stoppedRuns.length, 0);
+  assert.equal(parsed.alreadyStoppedControllerRuns.length, 1);
+  assert.equal(parsed.stoppedGroups[0].status, "returned");
+
+  const groupStatus = run(root, ["group-status", "--group", "batch-return", "--json"]);
+  assert.equal(groupStatus.status, 0, groupStatus.stderr);
+  assert.equal(JSON.parse(groupStatus.stdout).group.status, "returned");
+});
+
+test("group-status reports missing declared group tasks as non-terminal", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "visible-dispatch-group-missing-"));
+  writeFile(path.join(root, "AGENTS.md"), "# Fixture\n");
+  writeTwoWindowPlan(root);
+  run(root, [
+    "enqueue",
+    "--from-plan",
+    "--group",
+    "batch-return",
+    "--return-policy",
+    "controller-last",
+    "--write",
+  ]);
+  const queue = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json");
+  queue.tasks = queue.tasks.filter((task) => task.targetWindow !== "AlembicCore");
+  queue.tasks[0].status = "completed";
+  queue.tasks[0].backfill = "Alembic done";
+  writeJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json", queue);
+
+  const status = run(root, ["group-status", "--group", "batch-return", "--json"]);
+  assert.equal(status.status, 0, status.stderr);
+  const parsed = JSON.parse(status.stdout);
+  assert.equal(parsed.group.missingTaskCount, 1);
+  assert.deepEqual(parsed.group.missingTaskIds, ["batch-return-plan__AlembicCore"]);
+  assert.equal(parsed.group.terminal, false);
+});
+
+test("unattended controller loop waits for full group, accepts, then arms the next refreshed plan", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "visible-dispatch-controller-loop-"));
+  writeFile(path.join(root, "AGENTS.md"), "# Fixture\n");
+  writeTwoWindowPlan(root, { planFile: "round-one.md" });
+  run(root, ["mode", "--enable", "--write"]);
+  for (const windowName of ["Alembic", "AlembicCore", "AlembicWorkspace"]) {
+    run(root, ["register", "--window", windowName, "--thread", `thread-${windowName}`, "--write"]);
+  }
+  run(root, [
+    "enqueue",
+    "--from-plan",
+    "--group",
+    "round-one",
+    "--return-policy",
+    "controller-last",
+    "--write",
+  ]);
+  const queued = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json").tasks;
+  const alembicTask = queued.find((task) => task.targetWindow === "Alembic").taskId;
+  const coreTask = queued.find((task) => task.targetWindow === "AlembicCore").taskId;
+  for (const task of queued) {
+    run(root, ["record-arm", "--task", task.taskId, "--automation-id", `auto-${task.targetWindow}`, "--write"]);
+  }
+
+  const firstFinish = run(root, [
+    "finish",
+    "--window",
+    "Alembic",
+    "--task",
+    alembicTask,
+    "--backfill",
+    "Alembic evidence complete",
+    "--chain-next",
+    "--write",
+    "--json",
+  ]);
+  assert.equal(firstFinish.status, 0, firstFinish.stderr);
+  assert.equal(JSON.parse(firstFinish.stdout).chain.nextAction, "noReturn");
+
+  const midController = run(root, ["controller-tick", "--json"]);
+  assert.equal(midController.status, 0, midController.stderr);
+  const midParsed = JSON.parse(midController.stdout);
+  assert.equal(midParsed.topAction, "wait");
+  assert.equal(midParsed.nextAction, "waitForBackfill");
+  assert.equal(
+    midParsed.queueDecision.tasks.find((task) => task.taskId === alembicTask).nextAction,
+    "waitForGroup",
+  );
+
+  const finalFinish = run(root, [
+    "finish",
+    "--window",
+    "AlembicCore",
+    "--task",
+    coreTask,
+    "--backfill",
+    "AlembicCore evidence complete",
+    "--chain-next",
+    "--write",
+    "--json",
+  ]);
+  assert.equal(finalFinish.status, 0, finalFinish.stderr);
+  const finalParsed = JSON.parse(finalFinish.stdout);
+  assert.equal(finalParsed.chain.nextAction, "returnToController");
+  assert.equal(finalParsed.chain.payload.controllerReturnAllowed, true);
+  run(root, ["record-return", "--group", "round-one", "--automation-id", "return-round-one", "--write"]);
+
+  const reviewTick = run(root, ["controller-tick", "--json"]);
+  assert.equal(reviewTick.status, 0, reviewTick.stderr);
+  assert.equal(JSON.parse(reviewTick.stdout).topAction, "review");
+
+  for (const windowName of ["Alembic", "AlembicCore"]) {
+    const stopped = run(root, ["record-stop", "--automation-id", `auto-${windowName}`, "--write", "--json"]);
+    assert.equal(stopped.status, 0, stopped.stderr);
+  }
+
+  for (const taskId of [alembicTask, coreTask]) {
+    const accepted = run(root, [
+      "accept",
+      "--task",
+      taskId,
+      "--verdict",
+      "accepted",
+      "--note",
+      "fixture total-control acceptance",
+      "--write",
+      "--json",
+    ]);
+    assert.equal(accepted.status, 0, accepted.stderr);
+  }
+
+  const stalePlanTick = run(root, ["controller-tick", "--json"]);
+  assert.equal(stalePlanTick.status, 0, stalePlanTick.stderr);
+  const stalePlanParsed = JSON.parse(stalePlanTick.stdout);
+  assert.equal(stalePlanParsed.topAction, "decision");
+  assert.equal(stalePlanParsed.nextAction, "closeOrRefreshCurrentPlan");
+
+  writeTwoWindowPlan(root, { planFile: "round-two.md" });
+  const nextPlanTick = run(root, ["controller-tick", "--json"]);
+  assert.equal(nextPlanTick.status, 0, nextPlanTick.stderr);
+  const nextPlanParsed = JSON.parse(nextPlanTick.stdout);
+  assert.equal(nextPlanParsed.topAction, "enqueue");
+  assert.equal(nextPlanParsed.nextAction, "enqueueCurrentPlan");
+  assert.equal(nextPlanParsed.queueDecision.ignoredHistoricTasks.length, 2);
+
+  const enqueuedNext = run(root, [
+    "enqueue",
+    "--from-plan",
+    "--group",
+    "round-two",
+    "--return-policy",
+    "controller-last",
+    "--write",
+    "--json",
+  ]);
+  assert.equal(enqueuedNext.status, 0, enqueuedNext.stderr);
+  const batch = run(root, ["arm-batch", "--group", "round-two", "--json"]);
+  assert.equal(batch.status, 0, batch.stderr);
+  assert.equal(JSON.parse(batch.stdout).payloads.length, 2);
 });
 
 test("finish rejects placeholder thread registration", () => {
@@ -1052,6 +1533,15 @@ test("fake TODO multi-window rounds complete without duplicate enqueue loops", (
       ]);
       assert.equal(completed.status, 0, completed.stderr);
 
+      const stopped = run(root, [
+        "record-stop",
+        "--automation-id",
+        `auto-${round}-${windowName}`,
+        "--write",
+        "--json",
+      ]);
+      assert.equal(stopped.status, 0, stopped.stderr);
+
       const accepted = run(root, [
         "accept",
         "--task",
@@ -1114,6 +1604,24 @@ test("completed tasks with backfill can be accepted by total control", () => {
   assert.equal(accepted.status, 0, accepted.stderr);
   assert.equal(JSON.parse(accepted.stdout).task.status, "accepted");
   assert.equal(readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json").tasks[0].status, "accepted");
+});
+
+test("accept refuses tasks that still have active automation runs", () => {
+  const root = makeFixture();
+  run(root, ["mode", "--enable", "--write"]);
+  run(root, ["enqueue", "--from-plan", "--write"]);
+  const taskId = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json").tasks[0].taskId;
+  run(root, ["record-arm", "--task", taskId, "--automation-id", "auto-active", "--write"]);
+  run(root, ["finish", "--window", "Alembic", "--backfill", "evidence complete", "--write"]);
+
+  const refused = run(root, ["accept", "--task", taskId, "--write", "--json"]);
+  assert.notEqual(refused.status, 0);
+  assert.match(JSON.parse(refused.stdout).error, /active automation run/);
+
+  run(root, ["record-stop", "--automation-id", "auto-active", "--write"]);
+  const accepted = run(root, ["accept", "--task", taskId, "--write", "--json"]);
+  assert.equal(accepted.status, 0, accepted.stderr);
+  assert.equal(JSON.parse(accepted.stdout).task.status, "accepted");
 });
 
 test("accept refuses completed tasks without backfill evidence", () => {

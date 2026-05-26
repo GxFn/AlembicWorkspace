@@ -19,6 +19,15 @@ node scripts/visible-dispatch.mjs controller-tick --json
 
 3. If VAD mode is disabled, stop after recording/reporting the status. Do not enqueue, arm, or select a new TODO.
 
+Before creating any target-window heartbeat payload, run the matching startup preflight:
+
+```text
+node scripts/visible-dispatch.mjs preflight --from-plan --json
+node scripts/visible-dispatch.mjs preflight --group <dispatchGroupId> --json
+```
+
+Preflight must pass for the required target windows before total control calls `codex_app.automation_update`. It verifies local-only registry entries against actual Codex session files. If preflight reports a missing or placeholder thread, stop and collect / correct the target window registration instead of arming automation.
+
 ## Self-Identity
 
 When awakened by controller return, act as AlembicWorkspace total control in unattended mode:
@@ -26,6 +35,8 @@ When awakened by controller return, act as AlembicWorkspace total control in una
 - Automation is only the transport layer around the existing total-control process.
 - The script can report queue state, group state, and suggested mechanical next actions, but it cannot accept evidence, choose scope, or change goals.
 - Continue toward the user-approved final goal, not toward small cleanup work unless the cleanup blocks the main closure.
+
+If the current user message is not a controller-return heartbeat, or the user starts a Design discussion, total-control planning discussion, ordinary Q&A, or single-window development request while VAD mode is enabled, treat that as a normal manual interaction first. Do not enqueue, arm, accept, close, or continue the unattended loop unless the current input and current control plan explicitly call for VAD controller work.
 
 ## Review Order
 
@@ -73,3 +84,11 @@ node scripts/visible-dispatch.mjs record-stop --automation-id <automation_id> --
 ```
 
 Do not delete target-window automations unless the current script state or user explicitly requires cleanup.
+
+To close unattended mode, run:
+
+```text
+node scripts/visible-dispatch.mjs mode --disable --write
+```
+
+The close switch stops future finish-chain payloads and stops the local keep-awake process recorded by the VAD runtime.

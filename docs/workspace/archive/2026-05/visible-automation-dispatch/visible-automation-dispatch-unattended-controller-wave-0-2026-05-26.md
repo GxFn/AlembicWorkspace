@@ -1,7 +1,7 @@
 # Visible Automation Dispatch Unattended Controller Wave 0
 
 日期：2026-05-26
-状态：VAD unattended controller Wave 0 已验证完成
+状态：VAD unattended controller Wave 0 关系链与跳转边界验证通过
 发送给：无
 总控定位：本文件是 AlembicWorkspace 当前总控计划；本轮只修改 workspace 脚本、skill 和协作文档，不触碰产品源码，不派发子仓库窗口。
 
@@ -9,7 +9,7 @@
 
 - 用户目标：在现有总控流程里插入无人值守自动化能力，让总控可以批量发起多个窗口任务，子窗口完成后由脚本判断是否回跳，最后一个子窗口才真实回跳总控；总控被唤醒后要有 automation-goal 自我认知，能验收、测试、打回、重验、推进下一阶段和选择下一个大方向任务。
 - 最终完成定义：`visible-dispatch` 支持 dispatch group、批量 arm payload、controller-last return policy、最后窗口 controller-return、controller return 记录；target skill 和 controller skill 固化窗口 / 总控职责；脚本测试覆盖关键路径；当前 VAD 规则不重写 AGENTS 原总控流程。
-- 当前是否已经达到：已达到。脚本和 skill 第一版已实现，完整 workspace 验证已通过。
+- 当前是否已经达到：已达到。脚本和 skill 第一版已实现；用户点名的“总控多窗口分发 -> 最后窗口回跳 -> 总控验收 -> 新派发计划 -> 循环继续”关系链已用 fixture 测试覆盖，并已在 037 真实 heartbeat 链路中复核。
 - 未达到时剩余差距：无。后续应回到 `GTODO-2026-05-24-037` Wave 0 验收和下一阶段裁决。
 - 已达到时验收 / 归档判断：验证通过后可将 VAD unattended controller 标为 Wave 0 完成，再回到 `GTODO-2026-05-24-037` Wave 0 验收和下一阶段裁决。
 - 当前任务分区：规则治理 / skill 治理 + workspace script pipeline。
@@ -27,7 +27,7 @@
 ## 需求来源
 
 - 来源类型：用户直接确认的 workspace 自动化治理需求。
-- 需求设计文档：[../../requirement-designs/visible-automation-dispatch/unattended-controller-requirement-design-2026-05-26.md](../../requirement-designs/visible-automation-dispatch/unattended-controller-requirement-design-2026-05-26.md)。
+- 需求设计文档：[../../requirement-designs/visible-automation-dispatch/unattended-controller-requirement-design-2026-05-26.md](../../../../requirement-designs/visible-automation-dispatch/unattended-controller-requirement-design-2026-05-26.md)。
 - 用户确认状态：已确认进入下一步。
 - 总控接收结论：作为 VAD 第一版后的增强 Wave 0，由总控直接实现 workspace 脚本 / skill；不交给子仓库。
 
@@ -162,15 +162,18 @@
 
 - 2026-05-26：用户确认 VAD unattended controller 需求汇总，要求进入下一步；总控开始实现 dispatch group / controller-last / controller-return / controller skill。
 - 2026-05-26：Wave 0 已实现并通过验证：`node --test scripts/visible-dispatch.test.mjs` 34 项通过；`node scripts/check-task-packages.mjs --require --json` 通过；`node scripts/check-script-docs.mjs` 通过；`node scripts/verify-control-center.mjs --with-script-tests` 全部通过，包含 workspace script tests 59 项通过。下一步回到 `GTODO-2026-05-24-037` Wave 0 的总控验收，不自动把 037 产品链路判定为完成。
+- 2026-05-26：用户指出 VAD 不能只验证分段状态机，必须验证“总控多窗口分发、最后一个窗口回跳、总控验收后产生新派发计划、循环继续”关系链。总控复核发现真实缺口：open `controller-last` dispatch group 中第一个窗口完成后，`controller-tick` 仍可能提前进入 `acceptanceReview`。已修复为 open group completed task 返回 `waitForGroup`，只有 group terminal 后才 review；新增 `unattended controller loop waits for full group, accepts, then arms the next refreshed plan` 测试。
+- 2026-05-26：根据 037 真实 heartbeat 链路继续加固自动化跳转稳定性：`record-return` 阻止同 group 重复 controller-return；`record-stop` 可幂等修复已 stopped 但 group 仍 `return-armed` 的 controller-return；`group-status` 以 declared taskIds 判断 missing task 且 missing 时不 terminal；`finish --chain-next` 对 missing group task 返回 inspect、对已回跳 group 返回 review；`accept` 在 active automation run 未停止时拒绝接受；`finish` / `accept` JSON 输出隐藏本地 thread id；`prune-history` 清理旧 group 和 stopped controller-return run。`node --test scripts/visible-dispatch.test.mjs` 40 项通过。
+- 2026-05-26：最终总控验证通过：`node scripts/verify-control-center.mjs --with-script-tests` 全部 PASS，workspace script tests 65 项通过。
 
 <!-- workspace-sync
 {
-  "status": "VAD unattended controller Wave 0 已验证完成",
+  "status": "VAD unattended controller Wave 0 关系链与跳转边界验证通过",
   "indexPlanDescription": "Visible Automation Dispatch unattended controller Wave 0：增强 VAD 作为总控原流程中的自动化投递 / 回跳层，支持 dispatch group、最后窗口回总控和 automation-goal 总控自我决策。",
-  "indexStatusDescription": "VAD unattended controller Wave 0 已验证完成：dispatch group、批量 arm、最后窗口 controller-return 和 automation-goal controller skill 已通过总控验证；下一步回到 037 Wave 0 验收。",
+  "indexStatusDescription": "VAD unattended controller Wave 0 关系链与跳转边界验证通过：已覆盖多窗口批量分发、open group 不提前 review、最后窗口 controller-return、group returned 修复、missing task、active run accept guard 和下一批 arm。",
   "currentIndexType": "当前计划",
   "currentIndexDescription": "Visible Automation Dispatch unattended controller Wave 0：workspace 脚本 / skill / 文档治理。",
-  "currentStatusSummary": "VAD unattended controller Wave 0 已验证完成：workspace 脚本、skill、索引和当前计划格式均通过总控验证；037 Wave 0 回填暂缓到本轮后验收。",
+  "currentStatusSummary": "VAD unattended controller Wave 0 关系链与跳转边界验证通过：已修复 open group 提前 review、controller-return 重复 / 幂等停止、missing group task、active automation accept 和 thread id 输出边界，并通过 40 项 visible-dispatch 测试。",
   "indexRows": [
     {
       "type": "VAD Unattended Controller 需求设计",

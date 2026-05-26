@@ -14,7 +14,7 @@
 
 状态：总控验收通过；结论阻塞
 创建日期：2026-05-26
-总控来源：[visible-automation-dispatch-wave-4-2026-05-26.md](visible-automation-dispatch-wave-4-2026-05-26.md)
+总控来源：[visible-automation-dispatch-wave-4-2026-05-26.md](../archive/2026-05/visible-automation-dispatch/visible-automation-dispatch-wave-4-2026-05-26.md)
 执行窗口：AlembicTest
 目标项目：AlembicWorkspace Visible Automation Dispatch 本地状态机、Codex heartbeat automation 自唤醒目标窗口验证，以及 `AlembicTest` 作为单窗口可见目标的 claim / complete / backfill。
 
@@ -36,7 +36,7 @@
 
 #### 前置条件
 
-- Visible Automation Dispatch Wave 3 已通过总控验收：[visible-automation-dispatch-wave-3-2026-05-26.md](visible-automation-dispatch-wave-3-2026-05-26.md)。
+- Visible Automation Dispatch Wave 3 已通过总控验收：[visible-automation-dispatch-wave-3-2026-05-26.md](../archive/2026-05/visible-automation-dispatch/visible-automation-dispatch-wave-3-2026-05-26.md)。
 - `scripts/visible-dispatch.mjs` 已支持 `record-arm`、`armed` 状态、`tick`、`claim` 和 `complete`。
 - Codex controller heartbeat `visible-automation-dispatch-controller` 曾在 Wave 3 创建为 `PAUSED`；用户确认改由 Codex 追求目标模式驱动总控持续执行后，该 controller 已删除，不再作为正式路线。
 - 执行前先读取本 workspace `AGENTS.md`、`docs/workspace/index.md`、本文档、当前总控计划和 `AlembicTest/AGENTS.md`，并声明当前窗口定位和本轮仓库职责。
@@ -99,7 +99,7 @@
 
 - 测试结论：未通过，归类为阻塞。`queued -> armed` 成功，真实 Codex heartbeat automation 创建、`record-arm`、暂停和删除成功；heartbeat 在 3 分钟以上观察窗口内未投递到当前可见 `AlembicTest` thread 执行 `claim`，因此未进入 `claimed` / `completed`，无 backfill。
 - 执行范围：只使用 single-window visible heartbeat 最小链路；未跑 full cold-start / rescan；未启动 Alembic daemon / Dashboard；未操作 BiliDili 或真实项目业务源码；未修改 Alembic 系列产品源码。
-- 使用配置：当前总控计划 `docs/workspace/current/visible-automation-dispatch-wave-4-2026-05-26.md`；stateDir `.workspace-local/visible-dispatch`；task id `visible-automation-dispatch-wave-4-2026-05-26__AlembicTest`；automation id `vad-p4-alembictest-heartbeat`；heartbeat `kind=heartbeat`、`destination=thread`、`rrule=FREQ=MINUTELY;INTERVAL=1`、状态 `ACTIVE -> PAUSED -> deleted`；JSON evidence `AlembicTest/tmp/vad-single-window-visible-heartbeat-validation-2026-05-26.json`。
+- 使用配置：归档总控计划 `docs/workspace/archive/2026-05/visible-automation-dispatch/visible-automation-dispatch-wave-4-2026-05-26.md`；stateDir `.workspace-local/visible-dispatch`；task id `visible-automation-dispatch-wave-4-2026-05-26__AlembicTest`；automation id `vad-p4-alembictest-heartbeat`；heartbeat `kind=heartbeat`、`destination=thread`、`rrule=FREQ=MINUTELY;INTERVAL=1`、状态 `ACTIVE -> PAUSED -> deleted`；JSON evidence `AlembicTest/tmp/vad-single-window-visible-heartbeat-validation-2026-05-26.json`。
 - job id / session id：Codex automation id `vad-p4-alembictest-heartbeat`；无 Alembic job/session id。
 - Dashboard URL 摘要：无；本轮禁止启动 Dashboard。
 - 状态变化：`queued=true`（enqueue 1 task，`2026-05-25T16:16:08.112Z`）；`armed=true`（record-arm，`2026-05-25T16:16:29.819Z`）；`claimed=false`；`completed=false`；`accepted=false`。

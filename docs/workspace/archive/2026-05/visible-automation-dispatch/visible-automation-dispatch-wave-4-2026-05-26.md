@@ -28,10 +28,10 @@
 
 - 来源类型：用户直接需求 / 需求设计提升为当前主线。
 - 来源文档：
-  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
-  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
+  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](../../../current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
 - 用户确认状态：已确认分钟级延迟、Alembic 系列窗口、不依赖 Lark Remote、普通 Codex 输入关闭；用户确认总控可进入长期运行模式，并可通过正常 Codex 输入关闭。
 - 总控接收结论：进入 Wave 4，创建 `AlembicTest` 单窗口可见验证单。
 - 是否需要目标阶段确认：已完成。
@@ -41,7 +41,7 @@
 
 - 相关仓库：`AlembicWorkspace`、`AlembicTest`。
 - 关键入口：
-  - [alembic-test-exchange.md](alembic-test-exchange.md)
+  - [alembic-test-exchange.md](../../../current/alembic-test-exchange.md)
   - `scripts/visible-dispatch.mjs`
   - `scripts/visible-dispatch.test.mjs`
   - `.workspace-local/visible-dispatch/`
@@ -88,7 +88,7 @@
 
 主线动作：
 
-- 读取 [alembic-test-exchange.md](alembic-test-exchange.md) 中 `Test-2026-05-26-12 / VAD-P4-Single-Window-Visible-Heartbeat-Validation`。
+- 读取 [alembic-test-exchange.md](../../../current/alembic-test-exchange.md) 中 `Test-2026-05-26-12 / VAD-P4-Single-Window-Visible-Heartbeat-Validation`。
 - 用当前 Wave 4 plan 生成或复用一个 `AlembicTest` visible dispatch task。
 - 创建临时测试 heartbeat automation，prompt 只执行本轮 claim / complete / backfill。
 - 使用 `record-arm` 记录临时 automation id。
@@ -184,14 +184,14 @@ node scripts/verify-control-center.mjs --require-todo --require-task-packages --
 ## 测试交接
 
 - 是否需要 `AlembicTest`：需要。
-- 测试单：[alembic-test-exchange.md](alembic-test-exchange.md#test-2026-05-26-12vad-p4-single-window-visible-heartbeat-validation)。
-- 测试交流入口：[alembic-test-exchange.md](alembic-test-exchange.md)。
+- 测试单：[alembic-test-exchange.md](../../../current/alembic-test-exchange.md#test-2026-05-26-12vad-p4-single-window-visible-heartbeat-validation)。
+- 测试交流入口：[alembic-test-exchange.md](../../../current/alembic-test-exchange.md)。
 - 真实项目保护说明：Wave 4 不触碰真实项目业务源码；`AlembicTest` 自身测试资产可保持未提交，不作为总控验收阻塞。
 
 ## 回填区
 
 - 2026-05-26 00:10 CST：Wave 4 创建并待启动；当前发送给 `AlembicTest`。已创建 `Test-2026-05-26-12 / VAD-P4-Single-Window-Visible-Heartbeat-Validation`。
-- 2026-05-26 00:24 CST：`AlembicTest` 回填阻塞。`queued -> armed`、真实 heartbeat 创建、`record-arm`、暂停和删除均有证据；automation id `vad-p4-alembictest-heartbeat`。heartbeat 在 3 分钟以上观察窗口内未投递到当前可见线程执行 `claim`，任务未进入 `claimed` / `completed`。报告：[../../../AlembicTest/docs/vad-single-window-visible-heartbeat-validation-2026-05-26.md](../../../AlembicTest/docs/vad-single-window-visible-heartbeat-validation-2026-05-26.md)。
+- 2026-05-26 00:24 CST：`AlembicTest` 回填阻塞。`queued -> armed`、真实 heartbeat 创建、`record-arm`、暂停和删除均有证据；automation id `vad-p4-alembictest-heartbeat`。heartbeat 在 3 分钟以上观察窗口内未投递到当前可见线程执行 `claim`，任务未进入 `claimed` / `completed`。报告：[../../../AlembicTest/docs/vad-single-window-visible-heartbeat-validation-2026-05-26.md](../../../../../AlembicTest/docs/vad-single-window-visible-heartbeat-validation-2026-05-26.md)。
 - 2026-05-26 00:30 CST：总控验收 Test-12 证据有效，结论保持阻塞：问题不归咎于 `AlembicTest` 未执行，而是目标可见 heartbeat 投递 / 当前活跃线程调度模型未打通。按用户确认，`visible-automation-dispatch-controller` 已删除，5 分钟总控 heartbeat 不再作为正式路线。总控已补 `scripts/visible-dispatch.mjs record-stop`，并对 `vad-p4-alembictest-heartbeat` 记录 stopped，`cleanup` 后不再误报 active automation run。
 - 2026-05-26 00:35 CST：总控继续处理自动化失败，将 `visible-automation-dispatch-wave-4-2026-05-26__AlembicTest` 从 `armed` 转为 `blocked`，原因 `Test-2026-05-26-12-heartbeat-did-not-claim-visible-thread`；后续 tick 不再把该任务当成等待中的 automation，而是明确要求总控解决触发模型阻塞。
 - 2026-05-26 00:40 CST：总控按用户要求直接自跑最小闭环，使用独立 ignored stateDir `.workspace-local/vad-self-loop-test/state` 和临时 fixture plan `.workspace-local/vad-self-loop-test/plan.md`，完成 `mode-enable -> register -> enqueue -> tick-ready -> claim -> complete -> tick-review -> accept -> tick-done -> mode-disable -> cleanup`。结果：task `plan__AlembicTest` 依次进入 `queued`、`claimed`、`completed`、`accepted`；`tick-review` 为 `topAction=review / nextAction=acceptanceReview`；最终 `cleanup` 为 `staleTasks=0`、`activeAutomationRuns=0`。结论：本地 state machine 与总控自驱闭环已通过，剩余阻塞收窄为真实目标 thread heartbeat 投递 / 触发模型。

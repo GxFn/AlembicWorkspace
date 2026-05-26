@@ -28,10 +28,10 @@
 
 - 来源类型：用户直接需求 / VAD 主线调整。
 - 来源文档：
-  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
-  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
+  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](../../../current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
 - 用户确认状态：用户确认使用 fake TODO，但要求真实自动化流程和足够日志。
 - 总控接收结论：创建 Wave 9 真实 heartbeat smoke，准备本地队列，等待用户开启。
 - 是否需要目标阶段确认：不新增；属于已确认 VAD 路线内的真实 smoke。
@@ -229,7 +229,7 @@ node scripts/visible-dispatch.mjs record-stop --automation-id <当前 automation
   - 不能推出的结论：不能证明 PCVM、Plugin intent、file monitor 或真实产品任务已可无人值守完成。
   - 停止或不开始条件：用户未明确开启；mode disabled；任一窗口 thread id 缺失；已有 active automation run 未清；队列存在未裁决旧任务；用户要求停止。
 - 测试单：无。
-- 测试交流入口：[alembic-test-exchange.md](alembic-test-exchange.md)
+- 测试交流入口：[alembic-test-exchange.md](../../../current/alembic-test-exchange.md)
 - 真实项目保护说明：不涉及真实项目；`AlembicTest` 不运行真实项目测试，只参与非测试型 VAD heartbeat smoke。
 
 ## 回填区

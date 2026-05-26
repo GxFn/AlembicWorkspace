@@ -1,6 +1,20 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { spawn } from "node:child_process";
+import {
+  closeSync,
+  existsSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  readdirSync,
+  readSync,
+  renameSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 const rawArgs = process.argv.slice(2);
@@ -23,6 +37,9 @@ const registryWindows = new Set([...dispatchWindows, "AlembicWorkspace"]);
 const sendEligibleStatuses = new Set(["待启动", "执行中"]);
 const heartbeatRrule = "FREQ=MINUTELY;INTERVAL=1";
 const totalControlArmOnlyTargets = new Set(["AlembicTest"]);
+const finalSessionEventRe = /(?:turn[./_-]?completed|response[./_-]?completed|final_answer|agent_message)/i;
+const runningSessionEventRe = /(?:tool_call|command|exec|turn[./_-]?started|response[./_-]?started|agent_reasoning|agent_progress)/i;
+const sessionUuidRe = /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.jsonl$/i;
 
 const files = {
   state: path.join(stateDir, "state.json"),
@@ -37,9 +54,10 @@ Visible automation dispatch local state manager
 
 Usage:
   node scripts/visible-dispatch.mjs status [--json]
-  node scripts/visible-dispatch.mjs mode --enable|--disable --write [--reason <text>]
+  node scripts/visible-dispatch.mjs mode --enable|--disable --write [--reason <text>] [--no-keep-awake]
   node scripts/visible-dispatch.mjs register --window <name> --thread <threadId> [--cwd <cwd>] --write
   node scripts/visible-dispatch.mjs unregister --window <name> --write [--reason <text>]
+  node scripts/visible-dispatch.mjs preflight [--from-plan|--task <taskId>|--group <id>|--window <name>] [--include-controller] [--json]
   node scripts/visible-dispatch.mjs enqueue --from-plan [--plan <path>] [--group <id>] [--return-policy controller-last|target-courier] --write
   node scripts/visible-dispatch.mjs arm --task <taskId> [--json]
   node scripts/visible-dispatch.mjs arm-batch --group <id> [--json]
@@ -53,7 +71,7 @@ Usage:
   node scripts/visible-dispatch.mjs group-status --group <id> [--json]
   node scripts/visible-dispatch.mjs tick [--write] [--json]
   node scripts/visible-dispatch.mjs controller-tick [--json]
-  node scripts/visible-dispatch.mjs accept --task <taskId> [--verdict accepted|rejected] [--note <text>] --write
+  node scripts/visible-dispatch.mjs accept --task <taskId> [--verdict accepted|rejected] [--note <text>] [--allow-active-automation] --write
   node scripts/visible-dispatch.mjs cleanup [--write] [--json]
   node scripts/visible-dispatch.mjs prune-history [--write] [--json]
 
@@ -61,9 +79,14 @@ Safety:
   Runtime files live under .workspace-local/visible-dispatch by default and are
   ignored by git. The script does not call Codex automation APIs directly; arm
   and finish-chain only print payloads that a Codex window can pass to
-  codex_app.automation_update. mode=disabled is the close switch: it stops
+  codex_app.automation_update. preflight, arm, and arm-batch verify that target
+  window thread ids resolve to local Codex session files before payloads are
+  used. mode=disabled is the close switch: it stops
   controller loops immediately, and any already-awake target window will record
   completion without receiving another finish-chain wake payload.
+  On macOS, mode=enabled starts a local caffeinate keep-awake process unless
+  --no-keep-awake or CODEX_VAD_KEEP_AWAKE=0 is set; mode=disabled stops the
+  keep-awake process recorded in local runtime state.
 `.trim();
 
 function hasFlag(name) {
@@ -80,6 +103,20 @@ function getValue(name, fallback = null) {
     return options[index + 1];
   }
   return fallback;
+}
+
+function getAllValues(name) {
+  const values = [];
+  for (let index = 0; index < options.length; index += 1) {
+    const option = options[index];
+    if (option === name && options[index + 1] && !options[index + 1].startsWith("--")) {
+      values.push(options[index + 1]);
+      index += 1;
+    } else if (option.startsWith(`${name}=`)) {
+      values.push(option.slice(name.length + 1));
+    }
+  }
+  return values;
 }
 
 function nowIso() {
@@ -137,6 +174,22 @@ function defaultState() {
     stopRequestedAt: null,
     disablePolicy: "stop-next-chain",
     reason: "",
+    keepAwake: defaultKeepAwake(),
+  };
+}
+
+function defaultKeepAwake() {
+  return {
+    enabled: true,
+    active: false,
+    platform: process.platform,
+    pid: 0,
+    command: "caffeinate",
+    args: ["-dimsu"],
+    startedAt: null,
+    stoppedAt: null,
+    stopReason: "",
+    lastError: "",
   };
 }
 
@@ -186,6 +239,13 @@ function validateWindow(windowName, { allowController = false } = {}) {
 }
 
 function validateThreadId(threadId) {
+  const error = threadIdValidationError(threadId);
+  if (error) {
+    fail(error);
+  }
+}
+
+function threadIdValidationError(threadId) {
   const value = String(threadId ?? "").trim();
   const normalized = value.toLowerCase();
   const placeholderPatterns = [
@@ -200,8 +260,231 @@ function validateThreadId(threadId) {
     /当前.*线程/,
   ];
   if (!value || placeholderPatterns.some((pattern) => pattern.test(normalized))) {
-    fail(`Invalid visible dispatch thread id placeholder: ${threadId}`);
+    return `Invalid visible dispatch thread id placeholder: ${threadId}`;
   }
+  return "";
+}
+
+function codexHome() {
+  return path.resolve(getValue("--codex-home", process.env.CODEX_HOME || path.join(os.homedir(), ".codex")));
+}
+
+function codexSessionsRoot() {
+  return path.resolve(getValue("--codex-sessions-root", path.join(codexHome(), "sessions")));
+}
+
+function listCodexSessionFiles(root) {
+  const files = [];
+  walkCodexSessions(root, files);
+  files.sort((a, b) => b.mtimeMs - a.mtimeMs);
+  return files;
+}
+
+function walkCodexSessions(dir, files) {
+  let entries = [];
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      walkCodexSessions(fullPath, files);
+    } else if (entry.isFile() && entry.name.endsWith(".jsonl")) {
+      try {
+        const stat = statSync(fullPath);
+        files.push({ path: fullPath, mtimeMs: stat.mtimeMs });
+      } catch {
+        // Ignore sessions that disappear while scanning.
+      }
+    }
+  }
+}
+
+function readFirstLine(filePath, { maxBytes = 2 * 1024 * 1024 } = {}) {
+  const fd = openSync(filePath, "r");
+  try {
+    const chunks = [];
+    let offset = 0;
+    let total = 0;
+    const chunkSize = 128 * 1024;
+    while (total < maxBytes) {
+      const buffer = Buffer.alloc(chunkSize);
+      const bytesRead = readSync(fd, buffer, 0, buffer.length, offset);
+      if (!bytesRead) break;
+      const chunk = buffer.subarray(0, bytesRead);
+      const newline = chunk.indexOf(10);
+      if (newline >= 0) {
+        chunks.push(chunk.subarray(0, newline));
+        break;
+      }
+      chunks.push(chunk);
+      offset += bytesRead;
+      total += bytesRead;
+    }
+    return Buffer.concat(chunks).toString("utf8").replace(/\r$/, "");
+  } finally {
+    closeSync(fd);
+  }
+}
+
+function readLastJsonRecord(filePath) {
+  try {
+    const stat = statSync(filePath);
+    const length = Math.min(stat.size, 256 * 1024);
+    const fd = openSync(filePath, "r");
+    try {
+      const buffer = Buffer.alloc(length);
+      readSync(fd, buffer, 0, length, stat.size - length);
+      const lines = buffer.toString("utf8").split(/\r?\n/).filter(Boolean).reverse();
+      for (const line of lines) {
+        try {
+          return JSON.parse(line);
+        } catch {
+          // Try the previous line.
+        }
+      }
+      return null;
+    } finally {
+      closeSync(fd);
+    }
+  } catch {
+    return null;
+  }
+}
+
+function idFromSessionPath(filePath) {
+  return path.basename(filePath).match(sessionUuidRe)?.[1] || "";
+}
+
+function readSessionMeta(filePath) {
+  const fallbackId = idFromSessionPath(filePath);
+  try {
+    const firstLine = readFirstLine(filePath);
+    const record = JSON.parse(firstLine);
+    if (record.type !== "session_meta") {
+      return fallbackId ? { threadId: fallbackId, cwd: "", name: "", source: "path" } : null;
+    }
+    const payload = record.payload || {};
+    const threadId = payload.id || fallbackId;
+    if (!threadId) return null;
+    return {
+      threadId,
+      cwd: payload.cwd || "",
+      name: payload.name || payload.title || "",
+      source: payload.source || "session_meta",
+    };
+  } catch {
+    return fallbackId ? { threadId: fallbackId, cwd: "", name: "", source: "path" } : null;
+  }
+}
+
+function statusFromSessionRecord(record) {
+  if (!record || record.type === "session_meta") return "";
+  const payload = record.payload || {};
+  const item = record.item || payload.item || payload || {};
+  const typeText = [
+    record.type,
+    record.method,
+    payload.type,
+    payload.phase,
+    item.type,
+    item.phase,
+    item.status,
+  ].filter(Boolean).join(" ");
+  const text = `${typeText} ${JSON.stringify({
+    message: payload.message || item.message || "",
+    role: item.role || payload.role || "",
+  })}`;
+  if (/final_answer/i.test(text)) return "idle";
+  if (/turn[./_-]?completed|response[./_-]?completed/i.test(text)) return "idle";
+  if (item.type === "agent_message" || item.type === "message") {
+    if (item.phase === "final_answer" || payload.phase === "final_answer") return "idle";
+  }
+  if (runningSessionEventRe.test(text) && !finalSessionEventRe.test(text)) return "running";
+  return "";
+}
+
+function detectSessionStatus(sessionPath) {
+  if (!sessionPath) return { status: "unknown", reason: "missing session path", lastEventAtMs: 0 };
+  let stat;
+  try {
+    stat = statSync(sessionPath);
+  } catch {
+    return { status: "unknown", reason: "session file unavailable", lastEventAtMs: 0 };
+  }
+  const status = statusFromSessionRecord(readLastJsonRecord(sessionPath));
+  if (status) {
+    return { status, reason: `last event ${status}`, lastEventAtMs: stat.mtimeMs };
+  }
+  const idleDebounceMs = parsePositiveInteger(getValue("--idle-debounce-ms", "3000"), "--idle-debounce-ms");
+  if (Date.now() - stat.mtimeMs < idleDebounceMs) {
+    return { status: "running", reason: "recent session write", lastEventAtMs: stat.mtimeMs };
+  }
+  return { status: "idle", reason: "session file stable", lastEventAtMs: stat.mtimeMs };
+}
+
+function findCodexSessionById(threadId) {
+  const target = String(threadId || "").trim().toLowerCase();
+  if (!target) return null;
+  const sessionsRoot = codexSessionsRoot();
+  for (const file of listCodexSessionFiles(sessionsRoot)) {
+    const meta = readSessionMeta(file.path);
+    if (!meta?.threadId) continue;
+    if (String(meta.threadId).toLowerCase() !== target) continue;
+    const status = detectSessionStatus(file.path);
+    return {
+      ...meta,
+      threadPath: file.path,
+      updatedAtMs: file.mtimeMs,
+      sessionStatus: status.status,
+      sessionStatusReason: status.reason,
+      lastEventAtMs: status.lastEventAtMs,
+    };
+  }
+  return null;
+}
+
+function cwdMatchesSession(registryCwd, sessionCwd) {
+  if (!registryCwd || !sessionCwd) return true;
+  try {
+    return path.resolve(registryCwd) === path.resolve(sessionCwd);
+  } catch {
+    return registryCwd === sessionCwd;
+  }
+}
+
+function deliveryTargetReadiness(entry, { requireIdle = false } = {}) {
+  if (!entry) {
+    return { ready: false, reason: "No active window registry entry is available." };
+  }
+  const threadError = threadIdValidationError(entry.threadId);
+  if (threadError) {
+    return { ready: false, reason: threadError };
+  }
+  const session = findCodexSessionById(entry.threadId);
+  if (!session) {
+    return {
+      ready: false,
+      reason: `No local Codex session was found for ${entry.windowName}; register the real target thread before arming automation.`,
+    };
+  }
+  if (requireIdle && session.sessionStatus !== "idle") {
+    return {
+      ready: false,
+      reason: `${entry.windowName} session is ${session.sessionStatus}; wait for the target Codex window to become idle.`,
+      session,
+    };
+  }
+  const warnings = [];
+  if (session.sessionStatus === "running") {
+    warnings.push(`${entry.windowName} session appears running; automation may wait behind active work.`);
+  }
+  if (!cwdMatchesSession(entry.cwd, session.cwd)) {
+    warnings.push(`${entry.windowName} registry cwd differs from the resolved Codex session cwd.`);
+  }
+  return { ready: true, reason: "", session, warnings };
 }
 
 function parsePositiveInteger(value, label) {
@@ -381,12 +664,171 @@ function todoCandidatesFromBoard(limit = 5) {
     }));
 }
 
+function keepAwakeCommand() {
+  return getValue("--keep-awake-command", process.env.CODEX_VAD_KEEP_AWAKE_COMMAND || "caffeinate");
+}
+
+function keepAwakeArgs() {
+  const explicitArgs = getAllValues("--keep-awake-arg");
+  if (explicitArgs.length > 0) {
+    return explicitArgs;
+  }
+  const jsonArgs = process.env.CODEX_VAD_KEEP_AWAKE_ARGS_JSON;
+  if (jsonArgs) {
+    try {
+      const parsed = JSON.parse(jsonArgs);
+      if (Array.isArray(parsed) && parsed.every((item) => typeof item === "string")) {
+        return parsed;
+      }
+    } catch {
+      return ["-dimsu"];
+    }
+  }
+  return ["-dimsu"];
+}
+
+function keepAwakeEnabled() {
+  if (hasFlag("--no-keep-awake")) {
+    return false;
+  }
+  return process.env.CODEX_VAD_KEEP_AWAKE !== "0";
+}
+
+function normalizeKeepAwakeState(state) {
+  const current = state.keepAwake && typeof state.keepAwake === "object" ? state.keepAwake : {};
+  return {
+    ...defaultKeepAwake(),
+    ...current,
+    enabled: keepAwakeEnabled(),
+    platform: process.platform,
+    command: current.command || keepAwakeCommand(),
+    args: Array.isArray(current.args) && current.args.every((item) => typeof item === "string")
+      ? current.args
+      : keepAwakeArgs(),
+  };
+}
+
+function isPidRunning(pid) {
+  const numericPid = Number(pid);
+  if (!Number.isInteger(numericPid) || numericPid <= 0) {
+    return false;
+  }
+  try {
+    process.kill(numericPid, 0);
+    return true;
+  } catch (error) {
+    return error.code === "EPERM";
+  }
+}
+
+function keepAwakeStatus(state, extra = {}) {
+  const keepAwake = normalizeKeepAwakeState(state);
+  return {
+    ...keepAwake,
+    active: isPidRunning(keepAwake.pid),
+    ...extra,
+  };
+}
+
+function startKeepAwake(state, { dryRun = false } = {}) {
+  const status = keepAwakeStatus(state, {
+    command: keepAwakeCommand(),
+    args: keepAwakeArgs(),
+  });
+  if (!status.enabled) {
+    return {
+      ...status,
+      message: status.active ? "disabled; already running" : "disabled",
+    };
+  }
+  if (status.platform !== "darwin") {
+    return { ...status, active: false, pid: 0, message: "macOS only" };
+  }
+  if (status.active) {
+    return { ...status, message: "already running" };
+  }
+  if (dryRun) {
+    return { ...status, active: false, pid: 0, message: "would start" };
+  }
+  try {
+    const child = spawn(status.command, status.args, {
+      stdio: "ignore",
+      detached: false,
+    });
+    child.unref?.();
+    if (!child.pid) {
+      return {
+        ...status,
+        active: false,
+        pid: 0,
+        lastError: `Failed to start ${status.command}: no child pid returned.`,
+        message: "failed",
+      };
+    }
+    return {
+      ...status,
+      active: true,
+      pid: child.pid || 0,
+      startedAt: nowIso(),
+      stoppedAt: null,
+      stopReason: "",
+      lastError: "",
+      message: "started",
+    };
+  } catch (error) {
+    return {
+      ...status,
+      active: false,
+      pid: 0,
+      lastError: error.message,
+      message: "failed",
+    };
+  }
+}
+
+function stopKeepAwake(state, { dryRun = false, reason = "" } = {}) {
+  const status = keepAwakeStatus(state);
+  if (!status.active) {
+    return {
+      ...status,
+      active: false,
+      pid: 0,
+      stoppedAt: status.stoppedAt || nowIso(),
+      stopReason: reason,
+      message: status.pid ? "not running" : "not started",
+    };
+  }
+  if (dryRun) {
+    return { ...status, message: "would stop" };
+  }
+  try {
+    process.kill(status.pid, "SIGTERM");
+    return {
+      ...status,
+      active: false,
+      pid: 0,
+      stoppedAt: nowIso(),
+      stopReason: reason,
+      lastError: "",
+      message: "stopped",
+    };
+  } catch (error) {
+    return {
+      ...status,
+      active: isPidRunning(status.pid),
+      lastError: error.message,
+      message: "stop failed",
+    };
+  }
+}
+
 function commandStatus() {
   const { state, registry, queue, runs, groups } = readAll();
   const counts = queue.tasks.reduce((acc, task) => {
     acc[task.status] = (acc[task.status] ?? 0) + 1;
     return acc;
   }, {});
+  const keepAwake = keepAwakeStatus(state);
   output(
     {
       ok: true,
@@ -398,6 +840,7 @@ function commandStatus() {
       automationRuns: runs.runs.length,
       dispatchGroups: groups.groups.length,
       disablePolicy: state.disablePolicy ?? "stop-next-chain",
+      keepAwake,
     },
     [
       "Visible dispatch status",
@@ -405,6 +848,7 @@ function commandStatus() {
       `Mode: ${state.mode}`,
       `Loop enabled: ${Boolean(state.loopEnabled)}`,
       `Disable policy: ${state.disablePolicy ?? "stop-next-chain"}`,
+      `Keep awake: ${keepAwake.active ? `active pid=${keepAwake.pid}` : keepAwake.message || "inactive"}`,
       `Registered windows: ${registry.windows.length}`,
       `Tasks: ${Object.entries(counts).map(([key, value]) => `${key}=${value}`).join(", ") || "none"}`,
       `Automation runs: ${runs.runs.length}`,
@@ -420,10 +864,25 @@ function redactThreadEntry(entry) {
   };
 }
 
-function controllerDecisionFromQueue(state, registry, queue, currentPlanPath) {
+function redactTaskForOutput(task) {
+  if (!task || typeof task !== "object") {
+    return task;
+  }
+  return {
+    ...task,
+    completedByThreadId: task.completedByThreadId ? "<local-only>" : task.completedByThreadId,
+  };
+}
+
+function groupSummariesById(groups, queue) {
+  return new Map(groups.groups.map((group) => [group.groupId, summarizeGroup(group, queue)]));
+}
+
+function controllerDecisionFromQueue(state, registry, queue, groups, currentPlanPath) {
   const observedAt = nowIso();
   const nowMs = Date.parse(observedAt);
   const activeWindows = activeWindowSet(registry);
+  const groupSummaries = groupSummariesById(groups, queue);
   const tasks = queue.tasks.map((task) => ({
     taskId: task.taskId,
     targetWindow: task.targetWindow,
@@ -433,7 +892,8 @@ function controllerDecisionFromQueue(state, registry, queue, currentPlanPath) {
     armLeaseUntil: task.armLeaseUntil ?? null,
     automationId: task.automationId ?? null,
     hasBackfill: hasBackfill(task),
-    ...classifyTaskForTick(task, state, activeWindows, nowMs),
+    groupId: task.groupId ?? null,
+    ...classifyTaskForTick(task, state, activeWindows, nowMs, groupSummaries),
   }));
   const historicResolvedTasks = tasks.filter(
     (task) =>
@@ -484,7 +944,7 @@ function controllerDecisionFromQueue(state, registry, queue, currentPlanPath) {
 }
 
 function commandControllerTick() {
-  const { state, registry, queue } = readAll();
+  const { state, registry, queue, groups } = readAll();
   const planPath = currentPlanPathFromIndex();
   const planContent = existsSync(planPath) ? readFileSync(planPath, "utf8") : "";
   const currentPlan = {
@@ -498,7 +958,7 @@ function commandControllerTick() {
     (row) => !existingTaskIds.has(taskIdForPlanWindow(planPath, row.window)),
   );
   const unsupportedRows = sendEligibleRows.filter((row) => !dispatchWindows.has(row.window));
-  const queueDecision = controllerDecisionFromQueue(state, registry, queue, currentPlan.path);
+  const queueDecision = controllerDecisionFromQueue(state, registry, queue, groups, currentPlan.path);
   const todoCandidates = todoCandidatesFromBoard();
 
   let decision;
@@ -592,6 +1052,10 @@ function commandMode() {
     fail("Pass exactly one of --enable or --disable.");
   }
   const state = readJson(files.state, defaultState());
+  const reason = getValue("--reason", "");
+  const keepAwake = enable
+    ? startKeepAwake(state, { dryRun: !write })
+    : stopKeepAwake(state, { dryRun: !write, reason });
   const next = {
     ...state,
     mode: enable ? "enabled" : "disabled",
@@ -599,14 +1063,29 @@ function commandMode() {
     updatedAt: nowIso(),
     stopRequestedAt: disable ? nowIso() : null,
     disablePolicy: enable ? "" : "stop-next-chain",
-    reason: getValue("--reason", ""),
+    reason,
+    keepAwake,
   };
   if (write) {
     atomicWriteJson(files.state, next);
   }
   output(
-    { ok: true, wrote: write, state: next },
-    `${write ? "Updated" : "Would update"} visible dispatch mode to ${next.mode}.`,
+    {
+      ok: true,
+      wrote: write,
+      state: next,
+      keepAwake,
+      guidance: enable
+        ? "Automation mode is enabled for eligible current-plan dispatch only. Manual Design discussion, total-control planning, or single-window development still requires explicit total-control judgment and must not be treated as unattended work."
+        : "Automation mode is disabled. Already-awake target windows may finish once, but finish-chain must not produce another heartbeat payload.",
+    },
+    [
+      `${write ? "Updated" : "Would update"} visible dispatch mode to ${next.mode}.`,
+      `Keep awake: ${keepAwake.active ? `active pid=${keepAwake.pid}` : keepAwake.message || "inactive"}`,
+      enable
+        ? "Manual Design discussion, total-control discussion, and single-window development remain manual unless a current plan explicitly dispatches them."
+        : "Finish-chain is closed for the next jump; keep-awake has been stopped when it was owned by this runtime.",
+    ].join("\n"),
   );
 }
 
@@ -659,6 +1138,168 @@ function commandUnregister() {
     { ok: true, wrote: write, windowName, removed },
     `${write ? "Unregistered" : "Would unregister"} ${windowName} (${removed} entr${removed === 1 ? "y" : "ies"}).`,
   );
+}
+
+function addRequiredWindow(required, windowName, reason) {
+  validateWindow(windowName, { allowController: true });
+  const existing = required.get(windowName);
+  if (existing) {
+    existing.reasons.push(reason);
+    return;
+  }
+  required.set(windowName, { windowName, reasons: [reason] });
+}
+
+function requiredWindowsForPreflight(queue, groups) {
+  const required = new Map();
+  for (const windowName of getAllValues("--window")) {
+    addRequiredWindow(required, windowName, "--window");
+  }
+
+  const taskId = getValue("--task");
+  if (taskId) {
+    const task = queue.tasks.find((item) => item.taskId === taskId);
+    if (!task) fail(`Task not found: ${taskId}`);
+    addRequiredWindow(required, task.targetWindow, `task:${taskId}`);
+  }
+
+  const groupId = getValue("--group");
+  if (groupId) {
+    const normalizedGroupId = sanitizeGroupId(groupId);
+    const group = groups.groups.find((item) => item.groupId === normalizedGroupId);
+    if (!group) fail(`Dispatch group not found: ${normalizedGroupId}`);
+    const taskIds = new Set(Array.isArray(group.taskIds) ? group.taskIds : []);
+    const groupTasks = queue.tasks.filter((task) => task.groupId === normalizedGroupId || taskIds.has(task.taskId));
+    for (const task of groupTasks) {
+      addRequiredWindow(required, task.targetWindow, `group:${normalizedGroupId}`);
+    }
+    if (group.returnPolicy === "controller-last" || hasFlag("--include-controller")) {
+      addRequiredWindow(required, "AlembicWorkspace", `group-controller:${normalizedGroupId}`);
+    }
+  }
+
+  if (hasFlag("--from-plan")) {
+    const explicitPlan = getValue("--plan");
+    const planPath = explicitPlan ? path.resolve(workspaceRoot, explicitPlan) : currentPlanPathFromIndex();
+    if (!existsSync(planPath)) {
+      fail(`Plan not found: ${relativeToWorkspace(planPath)}`);
+    }
+    const rows = parseDispatchRows(readFileSync(planPath, "utf8")).filter((row) => sendEligibleStatuses.has(row.status));
+    for (const row of rows) {
+      addRequiredWindow(required, row.window, `plan:${relativeToWorkspace(planPath)}`);
+    }
+    if (hasFlag("--include-controller")) {
+      addRequiredWindow(required, "AlembicWorkspace", `plan-controller:${relativeToWorkspace(planPath)}`);
+    }
+  }
+
+  if (required.size === 0) {
+    const activeStatuses = new Set(["queued", "claimed", "armed", "running"]);
+    for (const task of queue.tasks.filter((item) => activeStatuses.has(item.status))) {
+      addRequiredWindow(required, task.targetWindow, `queue:${task.taskId}`);
+    }
+    for (const group of groups.groups.filter((item) => item.returnPolicy === "controller-last" && item.status !== "returned")) {
+      addRequiredWindow(required, "AlembicWorkspace", `group-controller:${group.groupId}`);
+    }
+  }
+
+  return [...required.values()];
+}
+
+function redactSessionForOutput(session) {
+  if (!session) return null;
+  return {
+    found: true,
+    threadPath: session.threadPath ? "<local-only>" : "",
+    cwd: session.cwd || "",
+    name: session.name || "",
+    source: session.source || "",
+    updatedAtMs: session.updatedAtMs || 0,
+    sessionStatus: session.sessionStatus || "unknown",
+    sessionStatusReason: session.sessionStatusReason || "",
+    lastEventAtMs: session.lastEventAtMs || 0,
+  };
+}
+
+function computePreflight() {
+  const { state, registry, queue, runs, groups } = readAll();
+  const requireIdle = hasFlag("--require-idle");
+  const allowActiveRuns = hasFlag("--allow-active-runs");
+  const required = requiredWindowsForPreflight(queue, groups);
+  const issues = [];
+  const warnings = [];
+  const windows = required.map((item) => {
+    const entry = activeRegistryEntry(registry, item.windowName);
+    const readiness = deliveryTargetReadiness(entry, { requireIdle });
+    if (!entry) {
+      issues.push(`No active window registry entry for ${item.windowName}.`);
+    } else if (!readiness.ready) {
+      issues.push(readiness.reason);
+    }
+    if (readiness.warnings?.length) {
+      warnings.push(...readiness.warnings);
+    }
+    return {
+      windowName: item.windowName,
+      reasons: item.reasons,
+      registered: Boolean(entry),
+      threadId: entry?.threadId ? "<local-only>" : "",
+      cwd: entry?.cwd || "",
+      ready: readiness.ready,
+      issue: readiness.ready ? "" : readiness.reason,
+      session: redactSessionForOutput(readiness.session),
+    };
+  });
+  const activeRuns = runs.runs.filter((run) => run.status !== "stopped");
+  if (activeRuns.length > 0 && !allowActiveRuns) {
+    issues.push(`Active automation run(s) exist: ${activeRuns.map((run) => run.automationId).join(", ")}.`);
+  }
+  if (required.length === 0) {
+    warnings.push("No required dispatch windows were found for preflight.");
+  }
+  const keepAwake = keepAwakeStatus(state);
+  if (state.mode === "enabled" && keepAwake.enabled && !keepAwake.active) {
+    warnings.push("Automation mode is enabled but keep-awake is not active.");
+  }
+  return {
+    ok: issues.length === 0,
+    ready: issues.length === 0,
+    checkedAt: nowIso(),
+    stateDir: relativeToWorkspace(stateDir),
+    mode: state.mode,
+    loopEnabled: Boolean(state.loopEnabled),
+    codexSessionsRoot: codexSessionsRoot(),
+    requireIdle,
+    requiredWindowCount: required.length,
+    windows,
+    activeAutomationRuns: activeRuns.map((run) => ({
+      taskId: run.taskId,
+      targetWindow: run.targetWindow,
+      automationId: run.automationId,
+      status: run.status,
+      runType: run.runType || "target",
+    })),
+    keepAwake,
+    warnings,
+    issues,
+  };
+}
+
+function commandPreflight() {
+  const result = computePreflight();
+  output(
+    result,
+    [
+      `Visible dispatch preflight: ${result.ready ? "ready" : "blocked"}`,
+      `Mode: ${result.mode}`,
+      `Required windows: ${result.requiredWindowCount}`,
+      `Issues: ${result.issues.join("; ") || "none"}`,
+      `Warnings: ${result.warnings.join("; ") || "none"}`,
+    ].join("\n"),
+  );
+  if (!result.ready) {
+    process.exit(1);
+  }
 }
 
 function commandEnqueue() {
@@ -780,6 +1421,8 @@ function buildTaskPrompt(task) {
     "",
     "只领取属于当前窗口的任务；没有任务或目标窗口不匹配则短退出，不得改用其它 --window 继续执行。完成后按当前总控文档回填完成范围、验证命令、验证结果、遗留风险和下一步建议。",
     "",
+    "自动化模式边界：只有本条 heartbeat 和当前总控计划明确分配的任务属于无人值守接续。用户在电脑前发起的普通讨论、Design 需求设计、总控决策讨论或单窗口开发请求，仍按最新用户输入和各自 AGENTS.md 执行，不得因为 visible-dispatch mode 已开启就当作自动化任务领取、续跳或关闭。",
+    "",
     "无人值守接续规则：",
     `1. 完成当前任务后运行：${finishCommand}`,
     "2. 若 finish JSON 返回 `chain.nextAction === \"noReturn\"`，说明本批次还有其它窗口未完成；不得创建任何下一跳或总控回跳。",
@@ -788,7 +1431,7 @@ function buildTaskPrompt(task) {
     "5. 创建目标窗口 heartbeat 成功后运行 `chain.recordArmCommand`；创建总控回跳 heartbeat 成功后运行 `chain.recordReturnCommand`。把 `<automation-id>` 替换为返回的 automation id；这只是机械投递，不得代替目标窗口或总控执行任务。",
     "6. 如果 finish JSON 返回 `controllerArm`、`modeDisabled`、`registerWindow`、`registerController`、`wait`、`review`，或没有对应 payload / permission flag，不得创建下一跳 automation，改为报告总控。",
     "7. 下一跳目标是 `AlembicTest` 时默认由总控调起；非 `AlembicTest` 窗口不得处理或代领 `AlembicTest` 任务。",
-    `8. 关闭开关是 \`node scripts/visible-dispatch.mjs mode --disable --write\`；heartbeat cadence 固定为 \`${heartbeatRrule}\`，真实窗口跳转是分钟级等待。`,
+    `8. 关闭开关是 \`node scripts/visible-dispatch.mjs mode --disable --write\`；它同时关闭后续 finish-chain 跳转和本地防睡眠。heartbeat cadence 固定为 \`${heartbeatRrule}\`，真实窗口跳转是分钟级等待。`,
     "9. 结束前，如果本条 heartbeat 消息包含 `automation_id`，只删除本条 automation，并用 `record-stop --automation-id <automation_id> --write --reason \"target completed\"` 记录停止。",
   ].join("\n");
 }
@@ -799,6 +1442,13 @@ function buildArmPayload(task, registry) {
     return {
       payload: null,
       reason: `No active window registry entry for ${task.targetWindow}.`,
+    };
+  }
+  const readiness = deliveryTargetReadiness(windowEntry);
+  if (!readiness.ready) {
+    return {
+      payload: null,
+      reason: readiness.reason,
     };
   }
   const prompt = buildTaskPrompt(task);
@@ -826,6 +1476,7 @@ function buildControllerReturnPrompt(group, completedTask) {
     "先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/workspace-current-status.md、当前总控计划、skills/dev/visible-automation-dispatch-controller/SKILL.md。",
     "",
     "你是 AlembicWorkspace 总控，当前处于无人值守自动化模式；自动化只是穿插在原总控流程里的投递/回跳层，不替代总控判断。",
+    "如果当前输入不是 controller-return heartbeat，或用户在同一窗口开始需求设计、总控讨论、普通问答或单窗口开发，则先按最新用户输入和 AGENTS.md 判断，不得把这些人工交互自动纳入 VAD 循环。",
     "",
     "先运行：",
     `node scripts/visible-dispatch.mjs group-status --group ${group.groupId} --json`,
@@ -834,6 +1485,7 @@ function buildControllerReturnPrompt(group, completedTask) {
     "随后按总控原流程独立验收本 group 所有 backfill：区分窗口自述、原始证据和总控裁决；决定接受、驳回、补证、自测、创建真实测试单、进入下一阶段、继续派发下一批或停止等待用户确认。",
     "",
     "不得因为脚本返回 completed 就关闭目标；不得在小修小补上偏离用户最终目标。若 mode 已关闭、确认门禁触发、证据不足、回填冲突或同一问题循环风险出现，停止自动推进并报告。",
+    "关闭无人值守模式使用：node scripts/visible-dispatch.mjs mode --disable --write；关闭后不得再创建下一跳 heartbeat，并会停止本地防睡眠。",
     "",
     `本次最后完成窗口：${completedTask.targetWindow}；任务：${completedTask.taskId}。`,
     "",
@@ -848,6 +1500,13 @@ function buildControllerReturnPayload(group, completedTask, registry) {
     return {
       payload: null,
       reason: "No active AlembicWorkspace controller registry entry is available for controller return.",
+    };
+  }
+  const readiness = deliveryTargetReadiness(controllerEntry);
+  if (!readiness.ready) {
+    return {
+      payload: null,
+      reason: readiness.reason,
     };
   }
   const payload = {
@@ -987,6 +1646,14 @@ function commandRecordReturn() {
   if (!group) {
     fail(`Dispatch group not found: ${groupId}`);
   }
+  const activeControllerReturn = runs.runs.find(
+    (run) => run.groupId === groupId && run.runType === "controller-return" && run.status !== "stopped",
+  );
+  if (activeControllerReturn) {
+    fail(
+      `Controller return automation ${activeControllerReturn.automationId} is already active for ${groupId}; stop it before recording another controller return.`,
+    );
+  }
   const duplicate = runs.runs.find(
     (run) => run.groupId === groupId && run.automationId === automationId && run.status !== "stopped",
   );
@@ -1031,17 +1698,26 @@ function commandRecordStop() {
 
   const queue = readJson(files.queue, defaultQueue());
   const runs = readJson(files.runs, defaultRuns());
-  const matches = runs.runs.filter(
+  const groups = readJson(files.groups, defaultGroups());
+  const activeMatches = runs.runs.filter(
     (run) => run.automationId === automationId && (!taskId || run.taskId === taskId) && run.status !== "stopped",
   );
-  if (matches.length === 0) {
+  const stoppedControllerMatches = runs.runs.filter(
+    (run) =>
+      run.automationId === automationId &&
+      (!taskId || run.taskId === taskId) &&
+      run.status === "stopped" &&
+      run.runType === "controller-return" &&
+      run.groupId,
+  );
+  if (activeMatches.length === 0 && stoppedControllerMatches.length === 0) {
     fail(`No active automation run found for ${automationId}${taskId ? ` / ${taskId}` : ""}.`);
   }
 
   const stoppedAt = nowIso();
   const reason = getValue("--reason", "");
-  const touchedTaskIds = new Set(matches.map((run) => run.taskId));
-  for (const run of matches) {
+  const touchedTaskIds = new Set(activeMatches.map((run) => run.taskId));
+  for (const run of activeMatches) {
     run.previousStatus = run.status;
     run.status = "stopped";
     run.stoppedAt = stoppedAt;
@@ -1053,20 +1729,67 @@ function commandRecordStop() {
       task.automationStopReason = reason;
     }
   }
-  queue.updatedAt = stoppedAt;
-  runs.updatedAt = stoppedAt;
+  const stoppedGroups = [];
+  const controllerReturnStops = new Map(
+    [...activeMatches, ...stoppedControllerMatches]
+      .filter((run) => run.runType === "controller-return" && run.groupId)
+      .map((run) => [
+        run.groupId,
+        {
+          stoppedAt: run.stoppedAt || stoppedAt,
+          reason: reason || run.stopReason || "",
+        },
+      ]),
+  );
+  for (const group of groups.groups) {
+    const controllerStop = controllerReturnStops.get(group.groupId);
+    if (!controllerStop || group.status === "returned") {
+      continue;
+    }
+    group.previousStatus = group.status;
+    group.status = "returned";
+    group.controllerReturnStoppedAt = controllerStop.stoppedAt;
+    group.controllerReturnStopReason = controllerStop.reason;
+    group.updatedAt = stoppedAt;
+    stoppedGroups.push(group);
+  }
+  if (activeMatches.length > 0) {
+    queue.updatedAt = stoppedAt;
+    runs.updatedAt = stoppedAt;
+  }
+  if (stoppedGroups.length > 0) {
+    groups.updatedAt = stoppedAt;
+  }
   if (write) {
-    atomicWriteJson(files.queue, queue);
-    atomicWriteJson(files.runs, runs);
+    if (activeMatches.length > 0) {
+      atomicWriteJson(files.queue, queue);
+      atomicWriteJson(files.runs, runs);
+    }
+    if (stoppedGroups.length > 0) {
+      atomicWriteJson(files.groups, groups);
+    }
   }
   output(
-    { ok: true, wrote: write, stoppedAt, stoppedRuns: matches },
+    {
+      ok: true,
+      wrote: write,
+      stoppedAt,
+      stoppedRuns: activeMatches,
+      alreadyStoppedControllerRuns: stoppedControllerMatches,
+      stoppedGroups,
+    },
     `${write ? "Recorded" : "Would record"} stopped automation ${automationId}.`,
   );
 }
 
 function summarizeGroup(group, queue) {
-  const groupTasks = queue.tasks.filter((task) => task.groupId === group.groupId);
+  const queueById = new Map(queue.tasks.map((task) => [task.taskId, task]));
+  const declaredTaskIds = Array.isArray(group.taskIds) ? group.taskIds : [];
+  const groupTasks =
+    declaredTaskIds.length > 0
+      ? declaredTaskIds.map((taskId) => queueById.get(taskId)).filter(Boolean)
+      : queue.tasks.filter((task) => task.groupId === group.groupId);
+  const missingTaskIds = declaredTaskIds.filter((taskId) => !queueById.has(taskId));
   const terminalStatuses = new Set(["completed", "accepted", "rejected", "blocked"]);
   const taskSummaries = groupTasks.map((task) => ({
     taskId: task.taskId,
@@ -1085,10 +1808,13 @@ function summarizeGroup(group, queue) {
     status: group.status,
     controlDoc: group.controlDoc,
     taskCount: taskSummaries.length,
+    declaredTaskCount: declaredTaskIds.length || taskSummaries.length,
+    missingTaskCount: missingTaskIds.length,
+    missingTaskIds,
     completedCount: completed.length,
     blockedCount: blocked.length,
     unfinishedCount: unfinished.length,
-    terminal: unfinished.length === 0 && taskSummaries.length > 0,
+    terminal: missingTaskIds.length === 0 && unfinished.length === 0 && taskSummaries.length > 0,
     tasks: taskSummaries,
   };
 }
@@ -1268,6 +1994,16 @@ function buildFinishChain({ state, registry, queue, groups, completedTask, chain
       group.lastCompletedTaskId = completedTask.taskId;
       group.lastCompletedAt = completedTask.completedAt;
       group.updatedAt = nowIso();
+      if (summary.missingTaskCount > 0) {
+        group.status = "needs-inspection";
+        return {
+          enabled: true,
+          nextAction: "inspect",
+          handoffPolicy: "controller-last",
+          message: `Dispatch group ${group.groupId} references missing task(s): ${summary.missingTaskIds.join(", ")}.`,
+          group: summary,
+        };
+      }
       if (!summary.terminal) {
         group.status = "open";
         return {
@@ -1275,6 +2011,15 @@ function buildFinishChain({ state, registry, queue, groups, completedTask, chain
           nextAction: "noReturn",
           handoffPolicy: "controller-last",
           message: `Dispatch group ${group.groupId} still has ${summary.unfinishedCount} unfinished task(s); do not return to total control yet.`,
+          group: summary,
+        };
+      }
+      if (group.status === "return-armed" || group.status === "returned") {
+        return {
+          enabled: true,
+          nextAction: "review",
+          handoffPolicy: "controller-return",
+          message: `Dispatch group ${group.groupId} already has a recorded controller return; do not create another heartbeat.`,
           group: summary,
         };
       }
@@ -1447,7 +2192,7 @@ function commandFinish() {
   }
 
   output(
-    { ok: true, wrote: write, registeredThread: Boolean(threadId), completed: task, chain },
+    { ok: true, wrote: write, registeredThread: Boolean(threadId), completed: redactTaskForOutput(task), chain },
     [
       `${write ? "Finished" : "Would finish"} ${task.taskId} for ${windowName}.`,
       `Previous status: ${previousStatus}`,
@@ -1465,10 +2210,14 @@ function hasBackfill(task) {
 }
 
 function activeWindowSet(registry) {
-  return new Set(registry.windows.filter((entry) => entry.status === "active").map((entry) => entry.windowName));
+  return new Set(
+    registry.windows
+      .filter((entry) => entry.status === "active" && deliveryTargetReadiness(entry).ready)
+      .map((entry) => entry.windowName),
+  );
 }
 
-function classifyTaskForTick(task, state, activeWindows, nowMs) {
+function classifyTaskForTick(task, state, activeWindows, nowMs, groupSummaries = new Map()) {
   if (task.status === "queued") {
     if (state.mode !== "enabled") {
       return {
@@ -1567,6 +2316,14 @@ function classifyTaskForTick(task, state, activeWindows, nowMs) {
   }
 
   if (task.status === "completed") {
+    const groupSummary = task.groupId ? groupSummaries.get(task.groupId) : null;
+    if (groupSummary?.returnPolicy === "controller-last" && !groupSummary.terminal) {
+      return {
+        waitState: "waiting",
+        nextAction: "waitForGroup",
+        message: `Task is complete, but dispatch group ${groupSummary.groupId} still has ${groupSummary.unfinishedCount} unfinished task(s); wait for the final target before total-control review.`,
+      };
+    }
     if (hasBackfill(task)) {
       return {
         waitState: "ready",
@@ -1613,13 +2370,14 @@ function classifyTaskForTick(task, state, activeWindows, nowMs) {
 }
 
 function commandTick() {
-  const { state, registry, queue } = readAll();
+  const { state, registry, queue, groups } = readAll();
   const observedAt = nowIso();
   const nowMs = Date.parse(observedAt);
   const activeWindows = activeWindowSet(registry);
+  const groupSummaries = groupSummariesById(groups, queue);
   let changed = false;
   const tasks = queue.tasks.map((task) => {
-    const summary = classifyTaskForTick(task, state, activeWindows, nowMs);
+    const summary = classifyTaskForTick(task, state, activeWindows, nowMs, groupSummaries);
     if (write && summary.nextAction === "markStale") {
       task.previousStatus = task.status;
       task.status = "stale";
@@ -1630,7 +2388,7 @@ function commandTick() {
         targetWindow: task.targetWindow,
         status: task.status,
         previousStatus: task.previousStatus,
-        ...classifyTaskForTick(task, state, activeWindows, nowMs),
+        ...classifyTaskForTick(task, state, activeWindows, nowMs, groupSummaries),
       };
     }
     return {
@@ -1707,6 +2465,7 @@ function commandAccept() {
     fail("--verdict must be accepted or rejected.");
   }
   const queue = readJson(files.queue, defaultQueue());
+  const runs = readJson(files.runs, defaultRuns());
   const task = queue.tasks.find((item) => item.taskId === taskId);
   if (!task) {
     fail(`Task not found: ${taskId}`);
@@ -1716,6 +2475,12 @@ function commandAccept() {
   }
   if (verdict === "accepted" && !hasBackfill(task)) {
     fail(`Task ${taskId} has no backfill evidence; reject it or request backfill before accepting.`);
+  }
+  const activeRuns = runs.runs.filter((run) => run.taskId === taskId && run.status !== "stopped");
+  if (verdict === "accepted" && activeRuns.length > 0 && !hasFlag("--allow-active-automation")) {
+    fail(
+      `Task ${taskId} still has active automation run(s): ${activeRuns.map((run) => run.automationId).join(", ")}. Delete/record-stop them before accepting, or pass --allow-active-automation with a reason.`,
+    );
   }
 
   const decidedAt = nowIso();
@@ -1735,7 +2500,7 @@ function commandAccept() {
     atomicWriteJson(files.queue, queue);
   }
   output(
-    { ok: true, wrote: write, task },
+    { ok: true, wrote: write, task: redactTaskForOutput(task), activeRuns },
     `${write ? "Recorded" : "Would record"} total-control ${verdict} verdict for ${taskId}.`,
   );
 }
@@ -1790,6 +2555,7 @@ function commandCleanup() {
 function commandPruneHistory() {
   const queue = readJson(files.queue, defaultQueue());
   const runs = readJson(files.runs, defaultRuns());
+  const groups = readJson(files.groups, defaultGroups());
   const currentPlanPath = relativeToWorkspace(currentPlanPathFromIndex());
   const terminalHistoricStatuses = new Set(["accepted", "rejected", "blocked"]);
   const activeRunTaskIds = new Set(
@@ -1811,16 +2577,39 @@ function commandPruneHistory() {
       terminalHistoricStatuses.has(task.status) &&
       activeRunTaskIds.has(task.taskId),
   );
+  const remainingTaskIdsAfterPrune = new Set(
+    queue.tasks.filter((task) => !prunableTaskIds.has(task.taskId)).map((task) => task.taskId),
+  );
+  const activeRunGroupIds = new Set(
+    runs.runs.filter((run) => run.groupId && run.status !== "stopped").map((run) => run.groupId),
+  );
+  const prunableGroups = groups.groups.filter((group) => {
+    if (!group.controlDoc || group.controlDoc === currentPlanPath || activeRunGroupIds.has(group.groupId)) {
+      return false;
+    }
+    const taskIds = Array.isArray(group.taskIds) ? group.taskIds : [];
+    return taskIds.length > 0 && taskIds.every((taskId) => !remainingTaskIdsAfterPrune.has(taskId));
+  });
+  const prunableGroupIds = new Set(prunableGroups.map((group) => group.groupId));
+  const prunableGroupRuns = runs.runs.filter(
+    (run) => run.groupId && prunableGroupIds.has(run.groupId) && run.status === "stopped",
+  );
+  const prunableRunIds = new Set([...prunableRuns, ...prunableGroupRuns].map((run) => run.runId));
 
   if (write && prunableTasks.length > 0) {
     queue.tasks = queue.tasks.filter((task) => !prunableTaskIds.has(task.taskId));
     queue.updatedAt = nowIso();
     atomicWriteJson(files.queue, queue);
   }
-  if (write && prunableRuns.length > 0) {
-    runs.runs = runs.runs.filter((run) => !(prunableTaskIds.has(run.taskId) && run.status === "stopped"));
+  if (write && prunableRunIds.size > 0) {
+    runs.runs = runs.runs.filter((run) => !prunableRunIds.has(run.runId));
     runs.updatedAt = nowIso();
     atomicWriteJson(files.runs, runs);
+  }
+  if (write && prunableGroups.length > 0) {
+    groups.groups = groups.groups.filter((group) => !prunableGroupIds.has(group.groupId));
+    groups.updatedAt = nowIso();
+    atomicWriteJson(files.groups, groups);
   }
 
   output(
@@ -1841,6 +2630,17 @@ function commandPruneHistory() {
         targetWindow: run.targetWindow,
         automationId: run.automationId,
       })),
+      prunedGroups: prunableGroups.map((group) => ({
+        groupId: group.groupId,
+        status: group.status,
+        controlDoc: group.controlDoc,
+      })),
+      prunedStoppedControllerRuns: prunableGroupRuns.map((run) => ({
+        runId: run.runId,
+        groupId: run.groupId,
+        targetWindow: run.targetWindow,
+        automationId: run.automationId,
+      })),
       skippedHistoricActiveTasks: skippedHistoricActiveTasks.map((task) => ({
         taskId: task.taskId,
         targetWindow: task.targetWindow,
@@ -1854,7 +2654,8 @@ function commandPruneHistory() {
       `Visible dispatch history prune ${write ? "applied" : "dry-run"}.`,
       `Current plan: ${currentPlanPath}`,
       `Prunable historic terminal tasks: ${prunableTasks.map((task) => task.taskId).join(", ") || "none"}`,
-      `Prunable stopped automation runs: ${prunableRuns.map((run) => run.automationId).join(", ") || "none"}`,
+      `Prunable stopped automation runs: ${[...prunableRuns, ...prunableGroupRuns].map((run) => run.automationId).join(", ") || "none"}`,
+      `Prunable dispatch groups: ${prunableGroups.map((group) => group.groupId).join(", ") || "none"}`,
       `Skipped historic tasks with active runs: ${skippedHistoricActiveTasks.map((task) => task.taskId).join(", ") || "none"}`,
     ].join("\n"),
   );
@@ -1877,6 +2678,9 @@ switch (command) {
     break;
   case "unregister":
     commandUnregister();
+    break;
+  case "preflight":
+    commandPreflight();
     break;
   case "enqueue":
     commandEnqueue();

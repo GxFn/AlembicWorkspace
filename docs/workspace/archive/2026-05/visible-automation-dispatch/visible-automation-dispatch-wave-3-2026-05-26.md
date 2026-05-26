@@ -19,10 +19,10 @@
 
 - 来源类型：用户直接需求 / 需求设计提升为当前主线。
 - 来源文档：
-  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
-  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
-  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)
+  - [../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)
+  - [visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md](../../../current/visible-automation-dispatch-goal-stage-confirmation-2026-05-25.md)
 - 用户确认状态：已确认分钟级延迟、Alembic 系列窗口、不依赖 Lark Remote、普通 Codex 输入关闭；用户进一步确认总控可开启长期运行模式，且远程关闭通过正常 Codex 输入处理。
 - 总控接收结论：进入 Wave 3，由 AlembicWorkspace 自执行 arming contract；其它窗口观察。
 - 是否需要目标阶段确认：已完成。
@@ -190,7 +190,7 @@ node scripts/visible-dispatch.mjs cleanup --json
 
 - 是否需要 `AlembicTest`：本轮不需要。
 - 测试单：无。
-- 测试交流入口：[alembic-test-exchange.md](alembic-test-exchange.md)。
+- 测试交流入口：[alembic-test-exchange.md](../../../current/alembic-test-exchange.md)。
 - 真实项目保护说明：Wave 3 不触碰真实项目；Wave 4 再创建单窗口可见验证单。
 
 ## 回填区

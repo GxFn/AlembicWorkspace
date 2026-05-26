@@ -33,9 +33,9 @@
 
 ## 前置需求设计
 
-- 原始计划书：[../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)。
-- 需求设计文档：[../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)。
-- 代码实现依赖调研：[../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)。
+- 原始计划书：[../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/original-plan-2026-05-25.md)。
+- 需求设计文档：[../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/requirement-design-2026-05-25.md)。
+- 代码实现依赖调研：[../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md](../../../../requirement-designs/visible-automation-dispatch/code-implementation-dependency-research-2026-05-25.md)。
 - 调研结论：第一版落在 AlembicWorkspace 文档、脚本和本地运行态；不进入产品包；不依赖 Lark Remote；窗口 thread registry 必须本地忽略。
 - 当前已有能力：当前计划同步、dispatch coverage、TODO / task package 校验、workspace-control 聚合入口、Codex heartbeat automation 工具。
 - 主要缺口：缺少 visible dispatch mode、window registry、dispatch queue、claim / lease、arm payload、cleanup 和目标窗口 pull contract。
@@ -185,11 +185,11 @@
 
 ### 确认后第一波
 
-- 启动文档：[visible-automation-dispatch-wave-1-2026-05-25.md](visible-automation-dispatch-wave-1-2026-05-25.md)，Wave 1 已通过总控验收。
+- 启动文档：[visible-automation-dispatch-wave-1-2026-05-25.md](../../../current/visible-automation-dispatch-wave-1-2026-05-25.md)，Wave 1 已通过总控验收。
 - 发送窗口：无。
 - 阻塞窗口：无。
 - 观察窗口：`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicTest`。
-- index 当前计划是否已切到 wave 执行计划：是，已切到 [visible-automation-dispatch-wave-1-2026-05-25.md](visible-automation-dispatch-wave-1-2026-05-25.md)。
+- index 当前计划是否已切到 wave 执行计划：是，已切到 [visible-automation-dispatch-wave-1-2026-05-25.md](../../../current/visible-automation-dispatch-wave-1-2026-05-25.md)。
 
 <!-- workspace-sync
 {

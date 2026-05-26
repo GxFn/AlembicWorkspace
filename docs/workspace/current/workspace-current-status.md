@@ -2,7 +2,7 @@
 
 更新日期：2026-05-26
 总控窗口：AlembicWorkspace
-状态：VAD unattended controller Wave 0 已验证完成
+状态：GTODO-2026-05-24-037 已确认为下一主线，Stage 1 代码调研待启动
 
 ## 阅读入口
 
@@ -15,11 +15,11 @@
 
 ## 状态摘要
 
-- 当前计划：[visible-automation-dispatch-unattended-controller-wave-0-2026-05-26.md](visible-automation-dispatch-unattended-controller-wave-0-2026-05-26.md)。
-- VAD unattended controller Wave 0 已验证完成：workspace 脚本、skill、索引和当前计划格式均通过总控验证；037 Wave 0 回填暂缓到本轮后验收。
+- 当前计划：[plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md)。
+- VAD 已归档；后续 VAD 问题作为 bug / optimization 排队处理。GTODO-2026-05-24-037 已确认为下一主线，当前发送给无，下一步由总控补 Stage 1 代码事实调研和执行计划。
 - Design 来源已同步到 [design-handoff-inbox.md](design-handoff-inbox.md)：`INTENT-RECOGNITION-2026-05-26` 与 `INTENT-KNOWLEDGE-2026-05-26` 共同构成 037；`KNOWLEDGE-EVOLUTION-TODOS-2026-05-26` 只是顺序索引，不作为执行计划。
-- Visible Dispatch 本地 runtime 已预排 3 个当前计划任务，mode 仍关闭；旧 Wave 9 / Wave 10 smoke 队列已裁决并清理，不会抢跑。
-- `GTODO-2026-05-25-003 / PCVM` Wave 4 仍是后续候选，但当前用户指定 037 为自动化主线，先不领取 PCVM。
+- Visible Dispatch 本地 runtime 当前 mode disabled，防睡眠 inactive；旧 Wave 9 / Wave 10 smoke 队列已裁决并清理，不会抢跑。
+- `GTODO-2026-05-25-003 / PCVM` Wave 4 仍是后续候选，但当前用户指定 037 为下一主线，先不领取 PCVM。
 
 ## 当前账本
 
@@ -32,8 +32,8 @@
 
 当前仍保留观察或下一主线相关事项：
 
-- `GTODO-2026-05-24-037`：当前主线，Wave 0 等待用户开启自动化；只做代码事实基线。
-- `GTODO-2026-05-25-005`：VAD 基础能力进入观察中；作为自动化工具服务当前计划，不再作为独立抢跑主线。
+- `GTODO-2026-05-24-037`：下一主线已确认；Stage 1 代码调研和执行计划待启动。
+- `GTODO-2026-05-25-005`：VAD 已完成待归档；后续 VAD 问题作为 bug / optimization 入队，不再作为独立抢跑主线。
 - `GTODO-2026-05-25-003`：PCVM Wave 4 仍待裁决，当前不与 037 并行领取。
 - `GTODO-2026-05-24-030`：多文件夹 ProjectScope 下的 project-level skill visibility mount。
 - `GTODO-2026-05-24-038` / `039`：等待 037 阶段结果，不进入本轮自动化。
@@ -46,17 +46,17 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `AlembicPlugin`<br>无任务 | 037 Wave 0 已完成回填，等待总控后续验收，不发送新任务。 |
-| `Alembic`<br>无任务 | 037 Wave 0 已完成回填，等待总控后续验收，不发送新任务。 |
-| `AlembicCore`<br>无任务 | 037 Wave 0 已完成回填，等待总控后续验收，不发送新任务。 |
-| `AlembicAgent`<br>无任务 | 本轮不涉及。 |
-| `AlembicDashboard`<br>无任务 | 本轮不涉及。 |
-| `AlembicTest`<br>无任务 | 本轮不涉及真实测试。 |
-| `BiliDili`<br>无任务 | 不改真实项目源码。 |
+| `Alembic`<br>观察中 | 等 037 Stage 1 代码调研后再判断是否派发。 |
+| `AlembicCore`<br>观察中 | 等真实 contract 下沉需求出现后再判断。 |
+| `AlembicAgent`<br>无任务 | 当前不涉及。 |
+| `AlembicDashboard`<br>观察中 | 当前不做 UI。 |
+| `AlembicPlugin`<br>观察中 | 等 Stage 1 代码调研后再判断是否派发。 |
+| `AlembicTest`<br>无任务 | 当前不涉及真实项目验证。 |
+| `BiliDili`<br>无任务 | 不触碰真实项目。 |
 
 ## 可复制提示词
 
-发送给：无。本轮由总控直接修改 workspace 脚本、skill 和文档。
+发送给：无。当前没有可复制给子窗口的提示词；下一步先由总控完成 037 Stage 1 代码事实调研和执行计划。
 
 ## 回填区
 
