@@ -44,6 +44,7 @@
 
 ## 当前需求
 
+- [visible-automation-dispatch/](visible-automation-dispatch/)：当前主线候选，原始计划书已确认，需求设计和代码实现依赖调研已形成；目标是通过 Codex thread automation 把总控任务自动投递到目标可见 Codex 窗口，减少用户手动复制提示词，并支持默认关闭 / 离开时开启 / 普通输入关闭的自动化模式生产线。2026-05-26 已追加 unattended controller 需求设计，补 dispatch group、最后窗口回跳和总控 automation-goal 自我决策边界。
 - [multi-root-project-scope/](multi-root-project-scope/)：当前活动需求，原始计划书已确认，代码实现依赖调研和需求设计已形成，等待任务级目标阶段确认。
 - [alembic-multi-project-control-redesign/](alembic-multi-project-control-redesign/)：历史多项目控制需求，需求设计完成并作为本次 ProjectScope 设计的背景材料。
 

@@ -1,14 +1,414 @@
 # AlembicTest Exchange
 
-更新日期：2026-05-25
+更新日期：2026-05-26
 维护窗口：AlembicWorkspace
-状态：`Test-2026-05-25-09 / LLMI-P11-Package-Runtime-Integration` 总控验收通过
+状态：`Test-2026-05-26-12 / VAD-P4-Single-Window-Visible-Heartbeat-Validation` 总控验收通过；结论阻塞
 
 ## 定位
 
 本文件只保存当前需要 `AlembicTest` 执行或回填的测试单。历史测试交流、测试报告和总控验收入口统一从 [workspace-record-map.md](../workspace-record-map.md#test-records) 查询。
 
 ## 当前测试单
+
+### Test-2026-05-26-12：VAD-P4-Single-Window-Visible-Heartbeat-Validation
+
+状态：总控验收通过；结论阻塞
+创建日期：2026-05-26
+总控来源：[visible-automation-dispatch-wave-4-2026-05-26.md](visible-automation-dispatch-wave-4-2026-05-26.md)
+执行窗口：AlembicTest
+目标项目：AlembicWorkspace Visible Automation Dispatch 本地状态机、Codex heartbeat automation 自唤醒目标窗口验证，以及 `AlembicTest` 作为单窗口可见目标的 claim / complete / backfill。
+
+#### 测试目标
+
+- 验证 `visible-dispatch` 在真实 Codex heartbeat automation 环境中能形成 `queued -> armed -> claimed -> completed` 的最小闭环。
+- 验证目标可见窗口收到 heartbeat 后能运行 `claim --window AlembicTest --write`，并能回填 completion evidence。
+- 验证 `record-arm` 能记录 automation id，避免 controller / tick 重复 arming。
+- 验证验证结束后测试 automation 能被暂停或删除，不留下活跃循环。
+
+#### 非目标
+
+- 不跑 full cold-start / rescan。
+- 不修改 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 产品源码。
+- 不操作 BiliDili 或任何真实测试项目业务源码、UI、登录、网络或播放逻辑。
+- 不验证多窗口并发调度。
+- 不实现 TODO 主线自动选择。
+- 不自动 accept 完成项；总控仍负责验收。
+
+#### 前置条件
+
+- Visible Automation Dispatch Wave 3 已通过总控验收：[visible-automation-dispatch-wave-3-2026-05-26.md](visible-automation-dispatch-wave-3-2026-05-26.md)。
+- `scripts/visible-dispatch.mjs` 已支持 `record-arm`、`armed` 状态、`tick`、`claim` 和 `complete`。
+- Codex controller heartbeat `visible-automation-dispatch-controller` 曾在 Wave 3 创建为 `PAUSED`；用户确认改由 Codex 追求目标模式驱动总控持续执行后，该 controller 已删除，不再作为正式路线。
+- 执行前先读取本 workspace `AGENTS.md`、`docs/workspace/index.md`、本文档、当前总控计划和 `AlembicTest/AGENTS.md`，并声明当前窗口定位和本轮仓库职责。
+
+#### 执行范围
+
+- 触发入口：在 `AlembicTest` 窗口内使用 Codex heartbeat automation 创建一个只作用于当前 AlembicTest thread 的临时目标 heartbeat。
+- 允许操作：写入 AlembicWorkspace ignored runtime state `.workspace-local/visible-dispatch/`；创建 / 暂停 / 删除本测试用 Codex heartbeat automation；创建 AlembicTest 测试报告、probe、临时 JSON evidence。
+- 禁止操作：不得启动真实产品 daemon / Dashboard；不得修改产品源码；不得提交产品子仓库；不得把测试 fixture 写入真实测试项目业务目录；不得留下 ACTIVE 测试 heartbeat。
+- 允许读取：AlembicWorkspace 当前计划、scripts README、visible-dispatch 脚本和测试、AlembicTest 测试规则。
+- 禁止修改：除 AlembicTest 报告、probe、必要临时输出和 AlembicWorkspace ignored runtime state 外，不修改其它仓库文件。
+
+#### 观察点
+
+- Runtime state：`node scripts/visible-dispatch.mjs status --json` 的 mode、taskCounts、automationRuns。
+- Queue：测试任务是否进入 `queued`，`record-arm` 后是否为 `armed`，heartbeat 触发后是否为 `claimed` / `completed`。
+- Automation：测试 automation id、创建状态、触发结果、结束后是否已暂停或删除。
+- Backfill：completed task 是否包含本轮测试证据摘要、命令、automation id 和结果路径。
+- Cleanup：`tick --json` / `cleanup --json` 是否显示无 stale task、无 active test automation run。
+- 真实项目 git 状态：Alembic 系列子仓库和真实测试项目不出现非预期源码改动；AlembicTest 自身未提交测试资产不作为阻塞。
+
+#### 验收标准
+
+- 报告证明至少一个真实 Codex heartbeat automation 在 AlembicTest 可见窗口触发，并执行了 `claim` 或等价领取动作。
+- 报告证明 `record-arm` 记录的 automation id 与本轮测试 heartbeat 对应，且任务没有被重复 arming。
+- 报告证明任务进入 `completed` 并带 backfill evidence；如 heartbeat 未触发，必须回填阻塞原因和最小复现。
+- 报告证明测试 heartbeat 结束后不保持 ACTIVE；如无法删除，至少必须暂停并记录 automation id。
+- 产品仓库和真实测试项目没有非预期源码改动。
+
+#### 建议命令或脚本
+
+```bash
+# 由 AlembicTest 窗口按自身 AGENTS 和测试策略选择最小命令执行。
+# 建议流程：
+# 1. 在 AlembicWorkspace 内启用 test-mode local state 或使用默认 ignored runtime state。
+# 2. 用当前 Wave 4 plan enqueue AlembicTest task。
+# 3. 创建临时 heartbeat automation，prompt 只执行 claim / complete / backfill。
+# 4. 使用 record-arm 落账 automation id。
+# 5. 等待 heartbeat 触发后检查 tick / queue / cleanup。
+# 6. 暂停或删除临时 heartbeat。
+```
+
+#### 回填要求
+
+- 测试结论：通过 / 未通过 / 阻塞。
+- 执行范围：是否只使用最小 single-window visible heartbeat；是否未跑 full cold-start；是否未操作真实项目业务代码。
+- 使用配置：当前总控计划、stateDir、automation id、heartbeat status、脚本 / fixture 路径。
+- job id / session id：可填 Codex automation id；如无 session id，写 `无`。
+- Dashboard URL 摘要：不适用，写 `无`。
+- 状态变化：queued / armed / claimed / completed / accepted 是否发生。
+- 候选 / 产物数量：runtime JSON evidence、测试报告数量。
+- 关键日志信号：tick、status、cleanup JSON 摘要。
+- 真实项目是否干净：
+- 详细报告路径：
+- 遗留风险：
+- 下一步建议：
+- 建议归属窗口：若失败，明确归属 `AlembicWorkspace visible-dispatch`、Codex automation routing、`AlembicTest harness` 或总控计划缺口。
+
+#### 执行回填（AlembicTest，2026-05-26 00:24 CST）
+
+- 测试结论：未通过，归类为阻塞。`queued -> armed` 成功，真实 Codex heartbeat automation 创建、`record-arm`、暂停和删除成功；heartbeat 在 3 分钟以上观察窗口内未投递到当前可见 `AlembicTest` thread 执行 `claim`，因此未进入 `claimed` / `completed`，无 backfill。
+- 执行范围：只使用 single-window visible heartbeat 最小链路；未跑 full cold-start / rescan；未启动 Alembic daemon / Dashboard；未操作 BiliDili 或真实项目业务源码；未修改 Alembic 系列产品源码。
+- 使用配置：当前总控计划 `docs/workspace/current/visible-automation-dispatch-wave-4-2026-05-26.md`；stateDir `.workspace-local/visible-dispatch`；task id `visible-automation-dispatch-wave-4-2026-05-26__AlembicTest`；automation id `vad-p4-alembictest-heartbeat`；heartbeat `kind=heartbeat`、`destination=thread`、`rrule=FREQ=MINUTELY;INTERVAL=1`、状态 `ACTIVE -> PAUSED -> deleted`；JSON evidence `AlembicTest/tmp/vad-single-window-visible-heartbeat-validation-2026-05-26.json`。
+- job id / session id：Codex automation id `vad-p4-alembictest-heartbeat`；无 Alembic job/session id。
+- Dashboard URL 摘要：无；本轮禁止启动 Dashboard。
+- 状态变化：`queued=true`（enqueue 1 task，`2026-05-25T16:16:08.112Z`）；`armed=true`（record-arm，`2026-05-25T16:16:29.819Z`）；`claimed=false`；`completed=false`；`accepted=false`。
+- 候选 / 产物数量：长期测试报告 1 份；临时 JSON evidence 1 份；未产生 Alembic candidates。
+- 关键日志信号：`tick` before arm 为 `topAction=arm` / `waitCounts.ready=1`；`tick` after arm 为 `topAction=wait` / `nextAction=waitForClaim`；00:17、00:18、00:20 CST 多轮观察仍为 `status=armed`；cleanup 后 `mode=disabled`、`shouldStop=true`、真实 automation 已删除，但本地 `automation-runs.json` 仍显示 active run，因为当时脚本缺少 `record-stop`；总控验收后已补。
+- 真实项目是否干净：`BiliDili`、`Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 均 clean；`.workspace-local/visible-dispatch/` 已由 workspace `.gitignore` 忽略；`AlembicTest` 仅新增本轮报告 / tmp evidence，历史未提交测试资产未回退。
+- 详细报告路径：`AlembicTest/docs/vad-single-window-visible-heartbeat-validation-2026-05-26.md`。
+- 遗留风险：无法证明真实可见窗口 heartbeat claim / complete 闭环；可能存在“同一活跃 Codex turn 中 heartbeat 不并发投递”的调度限制；脚本 registry 的 thread id 与 Codex automation 写入的真实 `target_thread_id` 尚未自动同步。
+- 下一步建议：由 `AlembicWorkspace` / VAD 实现窗口确认 heartbeat 是否必须在当前 turn 结束后才投递；下一轮如继续验证 heartbeat，应使用独立或空闲目标可见线程重跑，不要把手工 `claim` 当作 heartbeat 成功。
+- 建议归属窗口：Codex automation routing / visible thread delivery 机制判断归总控；`visible-dispatch` stopped 状态与 thread id 同步归 `AlembicWorkspace`；本轮测试 harness 已给出最小复现。
+
+#### 总控验收（2026-05-26 00:30 CST）
+
+- 验收结论：证据有效，Test-12 结论保持阻塞。`AlembicTest` 已按最小 single-window visible heartbeat 范围完成验证，失败点是 heartbeat 未投递到当前可见线程执行 `claim`，不是 Test 未执行。
+- 总控处理：按用户确认，`visible-automation-dispatch-controller` 已删除，5 分钟总控 heartbeat 不再作为正式路线；总控补充 `scripts/visible-dispatch.mjs record-stop` 和 `block`，已对 `vad-p4-alembictest-heartbeat` 记录 stopped，并将本轮派发任务转为 blocked，避免真实 automation 删除后本地 cleanup 继续误报 active run 或继续等待已失败的 claim。
+- 下一步：当前不再派 `AlembicTest`；由总控裁决 VAD 后续触发模型，确认是否继续目标 thread heartbeat 复测，或改为 Codex 追求目标模式驱动总控循环。
+
+### Test-2026-05-25-11：PCVM-P3B-N9-Observability-Linkage-Minimal
+
+状态：总控验收通过；N9 verdict 为 `linked`
+创建日期：2026-05-25
+总控来源：[progressive-chain-validation-metrics-wave-0-2026-05-25.md](progressive-chain-validation-metrics-wave-0-2026-05-25.md)
+执行窗口：AlembicTest
+目标项目：`AlembicAgent` N9 node-local evidence producer、`Alembic` job-level observability carry、PCV source scorecard contract，以及最小 test-mode fixture / probe。
+
+#### 测试目标
+
+- 验证 `AlembicAgent` commit `7ab94575ed9b475dc57253c88738e1f061a3c547` 产生的 N9 node-local evidence 能被测试读取，至少覆盖 `inputAssembly`、`ledgerRefs`、`findingRefs`、`sourceRefs`、`qualityGate`、`repair` 和 `missingLinkReasons`。
+- 验证 `Alembic` commit `647a42fc9e499fc9bbbd166e1b9db2a9c96f99f9` 产生的 job-level carry 能把 N9 evidence 关联到 job process event、artifactRefs、trace envelope、llm metrics、sourceRefs 和 artifact read API。
+- 专门验证真实 / 等价 process event 形态中的 nested `metadata.pcvNodeEvidence` 是否被 `Alembic` carry 消费；如果只能通过顶层 `sourceRefs` / `llmMetrics` 通过，必须报告 nested evidence 尚未贯通。
+- 判断 PCV N9 scorecard 是否能从 `blocked-by-observability-gap` 进入真实 baseline；若仍 blocked，输出精确 missing-link reason、first fix 和建议归属窗口。
+
+#### 非目标
+
+- 不跑 full cold-start / rescan。
+- 不修改 `AlembicAgent`、`Alembic`、`AlembicCore`、`AlembicDashboard`、`AlembicPlugin` 或真实测试项目产品源码。
+- 不操作 BiliDili 产品业务源码、UI、登录、网络或播放逻辑。
+- 不做 Agent prompt / runtime 策略优化。
+- 不做 Dashboard UI / comparison drawer。
+- 不发布 npm package，不推送远端。
+
+#### 前置条件
+
+- `AlembicAgent` Wave 3A 总控代码侧验收通过：commit `7ab94575ed9b475dc57253c88738e1f061a3c547`。
+- `Alembic` Wave 3A 总控代码侧验收通过：commit `647a42fc9e499fc9bbbd166e1b9db2a9c96f99f9`。
+- `Alembic` Wave 3C nested evidence consumer extraction 总控验收通过：commit `ae9531ac3315a4491e22e3df156cb05e13fc0879`。
+- PCV source Wave 0 已通过总控验收：commit `badbf0aa23bbaaff2cf185491a6785a61b74c1d8`。
+- `Test-2026-05-25-10 / PCVM-P2-Canonical-Source-Baseline` 已通过总控验收，consumer cleanup 阻塞已关闭。
+- 执行前先读取本 workspace `AGENTS.md`、`docs/workspace/index.md`、本文档、当前总控计划和 `AlembicTest/AGENTS.md`，并声明当前窗口定位和本轮仓库职责。
+
+#### 执行范围
+
+- 触发入口：由 AlembicTest 创建或复用最小 PCV N9 observability linkage probe / fixture；可以读取 `AlembicAgent` 和 `Alembic` 源码、测试、回填文档和 git commit。
+- 允许操作：创建 / 更新 AlembicTest probe、fixture、JSON evidence、plan/report 文档和临时输出；read-only 扫描相关产品仓库；必要时使用 fixture 事件模拟真实 process event shape。
+- 禁止操作：不得跑 full cold-start；不得修改产品源码；不得提交产品子仓库；不得把测试 fixture 写入真实测试项目业务目录；不得用泛泛文档阅读替代字段断言。
+- 允许读取：AlembicWorkspace 当前计划、AlembicTest 测试规则、PCV source metrics contract、`AlembicAgent` / `Alembic` 相关提交、job process event / artifact API 代码。
+- 禁止修改：除 AlembicTest 报告、probe 和必要测试输出外，不修改产品源码、PCV source 或真实项目源码。
+
+#### 观察点
+
+- Agent evidence：`metadata.pcvNodeEvidence` nested metadata、`AgentResult.pcvNodeEvidence`、quality gate artifact `pcvNodeEvidence` 是否存在并字段完整。
+- Alembic carry：`metadata.pcvN9Observability`、`metadata.pcvObservability.n9`、`metadata.traceEnvelope.pcvNodeId/nodeId/chainNodeId/jobId/artifactRefs/metricsPath/sourceRefs/traceId`。
+- Artifact/API：materialized artifact 是否仍能通过 artifact read API 读取，artifactRef 是否进入 N9 evidence links。
+- Verdict：`linkageStatus=linked` 或 `blocked-by-observability-gap` 是否与实际字段一致，不得伪造质量分。
+- Cross-shape 风险：如果 nested `pcvNodeEvidence` 未被 Alembic extraction 消费，必须明确归口为 `Alembic` consumer extraction 缺口，或说明 `AlembicAgent` 应同时发出顶层字段。
+- 真实项目 git 状态：Alembic 系列子仓库、PCV source、BiliDili 和被触达仓库不出现非预期源码改动。
+
+#### 验收标准
+
+- 测试报告证明最小 test-mode 能消费 `AlembicAgent` N9 evidence producer 和 `Alembic` N9 carry，而不是只分别读取两边单元测试。
+- 测试报告明确 nested `metadata.pcvNodeEvidence` 是否真实贯通到 `Alembic` carry / scorecard 输入；若不贯通，给出缺字段、missing-link reason 和建议归属窗口。
+- 测试报告给出 N9 scorecard verdict：`linked`、`blocked-by-observability-gap` 或 `阻塞`；若 linked，必须列出 artifact / trace / metrics / sourceRef 证据；若 blocked，必须列出 first fix。
+- 产品仓库和真实测试项目没有非预期源码改动。
+- 如果无法形成 fixture / baseline / gap verdict 证据，必须回填为阻塞并归口到 `AlembicAgent` producer、`Alembic` carry、`AlembicTest harness` 或总控计划缺口；不得只说“文档已读”。
+
+#### 建议命令或脚本
+
+```bash
+# 由 AlembicTest 窗口按自身 AGENTS 和测试策略选择最小命令执行。
+# 建议覆盖：probe 语法 / help、fixture generation、nested pcvNodeEvidence 读取、
+# Alembic carry field assertions、artifact API readback 和 git status 收口。
+```
+
+#### 回填要求
+
+- 测试结论：通过 / 未通过 / 阻塞。
+- 执行范围：是否只使用最小 test-mode probe / fixture；是否未跑 full cold-start；是否未操作 BiliDili 业务代码。
+- 使用配置：AlembicAgent commit、Alembic commit、PCV source commit、脚本 / fixture 路径、输出 JSON / 报告路径。
+- fixture / JSON evidence / report / plan 路径：
+- Agent nested `pcvNodeEvidence` 字段读取结果：
+- Alembic job-level carry / traceEnvelope / artifact API 结果：
+- N9 scorecard verdict：
+- missing-link reason / first fix / 建议归属窗口：
+- 真实项目是否干净：
+- 详细报告路径：
+- 遗留风险和下一步建议：
+
+#### AlembicTest 回填（2026-05-25 22:14 CST）
+
+- 测试结论：未通过。`AlembicAgent` nested `metadata.pcvNodeEvidence` 可读且字段完整；`Alembic` top-level control event 可形成 `linked`；但真实 nested-only event 被 `Alembic` carry 后 `sourceRefs=[]`、`linkageStatus=blocked-by-observability-gap`、`missingLinkReasons=["source_ref_missing"]`，说明 nested evidence 尚未被消费。
+- 执行范围：只执行最小 test-mode probe / fixture；未跑 full cold-start / rescan；未操作 BiliDili 业务代码；未修改 `AlembicAgent`、`Alembic`、PCV source 或真实测试项目源码。
+- 使用配置：`AlembicTest/scripts/probe-pcv-n9-observability-linkage.mjs`；`ALEMBIC_TEST_MODE` 语义的最小 fixture；目标 commits 为 `AlembicAgent` `7ab94575ed9b475dc57253c88738e1f061a3c547`、`Alembic` `647a42fc9e499fc9bbbd166e1b9db2a9c96f99f9`、PCV source `badbf0aa23bbaaff2cf185491a6785a61b74c1d8`。
+- fixture / JSON evidence / report / plan 路径：generated fixture test `AlembicTest/tmp/pcv-n9-observability-linkage.generated.test.ts`；Vitest config `AlembicTest/tmp/pcv-n9-observability-linkage.vitest.config.mjs`；fixture JSON `AlembicTest/tmp/pcv-n9-observability-linkage-fixture.json`；JSON evidence `AlembicTest/tmp/pcv-n9-observability-linkage.json`；plan `AlembicTest/tmp/pcv-n9-observability-linkage-plan.md`；详细报告 [../../../AlembicTest/docs/pcv-n9-observability-linkage-minimal-2026-05-25.md](../../../AlembicTest/docs/pcv-n9-observability-linkage-minimal-2026-05-25.md)。
+- Agent nested `pcvNodeEvidence` 字段读取结果：`nodeId=N9-agent-analyze-quality`；`inputAssemblyRef`、`ledgerRefs`、`acceptedFindingRefs`、`qualityGate`、`sourceRefs` 均存在；`sourceRefs=["src/index.ts:42"]`；nested producer 侧 `missingLinkReasons=[]`。
+- Alembic job-level carry / traceEnvelope / artifact API 结果：nested-only carry 能保留 artifact refs、trace id 和 metrics path，但未读取 nested `sourceRefs`，`nodeIdentitySource=host-stage-profile`，`linkageStatus=blocked-by-observability-gap`；top-level control event 在补入顶层 `sourceRefs` 和 `traceEnvelope.chainNodeId` 后可 `linked`，证明 carry 能链接，但 extraction 未消费 nested `metadata.pcvNodeEvidence`。
+- N9 scorecard verdict：`blocked-by-observability-gap`。
+- missing-link reason / first fix / 建议归属窗口：`source_ref_missing`；first fix 是在 `Alembic/lib/daemon/PcvObservabilityLinkage.ts` 中读取 nested `metadata.pcvNodeEvidence.nodeId/chainNodeId/sourceRefs`，再 fallback 到顶层 metadata / trace envelope；归口 `Alembic`。
+- 真实项目是否干净：`AlembicAgent`、`Alembic`、`progressive-chain-validation`、`BiliDili` 工作区均 clean；`AlembicAgent`、`Alembic`、PCV source 存在已知 `[ahead 1]` 本地提交状态，不属于本测试新增改动。
+- 验证命令 / 结果：`node --check AlembicTest/scripts/probe-pcv-n9-observability-linkage.mjs` 通过；`node AlembicTest/scripts/probe-pcv-n9-observability-linkage.mjs --help` 通过；`npm --prefix AlembicTest run check` 通过；主 probe `node AlembicTest/scripts/probe-pcv-n9-observability-linkage.mjs` 按预期以 exit code 1 写出 failure evidence，结论为 `fail-nested-evidence-not-consumed`；probe 内部 `npm test -- AgentRuntime llm-input-layering evidence-recording-phase-chain`、`npm run test:unit -- DaemonJobRunner.test.ts` 和 generated Vitest fixture 均通过。
+- 遗留风险和下一步建议：本轮只证明最小 fixture 交界缺口，未覆盖 full cold-start / rescan；建议总控先派 `Alembic` 做最小 consumer extraction 返修，再由 `AlembicTest` 重跑同一 probe；Wave 4 Agent / LLM 优化不应在 linkage 未通过前启动。
+
+#### 总控验收（2026-05-25 22:26 CST）
+
+- 验收结论：Test-11 证据有效，测试结果按“未通过”处理，不再要求 AlembicTest 补证据。
+- 有效证据：报告、JSON evidence、fixture、generated Vitest 和命令结果均指向同一事实：Agent nested evidence 字段完整，Alembic nested-only carry 未消费 nested `sourceRefs`。
+- 产品 / 真实项目状态：`AlembicAgent`、`Alembic`、PCV source、BiliDili 工作区 clean；`AlembicTest` 自身未提交 probe / report / tmp 资产按总控规则不作为阻塞。
+- 下一步：已在当前总控计划创建 Wave 3C `PCVM-P3C-ALEMBIC-NESTED-EVIDENCE-CONSUMER-EXTRACTION` 并发送给 `Alembic`；`AlembicTest` 等返修回填后重跑同一 probe。
+
+#### 返修后重测启动（2026-05-25 22:36 CST）
+
+- 启动原因：`Alembic` commit `ae9531ac3315a4491e22e3df156cb05e13fc0879` 已通过总控验收，修复 nested `metadata.pcvNodeEvidence.nodeId/chainNodeId/sourceRefs` consumer extraction，并补 nested-only unit。
+- 本次重测：重跑 Test-11 同一最小 probe / fixture，目标 `Alembic` commit 切到 `ae9531ac3315a4491e22e3df156cb05e13fc0879`；不跑 full cold-start / rescan，不修改产品源码或真实测试项目业务源码。
+- 回填重点：确认 nested source refs 是否进入 `metadata.pcvN9Observability.evidenceLinks.sourceRefs` 和 enriched `traceEnvelope.sourceRefs`；若仍 blocked，必须回填新的 missing-link reason、first fix 和归属窗口。
+
+#### AlembicTest 返修后重测回填（2026-05-25 22:58 CST）
+
+- 重测结论：通过。主 probe 输出 `conclusion=pass-linked`、`verdict=linked`、`nestedEvidenceConsumedByCarry=true`、`missingLinkReasons=[]`。
+- 执行范围：只重跑最小 test-mode probe / fixture；未跑 full cold-start / rescan；未修改产品源码、PCV source 或 BiliDili 业务源码。为支持返修后 linked 记录，AlembicTest probe 的 generated fixture 断言已调整为记录真实 carry verdict，不再硬编码上一轮失败形态。
+- 使用配置：`AlembicTest/scripts/probe-pcv-n9-observability-linkage.mjs --expected-alembic-commit ae9531ac3315a4491e22e3df156cb05e13fc0879`；`AlembicAgent` commit `7ab94575ed9b475dc57253c88738e1f061a3c547`；`Alembic` commit `ae9531ac3315a4491e22e3df156cb05e13fc0879`；PCV source commit `badbf0aa23bbaaff2cf185491a6785a61b74c1d8`。
+- fixture / JSON evidence / report / plan 路径：fixture `AlembicTest/tmp/pcv-n9-observability-linkage-rerun-fixture.json`；JSON evidence `AlembicTest/tmp/pcv-n9-observability-linkage-rerun.json`；generated test `AlembicTest/tmp/pcv-n9-observability-linkage-rerun.generated.test.ts`；generated config `AlembicTest/tmp/pcv-n9-observability-linkage-rerun.vitest.config.mjs`；plan `AlembicTest/tmp/pcv-n9-observability-linkage-rerun-plan.md`；报告 [../../../AlembicTest/docs/pcv-n9-observability-linkage-rerun-2026-05-25.md](../../../AlembicTest/docs/pcv-n9-observability-linkage-rerun-2026-05-25.md)。
+- Agent nested `pcvNodeEvidence` 字段读取结果：`nodeId=N9-agent-analyze-quality`；`inputAssemblyRef`、`ledgerRefs`、`acceptedFindingRefs`、`qualityGate`、`sourceRefs` 均存在；`sourceRefs=["src/index.ts:42"]`；producer-side `missingLinkReasons=[]`。
+- Alembic job-level carry / traceEnvelope / artifact API 结果：nested-only carry 为 `linkageStatus=linked`、`nodeIdentitySource=agent-explicit`、artifactRef `/api/v1/jobs/job_pcv_p3b/artifacts/llm-input-full-redacted-n9.md`、`traceId=trace-p3b`、`metricsPath=metadata.llmMetrics`、`sourceRefs=["src/index.ts:42"]`；top-level control carry 仍为 `linked`；artifact readback 由 probe 内部 `DaemonJobRunner.test.ts` 覆盖通过。
+- N9 scorecard verdict：`linked`。
+- missing-link reason / first fix / 建议归属窗口：无 missing-link reason；first fix 无；本 specific linkage gap 无需继续归口返修，`Alembic` Wave 3C 修复已被验证。
+- 真实项目是否干净：`Alembic`、`AlembicAgent`、`progressive-chain-validation`、`BiliDili` 工作区均 clean；`Alembic` 为 `main...origin/main [ahead 2]`，`AlembicAgent` 为 `main...origin/main [ahead 1]`，PCV source 与 `BiliDili` 为 `main...origin/main`。
+- 验证命令 / 结果：`node --check AlembicTest/scripts/probe-pcv-n9-observability-linkage.mjs` 通过；`node AlembicTest/scripts/probe-pcv-n9-observability-linkage.mjs --help` 通过；主 rerun probe 通过；probe 内部 `npm test -- AgentRuntime llm-input-layering evidence-recording-phase-chain`、`npm run test:unit -- DaemonJobRunner.test.ts` 和 generated Vitest fixture 均通过。
+- 遗留风险和下一步建议：本轮仍是最小 test-mode fixture，未证明 full cold-start / rescan、live daemon artifact API 或 Dashboard comparison UI；建议总控验收 Wave 3D 后再决定是否进入 Wave 4。
+
+#### 总控验收（2026-05-25 23:00 CST）
+
+- 验收结论：通过。返修后重测证据满足 Test-11 验收标准，nested `metadata.pcvNodeEvidence.sourceRefs` 已被 `Alembic` job-level carry 消费，N9 verdict 为 `linked`。
+- 有效证据：详细报告 [../../../AlembicTest/docs/pcv-n9-observability-linkage-rerun-2026-05-25.md](../../../AlembicTest/docs/pcv-n9-observability-linkage-rerun-2026-05-25.md) 与 JSON evidence `AlembicTest/tmp/pcv-n9-observability-linkage-rerun.json`；probe 输出 `conclusion=pass-linked`、`nestedEvidenceConsumedByCarry=true`、`missingLinkReasons=[]`、`verdict=linked`。
+- 边界判断：`AlembicTest` 自身未提交 probe / 报告 / tmp 资产不作为阻塞；产品仓库和真实项目没有非预期源码改动。
+- 下一步：关闭 Wave 3D 测试门；是否进入 Wave 4 Agent / LLM before-after 优化由当前总控计划另行裁决。
+
+### Test-2026-05-25-10：PCVM-P2-Canonical-Source-Baseline
+
+状态：总控验收通过
+创建日期：2026-05-25
+总控来源：[progressive-chain-validation-metrics-wave-0-2026-05-25.md](progressive-chain-validation-metrics-wave-0-2026-05-25.md)
+执行窗口：AlembicTest
+目标项目：顶层 `progressive-chain-validation` canonical source、`Alembic` / `AlembicPlugin` consumer cleanup read-only 复核，以及最小 N9 analyze quality baseline plan 文档 fixture。
+
+#### 测试目标
+
+- 验证顶层 `progressive-chain-validation/` source 可作为 PCV plan 文档能力来源，被测试 / 优化流程读取 metrics contract、plan template 和 N9 baseline example。
+- 验证 `Alembic` 与 `AlembicPlugin` 不再依赖内部 `skills/progressive-chain-validation` source checkout：无 PCV gitlink、无 `.gitmodules` PCV 条目、无内部 path 引用。
+- 用最小 fixture、冻结事实或测试报告生成 / 校验 N9 analyze quality baseline plan section，字段至少覆盖 `usefulUnit`、`qualityGate`、`stageLoss`、`baseline`、`evidenceLinks`、`verdict`。
+- 验证缺少 artifact / trace / metrics / source ref 稳定 node 关联时，报告使用 `blocked-by-observability-gap`，不得伪造质量分或优化 verdict。
+- 明确 AlembicTest 后续何时默认使用 PCV、何时可以 opt out，并要求 opt out 写明理由。
+
+#### 非目标
+
+- 不跑 full cold-start / rescan。
+- 不修改 `progressive-chain-validation`、`Alembic`、`AlembicPlugin`、`AlembicAgent`、`AlembicDashboard`、`AlembicCore` 产品源码。
+- 不操作 BiliDili 产品业务源码、UI、登录、网络或播放逻辑。
+- 不做 Agent / LLM 优化，不产出 optimized-after candidate。
+- 不做 Dashboard comparison UI。
+- 不发布 npm package，不推送远端。
+
+#### 前置条件
+
+- PCV source Wave 0 已通过总控验收：`badbf0aa23bbaaff2cf185491a6785a61b74c1d8`。
+- `Alembic` Wave 1 已通过总控验收：`d99d66d0af14fe6e8a51e683d963028ec9d0679a`。
+- `AlembicPlugin` Wave 1 已通过总控验收：`aa171f31734350ef49efaac56c34588b67f0d924`。
+- 当前总控计划已创建 PCVM Wave 2 任务包：[progressive-chain-validation-metrics-wave-0-2026-05-25.md](progressive-chain-validation-metrics-wave-0-2026-05-25.md)。
+- 执行前先读取本 workspace `AGENTS.md`、`docs/workspace/index.md`、本文档、当前总控计划和 `AlembicTest/AGENTS.md`，并声明当前窗口定位和本轮仓库职责。
+
+#### 执行范围
+
+- 触发入口：优先使用 AlembicTest 内最小 PCV plan fixture / report probe；可读取顶层 PCV source 的 `metrics-contract.md`、`templates/plan.md` 和 `examples/alembic-n9-analyze-quality-baseline.md`。
+- 允许操作：创建 / 复用 AlembicTest probe、测试 fixture、报告和临时输出；read-only 扫描 `Alembic`、`AlembicPlugin`、`progressive-chain-validation`。
+- 禁止操作：不得跑 full cold-start；不得修改产品源码；不得提交产品子仓库；不得把测试 fixture 写入真实测试项目业务目录；不得用泛泛文档阅读替代可核验字段断言。
+- 允许读取：AlembicWorkspace 当前计划、AlembicTest 测试规则、PCV source 文档 / template、`Alembic` / `AlembicPlugin` git status / submodule / grep 结果。
+- 禁止修改：除 AlembicTest 报告、probe 和必要测试输出外，不修改产品源码、PCV source 或真实项目源码。
+
+#### 观察点
+
+- PCV source：metrics contract、plan template、N9 baseline example 是否可读且字段完整。
+- Consumer cleanup：`git submodule status`、`git ls-files -s skills/progressive-chain-validation`、`rg "skills/progressive-chain-validation"` 在 `Alembic` / `AlembicPlugin` 的结果。
+- Plan 文档：N9 section 是否包含 useful unit、quality gate、stage loss、baseline、evidence links、verdict；comparison 字段可作为后续 candidate 对比扩展。
+- Observability gap：缺 node artifact / trace / metrics link 时是否输出 `blocked-by-observability-gap` 和 first fix。
+- 真实项目 git 状态：Alembic 系列子仓库、PCV source、BiliDili 和被触达仓库不出现非预期源码改动。
+
+#### 验收标准
+
+- 测试报告证明 PCV source plan 文档能力可被 AlembicTest 消费，且不是读取 `Alembic` / `AlembicPlugin` 内部旧 submodule。
+- 测试报告证明 `Alembic` 与 `AlembicPlugin` 无内部 `skills/progressive-chain-validation` gitlink / path 引用。
+- 测试报告给出 N9 baseline scorecard 字段，或在证据不足时给出合规 `blocked-by-observability-gap`。
+- 测试报告明确 PCV 默认使用 / opt out 规则建议，并说明本轮是否采用 PCV。
+- 产品仓库和真实测试项目没有非预期源码改动。
+- 若无法形成 plan fixture / baseline / gap verdict 证据，必须回填为阻塞并归口到 PCV source、AlembicTest harness 或总控计划缺口；不得只说“文档已读”。
+
+#### 建议命令或脚本
+
+```bash
+# 由 AlembicTest 窗口按自身 AGENTS 和测试策略选择最小命令执行。
+# 建议覆盖：probe 语法 / help、PCV source 字段读取、consumer cleanup read-only scans、报告生成和 git status 收口。
+```
+
+#### 回填要求
+
+- 测试结论：通过 / 未通过 / 阻塞。
+- 执行范围：是否只使用最小 PCV plan fixture / report probe；是否未跑 full cold-start；是否未操作 BiliDili 业务代码。
+- 使用配置：PCV source commit、Alembic commit、AlembicPlugin commit、脚本 / fixture 路径、输出 JSON / 报告路径。
+- fixture / report / plan 路径：
+- PCV source commit：
+- Alembic / AlembicPlugin consumer cleanup 复核结果：
+- N9 baseline scorecard 字段：
+- observability gap verdict 是否触发：
+- PCV 默认使用 / opt out 规则建议：
+- 真实项目是否干净：
+- 详细报告路径：
+- 遗留风险和下一步建议：
+- 建议归属窗口：若失败，明确归属 `progressive-chain-validation`、`Alembic`、`AlembicPlugin`、`AlembicTest harness` 或总控。
+
+#### AlembicTest 回填（2026-05-25 20:20 CST）
+
+- 测试结论：未通过。PCV canonical source 可被 AlembicTest 消费，N9 baseline scorecard 字段和 `blocked-by-observability-gap` verdict 可生成；但 `Alembic` 仍有被 git 跟踪的 CI / release workflow 引用旧内部 `Alembic/skills/progressive-chain-validation` path，consumer cleanup 未完全闭合。失败归口：`Alembic`。
+- 执行范围：只使用最小 PCV source-readonly probe、fixture 和报告；未跑 full cold-start / rescan；未启动 daemon job；未打开 Dashboard；未操作 BiliDili 业务代码；未修改 `progressive-chain-validation`、`Alembic`、`AlembicPlugin` 或 BiliDili 源码。
+- 使用配置：mode `source-readonly-plus-alembic-test-fixture`；probe `AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs`；`productSourceWrite=false`、`fullColdStart=false`、`bilidiliBusinessCodeWrite=false`。
+- fixture / report / plan 路径：fixture / plan `AlembicTest/tmp/pcv-canonical-source-baseline-plan.md`；JSON evidence `AlembicTest/tmp/pcv-canonical-source-baseline.json`；详细报告 [../../../AlembicTest/docs/pcv-canonical-source-baseline-2026-05-25.md](../../../AlembicTest/docs/pcv-canonical-source-baseline-2026-05-25.md)。
+- PCV source commit：`badbf0aa23bbaaff2cf185491a6785a61b74c1d8`，与测试单前置条件一致；`progressive-chain-validation` 工作区 clean。
+- Alembic / AlembicPlugin consumer cleanup 复核结果：
+  - `AlembicPlugin`：通过；`.gitmodules` 无 PCV entry，`git submodule status` 无 PCV，`git ls-files -s skills/progressive-chain-validation` 无输出，`git grep -n -- skills/progressive-chain-validation` 无输出。
+  - `Alembic`：未通过；`.gitmodules` / submodule / gitlink 均已清理，但 `git grep -n -- skills/progressive-chain-validation` 仍命中 `.github/workflows/ci.yml:182` 和 `.github/workflows/release.yml:37`，内容均为 `path: Alembic/skills/progressive-chain-validation`。
+- N9 baseline scorecard 字段：fixture 覆盖 `usefulUnit`、`qualityGate`、`stageLoss`、`baseline`、`evidenceLinks`、`verdict`；`nodeId=N9-agent-analyze-quality`；`qualityGate.status=blocked`；`stageLoss.unlinkedArtifactCount=blocked`。
+- observability gap verdict 是否触发：是，`verdict=blocked-by-observability-gap`，且 `noQualityScoreAssigned=true`。原因是本轮只验证 canonical source shape 和 consumer cleanup，没有真实 N9 artifact / trace / metric / source-ref / report field 与 node boundary 的稳定关联。
+- PCV 默认使用 / opt out 规则建议：默认用于长链 Alembic 验证、节点级 quality baseline、before/after 优化对比，以及任何 artifact / trace / metric 关联决定 verdict 的工作流；纯一次性 repo hygiene、source-only inventory 或不比较节点质量的紧急诊断可 opt out，但报告必须记录 opt-out reason。
+- 验证命令 / 结果：
+  - `node --check AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs`：通过。
+  - `node AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs --help`：通过。
+  - `npm --prefix AlembicTest run check`：通过，包含新 probe help。
+  - `node AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs`：退出码 `1`，符合本轮发现的 `Alembic` cleanup 失败；已写出 JSON evidence 和 fixture。
+  - `git -C progressive-chain-validation status --short --branch`：`## main...origin/main`，clean。
+  - `git -C Alembic status --short --branch`：`## main...origin/main [ahead 1]`，工作区 clean。
+  - `git -C AlembicPlugin status --short --branch`：`## main...origin/main [ahead 1]`，工作区 clean。
+  - `git -C BiliDili status --short --branch`：`## main...origin/main`，clean。
+- 真实项目是否干净：是。`progressive-chain-validation`、`Alembic`、`AlembicPlugin`、`BiliDili` 均无 dirty 工作区；`AlembicTest` 新增本轮 probe / report / tmp evidence；`AlembicWorkspace` 本轮回填当前文档，待总控统一提交。
+- 提交 hash：无，本轮为 AlembicTest 测试与文档回填，未执行提交。
+- 遗留风险：`Alembic` CI / release workflow 仍可能在远端链路中重新 checkout 旧内部 PCV source path；N9 baseline 当前只能给出 source shape + observability gap verdict，不能生成质量分或优化 verdict。
+- 下一步建议：由 `Alembic` 窗口清理 `.github/workflows/ci.yml` 与 `.github/workflows/release.yml` 中的旧 `Alembic/skills/progressive-chain-validation` path；修复后由 AlembicTest 最小重跑 consumer cleanup probe。后续若要解除 N9 `blocked-by-observability-gap`，需先补 N9 artifact / trace / metrics / source-ref / report field 的稳定 node 关联。
+
+#### 总控复核（2026-05-25 20:21 CST）
+
+- 复核结论：Test-10 证据有效，测试结论按“未通过”处理，不关闭 PCVM Wave 2。
+- 已复核失败点：`rg -n "progressive-chain-validation|skills/progressive-chain-validation|PCV" Alembic/.github Alembic -S -g '!node_modules' -g '!dist' -g '!vendor'` 命中 `.github/workflows/ci.yml:182` 与 `.github/workflows/release.yml:37`，均为旧 `path: Alembic/skills/progressive-chain-validation`；`SkillAdapter.test.ts` 搜索 query 字符串可保留。
+- 已认可通过部分：PCV canonical source 可读，N9 baseline scorecard fixture 可生成，`blocked-by-observability-gap` verdict 合规，`AlembicPlugin` consumer cleanup 通过。
+- 当前处理：总控已创建 `PCVM-P1A-ALEMBIC-WORKFLOW-PCV-PATH-CLEANUP` 并派 `Alembic` 最小返修；修复回填后再由 `AlembicTest` 重跑最小 cleanup probe。
+
+#### Alembic 返修回填（2026-05-25 20:29 CST）
+
+- `Alembic` 已提交 `92bd976162fb9c1dbc19da1f8afef8756c976c27`（`ci: remove pcv workflow checkout`），删除 `.github/workflows/ci.yml` 与 `.github/workflows/release.yml` 中 checkout `GxFn/progressive-chain-validation` 到 `Alembic/skills/progressive-chain-validation` 的步骤。
+- 回填记录：[../../Alembic/progressive-chain-validation-workflow-cleanup-2026-05-25.md](../../Alembic/progressive-chain-validation-workflow-cleanup-2026-05-25.md)。
+- 当前测试单结论仍保持“未通过，待重测”；总控验收 `Alembic` 返修后，再派 AlembicTest 重跑最小 consumer cleanup probe。
+
+#### 总控返修验收与重测派发（2026-05-25 20:37 CST）
+
+- 返修验收结论：通过。`Alembic` commit `92bd976162fb9c1dbc19da1f8afef8756c976c27` 只删除 `.github/workflows/ci.yml` 与 `.github/workflows/release.yml` 中旧 PCV workflow checkout，符合 P1A 最小修复边界。
+- 总控复核证据：
+  - `git -C Alembic status --short --branch`：工作区 clean。
+  - `git -C Alembic diff --check HEAD^ HEAD`：通过。
+  - `git -C Alembic grep -n -- skills/progressive-chain-validation`：无命中。
+  - `rg -n "skills/progressive-chain-validation|progressive-chain-validation|PCV" Alembic/.github Alembic/test Alembic/package.json Alembic/scripts Alembic/README.md Alembic/README_CN.md -S`：仅剩 `Alembic/test/unit/SkillAdapter.test.ts:111` 的 query 字符串。
+  - `git -C Alembic submodule status`：仅剩 `vendor/AlembicCore` 与 `vendor/AlembicDashboard`。
+- 当前重测任务：请 `AlembicTest` 重跑 Test-10 的最小 consumer cleanup probe，优先复用 `AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs`；不跑 full cold-start / rescan，不修改产品源码，不操作 BiliDili 业务代码。
+- 重测回填必须包含：重测结论、执行范围、使用配置、fixture / report / plan 路径、PCV source commit、Alembic / AlembicPlugin consumer cleanup 复核结果、N9 baseline scorecard / `blocked-by-observability-gap` 状态、真实项目是否干净、详细报告路径、遗留风险和下一步建议。
+
+#### AlembicTest 重测回填（2026-05-25 20:48 CST）
+
+- 重测结论：通过。rerun probe 结论为 `pass-source-baseline-with-scoring-blocked-by-observability-gap`，`consumerCleanupPassed=true`；Test-10 的 consumer cleanup 阻塞已闭合，并已通过总控验收。
+- 执行范围：只重跑 Test-10 最小 source-readonly + fixture probe，并直接复核 `Alembic` / `AlembicPlugin` consumer path ref；未跑 full cold-start / rescan，未启动 daemon job，未操作 BiliDili 业务代码，未修改产品源码。
+- 使用配置：probe `AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs`；显式参数 `--expected-alembic-commit 92bd976162fb9c1dbc19da1f8afef8756c976c27`；输出 `--out AlembicTest/tmp/pcv-canonical-source-baseline-rerun.json` 与 `--plan AlembicTest/tmp/pcv-canonical-source-baseline-rerun-plan.md`；`productSourceWrite=false`、`fullColdStart=false`、`bilidiliBusinessCodeWrite=false`。
+- fixture / report / plan 路径：JSON evidence `AlembicTest/tmp/pcv-canonical-source-baseline-rerun.json`；plan fixture `AlembicTest/tmp/pcv-canonical-source-baseline-rerun-plan.md`；详细报告 [../../../AlembicTest/docs/pcv-consumer-cleanup-rerun-2026-05-25.md](../../../AlembicTest/docs/pcv-consumer-cleanup-rerun-2026-05-25.md)；历史首次报告 [../../../AlembicTest/docs/pcv-canonical-source-baseline-2026-05-25.md](../../../AlembicTest/docs/pcv-canonical-source-baseline-2026-05-25.md) 保留失败证据。
+- PCV source commit：`badbf0aa23bbaaff2cf185491a6785a61b74c1d8`。
+- Alembic / AlembicPlugin consumer cleanup 复核结果：
+  - `Alembic`：HEAD `92bd976162fb9c1dbc19da1f8afef8756c976c27`；`.gitmodules` 无 PCV entry，`git submodule status` 无 PCV，`git ls-files -s skills/progressive-chain-validation` 无输出，`git grep -n -- skills/progressive-chain-validation` 无输出，probe checks 全部为 true。剩余 `progressive-chain-validation` 仅为 `test/unit/SkillAdapter.test.ts:111` 搜索 query 字符串，可保留。
+  - `AlembicPlugin`：HEAD `aa171f31734350ef49efaac56c34588b67f0d924`；`.gitmodules` 无 PCV entry，`git submodule status` 无 PCV，`git ls-files -s skills/progressive-chain-validation` 无输出，`git grep -n -- skills/progressive-chain-validation` 无输出，`git grep -n -- progressive-chain-validation` 无输出，probe checks 全部为 true。
+- N9 baseline scorecard 字段：fixture 覆盖 `usefulUnit`、`qualityGate`、`stageLoss`、`baseline`、`evidenceLinks`、`verdict`；`nodeId=N9-agent-analyze-quality`；`qualityGate.status=blocked`；`stageLoss.unlinkedArtifactCount=blocked`。
+- observability gap verdict 是否触发：是，`observabilityGapVerdict.triggered=true`，`verdict=blocked-by-observability-gap`，`noQualityScoreAssigned=true`。原因是本轮只验证 canonical source shape 和 consumer cleanup，没有真实 N9 artifact / trace / metric / source-ref / report field 与 node boundary 的稳定关联。
+- 真实项目是否干净：是。`progressive-chain-validation`、`Alembic`、`AlembicPlugin`、`BiliDili` 工作区均 clean；`AlembicPlugin` 分支为 `main...origin/main [ahead 1]` 但工作树干净；`AlembicTest` 有本轮测试报告 / probe 变更，待后续按测试仓库节奏提交。
+- 验证命令 / 结果：
+  - `node --check AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs`：通过。
+  - `node AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs --help`：通过，显示 `--expected-pcv-commit` / `--expected-alembic-commit` / `--expected-plugin-commit`。
+  - `npm --prefix AlembicTest run check`：通过。
+  - `node AlembicTest/scripts/probe-pcv-canonical-source-baseline.mjs --expected-alembic-commit 92bd976162fb9c1dbc19da1f8afef8756c976c27 --out AlembicTest/tmp/pcv-canonical-source-baseline-rerun.json --plan AlembicTest/tmp/pcv-canonical-source-baseline-rerun-plan.md`：通过，consumer cleanup passed。
+  - `git -C Alembic grep -n -- skills/progressive-chain-validation` / `git -C AlembicPlugin grep -n -- skills/progressive-chain-validation`：均无输出，exit 1 为 git grep 无命中惯例。
+  - `git -C Alembic ls-files -s skills/progressive-chain-validation` / `git -C AlembicPlugin ls-files -s skills/progressive-chain-validation`：均无输出。
+- 提交 hash：无，本轮为 AlembicTest 测试与文档回填，未执行提交。
+- 遗留风险：真实 N9 quality score 仍需要 producer 侧补齐 artifact / trace / metric / source-ref node linkage；`AlembicPlugin` ahead 1 的远端同步 / 发布状态不在本轮最小重测范围。
+- 下一步建议：总控验收后关闭 Test-10 consumer cleanup 阻塞；后续若要解除 N9 `blocked-by-observability-gap`，应另派 producer observability linkage 任务，不在本轮 rerun 中补做。
+
+#### 总控验收（2026-05-25 21:00 CST）
+
+- 验收结论：通过。Test-10 consumer cleanup 阻塞关闭，Wave 2 测试门通过。
+- 证据复核：已读取 rerun report、JSON evidence 和 plan fixture；`consumerCleanupPassed=true`，PCV source / N9 fixture 可用，`Alembic` / `AlembicPlugin` 均无内部 `skills/progressive-chain-validation` path ref / gitlink。
+- 独立复核：`git -C Alembic grep -n -- skills/progressive-chain-validation` 与 `git -C AlembicPlugin grep -n -- skills/progressive-chain-validation` 均无命中；两边 `git ls-files -s skills/progressive-chain-validation` 均无输出。
+- 边界判断：`AlembicTest` 自身未提交测试资产不作为验收阻塞；产品仓库和真实项目无非预期源码改动。
+- 遗留风险归口：N9 `blocked-by-observability-gap` 是后续 Wave 3 producer linkage / Agent 优化前置缺口，不作为本轮 consumer cleanup 失败。
 
 ### Test-2026-05-25-09：LLMI-P11-Package-Runtime-Integration
 
@@ -919,9 +1319,11 @@
 - 追加用户反馈：Dashboard ProjectScope 面板外层信息过重，外层应只放项目级摘要，更多字段和 source folder 操作进入子面板 / 折叠区。
 - 返修计划：[multi-root-project-scope-wave-4-2026-05-25.md](../archive/2026-05/multi-root-project-scope/multi-root-project-scope-wave-4-2026-05-25.md)，发送给 `AlembicPlugin` 和 `AlembicDashboard`。
 
-当前待启动测试：
+当前待总控验收测试：无。
 
-- `Test-2026-05-25-09 / LLMI-P11-Package-Runtime-Integration`：当前发送给 `AlembicTest`；验证 package/runtime 或小 cold-start 链路消费最新 Agent runtime，不跑 full cold-start，不修改产品源码或真实测试项目业务源码。
+最新总控验收：
+
+- `Test-2026-05-25-10 / PCVM-P2-Canonical-Source-Baseline`：AlembicTest 最小 consumer cleanup 重测已通过总控验收；下一轮 producer observability gap 任务进入 PCVM Wave 3 计划。
 
 今日已完成测试：
 
@@ -934,4 +1336,4 @@
 
 ## 下一步
 
-当前发送给 `AlembicTest` 执行 `Test-2026-05-25-09 / LLMI-P11-Package-Runtime-Integration`。测试回填后，总控再判断 LLM 输入优化主线是否完整闭合，或是否需要按失败归口返修。
+当前无新的 AlembicTest 待启动测试；PCVM 下一步转入 Wave 3 producer observability linkage / Agent 优化计划。

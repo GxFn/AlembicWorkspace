@@ -17,6 +17,7 @@ Use this reference when preparing a wave, task package, window coverage table, p
 - 制定分派表时必须区分“最终覆盖窗口”和“当前可派发窗口”：最终会参与某条链路的仓库可以写入覆盖表，但只有当前无上游依赖、发送后能直接推进的窗口才能标为 `待启动` 并进入提示词发送名单。
 - 每次分派前必须先判断 producer / consumer 依赖链：产出 contract、类型、artifact、API、schema、发布物或迁移证据的窗口是上游；消费这些结果的窗口在上游完成前必须标为 `阻塞` 或 `观察中`，不得为了并行而提前派发。
 - 依赖上游提交、接口或文档证据的窗口，只有在上游回填提交 hash、完成范围和验证结果后，才能由总控改为 `待启动`。不要让下游窗口猜字段、复制临时 contract、提前做 fallback 或空跑验证。
+- 发送 `AlembicTest` 前必须先做自测排除判断：`AlembicTest` 不再是默认测试窗口。脚本测试、文档校验、状态机验证、targeted unit / probe、轻量集成验证和可构造最小验证必须由总控自己做；只有需要真实项目环境、cold-start / rescan、Dashboard 手动观察、运行时监控、真实项目复现 / 回归或跨仓库集成环境证据时，才把 `AlembicTest` 标为 `待启动`，并写清总控不能自测的理由。
 
 ## Task Package Requirements
 

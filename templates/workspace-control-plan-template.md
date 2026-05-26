@@ -5,18 +5,6 @@
 发送给：无
 总控定位：本文件是 AlembicWorkspace 当前总控计划；只承载目标裁决、窗口分派、TODO 归口、测试交接和验收回填，不承载产品实现。
 
-<!-- workspace-sync
-{
-  "status": "<当前计划状态>",
-  "indexPlanDescription": "<写入 docs/workspace/index.md 当前计划行的说明>",
-  "indexStatusDescription": "<写入 docs/workspace/index.md 当前状态行的说明>",
-  "currentIndexType": "当前计划",
-  "currentIndexDescription": "<写入 docs/workspace/current/index.md 的说明>",
-  "indexRows": [],
-  "currentIndexRows": []
-}
--->
-
 ## 目标判断
 
 - 用户目标：
@@ -26,6 +14,15 @@
 - 已达到时验收 / 归档判断：
 - 当前任务分区：
 - 不纳入本轮事项：
+
+## 总控决策记录
+
+- 本次决策触发：
+- 需求 / 测试结果理解：
+- 已核对证据：
+- 是否需要先验证 / 重新计划 / 用户确认：
+- 本次允许更新：
+- 本次不得更新：
 
 ## Design / 需求来源
 
@@ -161,6 +158,15 @@
 ## 测试交接
 
 - 是否需要 `AlembicTest`：
+- 总控自测结论：
+- 需要真实场景的理由：
+- 测试前边界与多条件判断：
+  - 测试要回答的问题：
+  - 测试对象 / 目标窗口 / 线程 / 项目边界：
+  - 成功能推出的结论：
+  - 失败能推出的结论：
+  - 不能推出的结论：
+  - 停止或不开始条件：
 - 测试单：
 - 测试交流入口：[alembic-test-exchange.md](alembic-test-exchange.md)
 - 真实项目保护说明：
@@ -168,3 +174,16 @@
 ## 回填区
 
 - YYYY-MM-DD HH:mm CST：
+
+<!-- workspace-sync
+{
+  "status": "<当前计划状态>",
+  "indexPlanDescription": "<写入 docs/workspace/index.md 当前计划行的说明>",
+  "indexStatusDescription": "<写入 docs/workspace/index.md 当前状态行的说明>",
+  "currentIndexType": "当前计划",
+  "currentIndexDescription": "<写入 docs/workspace/current/index.md 的说明>",
+  "currentStatusSummary": "<写入 docs/workspace/current/workspace-current-status.md 状态摘要的主线说明>",
+  "indexRows": [],
+  "currentIndexRows": []
+}
+-->

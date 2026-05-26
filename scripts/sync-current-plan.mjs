@@ -29,6 +29,7 @@ const syncStringFields = new Set([
   "indexStatusDescription",
   "currentIndexType",
   "currentIndexDescription",
+  "currentStatusSummary",
 ]);
 const syncArrayFields = new Set(["indexRows", "currentIndexRows"]);
 const syncKeys = new Set([...syncStringFields, ...syncArrayFields]);
@@ -187,6 +188,29 @@ function parseSyncBlock(content) {
   }
 }
 
+function validateSyncBlockPlacement(content) {
+  const syncIndex = content.search(/<!--\s*workspace-sync\b/);
+  if (syncIndex < 0) {
+    return [];
+  }
+
+  const backfillIndex = content.search(/^## 回填区\s*$/m);
+  if (backfillIndex >= 0 && syncIndex < backfillIndex) {
+    return [
+      "workspace-sync block must appear after `## 回填区`; keep script metadata below the human-facing plan content",
+    ];
+  }
+
+  const firstSectionIndex = content.search(/^## /m);
+  if (firstSectionIndex >= 0 && syncIndex < firstSectionIndex) {
+    return [
+      "workspace-sync block must not appear before the first human-facing section; move it near the bottom of the plan",
+    ];
+  }
+
+  return [];
+}
+
 function validateSyncBlock(sync) {
   const issues = [];
   for (const key of Object.keys(sync)) {
@@ -279,6 +303,46 @@ function promptSectionForStatus(planContent) {
   return section.replace(/^## .+$/m, "## 可复制提示词");
 }
 
+function dispatchSectionForIndex(planContent) {
+  const section = sectionContent(planContent, "窗口分派");
+  if (!section) {
+    return "";
+  }
+  return section.replace(/^## .+$/m, "## 窗口覆盖状态");
+}
+
+function syncStatusSummary(content, planLink, statusSummary) {
+  const section = sectionContent(content, "状态摘要");
+  if (!section) {
+    return content;
+  }
+
+  const lines = section.split("\n");
+  let planLineIndex = lines.findIndex((line) => line.startsWith("- 当前计划："));
+  const planLabel = path.basename(planLink);
+  const planLine = `- 当前计划：[${planLabel}](${planLink})。`;
+  if (planLineIndex >= 0) {
+    lines[planLineIndex] = planLine;
+  } else {
+    planLineIndex = lines.findIndex((line) => line.trim().length === 0);
+    const insertAt = planLineIndex >= 0 ? planLineIndex + 1 : 1;
+    lines.splice(insertAt, 0, planLine);
+    planLineIndex = insertAt;
+  }
+
+  if (statusSummary) {
+    const summaryLine = `- ${statusSummary}`;
+    const nextBullet = lines.findIndex((line, index) => index > planLineIndex && line.startsWith("- "));
+    if (nextBullet >= 0) {
+      lines[nextBullet] = summaryLine;
+    } else {
+      lines.splice(planLineIndex + 1, 0, summaryLine);
+    }
+  }
+
+  return content.replace(section, lines.join("\n"));
+}
+
 function summarizeChanged(before, after, file) {
   return {
     changed: before !== after,
@@ -329,12 +393,14 @@ if (!planPath || !existsSync(planPath)) {
 if (issues.length === 0) {
   try {
     const planContent = read(planPath);
+    issues.push(...validateSyncBlockPlacement(planContent));
     const sync = parseSyncBlock(planContent);
     issues.push(...validateSyncBlock(sync));
     const planTitle = parseTitle(planContent);
     const planStatus = sync.status ?? parseLine(planContent, "状态");
     const planDocLink = normalizeRelative(indexPath, planPath);
     const currentPlanLink = normalizeRelative(currentIndexPath, planPath);
+    const statusPlanLink = normalizeRelative(currentStatusPath, planPath);
     const statusDocLink = normalizeRelative(indexPath, currentStatusPath);
 
     if (!planStatus) {
@@ -348,6 +414,7 @@ if (issues.length === 0) {
     const currentIndexType = sync.currentIndexType ?? "当前计划";
     const currentIndexDescription =
       sync.currentIndexDescription ?? `当前执行入口：${planTitle}。`;
+    const currentStatusSummary = sync.currentStatusSummary ?? "";
 
     if (issues.length === 0) {
       // 这里只同步总控已经写进当前计划的机械重复信息；验收、TODO 和派发决策仍由总控文档先表达。
@@ -365,6 +432,12 @@ if (issues.length === 0) {
         "当前状态",
         `| 当前状态 | [${statusDocLink}](${statusDocLink}) | ${planStatus} | ${statusDescription} |`,
       );
+      const indexDispatchSection = dispatchSectionForIndex(planContent);
+      if (indexDispatchSection) {
+        indexContent = replaceSection(indexContent, "窗口覆盖状态", indexDispatchSection);
+      } else {
+        warnings.push("plan has no `## 窗口分派`; workspace index coverage section was not synced");
+      }
       for (const row of sync.indexRows ?? []) {
         const target = resolveWorkspaceDocTarget(row.doc, `workspace-sync.indexRows.${row.type}.doc`);
         const link = normalizeRelative(indexPath, target);
@@ -405,6 +478,7 @@ if (issues.length === 0) {
       let currentStatusContent = read(currentStatusPath);
       const originalCurrentStatusContent = currentStatusContent;
       currentStatusContent = currentStatusContent.replace(/^状态[：:].*$/m, `状态：${planStatus}`);
+      currentStatusContent = syncStatusSummary(currentStatusContent, statusPlanLink, currentStatusSummary);
       const dispatchSection = sectionContent(planContent, "窗口分派");
       if (dispatchSection) {
         currentStatusContent = replaceSection(currentStatusContent, "窗口分派", dispatchSection);

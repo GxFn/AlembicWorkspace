@@ -1,6 +1,7 @@
 # AlembicTest Handoff Template
 
-Use this template when the control center needs `AlembicTest` to run a test.
+Use this template only when the control center needs `AlembicTest` to run a
+real-scenario test that total control cannot perform itself.
 Copy the filled section into `docs/workspace/current/alembic-test-exchange.md`.
 
 ````text
@@ -15,6 +16,23 @@ Copy the filled section into `docs/workspace/current/alembic-test-exchange.md`.
 #### 测试目标
 
 - <要证明的真实闭环>
+
+#### 总控自测排除理由
+
+- 为什么总控不能自己完成验证：
+- 需要的真实场景 / 真实项目 / cold-start / rescan / Dashboard 手动观察 / 运行时监控 / 跨仓库环境证据：
+- 已由总控自行完成的最小验证：
+
+#### 测试前边界与多条件判断
+
+- 测试要回答的问题：
+- 测试对象 / 目标窗口 / 线程 / 项目边界：
+- 总控可自测项：
+- 必须交给 `AlembicTest` 的真实场景条件：
+- 成功能推出的结论：
+- 失败能推出的结论：
+- 不能推出的结论：
+- 停止或不开始条件：
 
 #### 非目标
 
@@ -48,12 +66,14 @@ Copy the filled section into `docs/workspace/current/alembic-test-exchange.md`.
 #### 建议命令或脚本
 
 ```bash
-# 由 AlembicTest 窗口按自身仓库脚本执行；总控不直接运行
+# 仅限需要真实场景的部分由 AlembicTest 窗口按自身仓库脚本执行；
+# 不依赖真实场景的脚本测试 / 文档校验 / targeted probe 应由总控先完成。
 ```
 
 #### 回填要求
 
 - 测试结论：
+- 边界命中情况：
 - 执行范围：
 - 使用配置：
 - job id / session id：

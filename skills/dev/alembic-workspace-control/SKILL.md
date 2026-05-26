@@ -1,6 +1,6 @@
 ---
 name: alembic-workspace-control
-description: Use when working inside AlembicWorkspace on TODO / Backlog intake, Design handoff intake, idle-window scheduling, window coverage, task-package dispatch, producer/consumer sequencing, or unified dispatch prompts. This skill supplements AGENTS.md and must not override its hard boundaries.
+description: Use when working inside AlembicWorkspace on AGENTS.md / skill layering, TODO / Backlog intake, Design handoff intake, idle-window scheduling, window coverage, task-package dispatch, producer/consumer sequencing, unified dispatch prompts, test handoffs, validation boundaries, or workspace script pipelines. This skill supplements AGENTS.md and must not override its hard boundaries.
 ---
 
 # Alembic Workspace Control
@@ -22,19 +22,23 @@ This skill may guide workspace documentation, TODO intake, dispatch planning, an
 
 - Read [references/todo-backlog.md](references/todo-backlog.md) when creating, adjusting, rolling, accepting, canceling, prioritizing, or dispatching TODO / Backlog items.
 - Read [references/window-dispatch.md](references/window-dispatch.md) when preparing a wave, task package, window coverage table, producer / consumer sequence, unified dispatch prompt, or send/no-send decision.
+- Read [references/testing-validation.md](references/testing-validation.md) when deciding whether total control should self-test, whether `AlembicTest` is justified, how to write a test handoff, how to interpret test evidence, or which validation command applies.
 - Read [references/script-pipeline.md](references/script-pipeline.md) when auditing workspace scripts, choosing validation commands, syncing repeated control-plan surfaces, refreshing Design handoff intake, or maintaining script tests / documentation.
+- Read [references/workspace-ledgers.md](references/workspace-ledgers.md) when creating, moving, syncing, archiving, or validating workspace control documents, status mirrors, indexes, templates, Design handoff ledgers, test exchange entries, workspace skill assets, or `AGENTS.md` map / skill-pointer layering.
 
 ## Non-Negotiables
 
 - `AGENTS.md` remains the hard boundary source. If this skill and `AGENTS.md` differ, follow the stricter rule.
 - `AlembicDesign` signal / handoff is input to total control, not an execution plan.
-- `AlembicTest` owns real project verification, cold-start, repro, smoke, regression, and test evidence.
+- Total control self-tests by default; `AlembicTest` is only for real project verification, cold-start, repro, smoke, regression, runtime / Dashboard observation, and cross-repo environment evidence.
 - A TODO or task package must serve the user goal and current completion definition; it must not become a reason to create empty work.
 - Dispatch prompts must keep the `AGENTS.md` read requirement and current-window / target-repository positioning declaration.
+- Hard anti-failure rules belong in `AGENTS.md`, not only in this skill. This skill may add command details and templates, but it must not hide or weaken those rules.
+- Before changing `AGENTS.md` or moving content into references, prepare an old-rule migration check: keep / downshift / rewrite / discard, and state which `AGENTS.md` section or reference now owns each rule.
 
 ## Minimal Workflow
 
-1. Classify whether the task is TODO intake, TODO rolling, wave dispatch, task-package planning, or prompt generation.
+1. Classify whether the task is TODO intake, TODO rolling, wave dispatch, task-package planning, test / validation judgment, script pipeline work, or prompt generation.
 2. Load only the matching reference file.
 3. Update the current workspace plan, `global-todo-board`, `alembic-test-exchange`, or Design inbox only when that is the correct ledger.
 4. Run the workspace validation commands required by `AGENTS.md` and the current plan.

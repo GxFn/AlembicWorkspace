@@ -19,7 +19,12 @@ function readFile(file) {
   return readFileSync(file, "utf8");
 }
 
-function createWorkspaceFixture({ planSync = "", planStatus = "新状态", planHeading = "Example Plan" } = {}) {
+function createWorkspaceFixture({
+  planSync = "",
+  planSyncPlacement = "bottom",
+  planStatus = "新状态",
+  planHeading = "Example Plan",
+} = {}) {
   const root = mkdtempSync(path.join(tmpdir(), "alembic-sync-current-plan-"));
   writeFile(path.join(root, "AGENTS.md"), "# Fixture Agents\n");
   writeFile(
@@ -61,6 +66,11 @@ function createWorkspaceFixture({ planSync = "", planStatus = "新状态", planH
 
 状态：旧状态
 
+## 状态摘要
+
+- 当前计划：[old.md](old.md)。
+- 旧摘要。
+
 ## 窗口分派
 
 发送给：\`Alembic\`
@@ -85,7 +95,7 @@ function createWorkspaceFixture({ planSync = "", planStatus = "新状态", planH
 
 状态：${planStatus}
 
-${planSync}
+${planSyncPlacement === "top" ? planSync : ""}
 
 ## 窗口分派
 
@@ -109,6 +119,12 @@ ${planSync}
 先读取 AGENTS.md 和目标仓库 AGENTS.md。
 先明确声明当前窗口定位和本轮仓库职责。
 \`\`\`
+
+## 回填区
+
+- Fixture 回填记录。
+
+${planSyncPlacement === "bottom" ? planSync : ""}
 `,
   );
   return root;
@@ -135,7 +151,8 @@ test("dry-run reports changes without writing repeated current-control docs", ()
   "indexPlanDescription": "同步计划说明",
   "indexStatusDescription": "同步状态说明",
   "currentIndexType": "当前专项",
-  "currentIndexDescription": "同步当前地图说明"
+  "currentIndexDescription": "同步当前地图说明",
+  "currentStatusSummary": "同步状态摘要。"
 }
 -->
 `,
@@ -157,7 +174,8 @@ test("--write syncs index rows, current map row, dispatch section, and prompt se
   "indexPlanDescription": "同步计划说明",
   "indexStatusDescription": "同步状态说明",
   "currentIndexType": "当前专项",
-  "currentIndexDescription": "同步当前地图说明"
+  "currentIndexDescription": "同步当前地图说明",
+  "currentStatusSummary": "同步状态摘要。"
 }
 -->
 `,
@@ -171,8 +189,11 @@ test("--write syncs index rows, current map row, dispatch section, and prompt se
 
   assert.match(index, /\| 当前计划 \| \[current\/example-plan\.md]\(current\/example-plan\.md\) \| 同步状态 \| 同步计划说明 \|/);
   assert.match(index, /\| 当前状态 \| \[current\/workspace-current-status\.md]\(current\/workspace-current-status\.md\) \| 同步状态 \| 同步状态说明 \|/);
+  assert.match(index, /## 窗口覆盖状态[\s\S]*\| `AlembicDashboard`<br>已完成 \| 新任务 \|/);
   assert.match(currentIndex, /\| 当前专项 \| \[example-plan\.md]\(example-plan\.md\) \| 同步当前地图说明 \|/);
   assert.match(status, /^状态：同步状态$/m);
+  assert.match(status, /- 当前计划：\[example-plan\.md]\(example-plan\.md\)。/);
+  assert.match(status, /- 同步状态摘要。/);
   assert.match(status, /\| `AlembicDashboard`<br>已完成 \| 新任务 \|/);
   assert.match(status, /## 可复制提示词\n\n发送给：无。/);
 });
@@ -267,5 +288,25 @@ test("workspace-sync row targets cannot escape the workspace", () => {
 
   assert.notEqual(result.status, 0);
   assert.match(`${result.stdout}\n${result.stderr}`, /must stay inside workspace/);
+  assert.equal(readFile(path.join(root, "docs/workspace/index.md")), before);
+});
+
+test("workspace-sync metadata cannot sit above human-facing plan content", () => {
+  const root = createWorkspaceFixture({
+    planSyncPlacement: "top",
+    planSync: `
+<!-- workspace-sync
+{
+  "status": "同步状态"
+}
+-->
+`,
+  });
+  const before = readFile(path.join(root, "docs/workspace/index.md"));
+
+  const result = runSyncResult(root, ["--write"]);
+
+  assert.notEqual(result.status, 0);
+  assert.match(`${result.stdout}\n${result.stderr}`, /must appear after `## 回填区`/);
   assert.equal(readFile(path.join(root, "docs/workspace/index.md")), before);
 });

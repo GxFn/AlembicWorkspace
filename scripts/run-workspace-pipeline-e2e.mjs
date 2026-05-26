@@ -143,39 +143,14 @@ function planContent({ completed = false } = {}) {
 
 状态：${status}
 
-<!-- workspace-sync
-{
-  "status": "${status}",
-  "indexPlanDescription": "E2E fixture：需求到测试结束归档脚本全链。",
-  "indexStatusDescription": "E2E fixture 当前状态，由 sync-current-plan 生成。",
-  "currentIndexType": "当前计划",
-  "currentIndexDescription": "E2E fixture 当前计划。",
-  "indexRows": [
-    {
-      "type": "E2E Design Handoff Inbox",
-      "doc": "docs/workspace/current/design-handoff-inbox.md",
-      "status": "维护中",
-      "description": "由 import-design-handoffs 生成的 fixture inbox。",
-      "insertAfter": "当前状态"
-    },
-    {
-      "type": "E2E 需求设计",
-      "doc": "docs/requirement-designs/e2e-flow/requirement-design-2026-05-25.md",
-      "status": "已完成",
-      "description": "fixture 需求设计入口，用于 compact-workspace-index 验证。",
-      "insertAfter": "E2E Design Handoff Inbox"
-    }
-  ],
-  "currentIndexRows": [
-    {
-      "type": "E2E Test Exchange",
-      "doc": "docs/workspace/current/alembic-test-exchange.md",
-      "description": "fixture 测试交流入口。",
-      "insertAfter": "当前计划"
-    }
-  ]
-}
--->
+## 总控决策记录
+
+- 本次决策触发：E2E fixture 需要验证需求到测试结束归档脚本全链。
+- 需求 / 测试结果理解：fixture 只验证 workspace 自动化文档链路，不代表产品实现。
+- 已核对证据：fixture Design handoff、current plan、TODO、任务包和测试交流。
+- 是否需要先验证 / 重新计划 / 用户确认：不需要用户确认，脚本会在 fixture 内自测。
+- 本次允许更新：fixture workspace 文档和归档入口。
+- 本次不得更新：不得写入真实产品仓库或真实测试项目。
 
 ## 阶段任务包
 
@@ -233,6 +208,40 @@ ${sendLine}
 ## 回填区
 
 - ${completed ? "AlembicDashboard fixture 和 AlembicTest fixture 均已回填通过。" : "等待执行窗口回填。"}
+
+<!-- workspace-sync
+{
+  "status": "${status}",
+  "indexPlanDescription": "E2E fixture：需求到测试结束归档脚本全链。",
+  "indexStatusDescription": "E2E fixture 当前状态，由 sync-current-plan 生成。",
+  "currentIndexType": "当前计划",
+  "currentIndexDescription": "E2E fixture 当前计划。",
+  "indexRows": [
+    {
+      "type": "E2E Design Handoff Inbox",
+      "doc": "docs/workspace/current/design-handoff-inbox.md",
+      "status": "维护中",
+      "description": "由 import-design-handoffs 生成的 fixture inbox。",
+      "insertAfter": "当前状态"
+    },
+    {
+      "type": "E2E 需求设计",
+      "doc": "docs/requirement-designs/e2e-flow/requirement-design-2026-05-25.md",
+      "status": "已完成",
+      "description": "fixture 需求设计入口，用于 compact-workspace-index 验证。",
+      "insertAfter": "E2E Design Handoff Inbox"
+    }
+  ],
+  "currentIndexRows": [
+    {
+      "type": "E2E Test Exchange",
+      "doc": "docs/workspace/current/alembic-test-exchange.md",
+      "description": "fixture 测试交流入口。",
+      "insertAfter": "当前计划"
+    }
+  ]
+}
+-->
 `;
 }
 
@@ -241,15 +250,14 @@ function idlePlanContent() {
 
 状态：空闲
 
-<!-- workspace-sync
-{
-  "status": "空闲",
-  "indexPlanDescription": "E2E fixture 归档后的空闲控制入口。",
-  "indexStatusDescription": "E2E fixture 归档后当前状态。",
-  "currentIndexType": "当前计划",
-  "currentIndexDescription": "E2E fixture 归档后空闲状态。"
-}
--->
+## 总控决策记录
+
+- 本次决策触发：E2E fixture 已归档，需要空闲 current plan 维持验证入口。
+- 需求 / 测试结果理解：空闲计划只用于证明归档后总控入口仍可校验。
+- 已核对证据：归档后的 current index、workspace index 和 record map。
+- 是否需要先验证 / 重新计划 / 用户确认：不需要，post-archive verification 会复核。
+- 本次允许更新：fixture 空闲入口。
+- 本次不得更新：不得重新派发窗口或触碰真实产品仓库。
 
 ## 窗口分派
 
@@ -276,6 +284,16 @@ function idlePlanContent() {
 ## 回填区
 
 - E2E fixture 已切回空闲入口。
+
+<!-- workspace-sync
+{
+  "status": "空闲",
+  "indexPlanDescription": "E2E fixture 归档后的空闲控制入口。",
+  "indexStatusDescription": "E2E fixture 归档后当前状态。",
+  "currentIndexType": "当前计划",
+  "currentIndexDescription": "E2E fixture 归档后空闲状态。"
+}
+-->
 `;
 }
 

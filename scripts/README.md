@@ -34,6 +34,7 @@ Script-readable document format:
   "indexStatusDescription": "<index current-status row summary>",
   "currentIndexType": "当前计划",
   "currentIndexDescription": "<current index summary>",
+  "currentStatusSummary": "<first summary bullet after the current-plan link>",
   "indexRows": [],
   "currentIndexRows": []
 }
@@ -42,9 +43,18 @@ Script-readable document format:
 
 - `workspace-sync` is mechanical metadata only. It must not decide readiness,
   TODO priority, Design acceptance, window acceptance, or product scope.
+- Keep `workspace-sync` after `## 回填区`, near the end of the current plan.
+  `sync-current-plan.mjs` fails closed if this script metadata is placed above
+  human-facing plan content.
+- `currentStatusSummary` is optional; when present, `sync-current-plan.mjs`
+  uses it to keep the concise status page from retaining stale mainline text.
 - Keep these section names stable when scripts need to read or sync them:
-  `目标判断`, `任务包`, `TODO / Backlog`, `空闲窗口调度`, `窗口分派`,
-  `可复制分派提示词` / `可复制提示词`, `测试交接`, and `回填区`.
+  `目标判断`, `总控决策记录`, `任务包`, `TODO / Backlog`, `空闲窗口调度`,
+  `窗口分派`, `可复制分派提示词` / `可复制提示词`, `测试交接`, and `回填区`.
+- Current plans must include `总控决策记录` before mechanical sync or
+  acceptance checks. This section records what demand / evidence triggered the
+  doc update, whether the evidence answered the right question, what should be
+  verified or replanned first, and which conclusions are allowed or forbidden.
 - Window dispatch tables should keep the narrow form:
   `| 窗口 / 状态 | 任务 |`.
 - TODO / idle scheduling tables should keep explicit ID, status, owner,
@@ -55,6 +65,60 @@ Script-readable document format:
 
 Current scripts:
 
+- `workspace-control.mjs`: command-style aggregator for common control-center
+  workflows. It maps friendly subcommands such as `status`, `verify`,
+  `sync`, `dispatch`, `design`, `runtime`, `scripts`, and `pipeline` onto the
+  existing workspace scripts without replacing their dry-run / write gates.
+  Use `--print` to inspect the exact commands before running them.
+- `visible-dispatch.mjs`: local state manager for Visible Automation Dispatch.
+  It stores mode / window registry / dispatch queue / automation run metadata
+  under ignored `.workspace-local/visible-dispatch/`, supports explicit
+  `--write` for mode, registry, unregister, enqueue, claim, complete, tick, arm-recording,
+  stop-recording, controller-return recording, blocker, and acceptance operations, prints heartbeat arm
+  payloads for a Codex window to pass to Codex automation tools, records
+  returned automation ids with `record-arm`, records externally paused /
+  deleted automation runs with `record-stop`, marks failed dispatch attempts
+  with `block`, prunes old terminal queue residue with `prune-history`, separates
+  low-frequency waiting checks from total-control acceptance verdicts, and
+  exposes `controller-tick` as a read-only total-control loop classifier over
+  mode, queue, current plan dispatch rows, and global TODO candidates. Target
+  Window thread ids are local runtime data: `register` writes them under
+  ignored `.workspace-local/visible-dispatch/window-registry.json` and redacts
+  them from JSON output, rejects placeholder ids such as
+  `current-codex-thread`, and can remove polluted entries with `unregister`, so
+  they should not be copied into tracked docs or committed to GitHub. Target
+  `enqueue --from-plan --group <id> --return-policy controller-last --write`
+  creates a dispatch group, and `arm-batch --group <id> --json` prints all
+  ready target heartbeat payloads so total control can fan out multiple windows
+  in one batch. Target windows can use `finish --window <name> --thread <id>
+  --backfill <text> --write --chain-next --json` at the end of their work to
+  register their current thread, complete the claimed task with evidence, and
+  print the next safe wake payload for an already queued / registered window or,
+  for `controller-last` groups, print no payload until the final group task
+  finishes. The final target window gets a `controller-return` payload for
+  `AlembicWorkspace` and must record it with `record-return --group <id>`.
+  Generated heartbeat payloads use `FREQ=MINUTELY;INTERVAL=1`, reference the
+  `skills/dev/visible-automation-dispatch-target/` role-guard skill, and include
+  a compact claim / finish / next-arm / record-stop sequence. Target windows may
+  create a next heartbeat only when finish-chain returns
+  `handoffPolicy=target-courier` and `payload.courierAllowed=true`; otherwise the
+  next arm is total-control-owned. In dispatch-group mode, target windows may
+  create a total-control return heartbeat only when finish-chain returns
+  `handoffPolicy=controller-return` and `payload.controllerReturnAllowed=true`.
+  `AlembicTest` next-hop arming is total-control-owned by default so product /
+  plugin windows do not process or courier test-window automation accidentally.
+  Visible automation is an explicit mode: when `mode --enable --write` is in
+  effect, total control may keep running the acceptance / next-TODO loop and
+  target windows may use finish-chain wake payloads; when `mode --disable
+  --write` is in effect, completion evidence can still be recorded but
+  controller loops stop and `finish --chain-next` refuses to produce a next
+  wake payload. If a target heartbeat was already armed before the close switch,
+  that target may still wake once, but its finish-chain result is
+  `modeDisabled` with no `chain.payload`, so the next window jump no longer
+  carries automation.
+  The script still does not call Codex automation APIs directly, does not
+  accept evidence, does not select new TODOs, and does not write product
+  repositories.
 - `collect-repo-status.mjs`: summarizes branch, HEAD, dirty state,
   upstream, ahead / behind counts, untracked files, and latest commit for each
   workspace child repository.
@@ -69,7 +133,21 @@ Current scripts:
 - `check-dispatch-coverage.mjs`: verifies that the current control plan covers
   every expected window, that the declared copyable prompt send list matches
   task statuses, and that sendable prompts require reading `AGENTS.md` plus an
-  explicit window / repository positioning statement.
+  explicit window / repository positioning statement. Nonstandard extra
+  windows are allowed when they are not send-eligible.
+- `check-decision-preflight.mjs`: verifies that the current control plan
+  records `总控决策记录` before document/state changes are treated as valid.
+  It requires the trigger, demand / test-result interpretation, checked
+  evidence, whether verification / replanning / user confirmation should happen
+  first, allowed updates, and forbidden conclusions.
+- `check-test-boundary.mjs`: verifies that `AlembicTest` cannot be made
+  send-eligible for verification without an active test card that records why
+  total control cannot self-test, the real scenario dependency, the exact
+  question under test, object / window / thread / project boundaries, success /
+  failure inference limits, and stop / no-start conditions. Explicit non-test
+  thread-registry or Visible Automation Dispatch smoke rows are allowed only
+  when the current plan says no test handoff, no real-project validation, and
+  local-only runtime evidence.
 - `check-todo-board.mjs`: verifies that plans using the TODO submode contain a
   `TODO / Backlog` section and idle-window scheduling coverage. Use
   `--require` when TODO items affect dispatch, parallel scheduling, or the next
@@ -89,17 +167,19 @@ Current scripts:
   for fixture / CI execution and `--json` for machine output.
 - `verify-control-center.mjs`: one-command control-center verification that
   runs boundary, repo status, workspace docs, script docs, current-plan sync
-  check, dispatch coverage, and `git diff --check`. Add `--require-todo` when
-  TODO scheduling must be present, `--require-task-packages` when package-based
-  dispatch must be present, `--with-runtime` for a read-only runtime residue report,
+  check, decision preflight, dispatch coverage, test boundary, and
+  `git diff --check`. Add `--require-todo` when TODO scheduling must be
+  present, `--require-task-packages` when package-based dispatch must be
+  present, `--with-runtime` for a read-only runtime residue report,
   `--strict-runtime` to fail when Alembic daemon / Dashboard dev residue is
   present, or `--with-script-tests` to run workspace script unit tests.
 - `sync-current-plan.mjs`: dry-run by default; reads the current plan, plus an
   optional `<!-- workspace-sync { ... } -->` JSON block, and synchronizes the
   mechanical current-control surfaces: the first current-plan/current-status
-  rows in `docs/workspace/index.md`, the active plan row in
-  `docs/workspace/current/index.md`, and the status / window-dispatch /
-  copyable-prompt sections in `docs/workspace/current/workspace-current-status.md`.
+  rows and window coverage table in `docs/workspace/index.md`, the active plan
+  row in `docs/workspace/current/index.md`, and the status summary /
+  window-dispatch / copyable-prompt sections in
+  `docs/workspace/current/workspace-current-status.md`.
   It also supports controlled `indexRows` and `currentIndexRows` in the
   sync block for extra rows that the total-control plan has already decided.
   Use `--write` to apply, `--check` to fail when generated surfaces are stale,
@@ -148,18 +228,21 @@ Current scripts:
 Suggested pre-acceptance sequence:
 
 ```bash
+node scripts/workspace-control.mjs verify
 node scripts/verify-control-center.mjs
 ```
 
 Dispatch plan with TODO and task packages:
 
 ```bash
+node scripts/workspace-control.mjs verify --dispatch
 node scripts/verify-control-center.mjs --require-todo --require-task-packages
 ```
 
 Sync current plan metadata into repeated entry documents:
 
 ```bash
+node scripts/workspace-control.mjs sync --write --verify --dispatch
 node scripts/sync-current-plan.mjs --check
 node scripts/sync-current-plan.mjs --write
 node scripts/verify-control-center.mjs --require-todo --require-task-packages
@@ -169,7 +252,8 @@ Workspace script tests:
 
 ```bash
 node scripts/check-script-docs.mjs
-node --test scripts/check-script-docs.test.mjs scripts/sync-current-plan.test.mjs
+node --test scripts/check-decision-preflight.test.mjs scripts/check-dispatch-coverage.test.mjs scripts/check-script-docs.test.mjs scripts/check-test-boundary.test.mjs scripts/sync-current-plan.test.mjs scripts/visible-dispatch.test.mjs scripts/workspace-control.test.mjs
+node scripts/workspace-control.mjs scripts --tests
 node scripts/verify-control-center.mjs --with-script-tests
 ```
 
@@ -188,6 +272,7 @@ node scripts/check-task-packages.mjs --require
 Runtime residue check:
 
 ```bash
+node scripts/workspace-control.mjs runtime
 node scripts/check-runtime-residue.mjs
 node scripts/verify-control-center.mjs --with-runtime
 ```
@@ -195,6 +280,7 @@ node scripts/verify-control-center.mjs --with-runtime
 Design handoff inbox refresh:
 
 ```bash
+node scripts/workspace-control.mjs design --write
 node scripts/import-design-handoffs.mjs --write
 node scripts/import-design-handoffs.mjs --id ARTIFACT-DRAWER-2026-05-25 --json
 ```
@@ -202,6 +288,7 @@ node scripts/import-design-handoffs.mjs --id ARTIFACT-DRAWER-2026-05-25 --json
 Full governance pipeline fixture:
 
 ```bash
+node scripts/workspace-control.mjs pipeline
 node scripts/run-workspace-pipeline-e2e.mjs
 node scripts/run-workspace-pipeline-e2e.mjs --keep --json
 ```

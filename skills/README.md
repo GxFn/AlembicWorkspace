@@ -25,10 +25,21 @@ Current drafts:
 
 - `dev/alembic-workspace-control/`: trial extraction for bulky
   AlembicWorkspace control-center details. It currently holds TODO / Backlog,
-  window dispatch, and workspace script pipeline references that used to live
-  inline in `AGENTS.md` or ad hoc conversation memory. `AGENTS.md` remains the
-  hard boundary source and points to this skill only when those detailed
-  workflows are needed.
+  window dispatch, testing / validation, workspace ledger / document-surface,
+  and workspace script pipeline references that used to live inline in
+  `AGENTS.md` or ad hoc conversation memory. `AGENTS.md` remains the hard
+  boundary source and points to this skill only when those detailed workflows
+  are needed. Anti-failure hard rules must stay in `AGENTS.md`, not only here.
+- `dev/visible-automation-dispatch-target/`: target-window skill for Visible
+  Automation Dispatch heartbeat tasks. It keeps unattended claim / finish /
+  next-heartbeat courier rules, target-window role guards, `AlembicTest`
+  boundaries, and local thread-id handling out of long generated prompts and
+  child-repository `AGENTS.md` files.
+- `dev/visible-automation-dispatch-controller/`: total-control skill for
+  Visible Automation Dispatch controller-return heartbeats. It keeps
+  unattended acceptance, self-test / real-test judgment, next-wave decisions,
+  and anti-small-task-drift rules close to the automation controller without
+  moving hard boundaries out of `AGENTS.md`.
 
 Development workflow:
 

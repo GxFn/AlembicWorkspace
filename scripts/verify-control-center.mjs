@@ -36,6 +36,11 @@ const checks = [
     args: ["scripts/sync-current-plan.mjs", "--check"],
   },
   {
+    label: "decision preflight",
+    command: "node",
+    args: ["scripts/check-decision-preflight.mjs"],
+  },
+  {
     label: "current layout",
     command: "node",
     args: ["scripts/check-workspace-current-layout.mjs"],
@@ -44,6 +49,11 @@ const checks = [
     label: "dispatch coverage",
     command: "node",
     args: ["scripts/check-dispatch-coverage.mjs"],
+  },
+  {
+    label: "test boundary",
+    command: "node",
+    args: ["scripts/check-test-boundary.mjs"],
   },
   {
     label: "TODO board",
@@ -74,7 +84,16 @@ if (withScriptTests) {
   checks.push({
     label: "workspace script tests",
     command: "node",
-    args: ["--test", "scripts/check-script-docs.test.mjs", "scripts/sync-current-plan.test.mjs"],
+    args: [
+      "--test",
+      "scripts/check-decision-preflight.test.mjs",
+      "scripts/check-dispatch-coverage.test.mjs",
+      "scripts/check-script-docs.test.mjs",
+      "scripts/check-test-boundary.test.mjs",
+      "scripts/sync-current-plan.test.mjs",
+      "scripts/visible-dispatch.test.mjs",
+      "scripts/workspace-control.test.mjs",
+    ],
   });
 }
 

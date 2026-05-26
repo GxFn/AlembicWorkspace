@@ -12,6 +12,11 @@ Use this reference when auditing AlembicWorkspace scripts, choosing validation c
 
 ## Default Command Set
 
+- Aggregated command surface:
+  `node scripts/workspace-control.mjs status`
+  `node scripts/workspace-control.mjs verify --dispatch`
+  `node scripts/workspace-control.mjs sync --write --verify --dispatch`
+  `node scripts/workspace-control.mjs scripts --tests`
 - General pre-acceptance:
   `node scripts/verify-control-center.mjs`
 - Dispatch plans with TODO and task packages:
@@ -35,11 +40,14 @@ Use this reference when auditing AlembicWorkspace scripts, choosing validation c
 
 | Need | Primary script | Notes |
 | --- | --- | --- |
+| Choose a common control-center workflow without memorizing script flags | `workspace-control.mjs` | Aggregates existing scripts only; it does not replace total-control decisions or bypass write/apply gates. Use `--print` before unfamiliar flows. |
 | Know child repo branches, dirty state, and commits | `collect-repo-status.mjs` | Read-only; useful before acceptance or cross-repo planning. |
 | Ensure workspace git tracks only workspace files | `check-workspace-boundary.mjs` | Read-only guard against accidentally tracking child repos or local noise. |
 | Validate workspace docs and links | `verify-workspace-docs.mjs` | Use `--all-workspace` through `verify-control-center`. |
 | Validate current docs stay under `docs/workspace/current/` | `check-workspace-current-layout.mjs` | Read-only layout guard. |
 | Validate send list and prompt hard rules | `check-dispatch-coverage.mjs` | Mechanical guard only; total control still decides producer / consumer order. |
+| Validate decision preflight before doc/state changes | `check-decision-preflight.mjs` | Fails when the current plan lacks trigger, demand / test-result interpretation, checked evidence, verify / replan / confirm decision, allowed updates, and forbidden conclusions. |
+| Validate test-start boundary judgment | `check-test-boundary.mjs` | Fails when `AlembicTest` is send-eligible for verification without self-test exclusion, real-scenario dependency, test question, boundary, inference limit, and stop-condition fields. Explicit non-test thread-registry or Visible Automation Dispatch smoke rows are allowed only when the current plan says no test handoff / no real-project validation and local-only runtime evidence. |
 | Validate TODO scheduling sections | `check-todo-board.mjs --require` | Use when TODO / Backlog affects dispatch or wave order. |
 | Validate task-package completeness | `check-task-packages.mjs --require` | Use when bundling mainline work with TODOs. |
 | Sync current plan into repeated status/index surfaces | `sync-current-plan.mjs --check` / `--write` | Does not decide readiness, TODOs, Design status, or window acceptance. |
@@ -47,6 +55,7 @@ Use this reference when auditing AlembicWorkspace scripts, choosing validation c
 | Archive completed control docs and shrink historical indexes | `archive-workspace-docs.mjs`, `compact-workspace-index.mjs`, `archive-global-todo-board.mjs`, `generate-archive-topic-summaries.mjs` | Dry-run first; apply only after current status no longer points at the archived item. |
 | Prove the governance scripts work as a chain | `run-workspace-pipeline-e2e.mjs` | Uses a temporary fixture workspace and runs write/apply modes without touching product repositories. |
 | Keep script catalog and tests from drifting | `check-script-docs.mjs` | Runs inside `verify-control-center`; add tests to `--with-script-tests`. |
+| Manage Visible Automation Dispatch local mode / registry / queue / claim / finish / acceptance state | `visible-dispatch.mjs` | Runtime files stay under ignored `.workspace-local/visible-dispatch/`; window thread ids are local-only runtime data, `register` writes them to `.workspace-local/visible-dispatch/window-registry.json` and redacts them from JSON output, so raw thread ids must not be copied into tracked docs or GitHub commits; `mode --enable --write` explicitly turns on the automation loop where total control may continue acceptance / next-TODO decisions and windows may use finish-chain wake payloads; `mode --disable --write` is the close switch: controller automation stops immediately, and any already-armed target that wakes once can finish but receives no next `chain.payload`; `enqueue --from-plan --group <id> --return-policy controller-last --write` creates a dispatch group; `arm-batch --group <id> --json` prints all ready target heartbeat payloads for total-control fan-out; `arm` prints one-minute heartbeat payloads (`FREQ=MINUTELY;INTERVAL=1`) but does not call automation APIs directly; generated target prompts carry the unattended claim / finish / next-arm / controller-return / `record-arm` / `record-return` / `record-stop` sequence; `record-arm` stores the automation id returned by a target Codex window; `record-return` stores the automation id for the final child window's total-control return heartbeat; `finish --window <name> --thread <id> --backfill <text> --write --chain-next --json` lets a target window register its thread, complete the claimed task with evidence, and either return `noReturn` while a dispatch group still has unfinished work, emit `controller-return` for the final group task, or print the next queued / registered window wake payload only while mode remains enabled; `group-status --group <id> --json` summarizes batch completion; `prune-history --write` removes old terminal queue residue from previous control plans while keeping current-plan tasks and historic tasks with active automation runs; `tick` reports waiting / stale / ready-for-acceptance tasks; `controller-tick` classifies the next total-control loop action from mode, queue, current plan dispatch rows, and global TODO candidates without writing state; `accept` records total-control verdicts. |
 
 ## When To Extract A New Script
 

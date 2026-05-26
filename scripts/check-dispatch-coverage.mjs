@@ -179,13 +179,18 @@ if (planPath && existsSync(planPath)) {
   }
 
   for (const row of rows) {
-    if (!requiredWindows.includes(row.window)) {
+    const requiredWindow = requiredWindows.includes(row.window);
+    if (!requiredWindow && sendEligibleStatuses.has(row.status)) {
+      issues.push(`unexpected send-eligible dispatch window: ${row.window}`);
+    } else if (!requiredWindow && !validStatuses.has(row.status)) {
       warnings.push(`unexpected dispatch window: ${row.window}`);
     }
     if (!validStatuses.has(row.status)) {
       issues.push(`${row.window} has unknown status: ${row.status}`);
     }
-    if (noSendStatuses.has(row.status) && /发送|提示词/.test(row.task)) {
+    const looksLikePromptSending =
+      /发送|提示词/.test(row.task) && !/不发送|不要发送|不再发送|当前不发送/.test(row.task);
+    if (noSendStatuses.has(row.status) && looksLikePromptSending) {
       warnings.push(`${row.window} is ${row.status}; avoid assigning prompt-sending work unless the plan explains why`);
     }
   }
@@ -194,12 +199,12 @@ if (planPath && existsSync(planPath)) {
 const sendList = rows
   .filter((row) => sendEligibleStatuses.has(row.status))
   .map((row) => row.window)
-  .filter((window) => requiredWindows.includes(window));
+  .filter((window) => window.length > 0);
 const blocked = rows.filter((row) => row.status === blockedStatus).map((row) => row.window);
 const doNotSend = rows
   .filter((row) => noSendStatuses.has(row.status) || row.status === blockedStatus)
   .map((row) => row.window)
-  .filter((window) => requiredWindows.includes(window));
+  .filter((window) => window.length > 0);
 
 if (declaredSendList) {
   const expected = [...sendList].sort();
