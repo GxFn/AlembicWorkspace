@@ -37,6 +37,7 @@ Commands:
   design      Refresh or validate Design handoff intake.
   runtime     Inspect runtime residue without mutating processes.
   scripts     Check script docs, optionally including script tests.
+  vad         Inspect or operate Visible Automation Dispatch local state.
   pipeline    Run the fixture governance pipeline.
   help        Show this help.
 
@@ -45,6 +46,9 @@ Common examples:
   node scripts/workspace-control.mjs verify --dispatch --script-tests
   node scripts/workspace-control.mjs sync --write --verify --dispatch
   node scripts/workspace-control.mjs design --id PCVM-2026-05-25 --json
+  node scripts/workspace-control.mjs vad status --json
+  node scripts/workspace-control.mjs vad controller --json
+  node scripts/workspace-control.mjs vad audit --automation-id <id> --json
   node scripts/workspace-control.mjs pipeline --json
 
 Safety:
@@ -224,6 +228,116 @@ function buildScripts(options) {
   return steps;
 }
 
+function buildVad(options) {
+  const subcommand = options[0] ?? "status";
+  const rest = options.slice(1);
+  switch (subcommand) {
+    case "status": {
+      assertKnownOptions(rest, ["--json"]);
+      return [{ label: "visible dispatch status", ...nodeScript("visible-dispatch.mjs", ["status", ...(hasFlag(rest, "--json") ? ["--json"] : [])]) }];
+    }
+    case "controller":
+    case "controller-tick": {
+      assertKnownOptions(rest, ["--json"]);
+      return [{ label: "visible dispatch controller tick", ...nodeScript("visible-dispatch.mjs", ["controller-tick", ...(hasFlag(rest, "--json") ? ["--json"] : [])]) }];
+    }
+    case "preflight": {
+      assertKnownOptions(rest, ["--json", "--from-plan"], ["--group", "--task", "--window"]);
+      const out = [];
+      const group = getValue(rest, "--group");
+      const task = getValue(rest, "--task");
+      const windowName = getValue(rest, "--window");
+      if (group) {
+        out.push("--group", group);
+      } else if (task) {
+        out.push("--task", task);
+      } else if (windowName) {
+        out.push("--window", windowName);
+      } else {
+        out.push("--from-plan");
+      }
+      if (hasFlag(rest, "--json")) {
+        out.push("--json");
+      }
+      return [{ label: "visible dispatch preflight", ...nodeScript("visible-dispatch.mjs", ["preflight", ...out]) }];
+    }
+    case "audit": {
+      assertKnownOptions(
+        rest,
+        ["--json", "--strict", "--allow-historic", "--allow-alembic-test"],
+        ["--automation-id", "--window", "--group", "--role"],
+      );
+      const automationId = getValue(rest, "--automation-id");
+      if (!automationId) {
+        fail("vad audit requires --automation-id <id>.");
+      }
+      const out = ["audit-automation", "--automation-id", automationId];
+      for (const valueFlag of ["--window", "--group", "--role"]) {
+        const value = getValue(rest, valueFlag);
+        if (value) {
+          out.push(valueFlag, value);
+        }
+      }
+      for (const flag of ["--allow-historic", "--allow-alembic-test", "--strict", "--json"]) {
+        if (hasFlag(rest, flag)) {
+          out.push(flag);
+        }
+      }
+      return [{ label: "visible dispatch automation audit", ...nodeScript("visible-dispatch.mjs", out) }];
+    }
+    case "group": {
+      assertKnownOptions(rest, ["--json"], ["--group"]);
+      const group = getValue(rest, "--group");
+      if (!group) {
+        fail("vad group requires --group <dispatchGroupId>.");
+      }
+      return [{ label: "visible dispatch group status", ...nodeScript("visible-dispatch.mjs", ["group-status", "--group", group, ...(hasFlag(rest, "--json") ? ["--json"] : [])]) }];
+    }
+    case "enable": {
+      assertKnownOptions(rest, ["--write", "--json", "--no-keep-awake"], ["--reason"]);
+      if (!hasFlag(rest, "--write")) {
+        fail("vad enable requires --write.");
+      }
+      const out = ["mode", "--enable", "--write"];
+      const reason = getValue(rest, "--reason");
+      if (reason) {
+        out.push("--reason", reason);
+      }
+      if (hasFlag(rest, "--no-keep-awake")) {
+        out.push("--no-keep-awake");
+      }
+      if (hasFlag(rest, "--json")) {
+        out.push("--json");
+      }
+      return [{ label: "visible dispatch enable mode", ...nodeScript("visible-dispatch.mjs", out) }];
+    }
+    case "disable": {
+      assertKnownOptions(rest, ["--write", "--json"], ["--reason"]);
+      if (!hasFlag(rest, "--write")) {
+        fail("vad disable requires --write.");
+      }
+      const out = ["mode", "--disable", "--write"];
+      const reason = getValue(rest, "--reason");
+      if (reason) {
+        out.push("--reason", reason);
+      }
+      if (hasFlag(rest, "--json")) {
+        out.push("--json");
+      }
+      return [{ label: "visible dispatch disable mode", ...nodeScript("visible-dispatch.mjs", out) }];
+    }
+    case "prune": {
+      assertKnownOptions(rest, ["--write", "--json"]);
+      if (!hasFlag(rest, "--write")) {
+        fail("vad prune requires --write.");
+      }
+      return [{ label: "visible dispatch prune history", ...nodeScript("visible-dispatch.mjs", ["prune-history", "--write", ...(hasFlag(rest, "--json") ? ["--json"] : [])]) }];
+    }
+    default:
+      fail(`Unknown vad subcommand: ${subcommand}. Expected status, controller, preflight, audit, group, enable, disable, or prune.`);
+  }
+}
+
 function buildPipeline(options) {
   assertKnownOptions(options, ["--keep", "--json"]);
   const out = [];
@@ -256,6 +370,8 @@ function buildSteps() {
       return buildRuntime(commandArgs);
     case "scripts":
       return buildScripts(commandArgs);
+    case "vad":
+      return buildVad(commandArgs);
     case "pipeline":
       return buildPipeline(commandArgs);
     default:

@@ -373,6 +373,52 @@ test("enqueue from current plan creates only send-eligible Alembic tasks", () =>
   assert.equal(queue.tasks.length, 1);
 });
 
+test("enqueue distinguishes explicit task package ids in the same plan and window", () => {
+  const root = makeFixture({ alembicTask: "执行 `G037-STAGE0-ALEMBIC`" });
+  const first = run(root, ["enqueue", "--from-plan", "--write", "--json"]);
+  assert.equal(first.status, 0, first.stderr);
+  assert.equal(JSON.parse(first.stdout).created[0].taskId, "plan__Alembic__G037-STAGE0-ALEMBIC");
+
+  writeFile(
+    path.join(root, "docs/workspace/current/plan.md"),
+    `
+# Fixture Plan
+
+状态：待启动
+
+## 窗口分派
+
+发送给：\`Alembic\`
+
+| 窗口 / 状态 | 任务 |
+| --- | --- |
+| \`Alembic\`<br>待启动 | 执行 \`G037-STAGE1-ALEMBIC\` |
+| \`AlembicCore\`<br>观察中 | Wait |
+| \`AlembicAgent\`<br>无任务 | None |
+| \`AlembicDashboard\`<br>无任务 | None |
+| \`AlembicPlugin\`<br>无任务 | None |
+| \`AlembicTest\`<br>无任务 | None |
+| \`BiliDili\`<br>无任务 | None |
+`,
+  );
+
+  const tick = run(root, ["controller-tick", "--json"]);
+  assert.equal(tick.status, 0, tick.stderr);
+  assert.equal(
+    JSON.parse(tick.stdout).missingSendEligibleWindows[0].taskId,
+    "plan__Alembic__G037-STAGE1-ALEMBIC",
+  );
+
+  const second = run(root, ["enqueue", "--from-plan", "--write", "--json"]);
+  assert.equal(second.status, 0, second.stderr);
+  assert.equal(JSON.parse(second.stdout).created[0].taskId, "plan__Alembic__G037-STAGE1-ALEMBIC");
+  const queue = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json");
+  assert.deepEqual(
+    queue.tasks.map((task) => task.taskId),
+    ["plan__Alembic__G037-STAGE0-ALEMBIC", "plan__Alembic__G037-STAGE1-ALEMBIC"],
+  );
+});
+
 test("claim leases one task and prevents duplicate active claims", () => {
   const root = makeFixture();
   run(root, ["enqueue", "--from-plan", "--write"]);
@@ -403,13 +449,13 @@ test("arm outputs a heartbeat payload without calling automation APIs", () => {
   assert.match(parsed.payload.prompt, /claim --window Alembic --write/);
   assert.match(parsed.payload.prompt, /finish --window Alembic/);
   assert.match(parsed.payload.prompt, /visible-automation-dispatch-target\/SKILL\.md/);
-  assert.match(parsed.payload.prompt, /targetWindow=Alembic/);
-  assert.match(parsed.payload.prompt, /courierAllowed === true/);
-  assert.match(parsed.payload.prompt, /codex_app\.automation_update/);
-  assert.match(parsed.payload.prompt, /recordArmCommand/);
-  assert.match(parsed.payload.prompt, /mode --disable --write/);
-  assert.match(parsed.payload.prompt, /普通讨论/);
-  assert.match(parsed.payload.prompt, /本地防睡眠/);
+  assert.match(parsed.payload.prompt, /Target window: Alembic/);
+  assert.doesNotMatch(parsed.payload.prompt, /courierAllowed === true/);
+  assert.doesNotMatch(parsed.payload.prompt, /recordArmCommand/);
+  assert.doesNotMatch(parsed.payload.prompt, /无人值守接续规则/);
+  assert.doesNotMatch(parsed.payload.prompt, /returnToController/);
+  assert.ok(parsed.payload.prompt.length < 850);
+  assert.match(parsed.payload.prompt, /Next-hop, record commands, AlembicTest boundary/);
 });
 
 test("preflight verifies registered target threads resolve to local Codex sessions", () => {
@@ -480,7 +526,8 @@ test("arm-batch prepares payloads for every queued task in a dispatch group", ()
     ["Alembic", "AlembicCore"],
   );
   assert.equal(parsed.payloads.every((item) => item.payload.chainMode === "finish-chain"), true);
-  assert.match(parsed.payloads[0].payload.prompt, /returnToController/);
+  assert.doesNotMatch(parsed.payloads[0].payload.prompt, /returnToController/);
+    assert.ok(parsed.payloads.every((item) => item.payload.prompt.length < 850));
 });
 
 test("arm-batch skips queued tasks whose registered thread lacks a local session", () => {
@@ -569,6 +616,56 @@ test("record-stop marks automation runs stopped and removes cleanup noise", () =
   const tick = run(root, ["tick", "--json"]);
   assert.equal(tick.status, 0, tick.stderr);
   assert.equal(JSON.parse(tick.stdout).tasks[0].nextAction, "reviewStopped");
+});
+
+test("audit-automation accepts a matching active target automation", () => {
+  const root = makeFixture();
+  assert.equal(run(root, ["mode", "--enable", "--write"]).status, 0);
+  assert.equal(run(root, ["enqueue", "--from-plan", "--write"]).status, 0);
+  const taskId = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json").tasks[0].taskId;
+  assert.equal(run(root, ["record-arm", "--task", taskId, "--automation-id", "auto-1", "--write"]).status, 0);
+
+  const result = run(root, ["audit-automation", "--automation-id", "auto-1", "--window", "Alembic", "--role", "target", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.compliant, true);
+  assert.equal(parsed.deleteRecommended, false);
+  assert.deepEqual(parsed.issues, []);
+});
+
+test("audit-automation recommends deleting stale or unknown automations", () => {
+  const root = makeFixture();
+  assert.equal(run(root, ["mode", "--enable", "--write"]).status, 0);
+  assert.equal(run(root, ["enqueue", "--from-plan", "--write"]).status, 0);
+  const taskId = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json").tasks[0].taskId;
+  assert.equal(run(root, ["record-arm", "--task", taskId, "--automation-id", "auto-1", "--write"]).status, 0);
+  writeFile(
+    path.join(root, "docs/workspace/index.md"),
+    `
+# Workspace Index
+
+## 当前总控入口
+
+| 类型 | 文档 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| 当前计划 | [current/new-plan.md](current/new-plan.md) | 待启动 | New plan |
+`,
+  );
+  writeFile(path.join(root, "docs/workspace/current/new-plan.md"), "# New Plan\n\n状态：待启动\n");
+
+  const stale = run(root, ["audit-automation", "--automation-id", "auto-1", "--json"]);
+  assert.equal(stale.status, 0, stale.stderr);
+  const staleParsed = JSON.parse(stale.stdout);
+  assert.equal(staleParsed.compliant, false);
+  assert.equal(staleParsed.deleteRecommended, true);
+  assert.match(staleParsed.issues.join("\n"), /does not match current plan/);
+
+  const unknown = run(root, ["audit-automation", "--automation-id", "missing-auto", "--json"]);
+  assert.equal(unknown.status, 0, unknown.stderr);
+  const unknownParsed = JSON.parse(unknown.stdout);
+  assert.equal(unknownParsed.compliant, false);
+  assert.equal(unknownParsed.deleteRecommended, true);
+  assert.match(unknownParsed.issues.join("\n"), /No active VAD automation run/);
 });
 
 test("block records automation failure as a task blocker", () => {

@@ -25,6 +25,9 @@ This skill may guide workspace documentation, TODO intake, dispatch planning, an
 - Read [references/testing-validation.md](references/testing-validation.md) when deciding whether total control should self-test, whether `AlembicTest` is justified, how to write a test handoff, how to interpret test evidence, or which validation command applies.
 - Read [references/script-pipeline.md](references/script-pipeline.md) when auditing workspace scripts, choosing validation commands, syncing repeated control-plan surfaces, refreshing Design handoff intake, or maintaining script tests / documentation.
 - Read [references/workspace-ledgers.md](references/workspace-ledgers.md) when creating, moving, syncing, archiving, or validating workspace control documents, status mirrors, indexes, templates, Design handoff ledgers, test exchange entries, workspace skill assets, or `AGENTS.md` map / skill-pointer layering.
+- Read [references/control-architecture.md](references/control-architecture.md) when restructuring `AGENTS.md`, skills, references, templates, scripts, current plans, or VAD automation surfaces as one consistent control system.
+- Read [references/visible-automation-dispatch.md](references/visible-automation-dispatch.md) when total control starts, stops, inspects, debugs, or classifies VAD mode / registry / queue / group / heartbeat operations.
+- Read [references/phased-migration.md](references/phased-migration.md) when a task moves, extracts, deletes, or rehomes behavior across Alembic repositories.
 
 ## Non-Negotiables
 

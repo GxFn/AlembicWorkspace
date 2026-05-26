@@ -28,6 +28,8 @@
 - 如果回填只有文档读取、脚本表面操作或自然语言判断，没有提交 hash、命令输出、runtime JSON、日志摘要、截图、报告路径或可复核文件证据，停止并标为 `待补证` / `待裁决` / `阻塞`。
 - 如果回填与总控已知事实冲突，或同一事项出现“回填 -> 改文档 -> 重派发 -> 再回填”的循环风险，停止自动派发，先做代码事实复核或用户确认。
 - 如果准备派发下游，但当前窗口 / 目标仓库定位、producer / consumer 依赖、上游提交、接口、证据或真实 thread id 未确认，停止。
+- 如果当前 automation 无法证明属于当前总控计划、当前窗口职责、真实 thread id、合法 dispatch group / task、最新用户目标和允许的下一跳策略，停止继续执行；总控有权立即删除该 automation，并用 `record-stop` / 当前计划记录删除原因。
+- 如果 VAD 已开启无人值守目标模式，而下一步仍在用户已确认的最终目标、完成定义和仓库边界内，我准备把“阶段计划生成”“给用户看下一阶段计划”“当前计划已验收”当成默认停点，停止这种停止。正确动作是继续总控验收、补计划、创建下一阶段任务包并派发，直到最终目标完成、出现真实门禁或无可领取 TODO。
 - 如果准备整理、拆分、精简或扩展 `AGENTS.md`，但还没有先说清 `AGENTS.md` 内部地图、下层章节承接、skill / reference 指向、触发条件、旧规则去向和不得下沉的硬规则，停止。
 
 ### 正确顺序
@@ -138,6 +140,7 @@
 - 当前主线进行时，新需求可以先进入 TODO；除非改变当前完成定义或用户明确要求打断，否则不得直接跳过当前主线。
 - TODO 参与派发时要优先组成任务包，把当前阶段可以推进的主线动作，与同一窗口、同一边界、同一验证链路下可以顺手关闭的 TODO 合并派发。
 - VAD 自动化模式下，脚本输出的下一跳 payload 只是投递信封，不代表当前窗口获得下一窗口职责。总控验收时若发现窗口把下一跳当成自身任务、跨窗口处理 `AlembicTest`、或未按 role guard 执行，必须暂停自动验收并修正脚本 / prompt / AGENTS 规则后再继续。
+- 总控窗口拥有 automation 合规审计和删除权。任何当前 automation 若与当前总控计划、用户最新指令、VAD mode、dispatch group、task、目标窗口、真实 thread id、`AlembicTest` 边界或下一跳权限不一致，或本地 `audit-automation` 无法证明其合规，必须删除该 automation，并在本地运行态或当前计划记录删除原因；不得为了“不中断自动化”保留不合规循环。
 - VAD mode enabled 只表示当前总控计划允许无人值守投递 / 回跳，不表示用户在电脑前的普通讨论、Design 需求设计、总控决策讨论或单窗口开发都自动进入无人值守循环。每次仍按最新用户输入和当前窗口职责判断；非 heartbeat / 非当前计划任务不得 claim、续跳或自动关闭。
 - 在 macOS 上，`node scripts/visible-dispatch.mjs mode --enable --write` 会启动本地防睡眠进程，`node scripts/visible-dispatch.mjs mode --disable --write` 必须停止该进程并关闭后续跳转。若防睡眠启动或停止失败，必须报告为自动化就绪风险，不得假装无人值守可靠。
 - VAD 目标窗口只能 claim / finish 自己窗口名对应的任务；如果 `claim --json` 没有返回本窗口任务，必须停止，不得尝试其它窗口名、不得代领、不得验证其它窗口工作。
@@ -206,8 +209,17 @@ TODO / Backlog、窗口覆盖、任务包和 VAD 命令细节见 `skills/dev/ale
 - `AGENTS.md` 必须保留总控身份、不可变边界、确认门禁、用户目标判断、测试边界、验收底线、仓库保护、验证要求，以及所有因历史错误而新增的强制防错规则；不得为了精简把硬门禁只放进 skill。
 - Skill / reference 只放完整操作细则、命令顺序、模板字段、示例、排错和脚本说明；它们不能替代 `AGENTS.md` 中的硬规则，也不能降低 `AGENTS.md` 的优先级。
 - 修改 `AGENTS.md` 的分层前，必须先设计三层承接：最高硬规则是执行前停止条件；下层章节是常驻边界和地图入口；skill / reference 是按需加载的操作细则。每个 `AGENTS.md` 到 skill 的指向都要写清触发场景、承接文件和哪些结论不得下沉，不能只写“见 skill”。
-- `skills/dev/alembic-workspace-control/`：TODO / Backlog、窗口覆盖 / 分派 / 任务包、测试交接 / 验证命令、脚本流水线、workspace 账本和文档格式细则。
-- `skills/dev/visible-automation-dispatch-target/`：VAD 目标窗口 claim / finish / record-arm / record-stop 命令细节；role guard、thread id 真实性、next heartbeat 权限和 `AlembicTest` 边界仍必须同时在 `AGENTS.md` 明文常驻。
+- 使用地图：
+  - 做 `AGENTS.md` / skill / template / script 整理时，读 `skills/dev/alembic-workspace-control/references/control-architecture.md`；最高停止卡、历史防错硬规则和总控边界仍留在 `AGENTS.md`。
+  - 做 TODO / Backlog 入账、滚动、优先级、空闲窗口调度时，读 `skills/dev/alembic-workspace-control/references/todo-backlog.md`；TODO 不替代用户目标和完成定义。
+  - 做 wave、任务包、窗口覆盖、producer / consumer 顺序和可复制提示词时，读 `skills/dev/alembic-workspace-control/references/window-dispatch.md`；分派前的定位声明和上游证据门禁仍留在 `AGENTS.md`。
+  - 做测试边界、`AlembicTest` 交接、证据解释和验证命令选择时，读 `skills/dev/alembic-workspace-control/references/testing-validation.md`；总控默认自测和 `AlembicTest` 真实场景边界仍留在 `AGENTS.md`。
+  - 做脚本维护、脚本验证、Design handoff 导入、current plan 同步和 runtime 检查时，读 `skills/dev/alembic-workspace-control/references/script-pipeline.md`；脚本不得替代总控判断仍留在 `AGENTS.md`。
+  - 做 workspace 文档落点、索引、归档、模板字段和 skill 资产账本时，读 `skills/dev/alembic-workspace-control/references/workspace-ledgers.md`；workspace 不跟踪子仓库和真实测试项目仍留在 `AGENTS.md`。
+  - 做 VAD mode / registry / queue / group / heartbeat 操作时，读 `skills/dev/alembic-workspace-control/references/visible-automation-dispatch.md`；thread id 真实性、next heartbeat 权限和 `AlembicTest` 边界仍留在 `AGENTS.md`。
+  - 做跨仓库迁移、能力抽取、删除清理或发布封口时，读 `skills/dev/alembic-workspace-control/references/phased-migration.md`；不得薄实现、空壳迁移或提前删除仍留在 `AGENTS.md`。
+- `skills/dev/visible-automation-dispatch-target/`：VAD 目标窗口 claim / finish / record-arm / record-stop 命令细节；role guard、thread id 真实性、next heartbeat 权限和 `AlembicTest` 边界必须同时在 `AGENTS.md` 明文常驻。
+- `skills/dev/visible-automation-dispatch-controller/`：VAD controller-return heartbeat 的证据复核、下一波决策和避免小任务漂移的操作步骤；总控事实裁决和验收底线仍以 `AGENTS.md` 为准。
 - 新增或扩展完整能力时，先判断它是硬边界还是可按需加载的操作细则；硬边界写入 `AGENTS.md`，步骤、模板字段、脚本顺序、示例和排错规则写入 skill reference。
 
 ## 跨仓库接入、删除与兼容清理

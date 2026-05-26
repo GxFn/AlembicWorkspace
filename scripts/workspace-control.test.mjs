@@ -38,6 +38,39 @@ test("--print design preserves focused handoff validation arguments", () => {
   assert.match(result.stdout, /node scripts\/import-design-handoffs\.mjs --json --id PCVM-2026-05-25/);
 });
 
+test("--print vad status maps to visible-dispatch status", () => {
+  const result = run(["--print", "vad", "status", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /node scripts\/visible-dispatch\.mjs status --json/);
+});
+
+test("--print vad preflight defaults to current-plan preflight", () => {
+  const result = run(["--print", "vad", "preflight", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /node scripts\/visible-dispatch\.mjs preflight --from-plan --json/);
+});
+
+test("--print vad audit maps to automation compliance audit", () => {
+  const result = run(["--print", "vad", "audit", "--automation-id", "auto-1", "--window", "Alembic", "--role", "target", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(
+    result.stdout,
+    /node scripts\/visible-dispatch\.mjs audit-automation --automation-id auto-1 --window Alembic --role target --json/,
+  );
+});
+
+test("vad enable requires explicit write gate", () => {
+  const result = run(["--print", "vad", "enable"]);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /vad enable requires --write/);
+});
+
+test("--print vad disable preserves write gate and reason", () => {
+  const result = run(["--print", "vad", "disable", "--write", "--reason", "manual stop", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /node scripts\/visible-dispatch\.mjs mode --disable --write --reason manual stop --json/);
+});
+
 test("unknown command fails closed", () => {
   const result = run(["--print", "launch"]);
   assert.notEqual(result.status, 0);

@@ -2,7 +2,7 @@
 
 更新日期：2026-05-26
 总控窗口：AlembicWorkspace
-状态：GTODO-2026-05-24-037 已确认为下一主线，Stage 1 代码调研待启动
+状态：已完成（验证通过，待归档）
 
 ## 阅读入口
 
@@ -15,8 +15,8 @@
 
 ## 状态摘要
 
-- 当前计划：[plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md)。
-- VAD 已归档；后续 VAD 问题作为 bug / optimization 排队处理。GTODO-2026-05-24-037 已确认为下一主线，当前发送给无，下一步由总控补 Stage 1 代码事实调研和执行计划。
+- 当前计划：[workspace-control-architecture-refresh-2026-05-26.md](workspace-control-architecture-refresh-2026-05-26.md)。
+- Workspace Control Architecture Refresh 已完成验证；总控未派产品子仓库，未派 AlembicTest；旧 037 Stage 1 后续恢复为候选主线。
 - Design 来源已同步到 [design-handoff-inbox.md](design-handoff-inbox.md)：`INTENT-RECOGNITION-2026-05-26` 与 `INTENT-KNOWLEDGE-2026-05-26` 共同构成 037；`KNOWLEDGE-EVOLUTION-TODOS-2026-05-26` 只是顺序索引，不作为执行计划。
 - Visible Dispatch 本地 runtime 当前 mode disabled，防睡眠 inactive；旧 Wave 9 / Wave 10 smoke 队列已裁决并清理，不会抢跑。
 - `GTODO-2026-05-25-003 / PCVM` Wave 4 仍是后续候选，但当前用户指定 037 为下一主线，先不领取 PCVM。
@@ -46,17 +46,21 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | 等 037 Stage 1 代码调研后再判断是否派发。 |
-| `AlembicCore`<br>观察中 | 等真实 contract 下沉需求出现后再判断。 |
-| `AlembicAgent`<br>无任务 | 当前不涉及。 |
-| `AlembicDashboard`<br>观察中 | 当前不做 UI。 |
-| `AlembicPlugin`<br>观察中 | 等 Stage 1 代码调研后再判断是否派发。 |
-| `AlembicTest`<br>无任务 | 当前不涉及真实项目验证。 |
+| `Alembic`<br>观察中 | 本轮不派发；037 后续再恢复。 |
+| `AlembicCore`<br>观察中 | 本轮不派发。 |
+| `AlembicAgent`<br>观察中 | 本轮不派发。 |
+| `AlembicDashboard`<br>观察中 | 本轮不派发。 |
+| `AlembicPlugin`<br>观察中 | 本轮不派发；037 后续再恢复。 |
+| `AlembicTest`<br>无任务 | 本轮不需要真实测试窗口。 |
 | `BiliDili`<br>无任务 | 不触碰真实项目。 |
 
 ## 可复制提示词
 
-发送给：无。当前没有可复制给子窗口的提示词；下一步先由总控完成 037 Stage 1 代码事实调研和执行计划。
+发送给：无
+
+```text
+本轮不发送给子窗口。由 AlembicWorkspace 总控自执行 workspace 规则、skill、模板、脚本和自动化一致性整理。
+```
 
 ## 回填区
 

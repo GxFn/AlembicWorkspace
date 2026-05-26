@@ -5,90 +5,74 @@ description: Use when AlembicWorkspace total control is awakened by a Visible Au
 
 # Visible Automation Dispatch Controller
 
-This skill is for the AlembicWorkspace total-control window only. It supplements `AGENTS.md`; it never replaces total-control judgment, acceptance rules, testing boundaries, or confirmation gates.
+Total-control-only skill for VAD controller-return heartbeats. `AGENTS.md` owns hard judgment; this skill owns the operating steps.
 
-## Startup
+## Intent
 
-1. Read `AGENTS.md`, `docs/workspace/index.md`, `docs/workspace/current/workspace-current-status.md`, and the current control plan.
-2. Run:
+VAD unattended mode means: keep moving the user-approved final goal until it is complete, then optionally review the next automation-eligible TODO. A stage boundary, plan refresh, or "show Stage N plan" note is not a stop by itself when the next work stays inside the approved goal and completion definition.
+
+Automation is only delivery. Scripts report state and print payloads; total control still accepts evidence, chooses scope, writes/refines plans, and decides whether to continue.
+
+## Three Steps
+
+1. **Review evidence**
+   - Read `AGENTS.md`, workspace index/status, current control plan, and this skill.
+   - Run `group-status --group <id> --json` and `controller-tick --json`.
+   - If the heartbeat message includes `automation_id`, run `audit-automation --automation-id <automation_id> --role controller-return --group <id> --json` before trusting the return.
+   - Separate target self-report, raw evidence, and total-control verdict.
+   - Accept/reject/block completed tasks only after evidence answers the assigned boundary.
+
+2. **Decide the next unit**
+   - If evidence is insufficient, re-dispatch or request补证 for the owning window.
+   - If a directly checkable issue exists, self-test or inspect here before involving `AlembicTest`.
+   - If the active goal is still incomplete and the next step is in scope, create/refresh the next executable control plan and task packages.
+   - If the active goal is complete, archive/close it, then review the next automation-eligible TODO.
+
+3. **Dispatch or stop**
+   - For dispatch: `preflight --from-plan --json`, `enqueue --from-plan --group <id> --return-policy controller-last --write`, `arm-batch --group <id> --json`, create each returned heartbeat with `codex_app.automation_update`, then run each record command.
+   - For stop: disable mode only when a hard gate below is hit, no useful next unit exists, or the user explicitly asks to stop.
+
+## Hard Gates
+
+Stop and report instead of continuing only when one applies:
+
+- VAD mode is disabled.
+- The current controller-return automation fails local compliance audit, points at an old plan / wrong group, or cannot be tied to a recorded controller-return run.
+- Required window thread registration or preflight fails.
+- The next step changes the approved goal, removes scope, downgrades capability, touches a real test project, or starts 038/039 without permission.
+- Evidence is missing, contradictory, only natural-language assertion, or conflicts with local code facts.
+- Two automatic retries failed on the same issue.
+- `AlembicTest` would be needed but the test boundary/reason is not written.
+- No high-value next unit exists and the remaining TODO is low-value cleanup unrelated to the active goal.
+- The user explicitly asks to pause/stop or starts a normal discussion that is not a VAD controller heartbeat.
+
+Do not stop merely because a phase completed, a Stage plan was produced, or the current plan needs a next-wave refresh.
+
+## Preflight Commands
 
 ```text
 node scripts/visible-dispatch.mjs group-status --group <dispatchGroupId> --json
 node scripts/visible-dispatch.mjs controller-tick --json
-```
-
-3. If VAD mode is disabled, stop after recording/reporting the status. Do not enqueue, arm, or select a new TODO.
-
-Before creating any target-window heartbeat payload, run the matching startup preflight:
-
-```text
 node scripts/visible-dispatch.mjs preflight --from-plan --json
 node scripts/visible-dispatch.mjs preflight --group <dispatchGroupId> --json
 ```
 
-Preflight must pass for the required target windows before total control calls `codex_app.automation_update`. It verifies local-only registry entries against actual Codex session files. If preflight reports a missing or placeholder thread, stop and collect / correct the target window registration instead of arming automation.
+Preflight verifies local-only registry entries against actual Codex session files. If it fails, fix registration; do not arm payloads.
 
-## Self-Identity
+## Heartbeat Cleanup
 
-When awakened by controller return, act as AlembicWorkspace total control in unattended mode:
-
-- Automation is only the transport layer around the existing total-control process.
-- The script can report queue state, group state, and suggested mechanical next actions, but it cannot accept evidence, choose scope, or change goals.
-- Continue toward the user-approved final goal, not toward small cleanup work unless the cleanup blocks the main closure.
-
-If the current user message is not a controller-return heartbeat, or the user starts a Design discussion, total-control planning discussion, ordinary Q&A, or single-window development request while VAD mode is enabled, treat that as a normal manual interaction first. Do not enqueue, arm, accept, close, or continue the unattended loop unless the current input and current control plan explicitly call for VAD controller work.
-
-## Review Order
-
-1. Confirm the current user goal and final completion definition.
-2. Review each group task backfill as evidence input, not as fact.
-3. Separate:
-   - target-window self-report;
-   - raw evidence such as command output, logs, commit hashes, runtime JSON, screenshots, or file paths;
-   - total-control verdict.
-4. Accept only evidence that answers the assigned task boundary.
-5. Reject or request backfill when evidence is missing, mismatched, self-contradictory, or only natural-language assertion.
-6. If a problem is directly verifiable by total control with a workspace script, targeted unit, probe, runtime JSON, or diff inspection, verify it here before involving `AlembicTest`.
-
-## Unattended Decisions
-
-Allowed in unattended mode:
-
-- accept / reject / block completed VAD tasks with evidence;
-- run workspace scripts and targeted self-tests that stay within workspace boundaries;
-- create a follow-up wave for the same approved goal;
-- re-dispatch a rejected or incomplete task to the owning window;
-- create an `AlembicTest` handoff only when the required evidence truly depends on real project, cold-start / rescan, Dashboard manual observation, runtime monitoring, real repro / regression, or cross-repo environment proof;
-- when the current final goal is complete, review the next automation-eligible high-level TODO.
-
-Stop and report instead of continuing when:
-
-- confirmation gates are triggered;
-- the next step would change the approved goal, remove scope, downgrade capability, or touch a real test project without a test boundary;
-- two automatic retries have failed on the same issue;
-- backfill conflicts with local code facts;
-- the next candidate is only low-value cleanup and does not advance the active goal.
-
-## Next Action Scale
-
-Prefer the next action that advances the largest still-open part of the approved goal. Do not get stuck polishing stale docs, low-priority TODOs, or cosmetic drift while the main product / workflow closure is unfinished.
-
-Use small fixes only when they unblock the next verified step. Otherwise record them as TODO / backlog and continue the mainline.
-
-## Ending The Heartbeat
-
-If the controller-return heartbeat message includes an `automation_id`, delete only that heartbeat and record:
+If the controller-return message includes `automation_id`, delete only that heartbeat and run:
 
 ```text
 node scripts/visible-dispatch.mjs record-stop --automation-id <automation_id> --write --reason "controller return handled"
 ```
 
-Do not delete target-window automations unless the current script state or user explicitly requires cleanup.
+If `audit-automation` reports `deleteRecommended: true`, delete the heartbeat
+first, record-stop with the audit reason, and do not accept or continue the
+group until total control has repaired the local state or plan.
 
-To close unattended mode, run:
+Disable mode only for a hard gate or explicit user stop:
 
 ```text
 node scripts/visible-dispatch.mjs mode --disable --write
 ```
-
-The close switch stops future finish-chain payloads and stops the local keep-awake process recorded by the VAD runtime.

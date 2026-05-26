@@ -67,72 +67,21 @@ Current scripts:
 
 - `workspace-control.mjs`: command-style aggregator for common control-center
   workflows. It maps friendly subcommands such as `status`, `verify`,
-  `sync`, `dispatch`, `design`, `runtime`, `scripts`, and `pipeline` onto the
-  existing workspace scripts without replacing their dry-run / write gates.
-  Use `--print` to inspect the exact commands before running them.
+  `sync`, `dispatch`, `design`, `runtime`, `scripts`, `vad`, and `pipeline`
+  onto the existing workspace scripts without replacing their dry-run / write
+  gates. Use `--print` to inspect the exact commands before running them.
 - `visible-dispatch.mjs`: local state manager for Visible Automation Dispatch.
-  It stores mode / window registry / dispatch queue / automation run metadata
-  under ignored `.workspace-local/visible-dispatch/`, supports explicit
-  `--write` for mode, registry, unregister, enqueue, claim, complete, tick, arm-recording,
-  stop-recording, controller-return recording, blocker, and acceptance operations, prints heartbeat arm
-  payloads for a Codex window to pass to Codex automation tools, records
-  returned automation ids with `record-arm`, records externally paused /
-  deleted automation runs with `record-stop`, marks failed dispatch attempts
-  with `block`, prunes old terminal queue residue with `prune-history`, separates
-  low-frequency waiting checks from total-control acceptance verdicts, and
-  exposes `controller-tick` as a read-only total-control loop classifier over
-  mode, queue, current plan dispatch rows, and global TODO candidates. Target
-  Window thread ids are local runtime data: `register` writes them under
-  ignored `.workspace-local/visible-dispatch/window-registry.json` and redacts
-  them from JSON output, rejects placeholder ids such as
-  `current-codex-thread`, and can remove polluted entries with `unregister`, so
-  they should not be copied into tracked docs or committed to GitHub. Before
-  starting an automation fan-out, use `preflight --from-plan`, `preflight
-  --group <id>`, `preflight --task <id>`, or `preflight --window <name>` to
-  verify that each registered target thread resolves to a local Codex session
-  file; `arm`, `arm-batch`, and controller-return payload generation reuse the
-  same check and refuse / skip unverified targets before any Codex automation
-  API payload is used. Target `enqueue --from-plan --group <id>
-  --return-policy controller-last --write` creates a dispatch group, and
-  `arm-batch --group <id> --json` prints all ready target heartbeat payloads so
-  total control can fan out multiple windows in one batch. Target windows can
-  use `finish --window <name> --thread <id>
-  --backfill <text> --write --chain-next --json` at the end of their work to
-  register their current thread, complete the claimed task with evidence, and
-  print the next safe wake payload for an already queued / registered window or,
-  for `controller-last` groups, print no payload until the final group task
-  finishes. The final target window gets a `controller-return` payload for
-  `AlembicWorkspace` and must record it with `record-return --group <id>`.
-  Generated heartbeat payloads use `FREQ=MINUTELY;INTERVAL=1`, reference the
-  `skills/dev/visible-automation-dispatch-target/` role-guard skill, and include
-  a compact claim / finish / next-arm / record-stop sequence. Target windows may
-  create a next heartbeat only when finish-chain returns
-  `handoffPolicy=target-courier` and `payload.courierAllowed=true`; otherwise the
-  next arm is total-control-owned. In dispatch-group mode, target windows may
-  create a total-control return heartbeat only when finish-chain returns
-  `handoffPolicy=controller-return` and `payload.controllerReturnAllowed=true`.
-  `AlembicTest` next-hop arming is total-control-owned by default so product /
-  plugin windows do not process or courier test-window automation accidentally.
-  Visible automation is an explicit mode: when `mode --enable --write` is in
-  effect, total control may keep running the acceptance / next-TODO loop and
-  target windows may use finish-chain wake payloads; when `mode --disable
-  --write` is in effect, completion evidence can still be recorded but
-  controller loops stop and `finish --chain-next` refuses to produce a next
-  wake payload. If a target heartbeat was already armed before the close switch,
-  that target may still wake once, but its finish-chain result is
-  `modeDisabled` with no `chain.payload`, so the next window jump no longer
-  carries automation. Mode enabled does not make ordinary user discussion,
-  Design work, total-control planning, or single-window development unattended:
-  only heartbeat messages and tasks explicitly queued by the current plan should
-  claim / finish / chain. On macOS, `mode --enable --write` starts a local
-  `caffeinate -dimsu` keep-awake process owned by
-  `.workspace-local/visible-dispatch/state.json`; `mode --disable --write`
-  stops the recorded process. Use `--no-keep-awake` or
-  `CODEX_VAD_KEEP_AWAKE=0` only for dry test surfaces that must not start a
-  keep-awake process.
-  The script still does not call Codex automation APIs directly, does not
-  accept evidence, does not select new TODOs, and does not write product
-  repositories.
+  It stores mode, window registry, queue, groups, and automation-run metadata
+  under ignored `.workspace-local/visible-dispatch/`; prints heartbeat payloads
+  for Codex automation tools; and exposes mode, preflight, enqueue, arm,
+  claim, finish, accept, block, record-stop, record-return, cleanup, prune, and
+  controller classification commands, plus `audit-automation` for local
+  compliance checks before total control deletes stale or off-plan Codex
+  automations. It never calls Codex automation APIs, accepts evidence, selects
+  TODOs, or writes product repositories. Use
+  `skills/dev/alembic-workspace-control/references/visible-automation-dispatch.md`
+  for the operating map and `skills/dev/visible-automation-dispatch-*` for
+  heartbeat role rules.
 - `collect-repo-status.mjs`: summarizes branch, HEAD, dirty state,
   upstream, ahead / behind counts, untracked files, and latest commit for each
   workspace child repository.
@@ -289,6 +238,16 @@ Runtime residue check:
 node scripts/workspace-control.mjs runtime
 node scripts/check-runtime-residue.mjs
 node scripts/verify-control-center.mjs --with-runtime
+```
+
+Visible Automation Dispatch local state:
+
+```bash
+node scripts/workspace-control.mjs vad status --json
+node scripts/workspace-control.mjs vad controller --json
+node scripts/workspace-control.mjs vad preflight --json
+node scripts/workspace-control.mjs vad audit --automation-id <automationId> --json
+node scripts/workspace-control.mjs vad disable --write --reason "manual stop"
 ```
 
 Design handoff inbox refresh:

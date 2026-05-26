@@ -71,6 +71,7 @@ Usage:
   node scripts/visible-dispatch.mjs group-status --group <id> [--json]
   node scripts/visible-dispatch.mjs tick [--write] [--json]
   node scripts/visible-dispatch.mjs controller-tick [--json]
+  node scripts/visible-dispatch.mjs audit-automation --automation-id <id> [--window <name>] [--group <id>] [--role target|controller-return] [--strict] [--json]
   node scripts/visible-dispatch.mjs accept --task <taskId> [--verdict accepted|rejected] [--note <text>] [--allow-active-automation] --write
   node scripts/visible-dispatch.mjs cleanup [--write] [--json]
   node scripts/visible-dispatch.mjs prune-history [--write] [--json]
@@ -562,8 +563,18 @@ function parseDispatchRows(planContent) {
   return rows;
 }
 
-function taskIdForPlanWindow(planPath, windowName) {
-  return `${path.basename(planPath, ".md")}__${windowName}`;
+function taskKeyFromDispatchTask(taskText) {
+  const match = String(taskText ?? "").match(/`([A-Z][A-Z0-9]+(?:-[A-Z0-9]+){2,})`/);
+  if (!match) {
+    return "";
+  }
+  return match[1].replace(/[^A-Za-z0-9._:-]/g, "-");
+}
+
+function taskIdForPlanWindow(planPath, windowName, taskText = "") {
+  const base = `${path.basename(planPath, ".md")}__${windowName}`;
+  const taskKey = taskKeyFromDispatchTask(taskText);
+  return taskKey ? `${base}__${taskKey}` : base;
 }
 
 function sanitizeGroupId(value) {
@@ -681,10 +692,10 @@ function keepAwakeArgs() {
         return parsed;
       }
     } catch {
-      return ["-dimsu"];
+      return ["-dims"];
     }
   }
-  return ["-dimsu"];
+  return ["-dims"];
 }
 
 function keepAwakeEnabled() {
@@ -753,7 +764,10 @@ function startKeepAwake(state, { dryRun = false } = {}) {
   try {
     const child = spawn(status.command, status.args, {
       stdio: "ignore",
-      detached: false,
+      // Keep-awake must outlive this short-lived CLI invocation; otherwise the
+      // automation mode can report "started" while the assertion dies before
+      // the next preflight.
+      detached: true,
     });
     child.unref?.();
     if (!child.pid) {
@@ -795,6 +809,7 @@ function stopKeepAwake(state, { dryRun = false, reason = "" } = {}) {
       pid: 0,
       stoppedAt: status.stoppedAt || nowIso(),
       stopReason: reason,
+      lastError: "",
       message: status.pid ? "not running" : "not started",
     };
   }
@@ -955,7 +970,7 @@ function commandControllerTick() {
   const sendEligibleRows = dispatchRows.filter((row) => sendEligibleStatuses.has(row.status));
   const existingTaskIds = new Set(queue.tasks.map((task) => task.taskId));
   const missingSendEligibleRows = sendEligibleRows.filter(
-    (row) => !existingTaskIds.has(taskIdForPlanWindow(planPath, row.window)),
+    (row) => !existingTaskIds.has(taskIdForPlanWindow(planPath, row.window, row.task)),
   );
   const unsupportedRows = sendEligibleRows.filter((row) => !dispatchWindows.has(row.window));
   const queueDecision = controllerDecisionFromQueue(state, registry, queue, groups, currentPlan.path);
@@ -1021,13 +1036,13 @@ function commandControllerTick() {
         window: row.window,
         status: row.status,
         task: row.task,
-        taskId: taskIdForPlanWindow(planPath, row.window),
+        taskId: taskIdForPlanWindow(planPath, row.window, row.task),
       })),
       missingSendEligibleWindows: missingSendEligibleRows.map((row) => ({
         window: row.window,
         status: row.status,
         task: row.task,
-        taskId: taskIdForPlanWindow(planPath, row.window),
+        taskId: taskIdForPlanWindow(planPath, row.window, row.task),
       })),
       queueTaskCount: queue.tasks.length,
       queueDecision,
@@ -1324,7 +1339,7 @@ function commandEnqueue() {
   const created = [];
   const groupTaskIds = [];
   for (const row of rows) {
-    const taskId = taskIdForPlanWindow(planPath, row.window);
+    const taskId = taskIdForPlanWindow(planPath, row.window, row.task);
     const existing = queue.tasks.find((task) => task.taskId === taskId);
     const task = {
       taskId,
@@ -1401,6 +1416,7 @@ function activeRegistryEntry(registry, windowName) {
 }
 
 function buildTaskPrompt(task) {
+  const claimCommand = `node scripts/visible-dispatch.mjs claim --window ${task.targetWindow} --write --json`;
   const finishCommand = [
     "node scripts/visible-dispatch.mjs finish",
     `--window ${task.targetWindow}`,
@@ -1411,28 +1427,17 @@ function buildTaskPrompt(task) {
     "--json",
   ].join(" ");
   return [
-    "Visible Automation Dispatch 自动化模式目标任务。",
+    "VAD target heartbeat.",
+    `Target window: ${task.targetWindow}`,
+    `Task id: ${task.taskId}`,
+    `Control plan: ${task.controlDoc}`,
     "",
-    `先读取 AGENTS.md、docs/workspace/index.md、${task.controlDoc}、skills/dev/visible-automation-dispatch-target/SKILL.md，以及你所在窗口/目标仓库的 AGENTS.md。`,
-    "",
-    `先明确声明当前窗口定位和本轮仓库职责；本条 heartbeat 只允许处理 targetWindow=${task.targetWindow} 的任务。`,
-    "",
-    `在 AlembicWorkspace 工作目录运行：node scripts/visible-dispatch.mjs claim --window ${task.targetWindow} --write --json`,
-    "",
-    "只领取属于当前窗口的任务；没有任务或目标窗口不匹配则短退出，不得改用其它 --window 继续执行。完成后按当前总控文档回填完成范围、验证命令、验证结果、遗留风险和下一步建议。",
-    "",
-    "自动化模式边界：只有本条 heartbeat 和当前总控计划明确分配的任务属于无人值守接续。用户在电脑前发起的普通讨论、Design 需求设计、总控决策讨论或单窗口开发请求，仍按最新用户输入和各自 AGENTS.md 执行，不得因为 visible-dispatch mode 已开启就当作自动化任务领取、续跳或关闭。",
-    "",
-    "无人值守接续规则：",
-    `1. 完成当前任务后运行：${finishCommand}`,
-    "2. 若 finish JSON 返回 `chain.nextAction === \"noReturn\"`，说明本批次还有其它窗口未完成；不得创建任何下一跳或总控回跳。",
-    "3. 只在 finish JSON 返回 `chain.nextAction === \"armNext\"`、`chain.handoffPolicy === \"target-courier\"`、`chain.payload.courierAllowed === true` 时，才用 `codex_app.automation_update` 按 payload 创建下一条目标窗口 heartbeat。",
-    "4. 只在 finish JSON 返回 `chain.nextAction === \"returnToController\"`、`chain.handoffPolicy === \"controller-return\"`、`chain.payload.controllerReturnAllowed === true` 时，才用 `codex_app.automation_update` 按 payload 创建总控回跳 heartbeat。",
-    "5. 创建目标窗口 heartbeat 成功后运行 `chain.recordArmCommand`；创建总控回跳 heartbeat 成功后运行 `chain.recordReturnCommand`。把 `<automation-id>` 替换为返回的 automation id；这只是机械投递，不得代替目标窗口或总控执行任务。",
-    "6. 如果 finish JSON 返回 `controllerArm`、`modeDisabled`、`registerWindow`、`registerController`、`wait`、`review`，或没有对应 payload / permission flag，不得创建下一跳 automation，改为报告总控。",
-    "7. 下一跳目标是 `AlembicTest` 时默认由总控调起；非 `AlembicTest` 窗口不得处理或代领 `AlembicTest` 任务。",
-    `8. 关闭开关是 \`node scripts/visible-dispatch.mjs mode --disable --write\`；它同时关闭后续 finish-chain 跳转和本地防睡眠。heartbeat cadence 固定为 \`${heartbeatRrule}\`，真实窗口跳转是分钟级等待。`,
-    "9. 结束前，如果本条 heartbeat 消息包含 `automation_id`，只删除本条 automation，并用 `record-stop --automation-id <automation_id> --write --reason \"target completed\"` 记录停止。",
+    `Read AGENTS.md, docs/workspace/index.md, docs/workspace/current/workspace-current-status.md, ${task.controlDoc}, skills/dev/visible-automation-dispatch-target/SKILL.md, and the target repo AGENTS.md.`,
+    `1. Declare identity and repo duty for ${task.targetWindow}.`,
+    `2. Claim: ${claimCommand}`,
+    "3. Do only the claimed task; if no claim, stop.",
+    `4. Finish: ${finishCommand}`,
+    "Next-hop, record commands, AlembicTest boundary, mode disabled, and automation_id cleanup are in the target skill.",
   ].join("\n");
 }
 
@@ -1471,26 +1476,17 @@ function buildArmPayload(task, registry) {
 
 function buildControllerReturnPrompt(group, completedTask) {
   return [
-    `Visible Automation Dispatch unattended controller return for dispatchGroup=${group.groupId}.`,
+    "VAD controller-return heartbeat.",
+    `Dispatch group: ${group.groupId}`,
+    `Control plan: ${group.controlDoc}`,
+    `Last completed target: ${completedTask.targetWindow}`,
+    `Last task id: ${completedTask.taskId}`,
     "",
-    "先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/workspace-current-status.md、当前总控计划、skills/dev/visible-automation-dispatch-controller/SKILL.md。",
-    "",
-    "你是 AlembicWorkspace 总控，当前处于无人值守自动化模式；自动化只是穿插在原总控流程里的投递/回跳层，不替代总控判断。",
-    "如果当前输入不是 controller-return heartbeat，或用户在同一窗口开始需求设计、总控讨论、普通问答或单窗口开发，则先按最新用户输入和 AGENTS.md 判断，不得把这些人工交互自动纳入 VAD 循环。",
-    "",
-    "先运行：",
+    "Read AGENTS.md, workspace index/status, current plan, and skills/dev/visible-automation-dispatch-controller/SKILL.md.",
+    "Run:",
     `node scripts/visible-dispatch.mjs group-status --group ${group.groupId} --json`,
     "node scripts/visible-dispatch.mjs controller-tick --json",
-    "",
-    "随后按总控原流程独立验收本 group 所有 backfill：区分窗口自述、原始证据和总控裁决；决定接受、驳回、补证、自测、创建真实测试单、进入下一阶段、继续派发下一批或停止等待用户确认。",
-    "",
-    "不得因为脚本返回 completed 就关闭目标；不得在小修小补上偏离用户最终目标。若 mode 已关闭、确认门禁触发、证据不足、回填冲突或同一问题循环风险出现，停止自动推进并报告。",
-    "关闭无人值守模式使用：node scripts/visible-dispatch.mjs mode --disable --write；关闭后不得再创建下一跳 heartbeat，并会停止本地防睡眠。",
-    "",
-    `本次最后完成窗口：${completedTask.targetWindow}；任务：${completedTask.taskId}。`,
-    "",
-    "结束前，如果本条 heartbeat 消息包含 automation_id，只删除本条 controller-return automation，并运行：",
-    `node scripts/visible-dispatch.mjs record-stop --automation-id <automation_id> --write --reason "controller return handled"`,
+    "Then follow the controller skill: review evidence, continue the approved goal if no hard gate, dispatch the next unit/TODO, and clean up only this controller automation.",
   ].join("\n");
 }
 
@@ -1780,6 +1776,195 @@ function commandRecordStop() {
     },
     `${write ? "Recorded" : "Would record"} stopped automation ${automationId}.`,
   );
+}
+
+function taskById(queue) {
+  return new Map(queue.tasks.map((task) => [task.taskId, task]));
+}
+
+function currentPlanRelativePathForAudit() {
+  return relativeToWorkspace(currentPlanPathFromIndex());
+}
+
+function auditTargetAutomation({ run, queue, state, automationId, currentPlan, expectedWindow, expectedGroup, allowHistoric, allowAlembicTest }) {
+  const issues = [];
+  const warnings = [];
+  const task = taskById(queue).get(run.taskId);
+  if (!task) {
+    issues.push(`No queue task exists for run taskId ${run.taskId}.`);
+    return { run, task: null, issues, warnings };
+  }
+
+  if (task.automationId !== automationId) {
+    issues.push(`Task ${task.taskId} records automationId ${task.automationId || "(none)"} instead of ${automationId}.`);
+  }
+  if (task.targetWindow !== run.targetWindow) {
+    issues.push(`Run target ${run.targetWindow} does not match task target ${task.targetWindow}.`);
+  }
+  if (expectedWindow && task.targetWindow !== expectedWindow) {
+    issues.push(`Expected target window ${expectedWindow}, found ${task.targetWindow}.`);
+  }
+  if (expectedGroup && task.groupId !== expectedGroup) {
+    issues.push(`Expected dispatch group ${expectedGroup}, found ${task.groupId || "(none)"}.`);
+  }
+  if (!allowHistoric && task.controlDoc !== currentPlan) {
+    issues.push(`Task controlDoc ${task.controlDoc || "(none)"} does not match current plan ${currentPlan}.`);
+  }
+  if (task.targetWindow === "AlembicTest" && !allowAlembicTest) {
+    issues.push("AlembicTest automation requires explicit total-control authorization; pass --allow-alembic-test only when the current plan permits it.");
+  }
+  if (state.mode === "disabled") {
+    issues.push("VAD mode is disabled; target-window automation must not remain scheduled.");
+  }
+  if (["accepted", "rejected", "blocked"].includes(task.status)) {
+    issues.push(`Task ${task.taskId} is terminal (${task.status}) but its automation is still active.`);
+  } else if (task.status === "completed") {
+    issues.push(`Task ${task.taskId} is completed; total control must review evidence and delete/record-stop the active automation before acceptance.`);
+  } else if (!["armed", "claimed", "running"].includes(task.status)) {
+    issues.push(`Task ${task.taskId} is ${task.status}; active automation is only compliant for armed/claimed/running target tasks.`);
+  }
+  if (!task.automationClaimedAt && task.status === "claimed") {
+    warnings.push(`Task ${task.taskId} is claimed but has no automationClaimedAt marker.`);
+  }
+  return { run, task: redactTaskForOutput(task), issues, warnings };
+}
+
+function auditControllerReturnAutomation({ run, queue, groups, automationId, currentPlan, expectedWindow, expectedGroup, allowHistoric }) {
+  const issues = [];
+  const warnings = [];
+  if (run.targetWindow !== "AlembicWorkspace") {
+    issues.push(`Controller-return run target must be AlembicWorkspace, found ${run.targetWindow}.`);
+  }
+  if (expectedWindow && expectedWindow !== "AlembicWorkspace") {
+    issues.push(`Controller-return automation cannot target ${expectedWindow}.`);
+  }
+  const group = groups.groups.find((item) => item.groupId === run.groupId);
+  if (!group) {
+    issues.push(`No dispatch group exists for controller-return group ${run.groupId || "(none)"}.`);
+    return { run, group: null, summary: null, issues, warnings };
+  }
+  if (expectedGroup && group.groupId !== expectedGroup) {
+    issues.push(`Expected dispatch group ${expectedGroup}, found ${group.groupId}.`);
+  }
+  if (group.controllerReturnAutomationId !== automationId) {
+    issues.push(`Group ${group.groupId} records controllerReturnAutomationId ${group.controllerReturnAutomationId || "(none)"} instead of ${automationId}.`);
+  }
+  if (!allowHistoric && group.controlDoc !== currentPlan) {
+    issues.push(`Group controlDoc ${group.controlDoc || "(none)"} does not match current plan ${currentPlan}.`);
+  }
+  const summary = summarizeGroup(group, queue);
+  if (!summary.terminal) {
+    issues.push(`Controller return is armed before group ${group.groupId} is terminal.`);
+  }
+  if (group.status !== "return-armed") {
+    issues.push(`Controller-return group ${group.groupId} status is ${group.status}; active controller-return automation expects return-armed.`);
+  }
+  return { run, group, summary, issues, warnings };
+}
+
+function commandAuditAutomation() {
+  const automationId = getValue("--automation-id");
+  if (!automationId) {
+    fail("audit-automation requires --automation-id.");
+  }
+  const expectedWindow = getValue("--window", "");
+  if (expectedWindow) {
+    validateWindow(expectedWindow, { allowController: true });
+  }
+  const expectedGroup = getValue("--group", "");
+  if (expectedGroup) {
+    sanitizeGroupId(expectedGroup);
+  }
+  const expectedRole = getValue("--role", "");
+  if (expectedRole && !["target", "controller-return"].includes(expectedRole)) {
+    fail("--role must be target or controller-return.");
+  }
+
+  const { state, queue, runs, groups } = readAll();
+  const currentPlan = currentPlanRelativePathForAudit();
+  const allowHistoric = hasFlag("--allow-historic");
+  const allowAlembicTest = hasFlag("--allow-alembic-test");
+  const allMatches = runs.runs.filter((run) => run.automationId === automationId);
+  const activeMatches = allMatches.filter((run) => run.status !== "stopped");
+  const issues = [];
+  const warnings = [];
+
+  if (activeMatches.length === 0) {
+    issues.push(`No active VAD automation run is recorded for ${automationId}.`);
+  }
+  if (activeMatches.length > 1) {
+    issues.push(`Multiple active VAD automation runs are recorded for ${automationId}.`);
+  }
+
+  const audits = activeMatches.map((run) => {
+    const actualRole = run.runType === "controller-return" ? "controller-return" : "target";
+    if (expectedRole && actualRole !== expectedRole) {
+      issues.push(`Expected automation role ${expectedRole}, found ${actualRole}.`);
+    }
+    const audit = actualRole === "controller-return"
+      ? auditControllerReturnAutomation({
+          run,
+          queue,
+          groups,
+          automationId,
+          currentPlan,
+          expectedWindow,
+          expectedGroup,
+          allowHistoric,
+        })
+      : auditTargetAutomation({
+          run,
+          queue,
+          state,
+          automationId,
+          currentPlan,
+          expectedWindow,
+          expectedGroup,
+          allowHistoric,
+          allowAlembicTest,
+        });
+    issues.push(...audit.issues);
+    warnings.push(...audit.warnings);
+    return { role: actualRole, ...audit };
+  });
+
+  const compliant = issues.length === 0;
+  const result = {
+    ok: true,
+    automationId,
+    compliant,
+    verdict: compliant ? "compliant" : "non_compliant",
+    deleteRecommended: !compliant,
+    currentPlan,
+    mode: state.mode,
+    loopEnabled: Boolean(state.loopEnabled),
+    activeRunCount: activeMatches.length,
+    stoppedRunCount: allMatches.length - activeMatches.length,
+    issues,
+    warnings,
+    audits,
+    deleteTool: !compliant ? { tool: "codex_app.automation_update", mode: "delete", id: automationId } : null,
+    recordStopCommand: activeMatches.length > 0
+      ? `node scripts/visible-dispatch.mjs record-stop --automation-id ${automationId} --write --reason "<reason>"`
+      : null,
+    recordStopNote: activeMatches.length > 0
+      ? "After deleting the Codex automation, record the stop locally."
+      : "No active local VAD run exists, so there is no local run to record-stop after deletion.",
+    note: "This script judges local VAD compliance only. Total control performs the actual Codex automation deletion with codex_app.automation_update.",
+  };
+
+  output(
+    result,
+    [
+      `Automation ${automationId}: ${result.verdict}`,
+      `Delete recommended: ${result.deleteRecommended ? "yes" : "no"}`,
+      `Issues: ${issues.join("; ") || "none"}`,
+      `Warnings: ${warnings.join("; ") || "none"}`,
+    ].join("\n"),
+  );
+  if (!compliant && hasFlag("--strict")) {
+    process.exit(1);
+  }
 }
 
 function summarizeGroup(group, queue) {
@@ -2720,6 +2905,9 @@ switch (command) {
     break;
   case "controller-tick":
     commandControllerTick();
+    break;
+  case "audit-automation":
+    commandAuditAutomation();
     break;
   case "accept":
     commandAccept();

@@ -26,10 +26,12 @@ Current drafts:
 - `dev/alembic-workspace-control/`: trial extraction for bulky
   AlembicWorkspace control-center details. It currently holds TODO / Backlog,
   window dispatch, testing / validation, workspace ledger / document-surface,
-  and workspace script pipeline references that used to live inline in
-  `AGENTS.md` or ad hoc conversation memory. `AGENTS.md` remains the hard
-  boundary source and points to this skill only when those detailed workflows
-  are needed. Anti-failure hard rules must stay in `AGENTS.md`, not only here.
+  workspace script pipeline, VAD operation, phased migration, and workspace
+  control architecture references that used to live inline in `AGENTS.md` or
+  ad hoc conversation memory.
+  `AGENTS.md` remains the hard boundary source and points to this skill only
+  when those detailed workflows are needed. Anti-failure hard rules must stay
+  in `AGENTS.md`, not only here.
 - `dev/visible-automation-dispatch-target/`: target-window skill for Visible
   Automation Dispatch heartbeat tasks. It keeps unattended claim / finish /
   next-heartbeat courier rules, target-window role guards, `AlembicTest`
@@ -40,6 +42,9 @@ Current drafts:
   unattended acceptance, self-test / real-test judgment, next-wave decisions,
   and anti-small-task-drift rules close to the automation controller without
   moving hard boundaries out of `AGENTS.md`.
+- `dev/progressive-chain-validation/`: source ledger for the external PCV
+  repository. It is not a complete Codex skill package and intentionally has no
+  `SKILL.md`; do not install or advertise this directory as a runnable skill.
 
 Development workflow:
 

@@ -1,4 +1,4 @@
-# Progressive Chain Validation Skill
+# Progressive Chain Validation Source Ledger
 
 Development source: https://github.com/GxFn/progressive-chain-validation.git
 
@@ -8,9 +8,12 @@ Owner: GxFn
 
 Workspace role:
 
-- Treat this as a workspace-supported development skill.
-- Keep active local development under this directory when the user wants
-  AlembicWorkspace to manage changes.
+- Treat this directory as a source ledger for the external PCV skill repository,
+  not as a complete Codex skill package.
+- It intentionally has no `SKILL.md`; do not install, sync, or advertise this
+  directory itself as a runnable skill.
+- Keep active local development under this directory only when the user wants
+  AlembicWorkspace to manage PCV source changes.
 - Do not assume it is installed in Codex runtime unless a sync/link step has
   been performed and recorded.
 - When pulling or syncing from the upstream repository, record the source commit

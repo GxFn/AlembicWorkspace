@@ -15,8 +15,8 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md) | GTODO-2026-05-24-037 已确认为下一主线，Stage 1 代码调研待启动 | GTODO-2026-05-24-037 / Plugin intent knowledge route：VAD 已归档，037 已提升为下一主线；当前先做 Stage 1 代码事实调研与执行计划准备，不派发窗口。 |
-| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | GTODO-2026-05-24-037 已确认为下一主线，Stage 1 代码调研待启动 | VAD 已归档；后续 VAD 问题按 bug / optimization 入 TODO。037 已确认为下一主线，Stage 1 待总控补代码调研与执行计划。 |
+| 当前计划 | [current/workspace-control-architecture-refresh-2026-05-26.md](current/workspace-control-architecture-refresh-2026-05-26.md) | 已完成（验证通过，待归档） | Workspace Control Architecture Refresh：整理 AGENTS / skill / templates / scripts / VAD 自动化的一致性；当前总控自执行，不派产品子仓库，不派 AlembicTest。 |
+| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 已完成（验证通过，待归档） | Workspace Control Architecture Refresh 已完成验证，旧 VAD runtime 保持关闭；下一主线候选恢复为 037。 |
 | GTODO 037 Intent Recognition Design | [../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md](../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md) | 已接收 | 037 第一阶段需求设计：prime 快速路径结构化意图、hostTurnMeta、IntentEpisode 连续性和本地 refinement 边界。 |
 | GTODO 037 Intent Knowledge Design | [../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md](../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md) | 已接收 | 037 第二阶段需求设计：IntentSearchPlan、keyword / vector / relation 增强和保留 source refs 的 PrimeInjectionPackage。 |
 | PCVM Alembic nested evidence consumer extraction 回填 | [../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md](../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md) | 总控验收通过 | `Alembic` 提交 ae9531ac3315a4491e22e3df156cb05e13fc0879，修复 nested `metadata.pcvNodeEvidence.nodeId/chainNodeId/sourceRefs` 消费并补 nested-only unit。 |
@@ -82,12 +82,12 @@
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | 等 037 Stage 1 代码调研后再判断是否派发。 |
-| `AlembicCore`<br>观察中 | 等真实 contract 下沉需求出现后再判断。 |
-| `AlembicAgent`<br>无任务 | 当前不涉及。 |
-| `AlembicDashboard`<br>观察中 | 当前不做 UI。 |
-| `AlembicPlugin`<br>观察中 | 等 Stage 1 代码调研后再判断是否派发。 |
-| `AlembicTest`<br>无任务 | 当前不涉及真实项目验证。 |
+| `Alembic`<br>观察中 | 本轮不派发；037 后续再恢复。 |
+| `AlembicCore`<br>观察中 | 本轮不派发。 |
+| `AlembicAgent`<br>观察中 | 本轮不派发。 |
+| `AlembicDashboard`<br>观察中 | 本轮不派发。 |
+| `AlembicPlugin`<br>观察中 | 本轮不派发；037 后续再恢复。 |
+| `AlembicTest`<br>无任务 | 本轮不需要真实测试窗口。 |
 | `BiliDili`<br>无任务 | 不触碰真实项目。 |
 
 ## 状态枚举
