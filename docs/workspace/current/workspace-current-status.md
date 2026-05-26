@@ -2,7 +2,7 @@
 
 更新日期：2026-05-26
 总控窗口：AlembicWorkspace
-状态：已完成（验证通过，待归档）
+状态：执行中（无人值守 Stage 1 最小代码链路待启动）
 
 ## 阅读入口
 
@@ -15,8 +15,8 @@
 
 ## 状态摘要
 
-- 当前计划：[workspace-control-architecture-refresh-2026-05-26.md](workspace-control-architecture-refresh-2026-05-26.md)。
-- Workspace Control Architecture Refresh 已完成验证；总控未派产品子仓库，未派 AlembicTest；旧 037 Stage 1 后续恢复为候选主线。
+- 当前计划：[plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md)。
+- 037 Stage 0 已通过总控验收；当前无人值守继续 Stage 1，发送给 `AlembicPlugin` / `Alembic`。当前不派 `AlembicTest`，不启动 038/039，不提前做 search/vector/PrimeInjectionPackage。
 - Design 来源已同步到 [design-handoff-inbox.md](design-handoff-inbox.md)：`INTENT-RECOGNITION-2026-05-26` 与 `INTENT-KNOWLEDGE-2026-05-26` 共同构成 037；`KNOWLEDGE-EVOLUTION-TODOS-2026-05-26` 只是顺序索引，不作为执行计划。
 - Visible Dispatch 本地 runtime 当前 mode disabled，防睡眠 inactive；旧 Wave 9 / Wave 10 smoke 队列已裁决并清理，不会抢跑。
 - `GTODO-2026-05-25-003 / PCVM` Wave 4 仍是后续候选，但当前用户指定 037 为下一主线，先不领取 PCVM。
@@ -42,24 +42,30 @@
 
 ## 窗口分派
 
-发送给：无
+发送给：`AlembicPlugin`、`Alembic`
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>观察中 | 本轮不派发；037 后续再恢复。 |
-| `AlembicCore`<br>观察中 | 本轮不派发。 |
-| `AlembicAgent`<br>观察中 | 本轮不派发。 |
-| `AlembicDashboard`<br>观察中 | 本轮不派发。 |
-| `AlembicPlugin`<br>观察中 | 本轮不派发；037 后续再恢复。 |
-| `AlembicTest`<br>无任务 | 本轮不需要真实测试窗口。 |
+| `Alembic`<br>待启动 | 执行 `G037-STAGE1-ALEMBIC-INTENT-CONSUME`，消费 Plugin intent context 到现有 prime / search pipeline。 |
+| `AlembicCore`<br>观察中 | Stage 1 默认不新增 Core contract，观察是否出现稳定共享结构。 |
+| `AlembicAgent`<br>观察中 | 当前不派发；等 Stage 0 事实显示 Agent runtime 需要参与后再判断。 |
+| `AlembicDashboard`<br>观察中 | 当前不派发；Stage 0 不做 UI。 |
+| `AlembicPlugin`<br>待启动 | 执行 `G037-STAGE1-PLUGIN-HOST-INTENT-FRAME`，实现 Plugin-owned host intent / turn metadata 输入承载。 |
+| `AlembicTest`<br>无任务 | 当前不涉及真实项目验证。 |
 | `BiliDili`<br>无任务 | 不触碰真实项目。 |
 
 ## 可复制提示词
 
-发送给：无
+发送给：`AlembicPlugin`、`Alembic`
 
 ```text
-本轮不发送给子窗口。由 AlembicWorkspace 总控自执行 workspace 规则、skill、模板、脚本和自动化一致性整理。
+先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md，以及你所在窗口/目标仓库的 AGENTS.md。
+
+先明确声明当前窗口定位和本轮仓库职责。
+
+按照当前总控文档领取分配给你所在窗口的 Stage 1 最小代码链路任务；只做本窗口任务，不代处理其它窗口。
+
+完成后回填：完成范围、提交 hash、修改文件、验证命令、验证结果、旧路径兼容性、遗留风险和下一步建议。
 ```
 
 ## 回填区

@@ -215,7 +215,7 @@ node scripts/visible-dispatch.mjs status --json
   - 不能推出的结论：不能推出 037 产品实现已完成，不能推出真实项目环境通过。
   - 停止或不开始条件：出现产品源码改动需求、真实项目验证需求、用户改变目标或自动化 loop 试图继续旧 037。
 - 测试单：无。
-- 测试交流入口：[alembic-test-exchange.md](alembic-test-exchange.md)
+- 测试交流入口：[alembic-test-exchange.md](../../../current/alembic-test-exchange.md)
 - 真实项目保护说明：不触碰真实测试项目。
 
 ## 回填区
