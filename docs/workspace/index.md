@@ -15,8 +15,8 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [current/codex-control-workspace-extraction-2026-05-27.md](current/codex-control-workspace-extraction-2026-05-27.md) | 执行中（codex-control-workspace 抽取） | 通用 codex-control-workspace 抽取当前执行中：先归档 037，再提交 AlembicWorkspace 基线，随后初始化并推送 GxFn/codex-control-workspace。 |
-| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 执行中（codex-control-workspace 抽取） | 037 已完成并归档；当前主线切换为 codex-control-workspace 通用仓库抽取。 |
+| 当前计划 | [current/codex-control-workspace-extraction-2026-05-27.md](current/codex-control-workspace-extraction-2026-05-27.md) | 已完成待归档（codex-control-workspace 已推送） | 通用 codex-control-workspace 抽取已完成：037 已归档，AlembicWorkspace 基线已提交，新仓库 GxFn/codex-control-workspace 已初始化并推送。 |
+| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 已完成待归档（codex-control-workspace 已推送） | codex-control-workspace 抽取已完成待归档；新仓库已推送，后续增强进入新仓库 TODO。 |
 | GTODO 037 Intent Recognition Design | [../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md](../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md) | 已接收 | 037 第一阶段需求设计：prime 快速路径结构化意图、hostTurnMeta、IntentEpisode 连续性和本地 refinement 边界。 |
 | GTODO 037 Intent Knowledge Design | [../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md](../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md) | 已接收 | 037 第二阶段需求设计：IntentSearchPlan、keyword / vector / relation 增强和保留 source refs 的 PrimeInjectionPackage。 |
 | PCVM Alembic nested evidence consumer extraction 回填 | [../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md](../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md) | 总控验收通过 | `Alembic` 提交 ae9531ac3315a4491e22e3df156cb05e13fc0879，修复 nested `metadata.pcvNodeEvidence.nodeId/chainNodeId/sourceRefs` 消费并补 nested-only unit。 |

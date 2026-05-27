@@ -1,7 +1,7 @@
 # Codex Control Workspace Extraction
 
 日期：2026-05-27
-状态：执行中
+状态：已完成待归档
 发送给：无
 总控定位：本文件是 AlembicWorkspace 当前总控计划；本轮只做 workspace 自身归档、基线提交和通用 `codex-control-workspace` 仓库抽取，不修改 Alembic 产品子仓库。
 
@@ -12,9 +12,9 @@
 - 037 当前主线完成态已归档到 `docs/workspace/archive/2026-05/plugin-intent-knowledge-route/`，AlembicWorkspace 当前账本不再停留在已完成待归档状态。
   - AlembicWorkspace 当前变更完成验证并形成可提交基线。
   - 新仓库 `GxFn/codex-control-workspace` 已初始化为通用参考仓库，包含 AGENTS / skills / templates / scripts / docs skeleton / 使用说明，并推送到远端。
-- 当前是否已经达到：未达到。
-- 未达到时剩余差距：需要归档 037、同步当前计划、验证 workspace 脚本，再抽取和推送通用仓库。
-- 已达到时验收 / 归档判断：新仓库 push 成功且 AlembicWorkspace 基线提交后，本计划可归档；后续通用仓库增强进入新仓库 TODO。
+- 当前是否已经达到：已达到。
+- 未达到时剩余差距：无。
+- 已达到时验收 / 归档判断：新仓库 push 成功且 AlembicWorkspace 基线已提交；本计划进入待归档，后续通用仓库增强进入新仓库 TODO。
 - 当前任务分区：规则治理 / skill 治理、归档、仓库抽取。
 - 不纳入本轮事项：不启动 038 / 039，不恢复 037 实现，不派发 Alembic 子窗口，不修改产品子仓库，不设计商业化插件。
 
@@ -53,8 +53,8 @@
 4. 在临时目录初始化通用 `codex-control-workspace` 仓库，抽取 AGENTS / skills / templates / scripts / docs skeleton。
 5. 运行新仓库最小验证，提交并推送到 `GxFn/codex-control-workspace.git`。
 
-- 下一处真实阻塞点：需要完成 AlembicWorkspace 基线验证并提交，作为新仓库抽取来源。
-- 阻塞点之前还能做：读取 git diff、运行验证命令。
+- 下一处真实阻塞点：无；后续是用户确认是否继续增强通用仓库或归档本抽取计划。
+- 阻塞点之前还能做：无。
 - 当前可派发窗口：`AlembicWorkspace` 自执行。
 - 当前阻塞 / 观察窗口：无。
 
@@ -63,8 +63,8 @@
 | 任务包 ID | 窗口 | 摘要 | 状态 |
 | --- | --- | --- | --- |
 | CCW-P1 | `AlembicWorkspace` | 建立抽取当前计划并归档 037 | 已完成 |
-| CCW-P2 | `AlembicWorkspace` | 验证并提交 workspace 基线 | 验证通过，待提交 |
-| CCW-P3 | `AlembicWorkspace` | 初始化、验证并推送通用仓库 | 待启动 |
+| CCW-P2 | `AlembicWorkspace` | 验证并提交 workspace 基线 | 已完成 |
+| CCW-P3 | `AlembicWorkspace` | 初始化、验证并推送通用仓库 | 已完成 |
 
 ### CCW-P1：归档与当前计划切换
 
@@ -299,15 +299,16 @@ git diff --check
 - 2026-05-27：用户已新建远端 `GxFn/codex-control-workspace.git`。总控创建本计划，准备先切换 current plan、归档 037，再抽取通用仓库。
 - 2026-05-27：已运行 `node scripts/sync-current-plan.mjs --plan docs/workspace/current/codex-control-workspace-extraction-2026-05-27.md --write --json`，同步 `docs/workspace/index.md`、`docs/workspace/current/index.md` 和 `docs/workspace/current/workspace-current-status.md`。随后运行 `node scripts/archive-workspace-docs.mjs --topic plugin-intent-knowledge-route --file docs/workspace/current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md --apply`，037 计划已归档到 `docs/workspace/archive/2026-05/plugin-intent-knowledge-route/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md`。
 - 2026-05-27：AlembicWorkspace 基线验证通过：`node scripts/verify-control-center.mjs --require-task-packages --with-script-tests` 全部 PASS，workspace script tests 88 项通过；`node scripts/visible-dispatch.mjs post-run-audit --json` 返回 `ok=true`，VAD mode disabled 且无 active automation；`git diff --check` 通过。
+- 2026-05-27：AlembicWorkspace 基线已提交：`ed8026e chore: prepare control workspace extraction`。随后在 `/private/tmp/codex-control-workspace` 初始化通用仓库，提交 `c213e70 Initial codex control workspace template` 并成功 push 到 `https://github.com/GxFn/codex-control-workspace.git`。新仓库包含 generic `AGENTS.md`、`workspace.config.json`、docs skeleton、skills、templates、scripts 和 package scripts；验证通过：`node scripts/verify-control-center.mjs --require-task-packages --with-script-tests`，workspace script tests 88 项通过；`git diff --cached --check` 通过。
 
 <!-- workspace-sync
 {
-  "status": "执行中（codex-control-workspace 抽取）",
-  "indexPlanDescription": "通用 codex-control-workspace 抽取当前执行中：先归档 037，再提交 AlembicWorkspace 基线，随后初始化并推送 GxFn/codex-control-workspace。",
-  "indexStatusDescription": "037 已完成并归档；当前主线切换为 codex-control-workspace 通用仓库抽取。",
+  "status": "已完成待归档（codex-control-workspace 已推送）",
+  "indexPlanDescription": "通用 codex-control-workspace 抽取已完成：037 已归档，AlembicWorkspace 基线已提交，新仓库 GxFn/codex-control-workspace 已初始化并推送。",
+  "indexStatusDescription": "codex-control-workspace 抽取已完成待归档；新仓库已推送，后续增强进入新仓库 TODO。",
   "currentIndexType": "当前计划",
-  "currentIndexDescription": "codex-control-workspace 通用仓库抽取：归档 037、验证并提交 workspace 基线、初始化并推送新仓库。",
-  "currentStatusSummary": "当前计划切换为 codex-control-workspace 通用仓库抽取；037 已归档，下一步提交 AlembicWorkspace 基线并推送新远端。",
+  "currentIndexDescription": "codex-control-workspace 通用仓库抽取已完成待归档；新仓库已 push。",
+  "currentStatusSummary": "codex-control-workspace 通用仓库抽取已完成：037 已归档，AlembicWorkspace 基线提交 ed8026e，新仓库 GxFn/codex-control-workspace 提交 c213e70 已 push；后续增强进入新仓库 TODO。",
   "indexRows": [],
   "currentIndexRows": []
 }

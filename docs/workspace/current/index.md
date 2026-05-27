@@ -14,7 +14,7 @@
 | 类型 | 文档 | 说明 |
 | --- | --- | --- |
 | 当前状态 | [workspace-current-status.md](workspace-current-status.md) | 短状态快照、发送名单和当前账本入口。 |
-| 当前计划 | [codex-control-workspace-extraction-2026-05-27.md](codex-control-workspace-extraction-2026-05-27.md) | codex-control-workspace 通用仓库抽取：归档 037、验证并提交 workspace 基线、初始化并推送新仓库。 |
+| 当前计划 | [codex-control-workspace-extraction-2026-05-27.md](codex-control-workspace-extraction-2026-05-27.md) | codex-control-workspace 通用仓库抽取已完成待归档；新仓库已 push。 |
 | GTODO 037 Intent Recognition Design | [../../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md](../../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md) | 037 第一阶段需求设计：prime 快速路径结构化意图、hostTurnMeta、IntentEpisode 连续性和本地 refinement 边界。 |
 | GTODO 037 Intent Knowledge Design | [../../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md](../../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md) | 037 第二阶段需求设计：IntentSearchPlan、keyword / vector / relation 增强和保留 source refs 的 PrimeInjectionPackage。 |
 | PCVM Alembic nested evidence consumer extraction 回填 | [../../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md](../../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md) | `Alembic` commit ae9531ac3315a4491e22e3df156cb05e13fc0879 已通过总控验收，nested evidence consumer extraction 缺口关闭。 |
