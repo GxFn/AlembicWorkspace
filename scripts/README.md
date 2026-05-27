@@ -73,12 +73,29 @@ Current scripts:
 - `visible-dispatch.mjs`: local state manager for Visible Automation Dispatch.
   It stores mode, window registry, queue, groups, and automation-run metadata
   under ignored `.workspace-local/visible-dispatch/`; prints heartbeat payloads
-  for Codex automation tools; and exposes mode, preflight, enqueue, arm,
+  for Codex automation tools using a manual-prompt-like target message plus a
+  short automation supplement; adds a small default `arm-batch` create-time
+  stagger so multiple heartbeat automations are not all created in the same
+  moment, with `--stagger-seconds` / `--no-stagger` reserved for explicit
+  scheduling tests; and exposes mode, preflight, enqueue, arm, arm-batch,
   claim, finish, accept, block, record-stop, record-return, cleanup, prune, and
   controller classification commands, plus `audit-automation` for local
   compliance checks before total control deletes stale or off-plan Codex
-  automations. It never calls Codex automation APIs, accepts evidence, selects
-  TODOs, or writes product repositories. Use
+  automations. Target and controller heartbeat automations are disposable
+  wakeups: after receipt, the Codex window deletes the app automation and uses
+  `record-stop` locally so the same heartbeat cannot interrupt later. Target
+  wakeups are consumed before claim / finish, not cleaned up at the end. The
+  controller-return prompt is generated as the same manual-prompt-like
+  total-control workflow plus a short automation supplement; target windows
+  should use the printed payload verbatim instead of hand-writing old return
+  prompts. `controller-tick --compact` gives a short machine-readable status
+  for total-control returns; `post-run-audit` verifies that an ended run is
+  really disabled, has no live local automation runs, no send-eligible windows,
+  no non-terminal dispatch tasks, and no stale current-status automation text.
+  `prune-history --include-current-accepted` is available after acceptance /
+  archive review to clean accepted current-plan runtime noise explicitly. The
+  script never calls Codex automation APIs, accepts evidence, selects TODOs, or
+  writes product repositories. Use
   `skills/dev/alembic-workspace-control/references/visible-automation-dispatch.md`
   for the operating map and `skills/dev/visible-automation-dispatch-*` for
   heartbeat role rules.
@@ -95,9 +112,10 @@ Current scripts:
   root-level short-term paths.
 - `check-dispatch-coverage.mjs`: verifies that the current control plan covers
   every expected window, that the declared copyable prompt send list matches
-  task statuses, and that sendable prompts require reading `AGENTS.md` plus an
-  explicit window / repository positioning statement. Nonstandard extra
-  windows are allowed when they are not send-eligible.
+  task statuses (`待启动`, `执行中`, or `已 arm`), and that sendable prompts
+  require reading `AGENTS.md` plus an explicit window / repository positioning
+  statement. Nonstandard extra windows are allowed when they are not
+  send-eligible.
 - `check-decision-preflight.mjs`: verifies that the current control plan
   records `总控决策记录` before document/state changes are treated as valid.
   It requires the trigger, demand / test-result interpretation, checked
@@ -244,9 +262,10 @@ Visible Automation Dispatch local state:
 
 ```bash
 node scripts/workspace-control.mjs vad status --json
-node scripts/workspace-control.mjs vad controller --json
+node scripts/workspace-control.mjs vad controller --compact --json
 node scripts/workspace-control.mjs vad preflight --json
 node scripts/workspace-control.mjs vad audit --automation-id <automationId> --json
+node scripts/workspace-control.mjs vad post-run-audit --json
 node scripts/workspace-control.mjs vad disable --write --reason "manual stop"
 ```
 

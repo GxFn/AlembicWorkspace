@@ -446,16 +446,27 @@ test("arm outputs a heartbeat payload without calling automation APIs", () => {
   assert.equal(parsed.payload.targetThreadId, "thread-visible-1");
   assert.equal(parsed.payload.rrule, "FREQ=MINUTELY;INTERVAL=1");
   assert.equal(parsed.payload.chainMode, "finish-chain");
+  assert.match(parsed.payload.prompt, /Visible Automation Dispatch 自动化领取提示词/);
+  assert.match(parsed.payload.prompt, /先读取 AGENTS\.md、docs\/workspace\/index\.md/);
+  assert.match(parsed.payload.prompt, /先明确声明当前窗口定位和本轮仓库职责/);
+  assert.match(parsed.payload.prompt, /Codex 子 agent/);
+  assert.match(parsed.payload.prompt, /最终由当前窗口统一复核和回填/);
+  assert.match(parsed.payload.prompt, /完成后回填：完成范围、提交 hash、验证命令/);
+  assert.match(parsed.payload.prompt, /当前窗口：Alembic/);
+  assert.match(parsed.payload.prompt, /任务 id：plan__Alembic/);
+  assert.match(parsed.payload.prompt, /用完即弃/);
+  assert.match(parsed.payload.prompt, /不要等 finish 再删/);
+  assert.match(parsed.payload.prompt, /继续 claim \/ 执行 \/ finish/);
   assert.match(parsed.payload.prompt, /claim --window Alembic --write/);
   assert.match(parsed.payload.prompt, /finish --window Alembic/);
   assert.match(parsed.payload.prompt, /visible-automation-dispatch-target\/SKILL\.md/);
-  assert.match(parsed.payload.prompt, /Target window: Alembic/);
+  assert.match(parsed.payload.prompt, /record-stop/);
+  assert.doesNotMatch(parsed.payload.prompt, /target completed/);
   assert.doesNotMatch(parsed.payload.prompt, /courierAllowed === true/);
   assert.doesNotMatch(parsed.payload.prompt, /recordArmCommand/);
   assert.doesNotMatch(parsed.payload.prompt, /无人值守接续规则/);
   assert.doesNotMatch(parsed.payload.prompt, /returnToController/);
-  assert.ok(parsed.payload.prompt.length < 850);
-  assert.match(parsed.payload.prompt, /Next-hop, record commands, AlembicTest boundary/);
+  assert.ok(parsed.payload.prompt.length < 1250);
 });
 
 test("preflight verifies registered target threads resolve to local Codex sessions", () => {
@@ -520,14 +531,64 @@ test("arm-batch prepares payloads for every queued task in a dispatch group", ()
   const result = run(root, ["arm-batch", "--group", "batch-1", "--json"]);
   assert.equal(result.status, 0, result.stderr);
   const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.staggerSeconds, 20);
+  assert.match(parsed.staggerInstructions, /waitBeforeCreateSeconds/);
   assert.equal(parsed.payloads.length, 2);
   assert.deepEqual(
     parsed.payloads.map((item) => item.targetWindow).sort(),
     ["Alembic", "AlembicCore"],
   );
+  assert.deepEqual(
+    parsed.payloads.map((item) => item.createOrder),
+    [1, 2],
+  );
+  assert.deepEqual(
+    parsed.payloads.map((item) => item.createDelaySeconds),
+    [0, 20],
+  );
+  assert.deepEqual(
+    parsed.payloads.map((item) => item.waitBeforeCreateSeconds),
+    [0, 20],
+  );
   assert.equal(parsed.payloads.every((item) => item.payload.chainMode === "finish-chain"), true);
   assert.doesNotMatch(parsed.payloads[0].payload.prompt, /returnToController/);
-    assert.ok(parsed.payloads.every((item) => item.payload.prompt.length < 850));
+  assert.ok(parsed.payloads.every((item) => item.payload.prompt.length < 1100));
+});
+
+test("arm-batch supports explicit stagger interval and no-stagger mode", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "visible-dispatch-arm-batch-stagger-"));
+  writeFile(path.join(root, "AGENTS.md"), "# Fixture\n");
+  writeTwoWindowPlan(root);
+  run(root, ["mode", "--enable", "--write"]);
+  run(root, ["register", "--window", "Alembic", "--thread", "thread-Alembic", "--write"]);
+  run(root, ["register", "--window", "AlembicCore", "--thread", "thread-AlembicCore", "--write"]);
+  run(root, [
+    "enqueue",
+    "--from-plan",
+    "--group",
+    "batch-1",
+    "--return-policy",
+    "controller-last",
+    "--write",
+  ]);
+
+  const staggered = run(root, ["arm-batch", "--group", "batch-1", "--stagger-seconds", "35", "--json"]);
+  assert.equal(staggered.status, 0, staggered.stderr);
+  const parsedStaggered = JSON.parse(staggered.stdout);
+  assert.equal(parsedStaggered.staggerSeconds, 35);
+  assert.deepEqual(
+    parsedStaggered.payloads.map((item) => item.createDelaySeconds),
+    [0, 35],
+  );
+
+  const unstaggered = run(root, ["arm-batch", "--group", "batch-1", "--no-stagger", "--json"]);
+  assert.equal(unstaggered.status, 0, unstaggered.stderr);
+  const parsedUnstaggered = JSON.parse(unstaggered.stdout);
+  assert.equal(parsedUnstaggered.staggerSeconds, 0);
+  assert.deepEqual(
+    parsedUnstaggered.payloads.map((item) => item.waitBeforeCreateSeconds),
+    [0, 0],
+  );
 });
 
 test("arm-batch skips queued tasks whose registered thread lacks a local session", () => {
@@ -616,6 +677,32 @@ test("record-stop marks automation runs stopped and removes cleanup noise", () =
   const tick = run(root, ["tick", "--json"]);
   assert.equal(tick.status, 0, tick.stderr);
   assert.equal(JSON.parse(tick.stdout).tasks[0].nextAction, "reviewStopped");
+});
+
+test("target-received disposable heartbeat keeps armed task waiting for claim", () => {
+  const root = makeFixture();
+  run(root, ["mode", "--enable", "--write"]);
+  run(root, ["enqueue", "--from-plan", "--write"]);
+  const taskId = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json").tasks[0].taskId;
+  run(root, ["record-arm", "--task", taskId, "--automation-id", "auto-1", "--write"]);
+
+  const stopped = run(root, [
+    "record-stop",
+    "--automation-id",
+    "auto-1",
+    "--reason",
+    "target received",
+    "--write",
+    "--json",
+  ]);
+  assert.equal(stopped.status, 0, stopped.stderr);
+
+  const tick = run(root, ["tick", "--json"]);
+  assert.equal(tick.status, 0, tick.stderr);
+  const parsed = JSON.parse(tick.stdout);
+  assert.equal(parsed.topAction, "wait");
+  assert.equal(parsed.tasks[0].nextAction, "waitForClaim");
+  assert.match(parsed.tasks[0].message, /received and disposed/);
 });
 
 test("audit-automation accepts a matching active target automation", () => {
@@ -864,6 +951,28 @@ test("controller-tick selects the top TODO candidate only after the current plan
   assert.equal(parsed.candidate.id, "GTODO-1");
 });
 
+test("controller-tick compact stops at complete-pending-archive before TODO selection", () => {
+  const root = makeFixture({
+    planStatus: "已完成待归档",
+    alembicStatus: "无任务",
+    sendTo: "无",
+    globalTodoRows:
+      "| GTODO-1 | 待排期 | feature | P0 | `AlembicWorkspace` | First | 是 | 无 | `AlembicWorkspace` | board |",
+  });
+  run(root, ["mode", "--enable", "--write"]);
+
+  const result = run(root, ["controller-tick", "--compact", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.topAction, "decision");
+  assert.equal(parsed.nextAction, "archiveOrConfirmNextMainline");
+  assert.equal(parsed.candidate, null);
+  assert.equal(parsed.queueTaskCount, 0);
+  assert.equal(parsed.sendEligibleWindowCount, 0);
+  assert.equal(parsed.queueDecision, undefined);
+  assert.equal(parsed.todoCandidates, undefined);
+});
+
 test("controller-tick reports but does not block on historic resolved tasks from old plans", () => {
   const root = makeFixture({
     planStatus: "已完成",
@@ -891,6 +1000,45 @@ test("controller-tick reports but does not block on historic resolved tasks from
   const parsed = JSON.parse(result.stdout);
   assert.equal(parsed.topAction, "mainlineCandidate");
   assert.equal(parsed.queueDecision.ignoredHistoricTasks[0].taskId, "old-plan__AlembicTest");
+});
+
+test("post-run-audit passes for a disabled plan with no active dispatch work", () => {
+  const root = makeFixture({
+    planStatus: "已完成待归档",
+    alembicStatus: "无任务",
+    sendTo: "无",
+  });
+
+  const result = run(root, ["post-run-audit", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true);
+  assert.deepEqual(parsed.issues, []);
+  assert.equal(parsed.mode, "disabled");
+  assert.equal(parsed.sendEligibleWindowCount, 0);
+});
+
+test("post-run-audit fails when current status still advertises stale automation work", () => {
+  const root = makeFixture({
+    planStatus: "已完成待归档",
+    alembicStatus: "无任务",
+    sendTo: "无",
+  });
+  writeFile(
+    path.join(root, "docs/workspace/current/workspace-current-status.md"),
+    `
+# Current Status
+
+Visible Dispatch 本地 runtime 当前 mode enabled, loop enabled, 防睡眠 active；Stage 5B 准备由 VAD 投递给 \`AlembicPlugin\`。
+`,
+  );
+
+  const result = run(root, ["post-run-audit", "--json"]);
+  assert.notEqual(result.status, 0);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, false);
+  assert.match(parsed.issues.join("\n"), /workspace-current-status\.md appears stale/);
+  assert.equal(parsed.staleStatusLines[0].line, 4);
 });
 
 test("prune-history removes old terminal tasks without touching current or active history", () => {
@@ -1017,6 +1165,57 @@ test("prune-history removes old terminal tasks without touching current or activ
   assert.deepEqual(groups.groups.map((group) => group.groupId), ["current-group"]);
 });
 
+test("prune-history can explicitly remove accepted tasks from the current plan", () => {
+  const root = makeFixture({
+    planStatus: "已完成待归档",
+    alembicStatus: "无任务",
+    sendTo: "无",
+  });
+  writeJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json", {
+    version: 1,
+    tasks: [
+      {
+        taskId: "plan__Alembic",
+        targetWindow: "Alembic",
+        status: "accepted",
+        controlDoc: "docs/workspace/current/plan.md",
+        automationId: "auto-current",
+      },
+      {
+        taskId: "plan__AlembicCore",
+        targetWindow: "AlembicCore",
+        status: "blocked",
+        controlDoc: "docs/workspace/current/plan.md",
+      },
+    ],
+  });
+  writeJson(root, ".workspace-local/visible-dispatch/automation-runs.json", {
+    version: 1,
+    runs: [
+      {
+        runId: "plan__Alembic__auto-current",
+        taskId: "plan__Alembic",
+        targetWindow: "Alembic",
+        automationId: "auto-current",
+        status: "stopped",
+      },
+    ],
+  });
+
+  const defaultPrune = run(root, ["prune-history", "--json"]);
+  assert.equal(defaultPrune.status, 0, defaultPrune.stderr);
+  assert.deepEqual(JSON.parse(defaultPrune.stdout).prunedTasks, []);
+
+  const explicit = run(root, ["prune-history", "--include-current-accepted", "--write", "--json"]);
+  assert.equal(explicit.status, 0, explicit.stderr);
+  const parsed = JSON.parse(explicit.stdout);
+  assert.equal(parsed.includeCurrentAccepted, true);
+  assert.deepEqual(parsed.prunedTasks.map((task) => task.taskId), ["plan__Alembic"]);
+
+  const queue = readJson(root, ".workspace-local/visible-dispatch/dispatch-queue.json");
+  assert.deepEqual(queue.tasks.map((task) => task.taskId), ["plan__AlembicCore"]);
+});
+
 test("finish registers the current thread, completes evidence, and prepares the next wake payload", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "visible-dispatch-finish-"));
   writeFile(path.join(root, "AGENTS.md"), "# Fixture\n");
@@ -1113,6 +1312,17 @@ test("controller-last dispatch group returns to total control only after the fin
   assert.equal(secondParsed.chain.payload.targetWindow, "AlembicWorkspace");
   assert.equal(secondParsed.chain.payload.targetThreadId, "thread-controller");
   assert.equal(secondParsed.chain.payload.controllerReturnAllowed, true);
+  assert.match(secondParsed.chain.payload.prompt, /Visible Automation Dispatch 总控回跳提示词/);
+  assert.match(secondParsed.chain.payload.prompt, /先读取 AGENTS\.md、docs\/workspace\/index\.md/);
+  assert.match(secondParsed.chain.payload.prompt, /先明确声明当前窗口定位：AlembicWorkspace 总控/);
+  assert.match(secondParsed.chain.payload.prompt, /区分窗口自述、原始证据和总控裁决/);
+  assert.match(secondParsed.chain.payload.prompt, /用完即弃/);
+  assert.match(secondParsed.chain.payload.prompt, /audit-automation/);
+  assert.match(secondParsed.chain.payload.prompt, /controller return received/);
+  assert.match(secondParsed.chain.payload.prompt, /group-status/);
+  assert.match(secondParsed.chain.payload.prompt, /controller-tick/);
+  assert.doesNotMatch(secondParsed.chain.payload.prompt, /VAD controller-return heartbeat/);
+  assert.ok(secondParsed.chain.payload.prompt.length < 1300);
   assert.match(secondParsed.chain.recordReturnCommand, /record-return --group batch-return/);
 
   const recorded = run(root, [

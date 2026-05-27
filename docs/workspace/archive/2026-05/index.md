@@ -25,7 +25,7 @@
 | [global-todo](global-todo/) | 已完成全局 TODO 和旧同步记录。 |
 | [init-convergence-contract](init-convergence-contract/) | init convergence contract 历史计划。 |
 | [interface-boundary](interface-boundary/) | 接口边界优化与消费层收敛历史计划。 |
-| [llm-input-optimization](llm-input-optimization/) | 历史归档主题。 |
+| [llm-input-optimization](llm-input-optimization/) | 已归档 8 个 workspace 文档；当前索引只保留目录入口。 |
 | [llm-output-truncation-bug](llm-output-truncation-bug/) | Jobs Timeline `llm.output` 短内容像被截断的完整性标识与展示问题。 |
 | [local-source-import-unification](local-source-import-unification/) | 本地源码引入统一历史计划。 |
 | [module-boundary-foundation](module-boundary-foundation/) | module boundary foundation 历史计划。 |
@@ -34,6 +34,7 @@
 | [note-finding-closure-standard](note-finding-closure-standard/) | `note_finding` 判定标准历史形成记录。 |
 | [plugin-external-ai-remnants-removal](plugin-external-ai-remnants-removal/) | Plugin 旧外部 AI 能力残留删除计划。 |
 | [plugin-first-enhancement](plugin-first-enhancement/) | Plugin first enhancement 和 runtime boundary 历史计划。 |
+| [plugin-intent-knowledge-route](plugin-intent-knowledge-route/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | [plugin-service-request-boundary](plugin-service-request-boundary/) | Plugin 请求 Alembic service 的边界收口计划。 |
 | [prime-immediate-receipt-shout](prime-immediate-receipt-shout/) | prime 后立即知识接收呐喊记录。 |
 | [prime-knowledge-shout](prime-knowledge-shout/) | Prime 知识呐喊、Recipe 交互契约和 BiliDili bridge repair 历史计划。 |
@@ -46,3 +47,5 @@
 | [test-exchange-history](test-exchange-history/) | 历史测试交流正文。 |
 | [unified-resident-service](unified-resident-service/) | 已压缩 4 条历史索引行到 topic manifest；当前索引只保留目录入口。 |
 | [version-unification](version-unification/) | 0.2.0 版本统一和缓存刷新记录。 |
+| [visible-automation-dispatch](visible-automation-dispatch/) | 已归档 13 个 workspace 文档；当前索引只保留目录入口。 |
+| [workspace-control-architecture-refresh](workspace-control-architecture-refresh/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |

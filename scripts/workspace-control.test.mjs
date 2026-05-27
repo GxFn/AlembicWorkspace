@@ -50,6 +50,12 @@ test("--print vad preflight defaults to current-plan preflight", () => {
   assert.match(result.stdout, /node scripts\/visible-dispatch\.mjs preflight --from-plan --json/);
 });
 
+test("--print vad controller supports compact output", () => {
+  const result = run(["--print", "vad", "controller", "--compact", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /node scripts\/visible-dispatch\.mjs controller-tick --compact --json/);
+});
+
 test("--print vad audit maps to automation compliance audit", () => {
   const result = run(["--print", "vad", "audit", "--automation-id", "auto-1", "--window", "Alembic", "--role", "target", "--json"]);
   assert.equal(result.status, 0, result.stderr);
@@ -57,6 +63,12 @@ test("--print vad audit maps to automation compliance audit", () => {
     result.stdout,
     /node scripts\/visible-dispatch\.mjs audit-automation --automation-id auto-1 --window Alembic --role target --json/,
   );
+});
+
+test("--print vad post-run-audit maps to visible-dispatch post-run audit", () => {
+  const result = run(["--print", "vad", "post-run-audit", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /node scripts\/visible-dispatch\.mjs post-run-audit --json/);
 });
 
 test("vad enable requires explicit write gate", () => {
@@ -69,6 +81,12 @@ test("--print vad disable preserves write gate and reason", () => {
   const result = run(["--print", "vad", "disable", "--write", "--reason", "manual stop", "--json"]);
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /node scripts\/visible-dispatch\.mjs mode --disable --write --reason manual stop --json/);
+});
+
+test("--print vad prune forwards current accepted cleanup option", () => {
+  const result = run(["--print", "vad", "prune", "--include-current-accepted", "--write", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /node scripts\/visible-dispatch\.mjs prune-history --include-current-accepted --write --json/);
 });
 
 test("unknown command fails closed", () => {

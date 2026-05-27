@@ -1,8 +1,8 @@
 # AlembicWorkspace Current Status
 
-更新日期：2026-05-26
+更新日期：2026-05-27
 总控窗口：AlembicWorkspace
-状态：执行中（无人值守 Stage 1 最小代码链路待启动）
+状态：执行中（codex-control-workspace 抽取）
 
 ## 阅读入口
 
@@ -15,11 +15,11 @@
 
 ## 状态摘要
 
-- 当前计划：[plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md)。
-- 037 Stage 0 已通过总控验收；当前无人值守继续 Stage 1，发送给 `AlembicPlugin` / `Alembic`。当前不派 `AlembicTest`，不启动 038/039，不提前做 search/vector/PrimeInjectionPackage。
+- 当前计划：[codex-control-workspace-extraction-2026-05-27.md](codex-control-workspace-extraction-2026-05-27.md)。
+- 当前计划切换为 codex-control-workspace 通用仓库抽取；037 已归档，下一步提交 AlembicWorkspace 基线并推送新远端。
 - Design 来源已同步到 [design-handoff-inbox.md](design-handoff-inbox.md)：`INTENT-RECOGNITION-2026-05-26` 与 `INTENT-KNOWLEDGE-2026-05-26` 共同构成 037；`KNOWLEDGE-EVOLUTION-TODOS-2026-05-26` 只是顺序索引，不作为执行计划。
-- Visible Dispatch 本地 runtime 当前 mode disabled，防睡眠 inactive；旧 Wave 9 / Wave 10 smoke 队列已裁决并清理，不会抢跑。
-- `GTODO-2026-05-25-003 / PCVM` Wave 4 仍是后续候选，但当前用户指定 037 为下一主线，先不领取 PCVM。
+- Visible Dispatch 本地 runtime 当前 mode disabled、loop disabled，防睡眠 stopped；037 已完成并归档，没有当前可派发窗口。
+- `GTODO-2026-05-25-003 / PCVM` Wave 4 仍是后续候选，但不是本轮已确认自动化续跳目标；若要领取需重新确认主线和阶段计划。
 
 ## 当前账本
 
@@ -32,40 +32,35 @@
 
 当前仍保留观察或下一主线相关事项：
 
-- `GTODO-2026-05-24-037`：下一主线已确认；Stage 1 代码调研和执行计划待启动。
+- `GTODO-2026-05-24-037`：已完成已归档；Stage 0 至 Stage 6A 均已通过总控验收，当前无返修窗口。
 - `GTODO-2026-05-25-005`：VAD 已完成待归档；后续 VAD 问题作为 bug / optimization 入队，不再作为独立抢跑主线。
 - `GTODO-2026-05-25-003`：PCVM Wave 4 仍待裁决，当前不与 037 并行领取。
 - `GTODO-2026-05-24-030`：多文件夹 ProjectScope 下的 project-level skill visibility mount。
-- `GTODO-2026-05-24-038` / `039`：等待 037 阶段结果，不进入本轮自动化。
+- `GTODO-2026-05-24-038` / `039`：037 已闭合，但仍需要独立目标确认和阶段计划，不进入本轮自动化。
+- `GTODO-2026-05-27-001`：Stage 6A 发现的 Codex.app Node / Node 24 native addon runtime smoke 风险；不阻塞 037 归档，后续 full daemon / cold-start / release 验证前处理。
 - `GTODO-2026-05-23-022` / `023`：Dashboard `any` 类型化与 Mermaid async chunk 性能专项。
 - 其它低优观察项以 [global-todo-board.md](global-todo-board.md) 为准；本页不重复完整列表。
 
 ## 窗口分派
 
-发送给：`AlembicPlugin`、`Alembic`
+发送给：无
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | 执行 `G037-STAGE1-ALEMBIC-INTENT-CONSUME`，消费 Plugin intent context 到现有 prime / search pipeline。 |
-| `AlembicCore`<br>观察中 | Stage 1 默认不新增 Core contract，观察是否出现稳定共享结构。 |
-| `AlembicAgent`<br>观察中 | 当前不派发；等 Stage 0 事实显示 Agent runtime 需要参与后再判断。 |
-| `AlembicDashboard`<br>观察中 | 当前不派发；Stage 0 不做 UI。 |
-| `AlembicPlugin`<br>待启动 | 执行 `G037-STAGE1-PLUGIN-HOST-INTENT-FRAME`，实现 Plugin-owned host intent / turn metadata 输入承载。 |
-| `AlembicTest`<br>无任务 | 当前不涉及真实项目验证。 |
+| `Alembic`<br>无任务 | 不发送。 |
+| `AlembicCore`<br>无任务 | 不发送。 |
+| `AlembicAgent`<br>无任务 | 不发送。 |
+| `AlembicDashboard`<br>无任务 | 不发送。 |
+| `AlembicPlugin`<br>无任务 | 不发送。 |
+| `AlembicTest`<br>无任务 | 不发送。 |
 | `BiliDili`<br>无任务 | 不触碰真实项目。 |
 
 ## 可复制提示词
 
-发送给：`AlembicPlugin`、`Alembic`
+发送给：无
 
 ```text
-先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md，以及你所在窗口/目标仓库的 AGENTS.md。
-
-先明确声明当前窗口定位和本轮仓库职责。
-
-按照当前总控文档领取分配给你所在窗口的 Stage 1 最小代码链路任务；只做本窗口任务，不代处理其它窗口。
-
-完成后回填：完成范围、提交 hash、修改文件、验证命令、验证结果、旧路径兼容性、遗留风险和下一步建议。
+本轮是 AlembicWorkspace 自执行，不生成子窗口分派提示词。
 ```
 
 ## 回填区

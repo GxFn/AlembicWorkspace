@@ -1,14 +1,155 @@
 # AlembicTest Exchange
 
-更新日期：2026-05-26
+更新日期：2026-05-27
 维护窗口：AlembicWorkspace
-状态：`Test-2026-05-26-12 / VAD-P4-Single-Window-Visible-Heartbeat-Validation` 总控验收通过；结论阻塞
+状态：当前无待执行测试单；`Test-2026-05-27-13 / G037-STAGE6A-PrimeInjectionPackage-Real-Smoke` 已通过总控验收
 
 ## 定位
 
 本文件只保存当前需要 `AlembicTest` 执行或回填的测试单。历史测试交流、测试报告和总控验收入口统一从 [workspace-record-map.md](../workspace-record-map.md#test-records) 查询。
 
 ## 当前测试单
+
+### Test-2026-05-27-13：G037-STAGE6A-PrimeInjectionPackage-Real-Smoke
+
+状态：总控验收通过
+创建日期：2026-05-27
+总控来源：[plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](../archive/2026-05/plugin-intent-knowledge-route/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md)
+执行窗口：AlembicTest
+目标项目：AlembicPlugin runtime、Alembic resident、本地最小 test-mode fixture / smoke。
+
+#### 测试目标
+
+- 验证 `AlembicPlugin` runtime 调用 `Alembic` resident 后，`PrimeInjectionPackage` 能出现在 Codex-facing search response、prime material 和 episode metadata。
+- 验证使用版本：`Alembic` commit `15145a12baf47694f06392a7eeeeee666df8acd3`、`AlembicPlugin` commit `6c988dec2a118989ae97be637a4bb15ea0e4001f`、Plugin runtime commit `cedd422955e5b24b59794e90a8c0b7b71a940da6`。
+- 明确成功 / 失败归因：Alembic producer、AlembicPlugin consumer / runtime package、AlembicTest harness 或环境。
+
+#### 非目标
+
+- 不跑 full cold-start / rescan。
+- 不做 Dashboard UI 或人工浏览器验收。
+- 不启动 038 / 039。
+- 不修改 `Alembic`、`AlembicPlugin`、`AlembicCore` 或真实测试项目产品源码。
+- 不把本轮 smoke 结论扩大成生产质量 beyond-smoke。
+
+#### 前置条件
+
+- Stage 5A `Alembic` PrimeInjectionPackage source package 已通过总控验收，commit `15145a12baf47694f06392a7eeeeee666df8acd3`。
+- Stage 5B `AlembicPlugin` PrimeInjectionPackage Codex-facing exposure 已通过总控验收，commit `6c988dec2a118989ae97be637a4bb15ea0e4001f`，runtime commit `cedd422955e5b24b59794e90a8c0b7b71a940da6`。
+- 执行前先读取本 workspace `AGENTS.md`、`docs/workspace/index.md`、本文档、当前总控计划和 `AlembicTest/AGENTS.md`，并声明当前窗口定位和本轮测试职责。
+
+#### 总控自测排除理由
+
+为什么总控不能自己完成验证：
+
+- 总控已完成代码侧复核、targeted unit、build / lint / runtime package 验证，但没有在总控窗口直接运行真实 Plugin runtime -> Alembic resident -> Plugin projection 的跨仓库 test-mode 环境。
+
+需要的真实场景：
+
+- 需要 `AlembicTest` 在测试窗口内运行最小 test-mode smoke，证明 Alembic resident 返回的 package 经过 Plugin runtime projection 后真实出现在 Codex-facing search / prime / episode 字段。
+
+已由总控自行完成的最小验证：
+
+- 总控已验收 `Alembic` commit `15145a12baf47694f06392a7eeeeee666df8acd3` 的 package source targeted tests、lint / build check 和 repo clean。
+- 总控已验收 `AlembicPlugin` commit `6c988dec2a118989ae97be637a4bb15ea0e4001f` 的 resident client / search handler / task prime / episode tests、build check、lint、runtime package 和 repo clean。
+
+#### 测试前边界与多条件判断
+
+测试要回答的问题：
+
+- 真实 Plugin runtime / Alembic resident smoke 是否能让 `PrimeInjectionPackage` 出现在 Codex-facing search response、prime material 和 episode metadata。
+
+测试对象 / 目标窗口 / 线程 / 项目边界：
+
+- 对象是 `AlembicTest` 测试环境中的最小 test-mode smoke；版本边界为 `Alembic` `15145a12baf47694f06392a7eeeeee666df8acd3`、`AlembicPlugin` `6c988dec2a118989ae97be637a4bb15ea0e4001f`、runtime `cedd422955e5b24b59794e90a8c0b7b71a940da6`。
+- 不修改产品源码，不触碰真实测试项目业务行为，不写 raw thread id 到 tracked docs。
+
+总控可自测项：
+
+- workspace 文档 / VAD preflight、子仓库 clean status、targeted unit、build / lint / runtime package、diff check。
+
+必须交给 `AlembicTest` 的真实场景条件：
+
+- 需要一个测试窗口运行跨仓库 smoke，验证 runtime 调用和 response projection 的真实组合，而不是只分别读取 Alembic / Plugin 单元测试。
+
+成功能推出的结论：
+
+- 037 的 PrimeInjectionPackage producer / consumer 最小真实集成链路可用，可进入总控最终收口 / 归档或裁决后续优化。
+
+失败能推出的结论：
+
+- 失败只能按证据归因到 Alembic producer、AlembicPlugin consumer / runtime package、AlembicTest harness 或环境；不能直接扩大为 037 整体设计失败。
+
+不能推出的结论：
+
+- 不能证明 Dashboard UI、038 / 039、full cold-start / rescan 或生产质量 beyond-smoke 已完成；不能证明 Core typed contract 必须下沉。
+
+停止或不开始条件：
+
+- 缺少 AlembicTest 真实 thread id / VAD preflight；任务 id 与旧任务冲突；测试范围被扩大到 full cold-start / rescan / Dashboard UI；或需要修改产品源码才能继续。
+
+#### 执行范围
+
+- 触发入口：由 `AlembicTest` 创建或复用最小 test-mode smoke / fixture，连接或等价模拟 Plugin runtime -> Alembic resident -> Plugin projection 边界。
+- 允许操作：创建 / 更新 AlembicTest probe、fixture、JSON evidence、report 和临时输出；read-only 扫描相关产品仓库；运行最小本地命令。
+- 禁止操作：不得跑 full cold-start / rescan；不得启动 Dashboard UI；不得修改产品源码；不得提交产品子仓库；不得操作真实测试项目业务源码、UI、登录、网络或播放逻辑。
+
+#### 观察点
+
+- Alembic producer：resident search / prime metadata 是否返回 `searchMeta.primeInjectionPackage`。
+- Plugin consumer：Codex-facing search response 是否包含 `searchMeta.primeInjectionPackage`。
+- Prime material：`alembic_task prime` / prime material 是否包含 `primeInjectionPackage`。
+- Episode metadata：IntentEpisode start / outcome `searchMeta.primeInjectionPackage` 是否可读。
+- Redaction / fallback：本机绝对路径、raw thread id 和 oversized payload 不进入输出；旧无 package 路径仍能降级。
+- Repo 状态：Alembic 系列产品仓库和真实测试项目不出现非预期改动。
+
+#### 验收标准
+
+- 报告证明至少一条最小真实 smoke 能让 package 从 Alembic source 穿过 Plugin runtime projection 到达 Codex-facing search / prime / episode 字段路径。
+- 报告列出具体命令、结果、字段路径、版本和 JSON / report 路径。
+- 如未通过，必须给出失败点、missing field、first fix 和建议归属窗口。
+- 产品仓库和真实测试项目没有非预期源码改动。
+
+#### 建议命令或脚本
+
+```bash
+# 由 AlembicTest 窗口按自身 AGENTS 和测试策略选择最小命令执行。
+# 目标是最小 smoke，不要求 full cold-start / rescan。
+```
+
+#### 回填要求
+
+- 测试结论：通过 / 未通过 / 阻塞。
+- 执行范围：是否只使用最小 test-mode smoke；是否未跑 full cold-start / rescan；是否未操作真实项目业务代码。
+- 使用版本：Alembic commit、AlembicPlugin commit、Plugin runtime commit / package。
+- package 字段路径：search response、prime material、episode metadata。
+- 验证命令 / 结果：
+- JSON evidence / report 路径：
+- 失败归因 / first fix / 建议归属窗口：
+- 真实项目是否干净：
+- 遗留风险和下一步建议：
+
+#### 执行回填（AlembicTest，2026-05-27 12:46 CST）
+
+- 测试结论：通过，范围限定为最小 test-mode fixture smoke。真实 Alembic daemon / 默认 Codex.app Node 路径先被本机 `better-sqlite3` native addon 加载环境阻塞；随后使用 Stage 5B embedded Plugin runtime commit `cedd422955e5b24b59794e90a8c0b7b71a940da6` 与 resident-shaped HTTP fixture 完成最小链路验证。
+- 执行范围：只做 Plugin runtime -> resident-shaped HTTP service -> Plugin projection 的最小 smoke；未跑 full cold-start / rescan；未做 Dashboard UI；未修改 `Alembic`、`AlembicPlugin`、`AlembicCore`、真实测试项目或 BiliDili 业务源码。
+- 使用版本：`Alembic` `15145a12baf47694f06392a7eeeeee666df8acd3`；`AlembicPlugin` `6c988dec2a118989ae97be637a4bb15ea0e4001f`；Plugin runtime `cedd422955e5b24b59794e90a8c0b7b71a940da6`。
+- package 字段路径：`mcp.search.data.searchMeta.primeInjectionPackage=true`；`mcp.prime.data.searchMeta.primeInjectionPackage=true`；`mcp.prime.data.primeKnowledgeMaterial.primeInjectionPackage=true`；fixture 捕获 `POST /api/v1/intent-episodes` request `searchMeta.primeInjectionPackage=true`；fixture 捕获 `PATCH /api/v1/intent-episodes/episode-1` request `searchMeta.primeInjectionPackage=true`。
+- 验证命令 / 结果：`/Users/gaoxuefeng/.nvm/versions/node/v22.22.1/bin/node AlembicTest/scripts/probe-prime-injection-package-smoke.mjs --daemon-start-blocked --daemon-start-blocked-reason "Codex.app Node blocked by hardened-runtime Team ID mismatch; Node 24 blocked by NODE_MODULE_VERSION mismatch; nvm Node 22.22.1 matches runtime better-sqlite3 and was used for this smoke" --output AlembicTest/tmp/g037-stage6a-prime-package-smoke-2026-05-27.json --timeout-ms 90000`；结果 `ok=true`、`classification=passed`。
+- JSON evidence / report 路径：`AlembicTest/tmp/g037-stage6a-prime-package-smoke-2026-05-27.json`；详细报告 `AlembicTest/docs/g037-prime-injection-package-real-smoke-2026-05-27.md`。
+- 失败归因 / first fix / 建议归属窗口：无产品字段链路失败。环境阻塞为 Codex.app Node hardened-runtime Team ID mismatch、Node 24 ABI mismatch；可由 `AlembicTest` harness 固定 Node 22.22.1，或由发布 / 安装链路处理 native addon 签名与 ABI 匹配。
+- 真实项目是否干净：测试未修改 `Alembic`、`AlembicPlugin`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard` 或 `BiliDili` 产品源码；`AlembicTest` 新增 probe / 报告 / tmp evidence，历史未提交测试资产未回退。
+- 提交 hash：无；本轮未提交 AlembicTest 仓库。
+- 遗留风险：最终通过的是 resident-shaped test-mode fixture，不等同于 full real daemon / full cold-start / rescan；默认 Codex.app Node 仍不能直接跑 sqlite-backed runtime。
+- 下一步建议：总控可裁决 Stage 6A fixture smoke 是否足够收口；若必须要求真实 Alembic daemon，则先修复本机 native addon / Node 环境后重跑同一 probe。
+
+#### 总控验收（2026-05-27 12:48 CST）
+
+- 验收结论：通过。Stage 6A 的最小 test-mode fixture smoke 足以回答本测试单唯一问题：`PrimeInjectionPackage` 能从 Alembic source package 经 Plugin runtime projection 出现在 Codex-facing search response、prime response searchMeta、prime material 和 IntentEpisode start / outcome metadata。
+- 总控复核证据：`AlembicTest/tmp/g037-stage6a-prime-package-smoke-2026-05-27.json` 为 `ok=true`、`classification=passed`，关键 checks 均为 true；总控复跑同一 probe 生成 `AlembicTest/tmp/g037-stage6a-prime-package-smoke-2026-05-27-total-control-rerun.json`，结果同样为 `ok=true`、`classification=passed`。
+- 边界判断：本结论不扩大到 full daemon / cold-start / rescan、Dashboard UI 或生产质量 beyond-smoke；默认 Codex.app Node / Node 24 native addon 问题作为后续 `GTODO-2026-05-27-001`，不阻塞 037 当前最小闭环验收。
+- 产品仓库状态：`Alembic` 与 `AlembicPlugin` clean；`AlembicTest` 未提交 probe / report / tmp 资产按总控规则不作为验收阻塞。
+- 下一步：当前无新的 `AlembicTest` 测试单；037 进入总控归档。
 
 ### Test-2026-05-26-12：VAD-P4-Single-Window-Visible-Heartbeat-Validation
 

@@ -88,3 +88,44 @@ test("send-eligible nonstandard coverage row fails closed", () => {
   assert.notEqual(result.status, 0);
   assert.match(`${result.stdout}\n${result.stderr}`, /unexpected send-eligible dispatch window: custom-worker/);
 });
+
+test("armed Alembic window remains send-covered after automation creation", () => {
+  const root = createFixture("");
+  writeFile(
+    path.join(root, "docs/workspace/current/example-plan.md"),
+    `
+# Example Plan
+
+状态：执行中（已 arm）
+发送给：\`Alembic\`
+
+## 窗口分派
+
+发送给：\`Alembic\`
+
+| 窗口 / 状态 | 任务 |
+| --- | --- |
+| \`Alembic\`<br>已 arm | 目标 heartbeat 已创建，等待 claim。 |
+| \`AlembicCore\`<br>观察中 | 当前不发送。 |
+| \`AlembicAgent\`<br>无任务 | 当前不发送。 |
+| \`AlembicDashboard\`<br>无任务 | 当前不发送。 |
+| \`AlembicPlugin\`<br>无任务 | 当前不发送。 |
+| \`AlembicTest\`<br>无任务 | 当前不发送。 |
+| \`BiliDili\`<br>无任务 | 不改真实项目源码。 |
+
+## 可复制提示词
+
+发送给：\`Alembic\`
+
+\`\`\`text
+先读取 AGENTS.md、docs/workspace/index.md、docs/workspace/current/example-plan.md，以及你所在窗口/目标仓库的 AGENTS.md。
+先明确声明当前窗口定位和本轮仓库职责。
+\`\`\`
+`,
+  );
+
+  const result = runCheck(root);
+
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Send prompts to: Alembic/);
+});

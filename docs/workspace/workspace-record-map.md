@@ -99,6 +99,7 @@
 ## Archive Topics
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/plugin-intent-knowledge-route` | [plugin-intent-knowledge-route](archive/2026-05/plugin-intent-knowledge-route/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/workspace-control-architecture-refresh` | [workspace-control-architecture-refresh](archive/2026-05/workspace-control-architecture-refresh/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/visible-automation-dispatch` | [visible-automation-dispatch](archive/2026-05/visible-automation-dispatch/) | 已归档 13 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/llm-input-optimization` | [llm-input-optimization](archive/2026-05/llm-input-optimization/) | 已归档 8 个 workspace 文档；当前索引只保留目录入口。 |

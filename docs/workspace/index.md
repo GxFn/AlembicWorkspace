@@ -15,8 +15,8 @@
 
 | 类型 | 文档 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 当前计划 | [current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](current/plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md) | 执行中（无人值守 Stage 1 最小代码链路待启动） | GTODO-2026-05-24-037 / Plugin intent knowledge route：Stage 0 代码事实基线已验收；当前无人值守继续 Stage 1 最小代码链路，发送给 AlembicPlugin / Alembic，不派 AlembicTest，不启动 038/039，不提前做 search/vector/PrimeInjectionPackage。 |
-| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 执行中（无人值守 Stage 1 最小代码链路待启动） | 037 Stage 0 已通过总控验收；当前无人值守继续 Stage 1，发送给 AlembicPlugin / Alembic。 |
+| 当前计划 | [current/codex-control-workspace-extraction-2026-05-27.md](current/codex-control-workspace-extraction-2026-05-27.md) | 执行中（codex-control-workspace 抽取） | 通用 codex-control-workspace 抽取当前执行中：先归档 037，再提交 AlembicWorkspace 基线，随后初始化并推送 GxFn/codex-control-workspace。 |
+| 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 执行中（codex-control-workspace 抽取） | 037 已完成并归档；当前主线切换为 codex-control-workspace 通用仓库抽取。 |
 | GTODO 037 Intent Recognition Design | [../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md](../../AlembicDesign/docs/current/intent-recognition-episode-continuity-requirement-design-2026-05-26.md) | 已接收 | 037 第一阶段需求设计：prime 快速路径结构化意图、hostTurnMeta、IntentEpisode 连续性和本地 refinement 边界。 |
 | GTODO 037 Intent Knowledge Design | [../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md](../../AlembicDesign/docs/current/plugin-intent-knowledge-route-requirement-design-2026-05-26.md) | 已接收 | 037 第二阶段需求设计：IntentSearchPlan、keyword / vector / relation 增强和保留 source refs 的 PrimeInjectionPackage。 |
 | PCVM Alembic nested evidence consumer extraction 回填 | [../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md](../Alembic/progressive-chain-validation-n9-observability-linkage-2026-05-25.md) | 总控验收通过 | `Alembic` 提交 ae9531ac3315a4491e22e3df156cb05e13fc0879，修复 nested `metadata.pcvNodeEvidence.nodeId/chainNodeId/sourceRefs` 消费并补 nested-only unit。 |
@@ -78,16 +78,16 @@
 
 ## 窗口覆盖状态
 
-发送给：`AlembicPlugin`、`Alembic`
+发送给：无
 
 | 窗口 / 状态 | 任务 |
 | --- | --- |
-| `Alembic`<br>待启动 | 执行 `G037-STAGE1-ALEMBIC-INTENT-CONSUME`，消费 Plugin intent context 到现有 prime / search pipeline。 |
-| `AlembicCore`<br>观察中 | Stage 1 默认不新增 Core contract，观察是否出现稳定共享结构。 |
-| `AlembicAgent`<br>观察中 | 当前不派发；等 Stage 0 事实显示 Agent runtime 需要参与后再判断。 |
-| `AlembicDashboard`<br>观察中 | 当前不派发；Stage 0 不做 UI。 |
-| `AlembicPlugin`<br>待启动 | 执行 `G037-STAGE1-PLUGIN-HOST-INTENT-FRAME`，实现 Plugin-owned host intent / turn metadata 输入承载。 |
-| `AlembicTest`<br>无任务 | 当前不涉及真实项目验证。 |
+| `Alembic`<br>无任务 | 不发送。 |
+| `AlembicCore`<br>无任务 | 不发送。 |
+| `AlembicAgent`<br>无任务 | 不发送。 |
+| `AlembicDashboard`<br>无任务 | 不发送。 |
+| `AlembicPlugin`<br>无任务 | 不发送。 |
+| `AlembicTest`<br>无任务 | 不发送。 |
 | `BiliDili`<br>无任务 | 不触碰真实项目。 |
 
 ## 状态枚举

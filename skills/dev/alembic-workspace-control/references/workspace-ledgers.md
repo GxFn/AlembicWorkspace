@@ -128,6 +128,7 @@ Use task packages when mainline work and same-window TODOs can be closed togethe
 阻塞点之前还能做：
 验证命令：
 回填要求：
+子 agent 使用建议：可选；仅在当前窗口 / 仓库职责和当前计划边界内使用，最终由当前窗口统一复核和回填。
 执行前置硬规则：
 ```
 

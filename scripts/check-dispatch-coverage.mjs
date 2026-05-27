@@ -14,8 +14,8 @@ const requiredWindows = [
   "AlembicTest",
   "BiliDili",
 ];
-const validStatuses = new Set(["待启动", "执行中", "待验收", "阻塞", "已完成", "暂停", "观察中", "无任务"]);
-const sendEligibleStatuses = new Set(["待启动", "执行中"]);
+const validStatuses = new Set(["待启动", "执行中", "已 arm", "待验收", "阻塞", "已完成", "暂停", "观察中", "无任务"]);
+const sendEligibleStatuses = new Set(["待启动", "执行中", "已 arm"]);
 const blockedStatus = "阻塞";
 const noSendStatuses = new Set(["待验收", "已完成", "暂停", "观察中", "无任务"]);
 

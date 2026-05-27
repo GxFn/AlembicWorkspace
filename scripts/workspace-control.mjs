@@ -47,8 +47,9 @@ Common examples:
   node scripts/workspace-control.mjs sync --write --verify --dispatch
   node scripts/workspace-control.mjs design --id PCVM-2026-05-25 --json
   node scripts/workspace-control.mjs vad status --json
-  node scripts/workspace-control.mjs vad controller --json
+  node scripts/workspace-control.mjs vad controller --compact --json
   node scripts/workspace-control.mjs vad audit --automation-id <id> --json
+  node scripts/workspace-control.mjs vad post-run-audit --json
   node scripts/workspace-control.mjs pipeline --json
 
 Safety:
@@ -238,8 +239,20 @@ function buildVad(options) {
     }
     case "controller":
     case "controller-tick": {
+      assertKnownOptions(rest, ["--json", "--compact"]);
+      return [{
+        label: "visible dispatch controller tick",
+        ...nodeScript("visible-dispatch.mjs", [
+          "controller-tick",
+          ...(hasFlag(rest, "--compact") ? ["--compact"] : []),
+          ...(hasFlag(rest, "--json") ? ["--json"] : []),
+        ]),
+      }];
+    }
+    case "post-run-audit":
+    case "post-run": {
       assertKnownOptions(rest, ["--json"]);
-      return [{ label: "visible dispatch controller tick", ...nodeScript("visible-dispatch.mjs", ["controller-tick", ...(hasFlag(rest, "--json") ? ["--json"] : [])]) }];
+      return [{ label: "visible dispatch post-run audit", ...nodeScript("visible-dispatch.mjs", ["post-run-audit", ...(hasFlag(rest, "--json") ? ["--json"] : [])]) }];
     }
     case "preflight": {
       assertKnownOptions(rest, ["--json", "--from-plan"], ["--group", "--task", "--window"]);
@@ -327,14 +340,22 @@ function buildVad(options) {
       return [{ label: "visible dispatch disable mode", ...nodeScript("visible-dispatch.mjs", out) }];
     }
     case "prune": {
-      assertKnownOptions(rest, ["--write", "--json"]);
+      assertKnownOptions(rest, ["--write", "--json", "--include-current-accepted"]);
       if (!hasFlag(rest, "--write")) {
         fail("vad prune requires --write.");
       }
-      return [{ label: "visible dispatch prune history", ...nodeScript("visible-dispatch.mjs", ["prune-history", "--write", ...(hasFlag(rest, "--json") ? ["--json"] : [])]) }];
+      return [{
+        label: "visible dispatch prune history",
+        ...nodeScript("visible-dispatch.mjs", [
+          "prune-history",
+          ...(hasFlag(rest, "--include-current-accepted") ? ["--include-current-accepted"] : []),
+          "--write",
+          ...(hasFlag(rest, "--json") ? ["--json"] : []),
+        ]),
+      }];
     }
     default:
-      fail(`Unknown vad subcommand: ${subcommand}. Expected status, controller, preflight, audit, group, enable, disable, or prune.`);
+      fail(`Unknown vad subcommand: ${subcommand}. Expected status, controller, preflight, audit, group, enable, disable, post-run-audit, or prune.`);
   }
 }
 
