@@ -49,9 +49,9 @@
 | AlembicDashboard | [../AlembicDashboard/](../AlembicDashboard/) | LLM artifact detail 与 Artifact Drawer Dashboard 回填。 |
 
 ## Archive Topics
-
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/progressive-chain-validation-metrics` | [progressive-chain-validation-metrics](archive/2026-05/progressive-chain-validation-metrics/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/global-todo` | [global-todo](archive/2026-05/global-todo/) | 已完成全局 TODO 和旧同步记录。 |
 | `2026-05/plugin-intent-knowledge-route` | [plugin-intent-knowledge-route](archive/2026-05/plugin-intent-knowledge-route/) | 037 完整主线归档。 |
 | `2026-05/visible-automation-dispatch` | [visible-automation-dispatch](archive/2026-05/visible-automation-dispatch/) | VAD 自动化主线归档。 |
