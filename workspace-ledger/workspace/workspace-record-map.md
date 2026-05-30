@@ -51,8 +51,13 @@
 ## Archive Topics
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
-| `2026-05/progressive-chain-validation-metrics` | [progressive-chain-validation-metrics](archive/2026-05/progressive-chain-validation-metrics/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/artifact-drawer` | [artifact-drawer](archive/2026-05/artifact-drawer/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/workspace-extraction` | [workspace-extraction](archive/2026-05/workspace-extraction/) | 已归档 2 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/codex-automation-closed-loop` | [codex-automation-closed-loop](archive/2026-05/codex-automation-closed-loop/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/ai-mock-removal` | [ai-mock-removal](archive/2026-05/ai-mock-removal/) | 已归档 5 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/workspace-workflow-optimization` | [workspace-workflow-optimization](archive/2026-05/workspace-workflow-optimization/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/progressive-chain-validation-metrics` | [progressive-chain-validation-metrics](archive/2026-05/progressive-chain-validation-metrics/) | 已归档 11 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/global-todo` | [global-todo](archive/2026-05/global-todo/) | 已完成全局 TODO 和旧同步记录。 |
-| `2026-05/plugin-intent-knowledge-route` | [plugin-intent-knowledge-route](archive/2026-05/plugin-intent-knowledge-route/) | 037 完整主线归档。 |
+| `2026-05/plugin-intent-knowledge-route` | [plugin-intent-knowledge-route](archive/2026-05/plugin-intent-knowledge-route/) | 已归档 3 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/visible-automation-dispatch` | [visible-automation-dispatch](archive/2026-05/visible-automation-dispatch/) | VAD 自动化主线归档。 |
 | `2026-05/workspace-control-architecture-refresh` | [workspace-control-architecture-refresh](archive/2026-05/workspace-control-architecture-refresh/) | workspace 控制架构整理归档。 |

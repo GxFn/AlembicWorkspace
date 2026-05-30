@@ -6,7 +6,7 @@
 
 ## 概括
 
-已归档 1 个 workspace 文档；当前索引只保留目录入口。
+已归档 3 个 workspace 文档；当前索引只保留目录入口。
 
 本文件是该归档文件夹的汇总说明和地图清单。历史正文文件作为当时证据快照保留；开发区长期文档只链接到记录地图或本归档目录，不直接散链到具体历史文件。
 
@@ -15,3 +15,4 @@
 | 文件 | 类型 | 说明 |
 | --- | --- | --- |
 | [plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md](plugin-intent-knowledge-route-stage-1-mainline-2026-05-26.md) | archive document | plugin intent knowledge route stage 1 mainline |
+| [plugin-intent-knowledge-route-wave-0-2026-05-26.md](plugin-intent-knowledge-route-wave-0-2026-05-26.md) | wave plan | plugin intent knowledge route wave 0 |

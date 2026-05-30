@@ -1,17 +1,23 @@
 # 2026-05 Archive Summary
 
-状态：精选迁移归档
+状态：归档月份汇总
 维护入口：[workspace-record-map.md](../../workspace-record-map.md)
 
-## 定位
+## 概括
 
-本目录只保存从 `AlembicWorkspace-main` 迁入 `workspace-ledger` 的近期高价值归档。旧全量历史不在这里展开；如需追溯，读取 `codex-control-workspace/AlembicWorkspace-main/` 源副本。
+本文件汇总 2026-05 的 workspace 归档 topic。每个 topic 文件夹的 `index.md` 继续提供该 topic 的概括和文件地图。
 
 ## Topic 地图
 
 | Topic | 说明 |
 | --- | --- |
-| [global-todo](global-todo/) | 已完成全局 TODO 和旧同步记录，用于当前 TODO 连续性。 |
-| [plugin-intent-knowledge-route](plugin-intent-knowledge-route/) | `GTODO-2026-05-24-037` 完整归档，包含 Stage 0 到 Stage 6A 证据链。 |
-| [visible-automation-dispatch](visible-automation-dispatch/) | VAD Wave 1-10、无人值守 controller 和真实循环测试归档。 |
-| [workspace-control-architecture-refresh](workspace-control-architecture-refresh/) | workspace 总控架构整理归档，支撑当前通用仓库抽取。 |
+| [ai-mock-removal](ai-mock-removal/) | 已归档 5 个 workspace 文档；当前索引只保留目录入口。 |
+| [artifact-drawer](artifact-drawer/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| [codex-automation-closed-loop](codex-automation-closed-loop/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| [global-todo](global-todo/) | 已完成全局 TODO 和旧同步记录。 |
+| [plugin-intent-knowledge-route](plugin-intent-knowledge-route/) | 已归档 3 个 workspace 文档；当前索引只保留目录入口。 |
+| [progressive-chain-validation-metrics](progressive-chain-validation-metrics/) | 已归档 11 个 workspace 文档；当前索引只保留目录入口。 |
+| [visible-automation-dispatch](visible-automation-dispatch/) | VAD 自动化主线归档。 |
+| [workspace-control-architecture-refresh](workspace-control-architecture-refresh/) | workspace 控制架构整理归档。 |
+| [workspace-extraction](workspace-extraction/) | 已归档 2 个 workspace 文档；当前索引只保留目录入口。 |
+| [workspace-workflow-optimization](workspace-workflow-optimization/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |

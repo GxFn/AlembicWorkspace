@@ -11,4 +11,4 @@
 
 | 月份 | 说明 |
 | --- | --- |
-| [2026-05](2026-05/) | 精选迁移归档：global TODO、037、VAD、workspace control architecture refresh。 |
+| [2026-05](2026-05/) | 10 个 topic 归档文件夹。 |
