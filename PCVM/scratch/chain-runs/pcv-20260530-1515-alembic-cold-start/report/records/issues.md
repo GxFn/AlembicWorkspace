@@ -12,7 +12,8 @@ Current blocker:
 - Package Q proves Package P removed missing-`description` submit rejects and avoided the Package O continue-nudge/extra-final-round path.
 - Package Q fails the useful-output gate: accepted Recipes fell from O's `7` to Q's `1`, with `5` structured Analyst findings left unsubmitted.
 - PCVM root-cause review classifies Q as a source logic issue, not safe random variance: provider-visible `knowledge.submit` schema is too generic, Producer permits round-wasting non-submit actions, and Producer exits after `roundsSinceSubmit >= 3` without checking remaining structured findings.
-- The remaining blocker is Package R source/unit repair in `AlembicAgent`; do not rerun AlembicTest until this repair is implemented and verified.
+- Package R source/unit repair is complete in `AlembicAgent` commit `bcdc8bf`.
+- The remaining blocker is Package S same-input live rerun; verify the repair against the same BiliDili `design-patterns` route before claiming live pass.
 
 Next metric work:
 
@@ -299,7 +300,7 @@ Required next action:
 
 ## Open Issue: Producer Coverage Stops Before Structured Findings Are Submitted
 
-Status: `failed(scope=live-ai-local, package=Q); diagnosed(scope=source-logic); blocked(scope=source-unit-repair, package=R)`
+Status: `failed(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); blocked(scope=same-input-live-rerun, package=S)`
 
 Evidence:
 
@@ -310,10 +311,19 @@ Evidence:
 - The tracker does not know the structured finding obligation count, so it cannot distinguish "finished" from "stalled while work remains".
 - Provider-visible `knowledge` schema is generic `action`/`params`; action-specific required fields such as `title` are enforced only by runtime validation after the failed call.
 
+Package R repair:
+
+- `PipelineStrategy` now derives Producer `targetSubmits` from structured findings.
+- `STRATEGY_PRODUCER` / `ExplorationTracker` require target coverage before idle/text completion.
+- `ToolExecutionPipeline` blocks `knowledge.detail`, `meta.tools`, terminal/search/graph, and other non-submit drift during Producer PRODUCE.
+- Lightweight tool schemas expose action-specific required params, including `knowledge.submit` `title`, `description`, `content.markdown`, `content.rationale`, and `reasoning.sources`.
+- Producer prompts now repeat the same required-field contract.
+- Verified by targeted and full AlembicAgent source/unit tests; committed as `bcdc8bf`.
+
 Required next action:
 
-- Package R source/unit repair must add Producer candidate-obligation coverage and required-field visibility before another live rerun.
-- Repair should prevent `detail/meta/meta` after one accepted candidate from forcing `SUMMARIZE` while structured findings remain.
+- Package S live rerun must determine whether the repair prevents `detail/meta/meta` after one accepted candidate from forcing `SUMMARIZE` while structured findings remain.
+- Do not mark the LLM token run passed until Package S shows useful-output coverage and token/unit metrics are acceptable.
 
 ## Open Issue: Provider-Input Projection Is Reactive After Peak
 

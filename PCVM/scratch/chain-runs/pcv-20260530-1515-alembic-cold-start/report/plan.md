@@ -3,8 +3,8 @@
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Target: reduce duplicated and oversized LLM input/output in Alembic cold-start stages through one unified I/O design
 Owner: `PCVM`
-Current phase: `llm-stage-token-efficiency-package-q-root-cause-diagnosed`
-Status: `fail(scope=live-ai-local, package=Q); diagnosed(scope=source-logic, package=Q); blocked(scope=producer-coverage-source-unit-repair, package=R)`
+Current phase: `llm-stage-token-efficiency-package-r-source-unit-repaired`
+Status: `fail(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); blocked(scope=same-input-live-rerun, package=S)`
 
 ## Controller Snapshot
 
@@ -23,7 +23,7 @@ Current evidence:
 
 Current segment: `llm-stage-token-efficiency-live-verdict-and-output-contract`.
 
-First blocker: Package Q live evidence failed useful-output coverage. It proves Package P removed missing-`description` rejects and avoided the Package O completion-after-continue loop, but accepted Recipes collapsed from O's `7` to Q's `1`; `5` structured Analyst findings remained unsubmitted after Producer spent rounds on `knowledge.detail` and `meta.tools`, then hit `SUMMARIZE`. PCVM root-cause review classifies this as a source logic issue, not safe random variance: `knowledge.submit` required fields are not provider-visible enough, Producer allows non-submit tool actions, and Producer exits after `roundsSinceSubmit >= 3` without checking remaining structured finding obligations. The next blocker is Package R source/unit repair; do not re-run AlembicTest before this repair is packaged and verified.
+First blocker: Package R source/unit repair is implemented and verified in `AlembicAgent` commit `bcdc8bf`. It addresses the Package Q useful-output failure by making Producer aware of structured finding submit targets, blocking non-submit Producer drift (`knowledge.detail`, `meta.tools`, terminal/search/graph) during PRODUCE, surfacing action-specific `knowledge.submit` required params in lightweight schemas, and strengthening Producer required-field prompts. The next blocker is Package S same-input live rerun; do not call Q pass, and do not reopen SourceRef.
 
 ## Non-Goals
 
@@ -754,8 +754,41 @@ PCVM conclusion:
   - `STRATEGY_PRODUCER` transitions to `SUMMARIZE` after `submitCount > 0 && roundsSinceSubmit >= idleRoundsToExit`, without checking remaining structured findings.
 - The next repair is Package R source/unit: make required submit fields provider-visible, constrain Producer non-submit actions, and add candidate-obligation tracking before another live rerun.
 
+### Package R: Producer Coverage Source/Unit Repair
+
+Owner repo: `AlembicAgent`
+
+Goal: repair the deterministic source causes that let Package Q stop after `1/6` structured findings.
+
+Status: `repaired(scope=source-unit-fixture); blocked(scope=Package-S-live-rerun)`
+
+Implemented source outcomes:
+
+- `PipelineStrategy` derives `targetSubmits` from `gateArtifact.findings.length` for the Producer stage.
+- `STRATEGY_PRODUCER` and `ExplorationTracker` no longer accept idle/text completion while `submitCount < targetSubmits`.
+- `NudgeGenerator` tells Producer exactly how many structured findings remain and forbids `detail/tools/plan` drift.
+- `ToolExecutionPipeline` adds `producerSubmitOnlyGate`: Producer PRODUCE allows only `knowledge.submit`, narrow `code.read`, `memory.recall`, and `meta.review`; SUMMARIZE disables tools.
+- `generateLightweightSchemas()` now includes action-specific required params in `params.description`, including nested `content.markdown`, `content.rationale`, and `reasoning.sources`.
+- Producer system/capability/retry prompts now make `title`, `description`, `content.markdown`, `content.rationale`, and `reasoning.sources` explicit pre-submit fields.
+
+Source/unit verification:
+
+- `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts` passed; 2 files, 29 tests.
+- `npm test -- test/ContextWindow.test.ts test/evidence-recording-phase-chain.test.ts test/AgentRuntime.test.ts` passed; 3 files, 29 tests.
+- `npm test` passed; 28 files, 174 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+- `npm run lint:core-import-boundary` passed.
+- `git diff --check` passed.
+- Commit: `AlembicAgent` `bcdc8bf` (`Repair producer coverage controls`).
+
+PCVM reading:
+
+- Package R is not live evidence. It proves the deterministic state machine/tool schema/tool boundary repair is in place.
+- Package S must use the same BiliDili `design-patterns` one-dimension/no-delivery route and inspect whether Producer now covers all structured findings without missing-field rejects or non-submit drift.
+
 ## Scoped Verdict
 
-Verdict: `fail(scope=live-ai-local, package=Q); diagnosed(scope=source-logic, package=Q); blocked(scope=producer-coverage-source-unit-repair, package=R)`
+Verdict: `fail(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); blocked(scope=same-input-live-rerun, package=S)`
 
-Next action: Package R source/unit repair in `AlembicAgent`. Do not reopen SourceRef and do not run another AlembicTest package until Producer coverage repair is implemented and verified.
+Next action: Package S same-input live rerun in `AlembicTest`, after ensuring runtime uses `AlembicAgent` commit `bcdc8bf`. Do not reopen SourceRef and do not add unrelated metrics or guardrails.

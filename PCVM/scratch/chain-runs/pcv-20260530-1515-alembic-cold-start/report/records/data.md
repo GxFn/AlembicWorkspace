@@ -211,6 +211,42 @@ PCVM reading:
 - Package Q fails the route because Producer converted only `1/6` structured findings into accepted Recipes.
 - Next repair must be Package R source/unit in `AlembicAgent`; do not request another AlembicTest live run before Producer coverage and submit field contracts are repaired.
 
+## Package R Source/Unit Repair Evidence
+
+Evidence scope: `source-unit-fixture`
+
+Owner repo: `AlembicAgent`
+
+Source commit:
+
+- `bcdc8bf` — `Repair producer coverage controls`
+
+Source changes:
+
+- `PipelineStrategy` now sets Producer `targetSubmits` from the structured Analyst finding count in `gateArtifact.findings`.
+- `STRATEGY_PRODUCER` and `ExplorationTracker` require the target submit count before idle/text completion can move Producer to `SUMMARIZE`.
+- `NudgeGenerator` emits remaining-submit guidance such as `已提交 X/Y 个结构化发现候选`, and explicitly forbids `detail/tools/plan` drift.
+- `ToolExecutionPipeline` blocks Producer non-submit exploration during PRODUCE; allowed actions are `knowledge.submit`, narrow `code.read`, `memory.recall`, and `meta.review`.
+- `generateLightweightSchemas()` now exposes action-specific required params in the provider-visible `params.description`; for `knowledge.submit` this includes `title`, `description`, `content.markdown`, `content.rationale`, and `reasoning.sources`.
+- Producer prompts/capability/retry text now explicitly lists `title`, `description`, `content.markdown`, `content.rationale`, and `reasoning.sources` as required before `knowledge.submit`.
+
+Targeted verification:
+
+| Repo | Command | Result | PCVM reading |
+| --- | --- | --- | --- |
+| `AlembicAgent` | `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts` | pass; 2 files, 29 tests | Covers Producer target coverage, blocked `knowledge.detail` / `meta.tools`, and schema/prompt submit required fields. |
+| `AlembicAgent` | `npm test -- test/ContextWindow.test.ts test/evidence-recording-phase-chain.test.ts test/AgentRuntime.test.ts` | pass; 3 files, 29 tests | Runtime/evidence chain still passes after Producer gate insertion. |
+| `AlembicAgent` | `npm test` | pass; 28 files, 174 tests | Full Agent suite passes. |
+| `AlembicAgent` | `npm run build` | pass | TypeScript compile passes. |
+| `AlembicAgent` | `npm run lint` | pass | Biome checks 246 files. |
+| `AlembicAgent` | `npm run lint:core-import-boundary` | pass | Core import boundary still uses package entry correctly. |
+| `AlembicAgent` | `git diff --check` | pass | No whitespace errors before commit. |
+
+PCVM reading:
+
+- Package R repairs the source/unit causes exposed by Package Q.
+- It does not prove live token or useful-output metrics. Package S must rerun the same BiliDili route and verify Producer covers all structured findings without missing-field rejects, non-submit drift, or extra final rounds.
+
 ## Current LLM Token Efficiency Source/Unit Baseline
 
 Evidence scope: `source-unit-fixture`
