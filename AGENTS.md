@@ -163,14 +163,15 @@
 - 总控允许为了效率派发较大的同窗口任务包；执行窗口可以在自己的窗口 / 仓库职责和当前计划边界内，自行判断是否开启 Codex 子 agent 分担代码调研、实现、测试或文档梳理。子 agent 不能跨窗口代领、不能绕过目标仓库 `AGENTS.md`、不能替代执行窗口最终复核和回填；总控仍只验收该窗口统一提交的原始证据。
 - Codex Automation Closed Loop 模式下，脚本只产生 `ControllerDispatchPacket`、`DeliveryEnvelope` 和 `TargetResultEnvelope` 等机械信封，不代表当前窗口获得其它窗口职责，也不代表任务已被总控接受。
 - 总控窗口拥有 automation 合规审计和删除权。任何当前 automation 若无法对应当前用户目标、当前总控计划、合法 dispatch group / task、目标窗口、真实 thread id、`AlembicTest` 边界或一次性投递策略，必须删除并记录原因；不得为了“不中断自动化”保留不合规循环。
-- 自动化开启只表示当前总控计划允许无人值守投递 / 回跳，不表示用户在电脑前的普通讨论、Design 需求设计、总控决策讨论或单窗口开发都自动进入无人值守循环。每次仍按最新用户输入和当前窗口职责判断。
+- direct thread dispatch 是正常工作流水线；自动化开启只表示当前总控计划允许无人值守持续闭环，不表示用户在电脑前的普通讨论、Design 需求设计、总控决策讨论或单窗口开发都自动进入无人值守循环。每次仍按最新用户输入和当前窗口职责判断。
+- 一旦用户明确开启无人值守自动化，默认进入 continuous / infinite loop 形态：总控在已确认最终目标、完成定义、仓库边界和可领取 TODO 内持续 review result、拉原始证据、裁决、补计划、创建下一批 dispatch 并继续 direct thread 投递；不得把阶段完成、计划刷新或“给用户看下一阶段计划”当成默认停点。停止条件只能是最终目标完成、硬门禁、用户停止、无可领取 TODO、证据不足必须人工裁决或当前计划明确禁止继续。
 - 新闭环默认入口是 `cd codex-control-workspace && node scripts/codex-automation-loop.mjs`。常用命令语义：`create-dispatch` 只创建总控分派包；`build-delivery` 只创建投递信封；`submit-result` 只记录子窗口结果信封；`review-results` 只判断是否齐件和是否需要总控拉证据；`stop-loop` 只关闭后续投递意图。任何命令都不能替代总控验收。
-- 正常启动 / 续跑优先走轻量闭环：总控先决定任务包和目标窗口，再生成 dispatch packet / delivery envelope；delivery adapter 只按信封创建 heartbeat；子窗口返回 result envelope；总控再 pull 原始证据裁决。不要把完整 preflight、全量 verify、长审计当作每次启动前置。
-- macOS 防睡眠只属于 delivery support。若自动化需要无人值守但防睡眠启动或停止失败，必须报告为自动化就绪风险，不得假装可靠。
-- heartbeat 提示词必须是轻量唤醒信封，只放动态变量、规则名和对应 skill 指向；首行必须是任务语义，例如“继续当前窗口任务”或“继续总控验收”，不得以旧机制名开头抢占 UI 第一视线；不得把完整命令手册复制进提示词。
+- 正常启动 / 续跑优先走轻量闭环：总控先决定任务包和目标窗口，再生成 dispatch packet / delivery envelope；delivery adapter 使用 direct thread dispatch；缺真实 thread id、host send 能力不可用或目标线程不可投递时必须 fail closed 回到总控裁决，不创建旧 automation 投递路线；子窗口返回 result envelope；总控再 pull 原始证据裁决。不要把完整 preflight、全量 verify、长审计当作每次启动前置。
+- macOS keep-live / 防睡眠只属于无人值守 automation support，不是任务逻辑、投递 transport 或验收证据。若用户明确开启自动化，应同时开启 keep-live；若 keep-live 启动或停止失败，必须报告为自动化就绪风险，不得假装可靠。
+- direct thread 提示词必须是轻量唤醒信封，只放动态变量、规则名和对应 skill 指向；首行必须是任务语义，例如“继续当前窗口任务”或“继续总控验收”，不得以机制名开头抢占 UI 第一视线；不得把完整命令手册复制进提示词。direct send 成功只证明投递，不证明任务完成。
 - 目标窗口只能执行 dispatch packet 指定给自己窗口的任务，并返回 `TargetResultEnvelope`；不得代领、代验、代写其它窗口结果，也不得从 result envelope 推导自己获得下一窗口或总控职责。
-- 子窗口默认不创建目标窗口下一跳 heartbeat。多窗口 fan-out、补证、重派或进入下一阶段，都由总控在 review 后决定；但当 delivery envelope 的 `returnRoute=controller` 且 `review-results` 显示本组结果已齐件或阻塞时，目标窗口只允许用 `build-controller-return` 创建一次总控回跳，这不是目标窗口下一跳。
-- `AlembicTest` 下一跳默认由总控调起；非 `AlembicTest` 窗口不得创建、处理或验证 `AlembicTest` heartbeat，除非当前计划和 delivery envelope 同时显式授权该例外。
+- 子窗口默认不创建目标窗口下一跳 delivery。多窗口 fan-out、补证、重派或进入下一阶段，都由总控在 review 后决定；但当 delivery envelope 的 `returnRoute=controller` 且 `review-results` 显示本组结果已齐件或阻塞时，目标窗口只允许用 `build-controller-return` 创建一次总控回跳，这不是目标窗口下一跳。
+- `AlembicTest` 下一跳默认由总控调起；非 `AlembicTest` 窗口不得创建、处理或验证 `AlembicTest` delivery，除非当前计划和 delivery envelope 同时显式授权该例外。
 - thread id 必须是真实 Codex thread id，只能保存在 `codex-control-workspace/.workspace-local/` 下的本地运行态；不得把 thread id 写入 tracked 文档、GitHub、提示词或回填正文。严禁使用 `current-codex-thread`、`current thread`、`<thread id>`、`unknown`、说明文字或任何占位符登记窗口。
 - 旧 `claim / finish / chain-next / start-plan / resume-plan` 路线已退场；新的自动化闭环只能使用 `codex-automation-loop.mjs` 的 dispatch packet / delivery envelope / target result envelope 协议。
 

@@ -3,8 +3,8 @@
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Target: reduce duplicated and oversized LLM input/output in Alembic cold-start stages through one unified I/O design
 Owner: `PCVM`
-Current phase: `llm-stage-token-efficiency-package-r-source-unit-repaired`
-Status: `fail(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); blocked(scope=same-input-live-rerun, package=S)`
+Current phase: `stopped-by-user-after-package-t-source-unit-repair`
+Status: `stopped-by-user(scope=active-pcvm); historical-evidence-retained(package=S/T)`
 
 ## Controller Snapshot
 
@@ -23,7 +23,7 @@ Current evidence:
 
 Current segment: `llm-stage-token-efficiency-live-verdict-and-output-contract`.
 
-First blocker: Package R source/unit repair is implemented and verified in `AlembicAgent` commit `bcdc8bf`. It addresses the Package Q useful-output failure by making Producer aware of structured finding submit targets, blocking non-submit Producer drift (`knowledge.detail`, `meta.tools`, terminal/search/graph) during PRODUCE, surfacing action-specific `knowledge.submit` required params in lightweight schemas, and strengthening Producer required-field prompts. The next blocker is Package S same-input live rerun; do not call Q pass, and do not reopen SourceRef.
+First blocker: none for active PCVM, because the user has cancelled `GTODO-2026-05-25-003 / PCVM` as an active task. Package T source/unit repair is retained as historical evidence only: it preserves capability action constraints through provider schema projection, adds action-level runtime allowlist enforcement, keeps compact submit payload completeness semantics, and injects a runtime-owned Producer submit ledger for final summaries. Do not start Package U same-input live rerun unless the user explicitly reopens PCVM.
 
 ## Non-Goals
 
@@ -760,7 +760,7 @@ Owner repo: `AlembicAgent`
 
 Goal: repair the deterministic source causes that let Package Q stop after `1/6` structured findings.
 
-Status: `repaired(scope=source-unit-fixture); blocked(scope=Package-S-live-rerun)`
+Status: `repaired(scope=source-unit-fixture); fixed(scope=live-ai-local-coverage, package=S); superseded-by-contract-unification-blocker(package=T)`
 
 Implemented source outcomes:
 
@@ -785,10 +785,98 @@ Source/unit verification:
 PCVM reading:
 
 - Package R is not live evidence. It proves the deterministic state machine/tool schema/tool boundary repair is in place.
-- Package S must use the same BiliDili `design-patterns` one-dimension/no-delivery route and inspect whether Producer now covers all structured findings without missing-field rejects or non-submit drift.
+- Package S used the same BiliDili `design-patterns` one-dimension/no-delivery route and supersedes this blocker with live evidence.
+
+### Package S: Same-Input Live Rerun Design Root-Cause Audit
+
+Owner repo: `PCVM` diagnosis over `AlembicAgent` / `AlembicCore` source and `AlembicTest` raw evidence
+
+Goal: read Package S raw evidence and confirm whether remaining failures are occasional/live-noise or design-level source causes.
+
+Status: `partial(scope=live-ai-local); diagnosed(scope=design-root-cause); blocked(scope=Package-T-contract-unification)`
+
+Live evidence:
+
+- AlembicTest raw dir: `../AlembicTest/tmp/pcvm-package-s-same-input-live-rerun-2026-05-31`.
+- Job/session: `bootstrap_mptshl7z_b66ab16d` / `bs_1780232538380_vo8e6m`.
+- Timeline classification says `ok=true`, `classification=pass`, but PCVM classifies it as partial, not final pass.
+- Retained events: `72` (`llm.input=24`, `llm.output=24`, `llm.reflection=12`).
+- Stage counts: analyze `16` inputs / `16` outputs; produce `7` inputs / `7` outputs.
+- Job result: `extracted=6`, `created=6`, `degraded=false`, `toolCallCount=42`.
+- Token usage: input `246703`, output `22825`, reasoning `5922`, total model `275450`, per created Recipe `45908.33`.
+- QualityGate total score: `98`.
+
+Confirmed improvements:
+
+- Package S fixes the Package Q useful-output collapse: Producer created `6/6` structured findings.
+- Missing-`description` rejects did not recur.
+- Candidate files are persisted with full required payload fields.
+
+Confirmed remaining problems:
+
+- Producer still attempts invalid actions after submit coverage: `knowledge.detail` and `knowledge.manage` are visible in retained inputs and blocked by `producerSubmitOnlyGate`.
+- Provider-visible schemas still expose broad actions: `knowledge.search/submit/detail/manage` and `meta.tools/plan/review`, even though `BootstrapProduce.allowedTools` only allows `knowledge.submit` and `meta.review`.
+- Final Producer summary falsely says candidates were submitted with only partial fields; persisted candidate files prove full payloads exist.
+- One candidate contains `aactor` typos while still receiving grade `A`, proving current quality scoring is structural rather than exact-code validation.
+
+Root cause:
+
+- Action-level capability constraints are declared in `BootstrapProduce.allowedTools`, but `CapabilityV2.tools`, `AgentRuntime.#collectTools()`, and `V2CapabilityCatalog.generateSchemas()` reduce them to tool ids and expand back to all registered actions.
+- Runtime gates enforce Producer constraints after bad actions are selected, so they are safety nets rather than the provider-visible source of truth.
+- `ContextWindow.compactKnowledgeArgsForProviderHistory()` removes submit payload fields for token savings, but no compact semantic ledger preserves `requiredFieldsComplete` / `payloadStored` facts.
+- Final summaries reconstruct completion from compressed conversation history instead of runtime-owned submit state.
+- `knowledge.submit` validation and `QualityScorer` check field presence, length, structure, and provenance, not exact-source code correctness.
+
+PCVM reading:
+
+- Package S is a useful live improvement but not a clean pass.
+- The repeated failures are systemic design fragmentation across prompt, provider schema, runtime gate, tracker, history compaction, persistence, quality scoring, and final summary.
+- The next step must be Package T contract-unification, not another temporary Producer-only patch.
+
+Evidence record:
+
+- `records/package-s-root-cause-design-audit.md`
+
+### Package T: Stage Capability Action Contract And Submit Ledger Repair
+
+Owner repo: `AlembicAgent`
+
+Goal: repair Package S's design root cause at the source/unit level, without a Producer-only ad hoc patch.
+
+Status: `repaired(scope=source-unit-fixture); stopped-by-user(scope=active-pcvm)`
+
+Implemented source outcomes:
+
+- `AgentRuntime` now carries a `RuntimeToolContract` containing tool ids and action allowlists.
+- `V2CapabilityCatalog` now exposes action-aware schema projection methods and can render schemas from `Record<tool, action[]>`.
+- Producer `knowledge_production` provider schema now exposes `knowledge.submit`, `code.read`, `memory.recall`, and `meta.review`, not broad actions such as `knowledge.detail/manage/search` or `meta.tools/plan`.
+- Direct `note_finding` is only added when `memory.note_finding` is allowed; Producer has `memory.recall`, so direct `note_finding` is no longer leaked to Producer.
+- `ToolExecutionPipeline.allowlistGate` checks action-level allowlists before execution, aligning runtime blocking with the provider schema contract.
+- Compacted `knowledge.submit` provider history now carries a small `payloadSummary` with `requiredFieldsComplete`, `sourceCount`, omitted fields, and `contentOmittedForProviderHistory=true`.
+- Producer successful submit creates `_producerSubmitLedger` entries with `payloadStored`, `requiredFieldsComplete`, `sourceCount`, status, title, trigger, and target count when available.
+- `LLMInputAssembly` injects the compact `producerSubmitLedger` as the final-summary source of truth.
+- Diagnostics record `allowedToolActions` with stage toolsets.
+
+Source/unit verification:
+
+- `npm test -- test/tool-v2-contract.test.ts test/llm-input-layering.test.ts test/ContextWindow.test.ts test/ExplorationStrategies.test.ts` passed; 4 files, 45 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+- `npm test` passed; 28 files, 177 tests.
+- `npm run lint:core-import-boundary` passed.
+- `git diff --check` passed.
+
+PCVM reading:
+
+- Package T repairs the source/unit causes behind Package S's schema leak and final-summary misread.
+- This is not live evidence. The formerly proposed Package U same-input live rerun is not active after the user cancelled PCVM; retain this as historical source/unit evidence only.
+
+Evidence record:
+
+- `records/package-t-contract-unification-repair.md`
 
 ## Scoped Verdict
 
-Verdict: `fail(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); blocked(scope=same-input-live-rerun, package=S)`
+Verdict: `stopped-by-user(scope=active-pcvm); historical-evidence-retained(package=S/T)`
 
-Next action: Package S same-input live rerun in `AlembicTest`, after ensuring runtime uses `AlembicAgent` commit `bcdc8bf`. Do not reopen SourceRef and do not add unrelated metrics or guardrails.
+Next action: none. Do not launch Package U or any new PCVM live rerun unless the user explicitly reopens PCVM with a new goal and completion definition.

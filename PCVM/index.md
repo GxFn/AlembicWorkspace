@@ -1,6 +1,6 @@
 # PCVM Workspace
 
-状态：artifact 工作面 / LLM 阶段 token efficiency 已完成 Package R Producer 覆盖率 source/unit 修复并提交；下一步阻塞在 Package S same-input live rerun；工具与终端使用基线已基于 AlembicTest 报告完成 controlled baseline helper 修复
+状态：artifact 证据保留 / `GTODO-2026-05-25-003 / PCVM` 已按用户裁决从活跃 TODO 删除；LLM token run 历史停在 Package T source/unit 修复，Package U same-input live rerun 不再作为当前下一步
 
 ## 定位
 
@@ -10,7 +10,7 @@
 
 | Run ID | 目标 | 主产物 | 状态 |
 | --- | --- | --- | --- |
-| `pcv-20260530-1515-alembic-cold-start` | Reduce duplicated and oversized LLM input/output in Alembic cold-start stages | [scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md) | `fail(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); blocked(scope=same-input-live-rerun, package=S)` |
+| `pcv-20260530-1515-alembic-cold-start` | Reduce duplicated and oversized LLM input/output in Alembic cold-start stages | [scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md) | `stopped-by-user(scope=active-pcvm); historical-evidence-retained(package=S/T)` |
 | `pcv-20260531-1506-tool-terminal-usage-baseline` | Establish baseline facts and key metrics for current tool and terminal usage before optimization | [scratch/chain-runs/pcv-20260531-1506-tool-terminal-usage-baseline/report/plan.md](scratch/chain-runs/pcv-20260531-1506-tool-terminal-usage-baseline/report/plan.md) | `repair-implemented(scope=alembictest-controlled-baseline-helper); blocked(scope=historical-all-session-baseline)` |
 
 ## 说明文档
@@ -39,6 +39,8 @@ LLM token efficiency run:
 - [package-o-structure-self-check.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-o-structure-self-check.md)：Package O 全量逐条 input/output/reflection 产出阅读、自检和 live verdict。
 - [package-q-failure-root-cause.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-q-failure-root-cause.md)：Package Q live 失败 root-cause，区分偶发模型选择与确定性代码逻辑缺口。
 - [package-r-source-unit-repair.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-r-source-unit-repair.md)：Package R Producer 覆盖率、submit 字段可见性和工具边界 source/unit 修复证据。
+- [package-s-root-cause-design-audit.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-s-root-cause-design-audit.md)：Package S live raw evidence 与真实源码链路根因审计；确认剩余问题是设计契约断层，不再打临时补丁。
+- [package-t-contract-unification-repair.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-t-contract-unification-repair.md)：Package T stage capability/action contract、runtime action gate、compact submit ledger 与 final summary source-of-truth source/unit 修复证据。
 
 旧轮次、旧任务包和旧 AI 分析文件已删除，不再作为 PCVM 入口或判断依据。
 
@@ -51,6 +53,6 @@ LLM token efficiency run:
 
 当前默认线路：`S0-intake -> S1-source-chain-map -> S2-plan-artifact -> S3-round-registry -> S4-node-or-round-execution -> S5-record-classification -> S6-engineering-repair-packaging -> S8-verdict-and-next-round`。
 
-当前 LLM token run 下一步：Package R 已在 `AlembicAgent` 修复 Producer 覆盖率与字段契约，提交 `bcdc8bf`。下一步是 Package S same-input live rerun，用同一 BiliDili/design-patterns 路线验证 Package Q 的 `1/6` 覆盖率失败是否消除，同时继续检查 token/unit cost、缺字段 reject、Producer 非 submit 偏航和额外 final round。不要重开 SourceRef，不要新增伪指标。
+当前 LLM token run 状态：Package S/T 记录只作为历史诊断和源码修复证据保留。用户已裁决 `GTODO-2026-05-25-003 / PCVM` 不做并从活跃 TODO 删除，因此 Package U same-input live rerun 不再作为当前下一步；不要重开 SourceRef，不要新增伪指标，不要启动新的 PCVM live gate。
 
 当前工具/终端使用基线 run 下一步：AlembicTest controlled baseline helper 已实现并验证；不要为了造更好看的数字单独重跑 Test。等下一次真实 PCVM Tool/Terminal 任务出现时，用新脚本做 before/after。全历史 baseline 仍阻塞在真实 telemetry source。

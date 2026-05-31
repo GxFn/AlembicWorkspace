@@ -2,7 +2,7 @@
 
 状态：精选迁移记录地图
 维护窗口：codex-control-workspace / Alembic 项目 ledger
-更新日期：2026-05-27
+更新日期：2026-05-31
 
 本文只索引从 `AlembicWorkspace-main` 迁入 `workspace-ledger` 后仍需要继续使用、复盘或近期可能领取的文档。旧全量历史不在本地图引用；需要冷追溯时从 `codex-control-workspace/AlembicWorkspace-main/` 源副本读取，再按需导入。
 
@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | 当前短期工作区 | [current/](current/) | 当前状态、活跃 TODO、测试交流和后续执行计划。 |
 | 当前状态 | [current/workspace-current-status.md](current/workspace-current-status.md) | 当前主线状态、发送名单和活跃观察项。 |
-| 全局 TODO | [current/global-todo-board.md](current/global-todo-board.md) | 活跃 / 观察 TODO；038、039、PCV Wave 4、VAD 后续 bug 均从这里领取。 |
+| 全局 TODO | [current/global-todo-board.md](current/global-todo-board.md) | 活跃 / 观察 TODO；PCVM 已按用户裁决从活跃 TODO 删除，历史只从归档追溯。 |
 | 测试交流 | [current/test-exchange.md](current/test-exchange.md) | 当前测试单和回填证据入口；旧名 `alembic-test-exchange.md` 仅兼容保留。 |
 | 当前短期地图 | [current/index.md](current/index.md) | 当前区文件说明和近期项目入口。 |
 | Design handoff inbox | [current/design-handoff-inbox.md](current/design-handoff-inbox.md) | Design 正规需求交接候选的总控收件箱。 |
@@ -24,8 +24,8 @@
 | `GTODO-2026-05-24-037` Plugin Intent Knowledge Route | 已完成已归档 | [archive/2026-05/plugin-intent-knowledge-route/](archive/2026-05/plugin-intent-knowledge-route/) | Stage 0 代码事实基线到 Stage 6A 真实 smoke 均已验收，是后续 038 / 039 的前置事实。 |
 | `GTODO-2026-05-24-038` Alembic file monitor evolution | 待排期 / 需独立确认 | [requirement design](../requirement-designs/knowledge-evolution-todos/knowledge-evolution-todos-requirement-design-2026-05-26.md) | 需要独立目标确认、代码事实基线和阶段计划；不得自动继承 037 自动化。 |
 | `GTODO-2026-05-24-039` Plugin no-monitor evolution | 待排期 / 需独立确认 | [requirement design](../requirement-designs/knowledge-evolution-todos/knowledge-evolution-todos-requirement-design-2026-05-26.md) | 需要独立确认；不复制 Alembic daemon file monitor。 |
-| `GTODO-2026-05-25-003` Progressive Chain Validation Metrics | Wave 3D 已验收，Wave 4 待裁决 | [current/progressive-chain-validation-metrics-wave-0-2026-05-25.md](current/progressive-chain-validation-metrics-wave-0-2026-05-25.md) | PCV canonical source、consumer cleanup、N9 observability linkage 和 Wave 4 候选入口。 |
 | `GTODO-2026-05-25-005` Visible Automation Dispatch | 已完成待归档 / 后续 bug 优化 | [archive/2026-05/visible-automation-dispatch/](archive/2026-05/visible-automation-dispatch/) | VAD 自动化链路完成；后续只作为 bug / optimization 入队。 |
+| `PLUGIN-ARCHITECTURE-INTERFACE-REFACTOR-2026-05-31` | Stage 0 总控验收通过 / Stage 1+ 待组织 | [AlembicPlugin dossier](../AlembicPlugin/plugin-architecture-interface-contract-dossier-2026-05-31.md) | Plugin architecture interface contract dossier 已回填并通过总控复核；后续按用户裁决组织合并 implementation wave。 |
 | codex-control-workspace extraction | 已完成待归档 | [current/codex-control-workspace-extraction-2026-05-27.md](current/codex-control-workspace-extraction-2026-05-27.md) | 通用控制仓库抽取和配置化补强记录。 |
 
 ## Requirement Designs
@@ -47,10 +47,13 @@
 | AlembicAgent | [../AlembicAgent/](../AlembicAgent/) | PCV N9 producer 和 LLM input optimization 回填。 |
 | AlembicCore | [../AlembicCore/](../AlembicCore/) | 当前只保留 multi-root ProjectScope core contract，用作后续 project-level skill visibility 背景。 |
 | AlembicDashboard | [../AlembicDashboard/](../AlembicDashboard/) | LLM artifact detail 与 Artifact Drawer Dashboard 回填。 |
+| AlembicPlugin | [../AlembicPlugin/plugin-architecture-interface-contract-dossier-2026-05-31.md](../AlembicPlugin/plugin-architecture-interface-contract-dossier-2026-05-31.md) | Plugin architecture interface refactor Stage 0 dossier，作为后续 implementation wave 输入。 |
 
 ## Archive Topics
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/plugin-coldstart-rescan-test-optimization` | [plugin-coldstart-rescan-test-optimization](archive/2026-05/plugin-coldstart-rescan-test-optimization/) | 已归档 2 个 workspace 文档；当前索引只保留目录入口。 |
+| `2026-05/repository-residue-cleanup` | [repository-residue-cleanup](archive/2026-05/repository-residue-cleanup/) | Repository residue cleanup 总控复核与归档。 |
 | `2026-05/artifact-drawer` | [artifact-drawer](archive/2026-05/artifact-drawer/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/workspace-extraction` | [workspace-extraction](archive/2026-05/workspace-extraction/) | 已归档 2 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/codex-automation-closed-loop` | [codex-automation-closed-loop](archive/2026-05/codex-automation-closed-loop/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |

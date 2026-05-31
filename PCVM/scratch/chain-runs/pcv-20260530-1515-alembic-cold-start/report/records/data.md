@@ -2,7 +2,7 @@
 
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Owner: `PCVM`
-Status: `current`
+Status: `historical-evidence-retained`
 
 ## Package M Same-Input Live Evidence
 
@@ -245,7 +245,97 @@ Targeted verification:
 PCVM reading:
 
 - Package R repairs the source/unit causes exposed by Package Q.
-- It does not prove live token or useful-output metrics. Package S must rerun the same BiliDili route and verify Producer covers all structured findings without missing-field rejects, non-submit drift, or extra final rounds.
+- Package S reran the same BiliDili route and supersedes this blocker with live evidence.
+
+## Package S Live Evidence And Design Root-Cause Facts
+
+Evidence scope: `live-ai-local + source-design-audit`
+
+Raw evidence:
+
+- AlembicTest raw dir: `../AlembicTest/tmp/pcvm-package-s-same-input-live-rerun-2026-05-31`.
+- Job/session: `bootstrap_mptshl7z_b66ab16d` / `bs_1780232538380_vo8e6m`.
+- Job JSON: `/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/jobs/bootstrap_mptshl7z_b66ab16d.json`.
+- Artifacts: `/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/job-artifacts/bootstrap_mptshl7z_b66ab16d`.
+- Candidates: `/Users/gaoxuefeng/.asd/workspaces/02a25032/Alembic/candidates/design-patterns/*.md`.
+
+Live metrics:
+
+| Metric | Package S |
+| --- | ---: |
+| timeline classification | `pass` |
+| PCVM classification | `partial(scope=live-ai-local)` |
+| retained events | `72` |
+| `llm.input` / `llm.output` / `llm.reflection` | `24` / `24` / `12` |
+| analyze inputs / outputs | `16` / `16` |
+| produce inputs / outputs | `7` / `7` |
+| extracted / created | `6` / `6` |
+| tool calls | `42` |
+| input / output / reasoning tokens | `246703` / `22825` / `5922` |
+| total model tokens | `275450` |
+| total model tokens / created Recipe | `45908.33` |
+| QualityGate total score | `98` |
+
+Useful-output facts:
+
+- Package S fixed Package Q's useful-output collapse: Producer created all `6/6` structured findings.
+- Candidate files are persisted with full payload fields and grade `A`.
+- Missing-`description` rejects did not recur.
+
+Remaining evidence-backed problems:
+
+- Producer still attempted invalid non-submit actions after submit coverage: retained inputs include `knowledge.detail` and `knowledge.manage` blocked by `producerSubmitOnlyGate`.
+- Provider-visible schemas still expose broad actions such as `knowledge.search/submit/detail/manage` and `meta.tools/plan/review`.
+- Final Producer summary falsely says candidates were submitted with only partial fields, despite full persisted candidate payloads.
+- `singleton-thread-safety-strategy.md` contains `aactor` typo while scoring grade `A`.
+
+Source root-cause facts:
+
+- `BootstrapProduce.allowedTools` declares action-level constraints, but `CapabilityV2.tools`, `AgentRuntime.#collectTools()`, and `V2CapabilityCatalog.generateSchemas()` reduce the contract to tool ids and expand each id back to all registered actions.
+- `generateLightweightSchemas()` can honor action-level allowlists, but the AgentRuntime schema path does not pass the action map.
+- `producerSubmitOnlyGate` blocks invalid actions only after provider selection; it is not the provider-visible source of truth.
+- `ContextWindow.compactKnowledgeArgsForProviderHistory()` removes full submit payload fields and leaves only compact identifiers plus `providerHistoryCompacted: true`.
+- `limitToolResult('knowledge')` keeps submit results short; live success returns status/id/title rather than full field-completeness state.
+- `knowledge.submit` validation and `QualityScorer` validate structure/length/provenance, not exact-source code syntax or snippet equivalence.
+
+PCVM reading:
+
+- Package S is not a clean pass even though raw test classification says pass.
+- The remaining blocker is design fragmentation across prompt, schema, runtime gate, tracker, history compaction, persistence, quality scoring, and final summary.
+- The next package must unify stage capability/action contract and runtime submit-state source of truth before any further live rerun.
+
+## Package T Source/Unit Contract-Unification Repair Evidence
+
+Evidence scope: `source-unit-fixture`
+
+Owner repo: `AlembicAgent`
+
+Source changes:
+
+- `AgentRuntime` now collects `RuntimeToolContract` with tool ids and action allowlists, and records `allowedToolActions` in diagnostics.
+- `V2CapabilityCatalog` supports action-aware schema projection via `toToolSchemasForActions()` and `toMixedSchemasForActions()`.
+- Provider-visible Producer schema now exposes only `knowledge.submit`, `code.read`, `memory.recall`, and `meta.review` for `knowledge_production`.
+- Direct `note_finding` is no longer added unless `memory.note_finding` is allowed.
+- `ToolExecutionPipeline.allowlistGate` blocks disallowed actions by the same runtime action contract.
+- `ContextWindow` compacted `knowledge.submit` history now carries `payloadSummary.requiredFieldsComplete`, `sourceCount`, and omitted field names.
+- `submitDedup` records `_producerSubmitLedger` entries after successful Producer submit.
+- `LLMInputAssembly` injects `producerSubmitLedger` so final summaries can rely on runtime state instead of compacted history.
+
+Targeted verification:
+
+| Repo | Command | Result | PCVM reading |
+| --- | --- | --- | --- |
+| `AlembicAgent` | `npm test -- test/tool-v2-contract.test.ts test/llm-input-layering.test.ts test/ContextWindow.test.ts test/ExplorationStrategies.test.ts` | pass; 4 files, 45 tests | Covers action schema projection, Producer action schema, compact payload summary, submit ledger, and action gate. |
+| `AlembicAgent` | `npm run build` | pass | TypeScript compile passes. |
+| `AlembicAgent` | `npm run lint` | pass | Biome checks 246 files. |
+| `AlembicAgent` | `npm test` | pass; 28 files, 177 tests | Full Agent suite passes. |
+| `AlembicAgent` | `npm run lint:core-import-boundary` | pass | Core import boundary remains valid. |
+| `AlembicAgent` | `git diff --check` | pass | No whitespace errors. |
+
+PCVM reading:
+
+- Package T repairs Package S's schema leak and compact-history semantic-loss causes at source/unit level.
+- It is not live evidence. The formerly proposed Package U rerun is not active after the user cancelled PCVM; retain this entry as historical source/unit evidence only.
 
 ## Current LLM Token Efficiency Source/Unit Baseline
 

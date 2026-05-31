@@ -2,7 +2,7 @@
 
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Owner: `PCVM`
-Status: `current`
+Status: `historical-evidence-retained`
 
 | Date | Actor | Action | Result |
 | --- | --- | --- | --- |
@@ -59,3 +59,9 @@ Status: `current`
 | 2026-05-31 | PCVM | Classified Package Q failure as source logic, not safe random variance. | Root cause: provider-visible `knowledge.submit` schema is generic, required `title` is enforced only after failed call, Producer permits `detail/meta` round waste, and `STRATEGY_PRODUCER` enters `SUMMARIZE` after 3 non-submit rounds without checking remaining structured finding obligations. |
 | 2026-05-31 | PCVM | Implemented Package R source/unit repair in AlembicAgent. | Producer now has structured finding submit targets, Producer non-submit tool drift is blocked, lightweight schemas expose action-specific submit required fields, and Producer prompts/capability text include `title` / `description` / content / reasoning requirements. |
 | 2026-05-31 | PCVM | Verified and committed Package R. | `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts` passed 29 tests; expanded runtime suite passed 29 tests; full `npm test` passed 174 tests; `npm run build`, `npm run lint`, `npm run lint:core-import-boundary`, and `git diff --check` passed; AlembicAgent commit `bcdc8bf`. |
+| 2026-05-31 | AlembicTest | Completed Package S same-input live rerun. | Job `bootstrap_mptshl7z_b66ab16d` / session `bs_1780232538380_vo8e6m`; raw dir `../AlembicTest/tmp/pcvm-package-s-same-input-live-rerun-2026-05-31`; retained events `72`; job created `6/6` candidates. |
+| 2026-05-31 | PCVM | Read Package S raw evidence, persisted candidates, and source implementation chain before any new code patch. | Added `records/package-s-root-cause-design-audit.md`; confirmed Package R fixed the Q useful-output collapse, but remaining failures come from action-level capability contract loss before provider schema, runtime gate as after-the-fact safety net, lossy submit-history compaction, final summary state reconstruction, and structural-only quality scoring. |
+| 2026-05-31 | PCVM | Reclassified next step from live rerun to design-root-cause repair. | Current verdict is `partial(scope=live-ai-local, package=S); diagnosed(scope=design-root-cause); blocked(scope=package-t-contract-unification-design)`; next repair must unify stage capability/action contract and runtime submit ledger, not add another isolated Producer patch. |
+| 2026-05-31 | PCVM | Implemented Package T source/unit contract-unification repair in AlembicAgent. | Provider schema now receives action-level capability allowlists; runtime allowlist gate checks actions; Producer no longer leaks direct `note_finding`; compacted submit history keeps payload completeness semantics; Producer submit ledger is injected as final-summary source of truth. |
+| 2026-05-31 | PCVM | Verified Package T source/unit repair. | `npm test -- test/tool-v2-contract.test.ts test/llm-input-layering.test.ts test/ContextWindow.test.ts test/ExplorationStrategies.test.ts` passed 45 tests; `npm run build`, `npm run lint`, full `npm test` 177 tests, `npm run lint:core-import-boundary`, and `git diff --check` passed. |
+| 2026-05-31 | AlembicWorkspace | Stopped active PCVM continuation per user decision. | `GTODO-2026-05-25-003 / PCVM` is no longer an active TODO; Package S/T records are retained only as historical evidence, and Package U same-input live rerun is not an active next step. |

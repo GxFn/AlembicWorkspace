@@ -2,27 +2,24 @@
 
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Owner: `PCVM`
-Status: `current`
+Status: `historical-evidence-retained`
 
 ## Current LLM Token Efficiency Work
 
-Current blocker:
+Current active blocker:
 
-- Package Q same-input live evidence is `fail(scope=live-ai-local)`, not pass.
-- Package Q proves Package P removed missing-`description` submit rejects and avoided the Package O continue-nudge/extra-final-round path.
-- Package Q fails the useful-output gate: accepted Recipes fell from O's `7` to Q's `1`, with `5` structured Analyst findings left unsubmitted.
-- PCVM root-cause review classifies Q as a source logic issue, not safe random variance: provider-visible `knowledge.submit` schema is too generic, Producer permits round-wasting non-submit actions, and Producer exits after `roundsSinceSubmit >= 3` without checking remaining structured findings.
-- Package R source/unit repair is complete in `AlembicAgent` commit `bcdc8bf`.
-- The remaining blocker is Package S same-input live rerun; verify the repair against the same BiliDili `design-patterns` route before claiming live pass.
+- None. The user cancelled `GTODO-2026-05-25-003 / PCVM` as an active task.
+- Package T source/unit repair in `AlembicAgent` is complete for the contract-unification root causes exposed by Package S, but it is retained only as historical evidence.
+- Package S same-input live evidence remains `partial(scope=live-ai-local)`, not final pass.
+- The formerly proposed Package U same-input live rerun is not active and must not be launched unless the user explicitly reopens PCVM.
+- Exact candidate code-snippet validation remains a separate post-T quality scope; do not mix it into the LLM I/O efficiency gate unless the user expands scope.
 
-Next metric work:
+Historical metric notes:
 
-- AlembicTest rerun is not allowed yet; Package R source/unit repair must come first.
 - Use Package F `inputSizeEstimate` / `inputProjection` metadata to distinguish projected message history, runtime input layer, system prompt, and tool schemas per provider call.
 - Add accepted/submitted Recipe normalized metrics to every live comparison: route input/output/reasoning/total model per accepted Recipe and per submitted Recipe.
 - Add persisted Recipe payload approximate token metrics when local DB or raw artifacts preserve accepted Recipe fields.
-- Keep single-Recipe payload metrics visible: Package Q accepted payload is about `1490` approx tokens, but the route is invalid as a pass candidate because accepted count collapsed.
-- Keep quality constraints visible: Package Q `pcvAnalyzeGroundingInvalidNoEvidence=0`; QualityGate passed with score `88`.
+- Keep Package S useful-output/token facts visible: created `6`, total model tokens `275450`, total model tokens / created Recipe `45908.33`, QualityGate score `98`.
 - Compare only against the same-input route; do not promote live route to final product acceptance.
 - Do not modify BiliDili or any real test project source.
 
@@ -300,7 +297,7 @@ Required next action:
 
 ## Open Issue: Producer Coverage Stops Before Structured Findings Are Submitted
 
-Status: `failed(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); blocked(scope=same-input-live-rerun, package=S)`
+Status: `failed(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); fixed(scope=live-ai-local-coverage, package=S); contract-blocker-repaired(scope=source-unit, package=T); stopped-by-user(scope=active-pcvm)`
 
 Evidence:
 
@@ -320,10 +317,72 @@ Package R repair:
 - Producer prompts now repeat the same required-field contract.
 - Verified by targeted and full AlembicAgent source/unit tests; committed as `bcdc8bf`.
 
+Historical reading:
+
+- Package S proves structured finding coverage is repaired (`6/6` created).
+- Package T repairs the remaining contract blocker at source/unit level. No live rerun is active after the user cancelled PCVM.
+
+## Open Issue: Stage Capability Action Contract Is Not The Provider Schema Source Of Truth
+
+Status: `repaired(scope=source-unit, owner=AlembicAgent, package=T); stopped-by-user(scope=active-pcvm)`
+
+Evidence:
+
+- `BootstrapProduce.allowedTools` declares action-level constraints: `knowledge.submit`, `code.read`, `memory.recall`, `meta.review`.
+- `CapabilityV2.tools` collapses `allowedTools` to tool ids.
+- `AgentRuntime.#collectTools()` collects only tool ids.
+- `AgentRuntime.#getToolSchemas()` passes only ids to `V2CapabilityCatalog`.
+- `V2CapabilityCatalog.generateSchemas()` expands selected ids to all registered actions.
+- Package S Producer inputs show provider-visible `knowledge.search/submit/detail/manage` and `meta.tools/plan/review`.
+- Package S retained inputs show invalid `knowledge.detail` / `knowledge.manage` calls blocked by `producerSubmitOnlyGate`.
+
+Package T repair:
+
+- `V2CapabilityCatalog` now projects provider schemas from an action-aware tool contract instead of expanding selected tool ids to every registered action.
+- `AgentRuntime` preserves `CapabilityV2.tools` action constraints in a runtime tool contract and uses that same contract for provider schema generation.
+- Producer-visible schemas are narrowed to the allowed actions: `knowledge.submit`, `code.read`, `memory.recall`, and `meta.review`.
+- Direct `note_finding` exposure is now conditional on `memory.note_finding`, so Producer no longer receives Analyst-only direct memory actions.
+- `ToolExecutionPipeline` enforces the same action-level allowlist at runtime and exposes action diagnostics for future live comparison.
+
+Historical reading:
+
+- Former Package U verification target was broad schema exposure and invalid Producer action attempts. It is not active after the user cancelled PCVM.
+
+## Open Issue: Submit History Compaction Drops Completion Semantics
+
+Status: `repaired(scope=source-unit, owner=AlembicAgent, package=T); stopped-by-user(scope=active-pcvm)`
+
+Evidence:
+
+- `ContextWindow.compactKnowledgeArgsForProviderHistory()` drops full `knowledge.submit` payload fields and keeps only compact identifiers plus `providerHistoryCompacted: true`.
+- `limitToolResult('knowledge')` keeps submit result short; live success exposes status/id/title, not a payload completeness ledger.
+- Package S persisted candidate files contain full payload fields, but final Producer summary falsely says candidates were submitted with only partial fields and need later completion.
+
+Package T repair:
+
+- `ContextWindow.compactKnowledgeArgsForProviderHistory()` now keeps a compact `payloadSummary` for submitted candidates, including `requiredFieldsComplete`, `payloadStored`, `sourceCount`, and omitted-field markers.
+- Successful Producer `knowledge.submit` calls now record a runtime-owned `_producerSubmitLedger` with created count, target submit count, per-candidate status/title/trigger, and completion flags.
+- `LLMInputAssembly` injects the Producer submit ledger into the runtime evidence context and instructs the model to treat it as authoritative instead of inferring field loss from compacted history.
+
+Historical reading:
+
+- Former Package U verification target was live final-summary behavior against compacted provider history and the injected ledger. It is not active after the user cancelled PCVM.
+
+## Open Issue: Candidate Quality Score Does Not Validate Exact Code Snippet Correctness
+
+Status: `open(owner=AlembicAgent/AlembicCore, package=post-T-quality-scope)`
+
+Evidence:
+
+- Package S `singleton-thread-safety-strategy.md` contains `aactor AuthMiddleware` and `aactor WBISigner`.
+- The same candidate receives `_quality.overall=0.89`, grade `A`.
+- `knowledge.submit` validation checks required fields and lengths.
+- `QualityScorer` scores completeness, content depth, delivery readiness, actionability, and provenance; it does not compare snippets against source files or parse Swift syntax.
+
 Required next action:
 
-- Package S live rerun must determine whether the repair prevents `detail/meta/meta` after one accepted candidate from forcing `SUMMARIZE` while structured findings remain.
-- Do not mark the LLM token run passed until Package S shows useful-output coverage and token/unit metrics are acceptable.
+- Keep this as a quality-contract improvement candidate.
+- Do not mix it into Package T's token-efficiency gate unless the user expands scope from LLM I/O efficiency to exact Recipe content validation.
 
 ## Open Issue: Provider-Input Projection Is Reactive After Peak
 
