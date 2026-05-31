@@ -137,7 +137,7 @@ PCVM reading:
 - Package O is partial, not pass.
 - Package O proves Package N fixed two real live behaviors: Analyze final Markdown single-source discipline and Producer direct-code/full-payload replay.
 - Package O fails direct completion termination and reveals Producer submit schema-contract waste.
-- Package P source/unit repair is now complete; Package Q same-input live rerun is required before claiming live pass.
+- Package P source/unit repair supersedes the description/completion blocker; Package Q below is the next live verdict.
 
 ## Package P Source/Unit Repair Evidence
 
@@ -163,8 +163,53 @@ Targeted verification:
 PCVM reading:
 
 - Package P repairs deterministic source/unit causes for the Package O residual Producer waste.
-- Package P is not live evidence. It does not prove route output/reasoning improves.
-- Next live check must rerun the same route and inspect Producer first-completion termination, rejected submit attempts, and preservation of Package O's Analyze/Producer input gains.
+- Package Q live evidence shows the targeted description/completion effects hold, but the route still fails because Producer coverage collapses.
+
+## Package Q Same-Input Live Failure Evidence
+
+Evidence scope: `live-ai-local + source-logic-review`
+
+Raw evidence:
+
+- AlembicTest report: `../AlembicTest/docs/pcvm-package-q-same-input-live-rerun-2026-05-31.md`
+- Raw dir: `../AlembicTest/tmp/pcvm-package-q-same-input-live-rerun-2026-05-31`
+- Job/session: `bootstrap_mptqix3b_9d08f491` / `bs_1780229241375_wkpvcc`
+- Root-cause record: `records/package-q-failure-root-cause.md`
+- Fresh build proof: AlembicAgent commit `603626c`; runtime package resolves to local AlembicAgent.
+
+Same-input live comparison:
+
+| Metric | Package O | Package Q | PCVM reading |
+| --- | ---: | ---: | --- |
+| analyze input | 187313 | 216300 | Q grows due more Analyze rounds. |
+| analyze output | 11410 | 12086 | Slight regression. |
+| Producer input | 86998 | 56793 | Lower because Producer stopped early. |
+| Producer output | 16191 | 4337 | Lower because Producer stopped early. |
+| route total model | 309624 | 295465 | Slightly lower, but not useful because accepted coverage collapsed. |
+| accepted Recipes | 7 | 1 | Fails useful-output gate. |
+| submit attempts / rejected | 11 / 4 | 2 / 1 | Attempts fell because Producer did not finish. |
+| missing-description rejects | observed | 0 | Package P description repair holds. |
+| missing-title rejects | observed in O logs | 1 | Required-field weakness remains. |
+| unsubmitted structured findings | n/a | 5 | Main failure. |
+| total model / accepted Recipe | 44232 | 295465 | Severe efficiency regression. |
+| stored payload approx tokens | 1457 avg | 1490 | Payload size is not the blocker. |
+| `pcvAnalyzeGroundingInvalidNoEvidence` | 0 | 0 | Quality grounding held. |
+| quality score | 100 | 88 | QualityGate still passes, but evidenceScore drops. |
+
+Root-cause reading:
+
+- This is not safe to call an occasional model-only miss.
+- The exact model action path is stochastic, but deterministic source logic made the failure terminal:
+  - `knowledge.submit` required fields are enforced by runtime validation but provider-visible schema is generic `action`/`params`.
+  - Producer prompt now mentions `description`, but the explicit required field block still omits `title`.
+  - Producer can spend rounds on `knowledge.detail` and `meta.tools`.
+  - `STRATEGY_PRODUCER` moves to `SUMMARIZE` after `submitCount > 0 && roundsSinceSubmit >= idleRoundsToExit`, without checking that all structured Analyst findings have been submitted.
+
+PCVM reading:
+
+- Package Q proves Package P partially effective: missing-`description` rejects disappeared and the Package O extra final round did not recur.
+- Package Q fails the route because Producer converted only `1/6` structured findings into accepted Recipes.
+- Next repair must be Package R source/unit in `AlembicAgent`; do not request another AlembicTest live run before Producer coverage and submit field contracts are repaired.
 
 ## Current LLM Token Efficiency Source/Unit Baseline
 

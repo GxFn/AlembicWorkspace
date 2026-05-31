@@ -8,20 +8,20 @@ Status: `current`
 
 Current blocker:
 
-- Package O same-input live evidence was read through at the raw row level and is `partial(scope=live-ai-local)`, not pass.
-- Package O proves Analyze final Markdown single-source behavior and Producer input-history ownership improved, but Producer still has one extra no-tool final round after the first completion report.
-- Package O also introduces Producer schema-contract waste: 11 submit attempts for 7 accepted Recipes, with 4 rejected attempts caused by missing `description`.
-- Package P source/unit repair is implemented and verified in `AlembicAgent`.
-- The remaining blocker is Package Q same-input live rerun. PCVM still needs live evidence that Package P fixes Producer first-completion termination and missing-`description` submit retries without regressing Package O's Analyzer/Producer input improvements.
+- Package Q same-input live evidence is `fail(scope=live-ai-local)`, not pass.
+- Package Q proves Package P removed missing-`description` submit rejects and avoided the Package O continue-nudge/extra-final-round path.
+- Package Q fails the useful-output gate: accepted Recipes fell from O's `7` to Q's `1`, with `5` structured Analyst findings left unsubmitted.
+- PCVM root-cause review classifies Q as a source logic issue, not safe random variance: provider-visible `knowledge.submit` schema is too generic, Producer permits round-wasting non-submit actions, and Producer exits after `roundsSinceSubmit >= 3` without checking remaining structured findings.
+- The remaining blocker is Package R source/unit repair in `AlembicAgent`; do not rerun AlembicTest until this repair is implemented and verified.
 
 Next metric work:
 
-- AlembicTest rerun is now allowed as Package Q only for the same route and only to answer the Package P live-effect question.
+- AlembicTest rerun is not allowed yet; Package R source/unit repair must come first.
 - Use Package F `inputSizeEstimate` / `inputProjection` metadata to distinguish projected message history, runtime input layer, system prompt, and tool schemas per provider call.
 - Add accepted/submitted Recipe normalized metrics to every live comparison: route input/output/reasoning/total model per accepted Recipe and per submitted Recipe.
 - Add persisted Recipe payload approximate token metrics when local DB or raw artifacts preserve accepted Recipe fields.
-- Keep single-Recipe payload metrics visible: Package O accepted payloads average `1457.0` approx tokens and range from `1245` to `2040`.
-- Keep quality constraints visible: Package O `pcvAnalyzeGroundingInvalidNoEvidence=0`; QualityGate passed with score `100`.
+- Keep single-Recipe payload metrics visible: Package Q accepted payload is about `1490` approx tokens, but the route is invalid as a pass candidate because accepted count collapsed.
+- Keep quality constraints visible: Package Q `pcvAnalyzeGroundingInvalidNoEvidence=0`; QualityGate passed with score `88`.
 - Compare only against the same-input route; do not promote live route to final product acceptance.
 - Do not modify BiliDili or any real test project source.
 
@@ -238,7 +238,7 @@ Required next action:
 
 ## Open Issue: Producer Completion-Like Output Does Not Stop Immediately
 
-Status: `failed(scope=live-ai-local, package=O); repaired(scope=source-unit, owner=AlembicAgent, package=P); pending(scope=live-ai-rerun, package=Q)`
+Status: `failed(scope=live-ai-local, package=O); repaired(scope=source-unit, owner=AlembicAgent, package=P); pass(scope=live-ai-local-no-extra-final, package=Q)`
 
 Evidence:
 
@@ -254,11 +254,12 @@ Required next action:
 
 - Package N source/unit repair normalizes Markdown emphasis and recognizes `提交完成报告` / `已提交候选` plus `未提交: 0` as terminal after successful submissions.
 - Package P extends source/unit terminal detection to Package O mixed English/Chinese completion wording.
-- Package Q must verify that the live Producer no longer receives a continue nudge or produces an extra no-tool final-status round after the first completion report.
+- Package Q verifies that the live Producer no longer receives a continue nudge or produces an extra no-tool final-status round after the only Producer final summary.
+- This issue is not the current blocker; Q fails on Producer candidate coverage instead.
 
 ## Open Issue: Producer Evidence And Candidate Payload History Is Provider-Visible
 
-Status: `pass(scope=live-ai-local-direct-replay, package=O); watch(scope=compact-submit-observation, package=Q)`
+Status: `pass(scope=live-ai-local-direct-replay, package=O); pass(scope=live-ai-local-direct-replay-preserved, package=Q)`
 
 Evidence:
 
@@ -275,11 +276,11 @@ Package N repair:
 Required next action:
 
 - Package O confirms Producer inputs no longer contain the old direct-code block or full submit payload replay.
-- Package Q should ensure compact submit observations remain compact while Producer retries fall.
+- Package Q preserved the direct-code replay fix, but the route still fails because Producer stopped before submitting remaining structured findings.
 
 ## Open Issue: Producer Submit Attempts Waste Output Tokens
 
-Status: `failed(scope=live-ai-local, package=O); repaired(scope=source-unit, owner=AlembicAgent, package=P); pending(scope=live-ai-rerun, package=Q)`
+Status: `failed(scope=live-ai-local, package=O); repaired(scope=source-unit, owner=AlembicAgent, package=P); partial(scope=live-ai-local, package=Q); superseded-by-producer-coverage-blocker(package=R)`
 
 Evidence:
 
@@ -294,7 +295,25 @@ Package P repair:
 
 Required next action:
 
-- Package Q must verify submit attempts are close to accepted count and missing-`description` rejects disappear.
+- Package Q verifies missing-`description` rejects disappear, but submit attempts fell because Producer stopped early; this issue is superseded by the Producer coverage blocker below.
+
+## Open Issue: Producer Coverage Stops Before Structured Findings Are Submitted
+
+Status: `failed(scope=live-ai-local, package=Q); diagnosed(scope=source-logic); blocked(scope=source-unit-repair, package=R)`
+
+Evidence:
+
+- Package Q had 6 structured Analyst findings in the Producer obligation set.
+- Producer submitted one accepted Recipe, then spent three non-submit rounds on `knowledge.detail`, `meta.tools(knowledge)`, and `meta.tools(knowledge.submit)`.
+- After those three non-submit rounds, Q entered `SUMMARIZE` and final summary reported 5 structured findings unsubmitted.
+- `STRATEGY_PRODUCER` transitions to `SUMMARIZE` on `(m.submitCount > 0 && m.roundsSinceSubmit >= b.idleRoundsToExit)`.
+- The tracker does not know the structured finding obligation count, so it cannot distinguish "finished" from "stalled while work remains".
+- Provider-visible `knowledge` schema is generic `action`/`params`; action-specific required fields such as `title` are enforced only by runtime validation after the failed call.
+
+Required next action:
+
+- Package R source/unit repair must add Producer candidate-obligation coverage and required-field visibility before another live rerun.
+- Repair should prevent `detail/meta/meta` after one accepted candidate from forcing `SUMMARIZE` while structured findings remain.
 
 ## Open Issue: Provider-Input Projection Is Reactive After Peak
 

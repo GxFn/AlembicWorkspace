@@ -3,8 +3,8 @@
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Target: reduce duplicated and oversized LLM input/output in Alembic cold-start stages through one unified I/O design
 Owner: `PCVM`
-Current phase: `llm-stage-token-efficiency-package-p-source-unit-repaired`
-Status: `partial(scope=live-ai-local, package=O); repaired(scope=source-unit, package=P); blocked(scope=same-input-live-rerun, package=Q)`
+Current phase: `llm-stage-token-efficiency-package-q-root-cause-diagnosed`
+Status: `fail(scope=live-ai-local, package=Q); diagnosed(scope=source-logic, package=Q); blocked(scope=producer-coverage-source-unit-repair, package=R)`
 
 ## Controller Snapshot
 
@@ -23,7 +23,7 @@ Current evidence:
 
 Current segment: `llm-stage-token-efficiency-live-verdict-and-output-contract`.
 
-First blocker: Package O live evidence is partial, not pass. It proves Analyze final Markdown single-source behavior and Producer direct-code/full-payload replay improved, but Producer still emits one extra no-tool final round after a mixed English/Chinese completion report, and submit attempts include 4 schema-contract rejections for missing `description`. Package P source/unit repair is implemented and verified in `AlembicAgent`; the next blocker is Package Q same-input live rerun to confirm completion termination and submit-attempt cleanup in live AI output.
+First blocker: Package Q live evidence failed useful-output coverage. It proves Package P removed missing-`description` rejects and avoided the Package O completion-after-continue loop, but accepted Recipes collapsed from O's `7` to Q's `1`; `5` structured Analyst findings remained unsubmitted after Producer spent rounds on `knowledge.detail` and `meta.tools`, then hit `SUMMARIZE`. PCVM root-cause review classifies this as a source logic issue, not safe random variance: `knowledge.submit` required fields are not provider-visible enough, Producer allows non-submit tool actions, and Producer exits after `roundsSinceSubmit >= 3` without checking remaining structured finding obligations. The next blocker is Package R source/unit repair; do not re-run AlembicTest before this repair is packaged and verified.
 
 ## Non-Goals
 
@@ -701,7 +701,7 @@ Owner repo: `AlembicAgent`
 
 Goal: repair the two Package O residual Producer wastes before another live rerun.
 
-Status: `repaired(scope=source-unit); pending(scope=same-input-live-rerun, package=Q)`
+Status: `repaired(scope=source-unit); partial(scope=live-ai-local, package=Q, target=Package-P-effects)`
 
 Implemented source outcomes:
 
@@ -716,12 +716,46 @@ Source/unit verification:
 - `npm run lint` passed.
 - `git diff --check` passed.
 
-Remaining blocker:
+Live effect in Package Q:
 
-- Package P is not a live verdict. Package Q must rerun the same BiliDili `design-patterns` route and verify the first Producer completion report terminates directly and submit attempts no longer include missing-`description` rejects.
+- Missing-`description` submit rejects disappeared.
+- No continue nudge or extra no-tool final round appeared after Q's only Producer final summary.
+- Package P's all-submitted terminal detection is still not fully proven because Q never reached an all-submitted completion; Producer stopped with `5` structured findings unsubmitted.
+
+### Package Q: Same-Input Live Rerun Failure Root-Cause
+
+Evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-q-same-input-live-rerun-2026-05-31`
+- Report: `../AlembicTest/docs/pcvm-package-q-same-input-live-rerun-2026-05-31.md`
+- Job/session: `bootstrap_mptqix3b_9d08f491` / `bs_1780229241375_wkpvcc`
+- Root-cause record: `report/records/package-q-failure-root-cause.md`
+- Package under validation: `AlembicAgent` commit `603626c`.
+
+Result:
+
+| Metric | Package O | Package Q | PCVM reading |
+| --- | ---: | ---: | --- |
+| route input | 274311 | 273093 | Essentially flat/slightly improved. |
+| route output | 27601 | 16423 | Lower because Producer stopped early. |
+| route reasoning | 7712 | 5949 | Lower. |
+| route total model | 309624 | 295465 | Lower, but not useful without accepted coverage. |
+| accepted Recipes | 7 | 1 | Useful output collapsed. |
+| submit attempts / rejected | 11 / 4 | 2 / 1 | Attempts fell because Producer stopped early; remaining reject is missing `title`. |
+| total model / accepted | 44232 | 295465 | Severe useful-output regression. |
+| unsubmitted structured findings | n/a | 5 | Main failure. |
+
+PCVM conclusion:
+
+- Q is `fail(scope=live-ai-local, package=Q)`.
+- The failure is not safe to classify as an occasional model-only issue. The exact model path was stochastic, but source logic made it possible and then deterministic:
+  - provider-visible tool schema exposes only generic `action`/`params`, while runtime `knowledge.submit` validation requires `title`;
+  - Producer can spend rounds on `knowledge.detail` and `meta.tools`;
+  - `STRATEGY_PRODUCER` transitions to `SUMMARIZE` after `submitCount > 0 && roundsSinceSubmit >= idleRoundsToExit`, without checking remaining structured findings.
+- The next repair is Package R source/unit: make required submit fields provider-visible, constrain Producer non-submit actions, and add candidate-obligation tracking before another live rerun.
 
 ## Scoped Verdict
 
-Verdict: `partial(scope=live-ai-local, package=O); repaired(scope=source-unit, package=P); blocked(scope=same-input-live-rerun, package=Q)`
+Verdict: `fail(scope=live-ai-local, package=Q); diagnosed(scope=source-logic, package=Q); blocked(scope=producer-coverage-source-unit-repair, package=R)`
 
-Next action: Package Q same-input live rerun through AlembicTest. Do not reopen SourceRef. The rerun must answer only whether Package P fixes Producer first-completion termination and missing-`description` submit retries, while preserving Package O's Analyze single-source and Producer input-history improvements.
+Next action: Package R source/unit repair in `AlembicAgent`. Do not reopen SourceRef and do not run another AlembicTest package until Producer coverage repair is implemented and verified.

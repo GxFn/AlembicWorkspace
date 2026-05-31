@@ -1,6 +1,6 @@
 # PCVM Workspace
 
-状态：artifact 工作面 / LLM 阶段 token efficiency 已完成 Package O live 逐条复核与 Package P source/unit 修复；下一步阻塞在 Package Q 同输入 live AI 复测；工具与终端使用基线已基于 AlembicTest 报告完成 controlled baseline helper 修复
+状态：artifact 工作面 / LLM 阶段 token efficiency 已完成 Package Q live 失败复核与 root-cause 定位；下一步阻塞在 Package R Producer 覆盖率 source/unit 修复；工具与终端使用基线已基于 AlembicTest 报告完成 controlled baseline helper 修复
 
 ## 定位
 
@@ -10,7 +10,7 @@
 
 | Run ID | 目标 | 主产物 | 状态 |
 | --- | --- | --- | --- |
-| `pcv-20260530-1515-alembic-cold-start` | Reduce duplicated and oversized LLM input/output in Alembic cold-start stages | [scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md) | `partial(scope=live-ai-local, package=O); repaired(scope=source-unit, package=P); blocked(scope=same-input-live-rerun, package=Q)` |
+| `pcv-20260530-1515-alembic-cold-start` | Reduce duplicated and oversized LLM input/output in Alembic cold-start stages | [scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md) | `fail(scope=live-ai-local, package=Q); diagnosed(scope=source-logic, package=Q); blocked(scope=producer-coverage-source-unit-repair, package=R)` |
 | `pcv-20260531-1506-tool-terminal-usage-baseline` | Establish baseline facts and key metrics for current tool and terminal usage before optimization | [scratch/chain-runs/pcv-20260531-1506-tool-terminal-usage-baseline/report/plan.md](scratch/chain-runs/pcv-20260531-1506-tool-terminal-usage-baseline/report/plan.md) | `repair-implemented(scope=alembictest-controlled-baseline-helper); blocked(scope=historical-all-session-baseline)` |
 
 ## 说明文档
@@ -37,6 +37,7 @@ LLM token efficiency run:
 - [progress.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/progress.md)：当前推进记录。
 - [package-m-structure-self-check.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-m-structure-self-check.md)：Package M 全量逐条 input/output/reflection 产出阅读、自检和 live verdict。
 - [package-o-structure-self-check.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-o-structure-self-check.md)：Package O 全量逐条 input/output/reflection 产出阅读、自检和 live verdict。
+- [package-q-failure-root-cause.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-q-failure-root-cause.md)：Package Q live 失败 root-cause，区分偶发模型选择与确定性代码逻辑缺口。
 
 旧轮次、旧任务包和旧 AI 分析文件已删除，不再作为 PCVM 入口或判断依据。
 
@@ -49,6 +50,6 @@ LLM token efficiency run:
 
 当前默认线路：`S0-intake -> S1-source-chain-map -> S2-plan-artifact -> S3-round-registry -> S4-node-or-round-execution -> S5-record-classification -> S6-engineering-repair-packaging -> S8-verdict-and-next-round`。
 
-当前 LLM token run 下一步：Package O live 复测已完成并逐条阅读。O 证明 Analyze final Markdown 单源行为和 Producer direct-code/full-payload replay 明显改善，accepted Recipes 从 M 的 5 增至 7，total model / accepted Recipe 从 `61553.40` 降至 `44232.00`；但 Producer 首个 completion 后仍收到 continue nudge，且 11 次 submit attempts 中 4 次因缺 `description` 被拒，导致 Producer output/reasoning 上涨、route total model 仍略高于 M。Package P 已在 `AlembicAgent` 完成 source/unit 修复：覆盖 O 的 mixed English completion 终止识别，并把 `description` 必填前置到 Producer submit contract。下一步是 Package Q 同输入 live AI 复测。
+当前 LLM token run 下一步：Package Q live 复测失败。Q 证明 Package P 已消除 missing-`description` reject，且没有复现 Package O 的 completion 后 continue nudge/额外 no-tool final round；但 accepted Recipes 从 O 的 `7` 跌到 `1`，5 条结构化发现未提交。PCVM root-cause 判断：这不是可接受的偶发波动，而是 Producer tool schema、非 submit 动作边界和 `roundsSinceSubmit >= 3` 退出逻辑共同暴露的代码逻辑缺口。下一步是 Package R source/unit 修复 Producer 覆盖率与字段契约，不要重跑 Test。
 
 当前工具/终端使用基线 run 下一步：AlembicTest controlled baseline helper 已实现并验证；不要为了造更好看的数字单独重跑 Test。等下一次真实 PCVM Tool/Terminal 任务出现时，用新脚本做 before/after。全历史 baseline 仍阻塞在真实 telemetry source。
