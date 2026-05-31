@@ -25,7 +25,7 @@
 | `GTODO-2026-05-24-038` Alembic file monitor evolution | 待排期 / 需独立确认 | [requirement design](../requirement-designs/knowledge-evolution-todos/knowledge-evolution-todos-requirement-design-2026-05-26.md) | 需要独立目标确认、代码事实基线和阶段计划；不得自动继承 037 自动化。 |
 | `GTODO-2026-05-24-039` Plugin no-monitor evolution | 待排期 / 需独立确认 | [requirement design](../requirement-designs/knowledge-evolution-todos/knowledge-evolution-todos-requirement-design-2026-05-26.md) | 需要独立确认；不复制 Alembic daemon file monitor。 |
 | `GTODO-2026-05-25-005` Visible Automation Dispatch | 已完成待归档 / 后续 bug 优化 | [archive/2026-05/visible-automation-dispatch/](archive/2026-05/visible-automation-dispatch/) | VAD 自动化链路完成；后续只作为 bug / optimization 入队。 |
-| `PLUGIN-ARCHITECTURE-INTERFACE-REFACTOR-2026-05-31` | Stage 0 总控验收通过 / Stage 1+ 待组织 | [AlembicPlugin dossier](../AlembicPlugin/plugin-architecture-interface-contract-dossier-2026-05-31.md) | Plugin architecture interface contract dossier 已回填并通过总控复核；后续按用户裁决组织合并 implementation wave。 |
+| `PLUGIN-ARCHITECTURE-INTERFACE-REFACTOR-2026-05-31` | 已完成已归档 | [archive/2026-05/plugin-architecture-interface-refactor/](archive/2026-05/plugin-architecture-interface-refactor/) | Stage 0 dossier 与 Stage 1+ implementation wave 均已通过总控复核；AlembicPlugin commit `646c034`，runtime 子仓库 commit `6ceefca`。 |
 | codex-control-workspace extraction | 已完成待归档 | [current/codex-control-workspace-extraction-2026-05-27.md](current/codex-control-workspace-extraction-2026-05-27.md) | 通用控制仓库抽取和配置化补强记录。 |
 
 ## Requirement Designs
@@ -47,11 +47,12 @@
 | AlembicAgent | [../AlembicAgent/](../AlembicAgent/) | PCV N9 producer 和 LLM input optimization 回填。 |
 | AlembicCore | [../AlembicCore/](../AlembicCore/) | 当前只保留 multi-root ProjectScope core contract，用作后续 project-level skill visibility 背景。 |
 | AlembicDashboard | [../AlembicDashboard/](../AlembicDashboard/) | LLM artifact detail 与 Artifact Drawer Dashboard 回填。 |
-| AlembicPlugin | [../AlembicPlugin/plugin-architecture-interface-contract-dossier-2026-05-31.md](../AlembicPlugin/plugin-architecture-interface-contract-dossier-2026-05-31.md) | Plugin architecture interface refactor Stage 0 dossier，作为后续 implementation wave 输入。 |
+| AlembicPlugin | [../AlembicPlugin/plugin-architecture-interface-contract-dossier-2026-05-31.md](../AlembicPlugin/plugin-architecture-interface-contract-dossier-2026-05-31.md) | Plugin architecture interface refactor Stage 0 dossier；Stage 1+ implementation wave 证据见 archive/2026-05/plugin-architecture-interface-refactor。 |
 
 ## Archive Topics
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/plugin-architecture-interface-refactor` | [plugin-architecture-interface-refactor](archive/2026-05/plugin-architecture-interface-refactor/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/codex-direct-thread-dispatch` | [codex-direct-thread-dispatch](archive/2026-05/codex-direct-thread-dispatch/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/plugin-coldstart-rescan-test-optimization` | [plugin-coldstart-rescan-test-optimization](archive/2026-05/plugin-coldstart-rescan-test-optimization/) | 已归档 2 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/repository-residue-cleanup` | [repository-residue-cleanup](archive/2026-05/repository-residue-cleanup/) | Repository residue cleanup 总控复核与归档。 |

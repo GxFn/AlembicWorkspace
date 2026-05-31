@@ -6,7 +6,7 @@
 
 ## 概括
 
-Repository residue cleanup 已完成总控复核：当前 workspace 配置内仓库 residue 为 0，默认守卫已接入总控验证，AlembicCore Logger 源码仓库写入边界已由 targeted test 覆盖。
+Repository residue cleanup 总控复核与归档。
 
 本文件是该归档文件夹的汇总说明和地图清单。历史正文文件作为当时证据快照保留；开发区长期文档只链接到记录地图或本归档目录，不直接散链到具体历史文件。
 
