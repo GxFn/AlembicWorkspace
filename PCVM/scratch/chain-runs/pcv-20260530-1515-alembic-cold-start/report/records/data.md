@@ -2,7 +2,117 @@
 
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Owner: `PCVM`
-Status: `historical-evidence-retained`
+Status: `active`
+
+## Package Y Same-Input Live Evidence And Output Quantity Gate
+
+Evidence scope: `live-ai-local + raw JSON/job-artifact review`
+
+Raw evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-y-same-input-live-rerun-2026-06-01`
+- Job/session: `bootstrap_mptzmd58_95ecf0f3` / `bs_1780244518190_peg825`
+- Raw files: `events.json`, `analysis-summary.json`, `job-compact.json`, `report-bs_1780244518190_peg825.json`
+- Full record: `records/package-y-live-verdict-and-z-output-token-design.md`
+
+Same-input live comparison:
+
+| Metric | Package S | Package U | Package W | Package Y | PCVM reading |
+| --- | ---: | ---: | ---: | ---: | --- |
+| created / accepted candidates | 6 / 6 | 6 / 6 | 6 / 6 | 5 / 5 | Producer covered Y's structured target, but Y is not strict 6-output comparable. |
+| rejected attempts | 0 | 2 | 4 | 0 | Submit-history imitation fixed. |
+| tool calls | 42 | 62 | 44 | 30 | Improved; count drop and no retries both contribute. |
+| input tokens | 246703 | 275108 | 294769 | 190325 | Strong raw improvement. |
+| output tokens | 22825 | 23987 | 21806 | 17370 | Strong raw improvement, but lower useful-output count. |
+| reasoning tokens | 5922 | 6044 | 5925 | 5534 | Slight improvement. |
+| total model tokens | 275450 | 305139 | 322500 | 213229 | Raw total improves. |
+| total model / created Recipe | 45908.33 | 50856.50 | 53750.00 | 42645.80 | Unit cost improves, but quantity/granularity comparability is open. |
+| analyze iterations / input | 16 / 184353 | 15 / 155868 | 14 / 185685 | 15 / 143874 | Analyze input improves vs S/W. |
+| producer iterations / input | 7 / 62350 | 15 / 119240 | 13 / 109084 | 7 / 46451 | Producer input improves, but post-target `meta.review` remains. |
+
+Per-output read-through:
+
+- Package Y retained 68 events: `llm.input=23`, `llm.output=23`, `llm.reflection=10`.
+- Producer inputs/outputs are `7/7`.
+- Producer inputs include `[[Producer submit history]]` warnings and do not expose imitable compacted submit JSON.
+- Producer outputs include 5 successful `knowledge.submit` effects, one `meta.review`, and one final no-tool summary.
+- The Analyzer final report declares exactly 5 confirmed core findings and moves lower-confidence signals to `未结构化记录 / 待探索`.
+- ServiceRegistry/RouteMiddleware-style files appear in evidence/context, but they are not recorded as final structured candidate obligations in Y. This is an Analyzer output quantity/granularity question, not a Producer conversion miss.
+
+PCVM reading:
+
+- Package Y is `partial(scope=live-ai-local)`.
+- Package X's targeted bug fixes hold for submit-history imitation and missing-description retries.
+- The remaining token waste is a deterministic post-target Producer round (`meta.review` after 5/5 target coverage).
+- The next gate must prevent fewer outputs from making token numbers look better than the actual useful-output result, while preserving the user's裁决 that extra source-mining can be a later optimization.
+
+## Package Z Source/Unit Repair Evidence
+
+Evidence scope: `source-unit`
+
+Source changes:
+
+- `AlembicAgent/src/agent/context/exploration/ExplorationStrategies.ts`: removed the `Math.min(6, ...)` cap from Analyst structured finding target; target now scales with evidence surface as `max(3, ceil(evidenceToolCallCount / 2))`.
+- `AlembicAgent/src/agent/prompts/insight-analyst.ts`: removed "5-6 high-value findings" wording and replaced it with "record all confirmed high-value findings; do not stop just because count exceeds 6".
+- `AlembicAgent/src/agent/context/exploration/ExplorationStrategies.ts`: Producer moves to `SUMMARIZE` immediately after target submit coverage.
+- `AlembicAgent/src/agent/prompts/insight-producer.ts` and `src/tools/v2/capabilities/BootstrapProduce.ts`: `meta.review` is exceptional, not the normal final step.
+
+Verification:
+
+| Command | Result |
+| --- | --- |
+| `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts` | pass; 34 tests |
+| `npm run build` | pass |
+| `npm run lint` | pass |
+| `npm test` | pass; 28 files, 180 tests |
+| `npm run lint:core-import-boundary` | pass |
+| `git diff --check` | pass |
+
+PCVM reading:
+
+- This repair does not reopen Markdown mining or add a taxonomy branch.
+- Producer coverage is still measured against Analyst structured findings.
+- The code no longer instructs or forces Analyst to stop at 5-6 structured findings, so the next cold-start can reveal whether useful output recovers without relying on extra source-mining.
+
+## Package W Same-Input Live Evidence
+
+Evidence scope: `live-ai-local + raw JSON/job-artifact review`
+
+Raw evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-w-same-input-live-rerun-2026-05-31`
+- Job/session: `bootstrap_mptxbjo2_3e51c784` / `bs_1780240654943_3apoft`
+- Raw files: `events.json`, `analysis-summary.json`, `job-compact.json`, `report-bs_1780240654943_3apoft.json`
+- Full record: `records/package-w-live-verdict-and-x-source-repair.md`
+
+Same-input live comparison:
+
+| Metric | Package S | Package U | Package W | W vs S | W vs U |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| created candidates | 6 | 6 | 6 | 0.00% | 0.00% |
+| rejected attempts | 0 | 2 | 4 | regression | regression |
+| tool calls | 42 | 62 | 44 | +4.76% | -29.03% |
+| input tokens | 246703 | 275108 | 294769 | +19.48% | +7.15% |
+| output tokens | 22825 | 23987 | 21806 | -4.46% | -9.09% |
+| reasoning tokens | 5922 | 6044 | 5925 | +0.05% | -1.97% |
+| total model tokens | 275450 | 305139 | 322500 | +17.08% | +5.69% |
+| total model / created Recipe | 45908.33 | 50856.50 | 53750.00 | +17.08% | +5.69% |
+| analyze iterations / input | 16 / 184353 | 15 / 155868 | 14 / 185685 | mixed | input regression |
+| produce iterations / input | 7 / 62350 | 15 / 119240 | 13 / 109084 | iteration/input regression | improved but still high |
+
+Per-output read-through:
+
+- Package W retained 81 events: `llm.input=28`, `llm.output=28`, `llm.reflection=13`.
+- Producer inputs/outputs are `13/13`.
+- Producer visible tool contract is repaired versus Package U: no Producer `code` schema or `code.read`, real `knowledge.submit` required params schema, and clean restricted descriptions.
+- Four real missing-description rejects remain. They occur after prior successful compacted submit history becomes visible as `title/kind/trigger`-only assistant tool-call shape.
+- The first 6/6 completion summary is not terminal; it receives a continue nudge, then `meta.review`, then a second final summary.
+
+PCVM reading:
+
+- Package W is `partial(scope=live-ai-local)`.
+- Package V fixed the intended visible tool contract, but final token efficiency still fails because submit-history compaction and terminal detection remain source-level contradictions.
+- Package X repairs those two deterministic causes; next live evidence must be Package Y with explicit fresh source proof.
 
 ## Package M Same-Input Live Evidence
 
@@ -335,7 +445,50 @@ Targeted verification:
 PCVM reading:
 
 - Package T repairs Package S's schema leak and compact-history semantic-loss causes at source/unit level.
-- It is not live evidence. The formerly proposed Package U rerun is not active after the user cancelled PCVM; retain this entry as historical source/unit evidence only.
+- Package U live evidence shows Package T was necessary but incomplete for the final token-efficiency target.
+
+## Package U Live Verdict And Package V Source/Unit Repair Evidence
+
+Evidence scope: `live-ai-local + source-unit-fixture`
+
+Raw Package U facts:
+
+| Metric | Package U |
+| --- | --- |
+| raw dir | `../AlembicTest/tmp/pcvm-package-u-same-input-live-rerun-2026-05-31` |
+| job/session | `bootstrap_mptvdbij_f1710a27` / `bs_1780237377715_cigear` |
+| retained events | `86` |
+| analyze inputs / outputs | `15` / `15` |
+| produce inputs / outputs | `15` / `15` |
+| created candidates | `6` |
+| input / output / reasoning tokens | `275108` / `23987` / `6044` |
+| total model tokens | `305139` |
+| total model tokens / created Recipe | `50856.50` |
+| QualityGate total score | `99` |
+
+Package U reading:
+
+- Partial live result, not pass.
+- Compared with Package S, total model tokens regressed `275450 -> 305139` (`+10.78%`).
+- Producer rounds regressed `7` input/output pairs -> `15` input/output pairs.
+- Producer did not call `knowledge.detail/manage`, and final summaries did not misread full stored candidates as partial.
+- Remaining failures are source-contract problems: generic `params` schema, broad descriptions, Producer `code.read`, one missing-`description` reject, and unrecognized completion wording.
+
+Package V verification in `AlembicAgent`:
+
+| Command | Result |
+| --- | --- |
+| `npm test -- test/tool-v2-contract.test.ts test/llm-input-layering.test.ts test/ExplorationStrategies.test.ts` | pass; 3 files, 39 tests |
+| `npm run lint` | pass |
+| `npm run build` | pass |
+| `npm test` | pass; 28 files, 178 tests |
+| `npm run lint:core-import-boundary` | pass |
+| `git diff --check` | pass |
+
+PCVM reading:
+
+- Package V is source/unit repaired, not live pass.
+- Next live gate is Package W same-input rerun after Package V is committed or otherwise fixed as the tested source.
 
 ## Current LLM Token Efficiency Source/Unit Baseline
 

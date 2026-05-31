@@ -90,6 +90,26 @@ PCVM 的目标是优化已确认指标，不是创建护栏、防护型测试、
 - 不得把“防止未来出错”的测试、防护规则或可选回归检查包装成 PCVM 当前目标、阻塞点、完成条件或派发任务。
 - 如果用户要求测试基线方案，默认输出“指标基线 + 测量命令 + 优化下一步”，不要输出护栏、防护、可选 guard 或“为了未来防回归”的任务。
 
+## PCVM 工作流程摘要
+
+本节只保存长期工作方式，不记录当前 Package、run 状态、job/session、线程 id、指标数值或临时裁决。详细字段、机器路线、测试合同和提示词模板仍由 `skills/pcvm-flow-controller/SKILL.md`、`config/pcvm-flow-control.json` 和当前 run 文档承接。
+
+PCVM 每次推进前，必须先用一句话说清：用户最终目标、当前证据 scope、最小闭环、第一阻塞点。说不清时先补证或暂停，不得直接改 plan、派发、测试或汇报完成。
+
+标准推进顺序：
+
+1. 先复核原始证据：读取 Test raw files、runtime JSON、LLM input/output/events、日志和提交 hash；Test 的自然语言总结只作为线索，不作为裁决。
+2. 再判断问题归属：区分测试环境、源码逻辑、Prompt/LLM 输入结构、阶段职责混杂、指标口径、轮次变化和用户已裁决停止的方向。
+3. 先自修可自证部分：能用 source、unit、fixture、targeted probe 或日志直接验证的问题，先在归属源码仓库修复并验证，不转给 AlembicTest 重新发现。
+4. 再做真实场景验证：只有源码基线已提交或有 fresh source proof，且问题必须依赖真实项目 / live AI / runtime / Dashboard / delivery 时，才派发 AlembicTest。
+5. 验收必须读每条关键产出：遇到 LLM I/O、Producer、Analyzer 或 round/segment 问题时，逐轮阅读 input/output/tool/result 结构，不能只看汇总 token、总轮次或最终 verdict。
+6. 指标分析必须同输入对比：分清输入、输出、reasoning、总量、round count、tool call、created candidate、rejected attempt、per useful output 的变化，轮次增加不能被误读成单轮膨胀。
+7. 修复策略必须对齐最终目标：优先消除重复输入、错误上下文、阶段职责混杂、无效重试和多余轮次；不要为了隐藏 bug、解释失败或制造进展新增 taxonomy、护栏或伪指标。
+8. 派发提示词保持轻量：只放动态变量、测试边界、必须证明的 source baseline 和 verdict 问题；文档中已有的长期规则只引用路径，不复制全文；thread id 不写入提示词或 tracked 文档。
+9. 文档只记录已验证事实：短期状态写 `index.md`、当前 run `report/plan.md` 或 `report/records/*`；AGENTS 只沉淀长期规则，不能承载当前测试流水。
+
+如果测试暴露持续性问题，不得继续打临时补丁。必须从目标、职责、输入输出结构、真实代码调用链和测试证据重新确认根因，再决定是整体设计优化、独立阶段修复，还是暂停等待用户裁决。
+
 ## 细节索引
 
 - PCVM 执行流程：`skills/pcvm-flow-controller/SKILL.md`

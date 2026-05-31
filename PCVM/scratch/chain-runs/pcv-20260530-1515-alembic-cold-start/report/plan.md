@@ -3,8 +3,8 @@
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Target: reduce duplicated and oversized LLM input/output in Alembic cold-start stages through one unified I/O design
 Owner: `PCVM`
-Current phase: `stopped-by-user-after-package-t-source-unit-repair`
-Status: `stopped-by-user(scope=active-pcvm); historical-evidence-retained(package=S/T)`
+Current phase: `llm-stage-token-efficiency-package-z-source-unit-repaired`
+Status: `partial(scope=live-ai-local, package=Y); repaired(scope=source-unit, package=Z); pending(scope=alembic-project-space-cold-start-boundary)`
 
 ## Controller Snapshot
 
@@ -23,7 +23,7 @@ Current evidence:
 
 Current segment: `llm-stage-token-efficiency-live-verdict-and-output-contract`.
 
-First blocker: none for active PCVM, because the user has cancelled `GTODO-2026-05-25-003 / PCVM` as an active task. Package T source/unit repair is retained as historical evidence only: it preserves capability action constraints through provider schema projection, adds action-level runtime allowlist enforcement, keeps compact submit payload completeness semantics, and injects a runtime-owned Producer submit ledger for final summaries. Do not start Package U same-input live rerun unless the user explicitly reopens PCVM.
+First blocker: define the Alembic project-space cold-start test boundary. The user accepts the current coverage design: Producer coverage is measured against Analyst structured findings, and mining additional content from other sources is a later optimization item. Package Y remains partial live evidence because it produced `5/5` while older baselines were around `10` to `13`, but Package Z has now removed the hidden 6-finding cap and fixed post-target Producer waste at source/unit scope. Do not send AlembicTest until the Alembic project-space cold-start boundary states target project, route, source proof, metrics, and stop conditions.
 
 ## Non-Goals
 
@@ -54,6 +54,16 @@ Quality constraints:
 | --- | --- |
 | `pcvAnalyzeGroundingInvalidNoEvidence` | Must not increase. |
 | stage output tokens | Should decrease for non-final stages; cannot increase without a matching accepted-output improvement. |
+
+Useful-output quantity gates:
+
+| Gate | Meaning | Candidate pass |
+| --- | --- | --- |
+| `analystStructuredFindingTarget` | Count of Analyst `note_finding` / structured candidate obligations visible to Producer. | Must be reported for every live rerun; Producer pass is measured against this target, not a fixed historical Recipe count. |
+| `producerAcceptedCoverage` | `acceptedRecipeCount / analystStructuredFindingTarget`. | Must be `100%` for Producer contract pass. |
+| `sameUsefulOutputComparable` | Whether candidate and baseline have comparable structured finding target and Recipe granularity. | Required before declaring token-efficiency pass against a 6-output baseline. |
+| `quantityDropExplainedByEvidence` | If candidate output count is lower, PCVM must read dropped themes and classify whether they were duplicates, wrong-dimension items, or missed useful findings. | Required before using per-Recipe token metrics as a pass signal. |
+| `postTargetWasteRounds` | Producer rounds after `producerAcceptedCoverage=100%`, including `meta.review`, no-tool repeats, or continue nudges. | Must be `0` for terminal-token pass. |
 
 If token metrics improve but quality constraints regress, the candidate fails.
 
@@ -328,7 +338,7 @@ Design contradictions repaired:
 - Provider history ownership: provider-input budget projection now also applies to `produce`, not only analyze/record/summarize.
 - Analyst coverage ownership: `RECORD→SUMMARIZE` now uses an evidence-volume target (`3-6` findings) instead of always allowing 3 findings for broad evidence surfaces.
 - Producer completion ownership: Producer completion text with successful submissions and no remaining Analyst gap can stop the loop instead of receiving another generic continue nudge.
-- Analyst prompt ownership: the prompt now states that broad evidence surfaces should record 5-6 high-value findings, aligning prompt contract with runtime transition policy.
+- Analyst prompt ownership at Package J time stated that broad evidence surfaces should record 5-6 high-value findings, aligning prompt contract with that runtime transition policy. Package Z later removed this 5-6 limit.
 
 Verification:
 
@@ -843,7 +853,7 @@ Owner repo: `AlembicAgent`
 
 Goal: repair Package S's design root cause at the source/unit level, without a Producer-only ad hoc patch.
 
-Status: `repaired(scope=source-unit-fixture); stopped-by-user(scope=active-pcvm)`
+Status: `repaired(scope=source-unit-fixture); superseded-by-package-u-live-verdict`
 
 Implemented source outcomes:
 
@@ -869,14 +879,180 @@ Source/unit verification:
 PCVM reading:
 
 - Package T repairs the source/unit causes behind Package S's schema leak and final-summary misread.
-- This is not live evidence. The formerly proposed Package U same-input live rerun is not active after the user cancelled PCVM; retain this as historical source/unit evidence only.
+- Package U live evidence shows this repair was necessary but incomplete for the final token-efficiency target.
 
 Evidence record:
 
 - `records/package-t-contract-unification-repair.md`
 
+### Package U: Same-Input Live Rerun After Package T
+
+Owner repo: `AlembicTest` evidence, `PCVM` verdict
+
+Goal: verify Package T in the same BiliDili `design-patterns` route and determine the next token-efficiency blocker.
+
+Status: `partial(scope=live-ai-local)`
+
+Raw evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-u-same-input-live-rerun-2026-05-31`
+- Events: `events.json`
+- Job/session: `bootstrap_mptvdbij_f1710a27` / `bs_1780237377715_cigear`
+- Job artifacts: `/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/job-artifacts/bootstrap_mptvdbij_f1710a27`
+
+Metrics:
+
+- Retained events: `86`.
+- Stage counts: analyze `15` inputs / `15` outputs; produce `15` inputs / `15` outputs.
+- Candidate files: `6`.
+- Token usage: input `275108`, output `23987`, reasoning `6044`, total model `305139`, per created Recipe `50856.50`.
+- QualityGate total score: `99`.
+
+Verdict:
+
+- Package U is not a pass. Total model tokens regressed versus Package S by `+10.78%`.
+- Package T fixed useful pieces: no `knowledge.detail/manage` attempts, final summary no longer claims stored candidates are partial, and submit ledger/payload summaries are model-visible.
+- Remaining source-contract problems: broad tool descriptions still leak disallowed action names, `knowledge.submit.params` is still generic in provider schema, Producer can call empty `knowledge` or omit `description`, Producer can spend pre-submit rounds on `code.read`, and completion wording can still receive another continue nudge.
+
+### Package V: Producer Contract Tightening Source Repair
+
+Owner repo: `AlembicAgent`
+
+Goal: repair Package U's deterministic source causes before the next live rerun.
+
+Status: `repaired(scope=source-unit-fixture); superseded-by-package-w-live-verdict`
+
+Implemented source outcomes:
+
+- `V2CapabilityCatalog` / V2 registry now project real single-action `params` schemas instead of generic params objects.
+- Restricted provider descriptions now mention only allowed actions.
+- Bootstrap Producer no longer exposes `code.read`; Producer uses Analyst evidence/snippets instead of rereading source files.
+- Producer system/stage prompts now state that source reading/exploration is out of scope.
+- `ExplorationTracker` recognizes Package U completion wording (`所有 6 个结构化发现已全部提交完毕，无需继续`) as terminal after target submits.
+
+Verification:
+
+- `npm test -- test/tool-v2-contract.test.ts test/llm-input-layering.test.ts test/ExplorationStrategies.test.ts` passed; 3 files, 39 tests.
+- `npm run lint` passed.
+- `npm run build` passed.
+- `npm test` passed; 28 files, 178 tests.
+- `npm run lint:core-import-boundary` passed.
+- `git diff --check` passed.
+
+Evidence record:
+
+- `records/package-u-live-verdict-and-v-source-repair.md`
+
+### Package W: Same-Input Live Rerun and Package X Source Repair
+
+Owner repo: `AlembicTest` evidence, `PCVM` verdict, `AlembicAgent` repair
+
+Goal: verify Package V on the same BiliDili/design-patterns no-delivery live route and repair the next deterministic source cause.
+
+Status: `partial(scope=live-ai-local, package=W); repaired(scope=source-unit, package=X); blocked(scope=package-y-same-input-live-rerun)`
+
+Live evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-w-same-input-live-rerun-2026-05-31`
+- Job/session: `bootstrap_mptxbjo2_3e51c784` / `bs_1780240654943_3apoft`
+- Same-input request: `maxFiles=24`, `contentMaxLines=80`, `skipGuard=true`
+- Retained events: `81`; `llm.input=28`, `llm.output=28`, `llm.reflection=13`
+- Created candidates: `6`; rejected attempts: `4`; tool calls: `44`; quality gate: `100`
+
+Package W reading:
+
+- Package V effects are visible: Producer has no `code` tool schema, `knowledge.submit` exposes real required params, restricted descriptions are clean, and Producer performs no `code.read`.
+- Package W is not a pass: four real `Missing required param "description"` rejects remain, and the first 6/6 completion summary gets a continue nudge followed by `meta.review` and a second final summary.
+- Token result is mixed: W improves output tokens and tool calls vs U, but total model tokens still regress vs S and U; W total model / created Recipe is `53750.00`.
+
+Package X repair:
+
+- `LLMInputAssembly` now collapses Producer historical `knowledge.submit` tool rounds into plain submit-history summaries before provider dispatch.
+- The provider no longer sees compacted historical `params` as assistant tool-call JSON to imitate.
+- `ExplorationTracker` now recognizes Package W Analyst-confirmed completion wording and JSON `totalSubmitted` / empty `blockers` / empty `unsubmittedFindings` as terminal after target submits.
+
+Verification:
+
+- `npm test -- test/llm-input-layering.test.ts test/ExplorationStrategies.test.ts` passed; 2 files, 34 tests.
+- `npm run lint` passed.
+- `npm run build` passed.
+- `npm test` passed; 28 files, 180 tests.
+- `npm run lint:core-import-boundary` passed.
+- `git diff --check` passed.
+
+Evidence record:
+
+- `records/package-w-live-verdict-and-x-source-repair.md`
+
 ## Scoped Verdict
 
-Verdict: `stopped-by-user(scope=active-pcvm); historical-evidence-retained(package=S/T)`
+Verdict: `partial(scope=live-ai-local, package=W); repaired(scope=source-unit, package=X); blocked(scope=package-y-same-input-live-rerun)`
 
-Next action: none. Do not launch Package U or any new PCVM live rerun unless the user explicitly reopens PCVM with a new goal and completion definition.
+Next action: superseded by Package Y raw evidence and Package Z output quantity/token design below.
+
+### Package Y: Live Verdict and Package Z Output Quantity / Token Design
+
+Owner repo: `AlembicTest` evidence, `PCVM` verdict/design, `AlembicAgent` source repair
+
+Goal: review Package Y raw evidence without hiding output-count drift behind lower total tokens, then define the gate for the next source/unit verification and live test.
+
+Status: `partial(scope=live-ai-local, package=Y); repaired(scope=source-unit, package=Z); pending(scope=alembic-project-space-cold-start-boundary)`
+
+Live evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-y-same-input-live-rerun-2026-06-01`
+- Job/session: `bootstrap_mptzmd58_95ecf0f3` / `bs_1780244518190_peg825`
+- Same-input request: `maxFiles=24`, `contentMaxLines=80`, `skipGuard=true`
+- Retained events: `68`; `llm.input=23`, `llm.output=23`, `llm.reflection=10`
+- Created/accepted candidates: `5/5`; rejected attempts: `0`; tool calls: `30`
+
+Package Y reading:
+
+- Package X target effects hold: Producer submit-history summaries are provider-visible, imitable compacted submit JSON is absent, and missing-`description` rejects are `0`.
+- Producer still spends one post-target round on `meta.review` before the final no-tool summary.
+- The final Analyzer report lists exactly `5` confirmed core findings; Producer submitted all `5`. This is not a Producer drop.
+- The sixth-output comparison is not strict: S/U/W produced `6/6`, while Y produced `5/5` because Analyst structured output changed. Raw route token improvement is therefore useful evidence, but not a same-useful-output pass.
+
+Same-input metrics:
+
+| Metric | Package S | Package U | Package W | Package Y | PCVM reading |
+| --- | ---: | ---: | ---: | ---: | --- |
+| created/accepted | 6/6 | 6/6 | 6/6 | 5/5 | Y passes Producer target coverage but is not strict 6-output comparable. |
+| rejected attempts | 0 | 2 | 4 | 0 | Package X fixed submit-history imitation. |
+| tool calls | 42 | 62 | 44 | 30 | Improved, partly due fewer outputs and no rejects. |
+| route input tokens | 246703 | 275108 | 294769 | 190325 | Strong raw improvement; must be normalized by target/output count. |
+| route output tokens | 22825 | 23987 | 21806 | 17370 | Improved, but final Recipe count is lower. |
+| route total model | 275450 | 305139 | 322500 | 213229 | Improved raw total; not enough for final pass. |
+| route total / created Recipe | 45908.33 | 50856.50 | 53750.00 | 42645.80 | Better per created Recipe, but count/granularity comparability remains open. |
+| analyze rounds / input | 16 / 184353 | 15 / 155868 | 14 / 185685 | 15 / 143874 | Analyze input improves vs S/W; one more round than W. |
+| producer rounds / input | 7 / 62350 | 15 / 119240 | 13 / 109084 | 7 / 46451 | Producer cost improves; one `meta.review` remains after target coverage. |
+
+Package Z design and user裁决:
+
+1. `analystStructuredFindingTarget` is the primary output-quantity target for Producer. Producer must not fabricate a sixth Recipe if Analyst recorded five structured findings.
+2. A live run with fewer structured findings than baseline is `partial`, unless PCVM proves the missing themes were duplicates, wrong-dimension items, or intentionally merged with payload evidence.
+3. Token optimization is evaluated in three layers: waste elimination (`rejectedAttempts`, `postTargetWasteRounds`), unit economics (`route total / target finding`, `route total / accepted Recipe`), and payload/granularity (`storedRecipePayloadApproxTokens`, dropped-theme review).
+4. The next code target remains post-target waste: once `producerAcceptedCoverage=100%`, Producer should transition to `SUMMARIZE` with no further `meta.review` or no-tool repeats.
+5. The next AlembicTest prompt must require output quantity fields, not only token totals: structured finding count, accepted count, rejected count, post-target tool calls, dropped/unsubmitted themes, and per target/accepted token tables.
+6. User裁决: later mining from Markdown or other sources is acceptable as a separate optimization item; do not branch the current repair into extra source-mining design.
+
+Source repair:
+
+- `AlembicAgent/src/agent/context/exploration/ExplorationStrategies.ts`: `targetMemoryFindingCount()` no longer caps structured findings at 6; broad evidence surfaces can require more records, e.g. 19 evidence tool calls now require 10 structured findings.
+- `AlembicAgent/src/agent/context/exploration/ExplorationStrategies.ts`: Producer `PRODUCE→SUMMARIZE` transitions immediately once `submitCount >= targetProducerSubmitCount`.
+- `AlembicAgent/src/agent/prompts/insight-analyst.ts`: Analyst prompt no longer says broad evidence should stop at 5-6 findings; it instructs recording all confirmed high-value findings and not stopping only because count exceeds 6.
+- `AlembicAgent/src/agent/prompts/insight-producer.ts` and `src/tools/v2/capabilities/BootstrapProduce.ts`: `meta.review` is no longer a normal final workflow step; after all structured findings are submitted, Producer directly summarizes unless a tool error or evidence uncertainty requires review.
+- `AlembicAgent/test/ExplorationStrategies.test.ts`: broad evidence test now asserts no six-finding cap, and Producer target coverage test asserts immediate transition with `roundsSinceSubmit=0`.
+
+Verification:
+
+- `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts` passed; 34 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+- `npm test` passed; 28 files, 180 tests.
+- `npm run lint:core-import-boundary` passed.
+- `git diff --check` passed.
+
+Verdict: `partial(scope=live-ai-local, package=Y); repaired(scope=source-unit, package=Z); pending(scope=alembic-project-space-cold-start-boundary)`
+
+Next action: prepare the Alembic project-space cold-start test boundary with fresh AlembicAgent source proof and the quantity/token gate fields above.

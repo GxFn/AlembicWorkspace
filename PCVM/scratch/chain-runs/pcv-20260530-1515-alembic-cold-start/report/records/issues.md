@@ -2,26 +2,114 @@
 
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Owner: `PCVM`
-Status: `historical-evidence-retained`
+Status: `active`
 
 ## Current LLM Token Efficiency Work
 
 Current active blocker:
 
-- None. The user cancelled `GTODO-2026-05-25-003 / PCVM` as an active task.
-- Package T source/unit repair in `AlembicAgent` is complete for the contract-unification root causes exposed by Package S, but it is retained only as historical evidence.
-- Package S same-input live evidence remains `partial(scope=live-ai-local)`, not final pass.
-- The formerly proposed Package U same-input live rerun is not active and must not be launched unless the user explicitly reopens PCVM.
-- Exact candidate code-snippet validation remains a separate post-T quality scope; do not mix it into the LLM I/O efficiency gate unless the user expands scope.
+- The user clarified that LLM input/output optimization is not stopped and has not reached the final goal.
+- Package Y same-input live evidence is `partial(scope=live-ai-local)`, not final pass.
+- Package Y shows Package X fixed compacted submit-history imitation and missing-`description` retries, but Producer still spent one post-target `meta.review` round.
+- Package Y created `5/5` accepted candidates because Analyst produced 5 structured findings, while earlier same-input baselines produced around `10` to `13`; token gains cannot be treated as strict same-useful-output pass.
+- User裁决: coverage metrics can follow Producer coverage of Analyst structured findings; mining additional content from Markdown or other sources is a later optimization item, not this wave.
+- Package Z source/unit repair in `AlembicAgent` removes the hidden six-finding cap and targets post-target Producer waste.
+- Exact candidate code-snippet validation remains a separate quality scope; do not mix it into the LLM I/O efficiency gate unless the user expands scope.
 
-Historical metric notes:
+Active metric notes:
 
 - Use Package F `inputSizeEstimate` / `inputProjection` metadata to distinguish projected message history, runtime input layer, system prompt, and tool schemas per provider call.
 - Add accepted/submitted Recipe normalized metrics to every live comparison: route input/output/reasoning/total model per accepted Recipe and per submitted Recipe.
+- Add Analyst structured finding target, Producer accepted coverage, post-target waste rounds, and same-useful-output comparability to every live comparison.
 - Add persisted Recipe payload approximate token metrics when local DB or raw artifacts preserve accepted Recipe fields.
 - Keep Package S useful-output/token facts visible: created `6`, total model tokens `275450`, total model tokens / created Recipe `45908.33`, QualityGate score `98`.
 - Compare only against the same-input route; do not promote live route to final product acceptance.
 - Do not modify BiliDili or any real test project source.
+
+## Open Issue: Package Y Output Quantity Comparability And Post-Target Producer Waste
+
+Status: `partial(scope=live-ai-local, package=Y); repaired(scope=source-unit, package=Z); pending(scope=alembic-project-space-cold-start-boundary)`
+
+Evidence:
+
+- Package Y retained events: `68`.
+- Package Y analyze inputs/outputs: `15` / `15`.
+- Package Y produce inputs/outputs: `7` / `7`.
+- Package Y created/accepted candidates: `5/5`; rejected attempts: `0`.
+- Package Y input/output/reasoning tokens: `190325` / `17370` / `5534`.
+- Package Y total model tokens: `213229`; total model / created Recipe: `42645.80`.
+- Producer submit-history summary is visible and imitable compacted submit JSON is absent.
+- Producer still calls `meta.review` after all 5 Analyst structured findings have been submitted.
+- Output quantity is not strict-baseline comparable: the earliest baseline had `10` accepted candidates and Package E had `13`, while Y produced `5/5` because Analyst recorded only 5 structured findings.
+- Hidden source issue found: `targetMemoryFindingCount()` capped required structured findings at 6 and Analyst prompts told broad evidence surfaces to record only 5-6 high-value findings.
+
+Package Z repair:
+
+- `targetMemoryFindingCount()` no longer caps broad evidence at 6; 19 evidence tool calls now require 10 structured findings in source/unit tests.
+- Analyst prompts no longer say "5-6 high-value findings"; they require all confirmed high-value findings and explicitly avoid stopping just because the count exceeds 6.
+- Producer transitions to no-tool summary immediately when `submitCount >= targetProducerSubmitCount`.
+- Verification passed: targeted 34 tests, full 180 tests, build, lint, core-import-boundary, and diff check.
+
+Required next action:
+
+- Prepare Alembic project-space cold-start test boundary with source proof, route, metrics, and stop conditions.
+- The next live prompt must request output quantity/gate fields: `analystStructuredFindingTarget`, accepted/rejected counts, `producerAcceptedCoverage`, post-target tool calls, and per target/accepted token tables.
+
+## Open Issue: Package W Producer Submit-History And Terminal Regression
+
+Status: `superseded-by-package-y-and-z-repair(scope=live-ai-local/source-unit)`
+
+Evidence:
+
+- Package W retained events: `81`.
+- Package W analyze inputs/outputs: `14` / `14`.
+- Package W produce inputs/outputs: `13` / `13`.
+- Package W created candidates: `6`; rejected attempts: `4`.
+- Package W input/output/reasoning tokens: `294769` / `21806` / `5925`.
+- Package W total model tokens: `322500`, versus Package S `275450` (`+17.08%`) and Package U `305139` (`+5.69%`).
+- Package W total model / created Recipe: `53750.00`, versus Package S `45908.33`.
+- Producer visible tool contract is repaired: no Producer `code`, real `knowledge.submit` schema, restricted descriptions clean.
+- Four missing-`description` rejects remain because compacted historical `knowledge.submit` tool calls look like imitable `title/kind/trigger`-only assistant tool-call shapes.
+- Producer first 6/6 completion summary receives a continue nudge, then `meta.review`, then a second final summary.
+
+Package X repair:
+
+- Producer-stage historical `knowledge.submit` tool rounds are projected as plain submit-history summaries before provider dispatch.
+- Historical compacted submit summaries are no longer provider-visible assistant tool-call JSON.
+- Package W completion wording with `所有 6 个 Analyst 已确认结构化发现均已提交` plus JSON `totalSubmitted`, empty `blockers`, and empty `unsubmittedFindings` is terminal after target submits.
+
+Package X targeted repair was validated by Package Y for submit-history imitation and missing-description retries. The remaining terminal waste and quantity comparability are tracked under Package Y/Package Z above.
+
+## Open Issue: Package U Producer Schema And Responsibility Regression
+
+Status: `superseded-by-package-w-and-x(scope=live-ai-local/source-unit)`
+
+Evidence:
+
+- Package U retained events: `86`.
+- Package U analyze inputs/outputs: `15` / `15`.
+- Package U produce inputs/outputs: `15` / `15`, versus Package S `7` / `7`.
+- Package U created candidates: `6`.
+- Package U input/output/reasoning tokens: `275108` / `23987` / `6044`.
+- Package U total model tokens: `305139`, versus Package S `275450` (`+10.78%`).
+- Package U tool calls: `62`.
+- Provider schema narrowed `action.enum`, but descriptions still exposed broad wording such as `Knowledge management: search, submit, detail, manage`.
+- Provider-visible `knowledge.submit.params` was a generic object with required fields only in natural-language description.
+- Producer generated one invalid empty `knowledge` call and one missing-`description` submit reject.
+- Producer spent three early produce rounds on `17` `code.read` calls before creating any candidate.
+- Producer completion at iteration `13` was followed by a continue nudge, `meta.review`, and a second final summary.
+
+Package V repair:
+
+- Single-action schemas now expose real action `params` schema with required fields.
+- Restricted provider descriptions mention only allowed actions.
+- Bootstrap Producer no longer exposes `code.read`.
+- Producer prompts and runtime stage policy make source reading/exploration out of scope.
+- Package U completion wording is recognized as terminal after target submits.
+
+Required next action:
+
+- No direct action on Package U. Package W verified the visible Package V contract and exposed the next issue now tracked under Package W/Package X above.
 
 ## Open Issue: Package E Primary Token Regression
 
@@ -208,7 +296,7 @@ Evidence:
 - Package K analyze final report listed 7 pattern families, but Producer submitted 6 candidates.
 - Package K accepted Recipes are larger: avg stored payload approx tokens / Recipe `1997.4`, compared with Package E `1008.8`.
 - K's `totalModel / accepted Recipe` is worse than E (`49061.8` vs `43628.7`), but `totalModel / stored payload token` is better (`24.56x` vs `43.25x`).
-- `targetMemoryFindingCount()` currently caps structured findings at 6; this may be too low for design-pattern dimensions where each verified pattern family should map to a candidate.
+- At Package K time, `targetMemoryFindingCount()` capped structured findings at 6; Package Z later removed this hidden limit.
 
 Required next action:
 
@@ -297,7 +385,7 @@ Required next action:
 
 ## Open Issue: Producer Coverage Stops Before Structured Findings Are Submitted
 
-Status: `failed(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); fixed(scope=live-ai-local-coverage, package=S); contract-blocker-repaired(scope=source-unit, package=T); stopped-by-user(scope=active-pcvm)`
+Status: `failed(scope=live-ai-local, package=Q); repaired(scope=source-unit, package=R); fixed(scope=live-ai-local-coverage, package=S); contract-blocker-repaired(scope=source-unit, package=T); regressed(scope=producer-rounds, package=U); repaired(scope=source-unit, package=V)`
 
 Evidence:
 
@@ -317,18 +405,19 @@ Package R repair:
 - Producer prompts now repeat the same required-field contract.
 - Verified by targeted and full AlembicAgent source/unit tests; committed as `bcdc8bf`.
 
-Historical reading:
+Current reading:
 
 - Package S proves structured finding coverage is repaired (`6/6` created).
-- Package T repairs the remaining contract blocker at source/unit level. No live rerun is active after the user cancelled PCVM.
+- Package U proves Producer still regressed through generic params, missing-description retry, pre-submit code reads, and extra completion round.
+- Package V repairs those source/unit causes; Package W must verify live behavior.
 
 ## Open Issue: Stage Capability Action Contract Is Not The Provider Schema Source Of Truth
 
-Status: `repaired(scope=source-unit, owner=AlembicAgent, package=T); stopped-by-user(scope=active-pcvm)`
+Status: `partial(scope=live-ai-local, package=U); repaired(scope=source-unit, owner=AlembicAgent, package=V); blocked(scope=Package-W-live-rerun)`
 
 Evidence:
 
-- `BootstrapProduce.allowedTools` declares action-level constraints: `knowledge.submit`, `code.read`, `memory.recall`, `meta.review`.
+- `BootstrapProduce.allowedTools` declared action-level constraints: `knowledge.submit`, `code.read`, `memory.recall`, `meta.review`.
 - `CapabilityV2.tools` collapses `allowedTools` to tool ids.
 - `AgentRuntime.#collectTools()` collects only tool ids.
 - `AgentRuntime.#getToolSchemas()` passes only ids to `V2CapabilityCatalog`.
@@ -344,13 +433,24 @@ Package T repair:
 - Direct `note_finding` exposure is now conditional on `memory.note_finding`, so Producer no longer receives Analyst-only direct memory actions.
 - `ToolExecutionPipeline` enforces the same action-level allowlist at runtime and exposes action diagnostics for future live comparison.
 
-Historical reading:
+Package U result:
 
-- Former Package U verification target was broad schema exposure and invalid Producer action attempts. It is not active after the user cancelled PCVM.
+- `action.enum` was narrowed and Producer did not choose `knowledge.detail/manage`.
+- Provider-visible descriptions still leaked broad action words, and `params` remained generic.
+
+Package V repair:
+
+- Single-action schemas now expose real action `params` schema with required fields.
+- Restricted descriptions now mention only the allowed actions.
+- Bootstrap Producer no longer exposes `code.read`.
+
+Required next action:
+
+- Package W verifies live provider schemas and Producer calls after Package V.
 
 ## Open Issue: Submit History Compaction Drops Completion Semantics
 
-Status: `repaired(scope=source-unit, owner=AlembicAgent, package=T); stopped-by-user(scope=active-pcvm)`
+Status: `pass(scope=live-ai-local, package=U); preserve(scope=Package-W-live-rerun)`
 
 Evidence:
 
@@ -364,9 +464,10 @@ Package T repair:
 - Successful Producer `knowledge.submit` calls now record a runtime-owned `_producerSubmitLedger` with created count, target submit count, per-candidate status/title/trigger, and completion flags.
 - `LLMInputAssembly` injects the Producer submit ledger into the runtime evidence context and instructs the model to treat it as authoritative instead of inferring field loss from compacted history.
 
-Historical reading:
+Package U result:
 
-- Former Package U verification target was live final-summary behavior against compacted provider history and the injected ledger. It is not active after the user cancelled PCVM.
+- Producer final summaries no longer claimed stored candidates had only partial fields after all six candidates were created.
+- Preserve submit ledger and `payloadSummary` visibility in Package W.
 
 ## Open Issue: Candidate Quality Score Does Not Validate Exact Code Snippet Correctness
 

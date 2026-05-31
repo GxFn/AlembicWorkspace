@@ -1,6 +1,6 @@
 # PCVM Workspace
 
-状态：artifact 证据保留 / `GTODO-2026-05-25-003 / PCVM` 已按用户裁决从活跃 TODO 删除；LLM token run 历史停在 Package T source/unit 修复，Package U same-input live rerun 不再作为当前下一步
+状态：LLM token efficiency active / Package Z source-unit 修复已验证；下一步可准备 Alembic 项目空间 cold-start 测试边界
 
 ## 定位
 
@@ -10,7 +10,7 @@
 
 | Run ID | 目标 | 主产物 | 状态 |
 | --- | --- | --- | --- |
-| `pcv-20260530-1515-alembic-cold-start` | Reduce duplicated and oversized LLM input/output in Alembic cold-start stages | [scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md) | `stopped-by-user(scope=active-pcvm); historical-evidence-retained(package=S/T)` |
+| `pcv-20260530-1515-alembic-cold-start` | Reduce duplicated and oversized LLM input/output in Alembic cold-start stages | [scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/plan.md) | `partial(scope=live-ai-local, package=Y); repaired(scope=source-unit, package=Z); pending(scope=alembic-project-space-cold-start-boundary)` |
 | `pcv-20260531-1506-tool-terminal-usage-baseline` | Establish baseline facts and key metrics for current tool and terminal usage before optimization | [scratch/chain-runs/pcv-20260531-1506-tool-terminal-usage-baseline/report/plan.md](scratch/chain-runs/pcv-20260531-1506-tool-terminal-usage-baseline/report/plan.md) | `repair-implemented(scope=alembictest-controlled-baseline-helper); blocked(scope=historical-all-session-baseline)` |
 
 ## 说明文档
@@ -41,6 +41,9 @@ LLM token efficiency run:
 - [package-r-source-unit-repair.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-r-source-unit-repair.md)：Package R Producer 覆盖率、submit 字段可见性和工具边界 source/unit 修复证据。
 - [package-s-root-cause-design-audit.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-s-root-cause-design-audit.md)：Package S live raw evidence 与真实源码链路根因审计；确认剩余问题是设计契约断层，不再打临时补丁。
 - [package-t-contract-unification-repair.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-t-contract-unification-repair.md)：Package T stage capability/action contract、runtime action gate、compact submit ledger 与 final summary source-of-truth source/unit 修复证据。
+- [package-u-live-verdict-and-v-source-repair.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-u-live-verdict-and-v-source-repair.md)：Package U live raw evidence 复核与 Package V Producer schema/责任边界 source/unit 修复证据。
+- [package-w-live-verdict-and-x-source-repair.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-w-live-verdict-and-x-source-repair.md)：Package W live raw evidence 复核与 Package X Producer history projection / terminal completion source-unit 修复证据。
+- [package-y-live-verdict-and-z-output-token-design.md](scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/package-y-live-verdict-and-z-output-token-design.md)：Package Y live raw evidence 复核、output quantity gate、token gate 和 Package Z 测试前设计。
 
 旧轮次、旧任务包和旧 AI 分析文件已删除，不再作为 PCVM 入口或判断依据。
 
@@ -53,6 +56,6 @@ LLM token efficiency run:
 
 当前默认线路：`S0-intake -> S1-source-chain-map -> S2-plan-artifact -> S3-round-registry -> S4-node-or-round-execution -> S5-record-classification -> S6-engineering-repair-packaging -> S8-verdict-and-next-round`。
 
-当前 LLM token run 状态：Package S/T 记录只作为历史诊断和源码修复证据保留。用户已裁决 `GTODO-2026-05-25-003 / PCVM` 不做并从活跃 TODO 删除，因此 Package U same-input live rerun 不再作为当前下一步；不要重开 SourceRef，不要新增伪指标，不要启动新的 PCVM live gate。
+当前 LLM token run 状态：用户已确认 LLM 输入输出优化没有停止，且尚未达到最终目标。Package Y live rerun 证明 Package X 修复了 submit-history imitation 和 missing-description retries，但 Y 只有 `5/5` Analyst 结构化发现产出，不能拿 raw total token 降低直接宣告 6-output baseline pass。用户已裁决：后续是否从其它来源继续挖内容可作为优化项，本轮不展开分叉；覆盖指标按 Producer 覆盖 Analyst 结构化发现走。Package Z 已在 AlembicAgent 修掉 Analyst 结构化发现最多 6 条的隐性限制，并让 Producer 提交覆盖后直接总结。不要重开 SourceRef，不要新增伪指标。
 
 当前工具/终端使用基线 run 下一步：AlembicTest controlled baseline helper 已实现并验证；不要为了造更好看的数字单独重跑 Test。等下一次真实 PCVM Tool/Terminal 任务出现时，用新脚本做 before/after。全历史 baseline 仍阻塞在真实 telemetry source。
