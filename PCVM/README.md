@@ -21,6 +21,8 @@ PCVM 是 AlembicWorkspace 下的 Progressive Chain Validation artifact 工作面
 scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/
 ```
 
+当前状态：当前以清理后的产品代码事实为准。PCVM 不维护独立的伪指标契约或分类口径。R5、Dashboard、delivery、full cold-start 和 Alembic self-hosting 仍关闭。
+
 主产物必须是：
 
 ```text
@@ -37,13 +39,7 @@ scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/
 
 `plan.md` 只保留链路计划、节点指标契约、当前游标、verdict 和必要链接。
 
-当前 run 的轮次、任务包和 AI 局部链路占位分别放在：
-
-```text
-scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/rounds.md
-scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/task-packages.md
-scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/records/ai-local-chain.md
-```
+当前 run 的短期状态只保留 `records/data.md`、`records/issues.md` 和 `records/progress.md`。旧轮次、旧任务包和旧 AI 分析文件已删除，不再作为入口。
 
 机器形态 probe 摘要、JSON 输出和大块命令产物放在：
 
@@ -61,4 +57,4 @@ scratch/chain-runs/pcv-20260530-1515-alembic-cold-start/report/artifacts/
 
 ## 固定流程
 
-后续 PCVM 推进先按 `config/pcvm-flow-control.json` 判断状态线路，再按 `skills/pcvm-flow-controller/SKILL.md` 执行。默认顺序是先完成 `R2-engineering-repair` 的工程修复设计与 before/after 指标，再打开真实 AI 局部轮次；不得把 R1 fixture 结果直接升级成 runtime / live AI / delivery 验收。
+后续 PCVM 推进先按 `config/pcvm-flow-control.json` 判断状态线路，再按 `skills/pcvm-flow-controller/SKILL.md` 执行。不得把已删除的旧分析和任务包文档继续作为当前判断，也不得把 fixture、unit/typecheck、partial/failure 或 source pass 直接升级成 full runtime / Dashboard / delivery 验收。

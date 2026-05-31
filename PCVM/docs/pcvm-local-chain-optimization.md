@@ -36,7 +36,7 @@ Use the same loop for every local segment:
 | --- | --- |
 | data contract | missing field, ambiguous status, duplicate ids, unknown skip reason |
 | evidence linkage | missing node id, missing chain id, unlinked artifact, missing report surface |
-| source grounding | invalid sourceRefs, no referenced files, fallback-only findings |
+| source grounding | no referenced files, fallback-only findings |
 | side effect safety | unsafe write root, unapproved delivery, DB mutation outside round |
 | runtime health | timeout, missing dimension result, cancellation leak, stale session |
 | quality | rejected reason vague, quality gate incomplete, record repair incomplete |
@@ -67,7 +67,7 @@ The local verdict only applies to that segment. It does not close the whole PCVM
 | session-task | Alembic | selected dimensions | bootstrap session + task defs | skeleton response, cancellation, late transition |
 | runtime-stage-policy | Alembic/Agent | dimension plan/runtime context | Agent run input + stage policy | terminal tool leakage, PCV map visibility |
 | ai-analyze-quality | Agent/Alembic | Agent input | analysis + quality/repair evidence | grounding burns, invalid no-evidence, quality gate result |
-| ai-producer | Agent/Alembic | analysis artifact | candidate submit/reject digest | invalid sourceRefs, rejected reason, terminal use |
+| ai-producer | Agent/Alembic | analysis artifact | candidate submit/reject digest | rejected reason, terminal use |
 | consumer-persistence | Alembic/Core | projection + tool calls | SessionStore/checkpoint/candidate relations | accepted not findable, missing failure reason |
 | finalizer | Alembic/Core | session result | skills/delivery/memory summary | unapproved write, missing receipt, skipped reason |
 | report-history | Core/Alembic | finalizer result + evidence | report/history/job evidence | missing node id, report mismatch, artifact link |

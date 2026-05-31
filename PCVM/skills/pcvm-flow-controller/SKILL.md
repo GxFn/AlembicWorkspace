@@ -1,140 +1,150 @@
 ---
 name: pcvm-flow-controller
-description: Use when AlembicWorkspace is using PCVM to generate or update source-derived chain plans, run scoped PCVM rounds, control round transitions, package engineering repairs, or prepare live AI/Test phases for Alembic cold-start or rescan optimization.
+description: Use when PCVM is generating or updating source-derived chain plans, running scoped PCVM rounds, dispatching product-window tasks, doing PCV-scoped code repair, calling AlembicTest, comparing metrics, or deciding the next PCV optimization round.
 ---
 
 # PCVM Flow Controller
 
-This skill fixes how PCVM is used. PCVM is a plan, metrics, and evidence-control surface. It is not a product implementation window and not a substitute for AlembicWorkspace judgment.
+PCVM is the Progressive Chain Validation domain controller. Within a user-confirmed PCV scope it can plan, dispatch, self-repair, call AlembicTest, review evidence, and iterate without asking AlembicWorkspace for every step.
+
+AlembicWorkspace is only the escalation surface for global workspace goals, non-PCV scope expansion, cross-mainline conflicts, final archive, global TODO closure, or user-visible scope changes.
 
 ## Required Inputs
 
-Before changing any PCVM artifact, read:
+Before changing a PCVM artifact or dispatching work, read:
 
 1. `../AGENTS.md`
 2. `PCVM/AGENTS.md`
 3. `PCVM/config/pcvm-flow-control.json`
 4. `PCVM/index.md`
 5. The active run `report/plan.md`
-6. The active run `report/records/rounds.md`, `issues.md`, `data.md`, `progress.md`, and `task-packages.md` as needed
+6. The active run records needed for the task
 
-Load canonical PCV source only when method details or plan generation are needed:
+Load these only when needed:
 
-```text
-../progressive-chain-validation/progressive-chain-validation/SKILL.md
-```
+- PCV method details: `../progressive-chain-validation/progressive-chain-validation/SKILL.md`
+- round semantics: `PCVM/docs/pcvm-round-model.md`
+- local segment design: `PCVM/docs/pcvm-local-chain-optimization.md`
+- artifact usage: `PCVM/docs/pcvm-usage.md`
 
-## Authority Boundaries
+## Controller Loop
 
-- PCVM owns plan artifacts, metrics, round records, issue records, and task-package design candidates.
-- AlembicWorkspace owns final judgment, product task dispatch, Test handoff, acceptance, and TODO closure.
-- Product source changes happen only in the owning product repository after a PCVM task package is accepted by AlembicWorkspace.
-- `AlembicTest` is used only for live AI, real project, Dashboard/manual observation, runtime monitoring, or cross-repository integration evidence.
-- Do not update `.workspace-active/workspace/current/` merely because a PCVM record changed.
+1. State the user goal, current evidence, minimum closure, current round/node/segment, and first blocker.
+2. Classify the request using `requestRoutes` in `config/pcvm-flow-control.json`.
+3. Choose the smallest real action that removes the blocker:
+   - update PCVM plan/records
+   - self-repair a PCV-scoped code issue in the owning repository
+   - dispatch a product-window task package
+   - call AlembicTest for real AI/runtime/project evidence
+   - review returned raw evidence and decide the next iteration
+4. Record facts in the right artifact. Do not use document edits as proof of progress.
+5. Issue only a scoped PCVM verdict, then continue, stop, or escalate.
 
-## Request Routing
+## Authority Rules
 
-Classify the user request before editing:
+- PCVM owns PCV plan artifacts, round records, metric contracts, task packages, PCV-scoped product dispatch, scoped self-repair, AlembicTest handoff, evidence review, and next-round decisions.
+- Product source edits are allowed only when the code belongs to the current PCV objective. Read the target repo `AGENTS.md`, state the PCVM role, keep changes narrow, run verification, and record diff/evidence paths.
+- Product-window dispatch prompts must require the target window to read workspace `AGENTS.md`, `PCVM/AGENTS.md`, the active PCVM plan, and the target repo `AGENTS.md`.
+- AlembicTest is for live AI, real project, Dashboard/manual observation, runtime monitoring, regression, or cross-repository integration evidence. It is not for deterministic issues PCVM or the product repo can answer with source/unit/fixture/probe evidence.
+- PCVM does not close global TODOs, declare final product acceptance, or archive the workspace.
 
-| Request | Route |
-| --- | --- |
-| "fix PCVM flow", "write skill/config", "固化流程" | Update this skill and `config/pcvm-flow-control.json`; no product source edits. |
-| "generate PCVM plan" | Create or update `report/plan.md` from source-derived chain map and PCV references. |
-| "continue PCVM round" | Read current round and node cursor; advance only the authorized round/node. |
-| "summarize first round issues" | Update records, task packages, and next-round gates; do not mark product acceptance. |
-| "start engineering repair" | Prepare task package(s) and ownership; do not run live AI. |
-| "start live AI round" | Verify R2 gates, create Test placeholder/result contract, then hand to AlembicTest if needed. |
-| "accept/close PCVM" | Check scoped verdicts, unresolved issues, required round coverage, and evidence paths before recommending closure. |
+## Fixed Flow
 
-## Fixed Flow Line
+Use `flowStates` from config as the machine-readable route:
 
-Follow this route unless the user explicitly changes PCVM scope:
+1. `S0-intake`
+2. `S1-source-chain-map`
+3. `S2-plan-artifact`
+4. `S3-round-registry`
+5. `S4-node-or-round-execution`
+6. `S5-record-classification`
+7. `S6-engineering-repair-packaging`
+8. `S8-verdict-and-next-round`
 
-1. `S0-intake`: state user goal, evidence scope, minimum closure, and first blocker.
-2. `S1-source-chain-map`: derive chain boundaries from real source before applying overlays.
-3. `S2-plan-artifact`: create/update `report/plan.md`; it is the plan state machine.
-4. `S3-round-registry`: define round scope and verdict meaning in `records/rounds.md`.
-5. `S4-node-or-round-execution`: execute only the current authorized node/round.
-6. `S5-record-classification`: record data, issues, progress, and review in separate record files.
-7. `S6-engineering-repair-packaging`: group deterministic issues into product-repo task packages.
-8. `S7-live-ai-local-chain`: split AI-dependent behavior into local Test-ready stages.
-9. `S8-verdict-and-next-round`: issue scoped verdict and name the next safe round or stop condition.
-
-Never skip directly from discovery to live AI or delivery.
+Never skip directly from discovery to live AI, Dashboard, delivery, full cold-start, or self-hosting.
 
 ## Round Route
 
-Use this default round order:
+Use `roundRoute` from config as the default sequence:
 
-1. `R1-engineering-discovery`: source/unit/fixture discovery. Verdict scope: `fixture`.
-2. `R2-engineering-repair`: deterministic repairs and before/after comparison. Verdict scope: `unit` or `targeted-integration`.
-3. `R3-ai-local-analyze`: one live AI analyze/quality/record-repair segment. Verdict scope: `live-ai-local`.
-4. `R4-ai-local-producer`: one live AI producer/sourceRef segment. Verdict scope: `live-ai-local`.
-5. `R5-ai-expansion`: two/full live AI dimensions without delivery. Verdict scope: `live-ai-expansion`.
-6. `R6-dashboard-observability`: daemon/Dashboard/manual observability. Verdict scope: `runtime-dashboard`.
-7. `R7-delivery`: authorized delivery/write surfaces. Verdict scope: `delivery`.
+1. `R1-engineering-discovery`
+2. `R2-engineering-repair`
+3. `R3-ai-local-analyze`
+4. `R4-ai-local-producer`
+5. `R5-ai-expansion`
+6. `R6-dashboard-observability`
+7. `R7-delivery`
 
-Every round must declare entry gate, allowed actions, forbidden actions, metrics, artifacts, and exact verdict meaning.
+Every round must declare entry gate, evidence scope, allowed actions, forbidden actions, metrics, expected artifacts, verdict meaning, and next-round candidates.
 
-## Artifact Rules
+## Records
 
-- `report/plan.md`: chain plan, current cursor, node status, scorecard summary, links to records.
-- `records/data.md`: command evidence, source facts, measurement tables, report paths.
-- `records/issues.md`: problems, risk classes, blockers, residual risk, open decisions.
+- `report/plan.md`: state machine, current cursor, node/round status, scoped verdict summary, links to records.
+- `records/data.md`: source facts, command evidence, measurements, report paths, job/session ids.
+- `records/issues.md`: blockers, risks, regressions, residual risks, open decisions.
 - `records/progress.md`: chronological actions and user confirmations.
-- `records/review.md`: round review and next-round reasoning.
-- `records/rounds.md`: round contract, scope, gates, verdict semantics.
-- `records/task-packages.md`: engineering repair package candidates.
-- `records/ai-local-chain.md`: AI local stage split and Test result placeholders.
 
-Do not put process notes, raw logs, or broad issue dumps into `plan.md`.
+Do not put raw logs, long issue dumps, or process notes into `plan.md`.
 
-## Verdict Rules
+## Metrics And Verdicts
 
 - Plain `pass` is invalid. Use scoped verdicts such as `pass(scope=fixture)` or `blocked(scope=live-ai-local)`.
-- A full run cannot auto-pass its internal nodes.
-- A fixture verdict cannot prove runtime, AI, Dashboard, or delivery behavior.
-- A round can complete while later rounds remain unopened.
-- Improvement requires the same baseline/candidate metric and a passed quality gate.
-- If evidence is missing, classify the gap as `product-risk`, `test-gap`, `probe-error`, `expected-boundary`, or `runtime-placeholder`.
+- Improvement requires a passed quality gate and same-scope baseline/candidate comparison.
+- Loss reduction does not count if the useful unit gets weaker.
+- Different rounds cannot be merged into one verdict unless the comparison names the scope difference.
+- AI intervals always record stage token usage and whole-route cold-start token usage.
+- Any primary metric regression pauses dispatch, Test, record rolling, and closure until root cause is analyzed.
 
-## Engineering Repair Rules
+## AI Guardrails
 
-For deterministic issues discovered in R1:
+- Keep AI metrics to `primary`, `support`, and `diagnostic`; default to one primary gate.
+- Do not add taxonomy, fields, reason splits, or explanation layers unless they directly answer a user goal, gate, repair action, or Test verdict.
+- For LLM refs, keep only: stage, LLM output refs, final artifact refs, whether refs entered the final candidate, and evidence path.
+- Do not treat temporary reasoning, debug notes, fallback text, or per-stage scratch refs as final candidate metrics.
 
-1. Classify the issue and owner repository.
-2. Group related problems into a task package.
-3. Define input/output contract cleanup, coupling reduction, tests, and before/after metrics.
-4. Keep AI-dependent checks as placeholders unless the round is explicitly live AI.
-5. Do not dispatch Test for problems that can be reproduced with source, unit, fixture, or targeted integration evidence.
+## Product Task Packages
 
-## Live AI/Test Rules
+Each package must include:
 
-Open a live AI round only after the engineering gate in `records/rounds.md` says R2 is complete or explicitly blocked with a Test-relevant reason.
+- package id, owner repository, stage/round
+- user-goal linkage and problem statement
+- input contract, output contract, state changes, call chain
+- coupling/boundary issue and proposed repair
+- before/after metrics and verification commands
+- forbidden actions
+- expected return evidence
+- whether AlembicTest is required, with reason
 
-The Test handoff must include:
+## AlembicTest Contract
 
-- `roundId`
-- AI stage ids
-- project category
+Use AlembicTest only when the evidence requires a real project, live AI, runtime, Dashboard, delivery surface, regression, or cross-repo integration.
+
+The Test task must include:
+
+- round id and AI stage ids
+- target project/category
 - command or UI route
-- job/session/report paths expected
+- expected job/session/report paths
 - dimension ids
-- sourceRef validity metrics
-- failed/missing/skipped dimensions
-- delivery status
+- primary/support/diagnostic metrics
+- stage token usage and whole-route token usage
+- failed/missing/skipped dimension semantics
+- delivery status and no-delivery boundary
 - what success proves
 - what failure proves
 - what the test cannot prove
+- stop condition
 
-No live AI round may authorize delivery unless the current round is `R7-delivery`.
+After Test returns, PCVM reads raw evidence before writing any verdict.
+
+## Escalate Only When
+
+- scope, repo coverage, route, budget, or user-visible behavior changes
+- a primary metric regresses
+- required evidence is unavailable and cannot be self-produced
+- final product acceptance, global TODO closure, or archive is being considered
+- user confirmation is explicitly required
 
 ## Final Response Checklist
 
-When reporting PCVM work, say:
-
-- which PCVM artifacts changed
-- which round/stage is current
-- what evidence scope the verdict covers
-- what remains blocked or deliberately unopened
-- whether any product source or live AI action was performed
+Report: changed artifacts, current round/stage, evidence scope, product-source/Test involvement, scoped verdict, first blocker, and whether PCVM will continue autonomously or needs escalation.

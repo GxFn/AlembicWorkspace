@@ -16,10 +16,6 @@ const requiredFiles = [
   `scratch/chain-runs/${runId}/report/records/data.md`,
   `scratch/chain-runs/${runId}/report/records/issues.md`,
   `scratch/chain-runs/${runId}/report/records/progress.md`,
-  `scratch/chain-runs/${runId}/report/records/review.md`,
-  `scratch/chain-runs/${runId}/report/records/rounds.md`,
-  `scratch/chain-runs/${runId}/report/records/task-packages.md`,
-  `scratch/chain-runs/${runId}/report/records/ai-local-chain.md`,
 ];
 
 const allowedIssueClasses = new Set([
@@ -68,8 +64,6 @@ if (config) {
 
 const plan = readRelative(`scratch/chain-runs/${runId}/report/plan.md`);
 const issues = readRelative(`scratch/chain-runs/${runId}/report/records/issues.md`);
-const rounds = readRelative(`scratch/chain-runs/${runId}/report/records/rounds.md`);
-const taskPackages = readRelative(`scratch/chain-runs/${runId}/report/records/task-packages.md`);
 
 const plainVerdictMatches = [
   ...plan.matchAll(/verdict:\s*`(pass|blocked|fail|skipped)`/gi),
@@ -95,18 +89,6 @@ for (const section of issueSections) {
   }
   if (!allowedIssueClasses.has(issueClass)) {
     errors.push(`${title} has invalid Issue class: ${issueClass}`);
-  }
-}
-
-for (const expectedRound of ['R1-engineering-discovery', 'R2-engineering-repair']) {
-  if (!rounds.includes(expectedRound)) {
-    errors.push(`rounds.md missing ${expectedRound}`);
-  }
-}
-
-for (const expectedPackage of ['Package P0', 'Package P1', 'Package P2', 'Package P3']) {
-  if (!taskPackages.includes(expectedPackage)) {
-    errors.push(`task-packages.md missing ${expectedPackage}`);
   }
 }
 

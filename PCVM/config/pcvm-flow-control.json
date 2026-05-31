@@ -1,12 +1,12 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "pcvm-flow-control",
   "status": "active",
-  "owner": "AlembicWorkspace",
-  "purpose": "Fixed route for using PCVM as a source-derived plan, metrics, round-control, and evidence surface.",
-  "defaultRunId": "pcv-20260530-1515-alembic-cold-start",
+  "owner": "PCVM",
+  "purpose": "Machine-readable route for PCVM as a Progressive Chain Validation domain controller: plan, dispatch, self-repair, AlembicTest handoff, evidence review, scoped verdicts, and next-round optimization.",
   "paths": {
     "pcvmRoot": ".",
+    "agents": "AGENTS.md",
     "skill": "skills/pcvm-flow-controller/SKILL.md",
     "usage": "docs/pcvm-usage.md",
     "roundModel": "docs/pcvm-round-model.md",
@@ -16,40 +16,92 @@
     "records": {
       "data": "scratch/chain-runs/<run-id>/report/records/data.md",
       "issues": "scratch/chain-runs/<run-id>/report/records/issues.md",
-      "progress": "scratch/chain-runs/<run-id>/report/records/progress.md",
-      "review": "scratch/chain-runs/<run-id>/report/records/review.md",
-      "rounds": "scratch/chain-runs/<run-id>/report/records/rounds.md",
-      "taskPackages": "scratch/chain-runs/<run-id>/report/records/task-packages.md",
-      "aiLocalChain": "scratch/chain-runs/<run-id>/report/records/ai-local-chain.md"
+      "progress": "scratch/chain-runs/<run-id>/report/records/progress.md"
     },
     "artifacts": "scratch/chain-runs/<run-id>/report/artifacts"
   },
+  "authority": {
+    "pcvmOwns": [
+      "PCV plan artifacts",
+      "round records",
+      "metric contracts",
+      "task-package design and dispatch",
+      "PCV-scoped product code self-repair",
+      "AlembicTest handoff for real evidence",
+      "raw evidence review",
+      "scoped PCVM verdicts",
+      "next-round decisions"
+    ],
+    "escalateToAlembicWorkspaceFor": [
+      "global workspace goal changes",
+      "non-PCV scope expansion",
+      "cross-mainline priority conflicts",
+      "final product acceptance",
+      "global TODO closure",
+      "archive decisions",
+      "user-visible behavior or resource budget changes"
+    ]
+  },
   "globalRules": [
-    "PCVM is not an implementation repository.",
-    "AlembicWorkspace owns judgment, dispatch, acceptance, and Test handoff.",
-    "Do not update .workspace-active/workspace/current merely to show PCVM progress.",
-    "Do not edit product source from PCVM artifacts unless a product task package has been accepted by AlembicWorkspace.",
-    "Use one active round and one current node boundary at a time.",
+    "PCVM is the PCV domain controller, not a passive artifact folder.",
+    "PCVM may dispatch product-window tasks and may self-repair code inside the confirmed PCV scope.",
+    "Every product-source action must read the target repository AGENTS.md first.",
+    "AlembicTest is used only for real project, live AI, runtime, Dashboard, delivery, regression, or cross-repository integration evidence.",
+    "Do not ask AlembicTest to rediscover deterministic source/unit/fixture/probe issues.",
+    "Do not update AlembicWorkspace current status merely to show PCVM progress.",
+    "Use one active round and one current node or segment boundary at a time.",
     "Plain pass is invalid; every verdict must carry evidence scope.",
-    "Fixture evidence must not be promoted to runtime, live AI, Dashboard, or delivery acceptance.",
+    "Fixture evidence must not be promoted to runtime, live AI, Dashboard, delivery, or final acceptance.",
     "A broad run can provide observations but cannot auto-pass internal nodes.",
-    "Live AI rounds require explicit entry gates and Test-ready result envelopes.",
-    "Delivery/write-surface checks require R7 authorization."
+    "Delivery/write-surface checks require R7 authorization.",
+    "Primary metric regression pauses further dispatch, Test, record rolling, and closure until root cause is analyzed."
+  ],
+  "requestRoutes": [
+    {
+      "match": ["flow", "agents", "skill", "config", "固化流程", "流程治理"],
+      "route": "governance",
+      "allowedActions": ["update PCVM AGENTS", "update flow skill", "update flow config", "update PCVM docs"],
+      "forbiddenActions": ["opportunistic product source edit"]
+    },
+    {
+      "match": ["generate PCVM plan", "update plan", "生成计划", "更新计划"],
+      "route": "plan",
+      "allowedActions": ["source chain map", "plan update", "records update"],
+      "forbiddenActions": ["multi-node pass without isolation proof"]
+    },
+    {
+      "match": ["continue round", "推进轮次", "继续 PCVM"],
+      "route": "round-execution",
+      "allowedActions": ["execute current round/node", "update records", "scoped verdict"],
+      "forbiddenActions": ["skip round", "unscoped verdict"]
+    },
+    {
+      "match": ["engineering repair", "工程修复", "修 bug"],
+      "route": "engineering-repair",
+      "allowedActions": ["self-repair scoped code", "dispatch product-window package", "run verification"],
+      "forbiddenActions": ["live AI unless current round authorizes it"]
+    },
+    {
+      "match": ["live AI", "AlembicTest", "真实测试", "Dashboard", "runtime", "delivery"],
+      "route": "real-evidence",
+      "allowedActions": ["write Test contract", "call AlembicTest", "review raw evidence"],
+      "forbiddenActions": ["Test for deterministic gaps", "delivery before R7"]
+    }
   ],
   "flowStates": [
     {
       "id": "S0-intake",
-      "purpose": "State the user goal, evidence scope, minimum closure, and first blocker.",
+      "purpose": "State the user goal, evidence scope, minimum closure, current cursor, and first blocker.",
       "requiredInputs": ["../AGENTS.md", "AGENTS.md", "config/pcvm-flow-control.json", "index.md"],
-      "allowedActions": ["read PCVM artifacts", "classify request"],
-      "forbiddenActions": ["product source edit", "live AI", "runtime mutation"],
+      "allowedActions": ["read PCVM artifacts", "classify request", "choose first real action"],
+      "forbiddenActions": ["product source edit before route decision", "live AI", "runtime mutation"],
       "outputs": ["route decision"],
       "next": ["S1-source-chain-map", "S3-round-registry", "S6-engineering-repair-packaging"]
     },
     {
       "id": "S1-source-chain-map",
       "purpose": "Derive producer/consumer boundaries from real source before overlay alignment.",
-      "requiredInputs": ["canonical PCV SKILL.md when method details are needed", "target repository source"],
+      "requiredInputs": ["canonical PCV SKILL.md when method details are needed", "target repository source", "target repository AGENTS.md if editing or dispatching"],
       "allowedActions": ["read source", "read tests", "build source-first chain map"],
       "forbiddenActions": ["runtime writes", "broad bootstrap", "AI provider calls"],
       "outputs": ["source chain map", "branch and degradation paths"],
@@ -68,16 +120,16 @@
       "id": "S3-round-registry",
       "purpose": "Define round sequence, scope, gates, metrics, and verdict meaning.",
       "requiredInputs": ["docs/pcvm-round-model.md", "report/plan.md"],
-      "allowedActions": ["write records/rounds.md"],
+      "allowedActions": ["update plan round section", "write records/data.md", "write records/issues.md", "write records/progress.md"],
       "forbiddenActions": ["unscoped pass", "mixing round evidence"],
-      "outputs": ["records/rounds.md"],
+      "outputs": ["round state in current records"],
       "next": ["S4-node-or-round-execution"]
     },
     {
       "id": "S4-node-or-round-execution",
       "purpose": "Run only the authorized node or round using declared evidence scope.",
       "requiredInputs": ["current round gate", "current node cursor", "allowed actions"],
-      "allowedActions": ["focused source/unit/fixture/targeted integration action allowed by round"],
+      "allowedActions": ["focused source/unit/fixture/targeted integration action allowed by round", "scoped product self-repair when route allows"],
       "forbiddenActions": ["jump to later round", "delivery before R7", "live AI before R3"],
       "outputs": ["scoped verdict", "measurement data"],
       "next": ["S5-record-classification"]
@@ -86,34 +138,25 @@
       "id": "S5-record-classification",
       "purpose": "Separate data, issues, progress, and review records.",
       "requiredInputs": ["measurement data", "verdict", "residual risks"],
-      "allowedActions": ["write records/data.md", "write records/issues.md", "write records/progress.md", "write records/review.md"],
-      "forbiddenActions": ["closing product TODO", "acceptance without raw evidence"],
+      "allowedActions": ["write records/data.md", "write records/issues.md", "write records/progress.md"],
+      "forbiddenActions": ["global TODO closure", "acceptance without raw evidence"],
       "outputs": ["typed evidence and issue records"],
       "next": ["S6-engineering-repair-packaging", "S8-verdict-and-next-round"]
     },
     {
       "id": "S6-engineering-repair-packaging",
-      "purpose": "Group deterministic problems into product-repo task packages with metrics.",
-      "requiredInputs": ["R1/R2 issues", "owner repository facts"],
-      "allowedActions": ["write records/task-packages.md", "define before/after metrics"],
-      "forbiddenActions": ["implementing product code from PCVM", "sending Test for deterministic fixture gaps"],
-      "outputs": ["task package candidates"],
-      "next": ["S4-node-or-round-execution", "S7-live-ai-local-chain"]
-    },
-    {
-      "id": "S7-live-ai-local-chain",
-      "purpose": "Split AI-dependent behavior into local stages and Test-ready placeholders.",
-      "requiredInputs": ["R2 gate result", "docs/pcvm-local-chain-optimization.md"],
-      "allowedActions": ["write records/ai-local-chain.md", "prepare Test result envelope"],
-      "forbiddenActions": ["running live AI without entry gate", "authorizing delivery"],
-      "outputs": ["AI local chain stages", "Test placeholder contract"],
+      "purpose": "Group deterministic problems into self-repair or product-window task packages with metrics.",
+      "requiredInputs": ["R1/R2 issues", "owner repository facts", "target repository AGENTS.md when editing or dispatching"],
+      "allowedActions": ["write records/issues.md", "write records/progress.md", "define before/after metrics", "self-repair scoped code", "dispatch product-window package"],
+      "forbiddenActions": ["sending Test for deterministic fixture gaps", "editing unrelated source"],
+      "outputs": ["repair evidence"],
       "next": ["S4-node-or-round-execution", "S8-verdict-and-next-round"]
     },
     {
       "id": "S8-verdict-and-next-round",
       "purpose": "Record scoped verdict and name the next safe round or stop condition.",
       "requiredInputs": ["round evidence", "issue status", "plan cursor"],
-      "allowedActions": ["update plan cursor", "name next round", "stop with blocker"],
+      "allowedActions": ["update plan cursor", "name next round", "stop with blocker", "continue autonomous PCVM iteration"],
       "forbiddenActions": ["promoting scoped evidence to final product acceptance"],
       "outputs": ["next round decision"],
       "next": ["S0-intake"]
@@ -149,7 +192,7 @@
       "roundType": "R-live-ai-local",
       "evidenceScope": ["live-ai", "candidate-producing-dimension", "no-delivery"],
       "defaultVerdictScope": "live-ai-local",
-      "statusMeaning": "Validates producer/sourceRef/rejected-reason behavior for one scoped live dimension.",
+      "statusMeaning": "Validates producer/candidate/evidence behavior for one scoped live dimension.",
       "next": "R5-ai-expansion"
     },
     {
@@ -157,7 +200,7 @@
       "roundType": "R-live-ai-expansion",
       "evidenceScope": ["live-ai", "two-or-full-dimensions", "no-delivery"],
       "defaultVerdictScope": "live-ai-expansion",
-      "statusMeaning": "Expands live AI dimensions and measures aggregate failures, invalid sourceRefs, timeouts, and scorecard consistency.",
+      "statusMeaning": "Expands live AI dimensions and measures aggregate failures, missing evidence, timeouts, and scorecard consistency.",
       "next": "R6-dashboard-observability"
     },
     {
@@ -177,12 +220,56 @@
       "next": null
     }
   ],
+  "metricLayers": ["primary", "support", "diagnostic"],
+  "aiGuardrails": [
+    "Default to one primary gate.",
+    "Diagnostic metrics never decide pass/fail.",
+    "Do not create taxonomy or fields without a consumer and repair action.",
+    "Track LLM output refs and final artifact refs with minimal fields only.",
+    "Track stage token usage and whole-route cold-start token usage.",
+    "Primary regression stops further dispatch/Test/closure."
+  ],
   "issueClasses": [
     "product-risk",
     "test-gap",
     "probe-error",
     "expected-boundary",
     "runtime-placeholder"
+  ],
+  "taskPackageRequiredFields": [
+    "packageId",
+    "ownerRepository",
+    "stageOrRound",
+    "userGoalLinkage",
+    "problemStatement",
+    "inputContract",
+    "outputContract",
+    "stateChanges",
+    "callChain",
+    "boundaryIssue",
+    "proposedRepair",
+    "beforeAfterMetrics",
+    "verificationCommands",
+    "forbiddenActions",
+    "expectedReturnEvidence",
+    "alembicTestRequiredWithReason"
+  ],
+  "alembicTestRequiredFields": [
+    "roundId",
+    "aiStageIds",
+    "targetProjectOrCategory",
+    "commandOrUiRoute",
+    "expectedJobSessionReportPaths",
+    "dimensionIds",
+    "primarySupportDiagnosticMetrics",
+    "stageTokenUsage",
+    "wholeRouteTokenUsage",
+    "failedMissingSkippedSemantics",
+    "deliveryStatusAndNoDeliveryBoundary",
+    "successProves",
+    "failureProves",
+    "testCannotProve",
+    "stopCondition"
   ],
   "transitionGuards": [
     {
@@ -193,7 +280,7 @@
     {
       "from": "R2-engineering-repair",
       "to": "R3-ai-local-analyze",
-      "requires": ["deterministic repair packages accepted or explicitly deferred", "before/after metrics recorded", "Test result envelope prepared"]
+      "requires": ["deterministic repair packages accepted, completed, or explicitly deferred", "before/after metrics recorded", "AlembicTest contract prepared if live AI evidence is needed"]
     },
     {
       "from": "R3-ai-local-analyze",
@@ -203,7 +290,7 @@
     {
       "from": "R4-ai-local-producer",
       "to": "R5-ai-expansion",
-      "requires": ["producer/sourceRef metrics recorded", "rejected reason clarity recorded", "one-dimension live blocker absent or typed"]
+      "requires": ["producer metrics recorded", "primary gate passes or blocker is typed", "one-dimension live blocker absent or typed"]
     },
     {
       "from": "R5-ai-expansion",
@@ -213,24 +300,17 @@
     {
       "from": "R6-dashboard-observability",
       "to": "R7-delivery",
-      "requires": ["runtime job/session/report surfaces verified", "delivery authorization explicit", "safe test project selected"]
+      "requires": ["runtime job/session/report surfaces verified", "delivery authorization explicit", "safe target selected"]
     }
   ],
-  "currentRunRecommendedNext": {
-    "runId": "pcv-20260530-1515-alembic-cold-start",
-    "currentRound": "R2-engineering-repair",
-    "recommendedPackageOrder": [
-      "P0-PCVM-Round-Contract-And-Evidence-Hygiene",
-      "P1-Cold-start-Interface-Contract-Cleanup",
-      "P2-Deterministic-Error-And-Degraded-Fixtures",
-      "P3-PCV-Evidence-Envelope-Refactor",
-      "P4-Consumer-Responsibility-Split",
-      "P5-Finalizer-Responsibility-Split",
-      "P6-AI-Round-Preparation-Without-Running-AI"
-    ],
-    "doNotOpenBefore": {
-      "R3-ai-local-analyze": ["P1 complete or explicitly deferred", "P2 complete or explicitly deferred", "AI local Test envelope ready"],
-      "R7-delivery": ["R3-R6 evidence gates complete", "explicit delivery authorization"]
-    }
-  }
+  "escalationGates": [
+    "scope-change",
+    "repo-coverage-expansion",
+    "resource-budget-expansion",
+    "user-visible-behavior-change",
+    "primary-metric-regression",
+    "global-todo-closure",
+    "final-product-acceptance",
+    "archive"
+  ]
 }

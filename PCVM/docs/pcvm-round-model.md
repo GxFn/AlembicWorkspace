@@ -20,7 +20,7 @@ The first round is allowed to be limited. Its value is to reveal chain shape, da
 | `R-engineering-repair` | source + unit + fixture + targeted integration | fix deterministic gaps and rerun same metrics | before/after improvement under stable fixtures | model quality, real project behavior |
 | `R-runtime-smoke` | runtime, no live delivery | run safe local runtime boundaries | write roots, daemon/session/report wiring | AI output quality unless live AI enabled |
 | `R-live-ai-local` | live AI, local chain segment | validate AI subchain one stage at a time | analyze/quality/producer behavior for scoped project/dimensions | full product acceptance |
-| `R-live-ai-expansion` | live AI, broader dimensions | expand from one dimension to two/full dimensions | missing/failed dimensions, sourceRef validity, timeouts | delivery/export safety |
+| `R-live-ai-expansion` | live AI, broader dimensions | expand from one dimension to two/full dimensions | missing/failed dimensions, timeouts | delivery/export safety |
 | `R-dashboard-observability` | daemon + Dashboard/manual observation | verify user-visible job/process/report surfaces | UI/job observability and cancellation behavior | AI content quality unless paired with live round |
 | `R-delivery` | authorized delivery/wiki/skill export | verify final write surfaces | delivery safety and exported artifacts | earlier AI quality if not already proven |
 
