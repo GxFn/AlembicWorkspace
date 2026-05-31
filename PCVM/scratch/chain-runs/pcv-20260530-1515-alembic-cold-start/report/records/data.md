@@ -4,6 +4,168 @@ Run ID: `pcv-20260530-1515-alembic-cold-start`
 Owner: `PCVM`
 Status: `current`
 
+## Package M Same-Input Live Evidence
+
+Evidence scope: `live-ai-local + full per-round artifact review`
+
+Raw evidence:
+
+- AlembicTest report: `../AlembicTest/docs/pcvm-package-m-same-input-live-rerun-2026-05-31.md`
+- Raw dir: `../AlembicTest/tmp/pcvm-package-m-same-input-live-rerun-2026-05-31`
+- Job/session: `bootstrap_mptmg4ep_8a6f5854` / `bs_1780222392585_qizud3`
+- Per-row self-check: `records/package-m-structure-self-check.md`
+
+Route:
+
+| Field | Value |
+| --- | --- |
+| Project | `BiliDili` |
+| Dimension | `design-patterns` |
+| Route | one-dimension/no-delivery |
+| `maxFiles` / `contentMaxLines` / `skipGuard` | `24` / `80` / `true` |
+| Provider/model | `deepseek/deepseek-v4-pro` |
+
+Same-input live comparison:
+
+| Metric | Package K | Package M | Delta | PCVM reading |
+| --- | ---: | ---: | ---: | --- |
+| analyze input | 174988 | 175870 | +882 (+0.50%) | Flat; no meaningful analyze input improvement. |
+| analyze output | 12214 | 11826 | -388 (-3.18%) | Slight raw-output improvement. |
+| analyze iterations / tool calls | 16 / 38 | 14 / 25 | -2 / -13 | Analyze loop/tool use improved. |
+| Producer input | 85823 | 103057 | +17234 (+20.08%) | Regression; Producer history/evidence ownership is now the dominant input issue. |
+| Producer output | 13530 | 10457 | -3073 (-22.71%) | Raw Producer output improved. |
+| Producer iterations / tool calls | 9 / 14 | 10 / 12 | +1 / -2 | Tool calls down, but one extra no-tool final round remains. |
+| route input | 260811 | 278927 | +18116 (+6.94%) | Input regression versus K. |
+| route output | 25744 | 22283 | -3461 (-13.44%) | Raw route output improved. |
+| route total model | 294371 | 307767 | +13396 (+4.55%) | All-in regression versus K. |
+| accepted Recipes | 6 | 5 | -1 (-16.67%) | Useful-output count falls. |
+| total model / accepted Recipe | 49061.83 | 61553.40 | +12491.57 (+25.46%) | Fails useful-output unit gate. |
+| stored payload avg approx tokens / Recipe | 1997.4 | 2127.2 | +129.8 (+6.50%) | Persisted Recipes are not smaller. |
+| model-to-payload amplification | 24.56x | 28.94x | +4.38x | Worse than K. |
+| `pcvAnalyzeGroundingInvalidNoEvidence` | 0 | 0 | 0 | Quality constraint held. |
+| quality score | 100 | 98 | -2 | Still pass, but breadth fell to `90.4`. |
+
+Per-output read-through:
+
+- Package M has 61 per-round rows: `llm.input=25`, `llm.output=25`, `llm.reflection=11`.
+- Every provider input/output/reflection row was read for content in `records/package-m-structure-self-check.md`.
+- Producer candidate obligations now behave correctly: 5 structured Analyst findings became 5 accepted candidates, and final Markdown-only `Middleware Chain + Observer` / `Value-Type` themes were not submitted.
+- Analyze final Markdown still violates the Package L single-source contract: it lists 7 confirmed pattern families while structured `note_finding` has 5.
+- Producer completion is still not clean: iteration 9 emits a terminal completion report, then a continue nudge causes one extra no-tool final-status round at iteration 10.
+
+PCVM reading:
+
+- Package M is partial, not pass.
+- Package L repaired one real behavior: Producer no longer uses final Markdown as an extra candidate source.
+- The remaining live blockers are Analyzer final-Markdown discipline, Producer terminal nudge detection, and Producer evidence/candidate-history input ownership.
+- No further AlembicTest rerun should be launched before Package N source/unit repair; this gate is now superseded by the Package N source/unit evidence below.
+
+## Package N Source/Unit Repair Evidence
+
+Evidence scope: `source-unit-fixture`
+
+Owner repo: `AlembicAgent`
+
+Source changes:
+
+- `ExplorationTracker` now normalizes Markdown emphasis in Producer completion text and recognizes `提交完成报告` plus `未提交: 0` / `unsubmitted: 0` as terminal after successful submissions.
+- `NudgeGenerator`, `AgentRuntime`, `LLMInputAssembly`, and `forced-summary` now constrain Analyze confirmed/core final Markdown sections to recorded `note_finding` entries; unrecorded signals are only pending/unstructured notes.
+- `insight-producer` now uses refs-first Analyst evidence packets. `buildCodeContextSection()` emits file/range/summary refs and no longer replays Analyst code bodies into the Producer prompt.
+- `ContextWindow` now stores compact provider-history args for `knowledge.submit` tool calls: action + compact params such as `title`, `trigger`, `kind`, `dimensionId`, `category`, `knowledgeType`, `source`, and `supersedes`. Full `content.markdown`, `coreCode`, and reasoning payloads no longer remain provider-visible through assistant tool-call history.
+
+Targeted verification:
+
+| Repo | Command | Result | PCVM reading |
+| --- | --- | --- | --- |
+| `AlembicAgent` | `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts test/ContextWindow.test.ts` | pass; 3 files, 30 tests | Covers Package M `未提交: 0` completion, refs-first Producer evidence, and compacted `knowledge.submit` provider history. |
+| `AlembicAgent` | `npm test -- test/evidence-recording-phase-chain.test.ts test/AgentRuntime.test.ts` | pass; 2 files, 22 tests | Expanded runtime/evidence chain still passes after summary/terminal contract changes. |
+| `AlembicAgent` | `npm run build` | pass | TypeScript compile passes. |
+| `AlembicAgent` | `npm run lint` | pass | Biome checks 246 files with no fixes. |
+| `AlembicAgent` | `git diff --check` | pass | No whitespace errors in the source/unit patch. |
+
+PCVM reading:
+
+- Package N repairs the deterministic source/unit blockers identified from Package M.
+- Package N is not live evidence. It does not prove output-token or useful-output metrics improve.
+- Next live check must compare against the same Package M route and specifically inspect Analyzer final Markdown structure, Producer terminal behavior, Producer input history shape, and route total model / accepted Recipe.
+
+## Package O Same-Input Live Evidence
+
+Evidence scope: `live-ai-local + full per-round artifact review`
+
+Raw evidence:
+
+- AlembicTest report: `../AlembicTest/docs/pcvm-package-o-same-input-live-rerun-2026-05-31.md`
+- Raw dir: `../AlembicTest/tmp/pcvm-package-o-same-input-live-rerun-2026-05-31`
+- Job/session: `bootstrap_mptor1y1_6ad15f51` / `bs_1780226261219_6210re`
+- Per-row self-check: `records/package-o-structure-self-check.md`
+
+Same-input live comparison:
+
+| Metric | Package K | Package M | Package O | PCVM reading |
+| --- | ---: | ---: | ---: | --- |
+| analyze input | 174988 | 175870 | 187313 | O regresses; Analyze history still grows. |
+| analyze output | 12214 | 11826 | 11410 | O improves output slightly. |
+| analyze iterations / tool calls | 16 / 38 | 14 / 25 | 15 / 31 | O is worse than M but better than K on tool calls. |
+| Producer input | 85823 | 103057 | 86998 | O fixes most M Producer input regression. |
+| Producer output | 13530 | 10457 | 16191 | O regresses due retries and extra final round. |
+| Producer iterations / tool calls | 9 / 12 | 10 / 12 | 10 / 19 | O adds schema retry tool calls. |
+| route input | 260811 | 278927 | 274311 | O improves vs M but not K. |
+| route output | 25744 | 22283 | 27601 | O regresses vs K/M. |
+| route reasoning | n/a | 6557 | 7712 | O regresses vs M. |
+| route total model | 294371 | 307767 | 309624 | O is slightly worse than M. |
+| accepted Recipes | 6 | 5 | 7 | O improves useful-output count. |
+| submit attempts / rejected | n/a | 5 / 0 | 11 / 4 | O has Producer schema-contract waste. |
+| total model / accepted Recipe | 49061.83 | 61553.40 | 44232.00 | O improves useful-output unit cost. |
+| stored payload avg approx tokens / Recipe | 1997.4 | 2127.2 | 1457.0 | O payloads are smaller. |
+| model-to-payload amplification | 24.56x | 28.94x | 30.36x | O worse than K, close to M. |
+| `pcvAnalyzeGroundingInvalidNoEvidence` | 0 | 0 | 0 | Quality constraint held. |
+| quality score | 100 | 98 | 100 | Quality recovered. |
+
+Per-output read-through:
+
+- Package O has 63 per-round rows: `llm.input=26`, `llm.output=26`, `llm.reflection=11`.
+- Every provider input/output/reflection artifact was read for content in `records/package-o-structure-self-check.md`.
+- Analyze final Markdown now states confirmed/core sections are based on 7 recorded `note_finding` entries, and it moves Value Type, Error Type, Coordinator, and Observer into "未结构化记录".
+- Producer input no longer contains Package M's direct-code replay marker and instead includes refs-first evidence refs.
+- Provider-visible `knowledge.submit` assistant tool calls are compacted with `providerHistoryCompacted: true`; later inputs retain compact action/title/trigger/status/error context rather than full payload bodies.
+- Producer first completion report appears at sequence 64, but sequence 65 injects a continue nudge and sequence 67 emits an extra no-tool final status.
+- Producer accepted 7 candidates but made 11 submit attempts; 4 rejected attempts were missing required `description`.
+
+PCVM reading:
+
+- Package O is partial, not pass.
+- Package O proves Package N fixed two real live behaviors: Analyze final Markdown single-source discipline and Producer direct-code/full-payload replay.
+- Package O fails direct completion termination and reveals Producer submit schema-contract waste.
+- Package P source/unit repair is now complete; Package Q same-input live rerun is required before claiming live pass.
+
+## Package P Source/Unit Repair Evidence
+
+Evidence scope: `source-unit-fixture`
+
+Owner repo: `AlembicAgent`
+
+Source changes:
+
+- `ExplorationTracker` recognizes Package O's mixed English/Chinese completion report as terminal: "All 7 structured Analyst findings have been successfully submitted", `提交候选数: 7/7`, `阻塞项: 无`, and similar no-remaining summaries.
+- `PRODUCER_SYSTEM_PROMPT` now explicitly makes `description` a required field and instructs Producer to self-check `params.description` before every `knowledge.submit`.
+
+Targeted verification:
+
+| Repo | Command | Result | PCVM reading |
+| --- | --- | --- | --- |
+| `AlembicAgent` | `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts` | pass; 2 files, 25 tests | Covers Package O completion wording and Producer description pre-submit prompt contract. |
+| `AlembicAgent` | `npm test -- test/ContextWindow.test.ts test/evidence-recording-phase-chain.test.ts test/AgentRuntime.test.ts` | pass; 3 files, 29 tests | Runtime/evidence chain still passes. |
+| `AlembicAgent` | `npm run build` | pass | TypeScript compile passes. |
+| `AlembicAgent` | `npm run lint` | pass | Biome checks 246 files with no fixes. |
+| `AlembicAgent` | `git diff --check` | pass | No whitespace errors. |
+
+PCVM reading:
+
+- Package P repairs deterministic source/unit causes for the Package O residual Producer waste.
+- Package P is not live evidence. It does not prove route output/reasoning improves.
+- Next live check must rerun the same route and inspect Producer first-completion termination, rejected submit attempts, and preservation of Package O's Analyze/Producer input gains.
+
 ## Current LLM Token Efficiency Source/Unit Baseline
 
 Evidence scope: `source-unit-fixture`

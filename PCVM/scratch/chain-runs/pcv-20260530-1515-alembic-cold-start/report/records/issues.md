@@ -8,22 +8,20 @@ Status: `current`
 
 Current blocker:
 
-- Package L source/unit repair completed after Package K and is `pass(scope=source-unit-fixture)`.
-- Route input recovered from Package E `520700` to K `260811`, and route total model recovered from `567173` to `294371`.
-- Package I accepted-count collapse was partly repaired (`4 -> 6`), but K still did not restore Package E accepted count (`13`) or total model / accepted Recipe (`43628.7 -> 49061.8`).
-- K persisted much larger Recipes: avg payload approx tokens / Recipe `1008.8 -> 1997.4`, and model-to-payload amplification improved `43.25x -> 24.56x`.
-- Full per-output read-through found that Producer iteration 7 already declared all 6 candidates complete, but iteration 8 still ran an extra evidence-check round before final iteration 9.
-- Package L repaired the deterministic contract issue in AlembicAgent: Producer candidate obligations are structured `note_finding` only, final Markdown is background only, and Package K completion wording is terminal.
-- The current blocker is Package M live evidence: accepted Recipe count, Recipe payload size, Analyzer structured findings vs final Markdown coverage, and Producer terminal iteration must be measured on the same BiliDili route.
+- Package O same-input live evidence was read through at the raw row level and is `partial(scope=live-ai-local)`, not pass.
+- Package O proves Analyze final Markdown single-source behavior and Producer input-history ownership improved, but Producer still has one extra no-tool final round after the first completion report.
+- Package O also introduces Producer schema-contract waste: 11 submit attempts for 7 accepted Recipes, with 4 rejected attempts caused by missing `description`.
+- Package P source/unit repair is implemented and verified in `AlembicAgent`.
+- The remaining blocker is Package Q same-input live rerun. PCVM still needs live evidence that Package P fixes Producer first-completion termination and missing-`description` submit retries without regressing Package O's Analyzer/Producer input improvements.
 
 Next metric work:
 
-- AlembicTest rerun is now allowed only as Package M same-input live evidence with Package L source/unit repair included.
+- AlembicTest rerun is now allowed as Package Q only for the same route and only to answer the Package P live-effect question.
 - Use Package F `inputSizeEstimate` / `inputProjection` metadata to distinguish projected message history, runtime input layer, system prompt, and tool schemas per provider call.
 - Add accepted/submitted Recipe normalized metrics to every live comparison: route input/output/reasoning/total model per accepted Recipe and per submitted Recipe.
 - Add persisted Recipe payload approximate token metrics when local DB or raw artifacts preserve accepted Recipe fields.
-- Measure the useful-output granularity ambiguity under Package M: determine whether the source contract yields more stable structured finding/candidate coverage, fewer extra Producer rounds, or merely changes payload size.
-- Keep quality constraints visible: `pcvAnalyzeGroundingInvalidNoEvidence` stayed `0`, quality score improved `97 -> 100`.
+- Keep single-Recipe payload metrics visible: Package O accepted payloads average `1457.0` approx tokens and range from `1245` to `2040`.
+- Keep quality constraints visible: Package O `pcvAnalyzeGroundingInvalidNoEvidence=0`; QualityGate passed with score `100`.
 - Compare only against the same-input route; do not promote live route to final product acceptance.
 - Do not modify BiliDili or any real test project source.
 
@@ -222,7 +220,7 @@ Required next action:
 
 ## Open Issue: Analyzer Final Markdown And Structured Findings Diverge
 
-Status: `pass(scope=source-unit-fixture, owner=AlembicAgent, package=L); pending(scope=live-ai-local, package=M)`
+Status: `pass(scope=live-ai-local, package=O)`
 
 Evidence:
 
@@ -230,28 +228,73 @@ Evidence:
 - Package K structured findings / developer-facing findings count is 6.
 - Producer submits exactly those 6 structured findings and correctly reports no unsubmitted structured findings.
 - Therefore Producer is not missing its current contract; the contract itself allows final Markdown to contain extra candidate-worthy content that never becomes a Producer obligation.
+- Package M repeats the same class of failure after Package L: final Analyze Markdown lists 7 confirmed pattern families, while structured `note_finding` and Producer candidates are 5.
+- The Markdown-only M themes are `Middleware Chain + Observer` and `Value-Type`; Producer correctly does not submit them, but the final Analyze report still presents them as confirmed core sections.
 
 Required next action:
 
-- Package L aligned Analyzer/Producer source contract: final Markdown may only summarize structured `note_finding` findings, and Markdown-only themes are not Producer candidate obligations.
-- Package M must verify whether the live Analyzer obeys this contract and whether final Markdown families match structured findings closely enough for Producer coverage.
-- Do not ask AlembicTest to rediscover the source issue; the next Test run is only to validate live AI behavior after the deterministic repair.
+- Package O verifies this behavior in live output: final Analyze Markdown has 7 confirmed sections corresponding to 7 recorded `note_finding` entries and demotes unrecorded Value Type, Error Type, Coordinator, and Observer signals to "未结构化记录".
+- Preserve this behavior in Package Q.
 
 ## Open Issue: Producer Completion-Like Output Does Not Stop Immediately
 
-Status: `pass(scope=source-unit-fixture, owner=AlembicAgent, package=L); pending(scope=live-ai-local, package=M)`
+Status: `failed(scope=live-ai-local, package=O); repaired(scope=source-unit, owner=AlembicAgent, package=P); pending(scope=live-ai-rerun, package=Q)`
 
 Evidence:
 
 - Package K Producer iteration 7 says all 6 knowledge candidates were submitted, all 6 Analyst findings were covered, and there were no unsubmitted findings or blockers.
 - Package K Producer iteration 8 still checks unstructured analysis mentions such as Module/Plugin registration and URL Scheme routing, then reads more files.
 - Iteration 8 has no candidate delta and final completion only happens at iteration 9.
+- Package M eliminates Package K's extra evidence/code-check round after completion.
+- Package M still emits a terminal completion report at Producer iteration 9, then receives a continue nudge and emits a second no-tool final-status message at iteration 10.
+- Package O's first completion report uses mixed English/Chinese wording: "All 7 structured Analyst findings have been successfully submitted", `提交候选数: 7/7`, `阻塞项: 无`.
+- Package O still receives a continue nudge at sequence 65 and emits an extra no-tool final status at sequence 67.
 
 Required next action:
 
-- Package L aligned Producer terminal detection with the useful-output contract: if all structured findings are converted and completion text says no unsubmitted findings/no blockers, the loop can stop.
-- Package M must verify this in live AI. Success means Producer stops at the first completion-like output with no extra evidence-check round; failure means the same source path needs another deterministic repair.
-- Do not treat this as a data package problem; it is a loop ownership and output-contract problem.
+- Package N source/unit repair normalizes Markdown emphasis and recognizes `提交完成报告` / `已提交候选` plus `未提交: 0` as terminal after successful submissions.
+- Package P extends source/unit terminal detection to Package O mixed English/Chinese completion wording.
+- Package Q must verify that the live Producer no longer receives a continue nudge or produces an extra no-tool final-status round after the first completion report.
+
+## Open Issue: Producer Evidence And Candidate Payload History Is Provider-Visible
+
+Status: `pass(scope=live-ai-local-direct-replay, package=O); watch(scope=compact-submit-observation, package=Q)`
+
+Evidence:
+
+- Package M Producer iteration 1 input includes an `Analyst 已读取的代码 (直接引用, 无需 read_file)` block with large code excerpts.
+- The same Producer phase still calls `code.read`, so direct code replay and tool-read evidence both enter provider history.
+- Later Producer inputs grow as full `knowledge.submit` candidate payload history accumulates; Package M Producer input regresses versus K (`85823 -> 103057`).
+
+Package N repair:
+
+- Producer prompt evidence is now refs-first: file/range/summary refs are injected instead of direct code bodies.
+- Producer instructions only allow narrow `code.read` when exact short snippets are missing.
+- `ContextWindow` compacts `knowledge.submit` assistant tool-call args before they enter provider history, keeping compact metadata and dropping large `content.markdown`, `coreCode`, and reasoning payloads.
+
+Required next action:
+
+- Package O confirms Producer inputs no longer contain the old direct-code block or full submit payload replay.
+- Package Q should ensure compact submit observations remain compact while Producer retries fall.
+
+## Open Issue: Producer Submit Attempts Waste Output Tokens
+
+Status: `failed(scope=live-ai-local, package=O); repaired(scope=source-unit, owner=AlembicAgent, package=P); pending(scope=live-ai-rerun, package=Q)`
+
+Evidence:
+
+- Package O accepted 7 Recipes but made 11 submit attempts.
+- Four rejected attempts were schema-contract misses, mainly `Missing required param "description" for knowledge.submit`.
+- Producer output regressed versus Package M (`10457 -> 16191`) and Producer reasoning increased (`6557 -> 7712` route reasoning), partly due these retries and the extra final round.
+
+Package P repair:
+
+- `PRODUCER_SYSTEM_PROMPT` now lists中文 `description` as a required field before submission.
+- The prompt now instructs Producer to self-check `params.description` before every `knowledge.submit`.
+
+Required next action:
+
+- Package Q must verify submit attempts are close to accepted count and missing-`description` rejects disappear.
 
 ## Open Issue: Provider-Input Projection Is Reactive After Peak
 

@@ -3,8 +3,8 @@
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Target: reduce duplicated and oversized LLM input/output in Alembic cold-start stages through one unified I/O design
 Owner: `PCVM`
-Current phase: `llm-stage-token-efficiency-package-l-source-unit-repair`
-Status: `pass(scope=source-unit-fixture, package=L); ready(scope=live-ai-local, package=M)`
+Current phase: `llm-stage-token-efficiency-package-p-source-unit-repaired`
+Status: `partial(scope=live-ai-local, package=O); repaired(scope=source-unit, package=P); blocked(scope=same-input-live-rerun, package=Q)`
 
 ## Controller Snapshot
 
@@ -23,7 +23,7 @@ Current evidence:
 
 Current segment: `llm-stage-token-efficiency-live-verdict-and-output-contract`.
 
-First blocker: Package K proved Package J repaired part of the Package I regression: route total model tokens improved `567173 -> 294371` (-48.10%) versus Package E, accepted Recipes recovered `4 -> 6` versus Package I, and invalid-no-evidence stayed `0`. It still fails the Package E accepted-count and total-model-per-accepted gates (`13 -> 6`, `43628.7 -> 49061.8`). Package L has now repaired the deterministic source/unit blocker: Producer completion detection recognizes Package K's real completion wording, and Analyzer/Producer prompts/runtime policy define structured `note_finding` findings as the only Producer candidate obligations. The next blocker is live evidence: Package M must rerun the same BiliDili route to verify whether stop ownership and output contract hold under real AI.
+First blocker: Package O live evidence is partial, not pass. It proves Analyze final Markdown single-source behavior and Producer direct-code/full-payload replay improved, but Producer still emits one extra no-tool final round after a mixed English/Chinese completion report, and submit attempts include 4 schema-contract rejections for missing `description`. Package P source/unit repair is implemented and verified in `AlembicAgent`; the next blocker is Package Q same-input live rerun to confirm completion termination and submit-attempt cleanup in live AI output.
 
 ## Non-Goals
 
@@ -586,11 +586,142 @@ Verification:
 PCVM reading:
 
 - Package L does not change SourceRef, does not change BiliDili, and does not add taxonomy or guardrail-only work.
-- This is a source/unit repair only. It cannot prove live AI will follow the new output contract.
-- Package M should be the next same-input live rerun on the Package K route, with explicit attention to: Producer terminal iteration, Analyzer final Markdown vs structured findings, accepted Recipe count, stored payload size, and route total model / accepted Recipe.
+- This was a source/unit repair only. It could not prove live AI would follow the new output contract.
+- Package M was the next same-input live rerun on the Package K route, with explicit attention to: Producer terminal iteration, Analyzer final Markdown vs structured findings, accepted Recipe count, stored payload size, and route total model / accepted Recipe.
+
+### Package M: Same-Input Live Rerun Verdict
+
+Owner repo: `AlembicTest` evidence, `PCVM` raw row review
+
+Goal: verify Package L live behavior on the same BiliDili route by reading actual inputs/outputs, not only aggregate metrics.
+
+Status: `partial(scope=live-ai-local-structure)`
+
+Evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-m-same-input-live-rerun-2026-05-31`
+- Report: `../AlembicTest/docs/pcvm-package-m-same-input-live-rerun-2026-05-31.md`
+- Job/session: `bootstrap_mptmg4ep_8a6f5854` / `bs_1780222392585_qizud3`
+- Per-row self-check: `report/records/package-m-structure-self-check.md`
+- Route: BiliDili `design-patterns`, one-dimension/no-delivery, `maxFiles=24`, `contentMaxLines=80`, `skipGuard=true`.
+
+Result:
+
+| Metric | Package K | Package M | PCVM reading |
+| --- | ---: | ---: | --- |
+| route input | 260811 | 278927 | M regresses versus K. |
+| route output | 25744 | 22283 | Raw output improves. |
+| route total model | 294371 | 307767 | M regresses all-in. |
+| accepted Recipes | 6 | 5 | Useful-output count falls. |
+| total model / accepted | 49061.83 | 61553.40 | Fails useful-output unit gate. |
+| stored payload avg approx tokens / Recipe | 1997.4 | 2127.2 | Payloads are not smaller. |
+| model-to-payload amplification | 24.56x | 28.94x | Worse than K. |
+| invalid-no-evidence | 0 | 0 | Quality constraint held. |
+| quality score | 100 | 98 | Still pass, but breadth fell. |
+
+Per-row reading:
+
+- `per-round-content-matrix.json` has 61 rows: `llm.input=25`, `llm.output=25`, `llm.reflection=11`.
+- Every provider input/output/reflection artifact was read in `package-m-structure-self-check.md`.
+- Analyze final Markdown has 7 confirmed pattern-family sections, while structured `note_finding` and Producer candidates are 5.
+- Producer submits exactly the 5 structured findings and does not submit the Markdown-only `Middleware Chain + Observer` or `Value-Type` themes.
+- Package K's post-completion evidence/code-check round is gone.
+- Producer iteration 9 emits a terminal completion report, then a continue nudge creates iteration 10 no-tool final status.
+- Producer input regresses because direct Analyst code excerpts, additional code reads, and candidate payload history stay provider-visible.
+
+PCVM conclusion:
+
+- Package M proves Package L's Producer obligation contract is directionally correct.
+- Package M does not prove final Markdown single-source discipline or direct Producer termination.
+- Package M fails the useful-output normalized gate versus K.
+- Package N source/unit repair below supersedes this blocker; the next action is Package O same-input live rerun.
+
+### Package N: Final Markdown, Producer Stop, And Producer Input Ownership Repair
+
+Owner repo: `AlembicAgent`
+
+Goal: repair the Package M residual contradictions before another live rerun.
+
+Status: `repaired(scope=source-unit); pending(scope=same-input-live-rerun, package=O)`
+
+Implemented source outcomes:
+
+- Analyze final Markdown nudges, forced summaries, and stage policy now require confirmed/core sections to come from recorded `note_finding` only; unrecorded signals must be downgraded to "待探索/未结构化记录".
+- Producer no-tool completion reports such as `提交完成报告` with Markdown-bold `未提交: 0` are recognized as terminal by `ExplorationTracker` and do not require another continue nudge.
+- Producer evidence input is refs-first: `buildCodeContextSection()` now emits bounded Analyst evidence refs instead of direct code bodies, and Producer instructions only allow narrow `code.read` when exact short snippets are missing.
+- `ContextWindow` compacts provider-visible `knowledge.submit` tool-call args to action + compact params (`title`, `trigger`, `kind`, `dimensionId`, etc.) before the next provider turn, while keeping execution args unchanged.
+
+Source/unit verification:
+
+- `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts test/ContextWindow.test.ts` passed; 3 files, 30 tests.
+- `npm test -- test/evidence-recording-phase-chain.test.ts test/AgentRuntime.test.ts` passed; 2 files, 22 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+- `git diff --check` passed.
+
+Remaining blocker:
+
+- Package N was not a live verdict; Package O below supersedes this blocker with live evidence.
+
+### Package O: Same-Input Live Rerun After Package N
+
+Evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-o-same-input-live-rerun-2026-05-31`
+- Report: `../AlembicTest/docs/pcvm-package-o-same-input-live-rerun-2026-05-31.md`
+- Job/session: `bootstrap_mptor1y1_6ad15f51` / `bs_1780226261219_6210re`
+- Per-row self-check: `report/records/package-o-structure-self-check.md`
+- Route: BiliDili `design-patterns`, one-dimension/no-delivery, `maxFiles=24`, `contentMaxLines=80`, `skipGuard=true`.
+
+Result:
+
+| Metric | Package M | Package O | PCVM reading |
+| --- | ---: | ---: | --- |
+| route input | 278927 | 274311 | Slight improvement, but still above K. |
+| route output | 22283 | 27601 | Regression caused by Producer retries and extra final round. |
+| route reasoning | 6557 | 7712 | Regression. |
+| route total model | 307767 | 309624 | Essentially flat/slightly worse. |
+| accepted Recipes | 5 | 7 | Useful-output count improves. |
+| submit attempts / rejected | 5 / 0 | 11 / 4 | Producer schema-contract waste appears. |
+| total model / accepted | 61553.40 | 44232.00 | Useful-output normalized cost improves. |
+| stored payload avg approx tokens / Recipe | 2127.2 | 1457.0 | Payloads are smaller. |
+| `pcvAnalyzeGroundingInvalidNoEvidence` | 0 | 0 | Quality constraint held. |
+| quality score | 98 | 100 | Quality recovered. |
+
+PCVM conclusion:
+
+- Package O proves Package N fixed Analyze final Markdown single-source behavior in live output.
+- Package O proves Producer direct-code replay and full candidate-payload provider-history replay are substantially improved.
+- Package O does not pass the raw route token gate because Producer completion still adds one extra no-tool round, and submit schema retries increase output/reasoning.
+- Verdict: `partial(scope=live-ai-local, package=O)`.
+
+### Package P: Producer Completion And Submit Schema Repair
+
+Owner repo: `AlembicAgent`
+
+Goal: repair the two Package O residual Producer wastes before another live rerun.
+
+Status: `repaired(scope=source-unit); pending(scope=same-input-live-rerun, package=Q)`
+
+Implemented source outcomes:
+
+- `ExplorationTracker` now recognizes Package O's mixed English/Chinese completion wording, including "All 7 structured Analyst findings have been successfully submitted", `提交候选数: 7/7`, `阻塞项: 无`, and similar no-remaining summaries.
+- `PRODUCER_SYSTEM_PROMPT` now surfaces `description` as a required field before submission and tells Producer to self-check `params.description` before every `knowledge.submit`.
+
+Source/unit verification:
+
+- `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts` passed; 2 files, 25 tests.
+- `npm test -- test/ContextWindow.test.ts test/evidence-recording-phase-chain.test.ts test/AgentRuntime.test.ts` passed; 3 files, 29 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+- `git diff --check` passed.
+
+Remaining blocker:
+
+- Package P is not a live verdict. Package Q must rerun the same BiliDili `design-patterns` route and verify the first Producer completion report terminates directly and submit attempts no longer include missing-`description` rejects.
 
 ## Scoped Verdict
 
-Verdict: `pass(scope=source-unit-fixture, package=L); ready(scope=live-ai-local, package=M)`
+Verdict: `partial(scope=live-ai-local, package=O); repaired(scope=source-unit, package=P); blocked(scope=same-input-live-rerun, package=Q)`
 
-Next action: Package M same-input live rerun via AlembicTest. The test must not reopen SourceRef. It must answer whether the live run now keeps Producer candidate obligations tied to structured findings, stops after a completion-like Producer output, and improves or preserves the useful-output normalized metrics against Package K/E.
+Next action: Package Q same-input live rerun through AlembicTest. Do not reopen SourceRef. The rerun must answer only whether Package P fixes Producer first-completion termination and missing-`description` submit retries, while preserving Package O's Analyze single-source and Producer input-history improvements.
