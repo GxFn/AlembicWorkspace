@@ -16,3 +16,4 @@
 | --- | --- | --- |
 | [global-todo-completed-2026-05-23.md](global-todo-completed-2026-05-23.md) | completed TODO archive | global todo completed |
 | [global-todo-completed-2026-05-24.md](global-todo-completed-2026-05-24.md) | completed TODO archive | global todo completed |
+| [global-todo-completed-2026-05-31.md](global-todo-completed-2026-05-31.md) | completed TODO archive | global todo completed |

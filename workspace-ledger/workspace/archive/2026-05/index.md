@@ -14,6 +14,7 @@
 | [ai-mock-removal](ai-mock-removal/) | 已归档 5 个 workspace 文档；当前索引只保留目录入口。 |
 | [artifact-drawer](artifact-drawer/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | [codex-automation-closed-loop](codex-automation-closed-loop/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
+| [codex-direct-thread-dispatch](codex-direct-thread-dispatch/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | [global-todo](global-todo/) | 已完成全局 TODO 和旧同步记录。 |
 | [plugin-coldstart-rescan-test-optimization](plugin-coldstart-rescan-test-optimization/) | 已归档 2 个 workspace 文档；当前索引只保留目录入口。 |
 | [plugin-intent-knowledge-route](plugin-intent-knowledge-route/) | 已归档 3 个 workspace 文档；当前索引只保留目录入口。 |

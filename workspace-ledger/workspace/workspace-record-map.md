@@ -52,6 +52,7 @@
 ## Archive Topics
 | 归档主题 | 目录 | 说明 |
 | --- | --- | --- |
+| `2026-05/codex-direct-thread-dispatch` | [codex-direct-thread-dispatch](archive/2026-05/codex-direct-thread-dispatch/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/plugin-coldstart-rescan-test-optimization` | [plugin-coldstart-rescan-test-optimization](archive/2026-05/plugin-coldstart-rescan-test-optimization/) | 已归档 2 个 workspace 文档；当前索引只保留目录入口。 |
 | `2026-05/repository-residue-cleanup` | [repository-residue-cleanup](archive/2026-05/repository-residue-cleanup/) | Repository residue cleanup 总控复核与归档。 |
 | `2026-05/artifact-drawer` | [artifact-drawer](archive/2026-05/artifact-drawer/) | 已归档 1 个 workspace 文档；当前索引只保留目录入口。 |
