@@ -3,8 +3,8 @@
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Target: reduce duplicated and oversized LLM input/output in Alembic cold-start stages through one unified I/O design
 Owner: `PCVM`
-Current phase: `llm-stage-token-efficiency-plan`
-Status: `pass(scope=source-unit-fixture, packages=A-D); blocked(scope=live-ai-approval, package=E)`
+Current phase: `llm-stage-token-efficiency-package-l-source-unit-repair`
+Status: `pass(scope=source-unit-fixture, package=L); ready(scope=live-ai-local, package=M)`
 
 ## Controller Snapshot
 
@@ -18,10 +18,12 @@ Current evidence:
 - `Alembic/lib/workflows/capabilities/execution/internal-agent/BootstrapDimensionRuntimeBuilder.ts` injects project facts, evidence starters, graph/panorama summaries, existing recipes, and context into `strategyContext`.
 - `Alembic/lib/workflows/capabilities/execution/internal-agent/BootstrapInputBuilders.ts` passes full `fileCache`, `strategyContext`, `promptContext`, and system run context into Agent execution.
 - External best-practice research agrees on structured prompts, separated context/task/output sections, concise examples, structured/tool output, context caching, and explicit token budgeting.
+- AlembicTest Package E raw evidence completed for BiliDili `design-patterns` one-dimension / no-delivery route. Quality constraints did not regress, but live primary token metrics regressed versus the previous same-input baseline.
+- AlembicTest Package I raw evidence completed for the same route after Packages F-G-H. Absolute route tokens improved materially, but accepted Recipe count and per accepted Recipe unit cost regressed, so Package I does not pass the useful-output gate.
 
-Current segment: `llm-stage-token-efficiency-live-comparison`.
+Current segment: `llm-stage-token-efficiency-live-verdict-and-output-contract`.
 
-First blocker: Package E requires AlembicTest / live AI on the BiliDili same-input route, which sends project content to the configured external provider; explicit approval is required before starting.
+First blocker: Package K proved Package J repaired part of the Package I regression: route total model tokens improved `567173 -> 294371` (-48.10%) versus Package E, accepted Recipes recovered `4 -> 6` versus Package I, and invalid-no-evidence stayed `0`. It still fails the Package E accepted-count and total-model-per-accepted gates (`13 -> 6`, `43628.7 -> 49061.8`). Package L has now repaired the deterministic source/unit blocker: Producer completion detection recognizes Package K's real completion wording, and Analyzer/Producer prompts/runtime policy define structured `note_finding` findings as the only Producer candidate obligations. The next blocker is live evidence: Package M must rerun the same BiliDili route to verify whether stop ownership and output contract hold under real AI.
 
 ## Non-Goals
 
@@ -38,6 +40,12 @@ Primary optimization metrics:
 | `llm.stageInputTokens.analyze` | Provider input tokens for analyze stage. | Same route before change. | Lower than baseline. |
 | `llm.stageInputTokens.producer` | Provider input tokens for producer stage. | Same route before change. | Lower than baseline. |
 | `llm.routeInputTokens.total` | Total provider input tokens for same cold-start route. | Same route before change. | Lower than baseline. |
+| `llm.routeInputTokens.total / acceptedRecipeCount` | Route input tokens normalized by accepted Recipe count. | Same route before change. | Lower than baseline; prevents raw candidate-count changes from hiding cost. |
+| `llm.routeOutputTokens.total / acceptedRecipeCount` | Route output tokens normalized by accepted Recipe count. | Same route before change. | Lower than or not worse than baseline. |
+| `llm.totalModelTokens / acceptedRecipeCount` | Route input + output + reasoning normalized by accepted Recipe count. | Same route before change. | Lower than baseline. |
+| `producer input/output / submittedRecipeCount` | Producer conversion cost per submitted Recipe attempt. | Same route before change. | Lower than baseline, with reject rate controlled. |
+| `storedRecipePayloadApproxTokens` | Approximate token size of the persisted Recipe payload fields. | Current accepted Recipe DB rows when available. | Useful-output size should stay sufficient while provider cost falls. |
+| `routeTotalModelTokens / storedRecipePayloadApproxTokens` | Token amplification from model spend to persisted Recipe payload. | Same route when payload is available. | Lower than candidate; this is a reference metric, not a quality gate alone. |
 | `llm.duplicateBlockRatio` | Ratio of repeated normalized prompt blocks across input sections for the same stage. | Source/unit estimator before change. | At least 30% lower than baseline. |
 
 Quality constraints:
@@ -149,6 +157,189 @@ Implement only after `AlembicAgent` source/unit passes:
 - Do not add unrelated scoring or AI blame logic.
 
 ## Implementation Packages
+
+### Package E Diagnosis: Live Token Regression Root Cause
+
+Owner repo: `PCVM` diagnosis over `AlembicAgent` / `Alembic` source and `AlembicTest` reports
+
+Goal: compare live evidence with the same-input baseline and identify the first source-level fix target.
+
+Status: `diagnosed(scope=root-cause-analysis)`
+
+Findings:
+
+- Package B/C did reduce the first provider call and source/unit fixtures, but Package E failed because live analyze ran longer and accumulated more provider-visible history.
+- Baseline analyze used `14` iterations and `24` analyze tool calls; Package E analyze used `20` iterations and `37` analyze tool calls.
+- Timeline retained inputs show candidate analyze started smaller than baseline (`3904` vs `4044` estimated tokens on retained iteration 1), then grew to `19923` estimated tokens / `79692` original chars by retained analyze iteration 16 before late collapse.
+- `ContextWindow.compactIfNeeded()` is tied to a large model token budget and thresholds; on DeepSeek V4 system runs this allows history growth before L3 projection appears.
+- `AgentRuntime` sends `ctx.messages.toProjectedMessages()` plus the runtime input layer. The Package B/C compaction covers the runtime input layer, but not old assistant/tool/nudge messages until ContextWindow projection activates.
+- `PipelineStrategy` resets ContextWindow between stages, so producer does not inherit analyze history. Producer total input improved slightly because it ran fewer iterations, but Producer v2 still embeds full `analysisText` and repeated findings/evidence/style requirements in the stage prompt.
+- Output regression is partly a loop-count and candidate-count effect: accepted candidates changed from `10` to `13`, so raw route output grew even though some per-event visible producer outputs became shorter.
+
+Conclusion:
+
+- The next optimization target is not SourceRef and not another live rerun.
+- The first code target is analyze-stage history and stop/compaction behavior.
+- The second code target is the Producer artifact contract, replacing full `analysisText` replay with a compact finding/evidence packet.
+
+### Package F: Live Message-History Diagnostic And Analyze Context Budget
+
+Owner repo: `AlembicAgent`
+
+Goal: make analyze-stage live input growth measurable and reduce provider-visible history before DeepSeek V4's large context budget allows late collapse.
+
+Status: `pass(scope=source-unit-fixture)`
+
+Likely files:
+
+- `src/agent/runtime/AgentRuntime.ts`
+- `src/agent/context/ContextWindow.ts`
+- `src/agent/runtime/LLMInputMeasurement.ts`
+- `test/ContextWindow.test.ts`
+- `test/llm-input-layering.test.ts`
+
+Output:
+
+- Per-call measurement separates projected message history, runtime input layer, system prompt, and tool schemas.
+- Analyze-stage compaction/projection can trigger from stage-specific provider-input budget or message-count growth, not only global model context ratio.
+- Old tool results, nudges, and repetitive assistant text are summarized or projected earlier while preserving recent evidence rounds and recorded finding ids.
+- Deterministic tests prove projected analyze input growth is capped without dropping required finding/evidence markers.
+
+Verification:
+
+- `npm test -- test/ContextWindow.test.ts test/llm-input-layering.test.ts`
+- `npm run build`
+- `npm run lint`
+
+Evidence:
+
+- `AlembicAgent/src/agent/runtime/LLMInputMeasurement.ts` now separates provider history, appended runtime input layer, provider messages, system prompt, and tool schema estimated tokens.
+- `AlembicAgent/src/agent/context/ContextWindow.ts` now has provider-input budget projection that can trigger before the large model context ratio is high.
+- `AlembicAgent/src/agent/runtime/AgentRuntime.ts` now applies the provider-input projection for analyze/record/summarize profiles before building provider messages and emits `inputSizeEstimate` plus `inputProjection` metadata in `llm.input`.
+- `AlembicAgent/src/agent/runtime/MessageAdapter.ts` exposes the provider-input projection through the runtime message abstraction.
+- `AlembicAgent/test/ContextWindow.test.ts` proves provider-input projection can collapse old tool rounds under a stage-level budget while preserving recent evidence.
+- `AlembicAgent/test/llm-input-layering.test.ts` proves the new input-size split is visible in process metadata and measurement fixtures.
+- `npm test -- test/llm-input-layering.test.ts test/ContextWindow.test.ts` passed 15 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+
+### Package G: Analyze Loop Exit And Nudge Cost Control
+
+Owner repo: `AlembicAgent`
+
+Goal: prevent token gains from being erased by extra analyze iterations and repeated nudge/progress text.
+
+Status: `pass(scope=source-unit-fixture)`
+
+Likely files:
+
+- `src/agent/context/exploration/ExplorationStrategies.ts`
+- `src/agent/context/exploration/ExplorationTracker.ts`
+- `src/agent/context/exploration/NudgeGenerator.ts`
+- `test/ExplorationStrategies.test.ts`
+
+Output:
+
+- Analyze transitions should move from EXPLORE/VERIFY to RECORD/SUMMARIZE once sufficient evidence and finding count are present, instead of waiting for late budget ratios.
+- Repeated progress/nudge text should be ephemeral or compacted so it does not accumulate as provider-visible history.
+- Tests cover the same condition that regressed in Package E: more tool calls and findings must not automatically force more turns.
+
+Verification:
+
+- `npm test -- test/ExplorationStrategies.test.ts`
+- targeted runtime fixture for nudge/message count growth
+
+Evidence:
+
+- `AlembicAgent/src/agent/context/exploration/ExplorationStrategies.ts` now allows EXPLORE/VERIFY to converge earlier when at least 3 evidence-backed findings are already recorded with sufficient evidence tool calls.
+- `AlembicAgent/src/agent/context/ContextWindow.ts` now keeps runtime nudges ephemeral by removing older runtime nudge messages before appending the latest nudge.
+- `AlembicAgent/test/ExplorationStrategies.test.ts` covers early convergence once enough evidence-backed findings are recorded.
+- `AlembicAgent/test/ContextWindow.test.ts` covers runtime nudge replacement.
+- `npm test -- test/llm-input-layering.test.ts test/ExplorationStrategies.test.ts test/ContextWindow.test.ts test/evidence-recording-phase-chain.test.ts` passed 33 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+
+### Package H: Producer Artifact Contract
+
+Owner repo: `AlembicAgent`
+
+Goal: reduce Producer prompt size by replacing full analysis replay with compact, structured findings and evidence references.
+
+Status: `pass(scope=source-unit-fixture)`
+
+Likely files:
+
+- `src/agent/prompts/insight-producer.ts`
+- Producer prompt tests in `test/llm-input-layering.test.ts` or a dedicated producer prompt test
+
+Output:
+
+- Producer prompt carries finding ids, concise finding text, required source refs, and bounded evidence snippets.
+- Full `analysisText` is no longer replayed alongside findings/evidence when structured artifact fields already contain the required facts.
+- Style and submit requirements are represented by compact contract text or versioned requirement ids.
+
+Verification:
+
+- source/unit producer prompt size decreases against the current fixture
+- candidate content still contains required Cursor delivery fields and source refs
+
+Evidence:
+
+- `AlembicAgent/src/agent/prompts/insight-producer.ts` now renders a compact `Analyst 分析摘要` instead of replaying full `analysisText` in Producer v2.
+- The digest preserves headings, source paths, and finding/evidence keywords while bounding narrative body text.
+- `AlembicAgent/test/llm-input-layering.test.ts` verifies the long analysis body is not replayed wholesale while the required source path and finding remain visible.
+- `npm test -- test/llm-input-layering.test.ts test/ExplorationStrategies.test.ts test/ContextWindow.test.ts test/evidence-recording-phase-chain.test.ts` passed 33 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+
+### Package I: Same-Input Live Rerun Verdict
+
+Owner repo: `AlembicTest`
+
+Goal: verify whether Packages F-H improve the same BiliDili route without weakening useful output.
+
+Status: `failed(scope=live-ai-local, reason=unit-cost-and-accepted-count-regression)`
+
+Evidence:
+
+- AlembicTest raw dir: `../AlembicTest/tmp/pcvm-package-i-same-input-live-rerun-2026-05-31`
+- Job/session: `bootstrap_mptide7s_a086f60e` / `bs_1780215546262_fmbz5b`
+- Route: BiliDili `design-patterns`, one-dimension/no-delivery, `maxFiles=24`, `contentMaxLines=80`, `skipGuard=true`.
+- Fresh build and clean source proof were provided by AlembicTest.
+
+Result:
+
+- Route total model tokens improved `567173 -> 299497` (-47.19%) versus Package E.
+- Accepted Recipes fell `13 -> 4`.
+- Route total model / accepted Recipe regressed `43628.7 -> 74874.3` (+71.62%).
+- The failure is a useful-output regression, not a SourceRef issue.
+
+### Package J: Systemic Source Repair
+
+Owner repo: `AlembicAgent`
+
+Goal: repair the design contradictions exposed by Package I while preserving the F-H token savings direction.
+
+Status: `pass(scope=source-unit-fixture)`
+
+Design contradictions repaired:
+
+- Runtime input ownership: `Task context` now references the initial user message instead of replaying the full task prompt when it is already in provider history.
+- Provider history ownership: provider-input budget projection now also applies to `produce`, not only analyze/record/summarize.
+- Analyst coverage ownership: `RECORD→SUMMARIZE` now uses an evidence-volume target (`3-6` findings) instead of always allowing 3 findings for broad evidence surfaces.
+- Producer completion ownership: Producer completion text with successful submissions and no remaining Analyst gap can stop the loop instead of receiving another generic continue nudge.
+- Analyst prompt ownership: the prompt now states that broad evidence surfaces should record 5-6 high-value findings, aligning prompt contract with runtime transition policy.
+
+Verification:
+
+- `npm test -- test/llm-input-layering.test.ts test/ExplorationStrategies.test.ts test/ContextWindow.test.ts test/evidence-recording-phase-chain.test.ts` passed 35 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+
+Next live gate:
+
+- Package K should rerun the same-input route only after fresh build proof.
+- Required return evidence: stage totals, per accepted/submitted Recipe metrics, per-round content matrix, `inputSizeEstimate`, `inputProjection`, accepted/submitted/rejected counts, and BiliDili clean status.
 
 ### Package A: Unified Measurement Baseline
 
@@ -288,7 +479,7 @@ Owner: `AlembicTest`
 
 Run only after Package A-D source/unit pass.
 
-Status: `blocked(scope=live-ai-approval)`
+Status: `failed(scope=live-ai-local, reason=primary-token-regression)`
 
 Return:
 
@@ -299,8 +490,107 @@ Return:
 - report path, job id, timeline path
 - BiliDili git status
 
+Evidence:
+
+- AlembicTest report: `../AlembicTest/docs/pcvm-package-e-same-input-live-comparison-2026-05-31.md`
+- Raw summary: `../AlembicTest/tmp/pcvm-package-e-same-input-live-comparison-2026-05-31/package-e-raw-summary.json`
+- Timeline/process evidence: `../AlembicTest/tmp/pcvm-package-e-same-input-live-comparison-2026-05-31/timeline.json`
+- Latest report API snapshot: `../AlembicTest/tmp/pcvm-package-e-same-input-live-comparison-2026-05-31/api-report-latest.json`
+- Job id: `bootstrap_mptfvl61_f75bdcb6`
+- Session id: `bs_1780211356238_xiafi2`
+- BiliDili git status: clean
+
+Same-input live comparison:
+
+| Metric | Baseline | Candidate | Delta | PCVM reading |
+| --- | ---: | ---: | ---: | --- |
+| analyze input tokens | 180337 | 348915 | +168578 (+93.48%) | primary regression |
+| analyze output tokens | 9434 | 13242 | +3808 (+40.36%) | output regression |
+| producer input tokens | 174149 | 171785 | -2364 (-1.36%) | small improvement |
+| producer output tokens | 17705 | 24993 | +7288 (+41.16%) | output regression |
+| route input tokens | 354486 | 520700 | +166214 (+46.89%) | primary regression |
+| route output tokens | 27139 | 38235 | +11096 (+40.89%) | output regression |
+| `pcvAnalyzeGroundingInvalidNoEvidence` | 0 | 0 | 0 | quality constraint held |
+| quality score | 97 | 100 | +3 | quality did not regress |
+
+This package answered the live evidence question but did not pass the optimization gate. The result must not be promoted to product acceptance or hidden behind the source/unit fixture improvement.
+
+### Package K: Same-Input Live Rerun Verdict
+
+Owner repo: `AlembicTest`
+
+Goal: verify Package J source repair on the same BiliDili route with fresh build proof and per-round matrix.
+
+Status: `partial(scope=live-ai-local)`
+
+Evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-k-same-input-live-rerun-2026-05-31`
+- Report: `../AlembicTest/docs/pcvm-package-k-same-input-live-rerun-2026-05-31.md`
+- Job/session: `bootstrap_mptk1wmf_acf5ee00` / `bs_1780218369370_ypny01`
+- Route: BiliDili `design-patterns`, one-dimension/no-delivery, `maxFiles=24`, `contentMaxLines=80`, `skipGuard=true`.
+- Fresh build proof confirmed AlembicAgent and Alembic builds and runtime linkage to local AlembicAgent source.
+- BiliDili git status was clean; no `.asd/` or `Alembic/` write surface under BiliDili.
+
+Result:
+
+| Metric | Package E | Package I | Package K | PCVM reading |
+| --- | ---: | ---: | ---: | --- |
+| route input | 520700 | 273369 | 260811 | K improves over E and I. |
+| route total model | 567173 | 299497 | 294371 | K improves over E and I. |
+| accepted Recipes | 13 | 4 | 6 | K recovers I collapse partly, but not E coverage. |
+| total model / accepted | 43628.7 | 74874.3 | 49061.8 | K improves over I but remains worse than E. |
+| stored payload approx tokens / Recipe | 1008.8 | 883.6 | 1997.4 | K persisted Recipes are much larger. |
+| model-to-payload amplification | 43.25x | 84.73x | 24.56x | K improves payload-normalized efficiency. |
+| invalid-no-evidence | 0 | 0 | 0 | Quality constraint held. |
+| quality score | 100 | 97 | 100 | Quality held/recovered. |
+
+Per-round reading:
+
+- Peak analyze input by model tokens was iteration 12: input `21770`, provider history estimate `13859`, input layer `916`, tool schemas `427`.
+- First `note_finding` appeared at analyze iteration 8; first RECORD phase was iteration 15.
+- Analyze final summary listed 7 pattern families, while Producer converted 6 structured findings into 6 accepted candidates.
+- Every LLM output row was read after the user challenge. Producer iteration 7 already declared all 6 candidates complete and no unsubmitted findings, but iteration 8 still performed an extra evidence-check round before the actual terminal summary at iteration 9. Candidate delta stayed done, but stop behavior is not clean.
+
+PCVM conclusion:
+
+- Package K passes the token-input recovery part of the gate.
+- Package K does not pass accepted-count / total-model-per-accepted gate versus Package E.
+- Payload-normalized efficiency improved strongly, so accepted Recipe count alone is now an unstable useful-output metric.
+- Package L should stabilize Recipe granularity, Analyzer/Producer coverage contract, and Producer terminal detection before another live rerun.
+
+### Package L: Output Contract And Stop Ownership Source Repair
+
+Owner repo: `AlembicAgent`
+
+Goal: repair the deterministic design contradiction found by reading every Package K LLM output row: Producer followed 6 structured findings, but final Analyst Markdown remained a second source of candidate-worthy themes, and Producer completion-like text at iteration 7 was not recognized as terminal.
+
+Status: `pass(scope=source-unit-fixture)`
+
+Source changes:
+
+- `src/agent/context/ExplorationTracker.ts` now passes text into Producer completion detection and recognizes real Package K wording such as `所有 6 个知识候选已成功提交...无未提交发现，无阻断`.
+- `src/agent/runtime/LLMInputAssembly.ts` now states that Analyst final text must summarize recorded `note_finding` items only, and Producer obligations come only from structured Analyst findings.
+- `src/agent/prompts/insight-analyst.ts` now makes `note_finding` the single Producer fact source; final Markdown must not introduce unstructured candidate families.
+- `src/agent/prompts/insight-producer.ts` now says structured findings are the only candidate obligations and final Markdown digest is background only.
+- `src/agent/context/exploration/NudgeGenerator.ts` now tells Producer not to mine final Markdown for new candidate themes and to request Analyst structured-finding gaps instead.
+
+Verification:
+
+- `npm test -- test/ExplorationStrategies.test.ts test/llm-input-layering.test.ts` passed; 2 files, 21 tests.
+- `npm test -- test/llm-input-layering.test.ts test/ExplorationStrategies.test.ts test/ContextWindow.test.ts test/evidence-recording-phase-chain.test.ts` passed; 4 files, 38 tests.
+- `npm run build` passed.
+- `npm run lint` passed.
+- `git diff --check` passed in `AlembicAgent`.
+
+PCVM reading:
+
+- Package L does not change SourceRef, does not change BiliDili, and does not add taxonomy or guardrail-only work.
+- This is a source/unit repair only. It cannot prove live AI will follow the new output contract.
+- Package M should be the next same-input live rerun on the Package K route, with explicit attention to: Producer terminal iteration, Analyzer final Markdown vs structured findings, accepted Recipe count, stored payload size, and route total model / accepted Recipe.
+
 ## Scoped Verdict
 
-Verdict: `pass(scope=source-unit-fixture, packages=A-D); blocked(scope=live-ai-approval, package=E)`
+Verdict: `pass(scope=source-unit-fixture, package=L); ready(scope=live-ai-local, package=M)`
 
-Next action: Package E only after explicit approval. Run AlembicTest same-input BiliDili `design-patterns` no-delivery route and compare live analyze/producer input/output tokens plus quality constraints.
+Next action: Package M same-input live rerun via AlembicTest. The test must not reopen SourceRef. It must answer whether the live run now keeps Producer candidate obligations tied to structured findings, stops after a completion-like Producer output, and improves or preserves the useful-output normalized metrics against Package K/E.
