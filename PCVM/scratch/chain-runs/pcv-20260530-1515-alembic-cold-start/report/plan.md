@@ -3,8 +3,8 @@
 Run ID: `pcv-20260530-1515-alembic-cold-start`
 Target: reduce duplicated and oversized LLM input/output in Alembic cold-start stages through one unified I/O design
 Owner: `PCVM`
-Current phase: `llm-stage-token-efficiency-package-z-source-unit-repaired`
-Status: `partial(scope=live-ai-local, package=Y); repaired(scope=source-unit, package=Z); pending(scope=alembic-project-space-cold-start-boundary)`
+Current phase: `llm-stage-token-efficiency-package-aa-baseline-recorded`
+Status: `partial(scope=live-ai-local, package=Y); repaired(scope=source-unit, package=Z); baseline-recorded(scope=alembic-project-space, package=AA); pending(scope=package-aa-root-cause-analysis)`
 
 ## Controller Snapshot
 
@@ -20,10 +20,11 @@ Current evidence:
 - External best-practice research agrees on structured prompts, separated context/task/output sections, concise examples, structured/tool output, context caching, and explicit token budgeting.
 - AlembicTest Package E raw evidence completed for BiliDili `design-patterns` one-dimension / no-delivery route. Quality constraints did not regress, but live primary token metrics regressed versus the previous same-input baseline.
 - AlembicTest Package I raw evidence completed for the same route after Packages F-G-H. Absolute route tokens improved materially, but accepted Recipe count and per accepted Recipe unit cost regressed, so Package I does not pass the useful-output gate.
+- AlembicTest Package AA completed an Alembic project-space test-mode Dashboard cold-start after Package Z. Baseline: `10/10` accepted, total model `406651`, Analyst target `22`, Producer-visible target `10`, coverage vs full Analyst target `45.45%`.
 
-Current segment: `llm-stage-token-efficiency-live-verdict-and-output-contract`.
+Current segment: `llm-stage-token-efficiency-alembic-project-space-baseline`.
 
-First blocker: define the Alembic project-space cold-start test boundary. The user accepts the current coverage design: Producer coverage is measured against Analyst structured findings, and mining additional content from other sources is a later optimization item. Package Y remains partial live evidence because it produced `5/5` while older baselines were around `10` to `13`, but Package Z has now removed the hidden 6-finding cap and fixed post-target Producer waste at source/unit scope. Do not send AlembicTest until the Alembic project-space cold-start boundary states target project, route, source proof, metrics, and stop conditions.
+First blocker: analyze Package AA raw LLM inputs/outputs and submit ledger to explain the target mismatch. The user has not stopped LLM I/O optimization. Package AA is a new Alembic project-space baseline, not a BiliDili same-input pass/fail comparison; do not repair or dispatch another test until the mismatch between Analyst target `22` and Producer-visible/accepted `10` is traced through the real artifacts.
 
 ## Non-Goals
 

@@ -4,6 +4,43 @@ Run ID: `pcv-20260530-1515-alembic-cold-start`
 Owner: `PCVM`
 Status: `active`
 
+## Package AA Alembic Project-Space Cold-Start Baseline
+
+Evidence scope: `live-ai-local Alembic project-space test-mode cold-start`
+
+Raw evidence:
+
+- Raw dir: `../AlembicTest/tmp/pcvm-package-aa-alembic-project-space-cold-start-2026-06-01`
+- Job/session: `bootstrap_mpu1u4fq_287d3c49` / `bs_1780248253809_xejzi8`
+- API/Dashboard: `http://127.0.0.1:56164`
+- Target project: `Alembic`
+- Request: `maxFiles=500`, `contentMaxLines=120`, `skipGuard=false`
+- Full record: `records/package-aa-alembic-project-space-baseline.md`
+
+Project-space baseline:
+
+| Metric | Value |
+| --- | ---: |
+| created / accepted / rejected | 10 / 10 / 0 |
+| Analyst structured finding target | 22 |
+| Producer-visible target | 10 |
+| Producer accepted coverage vs Analyst target | 45.45% |
+| Producer accepted coverage vs Producer-visible target | 100% |
+| final summary unsubmitted rows | 12 |
+| analyze iterations / tool calls | 20 / 69 |
+| produce iterations / tool calls | 11 / 10 |
+| route input / output / reasoning | 351167 / 38211 / 17273 |
+| route cache hit | 170880 |
+| route total model tokens | 406651 |
+| total model / Analyst structured target | 18484.1 |
+| total model / accepted Recipe | 40665.1 |
+
+PCVM reading:
+
+- Package AA establishes the first Alembic project-space cold-start token/output baseline after Package Z.
+- It is not directly comparable to BiliDili same-input packages because the project, file budget, content budget, and guard setting differ.
+- The main next analysis point is target mismatch: Analyst target `22` versus Producer-visible/accepted `10`, with `12` unsubmitted rows in Producer final summary.
+
 ## Package Y Same-Input Live Evidence And Output Quantity Gate
 
 Evidence scope: `live-ai-local + raw JSON/job-artifact review`
