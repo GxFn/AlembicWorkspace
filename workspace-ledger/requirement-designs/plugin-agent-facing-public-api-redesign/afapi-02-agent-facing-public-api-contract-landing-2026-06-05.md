@@ -14,15 +14,15 @@ State Authority：controller state-root JSON; scripts may update only the Unifie
 Demand: AFAPI-REQ-02-AGENT-FACING-PUBLIC-API-CONTRACT - AFAPI 02 Agent-Facing Public API Contract
 Main state: planned
 Stage: none
-Current task packages: AFAPI-REQ-02-AGENT-FACING-PUBLIC-API-CONTRACT-CODE-FACT-P1(pending)
+Current task packages: AFAPI-REQ-02-AGENT-FACING-PUBLIC-API-CONTRACT-CODE-FACT-P1(accepted), AFAPI-REQ-02-AGENT-FACING-PUBLIC-API-CONTRACT-RUNTIME-ACCEPTANCE-P2(pending)
 Windows: AlembicPlugin(pending)
 Blockers: none
 Next action: prepare-dispatch-from-state, add-task-package, render-progress-doc
-Review: none
+Review: decision-accept
 Automation: disabled
 User decisions needed: none
-Last updated: 2026-06-06 14:46 CST
-Source state: revision 2 / event evt-20260606064643-0002
+Last updated: 2026-06-06 15:04 CST
+Source state: revision 5 / event evt-20260606070405-0005
 <!-- unified-status:end -->
 
 ## Goal
