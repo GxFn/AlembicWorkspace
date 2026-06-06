@@ -1,21 +1,35 @@
-# AFAPI 07 Scoped Code Guard 落地方案
+# AFAPI 07 Scoped Code Guard Progress
 
 Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
-独立需求：`AFAPI-REQ-07-SCOPED-CODE-GUARD`
-状态：landing-doc-ready / code-fact-reviewed
-维护窗口：AlembicWorkspace
+Demand Key：`AFAPI-REQ-07-SCOPED-CODE-GUARD`
+Sequence Order：07
+Template Version：`control-state-machine/developer-progress-v1`
+Maintainer：AlembicWorkspace
+Document Role：standard developer-readable demand progress document
+State Authority：controller state-root JSON; scripts may update only the Unified Status block and append-only log sections.
 
-## Design 来源
+## Unified Status
 
-- `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-requirement-design-2026-06-03.md`
-- `AlembicDesign/docs/current/plugin-task-public-api-split-addendum-2026-06-04.md`
-- `AlembicDesign/docs/current/plugin-codex-public-api-discussion-sequence-2026-06-04.md`
+<!-- unified-status:start -->
+Demand: AFAPI-REQ-07-SCOPED-CODE-GUARD - AFAPI 07 Scoped Code Guard
+Main state: not-claimed
+Stage: sequence-ready
+Current task packages: none
+Windows: none
+Blockers: none
+Next action: Claim this demand with `node scripts/workspace-control.mjs sequence claim-next --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --write --json`.
+Review: none
+Automation: disabled
+User decisions needed: none
+Last updated: 2026-06-06 CST
+Source state: sequence manifest / no state-root
+<!-- unified-status:end -->
 
-## 独立定位
+## Goal
 
 本需求定义 `alembic_code_guard` 为独立 scoped Recipe adherence check。它只检查明确 files / inline code / workRef scope 下的代码是否符合本轮相关 Recipe / Guard / accepted rules，不再用旧 no-args `guard` 扫描整个 dirty diff，也不承担 lint、安全审计或通用代码质量评审。
 
-## 真实需求
+### Requirements
 
 - code guard 必须由 host agent 显式调用，不能由 work_finish 隐式运行。
 - 输入应包含明确 scope：files、inline code、diffRef、workRef、primeRef、acceptedGuards 或 applicableRecipe。
@@ -23,16 +37,15 @@ Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
 - Guard 检查的是 Recipe adherence / accepted guards，不是全局 lint、安全扫描或所有代码风格问题。
 - Guard 输出必须有 guardResultRef、detailRefs、status、reason 和 scoped diagnostics。
 
-## 代码事实复核
+## Completion Definition
 
-- `AlembicPlugin/lib/shared/schemas/mcp-tools.ts` 已定义 `CodeGuardInput`，公开 `intentRef`、`workRef`、`files`、`code`、`filePath`、`language`、`operation`，并说明 omitted scope 返回 structured blocker，不再 whole-diff fallback。
-- `AlembicPlugin/lib/codex/mcp/handlers/agent-public-tools.ts` 已实现 `codeGuardHandler` 并返回 guardResultRef / result envelope。
-- `AlembicPlugin/lib/service/task/TaskLifecyclePolicy.ts` 的 `decideGuardTrigger` 已处理 no task anchor、no-code-diff、docs-only-diff、unrelated-dirty-diff、task-scoped-code-diff。
-- `AlembicPlugin/lib/codex/mcp/handlers/guard.ts` 仍是底层 guard handler，public `alembic_code_guard` 应只通过 explicit scope 调用。
-- `AlembicPlugin/test/unit/AgentPublicToolsActive.test.ts` 与 `AgentPublicToolsEvaluation.test.ts` 覆盖 missing-guard-scope、explicit file guard、guardResultRef。
-- 代码差异边界：原 Design 提到的 `diffRef`、`primeRef`、`acceptedGuards`、`applicableRecipe` 未全部作为当前 `CodeGuardInput` 的 public 字段公开；当前实现主轴是 files / inline code / workRef。后续如果按原 Design 全字段实现，必须重开 schema 扩展和 tests。
+- 无参数调用 `alembic_code_guard` 不扫描 whole diff，返回 missing-guard-scope blocker。
+- explicit files 或 inline code 调用返回 guardResultRef / detailRefs。
+- docs-only / unrelated dirty / no task anchor 场景不会被误判为当前代码失败。
+- guard description 明确 non-goal：不是 lint、安全审计或通用 review。
+- 若宣称支持 diffRef / primeRef / acceptedGuards，必须有 schema、handler、tests 和 real result evidence。
 
-## 落地方案
+## Stage Plan
 
 1. Stage 0 guard surface inventory：
    - 复核旧 `alembic_guard` / `alembic_task guard` / public `alembic_code_guard` 三者可见性、description、schema 和 handler path。
@@ -48,22 +61,42 @@ Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
 5. Stage 4 evidence and reporting：
    - 返回 guardResultRef、detailRefs、checked files / code summary、reasonCode 和 outputBudget。
 
-## 验收定义
+## Current Evidence Baseline
 
-- 无参数调用 `alembic_code_guard` 不扫描 whole diff，返回 missing-guard-scope blocker。
-- explicit files 或 inline code 调用返回 guardResultRef / detailRefs。
-- docs-only / unrelated dirty / no task anchor 场景不会被误判为当前代码失败。
-- guard description 明确 non-goal：不是 lint、安全审计或通用 review。
-- 若宣称支持 diffRef / primeRef / acceptedGuards，必须有 schema、handler、tests 和 real result evidence。
+### Design Sources
 
-## 边界和非目标
+- `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-requirement-design-2026-06-03.md`
+- `AlembicDesign/docs/current/plugin-task-public-api-split-addendum-2026-06-04.md`
+- `AlembicDesign/docs/current/plugin-codex-public-api-discussion-sequence-2026-06-04.md`
+
+### Code Facts
+
+- `AlembicPlugin/lib/shared/schemas/mcp-tools.ts` 已定义 `CodeGuardInput`，公开 `intentRef`、`workRef`、`files`、`code`、`filePath`、`language`、`operation`，并说明 omitted scope 返回 structured blocker，不再 whole-diff fallback。
+- `AlembicPlugin/lib/codex/mcp/handlers/agent-public-tools.ts` 已实现 `codeGuardHandler` 并返回 guardResultRef / result envelope。
+- `AlembicPlugin/lib/service/task/TaskLifecyclePolicy.ts` 的 `decideGuardTrigger` 已处理 no task anchor、no-code-diff、docs-only-diff、unrelated-dirty-diff、task-scoped-code-diff。
+- `AlembicPlugin/lib/codex/mcp/handlers/guard.ts` 仍是底层 guard handler，public `alembic_code_guard` 应只通过 explicit scope 调用。
+- `AlembicPlugin/test/unit/AgentPublicToolsActive.test.ts` 与 `AgentPublicToolsEvaluation.test.ts` 覆盖 missing-guard-scope、explicit file guard、guardResultRef。
+- 代码差异边界：原 Design 提到的 `diffRef`、`primeRef`、`acceptedGuards`、`applicableRecipe` 未全部作为当前 `CodeGuardInput` 的 public 字段公开；当前实现主轴是 files / inline code / workRef。后续如果按原 Design 全字段实现，必须重开 schema 扩展和 tests。
+
+### Current Judgment
+
+当前代码已完成 scoped code guard 的 P0 行为：explicit files / inline code 与 no-scope blocker。但原 Design 中更丰富的 diffRef / primeRef / acceptedGuards / applicableRecipe 字段未完全公开；若后续用户要求完整字段契约，应按本需求重新开 Stage 0。
+
+## Boundaries And Non-goals
 
 - 不替代 repo lint、typecheck、security scan。
 - 不在 work_finish 自动运行。
 - 不基于 sourceRef 生产 gate 拦截 Recipe / candidate 生成。
 - 不把全仓库 dirty diff 当作本轮用户任务 scope。
 
-## 当前裁决
+## Task Packages
 
-当前代码已完成 scoped code guard 的 P0 行为：explicit files / inline code 与 no-scope blocker。但原 Design 中更丰富的 diffRef / primeRef / acceptedGuards / applicableRecipe 字段未完全公开；若后续用户要求完整字段契约，应按本需求重新开 Stage 0。
+<!-- append-only: task-package entries belong below this line; do not edit previous entries without total-control judgment. -->
 
+## Backfill Summaries
+
+<!-- append-only: target result and evidence summaries belong below this line. -->
+
+## Decisions And Append Log
+
+<!-- append-only: controller decisions, user confirmations, and template migrations belong below this line. -->

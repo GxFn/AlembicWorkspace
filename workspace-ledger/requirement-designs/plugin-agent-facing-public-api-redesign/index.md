@@ -2,13 +2,24 @@
 
 Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
 日期：2026-06-05
-状态：independent-landing-docs-ready
+状态：standard-progress-docs-ready / sequence-manifest-ready
 维护窗口：AlembicWorkspace
 来源窗口：AlembicDesign
 
 ## 定位
 
-本目录把 AFAPI umbrella handoff 拆回一个个可独立领取、独立调研、独立实现、独立验收的需求方向。它不替代已完成的 AFAPI 总控计划，也不自动重启实现派发；后续如果任一方向需要返工或增强，必须从对应独立文档重新做 Stage 0 代码事实复核，再进入实现计划。
+本目录把 AFAPI umbrella handoff 拆回 12 个可独立领取、独立调研、独立实现、独立验收的标准需求推进文档。每篇文档都是 developer-readable progress document，包含唯一 `Unified Status` 区和固定追加区；机器顺序和 state-root 绑定由 [afapi-independent-demand-sequence-2026-06-06.json](afapi-independent-demand-sequence-2026-06-06.json) 维护。
+
+这些文档不替代已完成的 AFAPI 历史总控计划，也不自动重启实现派发。后续如果任一方向需要返工或增强，必须从对应标准文档领取 state-root，先做 Stage 0 代码事实复核，再进入实现计划。
+
+## 新方案推进入口
+
+- 开发者可读入口：本目录 12 篇 `AFAPI xx ... Progress` 标准文档。
+- 机器顺序入口：`afapi-independent-demand-sequence-2026-06-06.json`。
+- 状态 authority：每个需求领取后生成的 `.workspace-active/workspace/current/<demand-key>/controller-state.json`。
+- 文档状态同步：在 `codex-control-workspace/` 下执行 `node scripts/workspace-control.mjs sequence sync-doc --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --demand-key <DEMAND-KEY> --write --json`。
+- 领取下一个需求：在 `codex-control-workspace/` 下执行 `node scripts/workspace-control.mjs sequence claim-next --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --write --json`。
+- 领取只创建 state-root 和初始任务包，不创建 dispatch、不发送线程、不验收证据、不自动完成需求。
 
 ## 领取顺序分析
 
@@ -29,24 +40,24 @@ Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
 
 ## 独立文档列表
 
-| 顺序 | 独立需求 | 文档 | 当前代码事实状态 |
+| 顺序 | 独立需求 | 文档 | 标准推进状态 |
 | --- | --- | --- | --- |
-| 01 | Runtime identity / multi-project MCP runtime | [afapi-01-runtime-identity-multi-project-runtime-landing-2026-06-05.md](afapi-01-runtime-identity-multi-project-runtime-landing-2026-06-05.md) | 代码已有 ProjectRuntimeContext / Alembic sourceOfTruth / Core runtime contracts；后续重开需复核 local-dev 与 packaged mode。 |
-| 02 | Agent-facing public API contract | [afapi-02-agent-facing-public-api-contract-landing-2026-06-05.md](afapi-02-agent-facing-public-api-contract-landing-2026-06-05.md) | 代码已有六个 public tools、contract catalog、result envelope、descriptions 和 hidden legacy boundary。 |
-| 03 | Intent structured local-vector entry | [afapi-03-intent-structured-local-vector-landing-2026-06-05.md](afapi-03-intent-structured-local-vector-landing-2026-06-05.md) | 代码已有 intent handler、HostIntentFrame、local record、vectorPlan、IntentEpisode resident route；原设计枚举未全部以 public enum catalog 逐字公开。 |
-| 04 | Prime independent knowledge entry | [afapi-04-prime-independent-knowledge-entry-landing-2026-06-05.md](afapi-04-prime-independent-knowledge-entry-landing-2026-06-05.md) | 代码已有 `alembic_prime`、PrimeSearchPipeline、PrimeKnowledgeMaterial、detailRefs / primeRef；仍需按本文保留 structure-first 验收口径。 |
-| 05 | Prime trust receipt | [afapi-05-prime-trust-receipt-landing-2026-06-05.md](afapi-05-prime-trust-receipt-landing-2026-06-05.md) | 代码已有 trustPosture / receiptChecklist 五层和 focused tests。 |
-| 06 | Work evidence lifecycle | [afapi-06-work-evidence-lifecycle-landing-2026-06-05.md](afapi-06-work-evidence-lifecycle-landing-2026-06-05.md) | 代码已有 work_start / work_finish、workRef / finishRef、changedFiles / evidenceRefs、guardRecommendation。 |
-| 07 | Scoped code guard | [afapi-07-scoped-code-guard-landing-2026-06-05.md](afapi-07-scoped-code-guard-landing-2026-06-05.md) | 代码已有 explicit files / inline code guard contract；no-args whole-diff 被 structured blocker 替代。 |
-| 08 | Decision Register / decision_record | [afapi-08-decision-register-record-landing-2026-06-05.md](afapi-08-decision-register-record-landing-2026-06-05.md) | Alembic 已有 durable Decision Register producer；Plugin 已有 decision_record consumer。 |
-| 09 | Skill / tool prompt / automation guide cleanup | [afapi-09-skill-tool-prompt-automation-guide-cleanup-landing-2026-06-05.md](afapi-09-skill-tool-prompt-automation-guide-cleanup-landing-2026-06-05.md) | 代码和 tests 已证明 active skill / tool description 不再把旧 task operation 当主入口。 |
-| 10 | Evaluation / smoke / cross-host readiness | [afapi-10-evaluation-smoke-cross-host-readiness-landing-2026-06-05.md](afapi-10-evaluation-smoke-cross-host-readiness-landing-2026-06-05.md) | 已有 contract / active / evaluation / cross-host tests 与 real Codex resident smoke 证据。 |
-| 11 | Dashboard runtime diagnostics UI | [afapi-11-dashboard-runtime-diagnostics-ui-landing-2026-06-05.md](afapi-11-dashboard-runtime-diagnostics-ui-landing-2026-06-05.md) | Dashboard 已消费 projects sourceOfTruth / diagnostics / stateCleanup；只读展示，不写 runtime state。 |
-| 12 | Core shared schema promotion decision | [afapi-12-core-shared-schema-promotion-decision-landing-2026-06-05.md](afapi-12-core-shared-schema-promotion-decision-landing-2026-06-05.md) | Core 已提供 runtime/search/sourceRef/Recipe/Guard contracts；AFAPI agent contract 目前不强制上移。 |
+| 01 | Runtime identity / multi-project MCP runtime | [afapi-01-runtime-identity-multi-project-runtime-landing-2026-06-05.md](afapi-01-runtime-identity-multi-project-runtime-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 02 | Agent-facing public API contract | [afapi-02-agent-facing-public-api-contract-landing-2026-06-05.md](afapi-02-agent-facing-public-api-contract-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 03 | Intent structured local-vector entry | [afapi-03-intent-structured-local-vector-landing-2026-06-05.md](afapi-03-intent-structured-local-vector-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 04 | Prime independent knowledge entry | [afapi-04-prime-independent-knowledge-entry-landing-2026-06-05.md](afapi-04-prime-independent-knowledge-entry-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 05 | Prime trust receipt | [afapi-05-prime-trust-receipt-landing-2026-06-05.md](afapi-05-prime-trust-receipt-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 06 | Work evidence lifecycle | [afapi-06-work-evidence-lifecycle-landing-2026-06-05.md](afapi-06-work-evidence-lifecycle-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 07 | Scoped code guard | [afapi-07-scoped-code-guard-landing-2026-06-05.md](afapi-07-scoped-code-guard-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 08 | Decision Register / decision_record | [afapi-08-decision-register-record-landing-2026-06-05.md](afapi-08-decision-register-record-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 09 | Skill / tool prompt / automation guide cleanup | [afapi-09-skill-tool-prompt-automation-guide-cleanup-landing-2026-06-05.md](afapi-09-skill-tool-prompt-automation-guide-cleanup-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 10 | Evaluation / smoke / cross-host readiness | [afapi-10-evaluation-smoke-cross-host-readiness-landing-2026-06-05.md](afapi-10-evaluation-smoke-cross-host-readiness-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 11 | Dashboard runtime diagnostics UI | [afapi-11-dashboard-runtime-diagnostics-ui-landing-2026-06-05.md](afapi-11-dashboard-runtime-diagnostics-ui-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
+| 12 | Core shared schema promotion decision | [afapi-12-core-shared-schema-promotion-decision-landing-2026-06-05.md](afapi-12-core-shared-schema-promotion-decision-landing-2026-06-05.md) | 标准模板已重建；状态区待 sequence 领取后同步。 |
 
 ## 当前总控裁决
 
-- 本次动作只落实独立需求文档，不创建 dispatch，不启动 automation，不改产品源码。
-- 这些文档不能被旧 `AFAPI-FULL-00` 到 `AFAPI-FULL-21` TODO 账本替代；旧 TODO 可作为历史推进证据，但后续重开必须从对应独立文档重新领取。
-- 如果发现某个需求与当前代码实现不完全等价，应在该独立文档中保留差异，而不是用 umbrella 完成结论覆盖。
-
+- 本次动作重建的是 12 篇标准需求推进文档和机器 sequence manifest；不创建 dispatch，不启动 automation，不改产品源码。
+- 这些文档不能被旧 `AFAPI-FULL-00` 到 `AFAPI-FULL-21` TODO 账本替代；旧 TODO 只作为历史推进证据。
+- 如果发现某个需求与当前代码实现不完全等价，应在该标准文档中保留差异，并由对应 state-root 管理后续状态。
+- 旧 umbrella TODO / 旧当前计划不能再作为 AFAPI 新推进入口。

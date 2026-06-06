@@ -1,0 +1,275 @@
+{
+  "kind": "ControllerDemandSequenceManifest",
+  "schemaVersion": 1,
+  "sequenceId": "AFAPI-INDEPENDENT-DEMAND-SEQUENCE-2026-06-06",
+  "title": "Plugin Agent-Facing Public API Redesign independent demand sequence",
+  "designKey": "PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04",
+  "sourceIndex": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/index.md",
+  "philosophy": "developer docs are standard progress documents; machine order and state live in JSON/state-root; scripts sync only Unified Status and append-only logs.",
+  "items": [
+    {
+      "order": 1,
+      "demandKey": "AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME",
+      "title": "AFAPI 01 Runtime Identity / Multi-project MCP Runtime",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-01-runtime-identity-multi-project-runtime-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-01-runtime-identity-multi-project-runtime",
+      "goal": "本需求负责保证每个 host agent 窗口的 Plugin MCP runtime 能稳定绑定当前真实项目，而不是被 saved root、runtime-control selected / active、embedded fallback、旧 JobStore 或其它窗口状态污染。它是 AFAPI 的第一前置需求：如果 project identity 不可信，后续 `alembic_intent`、`alembic_prime`、work、guard 和 decision 都可能读错知识库或写错 dataRoot。",
+      "completionDefinition": "- 同一台机器多个 Codex / Claude Code / generic host 窗口同时运行时，各自 prime / status / decision 只绑定自己的 current projectRoot 与对应 dataRoot。 - resident search mismatch、daemon unavailable、ProjectScope unavailable、stale selected / active 均返回结构化 degraded / blocked / diagnostics，不注入其它项目知识。 - local-dev 和 packaged mode 分别有可复核测试或 probe；不会用 packaged wrapper 诊断覆盖 local-dev direct dist，反之亦然。 - Plugin 旧 embedded fallback 不再作为主链路身份来源；若保留，只能有明确 recovery boundary 和 tests。",
+      "stagePlan": "1. Stage 0 代码事实复核： - 复核 Plugin projectRoot resolution、WorkspaceResolver、ProjectRuntimeContext、resident client identity、local-dev / packaged entry detection。 - 复核 Alembic ProjectRuntimeControl、projects route、daemon health / sourceOfTruth、ProjectScope registry 和 stale selected / active cleanup。 - 复核 Core runtime contract 是否已满足 Plugin 和 Alembic 双消费者，不提前新增空 shared layer。 2. Stage 1 identity contract： - 固定 `real folder -> ghost dataRoot -> ProjectScope membership -> required service readiness -> failure envelope` 顺序。 - 对 saved root、runtime-control selected / active、embedded runtime、JobStore fallback 统一降级为 diagnostics 或 recovery，不允许参与 effective identity。 3. Stage 2 entry mode： - local-dev direct dist：独立验证 build / sync / reload / real tool-call。 - packaged wrapper：独立验证 runtime.tgz offline startup、startup lock、stdout/stderr readiness 和 diagnostics。 4. Stage 3 consumer unification： - public tools、status、prime、guard、decision consumer 统一从 ProjectRuntimeContext 获取 identity / readiness，不各自猜路径。 5. Stage 4 diagnostics： - Dashboard 或 host-visible diagnostics 只展示 sourceOfTruth 和 recovery next action，不写入 runtime identity。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-01-runtime-identity-multi-project-runtime-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "demandKey": "AFAPI-REQ-02-AGENT-FACING-PUBLIC-API-CONTRACT",
+      "title": "AFAPI 02 Agent-Facing Public API Contract",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-02-agent-facing-public-api-contract-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-02-agent-facing-public-api-contract",
+      "goal": "本需求把旧 `alembic_task(operation=prime/create/close/fail/record_decision)` 伞形入口拆成语义明确的 agent-facing public tools，并建立跨 host agent 共享的基础 schema、枚举、refs 和 result envelope。它不实现每个工具的全部业务逻辑，但为 intent、prime、work、guard、decision 提供统一公共契约。",
+      "completionDefinition": "- tools/list 可见的 host-facing public surface 包含六工具；旧 `alembic_task` 不作为 active public guidance。 - 六工具任一 handler 返回都满足 `contractVersion`、`toolName`、`actionKind`、`status`、`agentHost`、`inputSource`、`summary`、`refs`、reason kind 的 schema 约束。 - skipped / degraded / blocked / failed 状态必须携带对应 reason kind。 - cross-host snapshots 证明同一套 contract 可供 Codex、Claude Code 和 generic host 使用，不产生 schema fork。 - legacy cleanup tests 证明删除旧机械话术不丢失功能映射。",
+      "stagePlan": "1. Stage 0 public surface inventory： - 列出现有 MCP tools/list、tool schema、handler map、active skill、Project Skill、README / setup guidance、embedded runtime cache 中的 public wording。 - 明确哪些旧入口是 hidden compatibility，哪些是仍可见主入口 residue。 2. Stage 1 shared contract： - 在 Plugin 内独立 public-tools contract 目录定义 tool catalog、shared enums、refs、detailRefs、reason codes、result envelope。 - 为每个 tool 固定 required fields、accepted refs、produced refs、implementationStatus。 3. Stage 2 tool descriptions： - 每个工具必须说明 purpose、selectionHint、nonGoal。 - 描述不得使用旧 prime/create/close/guard 机械链路作为推荐流程。 4. Stage 3 handler activation： - 六工具必须真实出现在 active MCP surface，并返回符合 envelope schema 的结果。 - 旧 `alembic_task` 若保留，必须不进入 tools/list 或 active host guidance。 5. Stage 4 cross-host readiness： - Codex / Claude Code / generic host 的 prompt snapshot 共用同一 schema signature。 - agentHost 只区分调用来源，不改变业务字段定义。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-02-AGENT-FACING-PUBLIC-API-CONTRACT-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-02-AGENT-FACING-PUBLIC-API-CONTRACT Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-02-agent-facing-public-api-contract-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-02-AGENT-FACING-PUBLIC-API-CONTRACT-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "demandKey": "AFAPI-REQ-03-INTENT-STRUCTURED-LOCAL-VECTOR",
+      "title": "AFAPI 03 Intent Structured Local-Vector Entry",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-03-intent-structured-local-vector-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-03-intent-structured-local-vector",
+      "goal": "本需求定义 `alembic_intent` 作为 host agent 进入 Alembic 工具链的结构化意图入口。它不是每 turn 强制分类器，也不是 raw prompt 存储器；它负责把 host-declared intent、turn metadata、sourceRefs 和用户语义整理为可被 prime / work / guard / decision 消费的 `intentRef`、recognizedIntent、detailRefs 和 vector retrieval hint。",
+      "completionDefinition": "- semantic implementation / fix / refactor / review / planning input 能返回 ready 或 degraded 的 `intentRef` 与 recognizedIntent。 - status-only / mechanical envelope / no-semantic-intent 能返回 skipped 或 blocked，且 reasonCode 清楚。 - raw automation envelope without referenced docs 不能直接 prime。 - output 中保留 sourceRefs / detailRefs / vectorPlan，并说明 project/runtime source policy。 - 原 Design enum requirements 必须逐项有公开字段、internal derived field 或明确“不做 / 待裁决”说明；不能隐性漏掉。 - IntentEpisode resident route 若被使用，必须证明 raw ids 和 absolute paths 已 redacted。",
+      "stagePlan": "1. Stage 0 intent contract inventory： - 从 Design 原文枚举逐项映射当前 public schema、internal policy、resident store 字段和 result envelope。 - 明确哪些 enum 是必须公开字段，哪些可以作为 internal derived facts，哪些已由 result reason/status 替代。 2. Stage 1 input contract： - `agentHost`、`inputSource` 必须稳定公开。 - hostDeclaredIntent 和 hostTurnMeta 保持 allowlist / redaction；raw host thread id 不落盘。 - raw automation envelope 只能作为 `mechanical-envelope` 或 degraded source，不能直接变成 prime query。 3. Stage 2 local intent record： - handler 生成 `intentRef`、recognizedIntent、sourceRefs、detailRefs、vectorPlan。 - 对 skipped / blocked / degraded 也返回可解释 reason，方便 host agent 知道下一步是否 prime / work_start / guard。 4. Stage 3 resident continuity： - 如需跨 turn continuity，由 Alembic IntentEpisode route 持久化；Plugin consumer 只调用 resident，不自造长期 store。 5. Stage 4 vector retrieval hint： - 输出 recipeRetrievalHint / vectorPlan，供 `alembic_prime` 或 resident search 使用。 - vector hint 是检索增强，不是 sourceRef 生产 gate。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-03-INTENT-STRUCTURED-LOCAL-VECTOR-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-03-INTENT-STRUCTURED-LOCAL-VECTOR Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-03-intent-structured-local-vector-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-03-INTENT-STRUCTURED-LOCAL-VECTOR-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "demandKey": "AFAPI-REQ-04-PRIME-INDEPENDENT-KNOWLEDGE-ENTRY",
+      "title": "AFAPI 04 Prime Independent Knowledge Entry",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-04-prime-independent-knowledge-entry-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-04-prime-independent-knowledge-entry",
+      "goal": "本需求定义 `alembic_prime` 作为独立的结构化 Recipe knowledge 入口。它从 intentRef 或 curated recognizedIntent 出发，输出 compact, trust-labeled, ref-based 的 prime package。它不再依附 `alembic_task(operation=prime)`，也不直接消费 raw automation envelope 或未经整理的 prompt。",
+      "completionDefinition": "- 调用 `alembic_prime` 不经过旧 task operation，也不依赖 legacy task handler 才能返回结果。 - ready prime 返回 `primeRef`、detailRefs、trustPosture / receiptChecklist、compact package 和 runtime / source policy。 - raw automation envelope without source refs / referenced docs 被 block 或 skip，不发生 raw prime query。 - resident unavailable 或 knowledge-empty 返回 degraded，并且 host-visible message 不声称 trusted-to-use / trusted-to-obey。 - output budget 生效，长知识包通过 detailRefs 保留可复核证据，不在 message 中无限展开。 - Prime 的 project identity 来自 AFAPI 01，不被 selected / saved root 污染。",
+      "stagePlan": "1. Stage 0 prime chain inventory： - 复核 `alembic_prime` schema、handler、PrimeSearchPipeline、resident search client、PrimeKnowledgeMaterial、output budget 和 tool description。 - 复核 raw automation envelope / missing docs / no semantic intent 的 block / skip 路径。 2. Stage 1 input handoff： - 优先消费 `intentRef`；没有本地 record 时允许 structured recognizedIntent / hostDeclaredIntent fallback。 - 不允许 raw envelope 直接成为 query；必须有 sourceRefs 或 referenced docs 后才能作为 retrieval context。 3. Stage 2 retrieval package： - 查询计划需要体现 keywords、semantic anchors、sourceRefs、runtime project identity、resident route availability。 - 输出必须保留 detailRefs、sourceRefs / evidenceRefs 和 why / trace 信息，不能只给摘要。 4. Stage 3 degraded / empty behavior： - resident unavailable、knowledge-empty、low-confidence、budget-limited 等情况返回 structured degraded / skipped / blocked。 - empty / degraded prime 仍需告诉 host agent不能声称已经获得 trusted project knowledge。 5. Stage 4 consumer handoff： - `primeRef` 可被 work_start / work_finish / code_guard / decision_record 作为上下文 ref 使用。 - Prime 不负责执行后续动作，只给 host agent可用知识包和信任边界。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-04-PRIME-INDEPENDENT-KNOWLEDGE-ENTRY-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-04-PRIME-INDEPENDENT-KNOWLEDGE-ENTRY Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-04-prime-independent-knowledge-entry-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-04-PRIME-INDEPENDENT-KNOWLEDGE-ENTRY-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "demandKey": "AFAPI-REQ-05-PRIME-TRUST-RECEIPT",
+      "title": "AFAPI 05 Prime Trust Receipt",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-05-prime-trust-receipt-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-05-prime-trust-receipt",
+      "goal": "本需求负责 prime 之后的可见信任声明。它不是检索算法，也不是 work lifecycle；它要求 host agent 在使用 Alembic prime 知识前，用清晰、第一人称、非空洞的 receipt 告诉用户哪些内容可信可遵守、哪些只是上下文、哪些需要代码验证、哪些因 degraded 不可用。",
+      "completionDefinition": "- ready prime output 包含五层 receiptChecklist，并且每层有可解释 title / summary / items 或空层说明。 - degraded / empty prime output 包含 not-available-or-degraded item，并禁止 trusted claim。 - golden prompt / unit test 证明 receipt 不是“知识库已加载”这类空话。 - output budget 下 receipt 仍保留边界，detailRefs 保留证据。 - public prime 和 legacy compatibility prime 的 receipt 行为不互相冲突。",
+      "stagePlan": "1. Stage 0 receipt inventory： - 复核 public prime output 是否包含 receiptChecklist、trustPosture、hostResponse / shout instruction、degraded message。 - 复核 legacy task prime residue 是否仍影响 active guidance。 2. Stage 1 trust layer mapping： - Guard constraints -> trusted-to-obey。 - accepted Recipe / pattern knowledge -> trusted-to-use。 - host intent / query / relation evidence -> context-only。 - sourceRefs / candidates / missing verification -> requires-verification。 - empty / degraded / unavailable -> not-available-or-degraded。 3. Stage 2 visible receipt contract： - host agent必须在进一步工具调用、代码读取、编辑、Guard 或 final summary 前可见声明 receipt。 - receipt 简短但不能空泛；必须命名 obey / use / context / verify / degraded 边界。 4. Stage 3 degraded guardrail： - degraded / empty prime 强制 no trusted-to-use / no trusted-to-obey claim。 - Host response 必须明确下一步需要代码验证或补证。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-05-PRIME-TRUST-RECEIPT-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-05-PRIME-TRUST-RECEIPT Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-05-prime-trust-receipt-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-05-PRIME-TRUST-RECEIPT-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 6,
+      "demandKey": "AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE",
+      "title": "AFAPI 06 Work Evidence Lifecycle",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-06-work-evidence-lifecycle-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-06-work-evidence-lifecycle",
+      "goal": "本需求把旧 create / close task 语义拆成 `alembic_work_start` 和 `alembic_work_finish`。它只服务真实 implementation / fix / refactor / review 等 evidence-producing work，不负责普通问答、Design 讨论、状态汇报或机器信封读取，也不在 finish 时自动运行 Guard。",
+      "completionDefinition": "- `alembic_work_start` 对真实 work 返回 workRef / detailRefs / ready envelope。 - no-work 场景不创建 workRef，或以 structured skip / blocker 告知原因。 - `alembic_work_finish` 对有效 workRef 返回 finishRef、changedFiles、evidenceRefs、outcome 和 guardRecommendation。 - work_finish 不调用 Guard；Guard 是否运行由 host agent 显式调用 AFAPI 07。 - fake work、raw automation envelope work、status-only work 有 regression tests。 - 若宣称 durable work lifecycle，必须有跨进程 store 证据；当前内存态 workRef 不能被误写成 durable。",
+      "stagePlan": "1. Stage 0 lifecycle inventory： - 复核旧 `alembic_task create/close/fail` 调用方、handler、presenter、tests 和 active skill wording。 - 复核 `work_start` / `work_finish` schema 是否覆盖 intentRef、primeRef、workScope、changedFiles、evidenceRefs、outcome。 2. Stage 1 work_start policy： - implementation / fix / refactor / review / explicit task anchor -> 可以创建 workRef。 - status-only / read-only / design discussion / mechanical envelope -> skip 或不调用。 - workScope 只作为声明和证据，不作为隐藏策略。 3. Stage 2 work_finish policy： - 必须携带 workRef 或明确 missing-work-ref blocker。 - changedFiles 和 evidenceRefs 用于后续 guard recommendation / verification，不自动扩展到 whole repo。 4. Stage 3 guard recommendation： - 如果 changedFiles 包含 code-relevant scope，返回 `guardRecommendation.tool = alembic_code_guard` 与 explicit files。 - 如果无 code diff、docs-only、unrelated dirty、no task anchor，返回 skip reason。 5. Stage 4 evolution boundary： - opportunistic evolution 只能在有强 evidence 时作为提示，不替用户记录 decision 或自动改 Recipe。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-06-work-evidence-lifecycle-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 7,
+      "demandKey": "AFAPI-REQ-07-SCOPED-CODE-GUARD",
+      "title": "AFAPI 07 Scoped Code Guard",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-07-scoped-code-guard-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-07-scoped-code-guard",
+      "goal": "本需求定义 `alembic_code_guard` 为独立 scoped Recipe adherence check。它只检查明确 files / inline code / workRef scope 下的代码是否符合本轮相关 Recipe / Guard / accepted rules，不再用旧 no-args `guard` 扫描整个 dirty diff，也不承担 lint、安全审计或通用代码质量评审。",
+      "completionDefinition": "- 无参数调用 `alembic_code_guard` 不扫描 whole diff，返回 missing-guard-scope blocker。 - explicit files 或 inline code 调用返回 guardResultRef / detailRefs。 - docs-only / unrelated dirty / no task anchor 场景不会被误判为当前代码失败。 - guard description 明确 non-goal：不是 lint、安全审计或通用 review。 - 若宣称支持 diffRef / primeRef / acceptedGuards，必须有 schema、handler、tests 和 real result evidence。",
+      "stagePlan": "1. Stage 0 guard surface inventory： - 复核旧 `alembic_guard` / `alembic_task guard` / public `alembic_code_guard` 三者可见性、description、schema 和 handler path。 - 列出 no-args dirty diff 行为是否仍能从 active guidance 触发。 2. Stage 1 explicit scope contract： - 支持 files / inline code 为最小 P0。 - 对 diffRef / primeRef / acceptedGuards / applicableRecipe 做字段级裁决：公开、internal derived、或暂不做。 3. Stage 2 skip / blocker taxonomy： - missing-guard-scope、no-code-scope、docs-only、unrelated-dirty-diff、guard-not-relevant 必须结构化输出。 4. Stage 3 handler wiring： - public code_guard 只向底层 guard handler传入明确 scope。 - 不从 repo dirty state 自动扩大检查范围。 5. Stage 4 evidence and reporting： - 返回 guardResultRef、detailRefs、checked files / code summary、reasonCode 和 outputBudget。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-07-SCOPED-CODE-GUARD-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-07-SCOPED-CODE-GUARD Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-07-scoped-code-guard-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-07-SCOPED-CODE-GUARD-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 8,
+      "demandKey": "AFAPI-REQ-08-DECISION-REGISTER-RECORD",
+      "title": "AFAPI 08 Decision Register / Decision Record",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-08-decision-register-record-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-08-decision-register-record",
+      "goal": "本需求把用户裁决、长期偏好、架构决定和撤销 / 替换记录从 work evidence 中分离出来，形成 Alembic-owned durable Decision Register。Plugin 的 `alembic_decision_record` 只是 host-facing consumer / mutator，不得写 Plugin-local fake decisions。Prime 默认只消费 active / effective decisions，revoked / deleted / audit decisions 不进入默认知识包。",
+      "completionDefinition": "- `alembic_decision_record create/update/revoke/delete/read/list` 对有 resident route 的项目返回 durable decisionRef / detailRefs。 - 无 resident decision-register route 时返回 blocked，reasonCode 为 unavailable 或 capability mismatch。 - Alembic searchable default view 排除 revoked / deleted；audit readback 显式包含 auditCount / auditExcludedCount / status all。 - Search / prime 能消费 active effective decision-register items，且 metadata 说明 excluded statuses。 - Plugin 不在本地创建 fake decisions，也不把 tentative suggestion 当 confirmed decision。",
+      "stagePlan": "1. Stage 0 producer / consumer inventory： - Alembic：DecisionRegisterStore、HTTP routes、search integration、daemon health capability。 - Plugin：DecisionRecordInput、resident client、decisionRecordHandler、blocked route behavior。 - Prime：search / resident result 是否只消费 active effective decisions。 2. Stage 1 Alembic durable producer： - create / update / revoke / delete / read / list / searchable route。 - storage privacy：hash raw session / turn keys，redact absolute paths。 - project-scope mismatch 返回 409 blocker。 3. Stage 2 Plugin consumer： - public `alembic_decision_record` action mapping 到 resident route。 - 无 durable capability 时 blocked，不写本地 fake decision。 4. Stage 3 retrieval integration： - `/api/v1/search` 和 resident search 合并 active effective decisions。 - revoked / deleted 默认排除；includeAudit / status all 才能读 audit。 5. Stage 4 lifecycle cleanup： - 如果需要 superseded 一等 status 或 tombstone policy，必须新增 schema / tests，不隐式混在 revokeReason。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-08-DECISION-REGISTER-RECORD-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-08-DECISION-REGISTER-RECORD Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-08-decision-register-record-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-08-DECISION-REGISTER-RECORD-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 9,
+      "demandKey": "AFAPI-REQ-09-SKILL-TOOL-PROMPT-AUTOMATION-GUIDE-CLEANUP",
+      "title": "AFAPI 09 Skill / Tool Prompt / Automation Guide Cleanup",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-09-skill-tool-prompt-automation-guide-cleanup-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-09-skill-tool-prompt-automation-guide-cleanup",
+      "goal": "本需求负责在新 public contract 生效后，清理旧 skill、tool description、Project Skill、host-specific guide 和 automation guide 中的 prime/create/close/guard/record_decision 机械链路。它不是删除功能本身，而是删除会误导 host agent 的旧 public guidance，并用新工具映射和 tests 证明能力不丢失。",
+      "completionDefinition": "- active host-facing docs 不再推荐 `alembic_task(operation=prime/create/close/guard/record_decision)`。 - tools/list 和 tool descriptions 指向六个新 public tools。 - old wording 只允许出现在 hidden compatibility说明、历史记录或 tests 中，且 tests 有明确边界。 - automation guide 说明 raw envelope 不能直接 prime。 - cleanup 后 contract / active / cross-host / evaluation tests 全部通过，证明功能映射不丢失。",
+      "stagePlan": "1. Stage 0 wording inventory： - 搜索 active skill、Project Skill、README、setup guidance、tool descriptions、automation guide、embedded runtime cache 中的旧词。 - 区分 forbidden active guidance、allowed hidden compatibility wording、historical docs / tests。 2. Stage 1 replacement map： - prime -> `alembic_intent` + `alembic_prime`。 - create -> `alembic_work_start`。 - close / fail -> `alembic_work_finish`。 - guard -> `alembic_code_guard`。 - record_decision -> `alembic_decision_record`。 3. Stage 2 active skill rewrite： - active skill / Project Skill 只描述新语义工具链和 skip / blocked conditions。 - automation envelope guide 加入“读指向文档再 intent / prime”的硬要求。 4. Stage 3 compatibility isolation： - hidden legacy hook 可留作 old session direct-call recovery。 - tools/list、primary prompt、cross-host guide、new user docs 不以旧 hook 为主入口。 5. Stage 4 regression tests： - forbidden wording absence。 - tool mapping still works。 - old session compatibility 不污染 active guidance。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-09-SKILL-TOOL-PROMPT-AUTOMATION-GUIDE-CLEANUP-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-09-SKILL-TOOL-PROMPT-AUTOMATION-GUIDE-CLEANUP Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-09-skill-tool-prompt-automation-guide-cleanup-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-09-SKILL-TOOL-PROMPT-AUTOMATION-GUIDE-CLEANUP-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 10,
+      "demandKey": "AFAPI-REQ-10-EVALUATION-SMOKE-CROSS-HOST-READINESS",
+      "title": "AFAPI 10 Evaluation / Smoke / Cross-host Readiness",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-10-evaluation-smoke-cross-host-readiness-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-10-evaluation-smoke-cross-host-readiness",
+      "goal": "本需求定义 AFAPI 的评测和真实冒烟策略。它的目标不是“handler 能被调用”这么低，而是证明 agent-facing public API 在正确调用、错误调用、skip / degraded / blocked 路径、legacy cleanup、output budget、cross-host prompt 和真实 Codex resident 场景下都能维持契约。",
+      "completionDefinition": "- 所有 public tools contract tests 通过。 - 正向、skip、degraded、blocked 路径均有覆盖，不只验 happy path。 - legacy cleanup tests 证明旧 mechanical wording 不再 active。 - local-dev / packaged runtime probe 至少覆盖其中被本轮修改的入口；不能互相替代。 - real smoke 结论必须写清能推出什么、不能推出什么。 - Cross-host P0 证明 no schema fork；若宣称 Claude Code 实跑，必须提供真实 Claude Code runtime 证据。",
+      "stagePlan": "1. Stage 0 evaluation matrix： - 建立六工具 x 正向 / skip / degraded / blocked / failed / output budget / legacy boundary 的矩阵。 - 标注哪些可由 unit / schema test 覆盖，哪些必须 real MCP / real Codex / resident route。 2. Stage 1 contract tests： - catalog、required fields、accepted refs、produced refs、reason kind、status 和 legacyCompatibility。 3. Stage 2 active tests： - MCP handler callable，tools/list active surface 正确，legacy hook 不被 primary guidance 曝光。 4. Stage 3 negative / regression tests： - raw envelope prime、fake work、no-scope guard、decision unavailable、knowledge-empty、over-budget、wrong host schema fork。 5. Stage 4 runtime smoke： - local-dev direct dist / packaged installed-cache readback分别验证。 - 真实 Codex / resident smoke 只在需要证明 host runtime / daemon route 时启用。 6. Stage 5 cross-host readiness： - Prompt snapshot + schema signature是 P0。 - 实际 Claude Code / generic host smoke 是未来 P1 / user-confirmed boundary。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-10-EVALUATION-SMOKE-CROSS-HOST-READINESS-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-10-EVALUATION-SMOKE-CROSS-HOST-READINESS Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-10-evaluation-smoke-cross-host-readiness-landing-2026-06-05.md",
+          "targetWindow": "AlembicPlugin",
+          "targetTaskId": "AFAPI-REQ-10-EVALUATION-SMOKE-CROSS-HOST-READINESS-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 11,
+      "demandKey": "AFAPI-REQ-11-DASHBOARD-RUNTIME-DIAGNOSTICS-UI",
+      "title": "AFAPI 11 Dashboard Runtime Diagnostics UI",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-11-dashboard-runtime-diagnostics-ui-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-11-dashboard-runtime-diagnostics-ui",
+      "goal": "本需求是条件型下游需求：只有 runtime identity、sourceOfTruth、detailRefs、readiness、stateCleanup 或 diagnostics 需要用户可见解释时，Dashboard 才承接只读 UI。Dashboard 不决定 Plugin effective identity，不写 ProjectRuntimeControl，不替代 Alembic source of truth。",
+      "completionDefinition": "- Backend 返回 sourceOfTruth 时，Dashboard UI 可见 readiness / route / operation / requiredService / diagnostics / failure / cleanup。 - Backend 不返回 sourceOfTruth 时，UI 显示 unavailable，不展示假数据。 - API normalizer 保留 diagnostics 和 stateCleanup。 - UI 文案明确 read-only diagnostics，不暗示 Dashboard state 可覆盖 Plugin runtime identity。 - Contract test 覆盖类型、API client、UI component 和 i18n。",
+      "stagePlan": "1. Stage 0 UI necessity check： - 只有当 AFAPI runtime diagnostics 需要用户可见观察时才启动 Dashboard。 - 若 backend 没有新增 sourceOfTruth / diagnostics 字段，不创建 UI mock。 2. Stage 1 API client contract： - types / normalizer 保留 sourceOfTruth、diagnostics、stateCleanup、failure、sourceRefs / detailRefs。 - 不丢 unknown diagnostics fields；必要时保守显示。 3. Stage 2 read-only component： - Header / diagnostics panel 展示 readiness、route、requiredService、readOnly / writePolicy、failure reason、diagnostics list。 - sourceOfTruth missing 时显示 unavailable hint，不伪造。 4. Stage 3 state boundary： - Dashboard 可显示 selected / active state，但不能表达为 Codex effective identity。 - 任何 write action / cleanup action 必须由 Alembic runtime-control route 明确提供，不由本需求新增。 5. Stage 4 tests： - dashboard-contract test 覆盖 fields preserved and visible。 - 不允许 sourceOfTruth 被 normalizer 重置为 null。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-11-DASHBOARD-RUNTIME-DIAGNOSTICS-UI-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-11-DASHBOARD-RUNTIME-DIAGNOSTICS-UI Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-11-dashboard-runtime-diagnostics-ui-landing-2026-06-05.md",
+          "targetWindow": "AlembicDashboard",
+          "targetTaskId": "AFAPI-REQ-11-DASHBOARD-RUNTIME-DIAGNOSTICS-UI-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    },
+    {
+      "order": 12,
+      "demandKey": "AFAPI-REQ-12-CORE-SHARED-SCHEMA-PROMOTION-DECISION",
+      "title": "AFAPI 12 Core Shared Schema Promotion Decision",
+      "developerDoc": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-12-core-shared-schema-promotion-decision-landing-2026-06-05.md",
+      "stateRoot": "codex-control-workspace/.workspace-active/workspace/current/afapi-req-12-core-shared-schema-promotion-decision",
+      "goal": "本需求不是“必须把 AFAPI contract 放进 Core”，而是定义何时应该把 Plugin 内的 agent-facing public schema、enums、result envelope 或 runtime identity pieces 提升到 AlembicCore。原则是：只有真实多消费者需要、当前分散实现已经造成阻塞、并且 Core 职责匹配时才 promotion；不得为了显得干净而提前创建空 shared layer。",
+      "completionDefinition": "- 若决定不 promotion：文档必须说明现有 Core contracts 已满足哪些共享需求，agent-facing schema 为什么仍留 Plugin，且不存在当前阻塞。 - 若决定 promotion：至少两个真实消费者 import Core schema，并有 tests 证明行为一致。 - 不出现无业务语义的 empty shared layer。 - 任何 migration 都保留 backward compatibility 或明确 breaking cleanup 用户裁决。 - Core package public exports、Alembic / Plugin build 和 focused tests 通过。",
+      "stagePlan": "1. Stage 0 promotion trigger review： - 列出每个 public contract type 的真实消费者。 - 判断是否已经出现重复实现、版本漂移、无法测试或跨仓库 blocking。 2. Stage 1 split decision： - Core 保留 runtime / ProjectScope / sourceRef / Recipe / Guard / search / failure envelope 等 headless shared contracts。 - Plugin 保留 host-agent-facing tool contract、descriptions、cross-host prompt snapshots，除非出现第二个真实 host adapter 需要直接复用。 3. Stage 2 promotion candidate design： - 若要上移，先写 migration doc：source module、target module、exports、version、compat alias、consumer migration、tests。 - 禁止只移动 types 不迁移真实 consumer。 4. Stage 3 contract tests： - Core public API boundary test。 - Plugin import path / package export test。 - Alembic / Dashboard / Agent consumer tests。 5. Stage 4 cleanup： - 删除旧 duplicate schema 或建立 temporary adapter；adapter 必须有真实 migration deadline。",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "AFAPI-REQ-12-CORE-SHARED-SCHEMA-PROMOTION-DECISION-CODE-FACT-P1",
+          "summary": "按标准需求文档重开 AFAPI-REQ-12-CORE-SHARED-SCHEMA-PROMOTION-DECISION Stage 0 代码事实复核，确认当前代码、缺口、可实现边界和下一阶段任务包。",
+          "sourceRef": "workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-12-core-shared-schema-promotion-decision-landing-2026-06-05.md",
+          "targetWindow": "AlembicCore",
+          "targetTaskId": "AFAPI-REQ-12-CORE-SHARED-SCHEMA-PROMOTION-DECISION-CODE-FACT-T1",
+          "targetSummary": "读取 AFAPI 标准需求文档，按目标仓库职责完成 Stage 0 代码事实复核并回填原始证据。"
+        }
+      ]
+    }
+  ]
+}

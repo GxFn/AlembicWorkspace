@@ -1,21 +1,35 @@
-# AFAPI 05 Prime Trust Receipt 落地方案
+# AFAPI 05 Prime Trust Receipt Progress
 
 Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
-独立需求：`AFAPI-REQ-05-PRIME-TRUST-RECEIPT`
-状态：landing-doc-ready / code-fact-reviewed
-维护窗口：AlembicWorkspace
+Demand Key：`AFAPI-REQ-05-PRIME-TRUST-RECEIPT`
+Sequence Order：05
+Template Version：`control-state-machine/developer-progress-v1`
+Maintainer：AlembicWorkspace
+Document Role：standard developer-readable demand progress document
+State Authority：controller state-root JSON; scripts may update only the Unified Status block and append-only log sections.
 
-## Design 来源
+## Unified Status
 
-- `AlembicDesign/docs/current/plugin-prime-trust-receipt-requirement-design-2026-06-02.md`
-- `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-requirement-design-2026-06-03.md`
-- `AlembicDesign/docs/current/plugin-prime-task-decoupling-requirement-design-2026-06-04.md`
+<!-- unified-status:start -->
+Demand: AFAPI-REQ-05-PRIME-TRUST-RECEIPT - AFAPI 05 Prime Trust Receipt
+Main state: not-claimed
+Stage: sequence-ready
+Current task packages: none
+Windows: none
+Blockers: none
+Next action: Claim this demand with `node scripts/workspace-control.mjs sequence claim-next --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --write --json`.
+Review: none
+Automation: disabled
+User decisions needed: none
+Last updated: 2026-06-06 CST
+Source state: sequence manifest / no state-root
+<!-- unified-status:end -->
 
-## 独立定位
+## Goal
 
 本需求负责 prime 之后的可见信任声明。它不是检索算法，也不是 work lifecycle；它要求 host agent 在使用 Alembic prime 知识前，用清晰、第一人称、非空洞的 receipt 告诉用户哪些内容可信可遵守、哪些只是上下文、哪些需要代码验证、哪些因 degraded 不可用。
 
-## 真实需求
+### Requirements
 
 - 一旦 prime delivered，host agent 可见回复必须说明 trust posture，不能只说“已读取知识库”。
 - receipt 必须区分：
@@ -28,15 +42,15 @@ Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
 - receipt 不能列出过长路径清单；evidenceRefs 应保留在 payload，必要时后续引用。
 - receipt 必须是 Codex / host agent 第一人称，而不是让 Alembic prime 成为说话主体。
 
-## 代码事实复核
+## Completion Definition
 
-- `AlembicPlugin/lib/service/task/PrimeKnowledgeMaterial.ts` 已定义并构建 trustPosture / receiptChecklist，包含五层 trust boundary。
-- `AlembicPlugin/lib/codex/mcp/handlers/task.ts` 仍保留 legacy task prime material 的 receipt 逻辑；AFAPI 新 public prime 通过 `PrimeKnowledgeMaterial` 复用该材料。
-- `AlembicPlugin/lib/codex/mcp/handlers/agent-public-tools.ts` 的 `primeHandler` 返回 `primeKnowledgeMaterial`，可被 host agent 读取 receipt material。
-- `AlembicPlugin/test/unit/TaskPrimeKnowledgeMaterial.test.ts` 覆盖 delivered、empty、degraded、candidate、host intent、evidenceRefs、anti-empty receipt 和 hostResponse reason。
-- `AlembicPlugin/test/unit/AgentPublicToolsActive.test.ts` 验证 public `alembic_prime` 返回 trustPosture / receiptChecklist。
+- ready prime output 包含五层 receiptChecklist，并且每层有可解释 title / summary / items 或空层说明。
+- degraded / empty prime output 包含 not-available-or-degraded item，并禁止 trusted claim。
+- golden prompt / unit test 证明 receipt 不是“知识库已加载”这类空话。
+- output budget 下 receipt 仍保留边界，detailRefs 保留证据。
+- public prime 和 legacy compatibility prime 的 receipt 行为不互相冲突。
 
-## 落地方案
+## Stage Plan
 
 1. Stage 0 receipt inventory：
    - 复核 public prime output 是否包含 receiptChecklist、trustPosture、hostResponse / shout instruction、degraded message。
@@ -54,21 +68,40 @@ Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
    - degraded / empty prime 强制 no trusted-to-use / no trusted-to-obey claim。
    - Host response 必须明确下一步需要代码验证或补证。
 
-## 验收定义
+## Current Evidence Baseline
 
-- ready prime output 包含五层 receiptChecklist，并且每层有可解释 title / summary / items 或空层说明。
-- degraded / empty prime output 包含 not-available-or-degraded item，并禁止 trusted claim。
-- golden prompt / unit test 证明 receipt 不是“知识库已加载”这类空话。
-- output budget 下 receipt 仍保留边界，detailRefs 保留证据。
-- public prime 和 legacy compatibility prime 的 receipt 行为不互相冲突。
+### Design Sources
 
-## 边界和非目标
+- `AlembicDesign/docs/current/plugin-prime-trust-receipt-requirement-design-2026-06-02.md`
+- `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-requirement-design-2026-06-03.md`
+- `AlembicDesign/docs/current/plugin-prime-task-decoupling-requirement-design-2026-06-04.md`
+
+### Code Facts
+
+- `AlembicPlugin/lib/service/task/PrimeKnowledgeMaterial.ts` 已定义并构建 trustPosture / receiptChecklist，包含五层 trust boundary。
+- `AlembicPlugin/lib/codex/mcp/handlers/task.ts` 仍保留 legacy task prime material 的 receipt 逻辑；AFAPI 新 public prime 通过 `PrimeKnowledgeMaterial` 复用该材料。
+- `AlembicPlugin/lib/codex/mcp/handlers/agent-public-tools.ts` 的 `primeHandler` 返回 `primeKnowledgeMaterial`，可被 host agent 读取 receipt material。
+- `AlembicPlugin/test/unit/TaskPrimeKnowledgeMaterial.test.ts` 覆盖 delivered、empty、degraded、candidate、host intent、evidenceRefs、anti-empty receipt 和 hostResponse reason。
+- `AlembicPlugin/test/unit/AgentPublicToolsActive.test.ts` 验证 public `alembic_prime` 返回 trustPosture / receiptChecklist。
+
+### Current Judgment
+
+当前代码已覆盖五层 trust receipt，并有 focused tests 和 public prime active tests。后续若 prime package 字段调整，必须同步复核 receipt layers，避免新的检索材料绕过信任边界。
+
+## Boundaries And Non-goals
 
 - Trust receipt 不决定要不要 prime；触发时机由 AFAPI 04 和 lifecycle policy 决定。
 - Trust receipt 不替代代码验证；`requires-verification` 的内容不能被当成已验证事实。
 - Trust receipt 不记录 durable decision，也不创建 work。
 
-## 当前裁决
+## Task Packages
 
-当前代码已覆盖五层 trust receipt，并有 focused tests 和 public prime active tests。后续若 prime package 字段调整，必须同步复核 receipt layers，避免新的检索材料绕过信任边界。
+<!-- append-only: task-package entries belong below this line; do not edit previous entries without total-control judgment. -->
 
+## Backfill Summaries
+
+<!-- append-only: target result and evidence summaries belong below this line. -->
+
+## Decisions And Append Log
+
+<!-- append-only: controller decisions, user confirmations, and template migrations belong below this line. -->
