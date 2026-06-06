@@ -12,17 +12,17 @@ State Authority：controller state-root JSON; scripts may update only the Unifie
 
 <!-- unified-status:start -->
 Demand: AFAPI-REQ-04-PRIME-INDEPENDENT-KNOWLEDGE-ENTRY - AFAPI 04 Prime Independent Knowledge Entry
-Main state: not-claimed
-Stage: sequence-ready
-Current task packages: none
-Windows: none
+Main state: completed
+Stage: none
+Current task packages: AFAPI-REQ-04-PRIME-INDEPENDENT-KNOWLEDGE-ENTRY-CODE-FACT-P1(accepted), AFAPI-REQ-04-PRIME-INDEPENDENT-KNOWLEDGE-ENTRY-CONTRACT-CONVERGENCE-P2(accepted), AFAPI-REQ-04-PRIME-INDEPENDENT-KNOWLEDGE-ENTRY-RUNTIME-ACCEPTANCE-P3(accepted)
+Windows: AlembicPlugin(accepted)
 Blockers: none
-Next action: Claim this demand with `node scripts/workspace-control.mjs sequence claim-next --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --write --json`.
-Review: none
+Next action: render-progress-doc
+Review: demand-completed
 Automation: disabled
 User decisions needed: none
-Last updated: 2026-06-06 CST
-Source state: sequence manifest / no state-root
+Last updated: 2026-06-06 17:50 CST
+Source state: revision 11 / event evt-20260606095019-0011
 <!-- unified-status:end -->
 
 ## Goal

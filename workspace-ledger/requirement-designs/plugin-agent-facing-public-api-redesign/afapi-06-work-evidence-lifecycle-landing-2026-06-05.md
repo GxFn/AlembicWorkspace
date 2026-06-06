@@ -12,17 +12,17 @@ State Authority：controller state-root JSON; scripts may update only the Unifie
 
 <!-- unified-status:start -->
 Demand: AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE - AFAPI 06 Work Evidence Lifecycle
-Main state: not-claimed
-Stage: sequence-ready
-Current task packages: none
-Windows: none
+Main state: completed
+Stage: none
+Current task packages: AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-CODE-FACT-P1(accepted), AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-RUNTIME-GOLDEN-P2(accepted)
+Windows: AlembicPlugin(accepted)
 Blockers: none
-Next action: Claim this demand with `node scripts/workspace-control.mjs sequence claim-next --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --write --json`.
-Review: none
+Next action: render-progress-doc
+Review: demand-completed
 Automation: disabled
 User decisions needed: none
-Last updated: 2026-06-06 CST
-Source state: sequence manifest / no state-root
+Last updated: 2026-06-06 19:17 CST
+Source state: revision 8 / event evt-20260606111732-0008
 <!-- unified-status:end -->
 
 ## Goal

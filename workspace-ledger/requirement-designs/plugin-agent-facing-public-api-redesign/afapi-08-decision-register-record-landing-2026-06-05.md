@@ -12,17 +12,17 @@ State Authority：controller state-root JSON; scripts may update only the Unifie
 
 <!-- unified-status:start -->
 Demand: AFAPI-REQ-08-DECISION-REGISTER-RECORD - AFAPI 08 Decision Register / Decision Record
-Main state: not-claimed
-Stage: sequence-ready
-Current task packages: none
-Windows: none
+Main state: planned
+Stage: none
+Current task packages: AFAPI-REQ-08-DECISION-REGISTER-RECORD-CODE-FACT-P1(pending)
+Windows: AlembicPlugin(pending)
 Blockers: none
-Next action: Claim this demand with `node scripts/workspace-control.mjs sequence claim-next --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --write --json`.
+Next action: prepare-dispatch-from-state, add-task-package, render-progress-doc
 Review: none
 Automation: disabled
 User decisions needed: none
-Last updated: 2026-06-06 CST
-Source state: sequence manifest / no state-root
+Last updated: 2026-06-06 20:19 CST
+Source state: revision 2 / event evt-20260606121903-0002
 <!-- unified-status:end -->
 
 ## Goal
