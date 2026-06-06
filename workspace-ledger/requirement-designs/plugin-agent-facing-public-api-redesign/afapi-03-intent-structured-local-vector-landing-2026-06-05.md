@@ -14,15 +14,15 @@ State Authority：controller state-root JSON; scripts may update only the Unifie
 Demand: AFAPI-REQ-03-INTENT-STRUCTURED-LOCAL-VECTOR - AFAPI 03 Intent Structured Local-Vector Entry
 Main state: planned
 Stage: none
-Current task packages: AFAPI-REQ-03-INTENT-STRUCTURED-LOCAL-VECTOR-CODE-FACT-P1(pending)
+Current task packages: AFAPI-REQ-03-INTENT-STRUCTURED-LOCAL-VECTOR-CODE-FACT-P1(accepted), AFAPI-REQ-03-INTENT-STRUCTURED-LOCAL-VECTOR-CONTRACT-CONVERGENCE-P2(pending)
 Windows: AlembicPlugin(pending)
 Blockers: none
 Next action: prepare-dispatch-from-state, add-task-package, render-progress-doc
-Review: none
+Review: decision-accept
 Automation: disabled
 User decisions needed: none
-Last updated: 2026-06-06 15:26 CST
-Source state: revision 2 / event evt-20260606072609-0002
+Last updated: 2026-06-06 15:43 CST
+Source state: revision 5 / event evt-20260606074248-0005
 <!-- unified-status:end -->
 
 ## Goal
