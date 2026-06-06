@@ -12,17 +12,17 @@ State Authority：controller state-root JSON; scripts may update only the Unifie
 
 <!-- unified-status:start -->
 Demand: AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME - AFAPI 01 Runtime Identity / Multi-project MCP Runtime
-Main state: planned
+Main state: completed
 Stage: none
-Current task packages: AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-CODE-FACT-P1(accepted), AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-RUNTIME-PROBE-P2(accepted), AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-PRODUCER-P3(accepted), AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-RUNTIME-ARTIFACT-HYGIENE-P4(pending)
-Windows: AlembicPlugin(pending), Alembic(accepted)
+Current task packages: AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-CODE-FACT-P1(accepted), AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-RUNTIME-PROBE-P2(accepted), AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-PRODUCER-P3(accepted), AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-RUNTIME-ARTIFACT-HYGIENE-P4(accepted)
+Windows: AlembicPlugin(accepted), Alembic(accepted)
 Blockers: none
-Next action: prepare-dispatch-from-state, add-task-package, render-progress-doc
-Review: decision-accept
+Next action: render-progress-doc
+Review: demand-completed
 Automation: disabled
 User decisions needed: none
-Last updated: 2026-06-06 14:26 CST
-Source state: revision 9 / event evt-20260606062543-0009
+Last updated: 2026-06-06 14:45 CST
+Source state: revision 12 / event evt-20260606064512-0012
 <!-- unified-status:end -->
 
 ## Goal
