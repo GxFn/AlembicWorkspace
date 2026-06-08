@@ -1,14 +1,14 @@
-# Workspace Archive
+# Workspace Archive Summary
 
-Status: starter archive index
+Status: archive area summary
 Maintained Entry: [workspace-record-map.md](../workspace-record-map.md)
 
-This directory stores completed or superseded workspace history. Active docs
-should link to the record map or archive topic directories instead of scattering
-direct links to old body files.
+## Summary
+
+This file is the archive area entrypoint. Archived body files preserve evidence snapshots; summaries and maps live in archive `index.md` files.
 
 ## Month Map
 
-| Month | Description |
+| Month | Notes |
 | --- | --- |
-| None | No archived topics yet. |
+| [2026-06](2026-06/) | 2 topic archive folders. |

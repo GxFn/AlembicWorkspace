@@ -17,6 +17,19 @@ archive files.
 | Goal-stage confirmation | ../goal-stage-confirmation/ | Reusable goal/stage confirmation process. |
 | Archive | archive/ | Completed or superseded workspace history. |
 
+## TODO Records
+
+| Record | Entry | Description |
+| --- | --- | --- |
+| Active TODO board | ../../.workspace-active/workspace/current/global-todo-board.md | Current non-completed TODO, hold, and scheduling rows. |
+| AFAPI completed TODO archive | archive/2026-06/global-todo/ | Completed AFAPI 08-12 demand rows and closed probe-policy row compacted from the active TODO board. |
+
+## Requirement Completion Records
+
+| Record | Entry | Description |
+| --- | --- | --- |
+| AFAPI 08-12 completed demands | archive/2026-06/afapi-completed-demands/ | Demand-level completion summary for AFAPI 08-12, including final revisions, controller conclusions, and evidence maps. |
+
 ## Workflow References
 
 | Topic | Entry | Description |
@@ -40,4 +53,5 @@ records that are too project-specific for the reusable Wakeflow package.
 
 | Topic | Directory | Description |
 | --- | --- | --- |
-| None | archive/ | No archived topics yet. |
+| 2026-06/afapi-completed-demands | archive/2026-06/afapi-completed-demands/ | AFAPI 08-12 demand-level completion summary with final revisions, conclusions, and evidence map. |
+| 2026-06/global-todo | archive/2026-06/global-todo/ | Completed AFAPI 08-12 demand TODO history and closed probe-policy row compacted on 2026-06-07. |

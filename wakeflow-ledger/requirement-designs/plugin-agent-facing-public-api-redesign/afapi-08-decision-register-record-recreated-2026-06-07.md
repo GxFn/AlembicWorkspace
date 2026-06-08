@@ -11,17 +11,17 @@ State Authority: a future Wakeflow state root under `.workspace-active/workspace
 
 <!-- unified-status:start -->
 Demand: AFAPI-REQ-08-DECISION-REGISTER-RECORD - AFAPI 08 Decision Register / Decision Record
-Main state: not-claimed
-Stage: sequence-ready
-Current task packages: none
-Windows: none
+Main state: completed
+Stage: none
+Current task packages: AFAPI-REQ-08-DECISION-REGISTER-RECORD-CODE-FACT-P1(accepted), AFAPI-REQ-08-DECISION-REGISTER-RECORD-DURABLE-PRODUCER-P2(accepted), AFAPI-REQ-08-DECISION-REGISTER-RECORD-PLUGIN-SUCCESS-P3(accepted), AFAPI-REQ-08-DECISION-REGISTER-RECORD-LEGACY-CLEANUP-P4(accepted), AFAPI-REQ-08-DECISION-REGISTER-RECORD-CACHE-REPROBE-P5(accepted)
+Windows: AlembicPlugin(accepted), Alembic(accepted)
 Blockers: none
-Next action: Claim from `wakeflow-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-remaining-demand-sequence-2026-06-07.json` only when total control chooses this as the next safe demand.
-Review: none
+Next action: archived in `wakeflow-ledger/workspace/archive/2026-06/afapi-completed-demands/`; no active dispatch.
+Review: demand-completed
 Automation: disabled
-User decisions needed: none before Stage 0; later decisions come from the claimed state root.
-Last updated: 2026-06-07 CST
-Source state: rebuilt in Wakeflow from controller review of the old AFAPI track; no state root has been created in the new workspace.
+User decisions needed: none
+Last updated: 2026-06-08 17:20 CST
+Source state: revision 20 / event evt-20260607134826-0020
 <!-- unified-status:end -->
 
 ## Goal
