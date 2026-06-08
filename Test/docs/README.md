@@ -12,8 +12,13 @@ in `docs/`.
 | Type | Document | Purpose |
 | --- | --- | --- |
 | Operating policy | [testing-operation-policy.md](testing-operation-policy.md) | Defines when Test is justified and what evidence it must return. |
+| Legacy map | [legacy-alembic-test-map.md](legacy-alembic-test-map.md) | Points to old AlembicTest reports, scripts, skills, and raw evidence without moving old data. |
 | Current area | [current/README.md](current/README.md) | Explains active test notes and alignment files. |
 | Window alignment | [current/test-window-alignment.md](current/test-window-alignment.md) | Records how this Test surface aligns with the parent workspace. |
 
 Do not store product implementation plans, API keys, local credentials, private
 machine state, or real thread ids here.
+
+Old workspace-relative `AlembicTest/docs` reports and `AlembicTest/tmp` raw evidence remain
+in place. New Test evidence should use this `Test` surface unless the current
+state root names a different durable destination.

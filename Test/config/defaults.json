@@ -1,5 +1,54 @@
 {
-  "schemaVersion": 1,
-  "defaultTarget": "",
-  "targets": {}
+  "defaultProject": "BiliDili",
+  "ai": {
+    "defaultSourceProject": "BiliDili",
+    "fallbackToDefaultProject": true
+  },
+  "testProjects": [
+    {
+      "name": "AlembicWorkspace",
+      "role": "Alembic 系列仓库 multi-root / self-hosting 集成验证目标",
+      "defaultUse": "ProjectScope、Plugin、Dashboard、Alembic 自身跨仓库链路复测",
+      "protection": "按总控工作区和真实测试项目双重保护；Test 不提交 workspace 仓库，不把根目录加入 source folders，除测试单明确授权外不改产品源码"
+    },
+    {
+      "name": "BiliDili",
+      "role": "真实 iOS/Swift 业务项目验证目标",
+      "defaultUse": "冷启动、resident search、prime、真实项目只读扫描和最小回归",
+      "protection": "默认只读；不得为测试便利修改业务代码、登录、播放、网络、UI 或 Xcode 项目结构"
+    }
+  ],
+  "defaultAlembic": "Alembic",
+  "restart": {
+    "waitMs": 10000,
+    "stopWaitMs": 5000,
+    "statusTimeoutMs": 3000,
+    "monitorIntervalMs": 20000,
+    "devLink": true,
+    "preclean": {
+      "enabled": true,
+      "stopAllServices": true,
+      "cleanLogs": true,
+      "stopWaitMs": 5000
+    },
+    "runtimeWriteCheck": true,
+    "statusProbe": true
+  },
+  "codexMcpReload": {
+    "owner": "AlembicPlugin",
+    "defaultUse": "refresh installed plugin projection and run a fresh MCP probe; it does not live-reload the current Codex host MCP session",
+    "codexProbeAllowedUse": "collect fresh MCP evidence only when the active test order assigns Codex Plugin or host-environment verification to Test",
+    "realProjectRouteBoundary": "do not use the Codex Plugin or host-environment smoke route as a substitute for real-project cold-start/rescan, AI/provider, Dashboard, monitoring, or regression validation",
+    "forbiddenInTest": [
+      "do not use reload as a repair path for current Transport closed",
+      "do not pass --stop-mcp or watch --restart-mcp unless the control plan explicitly authorizes current host MCP loss and a Codex restart"
+    ]
+  },
+  "monitor": {
+    "intervalMs": 20000,
+    "timeoutSeconds": 8,
+    "signalLines": 12,
+    "tailBytes": 24000,
+    "signalPattern": "AgentService|AgentRuntime|LLM call|tool calls received|Dimension child result|Bootstrap tier|Bootstrap agent session|coding-standards|QualityGate|note_finding|quality_gate|quality_gate_failed|failed|error|timeout|abort|cancel|RECORD|analysis_retry|l4"
+  }
 }

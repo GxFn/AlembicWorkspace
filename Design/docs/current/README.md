@@ -5,6 +5,7 @@ surface:
 
 - `<topic>-original-plan-YYYY-MM-DD.md`
 - `<topic>-requirement-design-YYYY-MM-DD.md`
+- `<topic>-discussion-sequence-YYYY-MM-DD.md`
 - `<topic>-workspace-signal-YYYY-MM-DD.md`
 - `<topic>-workspace-handoff-YYYY-MM-DD.md`
 - `workspace-handoff-board.md`
@@ -15,3 +16,8 @@ controller decision.
 
 Do not store product source changes, runtime test evidence, secrets, real
 thread ids, or controller machine state here.
+
+Historical AlembicDesign drafts stay under the workspace-relative
+`AlembicDesign/docs/current/`. Use `../legacy-alembic-design-map.md` and the
+existing Design skills to cite or refresh them; do not bulk-copy old data into
+this current area.

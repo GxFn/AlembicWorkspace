@@ -46,6 +46,15 @@ explicitly authorizes it.
   - Output: source chain map, node cuts, round model, local segment scorecards,
     evidence links, current-node execution log, scoped verdicts, and full-run
     readiness gate.
+- `alembic-real-routes/SKILL.md`
+  - Purpose: run or monitor Alembic real-project, Codex Plugin / MCP,
+    resident-service, cold-start, multi-root, and test-mode routes with the
+    rebuilt reusable Test scripts.
+  - Sources: legacy `AlembicTest/AGENTS.md`,
+    `AlembicTest/skills/alembic-test-real-routes/SKILL.md`, and active
+    Wakeflow Test boundaries.
+  - Output: route choice, command path, evidence checklist, blocked condition,
+    and controller-ready backfill summary.
 
 ## Quality Standard
 
