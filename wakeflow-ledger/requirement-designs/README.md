@@ -36,6 +36,14 @@ Use one subdirectory per substantial demand:
 - `plugin-agent-facing-public-api-redesign/`: AFAPI remaining demands rebuilt
   for Wakeflow. AFAPI 01-07 are completed upstream; AFAPI 08-12 are queued as
   new Wakeflow demand definitions and must be claimed one at a time.
+- `alembic-plugin-marketplace-runtime-bootstrap/`: Candidate requirement to
+  change AlembicPlugin public marketplace distribution from embedded
+  `runtime.tgz` / `node_modules` artifact delivery to a lightweight plugin
+  shell plus pinned npm runtime package installed by the MCP startup path.
+- `alembic-dashboard-chat-wiki-candidate-ai-removal/`: Candidate deletion
+  requirement to remove candidate field completion/refinement plus Dashboard
+  Chat, Wiki, and Signal pages/surfaces, and delete related page-specific
+  Plugin HTTP, MCP, Core guidance, help, i18n, docs, and test support.
 
 ## Boundaries
 

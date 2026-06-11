@@ -1,0 +1,1865 @@
+{
+  "schemaVersion": 1,
+  "kind": "AlembicCrossRepoInterfaceContractRegistry",
+  "designKey": "alembic-cross-repo-interface-contract-2026-06-09",
+  "demandKey": "alembic-interface-contract-d1-registry-adr-2026-06-09",
+  "createdAt": "2026-06-09",
+  "status": "initial-registry-from-d0",
+  "sourceEvidence": [
+    ".workspace-active/workspace/current/alembic-interface-contract-d0-inventory/evidence/contract-inventory-2026-06-09.md",
+    ".workspace-active/workspace/current/alembic-interface-contract-d0-inventory/target-results/tr-alembic-interface-contract-d0-inventory-t1.json"
+  ],
+  "globalRules": {
+    "versionEvolutionStrategy": "deferred",
+    "featureReduction": "forbidden-without-user-decision",
+    "thinMinimumImplementation": "rejected",
+    "capabilityDiscovery": "consumers-must-use-explicit-discovery",
+    "ordinaryOutput": "public-and-consumer-needed-fields-only",
+    "diagnosticOutput": "diagnostic-fields-only-in-diagnostic-context",
+    "largePayloads": "summary-plus-detailRef-or-artifactRef",
+    "compatibilityRule": "keep-only-with-currentCompatibilityOwner-validation-evidence-and-cleanup-blocker",
+    "deletionRule": "delete-only-after-no-consumer-proof-replacement-evidence-where-needed-and-representative-validation"
+  },
+  "functionClassHandling": {
+    "package-export": {
+      "handlingRule": "Producer owns public exports; consumers use only public package subpaths.",
+      "validationFamily": [
+        "package export tests",
+        "import-boundary lint",
+        "build/check"
+      ]
+    },
+    "rest-query": {
+      "handlingRule": "Provider owns explicit response schemas and current consumer safety.",
+      "validationFamily": [
+        "OpenAPI or schema diff",
+        "route tests",
+        "consumer fixture tests"
+      ]
+    },
+    "rest-command": {
+      "handlingRule": "Provider separates command input, state change, conflict, unavailable, and problem response.",
+      "validationFamily": [
+        "route tests",
+        "state assertions",
+        "RFC 9457-style problem tests"
+      ]
+    },
+    "event-stream": {
+      "handlingRule": "Provider owns event registry with metadata and payload schemas separated.",
+      "validationFamily": [
+        "event fixture validation",
+        "replay tests",
+        "consumer event tests"
+      ]
+    },
+    "job-artifact": {
+      "handlingRule": "Provider references large artifacts and keeps summaries compact.",
+      "validationFamily": [
+        "artifact manifest tests",
+        "route tests",
+        "size and shape checks"
+      ]
+    },
+    "mcp-tool": {
+      "handlingRule": "Plugin owns per-tool input/output schema and projector; generic field bags are not enough.",
+      "validationFamily": [
+        "MCP schema and projector tests",
+        "missing-projector fail-closed tests",
+        "golden fixtures"
+      ]
+    },
+    "agent-tool": {
+      "handlingRule": "Agent owns tool manifest and result envelope with all result branches.",
+      "validationFamily": [
+        "tool and router tests",
+        "provider mock tests",
+        "result branch fixtures"
+      ]
+    },
+    "dashboard-view-model": {
+      "handlingRule": "Dashboard owns presentation adapters only; provider fixtures remain backend truth.",
+      "validationFamily": [
+        "Dashboard contract tests",
+        "provider fixture replay",
+        "typecheck and build"
+      ]
+    },
+    "diagnostic-observability": {
+      "handlingRule": "Producer owns stable diagnostic names, operation names, contract ids, correlation ids, and failure reason fields.",
+      "validationFamily": [
+        "snapshot/log/event assertions",
+        "sensitive-field checks",
+        "diagnostic context checks"
+      ]
+    }
+  },
+  "futureDemandRows": {
+    "alembic-interface-contract-d2-core-spine-2026-06-09": [
+      "I01",
+      "I03",
+      "I04",
+      "I05",
+      "I06",
+      "I07",
+      "I08",
+      "I21",
+      "I23"
+    ],
+    "alembic-interface-contract-d3-alembic-provider-2026-06-09": [
+      "I03",
+      "I04",
+      "I05",
+      "I06",
+      "I07",
+      "I08",
+      "I09",
+      "I10",
+      "I11",
+      "I21",
+      "I22",
+      "I23"
+    ],
+    "alembic-interface-contract-d4-plugin-host-mcp-2026-06-09": [
+      "I10",
+      "I11",
+      "I12",
+      "I13",
+      "I14",
+      "I15",
+      "I21",
+      "I22",
+      "I24"
+    ],
+    "alembic-interface-contract-d5-agent-runtime-tools-2026-06-09": [
+      "I02",
+      "I16",
+      "I17",
+      "I18"
+    ],
+    "alembic-interface-contract-d6-dashboard-consumer-2026-06-09": [
+      "I03",
+      "I04",
+      "I05",
+      "I06",
+      "I07",
+      "I08",
+      "I19",
+      "I20",
+      "I21",
+      "I22",
+      "I23"
+    ],
+    "alembic-interface-contract-d7-acceptance-cleanup-2026-06-09": [
+      "I01",
+      "I02",
+      "I03",
+      "I04",
+      "I05",
+      "I06",
+      "I07",
+      "I08",
+      "I09",
+      "I10",
+      "I11",
+      "I12",
+      "I13",
+      "I14",
+      "I15",
+      "I16",
+      "I17",
+      "I18",
+      "I19",
+      "I20",
+      "I21",
+      "I22",
+      "I23",
+      "I24"
+    ]
+  },
+  "rows": [
+    {
+      "id": "I01",
+      "title": "Core public package boundary",
+      "functionClass": "package-export",
+      "producer": "AlembicCore",
+      "consumers": [
+        "Alembic",
+        "AlembicPlugin",
+        "AlembicAgent"
+      ],
+      "transport": [
+        "package-export-map"
+      ],
+      "schemaSource": [
+        "AlembicCore/package.json",
+        "AlembicCore/src public facades"
+      ],
+      "validationCommand": [
+        "AlembicCore: npm run check",
+        "AlembicCore: npm run smoke:public-api",
+        "Alembic/AlembicPlugin/AlembicAgent: consumer import-boundary lint and build/check"
+      ],
+      "capabilityCoverage": [
+        "public subpath import success",
+        "missing subpath/type failure",
+        "release package integrity"
+      ],
+      "capabilityDiscovery": [
+        "package export map",
+        "consumer import scan"
+      ],
+      "errorKinds": [
+        "capability-mismatch",
+        "not-found",
+        "internal-build-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Inline export summary; generated declarations and large diffs by artifactRef.",
+      "fixturePolicy": "Core owns public import smoke fixtures; consumers replay imports in their build/check.",
+      "driftGate": "Export map/API inventory diff plus consumer import-boundary lint.",
+      "currentCompatibilityOwner": "Alembic, AlembicPlugin, AlembicAgent",
+      "observabilityKeys": [
+        "packageName",
+        "subpath",
+        "consumerRepo",
+        "importFile",
+        "checkCommand"
+      ],
+      "removalBlocker": "No subpath removal before import scans prove no consumer or replacement path is connected and representative builds pass.",
+      "securityPropertyExposureNotes": "Do not expose internal implementation through public wildcard subpaths without D2 decision.",
+      "codeRefs": [
+        "AlembicCore/package.json:8",
+        "AlembicCore/package.json:125",
+        "AlembicCore/package.json:129"
+      ],
+      "futureDemandOwner": "D2"
+    },
+    {
+      "id": "I02",
+      "title": "Agent public package boundary",
+      "functionClass": "package-export",
+      "producer": "AlembicAgent",
+      "consumers": [
+        "Alembic"
+      ],
+      "transport": [
+        "package-export-map"
+      ],
+      "schemaSource": [
+        "AlembicAgent/package.json",
+        "AlembicAgent/src public facades"
+      ],
+      "validationCommand": [
+        "AlembicAgent: npm run check",
+        "AlembicAgent: npm run smoke:public-imports",
+        "Alembic: npm run check"
+      ],
+      "capabilityCoverage": [
+        "agent runtime imports",
+        "AI provider imports",
+        "tool system imports",
+        "public subpath stability"
+      ],
+      "capabilityDiscovery": [
+        "package export map",
+        "Alembic consumer import scan"
+      ],
+      "errorKinds": [
+        "capability-mismatch",
+        "not-found",
+        "internal-build-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "sensitive"
+      ],
+      "artifactPolicy": "Inline export summary; declaration/package pack reports by artifactRef.",
+      "fixturePolicy": "Agent owns public import smoke; Alembic replays imports and runtime scenarios.",
+      "driftGate": "Public API boundary lint plus Alembic consumer build.",
+      "currentCompatibilityOwner": "Alembic agent integration",
+      "observabilityKeys": [
+        "packageName",
+        "subpath",
+        "consumerFile",
+        "checkCommand"
+      ],
+      "removalBlocker": "Alembic consumer import scan and runtime scenario must pass after any replacement.",
+      "securityPropertyExposureNotes": "Provider credentials and hidden reasoning are sensitive and must not become ordinary package output.",
+      "codeRefs": [
+        "AlembicAgent/package.json:8",
+        "AlembicAgent/package.json:45",
+        "AlembicAgent/package.json:57",
+        "AlembicAgent/package.json:65"
+      ],
+      "futureDemandOwner": "D5"
+    },
+    {
+      "id": "I03",
+      "title": "Runtime health and capability discovery",
+      "functionClass": "rest-query",
+      "producer": "Alembic",
+      "producerSchemaOwner": "AlembicCore",
+      "consumers": [
+        "AlembicPlugin",
+        "AlembicDashboard"
+      ],
+      "transport": [
+        "GET /api/v1/daemon/health"
+      ],
+      "schemaSource": [
+        "AlembicCore/src/daemon/RuntimeContracts.ts",
+        "Alembic/lib/http/routes/daemon.ts",
+        "AlembicDashboard/src/types.ts"
+      ],
+      "validationCommand": [
+        "AlembicCore: npm run check",
+        "Alembic: npm run check",
+        "AlembicDashboard: npm run check",
+        "AlembicPlugin: npm run smoke:codex-plugin"
+      ],
+      "capabilityCoverage": [
+        "ready",
+        "unavailable",
+        "partial",
+        "stale runtime",
+        "jobs/process-events capability",
+        "projectScope capability"
+      ],
+      "capabilityDiscovery": [
+        "health response capabilities object"
+      ],
+      "errorKinds": [
+        "unavailable",
+        "capability-mismatch",
+        "not-found",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "internal"
+      ],
+      "artifactPolicy": "Inline compact health summary; logs and state snapshots by detailRef in diagnostic context.",
+      "fixturePolicy": "Alembic owns health fixtures derived from Core contracts; Plugin and Dashboard replay them.",
+      "driftGate": "Core runtime fixture compared against Alembic route and Dashboard/Plugin normalizers.",
+      "currentCompatibilityOwner": "Plugin resident service and Dashboard runtime header",
+      "observabilityKeys": [
+        "mode",
+        "route",
+        "projectId",
+        "projectScopeId",
+        "dataRootSource",
+        "reasonCode"
+      ],
+      "removalBlocker": "Consumers discover runtime support through this route.",
+      "securityPropertyExposureNotes": "Local paths are consumer-needed for local UI but must not leak into ordinary MCP business output.",
+      "codeRefs": [
+        "AlembicCore/src/daemon/RuntimeContracts.ts:23",
+        "AlembicCore/src/daemon/RuntimeContracts.ts:95",
+        "AlembicCore/src/daemon/RuntimeContracts.ts:142",
+        "Alembic/lib/http/HttpServer.ts:270",
+        "AlembicDashboard/src/types.ts:83"
+      ],
+      "futureDemandOwner": "D2,D3,D4,D6"
+    },
+    {
+      "id": "I04",
+      "title": "Project runtime control",
+      "functionClass": "rest-command",
+      "producer": "Alembic",
+      "producerSchemaOwner": "AlembicCore",
+      "consumers": [
+        "AlembicDashboard",
+        "AlembicPlugin"
+      ],
+      "transport": [
+        "/api/v1/projects"
+      ],
+      "schemaSource": [
+        "AlembicCore project runtime contracts",
+        "Alembic projects route",
+        "AlembicDashboard project runtime DTOs"
+      ],
+      "validationCommand": [
+        "Alembic: npm run smoke:multi-project-control",
+        "Alembic: npm run check",
+        "AlembicDashboard: npm run check",
+        "AlembicPlugin: npm run smoke:codex-plugin"
+      ],
+      "capabilityCoverage": [
+        "list",
+        "status",
+        "current",
+        "select",
+        "clear selection",
+        "start",
+        "stop",
+        "switch",
+        "open dashboard",
+        "readiness/failure envelope"
+      ],
+      "capabilityDiscovery": [
+        "runtime health",
+        "projects route summary"
+      ],
+      "errorKinds": [
+        "unavailable",
+        "conflict",
+        "permission-denied",
+        "timeout",
+        "cancelled",
+        "not-found",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "consumer-needed",
+        "diagnostic",
+        "internal"
+      ],
+      "artifactPolicy": "Inline state summary; diagnostics/log paths by detailRef.",
+      "fixturePolicy": "Alembic owns route fixtures; Dashboard and Plugin replay source-of-truth snapshots.",
+      "driftGate": "Route fixture plus Dashboard source-of-truth normalization test.",
+      "currentCompatibilityOwner": "Dashboard project runtime selector and Plugin dashboard handoff",
+      "observabilityKeys": [
+        "projectId",
+        "projectRoot",
+        "reasonCode",
+        "blockingCondition",
+        "sourceRefs",
+        "detailRefs"
+      ],
+      "removalBlocker": "Runtime switching/open-dashboard UI and Plugin handoff depend on it.",
+      "securityPropertyExposureNotes": "Project roots are local consumer-needed fields; ordinary remote/public output must summarize or ref.",
+      "codeRefs": [
+        "Alembic/lib/http/HttpServer.ts:276",
+        "AlembicDashboard/src/types.ts:273",
+        "AlembicDashboard/src/types.ts:369",
+        "AlembicDashboard/src/api.ts:529"
+      ],
+      "futureDemandOwner": "D2,D3,D4,D6"
+    },
+    {
+      "id": "I05",
+      "title": "ProjectScope contract",
+      "functionClass": "rest-command",
+      "producer": "Alembic",
+      "producerSchemaOwner": "AlembicCore",
+      "consumers": [
+        "AlembicDashboard",
+        "AlembicPlugin"
+      ],
+      "transport": [
+        "/api/v1/project-scope"
+      ],
+      "schemaSource": [
+        "Core ProjectScope contracts",
+        "Alembic project-scope route",
+        "Dashboard transport DTOs"
+      ],
+      "validationCommand": [
+        "AlembicCore: npm run check",
+        "Alembic: npm run check",
+        "AlembicDashboard: npm run check",
+        "AlembicPlugin: npm run check"
+      ],
+      "capabilityCoverage": [
+        "empty scope",
+        "folder list",
+        "add folder",
+        "resolve folder",
+        "available/unavailable"
+      ],
+      "capabilityDiscovery": [
+        "runtime health projectScope capability",
+        "project-scope route capability"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "permission-denied",
+        "conflict",
+        "not-found",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "consumer-needed",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Inline summary; registry snapshots by artifactRef.",
+      "fixturePolicy": "Provider route fixtures and Dashboard panel samples.",
+      "driftGate": "Core ProjectScope fixture against Dashboard normalizer and Plugin client.",
+      "currentCompatibilityOwner": "Dashboard ProjectScopePanel and Plugin project-scoped tools",
+      "observabilityKeys": [
+        "projectScopeId",
+        "folderId",
+        "controlRoot",
+        "dataRootSource",
+        "storageKind"
+      ],
+      "removalBlocker": "Project-scoped routing and UI need this capability.",
+      "securityPropertyExposureNotes": "Local path fields are local consumer-needed and should not leak into public MCP outputs.",
+      "codeRefs": [
+        "Alembic/lib/http/HttpServer.ts:279",
+        "AlembicDashboard/src/types.ts:192",
+        "AlembicDashboard/src/api.ts:871",
+        "AlembicDashboard/src/api.ts:2315"
+      ],
+      "futureDemandOwner": "D2,D3,D4,D6"
+    },
+    {
+      "id": "I06",
+      "title": "Jobs command surface",
+      "functionClass": "rest-command",
+      "producer": "Alembic",
+      "producerSchemaOwner": "AlembicCore",
+      "consumers": [
+        "AlembicPlugin",
+        "AlembicDashboard"
+      ],
+      "transport": [
+        "/api/v1/jobs",
+        "/api/v1/jobs/bootstrap",
+        "/api/v1/jobs/rescan",
+        "/api/v1/jobs/:jobId/cancel"
+      ],
+      "schemaSource": [
+        "Core RuntimeContracts job endpoints",
+        "Alembic jobs route",
+        "Dashboard job API"
+      ],
+      "validationCommand": [
+        "Alembic: npm run check",
+        "AlembicPlugin: npm run smoke:codex-plugin",
+        "AlembicDashboard: npm run check"
+      ],
+      "capabilityCoverage": [
+        "queued",
+        "running",
+        "completed",
+        "failed",
+        "cancelled",
+        "partial evidence"
+      ],
+      "capabilityDiscovery": [
+        "daemon health jobs capability",
+        "codex-local tools/list"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "timeout",
+        "cancelled",
+        "conflict",
+        "not-found",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Compact job summary inline; reports/logs/snapshots via artifactRef/detailRef.",
+      "fixturePolicy": "Alembic owns job route fixtures and real bootstrap/rescan reports; Plugin/Dashboard replay.",
+      "driftGate": "Job route fixture plus Plugin/Dashboard consumer tests.",
+      "currentCompatibilityOwner": "Plugin codex-local tools and Dashboard JobsView",
+      "observabilityKeys": [
+        "jobId",
+        "kind",
+        "status",
+        "phase",
+        "reasonCode",
+        "correlationId"
+      ],
+      "removalBlocker": "Job orchestration is a primary runtime workflow.",
+      "securityPropertyExposureNotes": "Logs/reports must be refs when large or diagnostic.",
+      "codeRefs": [
+        "AlembicCore/src/daemon/RuntimeContracts.ts:44",
+        "AlembicCore/src/daemon/RuntimeContracts.ts:46",
+        "Alembic/lib/http/HttpServer.ts:273",
+        "AlembicDashboard/src/api.ts:2622"
+      ],
+      "futureDemandOwner": "D2,D3,D4,D6"
+    },
+    {
+      "id": "I07",
+      "title": "Job process events",
+      "functionClass": "event-stream",
+      "producer": "Alembic",
+      "producerSchemaOwner": "AlembicCore",
+      "consumers": [
+        "AlembicDashboard",
+        "AlembicPlugin"
+      ],
+      "transport": [
+        "GET /api/v1/jobs/:jobId/events",
+        "Socket.io job:process-event"
+      ],
+      "schemaSource": [
+        "Core JobProcessEventContracts",
+        "Alembic jobs route/socket bridge",
+        "Dashboard useJobProcessEvents"
+      ],
+      "validationCommand": [
+        "AlembicCore: npm run check",
+        "Alembic: npm run check",
+        "AlembicDashboard: npm run check"
+      ],
+      "capabilityCoverage": [
+        "workflow",
+        "llm.input",
+        "llm.reflection",
+        "llm.output",
+        "tool",
+        "artifact",
+        "checkpoint",
+        "error",
+        "summary",
+        "REST recovery after reconnect"
+      ],
+      "capabilityDiscovery": [
+        "daemon health jobs.processEvents capability"
+      ],
+      "errorKinds": [
+        "partial",
+        "unavailable",
+        "not-found",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "developer-facing",
+        "machine-only",
+        "raw-provider",
+        "secret",
+        "hidden-reasoning"
+      ],
+      "artifactPolicy": "Developer-facing events inline; raw-provider/secret/hidden-reasoning hidden/transient or artifact-only.",
+      "fixturePolicy": "Alembic owns event fixtures; Dashboard replays event and recovery fixtures.",
+      "driftGate": "Event schema fixture plus socket/recovery integration.",
+      "currentCompatibilityOwner": "Dashboard job event timeline",
+      "observabilityKeys": [
+        "jobId",
+        "eventId",
+        "sequence",
+        "correlationId",
+        "phase",
+        "sourceClass",
+        "displayPolicy",
+        "retention"
+      ],
+      "removalBlocker": "D7 runtime observation and Dashboard timelines depend on durable event/recovery behavior.",
+      "securityPropertyExposureNotes": "Only developer-facing and non-hidden events may enter UI ordinary views.",
+      "codeRefs": [
+        "AlembicCore/src/daemon/JobProcessEventContracts.ts:1",
+        "AlembicCore/src/daemon/JobProcessEventContracts.ts:17",
+        "AlembicCore/src/daemon/JobProcessEventContracts.ts:65",
+        "AlembicCore/src/daemon/JobProcessEventContracts.ts:268",
+        "AlembicDashboard/src/hooks/useJobProcessEvents.ts:107",
+        "AlembicDashboard/src/hooks/useJobProcessEvents.ts:153"
+      ],
+      "futureDemandOwner": "D2,D3,D6,D7"
+    },
+    {
+      "id": "I08",
+      "title": "Job display snapshots and artifacts",
+      "functionClass": "job-artifact",
+      "producer": "Alembic",
+      "producerSchemaOwner": "AlembicCore",
+      "consumers": [
+        "AlembicDashboard",
+        "AlembicPlugin"
+      ],
+      "transport": [
+        "/api/v1/jobs/:jobId/display-snapshot",
+        "/api/v1/jobs/:jobId/artifacts/:artifactId"
+      ],
+      "schemaSource": [
+        "Core JobDisplaySnapshotContracts",
+        "Alembic artifact routes",
+        "Dashboard snapshot normalizers"
+      ],
+      "validationCommand": [
+        "AlembicCore: npm run check",
+        "Alembic: npm run check",
+        "AlembicDashboard: npm run check"
+      ],
+      "capabilityCoverage": [
+        "summary",
+        "timeline",
+        "events",
+        "artifacts",
+        "llm-io",
+        "findings",
+        "candidates",
+        "source-refs",
+        "warnings",
+        "incomplete-evidence reasons"
+      ],
+      "capabilityDiscovery": [
+        "jobs capability",
+        "snapshot manifest"
+      ],
+      "errorKinds": [
+        "not-found",
+        "artifact-missing",
+        "artifact-unreadable",
+        "snapshot-truncated",
+        "checksum-mismatch",
+        "producer-error",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "developer-facing",
+        "diagnostic",
+        "sensitive"
+      ],
+      "artifactPolicy": "Snapshot manifest inline; large reports/logs/LLM IO by artifactRef with redaction.",
+      "fixturePolicy": "Alembic owns generated snapshot fixtures and real bootstrap/rescan artifacts.",
+      "driftGate": "Snapshot schema validation plus Dashboard rendering fixture.",
+      "currentCompatibilityOwner": "Dashboard JobsView",
+      "observabilityKeys": [
+        "jobId",
+        "snapshotId",
+        "snapshotVersion",
+        "checksum",
+        "evidenceIncompleteReason",
+        "artifactRef"
+      ],
+      "removalBlocker": "Runtime verification and user-facing job evidence rely on these endpoints.",
+      "securityPropertyExposureNotes": "Raw LLM/provider payloads require redaction and artifact policy.",
+      "codeRefs": [
+        "AlembicCore/src/daemon/JobDisplaySnapshotContracts.ts:11",
+        "AlembicCore/src/daemon/JobDisplaySnapshotContracts.ts:43",
+        "AlembicCore/src/daemon/JobDisplaySnapshotContracts.ts:217",
+        "AlembicCore/src/daemon/JobDisplaySnapshotContracts.ts:268",
+        "AlembicDashboard/src/api.ts:335",
+        "AlembicDashboard/src/api.ts:1547"
+      ],
+      "futureDemandOwner": "D2,D3,D6,D7"
+    },
+    {
+      "id": "I09",
+      "title": "Alembic API route surface and OpenAPI seed",
+      "functionClass": "rest-query",
+      "producer": "Alembic",
+      "consumers": [
+        "AlembicDashboard",
+        "AlembicPlugin",
+        "local host probes"
+      ],
+      "transport": [
+        "Express /api/v1 route tree",
+        "/api-spec"
+      ],
+      "schemaSource": [
+        "Alembic route handlers",
+        "Alembic api-spec"
+      ],
+      "validationCommand": [
+        "Alembic: npm run check",
+        "Alembic: route-to-openapi drift check to be added in D3"
+      ],
+      "capabilityCoverage": [
+        "health",
+        "daemon",
+        "jobs",
+        "projects",
+        "project-scope",
+        "auth/probe",
+        "monitoring",
+        "guard",
+        "task",
+        "intent-episodes",
+        "decision-register",
+        "search",
+        "ai",
+        "knowledge",
+        "recipes",
+        "panorama",
+        "evolution",
+        "diagnostics"
+      ],
+      "capabilityDiscovery": [
+        "/api-spec",
+        "/api/v1/daemon/health",
+        "route availability"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "permission-denied",
+        "unavailable",
+        "timeout",
+        "not-found",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "internal"
+      ],
+      "artifactPolicy": "Route summaries inline; long reports/logs via artifact routes.",
+      "fixturePolicy": "Alembic owns OpenAPI and route fixtures; consumers replay selected provider fixtures.",
+      "driftGate": "Mounted route tree to OpenAPI/fixture drift check.",
+      "currentCompatibilityOwner": "Dashboard and Plugin resident clients",
+      "observabilityKeys": [
+        "httpMethod",
+        "route",
+        "operationName",
+        "status",
+        "errorCode"
+      ],
+      "removalBlocker": "D3-D6 consumers route through this tree.",
+      "securityPropertyExposureNotes": "Diagnostic and internal service details must stay out of ordinary response schemas.",
+      "codeRefs": [
+        "Alembic/lib/http/HttpServer.ts:256",
+        "Alembic/lib/http/HttpServer.ts:262",
+        "Alembic/lib/http/HttpServer.ts:267",
+        "Alembic/lib/http/HttpServer.ts:384"
+      ],
+      "futureDemandOwner": "D3"
+    },
+    {
+      "id": "I10",
+      "title": "Decision Register",
+      "functionClass": "rest-command",
+      "producer": "Alembic",
+      "consumers": [
+        "AlembicPlugin"
+      ],
+      "transport": [
+        "/api/v1/decision-register",
+        "MCP alembic_decision_record"
+      ],
+      "schemaSource": [
+        "Alembic decision-register route",
+        "Plugin public tool schema and projector"
+      ],
+      "validationCommand": [
+        "Alembic: npm run check",
+        "AlembicPlugin: npm run test",
+        "AlembicPlugin: npm run smoke:codex-plugin"
+      ],
+      "capabilityCoverage": [
+        "durable write",
+        "durable read",
+        "route unavailable blocked behavior",
+        "project-scoped metadata"
+      ],
+      "capabilityDiscovery": [
+        "decision-register route capability",
+        "MCP tools/list"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "capability-mismatch",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Decision summary inline; large evidence payloads by ref.",
+      "fixturePolicy": "Alembic owns route fixtures; Plugin owns MCP fixture.",
+      "driftGate": "Route capability plus MCP output projector fixture.",
+      "currentCompatibilityOwner": "Plugin public decision tool",
+      "observabilityKeys": [
+        "decisionRef",
+        "projectScopeId",
+        "operation",
+        "routeStatus",
+        "reasonCode"
+      ],
+      "removalBlocker": "Durable decision-register requirement is active.",
+      "securityPropertyExposureNotes": "Do not synthesize plugin-local fake decisions when durable route is missing.",
+      "codeRefs": [
+        "Alembic/lib/http/HttpServer.ts:320",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:179",
+        "AlembicPlugin/lib/codex/mcp/public-tools/output.ts:214"
+      ],
+      "futureDemandOwner": "D3,D4"
+    },
+    {
+      "id": "I11",
+      "title": "Intent and work continuity",
+      "functionClass": "rest-command",
+      "producer": "Alembic",
+      "consumers": [
+        "AlembicPlugin"
+      ],
+      "transport": [
+        "/api/v1/intent-episodes",
+        "MCP public workflow tools"
+      ],
+      "schemaSource": [
+        "Alembic intent-episodes route",
+        "Plugin public tool schemas/projectors"
+      ],
+      "validationCommand": [
+        "Alembic: npm run check",
+        "AlembicPlugin: npm run test",
+        "AlembicPlugin: npm run smoke:codex-plugin"
+      ],
+      "capabilityCoverage": [
+        "intent capture",
+        "prime metadata",
+        "work start",
+        "work finish",
+        "blocked/unavailable"
+      ],
+      "capabilityDiscovery": [
+        "MCP tools/list",
+        "resident service route capability"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "capability-mismatch",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Summaries inline; long histories by detailRef.",
+      "fixturePolicy": "Alembic route fixtures and Plugin public tool fixtures.",
+      "driftGate": "Public tool output-schema fixture plus route fixture.",
+      "currentCompatibilityOwner": "Plugin public agent workflow tools",
+      "observabilityKeys": [
+        "intentRef",
+        "workRef",
+        "projectScopeId",
+        "operation",
+        "source"
+      ],
+      "removalBlocker": "Public agent workflow continuity depends on it.",
+      "securityPropertyExposureNotes": "Local cache must not mask durable route failure.",
+      "codeRefs": [
+        "Alembic/lib/http/HttpServer.ts:317",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:129",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:139",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:149",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:159"
+      ],
+      "futureDemandOwner": "D3,D4"
+    },
+    {
+      "id": "I12",
+      "title": "MCP query and workflow tools",
+      "functionClass": "mcp-tool",
+      "producer": "AlembicPlugin",
+      "consumers": [
+        "Codex host",
+        "Alembic plugin skills"
+      ],
+      "transport": [
+        "MCP tools/list",
+        "MCP tools/call"
+      ],
+      "schemaSource": [
+        "Plugin TOOLS",
+        "shared schemas",
+        "core-tool output projectors",
+        "Alembic routes"
+      ],
+      "validationCommand": [
+        "AlembicPlugin: npm run test",
+        "AlembicPlugin: npm run smoke:codex-plugin",
+        "AlembicPlugin: npm run verify:codex-plugin"
+      ],
+      "capabilityCoverage": [
+        "health",
+        "search",
+        "knowledge",
+        "structure",
+        "graph",
+        "call-context",
+        "guard",
+        "submit-knowledge",
+        "project-skill",
+        "bootstrap/rescan/evolve/consolidate/dimension/panorama",
+        "admin lifecycle"
+      ],
+      "capabilityDiscovery": [
+        "MCP tools/list",
+        "getVisibleCodexTools",
+        "health and capability probes"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "capability-mismatch",
+        "permission-denied",
+        "timeout",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "internal",
+        "sensitive"
+      ],
+      "artifactPolicy": "Compact MCP summary inline; reports/snapshots by detailRef or artifactRef.",
+      "fixturePolicy": "Plugin owns MCP fixtures; provider route fixtures are replayed through resident clients.",
+      "driftGate": "MCP visible tool catalog to projector/schema registration check.",
+      "currentCompatibilityOwner": "Codex host and Alembic plugin skills",
+      "observabilityKeys": [
+        "toolName",
+        "outputSchema",
+        "projector",
+        "responseTimeMs",
+        "status",
+        "errorCode"
+      ],
+      "removalBlocker": "Public tool surface is the Codex integration contract.",
+      "securityPropertyExposureNotes": "Missing projector must fail closed and never leak raw payload.",
+      "codeRefs": [
+        "AlembicPlugin/lib/codex/mcp/tools.ts:122",
+        "AlembicPlugin/lib/codex/mcp/PluginToolSurfaceCatalog.ts:215",
+        "AlembicPlugin/lib/codex/mcp/PluginToolSurfaceCatalog.ts:395"
+      ],
+      "futureDemandOwner": "D4"
+    },
+    {
+      "id": "I13",
+      "title": "MCP clean output contract",
+      "functionClass": "mcp-tool",
+      "producer": "AlembicPlugin",
+      "consumers": [
+        "Codex host",
+        "Alembic plugin skills",
+        "controller acceptance"
+      ],
+      "transport": [
+        "MCP CallToolResult.structuredContent",
+        "MCP text summary"
+      ],
+      "schemaSource": [
+        "output-contract.ts",
+        "core-tools/output.ts",
+        "codex-local-tools/output.ts",
+        "public-tools/output.ts"
+      ],
+      "validationCommand": [
+        "AlembicPlugin: npm run test",
+        "AlembicPlugin: npm run smoke:codex-plugin",
+        "AlembicPlugin: npm run verify:codex-session"
+      ],
+      "capabilityCoverage": [
+        "success",
+        "failed",
+        "blocked projector missing",
+        "legacy error projection",
+        "structuredContent"
+      ],
+      "capabilityDiscovery": [
+        "tool output schema in tools/list",
+        "registered projector"
+      ],
+      "errorKinds": [
+        "invalid-output",
+        "projector-missing",
+        "tool-failed",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "internal",
+        "sensitive",
+        "derived"
+      ],
+      "artifactPolicy": "Short summaries inline; logs/reports/snapshots by refs.",
+      "fixturePolicy": "Plugin owns per-tool golden clean-output fixtures.",
+      "driftGate": "Every visible tool has projector/schema and forbidden-key checks.",
+      "currentCompatibilityOwner": "Codex MCP host",
+      "observabilityKeys": [
+        "toolName",
+        "outputSchema",
+        "projector",
+        "responseTimeMs",
+        "error.code"
+      ],
+      "removalBlocker": "Clean-output contract is current accepted MCP contract.",
+      "securityPropertyExposureNotes": "Internal, sensitive, and unrelated derived fields must not appear in ordinary outputs.",
+      "codeRefs": [
+        "AlembicPlugin/lib/codex/mcp/output-contract.ts:5",
+        "AlembicPlugin/lib/codex/mcp/output-contract.ts:32",
+        "AlembicPlugin/lib/codex/mcp/output-contract.ts:151",
+        "AlembicPlugin/lib/codex/mcp/output-contract.ts:173",
+        "AlembicPlugin/lib/codex/mcp/core-tools/output.ts:32"
+      ],
+      "futureDemandOwner": "D4,D7"
+    },
+    {
+      "id": "I14",
+      "title": "Codex-local runtime tools",
+      "functionClass": "mcp-tool",
+      "producer": "AlembicPlugin",
+      "consumers": [
+        "Codex local plugin runtime"
+      ],
+      "transport": [
+        "MCP codex-local tools"
+      ],
+      "schemaSource": [
+        "Plugin tool catalog",
+        "local dispatcher",
+        "codex-local clean-output projectors"
+      ],
+      "validationCommand": [
+        "AlembicPlugin: npm run smoke:codex-plugin",
+        "AlembicPlugin: npm run dev:codex-plugin:verify"
+      ],
+      "capabilityCoverage": [
+        "status",
+        "diagnostics",
+        "init",
+        "dashboard",
+        "bootstrap",
+        "rescan",
+        "job",
+        "stop",
+        "cleanup"
+      ],
+      "capabilityDiscovery": [
+        "tools/list filtered by visible tool policy and project root"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "capability-mismatch",
+        "permission-denied",
+        "timeout",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "internal"
+      ],
+      "artifactPolicy": "Summaries inline; daemon logs/status snapshots by detailRef.",
+      "fixturePolicy": "Plugin owns codex-local smoke fixtures and real installed-plugin probes.",
+      "driftGate": "Codex-local visible tools require policy, handler, and projector.",
+      "currentCompatibilityOwner": "local Codex plugin runtime",
+      "observabilityKeys": [
+        "toolName",
+        "projectRoot",
+        "daemonRoute",
+        "reasonCode",
+        "residentService"
+      ],
+      "removalBlocker": "No public tool owns local plugin lifecycle.",
+      "securityPropertyExposureNotes": "Diagnostics may contain local details and must stay scoped to diagnostic tools.",
+      "codeRefs": [
+        "AlembicPlugin/lib/codex/mcp/PluginToolSurfaceCatalog.ts:116",
+        "AlembicPlugin/lib/codex/mcp/CodexMcpServer.ts:267",
+        "AlembicPlugin/lib/codex/mcp/codex-local-tools/output.ts:83"
+      ],
+      "futureDemandOwner": "D4"
+    },
+    {
+      "id": "I15",
+      "title": "Resident service client and capability routing",
+      "functionClass": "rest-query",
+      "producer": "AlembicPlugin",
+      "consumers": [
+        "Plugin MCP handlers",
+        "codex-local tools"
+      ],
+      "transport": [
+        "local HTTP to Alembic daemon/resident runtime"
+      ],
+      "schemaSource": [
+        "Core ResidentServiceContracts",
+        "Plugin resident clients",
+        "host project handoff"
+      ],
+      "validationCommand": [
+        "AlembicPlugin: npm run test",
+        "AlembicPlugin: npm run smoke:codex-plugin",
+        "Alembic: npm run check"
+      ],
+      "capabilityCoverage": [
+        "connected",
+        "unavailable",
+        "missing capability",
+        "dashboard handoff blocked",
+        "project identity mismatch"
+      ],
+      "capabilityDiscovery": [
+        "daemon health capabilities",
+        "Plugin enhancement-route checks"
+      ],
+      "errorKinds": [
+        "unavailable",
+        "capability-mismatch",
+        "not-found",
+        "timeout",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Summaries inline; route logs by detailRef.",
+      "fixturePolicy": "Plugin owns resident status/result/search/job/dashboard fixtures.",
+      "driftGate": "Capability-check fixture against real tool routing.",
+      "currentCompatibilityOwner": "Plugin MCP runtime",
+      "observabilityKeys": [
+        "runtimeRoute",
+        "missingCapability",
+        "requiredService",
+        "residentResultStatus"
+      ],
+      "removalBlocker": "All MCP provider calls need route and capability checks.",
+      "securityPropertyExposureNotes": "Fallback must be visible and must not silently mask unavailable provider.",
+      "codeRefs": [
+        "AlembicPlugin/lib/codex/mcp/CodexMcpServer.ts:709",
+        "AlembicPlugin/lib/codex/mcp/CodexMcpServer.ts:724",
+        "AlembicPlugin/lib/codex/mcp/host/tool-visibility.ts:19"
+      ],
+      "futureDemandOwner": "D4"
+    },
+    {
+      "id": "I16",
+      "title": "Agent tool runtime core",
+      "functionClass": "agent-tool",
+      "producer": "AlembicAgent",
+      "consumers": [
+        "Alembic"
+      ],
+      "transport": [
+        "in-process package API",
+        "tool adapter contract"
+      ],
+      "schemaSource": [
+        "CapabilityManifest",
+        "ToolContracts",
+        "ToolResultEnvelope",
+        "LightweightRouter",
+        "V2 tool types"
+      ],
+      "validationCommand": [
+        "AlembicAgent: npm run check",
+        "AlembicAgent: npm run test",
+        "Alembic: npm run check"
+      ],
+      "capabilityCoverage": [
+        "success",
+        "error",
+        "aborted",
+        "timeout",
+        "tool unavailable",
+        "policy failure",
+        "preview/execution"
+      ],
+      "capabilityDiscovery": [
+        "capability manifest",
+        "tool registry"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "permission-denied",
+        "timeout",
+        "cancelled",
+        "unavailable",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "internal",
+        "sensitive"
+      ],
+      "artifactPolicy": "Small result text/data inline; artifacts and resources by refs.",
+      "fixturePolicy": "Agent owns router/result branch fixtures; Alembic replays runtime scenarios.",
+      "driftGate": "Package API plus Alembic consumer integration test.",
+      "currentCompatibilityOwner": "Alembic agent runtime",
+      "observabilityKeys": [
+        "toolId",
+        "callId",
+        "adapterId",
+        "durationMs",
+        "status"
+      ],
+      "removalBlocker": "Alembic must prove it uses package route for active tools.",
+      "securityPropertyExposureNotes": "Secrets and internal tool context must not appear in ordinary output.",
+      "codeRefs": [
+        "AlembicAgent/src/tools/catalog/CapabilityManifest.ts:1",
+        "AlembicAgent/src/tools/core/ToolContracts.ts:12",
+        "AlembicAgent/src/tools/core/ToolResultEnvelope.ts:64",
+        "AlembicAgent/src/tools/core/LightweightRouter.ts:35",
+        "AlembicAgent/src/tools/v2/types.ts:64"
+      ],
+      "futureDemandOwner": "D5"
+    },
+    {
+      "id": "I17",
+      "title": "Agent AI provider and gateway",
+      "functionClass": "agent-tool",
+      "producer": "AlembicAgent",
+      "consumers": [
+        "Alembic"
+      ],
+      "transport": [
+        "in-process provider/gateway API"
+      ],
+      "schemaSource": [
+        "AiProvider",
+        "AiProviderManager",
+        "LLMGateway",
+        "provider transports"
+      ],
+      "validationCommand": [
+        "AlembicAgent: npm run test",
+        "AlembicAgent: npm run check",
+        "Alembic: npm run check"
+      ],
+      "capabilityCoverage": [
+        "success",
+        "missing API key",
+        "unknown provider fallback",
+        "abort",
+        "timeout",
+        "provider error classification",
+        "token usage"
+      ],
+      "capabilityDiscovery": [
+        "provider manager",
+        "runtime apiAi capability"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "timeout",
+        "cancelled",
+        "permission-denied",
+        "internal-provider-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "sensitive",
+        "hidden-reasoning"
+      ],
+      "artifactPolicy": "Summaries inline only when developer-facing; raw provider payload hidden or redacted artifact.",
+      "fixturePolicy": "Agent owns provider/gateway fixtures; Alembic replays AI route scenarios.",
+      "driftGate": "Provider/gateway tests plus Alembic route scenario.",
+      "currentCompatibilityOwner": "Alembic AI workflow",
+      "observabilityKeys": [
+        "provider",
+        "model",
+        "usageSource",
+        "errorClass",
+        "abortReason"
+      ],
+      "removalBlocker": "AI workflow must preserve provider, gateway, token usage, and error behavior.",
+      "securityPropertyExposureNotes": "API keys and hidden reasoning are sensitive and never ordinary output.",
+      "codeRefs": [
+        "AlembicAgent/src/ai/AiProvider.ts:33",
+        "AlembicAgent/src/ai/AiProvider.ts:100",
+        "AlembicAgent/src/ai/AiProvider.ts:895",
+        "AlembicAgent/src/ai/gateway/LLMGateway.ts:44",
+        "AlembicAgent/src/ai/gateway/LLMGateway.ts:337",
+        "AlembicAgent/src/ai/AiProviderManager.ts:75"
+      ],
+      "futureDemandOwner": "D5"
+    },
+    {
+      "id": "I18",
+      "title": "Agent runtime boundary manifest",
+      "functionClass": "agent-tool",
+      "producer": "AlembicAgent",
+      "consumers": [
+        "Alembic",
+        "host adapters"
+      ],
+      "transport": [
+        "package API manifest"
+      ],
+      "schemaSource": [
+        "AgentRuntimeBoundary"
+      ],
+      "validationCommand": [
+        "AlembicAgent: npm run check",
+        "Alembic: npm run check"
+      ],
+      "capabilityCoverage": [
+        "route supported",
+        "route unsupported",
+        "ownership mapping"
+      ],
+      "capabilityDiscovery": [
+        "manifest entries",
+        "supportsAgentRuntimeRoute"
+      ],
+      "errorKinds": [
+        "capability-mismatch",
+        "not-found"
+      ],
+      "exposureClasses": [
+        "public",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Inline manifest summary.",
+      "fixturePolicy": "Agent owns manifest import fixtures.",
+      "driftGate": "Manifest versus package exports and Alembic adapter import check.",
+      "currentCompatibilityOwner": "Alembic migration boundary",
+      "observabilityKeys": [
+        "area",
+        "owner",
+        "packageSubpath",
+        "unsupportedRoute"
+      ],
+      "removalBlocker": "Boundary map is needed to prevent ownership drift during cleanup.",
+      "securityPropertyExposureNotes": "Ownership metadata is public; runtime internals stay in owning packages.",
+      "codeRefs": [
+        "AlembicAgent/src/agent/runtime/AgentRuntimeBoundary.ts:1",
+        "AlembicAgent/src/agent/runtime/AgentRuntimeBoundary.ts:32",
+        "AlembicAgent/src/agent/runtime/AgentRuntimeBoundary.ts:78"
+      ],
+      "futureDemandOwner": "D5"
+    },
+    {
+      "id": "I19",
+      "title": "Dashboard runtime DTOs and normalizers",
+      "functionClass": "dashboard-view-model",
+      "producer": "AlembicDashboard",
+      "providerTruth": "Alembic and AlembicCore",
+      "consumers": [
+        "Dashboard UI components"
+      ],
+      "transport": [
+        "browser HTTP client over /api/v1"
+      ],
+      "schemaSource": [
+        "Dashboard types.ts",
+        "Dashboard api.ts",
+        "runtimeDiagnosticsPanelModel"
+      ],
+      "validationCommand": [
+        "AlembicDashboard: npm run check",
+        "Alembic: provider fixture generation in D3"
+      ],
+      "capabilityCoverage": [
+        "ready",
+        "stale",
+        "failed",
+        "unavailable",
+        "diagnostic rows",
+        "project scope",
+        "job event recovery"
+      ],
+      "capabilityDiscovery": [
+        "daemon health capabilities",
+        "Dashboard normalizers"
+      ],
+      "errorKinds": [
+        "unavailable",
+        "not-found",
+        "internal-normalization-fallback",
+        "partial"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "internal"
+      ],
+      "artifactPolicy": "UI summaries inline; artifact download refs for job evidence.",
+      "fixturePolicy": "Alembic owns provider fixtures; Dashboard replays them in contract tests.",
+      "driftGate": "Dashboard fixture generated from Alembic/Core sample responses.",
+      "currentCompatibilityOwner": "Dashboard UI",
+      "observabilityKeys": [
+        "reasonCode",
+        "sourceRefs",
+        "detailRefs",
+        "projectId",
+        "severity"
+      ],
+      "removalBlocker": "UI must keep rendering runtime states and job evidence.",
+      "securityPropertyExposureNotes": "Diagnostic extra fields stay in diagnostic panels, not ordinary UI fields.",
+      "codeRefs": [
+        "AlembicDashboard/src/types.ts:83",
+        "AlembicDashboard/src/types.ts:250",
+        "AlembicDashboard/src/types.ts:301",
+        "AlembicDashboard/src/api.ts:529",
+        "AlembicDashboard/src/runtimeDiagnosticsPanelModel.ts:59"
+      ],
+      "futureDemandOwner": "D6"
+    },
+    {
+      "id": "I20",
+      "title": "Dashboard job and socket consumers",
+      "functionClass": "dashboard-view-model",
+      "producer": "AlembicDashboard",
+      "providerTruth": "Alembic event producers and job routes",
+      "consumers": [
+        "Dashboard jobs/header/bootstrap/refine/signal UI"
+      ],
+      "transport": [
+        "HTTP",
+        "Socket.io"
+      ],
+      "schemaSource": [
+        "Dashboard hooks/components",
+        "Alembic socket event producers"
+      ],
+      "validationCommand": [
+        "AlembicDashboard: npm run check",
+        "Alembic: event fixture/replay tests in D3"
+      ],
+      "capabilityCoverage": [
+        "connected",
+        "disconnected",
+        "reconnect",
+        "initial API snapshot",
+        "event updates"
+      ],
+      "capabilityDiscovery": [
+        "socket connection",
+        "HTTP recovery routes"
+      ],
+      "errorKinds": [
+        "unavailable",
+        "partial",
+        "timeout",
+        "internal-socket-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Event summaries inline; detailed job artifacts by refs.",
+      "fixturePolicy": "Provider owns event fixtures; Dashboard owns hook replay tests.",
+      "driftGate": "Emitted event names versus hook listeners check.",
+      "currentCompatibilityOwner": "Dashboard live UI",
+      "observabilityKeys": [
+        "socketEventName",
+        "jobId",
+        "sessionId",
+        "sequence",
+        "reconnectRecovery"
+      ],
+      "removalBlocker": "Live Dashboard UX depends on these event names.",
+      "securityPropertyExposureNotes": "Socket payloads must follow backend exposure classes and event registry.",
+      "codeRefs": [
+        "Alembic/lib/http/HttpServer.ts:455",
+        "Alembic/lib/http/HttpServer.ts:481",
+        "AlembicDashboard/src/lib/socket.ts:13",
+        "AlembicDashboard/src/hooks/useJobProcessEvents.ts:137",
+        "AlembicDashboard/src/hooks/useBootstrapSocket.ts:307"
+      ],
+      "futureDemandOwner": "D6"
+    },
+    {
+      "id": "I21",
+      "title": "Guard, rules, violations, and code review surfaces",
+      "functionClass": "rest-command",
+      "producer": "Alembic",
+      "producerSchemaOwner": "AlembicCore",
+      "consumers": [
+        "AlembicPlugin",
+        "AlembicDashboard",
+        "Codex host"
+      ],
+      "transport": [
+        "/api/v1/guard",
+        "/api/v1/guard/report",
+        "/api/v1/rules",
+        "/api/v1/violations",
+        "MCP alembic_guard",
+        "MCP alembic_code_guard"
+      ],
+      "schemaSource": [
+        "Core guard exports",
+        "Alembic route handlers",
+        "Plugin schemas/projectors"
+      ],
+      "validationCommand": [
+        "AlembicCore: npm run check",
+        "Alembic: npm run check",
+        "AlembicPlugin: npm run smoke:codex-plugin",
+        "AlembicDashboard: npm run check"
+      ],
+      "capabilityCoverage": [
+        "pass",
+        "fail",
+        "warning",
+        "blocked/unavailable",
+        "rule lookup"
+      ],
+      "capabilityDiscovery": [
+        "route capability",
+        "Plugin visible tools"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "capability-mismatch",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "internal"
+      ],
+      "artifactPolicy": "Compact findings inline; full reports by artifactRef.",
+      "fixturePolicy": "Alembic owns guard route fixtures; Plugin/Dashboard replay.",
+      "driftGate": "Route output vs MCP clean output and Dashboard severity fixture.",
+      "currentCompatibilityOwner": "Codex plugin guard workflow and Dashboard guard UI",
+      "observabilityKeys": [
+        "ruleId",
+        "filePath",
+        "severity",
+        "operation",
+        "sourceRef"
+      ],
+      "removalBlocker": "Code-review workflow depends on guard semantics.",
+      "securityPropertyExposureNotes": "Prompt/evaluator internals are diagnostic/internal and not public findings.",
+      "codeRefs": [
+        "Alembic/lib/http/HttpServer.ts:305",
+        "Alembic/lib/http/HttpServer.ts:308",
+        "Alembic/lib/http/HttpServer.ts:311",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:169",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:264"
+      ],
+      "futureDemandOwner": "D2,D3,D4,D6"
+    },
+    {
+      "id": "I22",
+      "title": "Knowledge, recipes, wiki, candidates, modules, panorama, evolution",
+      "functionClass": "rest-command",
+      "producer": "Alembic",
+      "consumers": [
+        "AlembicPlugin",
+        "AlembicDashboard"
+      ],
+      "transport": [
+        "/api/v1/knowledge",
+        "/api/v1/recipes",
+        "/api/v1/wiki",
+        "/api/v1/candidates",
+        "/api/v1/modules",
+        "/api/v1/panorama",
+        "/api/v1/evolution",
+        "MCP workflow tools"
+      ],
+      "schemaSource": [
+        "Alembic routes",
+        "Core domain exports",
+        "Plugin MCP schemas/projectors"
+      ],
+      "validationCommand": [
+        "Alembic: npm run check",
+        "AlembicPlugin: npm run smoke:codex-plugin",
+        "AlembicDashboard: npm run check"
+      ],
+      "capabilityCoverage": [
+        "list",
+        "get",
+        "write",
+        "enrich",
+        "scan",
+        "evolve",
+        "pending/deprecated lifecycle",
+        "blocked/unavailable"
+      ],
+      "capabilityDiscovery": [
+        "Plugin tools/list",
+        "route availability/capabilities"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "permission-denied",
+        "timeout",
+        "conflict",
+        "partial",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic",
+        "derived"
+      ],
+      "artifactPolicy": "Summaries inline; long scans/reports/snapshots by refs.",
+      "fixturePolicy": "Alembic owns route fixtures; Plugin/Dashboard replay selected scenarios.",
+      "driftGate": "Route output vs Plugin projector/schema and Dashboard fixture.",
+      "currentCompatibilityOwner": "Plugin public/admin tools and Dashboard knowledge views",
+      "observabilityKeys": [
+        "operation",
+        "entryId",
+        "lifecycle",
+        "routeOrTool",
+        "reasonCode"
+      ],
+      "removalBlocker": "Main Alembic knowledge workflows depend on these routes.",
+      "securityPropertyExposureNotes": "Quality/diagnostic metadata must not become success gate or ordinary output unless consumer-needed.",
+      "codeRefs": [
+        "Alembic/lib/http/HttpServer.ts:338",
+        "Alembic/lib/http/HttpServer.ts:347",
+        "Alembic/lib/http/HttpServer.ts:350",
+        "Alembic/lib/http/HttpServer.ts:356",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:310",
+        "AlembicPlugin/lib/codex/mcp/tools.ts:379"
+      ],
+      "futureDemandOwner": "D3,D4,D6"
+    },
+    {
+      "id": "I23",
+      "title": "File changes, signals, audit, monitoring, logs",
+      "functionClass": "diagnostic-observability",
+      "producer": "Alembic",
+      "producerSchemaOwner": "AlembicCore",
+      "consumers": [
+        "AlembicDashboard",
+        "AlembicPlugin"
+      ],
+      "transport": [
+        "/api/v1/file-changes",
+        "/api/v1/signals",
+        "/api/v1/audit",
+        "/api/v1/monitoring",
+        "/api/v1/logs",
+        "Socket signal/audit events"
+      ],
+      "schemaSource": [
+        "Core source contracts",
+        "Alembic routes/realtime bridge",
+        "Dashboard socket panels"
+      ],
+      "validationCommand": [
+        "AlembicCore: npm run check",
+        "Alembic: npm run check",
+        "AlembicPlugin: npm run check",
+        "AlembicDashboard: npm run check"
+      ],
+      "capabilityCoverage": [
+        "file-change dispatch",
+        "signal display",
+        "audit trail",
+        "monitoring",
+        "log access",
+        "hidden/internal diagnostics"
+      ],
+      "capabilityDiscovery": [
+        "runtime health fileMonitor capability",
+        "route availability"
+      ],
+      "errorKinds": [
+        "invalid-input",
+        "unavailable",
+        "permission-denied",
+        "not-found",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "diagnostic",
+        "internal",
+        "consumer-needed",
+        "sensitive"
+      ],
+      "artifactPolicy": "Summaries inline; logs/reports as detailRef.",
+      "fixturePolicy": "Alembic owns diagnostic route/socket fixtures; consumers replay diagnostic contexts.",
+      "driftGate": "Source-contract aliases plus Dashboard/Plugin diagnostic fixture.",
+      "currentCompatibilityOwner": "Dashboard diagnostics and Plugin diagnostics",
+      "observabilityKeys": [
+        "source",
+        "eventId",
+        "operation",
+        "reasonCode",
+        "failureCode",
+        "logRef"
+      ],
+      "removalBlocker": "Diagnostics are required for runtime verification and troubleshooting.",
+      "securityPropertyExposureNotes": "Diagnostic payloads must not leak unrelated internal/sensitive fields into ordinary outputs.",
+      "codeRefs": [
+        "AlembicCore/src/daemon/RuntimeContracts.ts:26",
+        "Alembic/lib/http/HttpServer.ts:362",
+        "Alembic/lib/http/HttpServer.ts:365",
+        "Alembic/lib/http/HttpServer.ts:368",
+        "Alembic/lib/http/HttpServer.ts:371"
+      ],
+      "futureDemandOwner": "D2,D3,D4,D6,D7"
+    },
+    {
+      "id": "I24",
+      "title": "Plugin embedded HTTP mirror",
+      "functionClass": "rest-query",
+      "producer": "AlembicPlugin",
+      "consumers": [
+        "Codex plugin fallback/local sessions"
+      ],
+      "transport": [
+        "embedded HTTP route mirror"
+      ],
+      "schemaSource": [
+        "Plugin embedded routes",
+        "Core/Alembic shared schemas where imported"
+      ],
+      "validationCommand": [
+        "AlembicPlugin: npm run smoke:codex-plugin",
+        "AlembicPlugin: npm run verify:codex-plugin"
+      ],
+      "capabilityCoverage": [
+        "local fallback",
+        "subset route availability",
+        "unavailable route blocked"
+      ],
+      "capabilityDiscovery": [
+        "Plugin route policy",
+        "visible tools"
+      ],
+      "errorKinds": [
+        "unavailable",
+        "capability-mismatch",
+        "not-found",
+        "internal-error"
+      ],
+      "exposureClasses": [
+        "public",
+        "consumer-needed",
+        "diagnostic"
+      ],
+      "artifactPolicy": "Summaries inline; reports/logs by refs.",
+      "fixturePolicy": "Plugin owns embedded route smoke tests and compatibility matrix.",
+      "driftGate": "Embedded route list versus resident route compatibility matrix.",
+      "currentCompatibilityOwner": "Codex plugin local runtime fallback",
+      "observabilityKeys": [
+        "route",
+        "fallbackMode",
+        "capability",
+        "reasonCode"
+      ],
+      "removalBlocker": "Prove no current plugin session requires embedded fallback or replace with connected resident route and tests.",
+      "securityPropertyExposureNotes": "Embedded fallback must obey the same clean-output and exposure rules as resident routing.",
+      "codeRefs": [
+        "AlembicPlugin/lib/codex/mcp/PluginToolSurfaceCatalog.ts:116",
+        "AlembicPlugin/lib/codex/mcp/host/tool-visibility.ts:19",
+        "AlembicPlugin/lib/codex/mcp/McpServer.ts:347"
+      ],
+      "futureDemandOwner": "D4"
+    }
+  ]
+}

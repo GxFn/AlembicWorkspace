@@ -18,7 +18,8 @@ Read:
 7. `docs/testing-operation-policy.md`.
 8. `docs/current/README.md`.
 9. `docs/current/test-window-alignment.md`.
-10. `skills/alembic-real-routes/SKILL.md` when the task involves Alembic
+10. `skills/README.md`.
+11. `skills/alembic-real-routes/SKILL.md` when the task involves Alembic
     runtime, Dashboard, BiliDili, AlembicWorkspace, Codex Plugin, MCP, or
     environment probe evidence.
 
@@ -34,6 +35,11 @@ repository cannot safely reproduce alone, such as:
 - reproduction and regression checks.
 - Codex Plugin / host MCP / local environment probe evidence when a controller
   test card explicitly assigns that route to Test.
+
+When a test card, user request, or controller return asks Test to plan
+validation, reproduce a bug, design regression coverage, review evidence, or
+validate a long chain, proactively recommend the smallest matching Test skill
+from `skills/README.md` and use it to shape the work.
 
 ## Boundaries
 
@@ -61,12 +67,44 @@ Every test backfill must include the state root, test card, target project,
 entrypoint, configuration used, command/log evidence, result classification,
 project cleanliness, residual risks, and recommended next step.
 
+## Skill Routing
+
+Test skills are first-class evidence methods, not hidden optional docs and not
+automatic authority to run broad tests. Before selecting a skill, run a brief
+skill-fit check:
+
+1. What exact controller question or user uncertainty needs evidence?
+2. Is the missing value a Test method, or can the answer be given directly from
+   the assigned state root, test card, and current evidence?
+3. If no Test skill is genuinely needed, say so briefly and stay inside the
+   assigned test boundary.
+4. If a skill is needed or likely useful, name the smallest matching skill,
+   explain why it fits, and use or recommend it before running commands,
+   writing helpers, or recording backfill.
+5. If multiple skills apply, state the sequence and use only the first one
+   needed for the current evidence question.
+
+Skill map:
+
+- Validation plan or risk focus: `skills/test-strategy/SKILL.md`.
+- Reproduction, isolation, or failure classification:
+  `skills/debugging-and-triage/SKILL.md`.
+- Behavior-focused regression coverage:
+  `skills/regression-design/SKILL.md`.
+- Review of target evidence, diffs, reports, logs, or validation output:
+  `skills/evidence-review/SKILL.md`.
+- Long workflow, source-derived chain plan, node isolation, or scoped round
+  verdicts: `skills/progressive-chain-validation/SKILL.md`.
+- Alembic runtime, Dashboard, Codex Plugin / MCP, cold-start, multi-root, or
+  environment probe route: `skills/alembic-real-routes/SKILL.md`.
+
 ## Local Surfaces
 
 - Use `config/defaults.json` only for generic, secret-free defaults.
 - Use `scripts/` for Test-owned helpers that need a real scenario or runtime.
-- Use `skills/` only for repeated Test-local validation instructions that do
-  not belong in the installed Wakeflow skills or product repositories.
+- Use `skills/` as Test-local evidence methods. Surface the matching skill
+  before planning validation, triaging failures, designing regressions,
+  reviewing evidence, or running long-chain validation.
 - Use `package.json` only as a convenience wrapper for Test-owned scripts.
 - Use `docs/legacy-alembic-test-map.md` for old evidence locations; old
   `../AlembicTest/docs` and `../AlembicTest/tmp` data stays in place.

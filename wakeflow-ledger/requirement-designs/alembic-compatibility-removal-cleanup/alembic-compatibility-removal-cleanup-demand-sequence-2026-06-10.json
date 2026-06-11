@@ -1,0 +1,131 @@
+{
+  "kind": "ControllerDemandSequenceManifest",
+  "schemaVersion": 1,
+  "sequenceId": "alembic-compatibility-removal-cleanup-demand-sequence-2026-06-10",
+  "title": "Alembic post-D32 compatibility removal cleanup",
+  "createdAt": "2026-06-10",
+  "sourceIndex": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/index.md",
+  "continuesAfter": "alembic-interface-contract-post-deep-interface-audit-sequence-2026-06-10",
+  "purpose": "Remove preserved compatibility paths from D29/D32 by migrating current consumers to canonical post-D32 interfaces, then deleting old aliases/fallbacks/parsers and tightening drift gates.",
+  "globalUserDecisions": [
+    "Continue compatibility deletion and cleanup after D32.",
+    "Use only new interfaces or contracts for cross-repository integration.",
+    "Keep integration clean without split paths or downgrade behavior.",
+    "Preserve full functionality while removing compatibility paths."
+  ],
+  "claimRules": [
+    "Claim at most one demand at a time.",
+    "Do not use D33+ numbering.",
+    "CR0 must run before product cleanup packages.",
+    "Delete only after current consumers are migrated and replacement validation passes.",
+    "If external consumer compatibility is ambiguous, mark a release/breaking-change decision instead of deleting silently.",
+    "Final CR7 acceptance must review raw evidence, not target summaries."
+  ],
+  "items": [
+    {
+      "order": 1,
+      "demandKey": "alembic-compatibility-removal-cleanup-cr0-readiness-scan-2026-06-10",
+      "title": "Compatibility Removal Readiness Scan",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr0-readiness-scan-2026-06-10.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr0-readiness-scan",
+      "goal": "Build the exact deletion readiness matrix from D29/D32 and current code before dispatching product cleanup.",
+      "completionDefinition": "Every preserved compatibility candidate has current consumer scan, replacement path, dispatch owner, validation command, delete-ready status, and stop condition.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "alembic-compatibility-removal-cleanup-cr0-readiness-scan-p1",
+          "summary": "Scan preserved compatibility candidates and build product dispatch matrix.",
+          "sourceRef": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr0-readiness-scan-2026-06-10.md",
+          "targetWindow": "AlembicWorkspace",
+          "targetTaskId": "alembic-compatibility-removal-cleanup-cr0-readiness-scan-t1",
+          "targetSummary": "Review D29/D32 preserved compatibility, scan current code, and create exact CR1-CR7 dispatch matrix."
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "demandKey": "alembic-compatibility-removal-cleanup-cr1-core-projectscope-2026-06-10",
+      "title": "Core ProjectScope Legacy Path Removal",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr1-core-projectscope-2026-06-10.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr1-core-projectscope",
+      "goal": "Move all current consumers to canonical ProjectScope identifiers and remove cross-repo reliance on legacyPath/byLegacyPath ambiguity compatibility.",
+      "completionDefinition": "Product consumers use projectScopeId/qualifiedPath, no active product source imports or reads legacy path compatibility, Core removes or quarantines legacy lookup from public paths, and representative builds/tests/replay pass.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 3,
+      "demandKey": "alembic-compatibility-removal-cleanup-cr2-alembic-runtime-aliases-2026-06-10",
+      "title": "Alembic Runtime Alias Removal",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr2-alembic-runtime-aliases-2026-06-10.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr2-alembic-runtime-aliases",
+      "goal": "Remove public project runtime request aliases and whole-result compatibility after current consumers use canonical action contracts.",
+      "completionDefinition": "Canonical waitUntilReadyMs/action projection paths are the only internal product consumers; legacy waitMs public alias is deleted or explicitly blocked as external release decision; route tests and runtime smoke pass.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 4,
+      "demandKey": "alembic-compatibility-removal-cleanup-cr3-dashboard-fallbacks-2026-06-10",
+      "title": "Dashboard Compatibility Fallback Removal",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr3-dashboard-fallbacks-2026-06-10.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr3-dashboard-fallbacks",
+      "goal": "Replace Dashboard legacy labels, aliases, and guessing fallbacks with canonical provider/capability/problem fields.",
+      "completionDefinition": "Dashboard adapters consume canonical provider/capability fields; compatibility fallback policies are deleted or test-only; UI states and contract replay pass.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 5,
+      "demandKey": "alembic-compatibility-removal-cleanup-cr4-plugin-legacy-io-2026-06-10",
+      "title": "Plugin Legacy Input And Envelope Removal",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr4-plugin-legacy-io-2026-06-10.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr4-plugin-legacy-io",
+      "goal": "Remove public legacy input/envelope compatibility from MCP tool paths after host inputs and tool outputs use canonical contracts.",
+      "completionDefinition": "Public MCP tools require canonical inputSource and clean per-tool structuredContent; legacy envelope fields are absent from public parsing/output; real MCP probes pass.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 6,
+      "demandKey": "alembic-compatibility-removal-cleanup-cr5-agent-public-compat-2026-06-10",
+      "title": "Agent Public Compatibility Semantics Removal",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr5-agent-public-compat-2026-06-10.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr5-agent-public-compat",
+      "goal": "Ensure Agent public results expose only canonical contract semantics while provider-private quirks stay private.",
+      "completionDefinition": "Public Agent interfaces do not expose legacy compatibility semantics, DeepSeek/provider quirks are private adapter behavior only when needed, and branch fixtures/tests pass.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 7,
+      "demandKey": "alembic-compatibility-removal-cleanup-cr6-drift-gate-tightening-2026-06-10",
+      "title": "Compatibility Drift Gate Tightening",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr6-drift-gate-tightening-2026-06-10.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr6-drift-gate-tightening",
+      "goal": "Tighten drift gates so removed compatibility fields and aliases cannot reappear in public paths.",
+      "completionDefinition": "D30 drift gate command set is updated or extended to fail on removed public compatibility fields, while provider-private/internal shims remain allowed only in named private contexts.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 8,
+      "demandKey": "alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive-2026-06-10",
+      "title": "Compatibility Removal Runtime Acceptance And Archive",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-compatibility-removal-cleanup/cr7-runtime-acceptance-archive-2026-06-10.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive",
+      "goal": "Validate runtime/MCP/Dashboard behavior after compatibility removal and archive final cleanup.",
+      "completionDefinition": "Runtime smoke, MCP probes, Dashboard contract/UI evidence, consumer replay, import scans, and Wakeflow verification pass; final archive states deleted, private-only, blocked, and release-decision paths.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    }
+  ]
+}
