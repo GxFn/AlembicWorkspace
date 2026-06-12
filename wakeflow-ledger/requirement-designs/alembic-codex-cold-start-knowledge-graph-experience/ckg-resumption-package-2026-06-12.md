@@ -46,3 +46,22 @@ before CKG4 builds on it.
 - **F-CC4-4 — evidence-gate DX register (CKG3 surface)**: real-agent submission arcs cost ~5 attempts/~15min. Specific gaps: SOURCE_REF_BARE rejects root-level files (`package.json:N` style refs), verbatim-snippet rule trips agents, `scope:narrow` escape is undocumented, graph-evidence coupling is prose-language-dependent. Raw transcripts in P3 state root evidence/raw/cc4/.
 - **F-CC4-5 — consent-gate refusal misclassified** as internal-problem/internal-error (same family as F2): fix together with the F2 taxonomy work at resumption.
 - **Real-agent positive baseline**: both hosts completed cold→init→evidence-gated submission→consumption→refusal arcs as genuine interactive sessions (Opus 4.8 + gpt-5.5); transcripts are the acceptance record.
+
+## User routing decisions (2026-06-13)
+
+1. **Real plugin testing DEFERRED by user decision**: no further real-agent /
+   real-install plugin verification runs for now. Specifically deferred:
+   MT4 re-certification (and its sheet upgrades: gated-response expectations,
+   edge-args registry, no-in-session-tier-flip rule), CC4-FIRST-SESSION-MCP-
+   CONNECT root-cause isolation (needs real cold-cache sessions), and any new
+   CC4-style live acceptance. Certification matrix v1 + the CC4 transcripts
+   remain the standing record with known deltas documented. Nothing in the
+   currently executable portfolio set depends on these runs.
+2. **CKG resumption route**: CKG waits until the controller's portfolio
+   tasks are fully complete; the user will then REORGANIZE the requirement
+   and hand it to the Codex window for real-verification development. This
+   package (CKG3 rework backlog F2/F-CC4-4/F-CC4-5, the positive live
+   baseline, and the accumulated slots above) is the handoff source. The
+   deferred real-testing items in (1) naturally fold into that Codex-led
+   phase. SN5 (Plugin naming wave incl. lib/codex rename) stays parked
+   behind CKG completion and chains after it.
