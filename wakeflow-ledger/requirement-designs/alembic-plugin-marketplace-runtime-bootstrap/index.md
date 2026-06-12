@@ -1,6 +1,6 @@
 # Alembic Plugin Marketplace Runtime Bootstrap
 
-Status: candidate / user-requested / needs controller intake
+Status: candidate / user-requested / superseded-as-standalone 2026-06-12 — remaining scope folds into the P3 Plugin train's distribution sub-wave per [the portfolio execution plan](../alembic-portfolio-execution-plan/index.md) (packaging partially landed during CKG: thin runtime package, no embedded tarballs in committed state; P0 re-freezes the remainder)
 Maintained Window: AlembicWorkspace
 Date: 2026-06-11
 Design Key: alembic-plugin-marketplace-runtime-bootstrap

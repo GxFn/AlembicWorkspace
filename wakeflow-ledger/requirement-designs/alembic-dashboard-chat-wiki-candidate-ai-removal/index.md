@@ -1,6 +1,6 @@
 # Alembic Dashboard Chat Wiki Signal Candidate AI Removal
 
-Status: candidate / user-requested / needs controller intake
+Status: completed / controller-accepted
 Maintained Window: AlembicWorkspace
 Date: 2026-06-11
 Design Key: alembic-dashboard-chat-wiki-candidate-ai-removal
@@ -28,6 +28,21 @@ capabilities.
   [alembic-dashboard-chat-wiki-candidate-ai-removal-requirement-design-2026-06-11.md](alembic-dashboard-chat-wiki-candidate-ai-removal-requirement-design-2026-06-11.md)
 - Candidate demand sequence:
   [alembic-dashboard-chat-wiki-candidate-ai-removal-demand-sequence-2026-06-11.json](alembic-dashboard-chat-wiki-candidate-ai-removal-demand-sequence-2026-06-11.json)
+- Final validation acceptance:
+  [final-validation-acceptance-2026-06-11.md](final-validation-acceptance-2026-06-11.md)
+
+## Completion Snapshot
+
+DCR0-DCR7 are completed and accepted by AlembicWorkspace total control.
+
+- Final state root:
+  `.workspace-active/workspace/current/alembic-dashboard-chat-wiki-candidate-ai-removal-dcr7-validation-acceptance`
+- Final controller evidence:
+  `.workspace-active/workspace/current/alembic-dashboard-chat-wiki-candidate-ai-removal-dcr7-validation-acceptance/evidence/dcr7-final-validation-acceptance-2026-06-11.md`
+- Accepted product heads:
+  - AlembicDashboard: `0a61a00137079f1951934683ce521dc95d5b60b9`
+  - AlembicPlugin: `b8982d0933f3be69d98cadf07e5606201fb238ac`
+  - AlembicCore: `5ae117f481345e82921429371bc1427df52ac06d`
 
 ## Local Evidence Baseline
 

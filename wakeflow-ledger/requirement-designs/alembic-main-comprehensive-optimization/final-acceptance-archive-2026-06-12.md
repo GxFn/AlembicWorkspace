@@ -7,7 +7,7 @@ Status: completed with controller acceptance
 ## Scope
 
 This archive closes AO0-AO5 for the Alembic main repository. Product code
-changes were limited to `/Users/gaoxuefeng/Documents/AlembicWorkspace/Alembic`.
+changes were limited to `<workspace>/Alembic`.
 AO5 performed controller acceptance and archive only.
 
 Non-goals held: no `@alembic/core` import-path changes, no shared-asset

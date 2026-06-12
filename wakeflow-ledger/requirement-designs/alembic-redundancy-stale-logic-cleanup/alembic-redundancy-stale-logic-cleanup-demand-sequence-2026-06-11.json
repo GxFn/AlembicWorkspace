@@ -1,0 +1,130 @@
+{
+  "kind": "ControllerDemandSequenceManifest",
+  "schemaVersion": 1,
+  "sequenceId": "alembic-redundancy-stale-logic-cleanup-demand-sequence-2026-06-11",
+  "title": "Alembic redundancy and stale logic cleanup",
+  "createdAt": "2026-06-11",
+  "sourceIndex": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/index.md",
+  "purpose": "Re-verify the 2026-06-11 six-agent audit findings, fix docs-vs-reality drift, restore Core headless determinism, remove verified-dead remnants, single-source shared Alembic/AlembicPlugin assets behind a drift gate, and convert structural debt into design candidates without implementing it.",
+  "globalUserDecisions": [
+    "Scope is locked to the five product repositories: Alembic, AlembicCore, AlembicAgent, AlembicDashboard, AlembicPlugin.",
+    "Remove redundant code and stale logic outside each repository's declared responsibility; preserve all behavior.",
+    "AlembicDashboard receives no cleanup wave this sequence (audit grade A); it participates in validation only.",
+    "Structural refactors (layer sinking, V1/V2 convergence, MemoryStore ownership, Dashboard artifact pipeline) require design decisions first and must not be executed inside this sequence."
+  ],
+  "claimRules": [
+    "Claim at most one demand at a time.",
+    "RC0 must complete before any product cleanup package is dispatched.",
+    "Delete only items RC0 marked delete-ready; migrate-first items need consumer migration evidence before removal.",
+    "Intentional Alembic/AlembicPlugin divergence is documented, never merged, in this sequence.",
+    "If a removal candidate has an ambiguous external consumer, mark it keep-with-reason or escalate to RC6 instead of deleting silently.",
+    "Final RC7 acceptance must review raw evidence, not target summaries."
+  ],
+  "items": [
+    {
+      "order": 1,
+      "demandKey": "alembic-redundancy-stale-logic-cleanup-rc0-readiness-scan-2026-06-11",
+      "title": "Cleanup Readiness Scan",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc0-readiness-scan-2026-06-11.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-rc0-readiness-scan",
+      "goal": "Re-verify medium/low-confidence audit findings with consumer scans across all five repositories and build the per-item cleanup readiness matrix.",
+      "completionDefinition": "Every audit item A3-A7, C1, C3, G1-G5, P2-P4 and the shared-asset drift table has a verification record, current-consumer list, delete-ready status, owning demand, validation command, and stop condition.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": [
+        {
+          "taskPackageId": "alembic-redundancy-stale-logic-cleanup-rc0-readiness-scan-p1",
+          "summary": "Verify audit findings and build the RC1-RC6 cleanup dispatch matrix.",
+          "sourceRef": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc0-readiness-scan-2026-06-11.md",
+          "targetWindow": "AlembicWorkspace",
+          "targetTaskId": "alembic-redundancy-stale-logic-cleanup-rc0-readiness-scan-t1",
+          "targetSummary": "Run the nine verification tasks against current code and produce the readiness matrix with raw scan evidence."
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "demandKey": "alembic-redundancy-stale-logic-cleanup-rc1-alembic-docs-stale-artifacts-2026-06-11",
+      "title": "Alembic Docs & Stale Artifact Cleanup",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc1-alembic-docs-stale-artifacts-2026-06-11.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-rc1-alembic-docs-stale-artifacts",
+      "goal": "Align AGENTS.md with the post-Wave-4/5 tree, archive tracked scratch decisions to the ledger, and remove verified stale remnants in the main repository.",
+      "completionDefinition": "AGENTS.md matches the real lib/ tree and Dashboard artifact reality; git tracks no scratch decision documents; deprecated search helper and disabled tests carry RC0 verdicts applied; empty skills/ directory resolved; build, tests, and boundary lints green.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 3,
+      "demandKey": "alembic-redundancy-stale-logic-cleanup-rc2-core-headless-boundary-2026-06-11",
+      "title": "Core Headless Boundary Restoration",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc2-core-headless-boundary-2026-06-11.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-rc2-core-headless-boundary",
+      "goal": "Move the interactive discoverer prompt out of Core to its consumer layer, replace the random pruning trigger with a deterministic counter, and record the migration-gap verdict in-tree.",
+      "completionDefinition": "No readline/stdin code in Core product paths; Math.random remains only in HnswIndex with documentation; migration 002/003 gap explained in-tree; Core suite, public-api boundary, release readiness, smoke, and downstream builds green with unchanged consumer-visible behavior.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 4,
+      "demandKey": "alembic-redundancy-stale-logic-cleanup-rc3-agent-hygiene-boundary-config-2026-06-11",
+      "title": "Agent Hygiene & Boundary Config Hardening",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc3-agent-hygiene-boundary-config-2026-06-11.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-rc3-agent-hygiene-boundary-config",
+      "goal": "Fix or remove the broken probe script, encode core-import referenceLimits, compute public-api expectedCounts mechanically, and register V1 tool retirement and MemoryStore ownership intent.",
+      "completionDefinition": "tmp/ has no broken imports; core-import lint fails on un-allowlisted subpaths (demonstrated); public-api lint computes counts (demonstrated failure on mismatch); V1 retirement register and MemoryStore boundary note exist; check gate and pack-preview green.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 5,
+      "demandKey": "alembic-redundancy-stale-logic-cleanup-rc4-plugin-docs-legacy-governance-2026-06-11",
+      "title": "Plugin Docs, Legacy Governance & Surface Pruning",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc4-plugin-docs-legacy-governance-2026-06-11.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-rc4-plugin-docs-legacy-governance",
+      "goal": "Rewrite the README for plugin scope, delete or deadline-mark every legacy compatibility path into a legacy register, prune routes without plugin-runtime consumers, add scratch retention, and document the vendor snapshot flow.",
+      "completionDefinition": "README is plugin-scoped; docs/legacy-register.md covers all remaining legacy paths with owner and retirement condition; every remaining HTTP route has a named consumer; scratch retention script exists and ran once supervised; vendor refresh documented; vitest, repo-boundary lint, smoke, and MCP samples green.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 6,
+      "demandKey": "alembic-redundancy-stale-logic-cleanup-rc5-shared-asset-single-source-2026-06-11",
+      "title": "Shared Asset Single-Sourcing & Drift Gate",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc5-shared-asset-single-source-2026-06-11.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-rc5-shared-asset-single-source",
+      "goal": "Declare an authoritative source per shared asset, backport missed hunks so both repositories reconcile, mark intentional variants, and wire a drift gate into both check pipelines.",
+      "completionDefinition": "All in-scope assets reconciled with declared authority; drift gate green in both repos and demonstrably fails on injected drift; constitution role mapping recorded; both suites and plugin skill-delivery samples green.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 7,
+      "demandKey": "alembic-redundancy-stale-logic-cleanup-rc6-structural-debt-decision-gate-2026-06-11",
+      "title": "Structural Debt Decision Gate",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc6-structural-debt-decision-gate-2026-06-11.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-rc6-structural-debt-decision-gate",
+      "goal": "Draft six structural design candidates (SD-1 layer sinking, SD-2 Dashboard artifact pipeline, SD-3 V1/V2 convergence, SD-4 MemoryStore ownership, SD-5 Core Wave 3B closeout, SD-6 daemon observability reuse) and obtain a controller decision on each.",
+      "completionDefinition": "Six design notes exist with options, costs, recommendations, and re-verified evidence; each carries an accept/reject/defer decision record; nothing implemented.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    },
+    {
+      "order": 8,
+      "demandKey": "alembic-redundancy-stale-logic-cleanup-rc7-final-acceptance-archive-2026-06-11",
+      "title": "Final Acceptance & Archive",
+      "developerDoc": "wakeflow-ledger/requirement-designs/alembic-redundancy-stale-logic-cleanup/rc7-final-acceptance-archive-2026-06-11.md",
+      "stateRoot": ".workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-rc7-final-acceptance-archive",
+      "goal": "Run the full cross-repository gate set on the final state, review raw evidence against each completion definition, annotate audit-item dispositions, and archive the sequence.",
+      "completionDefinition": "All five repository gates plus the drift gate green; AlembicDashboard shows zero code diff; every audit item has a final disposition; acceptance archive written and recorded in the workspace record map.",
+      "controllerWindow": "AlembicWorkspace",
+      "returnPolicy": "group-ready",
+      "initialTaskPackages": []
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # AlembicAgent Comprehensive Optimization
 
-Status: candidate / user-requested 2026-06-12 / repo-internal scope / needs controller intake
+Status: completed / controller-accepted 2026-06-12 (AG0-AG5; final Agent HEAD `35901cf`; controller-adjusted scope: V1 direct importers to zero via ToolRuntimeBridge, public `./tools` compatibility preserved pending downstream migration evidence — see final acceptance archive)
 Maintained Window: AlembicWorkspace
 Date: 2026-06-12
 Design Key: alembic-agent-comprehensive-optimization

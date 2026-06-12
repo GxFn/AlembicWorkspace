@@ -29,6 +29,8 @@ archive files.
 | Record | Entry | Description |
 | --- | --- | --- |
 | AFAPI 08-12 completed demands | archive/2026-06/afapi-completed-demands/ | Demand-level completion summary for AFAPI 08-12, including final revisions, controller conclusions, and evidence maps. |
+| Alembic redundancy & stale-logic cleanup RC0-RC7 | ../requirement-designs/alembic-redundancy-stale-logic-cleanup/final-acceptance-archive-2026-06-12.md | Eight-demand cleanup sequence completed 2026-06-12: five-repo final gate sweep green + strict drift gate both sides, Dashboard zero code diff, all audit items dispositioned (audit doc §9), seven structural-debt design candidates decided (RC6 register) as future demands. |
+| AlembicCore comprehensive optimization CO0-CO5 | ../requirement-designs/alembic-core-comprehensive-optimization/final-acceptance-archive-2026-06-12.md | Six-demand hardening sequence completed 2026-06-12: public surface 140→126 with prescriptive gate, lint-enforced layer contract, seven silent-to-loud failure-semantics repairs (census silent 80→72), test floor +65 suites tests (vitest 1133), final gate matrix green incl. release:check; one real data defect (per-recipe totalCount) found and repaired by the new floor; open decisions registered (coverage enforcement pending user; scanner blind-spot + Plugin migrations post-CKG). |
 
 ## Workflow References
 

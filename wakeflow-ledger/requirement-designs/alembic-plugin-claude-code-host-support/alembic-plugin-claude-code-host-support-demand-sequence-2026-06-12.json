@@ -1,0 +1,98 @@
+{
+  "sequenceId": "alembic-plugin-claude-code-host-support",
+  "status": "candidate-needs-controller-intake",
+  "createdAt": "2026-06-12",
+  "maintainedWindow": "AlembicWorkspace",
+  "sourceDocument": "wakeflow-ledger/requirement-designs/alembic-plugin-claude-code-host-support/alembic-plugin-claude-code-host-support-requirement-design-2026-06-12.md",
+  "evidenceBase": "wakeflow-ledger/requirement-designs/alembic-plugin-claude-code-host-support/claude-code-host-findings-2026-06-12.md",
+  "goal": "Make Alembic installable as a Claude Code plugin: same MCP tool surface under ALEMBIC_PLUGIN_HOST=claude-code with the project root from CLAUDE_PROJECT_DIR, shared-manifest skills as plugin skills, host-rendered CKG cold start, Claude Code Project Skill export convention, Dashboard handoff, and a real Claude-Code-agent acceptance run - with the Codex host regression-proven unchanged.",
+  "nonGoals": [
+    "No new tools and no third tool catalog - one MCP server serves both hosts.",
+    "No lib/codex path rename (cosmetic churn; future cleanup if ever).",
+    "No Codex-host behavior changes (byte-stable parity gate per demand).",
+    "No slash commands or hooks in the first version unless CC0 confirms them in scope.",
+    "No Plugin edits before CKG completes (CC0 controller-window facts excepted); no version bumps or publication without user direction."
+  ],
+  "demands": [
+    {
+      "order": 0,
+      "demandId": "alembic-plugin-claude-code-host-support-cc0-packaging-facts-scope-freeze-2026-06-12",
+      "title": "CC0 Packaging Facts And Scope Freeze",
+      "primaryWindow": "AlembicWorkspace",
+      "gate": "may run before CKG completion (controller-window facts only, no Plugin edits)",
+      "purpose": "Verify the official Claude Code plugin/marketplace spec against the local Wakeflow-plugin precedent, re-freeze the Plugin host-coupling census on the post-CKG state, determine the Claude Code skill-export convention, obtain the three user gates, and relay the CKG SOP host-variable timing signal.",
+      "requiredEvidence": [
+        "Official Claude Code plugin + marketplace spec recorded (manifest, mcp.json substitution vars, skills layout, marketplace registration) and reconciled with the installed Wakeflow-plugin precedent",
+        "Post-CKG host-coupling census re-freeze: Codex-named strings, packaging env set, ProjectSkillDelivery target, MPB packaging state",
+        "Claude Code Project Skill export convention determined from official docs",
+        "User gates recorded 2026-06-12 (all three adopted as recommended): local-path install first with the marketplace entry later as a user release decision; first version ships MCP + skills only; ALEMBIC_CHANNEL_ID=claude-code",
+        "Local-path install package shape and skills-only artifact list specified under the recorded rulings",
+        "CKG timing signal relayed to the controller: staged-SOP renderer keeps the host name as a render variable"
+      ]
+    },
+    {
+      "order": 1,
+      "demandId": "alembic-plugin-claude-code-host-support-cc1-host-parameterization-completion-2026-06-12",
+      "title": "CC1 Host Parameterization Completion",
+      "primaryWindow": "AlembicPlugin",
+      "gate": "CKG paused-clean (user-directed 2026-06-12; controller-verified) before dispatch; the cold-start contract consumed is the landed CKG1-CKG3 state",
+      "dependsOn": ["alembic-plugin-claude-code-host-support-cc0-packaging-facts-scope-freeze-2026-06-12"],
+      "purpose": "Make ALEMBIC_PLUGIN_HOST=claude-code work end-to-end with no codex-default leakage; parameterize the Codex-named strings and briefing/SOP/initialize wording via the CKG contract host slot; extend cross-host readiness; prove Codex parity.",
+      "requiredEvidence": [
+        "claude-code host identity end-to-end proof: runtime context, diagnostics, status, clean output carry the right host with ALEMBIC_PLUGIN_HOST=claude-code",
+        "The 4 Codex-named tool-description strings and briefing/SOP/initialize wording host-parameterized via the CKG contract host slot",
+        "cross-host-readiness checks assert claude-code readiness",
+        "Codex parity gate: tools/list and representative callTool snapshots byte-stable before/after",
+        "Plugin full check green"
+      ]
+    },
+    {
+      "order": 2,
+      "demandId": "alembic-plugin-claude-code-host-support-cc2-claude-code-plugin-packaging-2026-06-12",
+      "title": "CC2 Claude Code Plugin Packaging",
+      "primaryWindow": "AlembicPlugin",
+      "supportWindows": ["Alembic"],
+      "dependsOn": ["alembic-plugin-claude-code-host-support-cc1-host-parameterization-completion-2026-06-12"],
+      "purpose": "Ship the Claude Code packaging artifact set: manifest, mcp.json wiring with CLAUDE_PLUGIN_ROOT/CLAUDE_PROJECT_DIR, shared-manifest skills with a claude-code overlay, thin shell over the shared pinned npm runtime, marketplace artifact per the CC0 ruling.",
+      "requiredEvidence": [
+        ".claude-plugin/plugin.json manifest plus plugin .mcp.json wiring the MCP server with CLAUDE_PLUGIN_ROOT paths, ALEMBIC_PROJECT_DIR=CLAUDE_PROJECT_DIR, ALEMBIC_PLUGIN_HOST=claude-code, and the CC0 channel id",
+        "Plugin skills populated from the shared-asset manifest with a claude-code overlay; Alembic-side manifest + drift-gate extension landed as one coordinated commit; drift gate green on all three consumers",
+        "Distribution shell per the CC0-frozen MPB state: no embedded node_modules or tarballs; pinned npm runtime reuse; dev file: links intact",
+        "Marketplace artifact or local-path install package per the CC0 distribution ruling, install-from-artifact proof",
+        "Plugin and Alembic full checks green; Codex parity gate green"
+      ]
+    },
+    {
+      "order": 3,
+      "demandId": "alembic-plugin-claude-code-host-support-cc3-cold-start-skill-delivery-claude-code-2026-06-12",
+      "title": "CC3 Cold Start And Skill Delivery On Claude Code",
+      "primaryWindow": "AlembicPlugin",
+      "supportWindows": ["Alembic"],
+      "dependsOn": ["alembic-plugin-claude-code-host-support-cc2-claude-code-plugin-packaging-2026-06-12"],
+      "purpose": "Prove the product loop on the new host: host-rendered CKG cold start, Claude Code Project Skill export convention, Dashboard handoff, and honest failure semantics.",
+      "requiredEvidence": [
+        "Real cold start from a Claude Code session against the CKG contract: status, bootstrap, host-rendered staged SOPs, submit/dimension gates, post-bootstrap knowledge use - raw MCP outputs",
+        "Project Skill export delivered to the CC0-verified Claude Code convention with the Ghost/source-repo skip policy preserved",
+        "Dashboard handoff verified from the Claude Code session",
+        "Failure semantics on this host: wrong-scope, missing CLAUDE_PROJECT_DIR, degraded states - clean problem output parity with the Codex host",
+        "Plugin full check green; Codex parity gate green"
+      ]
+    },
+    {
+      "order": 4,
+      "demandId": "alembic-plugin-claude-code-host-support-cc4-real-claude-code-acceptance-2026-06-12",
+      "title": "CC4 Real Claude Code Host Acceptance",
+      "primaryWindow": "AlembicWorkspace",
+      "supportWindows": ["Test", "AlembicPlugin"],
+      "dependsOn": ["alembic-plugin-claude-code-host-support-cc3-cold-start-skill-delivery-claude-code-2026-06-12"],
+      "purpose": "Fresh install into a real Claude Code session, tools/list parity, a real Claude-Code-agent cold-start run to the CKG7 quality standard, skills invocation, Dashboard handoff, failure branches, second-launch reuse, Codex regression smoke, acceptance and archive.",
+      "requiredEvidence": [
+        "Fresh install from the CC0-chosen route into a real Claude Code session; tools/list parity vs the Codex surface (identical tools and schemas, host field differs)",
+        "Real Claude-Code-agent cold-start run on a sample project to the CKG7 standard: raw tool outputs, transcript evidence, accepted/rejected Recipe sample audits",
+        "Plugin skills visible and invocable in the session; Dashboard handoff evidence",
+        "Representative failure branches with raw MCP outputs; second launch reuses the runtime without reinstall",
+        "Codex-host regression smoke green; controller acceptance from raw evidence; ledger archive; Wakeflow verification pass"
+      ]
+    }
+  ]
+}

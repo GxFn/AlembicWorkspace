@@ -1,0 +1,96 @@
+{
+  "sequenceId": "alembic-mcp-tool-certification",
+  "status": "candidate-needs-controller-intake",
+  "createdAt": "2026-06-12",
+  "maintainedWindow": "AlembicWorkspace",
+  "sourceDocument": "wakeflow-ledger/requirement-designs/alembic-mcp-tool-certification/alembic-mcp-tool-certification-requirement-design-2026-06-12.md",
+  "evidenceBase": "wakeflow-ledger/requirement-designs/alembic-mcp-tool-certification/mcp-tool-certification-findings-2026-06-12.md",
+  "goal": "Certify every Alembic MCP tool on both surfaces, one by one: connectivity and functional completeness against the already-defined design expectations, edge-case honesty, a measured and enforced per-tool output budget with an honest overflow route replacing magic-number slices, misuse-resistant descriptions and schemas closing every harvested real misuse case, and a per-tool value verdict - so each tool is provably usable and worth its place.",
+  "nonGoals": [
+    "No surface-duality resolution (IC5), no source-graph catalog redesign (CKG4 - findings on those 9 tools are handed to CKG4 via the controller), no host packaging (CC), no new tools.",
+    "No deletions or merges executed here - verdict candidates go to a per-item user decision register.",
+    "No Plugin code edits before CKG completes (invocation-only audit of the committed Plugin MCP server is allowed per the CO smoke precedent).",
+    "No weakening of existing contracts, gates, or census ratchets; no version bumps without user direction."
+  ],
+  "demands": [
+    {
+      "order": 0,
+      "demandId": "alembic-mcp-tool-certification-mt0-inventory-expectations-harness-2026-06-12",
+      "title": "MT0 Inventory Freeze, Expectation Sheets, And Harness",
+      "primaryWindow": "AlembicWorkspace",
+      "supportWindows": ["Test"],
+      "purpose": "Freeze the tool population, write one design-expectation sheet per tool, harvest real misuse/bloat evidence from existing transcripts, build the certification harness, and obtain the three user gates.",
+      "requiredEvidence": [
+        "Frozen tool inventory across both surfaces (committed state) with one expectation sheet per tool: design intent source, operations, input schema, output shape, edge matrix, proposed size budget",
+        "Per-tool symptom list harvested from real evidence (2026-06-11 cold-start observation, CKG run transcripts, controller smokes) - misuse cases, error cases, oversized outputs",
+        "Certification harness: scripted MCP client driving every tool/operation with representative and edge inputs, capturing raw outputs, sizes, latencies, problem objects",
+        "User gates recorded 2026-06-12 (all three adopted as recommended): per-tool budgets are blocking smoke gates; certification floor is all-five-pass (connectivity, completeness, edge honesty, budget compliance, description standard); merge/deprecate candidates go to per-item user decisions",
+        "Harness pass/fail rules and budget-gate wiring spec written under the recorded rulings"
+      ]
+    },
+    {
+      "order": 1,
+      "demandId": "alembic-mcp-tool-certification-mt1-connectivity-completeness-sweep-2026-06-12",
+      "title": "MT1 Connectivity And Completeness Sweep",
+      "primaryWindow": "AlembicWorkspace",
+      "supportWindows": ["Test"],
+      "dependsOn": ["alembic-mcp-tool-certification-mt0-inventory-expectations-harness-2026-06-12"],
+      "purpose": "Run the harness against both real runtimes for every tool and operation; produce certification matrix v1 with raw outputs; route findings to the right fix queues.",
+      "requiredEvidence": [
+        "Harness run against the resident daemon MCP and the committed Plugin MCP server: every tool, every advertised operation, PASS/FAIL matrix with archived raw outputs",
+        "Enumerated dead routes, stubs, contract drift, and expectation mismatches with file/contract anchors",
+        "Finding routes recorded: resident/embedded defects to MT2/MT3 scope; Plugin-code defects to the post-CKG queue; source-graph-tool findings handed to CKG4 via controller",
+        "Size baseline per tool from measured representative calls"
+      ]
+    },
+    {
+      "order": 2,
+      "demandId": "alembic-mcp-tool-certification-mt2-output-budget-mechanism-compaction-2026-06-12",
+      "title": "MT2 Output Budget Mechanism And Compaction",
+      "primaryWindow": "AlembicCore",
+      "supportWindows": ["Alembic"],
+      "dependsOn": ["alembic-mcp-tool-certification-mt1-connectivity-completeness-sweep-2026-06-12"],
+      "purpose": "One shared Core budget mechanism (declared per-tool budgets, honest truncation, pagination/artifact-ref overflow) replacing magic-number slices; oversized tools compacted; budget gate wired per the MT0 ruling.",
+      "requiredEvidence": [
+        "Shared budget mechanism in Core: per-tool declared budget, measured enforcement, honest truncated signal, pagination or artifact-ref overflow route",
+        "Magic-number slices in handlers replaced by the mechanism (diff census: slice(0,N) sites before/after)",
+        "Budgets set from MT1 measurements per the MT0-ruled policy; oversized tools compacted with before/after size evidence",
+        "Budget gate wired into repo smokes per the MT0 ruling with a demonstrated failure",
+        "Resident/embedded tools landed; Plugin tools recorded in the post-CKG queue with owners",
+        "Owning repos full checks green; no data silently dropped (overflow-honesty tests)"
+      ]
+    },
+    {
+      "order": 3,
+      "demandId": "alembic-mcp-tool-certification-mt3-usage-error-hardening-2026-06-12",
+      "title": "MT3 Usage-Error Hardening",
+      "primaryWindow": "Alembic",
+      "supportWindows": ["AlembicCore"],
+      "dependsOn": ["alembic-mcp-tool-certification-mt1-connectivity-completeness-sweep-2026-06-12"],
+      "purpose": "Bring every tool description to the tool-to-information standard, make schemas misuse-resistant, and close every harvested misuse case with a guard or guidance fix plus a regression negative test.",
+      "requiredEvidence": [
+        "Every tool description meets the standard (answers what / inputs / cannot prove / when not to use) with a description-completeness check wired",
+        "Schemas misuse-resistant: enumerated modes, honest required fields, cross-field validation returning taxonomy problems with next actions",
+        "Each harvested misuse case closed by a specific fix with a regression negative test (per-case evidence list)",
+        "Remaining gateway resolver closures replaced by statically auditable declarations (AO1 follow-through verified)",
+        "Plugin-side description/schema changes recorded in the post-CKG queue; resident/embedded landed; full checks green"
+      ]
+    },
+    {
+      "order": 4,
+      "demandId": "alembic-mcp-tool-certification-mt4-certification-cards-verdicts-acceptance-2026-06-12",
+      "title": "MT4 Certification Cards, Verdicts, And Acceptance",
+      "primaryWindow": "AlembicWorkspace",
+      "supportWindows": ["Test"],
+      "dependsOn": ["alembic-mcp-tool-certification-mt2-output-budget-mechanism-compaction-2026-06-12", "alembic-mcp-tool-certification-mt3-usage-error-hardening-2026-06-12"],
+      "purpose": "Re-run the full harness, issue a certification card per tool, deliver the per-tool value verdict register, hand over the Plugin post-CKG queue, accept and archive.",
+      "requiredEvidence": [
+        "Full harness re-run; script-readable certification card per tool (connectivity, completeness, edges, measured size vs budget, ergonomics, evidence links) stored in the ledger",
+        "Per-tool value verdicts: keep / upgraded / merge-candidate / deprecate-candidate; candidates delivered as a per-item user decision register",
+        "Before/after deltas: misuse-case closure rate, output-size reductions, PASS matrix completion",
+        "Plugin post-CKG fix queue handed to the controller with owners and triggers",
+        "Controller acceptance from raw harness evidence; ledger archive; Wakeflow verification pass"
+      ]
+    }
+  ]
+}

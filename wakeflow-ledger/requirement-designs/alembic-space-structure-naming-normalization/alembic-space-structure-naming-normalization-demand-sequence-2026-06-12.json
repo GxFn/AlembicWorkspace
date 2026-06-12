@@ -1,0 +1,121 @@
+{
+  "sequenceId": "alembic-space-structure-naming-normalization",
+  "status": "candidate-needs-controller-intake",
+  "createdAt": "2026-06-12",
+  "maintainedWindow": "AlembicWorkspace",
+  "sourceDocument": "wakeflow-ledger/requirement-designs/alembic-space-structure-naming-normalization/alembic-space-structure-naming-normalization-requirement-design-2026-06-12.md",
+  "evidenceBase": "wakeflow-ledger/requirement-designs/alembic-space-structure-naming-normalization/structure-naming-findings-2026-06-12.md",
+  "goal": "Unify folder hierarchy and file naming across all five repos: one written convention codified from the measured dominant styles and lint-enforced everywhere, per-repo target trees derived from the AD charters and layer contracts, and a real landing plan - per-repo migration waves as the final cleanup train with git-mv blame preservation, same-commit gate-config updates, public-specifier safety, and proven behavior neutrality.",
+  "nonGoals": [
+    "No behavior, API, or contract changes - moves and renames only, proven behavior-neutral per wave.",
+    "No invented style: the convention codifies measured dominants; target trees follow the AD-written responsibility model.",
+    "No public specifier changes outside the SN0 wildcard-handling ruling (frozen until after SD-5 phase 2 by default).",
+    "No wave on a repo with any other in-flight demand; the Plugin wave additionally waits for CKG completion and the CC packaging demands.",
+    "No version bumps or releases without user direction."
+  ],
+  "demands": [
+    {
+      "order": 0,
+      "demandId": "alembic-space-structure-naming-normalization-sn0-convention-census-target-trees-2026-06-12",
+      "title": "SN0 Convention Spec, Census Freeze, Target Trees, Tooling Spec",
+      "primaryWindow": "AlembicWorkspace",
+      "dependsOn": [],
+      "gate": "runs after AD3 layer contracts exist (semantic input for target trees)",
+      "purpose": "Codify the convention from measured dominants, freeze the full census including .tsx, derive per-repo target trees from AD2/AD3 outputs, map public-path and gate-config constraints, spec the migration tooling, and obtain the four user gates.",
+      "requiredEvidence": [
+        "Full census re-freeze including .tsx with per-artifact-type classification and the straggler list per repo",
+        "Written space naming convention plus the naming-lint specification",
+        "Per-repo target tree maps derived from AD2 charters and AD3 layer contracts",
+        "Public-path constraint map (exports-mapped shieldable vs wildcard-exposed frozen) and the path-based gate-config inventory requiring same-commit updates",
+        "Migration tooling spec: codemod pipeline, git mv discipline, single-purpose commits, .git-blame-ignore-revs per wave",
+        "User gates recorded 2026-06-12 (all four adopted as recommended): codify-dominants convention with straggler normalization; Plugin lib/codex host-neutral rename in SN5 scope; git mv + single-purpose commits + .git-blame-ignore-revs per wave; wildcard-exposed Core directories frozen until the post-SD-5-phase-2 release-aligned ruling",
+        "Written convention artifact, SN5 rename plan, per-wave commit protocol, and frozen-path list produced under the recorded rulings"
+      ]
+    },
+    {
+      "order": 1,
+      "demandId": "alembic-space-structure-naming-normalization-sn1-tooling-pilot-dashboard-2026-06-12",
+      "title": "SN1 Tooling Build And Pilot Wave: AlembicDashboard",
+      "primaryWindow": "AlembicDashboard",
+      "supportWindows": ["AlembicWorkspace"],
+      "dependsOn": ["alembic-space-structure-naming-normalization-sn0-convention-census-target-trees-2026-06-12"],
+      "purpose": "Build the codemod pipeline and pilot the full wave pattern on the smallest consumer-free repo; wire its naming lint; produce the pilot report for all later waves.",
+      "requiredEvidence": [
+        "Codemod pipeline built per the SN0 tooling spec",
+        "Dashboard wave executed: naming per spec (.tsx rules), tree per its conventions contract, git mv history preserved, .git-blame-ignore-revs entry",
+        "Naming lint wired into the Dashboard check with a demonstrated failure",
+        "Full Dashboard check green; behavior-neutrality mechanical-diff audit",
+        "Pilot report: tooling defects, effort metrics, gate-config update pattern"
+      ]
+    },
+    {
+      "order": 2,
+      "demandId": "alembic-space-structure-naming-normalization-sn2-agent-wave-2026-06-12",
+      "title": "SN2 AlembicAgent Wave",
+      "primaryWindow": "AlembicAgent",
+      "dependsOn": ["alembic-space-structure-naming-normalization-sn1-tooling-pilot-dashboard-2026-06-12"],
+      "purpose": "Apply the wave to the cleanest package repo: tree per its AD3 contract, naming lint wired, boundary configs updated in-commit, public surface byte-stable.",
+      "requiredEvidence": [
+        "Wave executed with git mv discipline and ignore-revs entry; naming lint wired with demonstrated failure",
+        "Same-commit updates: import-boundary configs, public-api boundary policy paths, validation-floor snapshot",
+        "15-export surface and signature smoke byte-stable; full check green; downstream Alembic build green",
+        "Behavior-neutrality mechanical-diff audit"
+      ]
+    },
+    {
+      "order": 3,
+      "demandId": "alembic-space-structure-naming-normalization-sn3-alembic-wave-2026-06-12",
+      "title": "SN3 Alembic Wave",
+      "primaryWindow": "Alembic",
+      "dependsOn": ["alembic-space-structure-naming-normalization-sn2-agent-wave-2026-06-12"],
+      "purpose": "Align the largest tree (16 lib areas) to its AD3 layer contract with straggler renames, naming lint, and same-commit gate-config updates.",
+      "requiredEvidence": [
+        "Wave executed per the target tree; naming lint wired with demonstrated failure",
+        "Same-commit updates: extraction/repo-boundary lints, RC5 shared-asset manifest paths, provider-contract doc regeneration where touched",
+        "Full check green (units, integration, coverage floors, drift gate); behavior-neutrality mechanical-diff audit"
+      ]
+    },
+    {
+      "order": 4,
+      "demandId": "alembic-space-structure-naming-normalization-sn4-core-wave-2026-06-12",
+      "title": "SN4 AlembicCore Wave",
+      "primaryWindow": "AlembicCore",
+      "dependsOn": ["alembic-space-structure-naming-normalization-sn3-alembic-wave-2026-06-12"],
+      "purpose": "The public-surface wave: exports-mapped moves with specifier-stable map updates; wildcard-exposed directories per the SN0 ruling; all boundary/layer configs updated in-commit.",
+      "requiredEvidence": [
+        "Exports-mapped moves executed with package.json map updates; public specifiers byte-stable proven by the prescriptive boundary gate, smoke, and consumer lint across all three consumers",
+        "Wildcard-exposed directories handled per the SN0 ruling (frozen record or release-aligned execution)",
+        "Same-commit updates: layer-contract lint paths, boundary policy, lint-debt doc; naming lint wired with demonstrated failure",
+        "Full vitest suite green; downstream Alembic and Agent builds green; behavior-neutrality mechanical-diff audit"
+      ]
+    },
+    {
+      "order": 5,
+      "demandId": "alembic-space-structure-naming-normalization-sn5-plugin-wave-2026-06-12",
+      "title": "SN5 AlembicPlugin Wave",
+      "primaryWindow": "AlembicPlugin",
+      "dependsOn": ["alembic-space-structure-naming-normalization-sn4-core-wave-2026-06-12"],
+      "gate": "CKG paused-clean (user-directed 2026-06-12) AND CC packaging demands landed",
+      "purpose": "Apply the wave to the Plugin including the SN0-ruled lib/codex host-neutral rename, with both host parity gates green.",
+      "requiredEvidence": [
+        "Wave executed including the lib/codex host-neutral rename per the SN0 ruling: imports, tsconfig aliases, vendored-path references, .mcp.json command paths updated in-commit",
+        "Codex parity gate byte-stable (tools/list + representative callTool) and the Claude Code parity equivalent green",
+        "Naming lint wired with demonstrated failure; full Plugin check green; behavior-neutrality mechanical-diff audit"
+      ]
+    },
+    {
+      "order": 6,
+      "demandId": "alembic-space-structure-naming-normalization-sn6-space-acceptance-archive-2026-06-12",
+      "title": "SN6 Space Acceptance And Archive",
+      "primaryWindow": "AlembicWorkspace",
+      "dependsOn": ["alembic-space-structure-naming-normalization-sn5-plugin-wave-2026-06-12"],
+      "purpose": "Prove the space-wide result: naming lint green everywhere, stragglers zero, target trees realized or deviations ruled, behavior neutrality attested, archive.",
+      "requiredEvidence": [
+        "Naming lint green in all five repos; straggler count zero per the spec",
+        "Target trees realized or deviations explicitly ruled; census deltas vs SN0",
+        "All gates and downstream builds green; per-wave mechanical-diff audits collected",
+        "Controller acceptance from raw evidence; ledger archive; Wakeflow verification pass"
+      ]
+    }
+  ]
+}

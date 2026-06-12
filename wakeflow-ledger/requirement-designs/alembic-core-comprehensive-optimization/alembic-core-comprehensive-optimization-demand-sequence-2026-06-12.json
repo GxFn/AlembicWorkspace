@@ -1,0 +1,120 @@
+{
+  "sequenceId": "alembic-core-comprehensive-optimization",
+  "status": "candidate-needs-controller-intake",
+  "createdAt": "2026-06-12",
+  "maintainedWindow": "AlembicWorkspace",
+  "sourceDocument": "wakeflow-ledger/requirement-designs/alembic-core-comprehensive-optimization/alembic-core-comprehensive-optimization-requirement-design-2026-06-12.md",
+  "evidenceBase": "wakeflow-ledger/requirement-designs/alembic-core-comprehensive-optimization/core-audit-findings-2026-06-12.md",
+  "goal": "Harden and clarify AlembicCore: intentional public API surface, written and lint-enforced layer contract, honest failure semantics on critical paths, unambiguous domain vocabulary, and a closed test/gate floor.",
+  "nonGoals": [
+    "No new features; delete only zero-consumer surface with scan, replacement, and gate proof.",
+    "No redo of RC2 headless/deterministic work.",
+    "No source-graph lifecycle wiring (CKG2), no submit/dimension evidence-gate enforcement (CKG3), no MissionBriefing/staged-SOP restructuring (CKG1), no Codex tool-surface changes (CKG4).",
+    "No layer-sinking migrations from other repos (RC6 SD-1 phase 2 stays outside CO and after SD-5 closeout).",
+    "No AlembicPlugin code modifications (user-directed 2026-06-12): the Codex host is actively executing CKG in AlembicPlugin; CO leaves stable interfaces and defers Plugin-side import migrations with owner and post-CKG trigger.",
+    "No version bumps or releases without explicit user direction; no Dashboard changes."
+  ],
+  "demands": [
+    {
+      "order": 0,
+      "demandId": "alembic-core-comprehensive-optimization-co0-fact-freeze-decision-matrix-2026-06-12",
+      "title": "CO0 Fact Freeze And Decision Matrix",
+      "primaryWindow": "AlembicWorkspace",
+      "purpose": "Re-verify the 2026-06-12 audit at dispatch time and convert findings A1-E5 into a keep/fix/route/defer decision matrix with user confirmation of every visible-behavior change.",
+      "requiredEvidence": [
+        "Fresh cross-repo consumer-import census with counts frozen (Alembic/AlembicAgent/AlembicPlugin/AlembicDashboard)",
+        "Decision matrix covering every audit finding A1-E5: fix-in-CO / route-to-CKG / route-to-RC6 / defer-with-owner",
+        "RC6 reconciliation against rc6-structural-debt-decisions-2026-06-12.md: confirm or amend SD-5 phase-1 merge into the CO1 wave, keep SD-5 phase 2 release-aligned after the post-CKG Plugin vendor refresh, keep SD-1 phase 2 outside CO",
+        "AlembicPlugin consumption freeze: verify the real source-graph import route (package specifier versus vendored vendor/AlembicCore copy) and freeze the Plugin-consumed specifier list CO1 must keep alive untouched",
+        "User-confirmed silent-to-loud failure list for CO3 and user-confirmed export-removal list for CO1",
+        "Target export-surface shape: surviving curated keys, facadeReadiness migrations now vs owner+trigger deferrals for the 45 unmapped wildcard groups",
+        "core/ layer ruling input: evidence for blessing core as importable analysis leaf versus service-adapter wrapping",
+        "CO4 numeric targets: exact suites to add and threshold handling"
+      ]
+    },
+    {
+      "order": 1,
+      "demandId": "alembic-core-comprehensive-optimization-co1-public-api-surface-convergence-2026-06-12",
+      "title": "CO1 Public API Surface Convergence",
+      "primaryWindow": "AlembicCore",
+      "supportWindows": ["Alembic", "AlembicAgent"],
+      "dependsOn": ["alembic-core-comprehensive-optimization-co0-fact-freeze-decision-matrix-2026-06-12"],
+      "purpose": "Freeze an intentional public contract: remove zero-consumer exports, unify the source-graph facade, execute or own every wildcard migration, and make the boundary gate prescriptive.",
+      "requiredEvidence": [
+        "Per-removal proof: fresh import scan across all four consumer repos, named replacement facade, updated boundary policy",
+        "Single canonical source-graph facade Core-side; domain/service/repository variants deprecated in policy but kept importable until the Plugin/CKG side migrates post-CKG; canonical facade documented as the ready interface for CKG2/CKG4",
+        "RC6 SD-5 phase-1 execution inside this wave: deprecate-marks with date and removal release on the 67 zero-consumer transitional candidates, review-by dates for 13 must-keep and 18 keep-provisional; SD-5 phase-2 deletion explicitly deferred to the release-aligned wave after the post-CKG Plugin vendor refresh",
+        "FacadeReadiness execution evidence for mapped wildcard groups; owner + consumer + cleanup trigger recorded for every remaining transitional/wildcard group",
+        "Boundary gate upgraded: narrowness validation, transitional/wildcard trend report, shrink-only maxCounts, demonstrated gate failure",
+        "lint:consumer-core-imports and smoke:public-api wired into the main check pipeline with demonstrated blocking failures",
+        "Coordinated consumer import updates committed by the Alembic and AlembicAgent windows only; AlembicPlugin code untouched and every Plugin-consumed specifier (per the CO0 freeze) kept available with owner and post-CKG migration trigger; downstream builds green (Alembic, AlembicAgent; AlembicPlugin build-only participation)"
+      ]
+    },
+    {
+      "order": 2,
+      "demandId": "alembic-core-comprehensive-optimization-co2-layer-contract-responsibility-repair-2026-06-12",
+      "title": "CO2 Layer Contract And Responsibility Repair",
+      "primaryWindow": "AlembicCore",
+      "dependsOn": ["alembic-core-comprehensive-optimization-co1-public-api-surface-convergence-2026-06-12"],
+      "purpose": "Write and lint-enforce the layer contract, repair or bless the audited upward imports, unify validator entry, settle straddlers, close deprecation debris, and publish the semantic glossary.",
+      "requiredEvidence": [
+        "Layer contract document in Core naming each src area responsibility and allowed import directions, recording the user-decided core/-as-importable-analysis-leaf ruling (no service-adapter layer)",
+        "Dependency-direction lint wired into npm run check with a demonstrated failure",
+        "Direction repair: ModuleDiscoverer->TargetClassifier extracted to a contract-clean location (service->workflows removed); GuardCheckEngine->AstAnalyzer and ProjectIntelligenceRunner->AstAnalyzer/CallGraphAnalyzer recorded as contract-blessed core-leaf imports with reasons",
+        "Unified validation facade evidence: callers cannot reach a weaker validator subset; advisory quality scoring kept separate from enforcement (CKG3 boundary stated)",
+        "KnowledgeFileStore versus KnowledgeFileWriter write-strategy boundary recorded and reflected in code",
+        "Deprecation closure: RecipeReadinessChecker, ProposalType @deprecated, ProjectAnalysisCapability alias - each migrated, removed with consumer scan, or owned with trigger",
+        "Semantic glossary published (recipe/candidate/entry, dimension key versus concept, session versus snapshot) and reflected in types or doc comments; confirmed boolean-flag clusters replaced by mode types where internal-only",
+        "Full Core floor green: typecheck, build:check, lint:public-api-boundary, vitest, biome"
+      ]
+    },
+    {
+      "order": 3,
+      "demandId": "alembic-core-comprehensive-optimization-co3-failure-semantics-edge-hardening-2026-06-12",
+      "title": "CO3 Failure Semantics And Edge-Case Hardening",
+      "primaryWindow": "AlembicCore",
+      "dependsOn": ["alembic-core-comprehensive-optimization-co2-layer-contract-responsibility-repair-2026-06-12"],
+      "purpose": "Eliminate the CO0-confirmed silent failures on critical paths, surface file/DB divergence, guard lifecycle transitions, and make concurrency and path-safety policies explicit.",
+      "requiredEvidence": [
+        "User-decided write-strict/read-tolerant posture enforced with negative tests: write paths (SyncRepoAdapter audit insert, KnowledgeUnitOfWork file/DB divergence, lifecycle bypass, FeedbackCollector save) become typed errors; read paths (SearchEngine.buildIndex missing table, FeedbackCollector load) return visibly degraded results with stable diagnostic reasons, never silent emptiness",
+        "KnowledgeUnitOfWork files-persisted-but-db-failed state surfaced via diagnostic event plus reconciliation visibility test",
+        "Vector sync orphan behavior defined and tested: transactional batch or explicit reconcile contract with diagnostics",
+        "KnowledgeService.update lifecycle bypass closed with a typed error and a negative test",
+        "PathGuard exclusion staleness policy implemented or documented; SimilarityService walk gains symlink/depth guards with tests",
+        "SQLite busy/WAL stance documented with busy diagnostics; backoff only if CO0 confirmed",
+        "Catch-block census re-measured: silent class reduced to the CO0-agreed floor on critical paths; shared error taxonomy adoption evidence",
+        "No data-structure or API-shape changes beyond the CO0-confirmed list; full Core floor green"
+      ]
+    },
+    {
+      "order": 4,
+      "demandId": "alembic-core-comprehensive-optimization-co4-test-gate-floor-closure-2026-06-12",
+      "title": "CO4 Test And Gate Floor Closure",
+      "primaryWindow": "AlembicCore",
+      "dependsOn": ["alembic-core-comprehensive-optimization-co3-failure-semantics-edge-hardening-2026-06-12"],
+      "purpose": "Close the test floor: migration re-run tests, suites for near-zero-coverage areas, skip/only cleanup, threshold hold, and blocking pipeline wiring for all new gates.",
+      "requiredEvidence": [
+        "Migration re-run/idempotency tests on a fresh database including the documented 002/003 gaps",
+        "New suites for the CO0-named areas (repository/code, repository/sync, repository/sourceref, service/candidate, service/panorama, infrastructure/logging, weakest workflows paths) with counts",
+        "All .skip/.only occurrences resolved with reasons",
+        "Coverage thresholds held or raised; before/after coverage report",
+        "Biome noExplicitAny override shrink evidence or owner+trigger records",
+        "Main check pipeline proof: consumer-import lint, smoke, and dependency-direction lint blocking with demonstrated failures; vitest count delta reported"
+      ]
+    },
+    {
+      "order": 5,
+      "demandId": "alembic-core-comprehensive-optimization-co5-final-acceptance-archive-2026-06-12",
+      "title": "CO5 Final Acceptance And Archive",
+      "primaryWindow": "AlembicWorkspace",
+      "dependsOn": ["alembic-core-comprehensive-optimization-co4-test-gate-floor-closure-2026-06-12"],
+      "purpose": "Run the complete gate matrix, review raw evidence and census deltas against the CO0 decision matrix, and archive the sequence.",
+      "requiredEvidence": [
+        "Full gate matrix green: typecheck, build:check, prescriptive lint:public-api-boundary, vitest, biome, smoke:public-api, lint:consumer-core-imports, dependency-direction lint, release:check",
+        "Downstream builds green: Alembic, AlembicAgent, AlembicPlugin; AlembicDashboard npm run check participation",
+        "Census deltas reviewed: export counts, catch-block classes, coverage, lint violations - against the CO0 matrix",
+        "Controller acceptance record from raw diffs and gate logs; ledger archive entry; Wakeflow verification pass"
+      ]
+    }
+  ]
+}
