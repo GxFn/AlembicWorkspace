@@ -65,3 +65,14 @@ before CKG4 builds on it.
    deferred real-testing items in (1) naturally fold into that Codex-led
    phase. SN5 (Plugin naming wave incl. lib/codex rename) stays parked
    behind CKG completion and chains after it.
+
+### Amendment (2026-06-13, user decision)
+
+Routing decision (1) above is PARTIALLY SUPERSEDED: the user re-activated
+the deferred plugin testing as the P5 re-certification wave — deterministic
+harness re-cert on BOTH shells (codex + claude-code entries) + expectation
+sheet/edge-args upgrades + CC4 first-session isolation probes. STILL
+EXCLUDED: agent-driven cold-start KB-building arcs (token cost; CC4
+real-agent baseline already on record). Routing decision (2) is UNCHANGED:
+CKG reorganization and real-verification development still go to the
+Codex window after portfolio completion.
