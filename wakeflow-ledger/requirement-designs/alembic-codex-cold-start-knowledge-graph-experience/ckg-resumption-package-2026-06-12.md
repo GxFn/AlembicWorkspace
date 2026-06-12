@@ -76,3 +76,14 @@ EXCLUDED: agent-driven cold-start KB-building arcs (token cost; CC4
 real-agent baseline already on record). Routing decision (2) is UNCHANGED:
 CKG reorganization and real-verification development still go to the
 Codex window after portfolio completion.
+
+## P5 routed addition (2026-06-13, p3 first-connect diagnosis)
+
+- **Design input for the CC-next/CKG start-path work**: option A
+  "early-handshake readiness" (serve MCP initialize before runtime
+  resolution; defer tools/list until ready) — motivated by the
+  DEMONSTRATED install-lock race (60s lock wait > 30s host connect
+  timeout → first-session connect failure; diagnosis doc in the P5
+  state root). Option B (sub-timeout lock fail-fast ~20s with a
+  structured retry-after diagnostic) is staged as a parity-budgeted
+  wave candidate independent of CKG.
