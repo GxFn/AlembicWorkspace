@@ -135,3 +135,55 @@ log-visibility note is recorded in the harness README.
 - A failed early boot (missing cache env) created a stray `.runtime/` inside
   the CC shell REPO working tree — removed immediately; both shell repos
   verified clean after.
+
+---
+
+## ADDENDUM — Targeted re-certification after the p4 repair (P5 t5, 2026-06-13)
+
+Tree: AlembicPlugin parent `1256b1d` (p4 repair commit: panorama project-root
+wiring via canonical resolveProjectRoot + host-shape-aware diagnostics), CC
+shell `6c39111`, Codex shell `c452de3`. Runtime cache re-seeded from the repo
+dist at `1256b1d` (diff-verified identical). Targeted re-runs only — the rest
+of the matrix stands on the runs above. Raw: p5-recert state root
+`evidence/t5-reruns/`.
+
+### F-V2-3 (panorama) → FIXED + RE-CERTIFIED
+
+| Row | CC shell | Codex shell |
+| --- | --- | --- |
+| bare call (usable KB) | ok:true "Panorama request completed." | ok:true "Panorama request completed." |
+| operation=module, unknown module | honest error "Module not found: nonexistent-module" | same |
+
+Both targeted runs exit 0. Breaking-mechanism summary per p4: a LATENT Plugin
+cwd-wiring defect (panorama resolved its project root from process cwd instead
+of the canonical resolveProjectRoot route) — NOT a commit regression; the
+e9d1bb8..f5bdab6 blame window named in the original F-V2-3 entry is CLEARED.
+
+### F-V2-2 (diagnostics host shape) → FIXED + RE-CERTIFIED
+
+- CC shell (fresh expectation, now in the expectation sheet citing p4):
+  ok:true, status=ready, businessOk:true, **17/17 checks pass**,
+  runtime-context mode=marketplace-shell.
+- Codex shell: unchanged — t5 like-for-like comparison vs the v2 capture:
+  state-free cases byte-stable after volatile normalization; the only residual
+  deltas are JSON-RPC sequence ids and the autoInit context block, which echoes
+  run composition (which tool first triggered ghost init + the per-run scratch
+  path), not behavior. The fix did not move Codex bytes.
+- Sheet update: `expectation-sheets/plugin/alembic_codex_diagnostics.md`
+  carries the fresh CC expectation with the p4 citation; sheets reload clean
+  (38 loaded, 0 parse problems).
+
+### V1-FIDELITY NOTE
+
+Matrix v1 (Train H) did NOT launch through a real shell entry — it executed the
+repo dist server (`dist/bin/codex-mcp.js`) directly, so shell-entry defects of
+the F-V2-2 class were invisible to v1. v2's dual-shell-entry fidelity
+(`bin/alembic-start.mjs` on both shells) is the certification standard going
+forward; v1 rows remain valid for tool behavior but not for shell-entry claims.
+
+### MT4 verdict — revised
+
+With F-V2-3 and F-V2-2 fixed and re-certified on both shells, and F-V2-1
+(symbol_search limit coercion divergence) routed as a Train B schema-honesty
+item (a sheet/schema documentation gap, not a certification gate):
+**MT4 re-certification = UNQUALIFIED PASS on both shell entries.**
