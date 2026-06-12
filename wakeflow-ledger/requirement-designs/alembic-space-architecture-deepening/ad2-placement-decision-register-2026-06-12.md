@@ -29,7 +29,7 @@ decisions consolidated.
 | # | Item | Where staged |
 | --- | --- | --- |
 | C1 | npm publish @gxfn/alembic-codex-runtime 0.2.0 (unblocks BOTH hosts' cacheless cold start; exact command staged) | t7 decision-prep + 0.3.0 ledger |
-| C2 | Plugin naming/namespace + version-pin policy | cc2-user-decision-prep doc |
+| C2 | Plugin naming/namespace + version-pin policy — **RULED 2026-06-13**: name → `alembic` (user); runtime → `@gxfn/alembic-runtime` pre-first-publish, exact-version pins kept, repos/tool-names/lib-codex out of scope (controller determinations D1-D9 under user delegation) | plugin-naming-ruling-2026-06-13.md (enactment = N1 wave; re-cert P5 p2 certifies final state) |
 | C3 | SD-5 phase 2 execution (67/67 staged, fresh re-scan precondition) | t13 staging doc + 0.3.0 ledger |
 | C4 | Coverage enforcement strategy (wire/raise/leave) | CO4 evidence + TODO board |
 | C5 | codex_stop / codex_cleanup destructive-tool sheets + visibility | Train H risks + t12 decision-prep |
