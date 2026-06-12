@@ -87,3 +87,13 @@ Codex window after portfolio completion.
   state root). Option B (sub-timeout lock fail-fast ~20s with a
   structured retry-after diagnostic) is staged as a parity-budgeted
   wave candidate independent of CKG.
+
+### Amendment 2 (2026-06-13, user decision): CKG is NOT a blocker
+
+The user ruled: CKG will be reorganized later as its own requirement
+(handed to the Codex window) and must NOT block other work. Effect:
+SN5 un-parks (runs as alembic-sn-continuation after the N1 naming
+wave; lib/codex → lib/runtime per ruling D10) — the future reorganized
+CKG requirement will inherit the renamed tree and the alembic plugin
+name. Everything else in this package (rework backlog F2/F-CC4-4/5,
+option A design input, positive baseline) remains the handoff source.

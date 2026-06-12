@@ -27,10 +27,15 @@ train: ZERO (the SN2 pack-floor edit is a measurement calibration).
   Un-park procedure: move the parked rules in Core config/naming-lint.json
   to active (migrations family stays first), then run the SN wave protocol
   with the 65-key exports shield map from the SN0 sweep.
-- **SN5 (Plugin wave incl. lib/codex/ 75-file rename)**: design-GATED on
-  CKG completion (user-paused; see ckg-resumption-package-2026-06-12.md).
-  Must move both shells' dist/lib bootstrap requires in-commit
-  (cross-shell gate) and source the codemod from Core fa464c7.
+- **SN5 (Plugin wave incl. lib/codex/ 75-file rename)**: CKG gate
+  REMOVED by user decision 2026-06-13 ("不要作为阻碍项") — UN-PARKED;
+  re-enters as the alembic-sn-continuation demand, sequenced AFTER the
+  N1 naming-unification wave (same window/repo). Target name ruled
+  D10: lib/codex/ → lib/runtime/. Must move both shells' dist/lib
+  bootstrap requires in-commit (cross-shell gate) and source the
+  codemod from Core fa464c7. The CKG requirement itself still goes to
+  the Codex window after the user reorganizes it — only the BLOCKING
+  relationship is removed.
 
 ## Deferred items and observations (SN6 register)
 

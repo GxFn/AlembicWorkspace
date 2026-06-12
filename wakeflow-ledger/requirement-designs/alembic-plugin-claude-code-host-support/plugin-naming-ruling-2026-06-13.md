@@ -55,3 +55,17 @@ reversible until C1 publish, which stays user-triggered)
 
 Out of scope: publish (C1 user trigger), tool renames (D5), lib/codex
 (D6), repo renames (D4).
+
+## Addendum (2026-06-13): D10 + D6 supersession
+
+The user removed the CKG gate as a blocker ("CKG后续会重新整理需求，不要
+作为阻碍项，其他需求正常全部执行") — SN5 un-parks and D6 is superseded:
+the `lib/codex/` rename now rides SN5 (its own wave, sequenced AFTER N1).
+
+- **D10**: the SN-design "host-neutral rename" target for `lib/codex/`
+  is **`lib/runtime/`** — content-descriptive (it IS the runtime both
+  shells load), host-neutral, aligned with `@gxfn/alembic-runtime`, no
+  product-name redundancy inside AlembicPlugin. Shell bootstrap pins
+  move `dist/lib/codex/*` → `dist/lib/runtime/*` in the same commit
+  (cross-shell gate). Class identifiers (e.g. CodexMcpServer) and tool
+  names stay untouched per D5 — SN scope is file/dir names only.
