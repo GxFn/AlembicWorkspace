@@ -187,3 +187,39 @@ With F-V2-3 and F-V2-2 fixed and re-certified on both shells, and F-V2-1
 (symbol_search limit coercion divergence) routed as a Train B schema-honesty
 item (a sheet/schema documentation gap, not a certification gate):
 **MT4 re-certification = UNQUALIFIED PASS on both shell entries.**
+
+---
+
+## C8 ASYMMETRY NOTE — daemon-route rebuild-confirmation parity (governance GD4, 2026-06-13)
+
+Ruling enacted: **DOCUMENT THE ASYMMETRY** (default ruling, AD2 register C8;
+r-group-rulings-2026-06-13). This is a DOCUMENTED DECISION — no behavior/
+alignment edit was made. Source characterization: Train H / MT route analysis
+and the t12 duality-resolution decision-prep row #1.
+
+Reverse-checked against the renamed tree (AlembicPlugin 1256b1d):
+
+| Route | Tool | Rebuild-confirmation pre-gate? | Evidence |
+| --- | --- | --- | --- |
+| Local host-agent cold start | `alembic_bootstrap` | **YES** — pre-gates on `inspectCodexKnowledge.usable` (the same predicate as the tools/list knowledge gate); usable && !rebuild → `CODEX_BOOTSTRAP_REBUILD_CONFIRMATION_REQUIRED` (failureKind needs-confirmation), recommends `alembic_rescan`, requires explicit `{"rebuild": true}`, archives to `.asd/.trash/<ts>/`. | lib/runtime/mcp/host-agent-workflows/cold-start.ts:245-280 (gate matrix; DataLossWorkflowGates.test.ts pins it); live in matrix-v2 bootstrap rows + addendum |
+| Resident / daemon JOB | `alembic_codex_bootstrap` | **NO** — enqueues a resident-owned daemon job with no `rebuild:true` pre-gate (0 rebuild references on the dispatch/enqueue path). It IS host-project-selection-gated (alignment block with the t6 non-circular recovery nextActions), but it does not pre-gate rebuild-confirmation. | lib/runtime/mcp/host/local-tool-dispatcher.ts:51-52 → CodexMcpServer.ts enqueueJob (~943+); t12 duality doc row #1 |
+
+**The asymmetry, stated:** the local route owns the destructive cold-start, so
+it carries the rebuild-confirmation pre-gate; the daemon route delegates
+execution to the resident service (resident-owned job semantics) and relies on
+its own selection gate instead of a plugin-side rebuild pre-gate. Aligning them
+would be a resident/daemon BEHAVIOR change (t12 options: (a) plugin-side
+pre-gate before enqueue — parity-budgeted, plugin-owned; (b) resident-side job
+gate — Alembic window; (c) keep asymmetric + document — THIS ruling). Under the
+default ruling the asymmetry is accepted and recorded; revisit only if the user
+later wants alignment. No certification gate depends on this — both routes are
+honest within their own contract (the local route refuses-then-archives; the
+daemon route is selection-gated and returns recoverable job state via
+`alembic_codex_job`).
+
+Ledger-commit note (for the controller): this C8 note and the C5
+destructive-tool sheets are docs/sheets-only, behavior-neutral. The C5 sheets
+(`alembic_codex_stop.md`, `alembic_codex_cleanup.md`) are workspace-local
+Train-H state-root assets (no repo commit). This file
+(`certification-matrix-v2-2026-06-13.md`) is the ledger doc — controller commits
+it with the C5/C8 governance enactment.
