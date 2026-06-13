@@ -46,6 +46,24 @@ from `skills/README.md` and use it to shape the work.
 - Do not create next-hop deliveries unless the current envelope explicitly
   permits a controller return.
 
+## Functional Completeness Self-Check
+
+Before returning Test evidence or a test backfill, self-check that the evidence
+answers the assigned question completely enough for controller review. Do not
+rely on the controller to discover obvious gaps.
+
+- Re-read the state root, test card, target project, success/failure meaning,
+  invalid conclusions, stop conditions, and selected Test skill output.
+- Verify the evidence covers the requested scenario, edge cases, integration
+  boundaries, runtime configuration, logs/reports, and cleanliness state that
+  Test can reasonably inspect.
+- Do not downgrade a complete verification need into a thin adapter,
+  smoke-only note, skipped command, shape-only check, or broad claim without
+  evidence.
+- If completeness cannot be proven from Test's boundary, classify the result as
+  blocked, inconclusive, or needs-review with missing evidence and recommended
+  next step.
+
 ## Backfill
 
 Every test backfill must include the state root, test card, target project,

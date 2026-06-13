@@ -53,6 +53,23 @@ current controller state.
 - Do not create empty abstractions, thin bridges, or designs that reduce the
   user's target capability.
 
+## Functional Completeness Self-Check
+
+Before returning a Design handoff, signal, requirement design, or
+recommendation, self-check that the output preserves the user's intended
+capability. Do not rely on the controller to discover obvious gaps.
+
+- Re-read the user goal, constraints, open questions, non-goals, relevant
+  current workspace docs, and any selected Design skill output.
+- Verify the design covers behavior, acceptance meaning, edge cases,
+  integration boundaries, risks, and evidence needs at the right level for
+  controller intake.
+- Do not downgrade a complete capability into a thin adapter, placeholder plan,
+  vague TODO, or handoff that skips requirement clarification, option
+  comparison, or requirement design when those facts are still missing.
+- If completeness cannot be proven from Design's boundary, keep the output as
+  a question, option, or blocked handoff instead of marking it ready.
+
 ## Skill Routing
 
 Design skills are first-class conversational methods, not hidden optional docs
