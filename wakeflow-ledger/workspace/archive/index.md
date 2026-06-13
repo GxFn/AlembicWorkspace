@@ -11,4 +11,4 @@ This file is the archive area entrypoint. Archived body files preserve evidence 
 
 | Month | Notes |
 | --- | --- |
-| [2026-06](2026-06/) | 2 topic archive folders. |
+| [2026-06](2026-06/) | 4 topic archive folders. |
