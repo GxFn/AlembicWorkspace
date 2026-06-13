@@ -106,10 +106,11 @@ A consistent 0.3.0 public surface and a working cacheless cold start:
 - on the user's publish trigger: run the staged
   `npm publish --access public` for `@gxfn/alembic-runtime@0.2.0` and
   verify the cacheless cold start resolves on both hosts (E404 gone);
-- AFAPI-REQ-08 runtime-snapshot release judgment: decide commit-vs-discard
-  for the nested `plugins/alembic-codex` runtime snapshot changes that the
-  P5 cache reload generated — this is the release/runtime-snapshot path the
-  row was held for; record the decision and leave the tree clean;
+- AFAPI-REQ-08 runtime-snapshot release judgment: RESOLVED 2026-06-13 (user
+  marked completed) — controller verified the parent `plugins/` tree and
+  both shells are clean/even with origin, so the P5 cache-reload changes
+  were transient install-cache state with nothing tracked to commit or
+  discard; no release-path action pending;
 - full release gate matrix: all five repos green, boundary closeout at the
   new target, naming lints green, downstream builds green;
 - controller acceptance from raw evidence; 0.3.0 ledger closed; archive;
