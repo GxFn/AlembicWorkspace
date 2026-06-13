@@ -1,6 +1,6 @@
 # Alembic Post-Portfolio Follow-Through Group
 
-Status: controller intake complete (reviewed 2026-06-13) / members 1-3 ready for user rulings / member 4 (CKG) awaits user reorganization → Codex window
+Status: ADVANCED 2026-06-13 under "开始整个 R 任务组的自动化推进，ckg ckg-v2 除外" — member 2 (governance) COMPLETED, member 3 (quality) COMPLETED; member 1 (release) RELEASE-READY, paused at the publish hard gate (publish HELD for user trigger); member 4 (CKG/ckg-v2) excluded by the user (→ Codex window)
 Maintained Window: AlembicWorkspace
 Date: 2026-06-13
 Design Key: alembic-post-portfolio-followthrough
@@ -50,6 +50,37 @@ Controller intake 2026-06-13 re-verified the partition against the live AD2
 register and TODO board and closed one gap: AFAPI-REQ-08 (runtime-snapshot
 release judgment, R-package §4) was unhomed and is now in member 1 at
 release-wave RW5. With that, the partition is complete and exclusive.
+
+## Execution Outcome (2026-06-13)
+
+Autonomous advancement of the R group (CKG excluded) reached the user-decision
+boundary the plan was designed to stop at:
+
+- **Member 2 — governance** ✅ COMPLETED (rev 14). B1 resident registry deleted
+  (zero-importer) + charter re-chartered "HTTP/daemon host"; B7/W1 charter batch
+  applied (config-only, drift test green); C5/C8 tool-contract decisions
+  enacted; B5/B6/W2/A1 + A2/A4/B3/B4 acknowledged as controller-defaults (user
+  may override). Closeout:
+  [gd6-register-closure](../alembic-governance-decision-enactment/gd6-register-closure-2026-06-13.md).
+- **Member 3 — quality** ✅ COMPLETED (rev 12). QD1 stale-dist gate + QD2 schema
+  honesty + SN5 residues + CO4 drill accepted; coverage recorded at status-quo
+  (thresholds never lowered); C6/C7 surfaced (HELD, not auto-mutated); TODO
+  board reconciled. CC4 connect-hardening + the Alembic/Agent stale-dist half
+  are explicitly-owned backlog (surfaced, not silently dropped). Closeout:
+  [qd-burndown-closeout](../alembic-quality-debt-burndown/qd-burndown-closeout-2026-06-13.md).
+- **Member 1 — release** ⏸ RELEASE-READY, paused at the publish hard gate. All
+  code waves accepted (RW0-RW4: B2 ./shared re-point, SD-5 phase-2 deletion,
+  SN4 Core naming, A3 overlay delete, C2 version-pin tail); all five repos clean
+  + even with origin at 0.2.0. The only remaining step is
+  `npm publish --access public @gxfn/alembic-runtime@0.2.0` + cacheless
+  cold-start verification on both hosts — HELD for the explicit user trigger.
+  Readiness:
+  [rw5-release-readiness](../alembic-0.3.0-release-wave/rw5-release-readiness-2026-06-13.md).
+- **Member 4 — CKG/ckg-v2** ⏸ EXCLUDED by the user; owned by the Codex window.
+
+User-gated remainders (the stopping boundary): the runtime **publish** (C1) and
+the real-`~/.asd` **C6/C7** cleanups. Everything else in the R group is done and
+verified.
 
 ## Standing Constraints (inherited, unchanged)
 
