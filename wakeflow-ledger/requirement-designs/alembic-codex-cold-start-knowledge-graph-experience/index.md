@@ -1,8 +1,8 @@
 # Alembic Codex Cold Start Knowledge Graph Experience
 
-Status: PAUSED by user decision 2026-06-12 — paused at the CKG1/CKG2/CKG3 landed point (onboarding contract `838da9e`, source-graph lifecycle Core `68f7ad5`, evidence gates `ef90c9b`); CKG4-CKG7 including the real host-agent cold-start acceptance are deferred to a later user-decided resumption. The controller executes the pause: stop CKG dispatch, verify the Codex window quiesced and the Plugin tree clean/pushed, and open the resumption package (Train H tool findings, the duality-resolved surface from the P3 train, the SOP host-variable signal, MT certification state feed in). Plugin hands-off lifts once the pause is verified clean.
-Maintained Window: AlembicWorkspace
-Date: 2026-06-11 (code-fact verification 2026-06-12; paused 2026-06-12)
+Status: RE-ORGANIZED FOR THE CODEX WINDOW 2026-06-13 — the portfolio completed and renamed the tree (`lib/codex/`→`lib/runtime/`, plugin `alembic`, runtime `@gxfn/alembic-runtime`, two host shells). CKG is re-stated fresh on the current tree as **[CKG v2](ckg-v2-requirement-design-2026-06-13.md)** for the Codex window's real-verification development. CKG1/CKG2 landed; CKG3 needs rework (backlog F2/F-CC4-4/F-CC4-5 + real-route/restart/lease/parity/rich-repair proofs); CKG4-CKG7 remain. CKG stays NON-BLOCKING for every other requirement (user decision 2026-06-13). The 2026-06-11 design + the resumption package are history/handoff source.
+Maintained Window: AlembicWorkspace until reorganization handoff → Codex window
+Date: 2026-06-11 (code-fact verification 2026-06-12; paused 2026-06-12; v2 re-statement 2026-06-13)
 Design Key: alembic-codex-cold-start-knowledge-graph-experience
 
 ## Controller Judgment
@@ -24,9 +24,13 @@ Codex user action
 
 ## Entry Points
 
-- Requirement design:
+- **CURRENT — CKG v2 requirement design (Codex window):**
+  [ckg-v2-requirement-design-2026-06-13.md](ckg-v2-requirement-design-2026-06-13.md)
+- Resumption / handoff source:
+  [ckg-resumption-package-2026-06-12.md](ckg-resumption-package-2026-06-12.md)
+- History — original requirement design:
   [alembic-codex-cold-start-knowledge-graph-experience-requirement-design-2026-06-11.md](alembic-codex-cold-start-knowledge-graph-experience-requirement-design-2026-06-11.md)
-- Candidate demand sequence:
+- History — original demand sequence:
   [alembic-codex-cold-start-knowledge-graph-experience-demand-sequence-2026-06-11.json](alembic-codex-cold-start-knowledge-graph-experience-demand-sequence-2026-06-11.json)
 - Live observation:
   [cold-start-observation-2026-06-11.md](cold-start-observation-2026-06-11.md)

@@ -1,0 +1,140 @@
+{
+  "sequenceId": "alembic-quality-debt-burndown",
+  "status": "intake-complete-ready-for-user-rulings",
+  "createdAt": "2026-06-13",
+  "maintainedWindow": "AlembicWorkspace",
+  "group": "alembic-post-portfolio-followthrough",
+  "sourceDocument": "wakeflow-ledger/requirement-designs/alembic-quality-debt-burndown/alembic-quality-debt-burndown-requirement-design-2026-06-13.md",
+  "evidenceBase": "wakeflow-ledger/requirement-designs/alembic-portfolio-execution-plan/r-delivery-0.3.0-decision-package-2026-06-12.md",
+  "goal": "Burn down the accumulated portfolio quality/test-infra TODO debt: close the stale-dist family with a clean-build-before-pack gate and .tmp freshness pin, tighten tool input schemas to reject malformed input, rule and wire coverage enforcement, prevent the demonstrated CC4 first-session install-lock race, and clear the smaller cleanups - each closed-with-evidence or explicitly owned.",
+  "nonGoals": [
+    "No behavior change beyond the confirmed honest-failure tightenings (schema rejects, stale-dist gate fails loudly).",
+    "No coverage threshold lowering; the C4 decision is held until ruled.",
+    "No Plugin code change that breaks dual-shell parity.",
+    "No CKG work (CC4 evidence-gate DX rows belong to the CKG resumption package)."
+  ],
+  "demands": [
+    {
+      "order": 0,
+      "demandId": "alembic-quality-debt-burndown-qd0-triage-coverage-ruling-2026-06-13",
+      "title": "QD0 Debt Triage And Coverage Ruling",
+      "primaryWindow": "AlembicWorkspace",
+      "purpose": "Re-freeze the debt rows with instances and owners, rule C4 coverage enforcement, rule the CC4 lock-fail-fast parity wave, and route each row.",
+      "requiredEvidence": [
+        "Debt rows re-frozen from the TODO board with exact instances and owners; honest-failure tightenings confirmed as intended",
+        "User ruling C4: coverage enforcement strategy (honest-baseline ratchet / uplift waves / status quo) with routing",
+        "CC4 lock-fail-fast ruled as a parity-budgeted wave; each row routed to its owning repo"
+      ]
+    },
+    {
+      "order": 1,
+      "demandId": "alembic-quality-debt-burndown-qd1-stale-dist-family-closure-2026-06-13",
+      "title": "QD1 Test-Infra Stale-Dist Family Closure",
+      "primaryWindow": "AlembicWorkspace",
+      "supportWindows": [
+        "AlembicCore",
+        "AlembicAgent",
+        "AlembicPlugin"
+      ],
+      "dependsOn": [
+        "alembic-quality-debt-burndown-qd0-triage-coverage-ruling-2026-06-13"
+      ],
+      "purpose": "Add the clean-build-before-pack gate and .tmp freshness pin so a stale dist cannot alias real behavior or float a pack floor.",
+      "requiredEvidence": [
+        "Clean-build-before-pack gate and .tmp freshness pin added to the affected repos' check/pack paths",
+        "Gate demonstrated failing on a deliberately stale dist and passing on a clean build",
+        "The four prior instances annotated closed against the family row"
+      ]
+    },
+    {
+      "order": 2,
+      "demandId": "alembic-quality-debt-burndown-qd2-tool-schema-honesty-2026-06-13",
+      "title": "QD2 Tool Schema Honesty",
+      "primaryWindow": "AlembicPlugin",
+      "supportWindows": [
+        "Alembic"
+      ],
+      "dependsOn": [
+        "alembic-quality-debt-burndown-qd0-triage-coverage-ruling-2026-06-13"
+      ],
+      "purpose": "Tighten tool input schemas (additionalProperties:false + type-correct validation) so malformed input is rejected with a taxonomy problem and a next action.",
+      "requiredEvidence": [
+        "Schemas tightened: additionalProperties:false and type-correct fields; F-V2-1 limit:\"ten\" class rejected with a taxonomy problem + next action",
+        "Negative tests per tightened tool; resident and plugin surfaces consistent; both shells' parity gates byte-stable"
+      ]
+    },
+    {
+      "order": 3,
+      "demandId": "alembic-quality-debt-burndown-qd3-coverage-enforcement-wiring-2026-06-13",
+      "title": "QD3 Coverage Enforcement Wiring",
+      "primaryWindow": "AlembicWorkspace",
+      "supportWindows": [
+        "AlembicCore"
+      ],
+      "dependsOn": [
+        "alembic-quality-debt-burndown-qd0-triage-coverage-ruling-2026-06-13"
+      ],
+      "purpose": "Enact the C4 ruling: wire the chosen enforcement, thresholds never lowered.",
+      "requiredEvidence": [
+        "C4 ruling enacted: ratchet floors at measured values / scheduled uplift / recorded status-quo with provider-installed-but-unwired note",
+        "Demonstrated gate failure if a ratchet is chosen; no threshold lowered"
+      ]
+    },
+    {
+      "order": 4,
+      "demandId": "alembic-quality-debt-burndown-qd4-cc4-connect-hardening-2026-06-13",
+      "title": "QD4 CC4 Connect Hardening",
+      "primaryWindow": "AlembicPlugin",
+      "dependsOn": [
+        "alembic-quality-debt-burndown-qd0-triage-coverage-ruling-2026-06-13"
+      ],
+      "purpose": "Land the sub-timeout lock fail-fast with a structured retry-after diagnostic and the negative-cache clear docs step.",
+      "requiredEvidence": [
+        "Sub-timeout lock fail-fast (~20s) with a structured retry-after diagnostic so the install-lock wait cannot exceed the host connect timeout",
+        "Regression test for the lock-race window; CC4-TIER-FLIP-CONNECT-CACHE doc fix; negative-cache clear step in install docs; dual-shell parity byte-stable"
+      ]
+    },
+    {
+      "order": 5,
+      "demandId": "alembic-quality-debt-burndown-qd5-smaller-cleanups-2026-06-13",
+      "title": "QD5 Smaller Cleanups",
+      "primaryWindow": "AlembicWorkspace",
+      "supportWindows": [
+        "AlembicCore",
+        "Alembic"
+      ],
+      "dependsOn": [
+        "alembic-quality-debt-burndown-qd0-triage-coverage-ruling-2026-06-13"
+      ],
+      "purpose": "Clear the scratch-registry entry, the corrupted ghost DB, the consumer-gate sibling drill, and the empty-KB-edge / admin-tier residuals.",
+      "requiredEvidence": [
+        "C6 scratch-registry stale entry removed; C7 corrupted ghost-workspace DB cleaned or quarantined with a user-visible note",
+        "CO4-CONSUMER-GATE-SIBLING-DRILL implemented",
+        "3/178 empty-KB edge residuals and admin-tier scope fixed or recorded as accepted limitations with evidence"
+      ]
+    },
+    {
+      "order": 6,
+      "demandId": "alembic-quality-debt-burndown-qd6-burndown-acceptance-2026-06-13",
+      "title": "QD6 Burndown Acceptance",
+      "primaryWindow": "AlembicWorkspace",
+      "dependsOn": [
+        "alembic-quality-debt-burndown-qd1-stale-dist-family-closure-2026-06-13",
+        "alembic-quality-debt-burndown-qd2-tool-schema-honesty-2026-06-13",
+        "alembic-quality-debt-burndown-qd3-coverage-enforcement-wiring-2026-06-13",
+        "alembic-quality-debt-burndown-qd4-cc4-connect-hardening-2026-06-13",
+        "alembic-quality-debt-burndown-qd5-smaller-cleanups-2026-06-13"
+      ],
+      "purpose": "Confirm every debt row closed-with-evidence or explicitly owned; gates demonstrated; reconcile the TODO board; accept and archive.",
+      "requiredEvidence": [
+        "Every debt row closed-with-evidence or explicitly owned with a trigger; stale-dist and schema-honesty gates demonstrated; coverage at the ruled state",
+        "All repos green; TODO board reconciled; ledger archive; Wakeflow verification pass"
+      ]
+    }
+  ],
+  "controllerIntake": {
+    "reviewedAt": "2026-06-13",
+    "by": "AlembicWorkspace",
+    "note": "Controller intake complete; partition verified against the AD2 register and TODO board; ready for per-item user rulings."
+  }
+}

@@ -33,6 +33,17 @@ Use one subdirectory per substantial demand:
 
 ## Current Demand Sets
 
+> PORTFOLIO EXECUTED 2026-06-13: the controller ran the
+> `alembic-portfolio-execution-plan` to its designed user-decision boundary —
+> the IC / AD / CC / MT / SN candidate sequences below were EXECUTED and
+> accepted as the portfolio's P0-P5 phases (heads Core `2823939` / Alembic
+> `fca6e6a` / Agent `9c2a4b3` / Dashboard `18837ef` / Plugin `1256b1d` with
+> CC shell `6c39111` + Codex shell `c452de3`). Their entries below describe
+> the original candidate scope and remain as the per-demand
+> completion-definition source. What remains is re-stated as the
+> `alembic-post-portfolio-followthrough` group (three members) plus the
+> CKG v2 re-statement for the Codex window.
+
 - `alembic-redundancy-stale-logic-cleanup/`: Eight-demand cleanup sequence
   (RC0-RC7) built from the 2026-06-11 six-agent audit: docs-vs-reality fixes,
   Core headless-boundary restoration, stale-artifact removal, Alembic/Plugin
@@ -153,7 +164,35 @@ Use one subdirectory per substantial demand:
   (IC5+CC1-4+MT-plugin+MPB-remainder+SD-5-p2 staging, acceptance
   CC4+IC6), P4 SN final cleanup train. Four explicit structural mergers;
   MPB dissolved as standalone; demand definitions stay authoritative for
-  merged packages. Needs controller intake.
+  merged packages. EXECUTED to the user-decision boundary 2026-06-13
+  (P0-P5 + R delivery + Core hardening, 22 task packages accepted).
+
+- `alembic-post-portfolio-followthrough/`: GROUP, controller-intake-complete
+  (2026-06-13), re-stating everything the executed portfolio left at the
+  user-decision boundary, as three member requirements (ready for user
+  rulings; publishes/version-bumps user-triggered): (1)
+  `alembic-0.3.0-release-wave` (RW0-RW5: runtime publish, SD-5 phase-2
+  deletion, SN4 Core source naming, `./shared` sequencing, R-1 overlays,
+  C2 version-pin tail — release-coupled, publish user-triggered); (2)
+  `alembic-governance-decision-enactment` (GD0-GD6: the AD2 placement
+  decision register A/B/W rows — B1 resident-registry keystone + 15-tool
+  duality, B5/B6/B7 placement, charter-wording batch, W2 strays, A1 SD-1
+  p2 evaluation, C5/C8 contract decisions); (3)
+  `alembic-quality-debt-burndown` (QD0-QD6: stale-dist family gate, tool
+  schema honesty, coverage enforcement, CC4 connect race, scratch/ghost-DB
+  cleanups). Every R-package and register row lands in exactly one member
+  (controller intake 2026-06-13 closed the one gap — AFAPI-REQ-08 homed in
+  member 1 RW5). Members 1-3 ready for user rulings; member 4 (CKG) awaits
+  the user's reorganization → Codex window.
+
+- `alembic-codex-cold-start-knowledge-graph-experience/` (CKG v2): the CKG
+  requirement RE-ORGANIZED 2026-06-13 for the Codex window on the renamed
+  tree (`lib/runtime`, plugin `alembic`, runtime `@gxfn/alembic-runtime`,
+  two host shells). CKG1/CKG2 landed; CKG3 needs rework (F2/F-CC4-4/F-CC4-5
+  + real-route/restart/lease/parity/rich-repair proofs); CKG4-CKG7 remain.
+  Owned by the Codex window for real-verification development after the
+  user reorganizes it; NON-BLOCKING for every other requirement. Fresh
+  statement: `ckg-v2-requirement-design-2026-06-13.md`.
 
 ## Boundaries
 

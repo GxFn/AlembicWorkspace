@@ -52,3 +52,26 @@ candidate), MT1-EDGE-ARGS-REGISTRY, TRAIN-H-SCRATCH-REGISTRY-CLEANUP
 Core fa464c7 / Alembic 720dc28 / Agent 9c2a4b3 / Dashboard 18837ef /
 Plugin e96dbf1 / AlembicClaudeCode be36846 / AlembicCodex 481ab71 — all
 even with origin; every train's evidence in its state root and ledger.
+
+## 6. Organized into requirement designs (controller intake 2026-06-13)
+
+This flat decision package has been re-stated as a proper requirement-design
+group so each remainder is ready to become real work the moment the user
+rules — see
+[alembic-post-portfolio-followthrough](../alembic-post-portfolio-followthrough/index.md):
+
+- §1 release-coupled set (C1/C3/B2/A3 + C2 tail + AFAPI-REQ-08 snapshot
+  judgment) → [alembic-0.3.0-release-wave](../alembic-0.3.0-release-wave/index.md)
+- §2/§3 AD2 register decisions (A1/A2/A4/B1/B3/B4/B5/B6/B7/W1/W2/C5/C8) →
+  [alembic-governance-decision-enactment](../alembic-governance-decision-enactment/index.md)
+- §3/§4 quality + test-infra TODO debt (C4/C6/C7 + TEST-INFRA-STALE-DIST,
+  CODE-GUARD-SCHEMA, CC4 connect, CO4 drill, residuals) →
+  [alembic-quality-debt-burndown](../alembic-quality-debt-burndown/index.md)
+- CKG re-stated separately for the Codex window →
+  [ckg-v2](../alembic-codex-cold-start-knowledge-graph-experience/ckg-v2-requirement-design-2026-06-13.md)
+
+Partition verified complete and exclusive at intake (the AFAPI-REQ-08 gap was
+closed). Members 1-3 await user rulings; member 4 awaits the user's CKG
+reorganization → Codex window. Subsequent pushed heads (post-R execution):
+Core `2823939` / Alembic `fca6e6a` / Agent `9c2a4b3` / Dashboard `18837ef` /
+Plugin `1256b1d` (CC shell `6c39111`, Codex shell `c452de3`).

@@ -1,0 +1,114 @@
+{
+  "sequenceId": "alembic-0.3.0-release-wave",
+  "status": "intake-complete-ready-for-user-rulings",
+  "createdAt": "2026-06-13",
+  "maintainedWindow": "AlembicWorkspace",
+  "group": "alembic-post-portfolio-followthrough",
+  "sourceDocument": "wakeflow-ledger/requirement-designs/alembic-0.3.0-release-wave/alembic-0.3.0-release-wave-requirement-design-2026-06-13.md",
+  "evidenceBase": "wakeflow-ledger/requirement-designs/alembic-portfolio-execution-plan/r-delivery-0.3.0-decision-package-2026-06-12.md",
+  "goal": "Execute the release-coupled 0.3.0 set as one consistent wave: publish the pinned runtime (user trigger) to close the cacheless cold-start E404, execute SD-5 phase-2 deletion on a fresh re-scan, settle ./shared sequencing before deletion, run the parked SN4 Core source-naming wave once SD-5 un-parks it, resolve the R-1 overlay routes, and close the C2 version-pin/marketplace tail - all behavior-neutral, publish user-triggered.",
+  "nonGoals": [
+    "No publish or version bump without the explicit user trigger.",
+    "No deletion beyond the 67/67 SD-5-staged keys plus the folded keep-alive set; the drizzle exact-row stays.",
+    "No behavior change: SD-5 deletes only zero-consumer surface, SN4 is rename-only, ./shared sequencing is import-path-only.",
+    "No CKG work; no new features."
+  ],
+  "demands": [
+    {
+      "order": 0,
+      "demandId": "alembic-0.3.0-release-wave-rw0-release-gate-freeze-rulings-2026-06-13",
+      "title": "RW0 Release Gate Freeze And B2/A3 Rulings",
+      "primaryWindow": "AlembicWorkspace",
+      "purpose": "Fresh SD-5 re-scan precondition and the three user rulings (B2 shared route, A3 overlay keep/delete, C2 pin policy), with the wave ordering confirmed.",
+      "requiredEvidence": [
+        "Fresh 4-repo reference resolution re-scan re-confirming 67/67 zero-consumer keys and keep-alive 36/37 with per-row zero-served proof",
+        "User ruling B2: promote OutputBudget + CO3 error classes onto ./shared with a budget raise, versus re-point MT2 docs to the root facade and delete as staged",
+        "User ruling A3: name a consumer for the R-1 overlay routes (keep with owner) versus delete-in-0.3.0 with the RC4-style proof set",
+        "User ruling C2 tail: 0.2.0 pin policy (bump vs SHA) and marketplace hosting/naming confirm",
+        "Confirmed wave ordering: shared settle then SD-5 delete then SN4 unpark then publish on user trigger"
+      ]
+    },
+    {
+      "order": 1,
+      "demandId": "alembic-0.3.0-release-wave-rw1-shared-sequencing-2026-06-13",
+      "title": "RW1 ./shared Sequencing",
+      "primaryWindow": "AlembicCore",
+      "dependsOn": [
+        "alembic-0.3.0-release-wave-rw0-release-gate-freeze-rulings-2026-06-13"
+      ],
+      "purpose": "Enact the B2 ruling so MT2 OutputBudget and the CO3 error classes keep a valid import path independent of the wildcard deletion.",
+      "requiredEvidence": [
+        "B2 ruling enacted: OutputBudget and CO3 PersistenceError/DivergenceError reachable on the chosen stable path",
+        "No consumer import path breaks (Core full check + downstream Alembic/Agent/Plugin builds green)"
+      ]
+    },
+    {
+      "order": 2,
+      "demandId": "alembic-0.3.0-release-wave-rw2-sd5-phase2-execution-2026-06-13",
+      "title": "RW2 SD-5 Phase-2 Execution",
+      "primaryWindow": "AlembicCore",
+      "dependsOn": [
+        "alembic-0.3.0-release-wave-rw1-shared-sequencing-2026-06-13"
+      ],
+      "purpose": "Delete the 67/67 zero-consumer wildcard keys, fold the keep-alive set, move expectedCounts to the closeout target, closeout report candidates 0.",
+      "requiredEvidence": [
+        "67/67 wildcard keys deleted; keep-alive folded (drizzle exact-row survives with 5 consumers); expectedCounts at the closeout target",
+        "Boundary gate, smoke, and three-consumer import scans green; closeout report shows candidates 0",
+        "Downstream Alembic, Agent, Plugin builds green; zero behavior change"
+      ]
+    },
+    {
+      "order": 3,
+      "demandId": "alembic-0.3.0-release-wave-rw3-sn4-core-source-naming-2026-06-13",
+      "title": "RW3 SN4 Core Source Naming Wave",
+      "primaryWindow": "AlembicCore",
+      "dependsOn": [
+        "alembic-0.3.0-release-wave-rw2-sd5-phase2-execution-2026-06-13"
+      ],
+      "purpose": "Run the parked SN4 source-naming wave once SD-5 un-froze the src-covering wildcards, per the SN6 resumption pointer.",
+      "requiredEvidence": [
+        "Git-mv codemod with single-purpose commits and .git-blame-ignore-revs; gate-config moves in-commit",
+        "Naming lint green (already BLOCKING); full check green; mechanical-diff audit proves zero behavior change",
+        "Public specifiers unchanged or only as ruled; downstream builds green"
+      ]
+    },
+    {
+      "order": 4,
+      "demandId": "alembic-0.3.0-release-wave-rw4-overlay-routes-version-pin-tail-2026-06-13",
+      "title": "RW4 R-1 Overlay Routes And Version-Pin Tail",
+      "primaryWindow": "AlembicPlugin",
+      "dependsOn": [
+        "alembic-0.3.0-release-wave-rw0-release-gate-freeze-rulings-2026-06-13"
+      ],
+      "purpose": "Enact the A3 overlay ruling and close the C2 version-pin/marketplace/negative-cache tail, both shells parity-stable.",
+      "requiredEvidence": [
+        "A3 ruling enacted: overlay routes kept with owner record, or deleted with the RC4-style proof set (route-negative, consumer scan)",
+        "C2 tail closed: pin policy applied, marketplace hosting/naming under alembic@gxfn, negative-cache clear step added to install docs",
+        "Codex and Claude Code parity gates byte-stable; Plugin full check green"
+      ]
+    },
+    {
+      "order": 5,
+      "demandId": "alembic-0.3.0-release-wave-rw5-publish-release-acceptance-2026-06-13",
+      "title": "RW5 Publish And Release Acceptance",
+      "primaryWindow": "AlembicWorkspace",
+      "gate": "publish step requires the explicit user trigger",
+      "dependsOn": [
+        "alembic-0.3.0-release-wave-rw3-sn4-core-source-naming-2026-06-13",
+        "alembic-0.3.0-release-wave-rw4-overlay-routes-version-pin-tail-2026-06-13"
+      ],
+      "purpose": "On the user trigger, publish the runtime and verify cacheless cold start on both hosts; run the full release matrix; accept and archive.",
+      "requiredEvidence": [
+        "On user trigger: staged npm publish --access public for @gxfn/alembic-runtime@0.2.0 executed; cacheless cold start resolves on both hosts (E404 gone)",
+        "Full release gate matrix: all five repos green, boundary closeout at the new target, naming lints green, downstream builds green",
+        "Controller acceptance from raw evidence; 0.3.0 ledger closed; ledger archive; Wakeflow verification pass",
+        "AFAPI-REQ-08 runtime-snapshot release judgment: nested plugins/alembic-codex runtime snapshot changes from the P5 cache reload decided commit-vs-discard in this release path; tree left clean"
+      ]
+    }
+  ],
+  "controllerIntake": {
+    "reviewedAt": "2026-06-13",
+    "by": "AlembicWorkspace",
+    "note": "Partition gap closed: AFAPI-REQ-08 runtime-snapshot release judgment homed at RW5. Ready for user rulings; no wave executes until the user rules; publish user-triggered."
+  }
+}
