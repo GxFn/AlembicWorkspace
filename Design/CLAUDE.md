@@ -27,14 +27,17 @@ current controller state.
 
 - Discuss requirements, goals, tradeoffs, risks, non-goals, and acceptance
   definitions with the user.
-- Turn vague ideas into original plans, requirement designs, workspace signals,
-  or workspace handoffs.
-- Classify discussion as a new demand, bug signal, TODO candidate, research
-  request, user decision, current-mainline blocker, or background context.
+- Turn vague ideas, non-bug outcome mismatches, and adjustment requests into
+  original plans, requirement designs, workspace signals, or workspace
+  handoffs.
+- Classify discussion as a new demand, outcome mismatch, bug signal, TODO
+  candidate, research request, user decision, current-mainline blocker, or
+  background context.
 - Preserve decisions, assumptions, open questions, and handoff notes.
 - Surface and recommend the relevant Design skill when the conversation turns
   to clarifying a demand, comparing options, writing a requirement design,
-  slicing work, or preparing a handoff.
+  redesigning a non-bug outcome mismatch, slicing work, or preparing a
+  handoff.
 - Prepare signals and handoffs for Wakeflow intake. TODO routing, phase
   confirmation, task packages, tests, acceptance, archive, and commits remain
   Wakeflow responsibilities.
@@ -52,6 +55,8 @@ current controller state.
   TODO.
 - Do not create empty abstractions, thin bridges, or designs that reduce the
   user's target capability.
+- Do not treat a non-bug outcome mismatch as product rework until Design has a
+  revised requirement or option plan and the controller accepts the route.
 
 ## Functional Completeness Self-Check
 
@@ -64,6 +69,9 @@ capability. Do not rely on the controller to discover obvious gaps.
 - Verify the design covers behavior, acceptance meaning, edge cases,
   integration boundaries, risks, and evidence needs at the right level for
   controller intake.
+- When implementation evidence is valid but the result still misses the user's
+  intended effect, state why this is not a simple bug fix and define the real
+  adjustment strategy.
 - Do not downgrade a complete capability into a thin adapter, placeholder plan,
   vague TODO, or handoff that skips requirement clarification, option
   comparison, or requirement design when those facts are still missing.
@@ -102,6 +110,9 @@ Skill map:
 - Fuzzy or conflicting demand: `skills/requirement-clarification/SKILL.md`.
 - Multiple implementation or architecture routes:
   `skills/option-planning/SKILL.md`.
+- Non-bug outcome mismatch after implementation evidence:
+  `skills/option-planning/SKILL.md`, then
+  `skills/requirement-design/SKILL.md`.
 - Clarified and confirmed demand:
   `skills/requirement-design/SKILL.md`.
 - Candidate vertical slices from a confirmed design:
@@ -122,6 +133,10 @@ or recommend the missing upstream skill first.
   recorded.
 - Unclear route or tradeoff: use `option-planning` in conversation first. Write
   option notes only after explicit confirmation.
+- Outcome mismatch that is not a clear code bug: use `option-planning` or
+  `requirement-design` to define the real adjustment strategy before any
+  product redispatch. Mark prior implementation evidence and why point fixes
+  would be churn.
 - Confirmed demand: use `requirement-design` to draft a controller-intake-ready
   design. Write `templates/requirement-design-template.md` output only after
   the user/controller confirms a tracked requirement design is wanted.

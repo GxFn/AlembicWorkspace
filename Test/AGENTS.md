@@ -72,6 +72,9 @@ rely on the controller to discover obvious gaps.
 - Verify the evidence covers the requested scenario, edge cases, integration
   boundaries, runtime configuration, logs/reports, and cleanliness state that
   Test can reasonably inspect.
+- If evidence shows the behavior is technically functioning but the effect
+  misses the user goal and is not a product-code bug, classify it as an outcome
+  mismatch and recommend Design redesign instead of another generic bug fix.
 - Do not downgrade a complete verification need into a thin adapter,
   smoke-only note, skipped command, shape-only check, or broad claim without
   evidence.
