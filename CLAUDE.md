@@ -58,6 +58,9 @@ and state the correct next action.
   current plan, task package, or implementation without checking whether it
   changes the original completion definition, repository boundary, phase order,
   capability level, or visible behavior.
+- You are adding follow-up scope from code/test/target evidence without checking
+  the original plan, confirmed decisions, non-goals, and forbidden shortcuts.
+  Evidence can reveal gaps; it cannot override original requirement authority.
 - You are presenting controller judgment, Design advice, or agent opinion as a
   final product decision. Final product decisions belong to the user/developer.
 - You are editing documents to create progress instead of removing a blocker,
@@ -252,6 +255,9 @@ and no executable prompt.
 - Acceptance requires raw evidence review: user scenario, inputs, outputs,
   state/data changes, actual call chain, real consumers, failure paths, edge
   cases, and user-verifiable behavior.
+- Before accepting or adding follow-up work, check original requirement
+  decisions and non-goals; residual code/test artifacts do not reauthorize
+  excluded scope.
 - A task that only creates a connection, empty API, static mock, unused
   contract, or unreachable entrypoint is not complete. If acceptance finds a
   thin implementation, create a follow-up package naming missing entrypoints,
@@ -284,6 +290,8 @@ Details live in `installed Wakeflow skill wakeflow-governance/references/testing
   unless the prompt removes that blocker.
 - TODO/Backlog is a scheduling ledger, not a goal definition. Design signals
   become executable only after controller intake and routing.
+- TODO/Backlog additions need original-requirement or verified in-scope-defect
+  authority; otherwise record an observation, risk, or pending decision.
 - Dispatch may use larger same-window task packages when they share a boundary
   and validation path.
 - Prefer Claude Code subagents (the Task/Agent tool) for narrow parallel
@@ -325,7 +333,7 @@ Details live in `installed Wakeflow skill wakeflow-governance/references/testing
   `readback.paneTail` evidence. Controller returns use the same helper `send`
   aimed at the controller window. Recovery is not a mode: a dead window's
   session is finished or recovered headless with
-  `claude -p --resume <registered session id>` and relaunched with
+  `launch-window --resume --session-id <registered id> --replace (interactive; headless claude -p bills the separate Agent SDK credit from 2026-06-15)` and relaunched with
   `launch-window --replace --session-id <same id>`. (Claude Code desktop
   windows are not an automation transport.) Do not wrap the prompt in XML,
   JSON, or delegation tags.
@@ -378,6 +386,8 @@ See `installed Wakeflow skill wakeflow-governance/references/wakeflow-ledgers.md
   revised requirement/option design and adjustment handoff. The controller
   decides whether to update the state root, ask the user for confirmation, or
   create new task packages; product windows do not guess the new solution.
+- Supplemental requirements or next packages must not reverse original
+  decisions, non-goals, or forbidden shortcuts.
 - Do not split work into only abstract connections, placeholders, empty
   adapters, unused providers, or type-only changes. Contract-only stages must
   name their consumer, next consumption step, and targeted validation.
