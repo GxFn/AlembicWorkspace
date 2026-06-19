@@ -99,10 +99,33 @@ Targeted the genuine critical-path coverage gaps before any AAO5 decomposition.
   in `ToolRouterAdapter` → envelope diagnostics. Public surface unchanged (smoke 13
   exports); **cross-repo verified** (Alembic `tsc --noEmit` exit 0 against the rebuilt
   agent dist). Gate green 260/260.
-- Remaining AAO3: contract versioning + DI typing (not yet scoped).
+- **AAO3 remaining items assessed as non-genuine.** *Contract versioning* contradicts
+  the V1/V2 convergence (kernel/index.ts: "there are no version labels left"); re-adding
+  a marker is regressive ceremony for a symlinked single consumer. *DI typing* — the
+  DI surface is already typed; the 19 scattered `as unknown as` casts are boundary
+  bridges, not a concentrated gap. **AAO3 is effectively complete** (the diagnostics
+  channel was its genuine content).
 
-Test count grew 240→260 across the session's AAO0/AAO2/AAO3 work, all gates green;
-coverage ratchet now enforced.
+### AAO6 (break the agent⇄tools cycle) — COMPLETE
+
+- **AAO6 `2fba4a8`** — executed the cleanupTrigger the layer-contract itself recorded:
+  the lone `tools→agent` inversion was `RuntimeCapability extends` the agent-owned
+  `Capability` base. Moved `Capability.ts` (a zero-import leaf) into the tools leaf
+  `tools/runtime/capabilities/`, repointed the 3 import sites downward, and retired the
+  contract's `blessedImports` + marked `cycleFindings` RESOLVED. Verified: zero
+  `tools→agent` imports remain; layer lint passes with an empty blessed list; smoke
+  unchanged (13 exports, `Capability` preserved via the facade); **cross-repo safe**
+  (main repo doesn't import Capability directly; Alembic `tsc` exit 0). Gate green 260/260.
+
+## Status summary (2026-06-19)
+
+Genuine work landed: **AAO1** (dead code, ~900 LOC) · **AAO2** (forcedSummary circuit,
+errorClassify breaker) · **AAO0** (test net: transports/lock/AiFactory + coverage ratchet)
+· **AAO3** (diagnostics channel) · **AAO6** (cycle break). Tests 240→260, coverage ratchet
+enforced, every round cross-repo-green. Five audit findings corrected by verification.
+Remaining: **AAO4** (duplication, unassessed) and **AAO5** (god-object decomposition —
+the biggest/most behavior-sensitive change, held for explicit user go-ahead); the AAO0
+layering-governance sub-area split stays deferred to co-evolve with AAO5.
 
 Design Key: alembic-agent-architecture-optimization
 
