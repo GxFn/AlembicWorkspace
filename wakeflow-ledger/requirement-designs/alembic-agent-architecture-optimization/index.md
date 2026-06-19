@@ -67,7 +67,7 @@ handler-degrade channel) is reclassified to **AAO3**. Four AAO findings total we
 corrected by verification (ExitController, RuntimeCapabilityCatalog, EMPTY_DIAGNOSTICS,
 abort guard): the audit was directionally right but over-counted dead/broken.
 
-### AAO0 (test safety net) — in progress
+### AAO0 (test safety net) — COMPLETE (test-net half)
 
 Targeted the genuine critical-path coverage gaps before any AAO5 decomposition.
 
@@ -81,13 +81,28 @@ Targeted the genuine critical-path coverage gaps before any AAO5 decomposition.
   (concurrency:'single' via terminal.exec, asserts maxActive===1) + `AiFactory`
   fallback gate (pins that rate-limit/429 is NOT a geo/provider error → no needless
   provider switch; plus getAvailableFallbacks / createProvider).
-- **Coverage thresholds — BLOCKED on a dependency decision.** No coverage provider
-  (`@vitest/coverage-v8`) is installed; adding a ratchet floor needs that devDep,
-  which is user-controlled. Deferred pending approval.
-- Remaining AAO0: the layering-governance half (split `agent/` into sub-areas in
-  `layer-contract.json`, refresh the census/edge pins) — separate, more involved.
+- **AAO0.3 `2609e77`** — coverage thresholds (user-approved `@vitest/coverage-v8`
+  devDep). Pinned a ratchet floor just below the baseline (S52/B42/F56/L52; baseline
+  S52.89/B43.21/F57.3/L52.94 over imported files); `npm run test:coverage`. Coverage
+  can only climb from here.
+- **Deferred (user decision):** the layering-governance half (split `agent/` into
+  sub-areas in `layer-contract.json`, refresh census/edge pins) — judged better to
+  co-evolve with the AAO5 decomposition than to pin sub-area boundaries beforehand.
 
-Test count grew 240→258 across the session's AAO0/AAO2 work, all gates green.
+### AAO3 (contract work) — in progress
+
+- **AAO3.1 `a3cb414`** — closed the AAO2 diagnostics residual. Handlers degraded
+  internally with no channel to surface it (terminal SIGKILL/timeout partial;
+  code.search regex fallback when ripgrep fails), so every per-call diagnosticSummary
+  read `degraded:false`. Extended the internal `ToolResultMeta` with optional
+  `degraded?`/`fallbackUsed?`, set them at the two verified producers, and mapped them
+  in `ToolRouterAdapter` → envelope diagnostics. Public surface unchanged (smoke 13
+  exports); **cross-repo verified** (Alembic `tsc --noEmit` exit 0 against the rebuilt
+  agent dist). Gate green 260/260.
+- Remaining AAO3: contract versioning + DI typing (not yet scoped).
+
+Test count grew 240→260 across the session's AAO0/AAO2/AAO3 work, all gates green;
+coverage ratchet now enforced.
 
 Design Key: alembic-agent-architecture-optimization
 
