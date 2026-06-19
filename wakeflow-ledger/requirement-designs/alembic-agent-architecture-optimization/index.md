@@ -22,6 +22,33 @@ Date: 2026-06-19
   provider circuit moved to the gateway's ReliabilityController; `_circuitState` was
   kept (CLOSED) for behavior preservation. Rewire to the gateway circuit (or remove
   the dead branch) under AAO2.
+
+### AAO2 (correctness) — in progress
+
+- **AAO2.1 `ea92bc6`** — finished the gateway-circuit migration: removed the dead
+  `forcedSummary` `_circuitState` pre-check + the now-write-only `AiProvider._circuitState`
+  field. Proven behavior-identical (the gateway's `ReliabilityController.run()`
+  fast-fails `CIRCUIT_OPEN` before any network call → forcedSummary's existing catch
+  already routes to the synthetic summary). Cross-repo verified; gate green 240/240.
+- **AAO2.2 `23041ad`** — `classifyLlmError` no longer counts programmer errors
+  (TypeError/ReferenceError/SyntaxError/RangeError) as server errors, so a
+  deterministic code bug can't trip the circuit breaker and masquerade as an AI
+  outage. Added a regression test; dropped a dead `classifyLlmError` import from
+  AiProvider. Gate green 241/241.
+- **Audit correction — tool diagnostics (`EMPTY_DIAGNOSTICS`) is largely a false
+  alarm.** Verified the real flow: degrade/block/gate/timeout signals are recorded
+  *directly* into the loop-level `DiagnosticsCollector` by the pipeline/strategy
+  (`recordBlockedTool`/`recordGateFailure`/`markDegraded`/`recordTimedOutStage`),
+  and `merge()` folds them correctly. The per-call `ToolRouterAdapter` envelope is
+  empty because a single `ToolResult` (ok/data/error/_meta) carries no degrade/
+  fallback signal, and `recordToolCallEnvelope` doesn't read `envelope.diagnostics`
+  anyway. The one genuine residual: handlers `terminal.ts`/`code.ts` degrade
+  internally with no `ToolResult` channel to surface it to the per-call
+  `diagnosticSummary` — a `ToolResult` contract extension, reclassified to **AAO3**
+  (contract work), not a quick adapter patch.
+
+Remaining AAO2: production ToolRouter timeout/abort guard + handlers honoring
+`abortSignal` (genuine, not yet scoped).
 Design Key: alembic-agent-architecture-optimization
 
 ## Lineage
