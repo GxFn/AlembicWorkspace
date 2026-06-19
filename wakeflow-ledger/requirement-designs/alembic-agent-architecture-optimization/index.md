@@ -47,8 +47,26 @@ Date: 2026-06-19
   `diagnosticSummary` — a `ToolResult` contract extension, reclassified to **AAO3**
   (contract work), not a quick adapter patch.
 
-Remaining AAO2: production ToolRouter timeout/abort guard + handlers honoring
-`abortSignal` (genuine, not yet scoped).
+- **Audit correction — "ToolRouter timeout/abort guard" is a false alarm (caught
+  pre-commit by the gate).** A router-level abort pre-check was prototyped but it
+  broke `routes V2 terminal cancellation as a structured partial timeout result`:
+  the kernel `ToolRouter` **deliberately** passes `ctx.abortSignal` through to
+  handlers so long-running ones (terminal, code) produce graceful *partial* results
+  (`ok:true`, `[timeout] partial output`, exit 137) — abort is not a hard fail. The
+  loop already stops issuing new calls post-cancel (`AgentRuntime` abort check), and
+  fast/bounded handlers need no deadline. The router-level guard was reverted
+  entirely (working tree clean); abort is correctly delegated. The host path
+  (`LightweightRouter`) already has `#executeWithControls` timeout+abort for its
+  surfaces. No change warranted.
+
+**AAO2 status: effectively complete.** The two genuine correctness defects —
+forcedSummary dead circuit (AAO2.1) and the circuit-breaker error-classification
+(AAO2.2) — are fixed. The remaining audit items in this phase (tool diagnostics,
+abort guard) were verified false alarms; the one real residual (ToolResult lacks a
+handler-degrade channel) is reclassified to **AAO3**. Four AAO findings total were
+corrected by verification (ExitController, RuntimeCapabilityCatalog, EMPTY_DIAGNOSTICS,
+abort guard): the audit was directionally right but over-counted dead/broken.
+
 Design Key: alembic-agent-architecture-optimization
 
 ## Lineage
