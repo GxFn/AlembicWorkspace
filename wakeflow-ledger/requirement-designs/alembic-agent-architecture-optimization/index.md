@@ -1,6 +1,6 @@
 # AlembicAgent Architecture Optimization (Post-Convergence)
 
-Status: in execution / direct-execution mode (user-authorized, commit-per-round, no dispatch) / repo-internal scope
+Status: COMPLETE — user-accepted 2026-06-19. Direct-execution mode (commit-per-round, no dispatch), repo-internal scope. AAO0–AAO4 + AAO6 landed and cross-repo-verified; AAO5 (god-object decomposition) deferred by user decision to a future focused session (see Completion Definition + Phase Order).
 Maintained Window: AlembicWorkspace
 Date: 2026-06-19
 
@@ -189,18 +189,17 @@ and `LightweightRouter` ARE live public API consumed by the Alembic main repo
 
 ## Phase Order
 
-| Phase | Title | Window | Risk |
-| --- | --- | --- | --- |
-| AAO0 | Layering governance + test safety net | AlembicAgent | low |
-| AAO1 | Dead-code removal (cross-repo verified) | AlembicAgent | low |
-| AAO2 | Observability + boundary robustness (correctness) | AlembicAgent | medium |
-| AAO3 | Contract unification + versioning + DI typing | AlembicAgent | medium |
-| AAO4 | Duplication consolidation | AlembicAgent | low |
-| AAO5 | God-object decomposition | AlembicAgent | high |
-| AAO6 | Break the tools->agent capability cycle | AlembicAgent | low |
+| Phase | Title | Window | Risk | Status |
+| --- | --- | --- | --- | --- |
+| AAO0 | Layering governance + test safety net | AlembicAgent | low | ✅ test net done (`531414a`/`ad52902`/`2609e77`); layering sub-area split deferred to co-evolve with AAO5 |
+| AAO1 | Dead-code removal (cross-repo verified) | AlembicAgent | low | ✅ done (`298ad65`…`6b55c5f`) |
+| AAO2 | Observability + boundary robustness (correctness) | AlembicAgent | medium | ✅ done (`ea92bc6`/`23041ad`); diagnostics + abort items verified false alarms |
+| AAO3 | Contract unification + versioning + DI typing | AlembicAgent | medium | ✅ done (`a3cb414` diagnostics channel); versioning + DI-typing assessed non-genuine |
+| AAO4 | Duplication consolidation | AlembicAgent | low | ✅ done (`508905d`) |
+| AAO5 | God-object decomposition | AlembicAgent | high | ⏸ **DEFERRED by user 2026-06-19** — future focused session; test net de-risks it |
+| AAO6 | Break the tools->agent capability cycle | AlembicAgent | low | ✅ done (`2fba4a8`) |
 
-Execution order: AAO1 may start immediately (no safety-net dependency);
-AAO0 governance + tests precede AAO5; AAO2 (correctness) is highest value.
+Execution order (as executed): AAO1 → AAO2 → AAO0 → AAO3 → AAO6 → AAO4. AAO5 deferred.
 
 ## Completion Definition
 
@@ -211,6 +210,31 @@ LOC/responsibility threshold; production tool degradations are observable
 token estimation has a single source; no V1/V2 or migration-phase residue; the
 tools->agent cycle is gone; the AlembicAgent gate matrix and downstream Alembic
 build stay green at every commit.
+
+### Acceptance (2026-06-19, user-accepted)
+
+Met against the definition above:
+
+- **Findings resolved or explicitly deferred** — ✅. All resolved except the
+  god-object LOC-threshold clause, which is **explicitly deferred** as AAO5 by user
+  decision (recorded reason: deferred to a future focused session). This satisfies
+  the "or explicitly deferred with a recorded reason" branch.
+- **Tool degradations observable + abortable** — ✅ envelope-diagnostics channel
+  (`a3cb414`); abort verified already delegated to handlers for graceful partials.
+- **No V1/V2 / migration-phase residue** — ✅ (convergence + AAO1 metadata removal).
+- **tools->agent cycle gone** — ✅ (`2fba4a8`).
+- **Gate matrix + downstream Alembic build green every commit** — ✅ 16 agent
+  commits, each full-gated; main-repo `tsc` exit 0 at every cross-repo touch point.
+- **Not met / deferred:** god-object LOC threshold (AAO5); kernel-contract
+  versioning (assessed non-genuine — contradicts the V1/V2 convergence). Both
+  recorded, not silently dropped.
+
+Six audit findings were corrected by verification during execution (ExitController,
+RuntimeCapabilityCatalog, EMPTY_DIAGNOSTICS, abort-guard, AAO3 versioning/DI-typing,
+summarize-is-dead) — the audit was directionally right but over-counted dead/broken.
+
+**Reopen trigger:** pick up AAO5 (god-object decomposition) as a new demand when
+scheduled; the AAO0 test net is its safety harness.
 
 ## Non-goals
 
