@@ -3,6 +3,25 @@
 Status: in execution / direct-execution mode (user-authorized, commit-per-round, no dispatch) / repo-internal scope
 Maintained Window: AlembicWorkspace
 Date: 2026-06-19
+
+## Execution Log
+
+- **AAO1 dead-code removal — COMPLETE** (~900+ LOC). Agent commits: 6 dead local
+  capability classes `298ad65`; `AgentRouter`+`PresetName` `cbc457b`;
+  `ConsolidationGate` `a01d8ff`; migration metadata + `StrategyRegistry` `c1c4bbe`;
+  `AiProvider` retry/circuit/slot machinery `6b55c5f`. Every round green (240/240),
+  G5 + floor regenerated deliberately, cross-repo verified.
+- **AAO1 corrections from cross-repo verification** (audit findings were imprecise):
+  `WorkflowRegistry`/`LightweightRouter` are live host API (kept); `ExitController`'s
+  5 "dead" methods are exercised by the main-repo `ExitController.test.ts` suite —
+  they are tested public API, so reclassified to **AAO5** (finish the loop wiring +
+  drop the inline duplication, behavior-sensitive); `RuntimeCapabilityCatalog`'s
+  no-op methods are duck-typed by AgentRuntime (cosmetic alias cleanup, AAO5).
+- **New finding (surfaced during AAO1.5, AAO2):** `forcedSummary`'s
+  `aiProvider._circuitState === 'OPEN'` check is always-false dead behavior — the
+  provider circuit moved to the gateway's ReliabilityController; `_circuitState` was
+  kept (CLOSED) for behavior preservation. Rewire to the gateway circuit (or remove
+  the dead branch) under AAO2.
 Design Key: alembic-agent-architecture-optimization
 
 ## Lineage
