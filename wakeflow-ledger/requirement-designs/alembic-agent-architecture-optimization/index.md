@@ -67,6 +67,28 @@ handler-degrade channel) is reclassified to **AAO3**. Four AAO findings total we
 corrected by verification (ExitController, RuntimeCapabilityCatalog, EMPTY_DIAGNOSTICS,
 abort guard): the audit was directionally right but over-counted dead/broken.
 
+### AAO0 (test safety net) — in progress
+
+Targeted the genuine critical-path coverage gaps before any AAO5 decomposition.
+
+- **AAO0.1 `531414a`** — `ClaudeTransport` (the *primary* provider) and
+  `GoogleTransport` (Gemini) had **zero** dedicated tests despite carrying bug-prone
+  protocol translation. Added focused fetch-stub tests: Claude tool_result→user-turn
+  merge, system-prompt lift, tool_choice mapping, response/usage parsing, headers;
+  Gemini assistant→model rename, functionResponse parts, functionCallingConfig mode,
+  schema sanitization, API-key-in-URL, thoughtSignature round-trip.
+- **AAO0.2 `ad52902`** — `ToolRouter` per-tool lock serialization test
+  (concurrency:'single' via terminal.exec, asserts maxActive===1) + `AiFactory`
+  fallback gate (pins that rate-limit/429 is NOT a geo/provider error → no needless
+  provider switch; plus getAvailableFallbacks / createProvider).
+- **Coverage thresholds — BLOCKED on a dependency decision.** No coverage provider
+  (`@vitest/coverage-v8`) is installed; adding a ratchet floor needs that devDep,
+  which is user-controlled. Deferred pending approval.
+- Remaining AAO0: the layering-governance half (split `agent/` into sub-areas in
+  `layer-contract.json`, refresh the census/edge pins) — separate, more involved.
+
+Test count grew 240→258 across the session's AAO0/AAO2 work, all gates green.
+
 Design Key: alembic-agent-architecture-optimization
 
 ## Lineage
