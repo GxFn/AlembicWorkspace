@@ -117,15 +117,30 @@ Targeted the genuine critical-path coverage gaps before any AAO5 decomposition.
   unchanged (13 exports, `Capability` preserved via the facade); **cross-repo safe**
   (main repo doesn't import Capability directly; Alembic `tsc` exit 0). Gate green 260/260.
 
+### AAO4 (duplication consolidation) — COMPLETE
+
+- **AAO4 `508905d`** — two mechanical dedups. (1) AiFactory: the provider→API-key-env
+  map was listed twice; collapsed to one `PROVIDER_KEY_ENV` source (alias map + fallback
+  enumeration both derive from it). (2) `AiProvider.summarize`: the same prompt +
+  `chatWithStructuredOutput` was copy-pasted across all 5 providers (identical but for
+  Gemini's maxTokens); hoisted to the base with a `summarizeMaxTokens` getter (Gemini
+  keeps 8192), 5 overrides removed. Net −30 LOC. Public surface unchanged (smoke 13);
+  cross-repo `tsc` exit 0. **Correction:** `summarize` is actually uncalled in both
+  repos — flagged as an AAO1-style removal candidate, kept available (dedup ≠ scope cut).
+
 ## Status summary (2026-06-19)
 
-Genuine work landed: **AAO1** (dead code, ~900 LOC) · **AAO2** (forcedSummary circuit,
+Genuine work landed: **AAO1** (dead code ~900 LOC) · **AAO2** (forcedSummary circuit +
 errorClassify breaker) · **AAO0** (test net: transports/lock/AiFactory + coverage ratchet)
-· **AAO3** (diagnostics channel) · **AAO6** (cycle break). Tests 240→260, coverage ratchet
-enforced, every round cross-repo-green. Five audit findings corrected by verification.
-Remaining: **AAO4** (duplication, unassessed) and **AAO5** (god-object decomposition —
-the biggest/most behavior-sensitive change, held for explicit user go-ahead); the AAO0
-layering-governance sub-area split stays deferred to co-evolve with AAO5.
+· **AAO3** (diagnostics channel) · **AAO6** (agent⇄tools cycle break) · **AAO4** (dedup).
+Tests 240→260, coverage ratchet enforced, every round cross-repo-green. Six audit findings
+corrected by verification.
+
+**Only AAO5 remains** — god-object decomposition (`AgentRuntime` 2758 / `PcvNodeEvidence`
+1669 / `ActiveContext` 1378 / `ContextWindow` 1209 / `PipelineStrategy` 1104 / `AiProvider`
+869), the single biggest, most behavior-sensitive change. **Held for explicit user
+go-ahead** — recommended as its own focused session, now de-risked by the AAO0 test net.
+The AAO0 layering-governance sub-area split stays deferred to co-evolve with AAO5.
 
 Design Key: alembic-agent-architecture-optimization
 
