@@ -11,8 +11,8 @@ Read:
 
 1. This file.
 2. The parent workspace `../AGENTS.md`.
-3. `../.workspace-active/workspace/index.md`.
-4. `../.workspace-active/workspace/current/workspace-current-status.md`.
+3. `../.wakeflow-active/index.md`.
+4. `../.wakeflow-active/current/workspace-current-status.md`.
 5. `docs/README.md`.
 6. `docs/legacy-alembic-test-map.md`.
 7. `docs/testing-operation-policy.md`.

@@ -11,13 +11,14 @@ Read:
 
 1. This file.
 2. The parent workspace `../CLAUDE.md`.
-3. `../.workspace-active/workspace/index.md`.
-4. `../.workspace-active/workspace/current/workspace-current-status.md`.
+3. `../.wakeflow-active/index.md`.
+4. `../.wakeflow-active/current/workspace-current-status.md`.
 5. `docs/index.md`.
-6. `docs/design-window-operating-policy.md`.
-7. `docs/workspace-alignment-checklist.md`.
-8. `docs/current/README.md`.
-9. `skills/README.md`.
+6. `docs/legacy-alembic-design-map.md`.
+7. `docs/design-window-operating-policy.md`.
+8. `docs/workspace-alignment-checklist.md`.
+9. `docs/current/README.md`.
+10. `skills/README.md`.
 
 If controller documents are unavailable, enter `detached-design-mode`: drafts
 may continue, but they must say that they have not been imported into the
@@ -41,6 +42,9 @@ current controller state.
 - Prepare signals and handoffs for Wakeflow intake. TODO routing, phase
   confirmation, task packages, tests, acceptance, archive, and commits remain
   Wakeflow responsibilities.
+- Read legacy `../AlembicDesign` artifacts as historical evidence when needed,
+  but keep current work in this `Design` surface unless the controller
+  explicitly asks for a refreshed artifact.
 
 ## Boundaries
 
@@ -57,6 +61,9 @@ current controller state.
   user's target capability.
 - Do not treat a non-bug outcome mismatch as product rework until Design has a
   revised requirement or option plan and the controller accepts the route.
+- Do not revive the old `AlembicDesign` window identity, retired
+  `codex-control-workspace` coordinates, or historical handoff board as current
+  authority. The configured Design window is `Design`.
 
 ## Functional Completeness Self-Check
 
@@ -151,6 +158,9 @@ or recommend the missing upstream skill first.
   register it in `docs/current/workspace-handoff-board.md` only after explicit
   user/controller confirmation, unless the current workspace config points
   Design handoff intake to a different board.
+- Ongoing discussion sequence: use a `*-discussion-sequence-YYYY-MM-DD.md`
+  note only to preserve active decision order and user rulings. It is not a
+  formal handoff and is not executable controller scope.
 
 Each plan, signal, design, and handoff board entry must have a stable
 `Design Key` in lowercase kebab-case form `<readable-topic>-YYYY-MM-DD`. The
@@ -163,3 +173,20 @@ board `ID` and controller `demandKey` must match the design key exactly.
   comparisons, requirement designs, candidate slices, and handoff readiness.
 - Design skills do not confirm executable scope, mutate Wakeflow state, or
   replace controller judgment.
+
+## AlembicDesign Continuity
+
+`../AlembicDesign` is the previous external Design repository for this
+workspace. It remains in place as a read-only historical source. New active
+Design work belongs in this directory.
+
+- Use `docs/legacy-alembic-design-map.md` to locate historical Design plans,
+  requirement designs, discussion sequences, signals, and handoffs.
+- Use existing Design skills, especially `skills/design-handoff/SKILL.md`, when
+  converting a historical AlembicDesign artifact into a current summary or
+  handoff.
+- Do not bulk-copy historical `../AlembicDesign/docs/current/*` files into
+  `Design/docs/current/`.
+- When a historical artifact is still relevant, cite its path and clearly
+  separate verified fact, old Design recommendation, user-confirmed decision,
+  and current controller judgment.

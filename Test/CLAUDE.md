@@ -11,13 +11,17 @@ Read:
 
 1. This file.
 2. The parent workspace `../CLAUDE.md`.
-3. `../.workspace-active/workspace/index.md`.
-4. `../.workspace-active/workspace/current/workspace-current-status.md`.
+3. `../.wakeflow-active/index.md`.
+4. `../.wakeflow-active/current/workspace-current-status.md`.
 5. `docs/README.md`.
-6. `docs/testing-operation-policy.md`.
-7. `docs/current/README.md`.
-8. `docs/current/test-window-alignment.md`.
-9. `skills/README.md`.
+6. `docs/legacy-alembic-test-map.md`.
+7. `docs/testing-operation-policy.md`.
+8. `docs/current/README.md`.
+9. `docs/current/test-window-alignment.md`.
+10. `skills/README.md`.
+11. `skills/alembic-real-routes/SKILL.md` when the task involves Alembic
+    runtime, Dashboard, BiliDili, AlembicWorkspace, host plugin/MCP, or
+    environment probe evidence.
 
 ## Role
 
@@ -29,6 +33,8 @@ repository cannot safely reproduce alone, such as:
 - daemon/job/log monitoring,
 - cross-repository integration smoke,
 - reproduction and regression checks.
+- host plugin / MCP / local environment probe evidence when a controller
+  test card explicitly assigns that route to Test.
 
 When a test card, user request, or controller return asks Test to plan
 validation, reproduce a bug, design regression coverage, review evidence, or
@@ -45,6 +51,15 @@ from `skills/README.md` and use it to shape the work.
   Wakeflow route repairs.
 - Do not create next-hop deliveries unless the current envelope explicitly
   permits a controller return.
+- Do not run host plugin reload, MCP stop/restart, watch/restart, or any
+  current host MCP repair path unless the active state root explicitly accepts
+  the destructive route and host restart requirement.
+- Do not send protected project context to an external provider automatically.
+  `BiliDili` may use the documented open-source test-mode route only when the
+  user, state root, or test card assigns it.
+- When using Dashboard or a local web UI, capture the URL, logs, screenshots, or
+  browser evidence with the host/browser capability available in the current
+  Claude Code environment.
 
 ## Functional Completeness Self-Check
 
@@ -101,10 +116,34 @@ Skill map:
   `skills/evidence-review/SKILL.md`.
 - Long workflow, source-derived chain plan, node isolation, or scoped round
   verdicts: `skills/progressive-chain-validation/SKILL.md`.
+- Alembic runtime, Dashboard, host plugin / MCP, cold-start, multi-root, or
+  environment probe route: `skills/alembic-real-routes/SKILL.md`.
 
 ## Local Surfaces
 
 - Use `config/defaults.json` only for generic, secret-free defaults.
 - Use `scripts/` for Test-owned helpers that need a real scenario or runtime.
-- Use `skills/` only for repeated Test-local validation instructions that do
-  not belong in the installed Wakeflow skills or product repositories.
+- Use `skills/` as Test-local evidence methods. Surface the matching skill
+  before planning validation, triaging failures, designing regressions,
+  reviewing evidence, or running long-chain validation.
+- Use `package.json` only as a convenience wrapper for Test-owned scripts.
+- Use `docs/legacy-alembic-test-map.md` for old evidence locations; old
+  `../AlembicTest/docs` and `../AlembicTest/tmp` data stays in place.
+
+## AlembicTest Continuity
+
+`../AlembicTest` is the previous external Test repository. Its historical
+reports, raw evidence, and old checkout remain in place. This directory is now
+the configured active `Test` surface.
+
+- Rebuilt executable capability lives in `Test/scripts/`,
+  `Test/config/defaults.json`, `Test/package.json`, and
+  `Test/skills/alembic-real-routes/SKILL.md`.
+- Historical docs and raw evidence remain under `../AlembicTest/docs/` and
+  `../AlembicTest/tmp/`.
+- The old `AlembicTest` / `AlembicTest-IDE` split is now a route
+  classification inside the single configured `Test` window. Current dispatch
+  identity remains `Test`.
+- Historical reports are point-in-time evidence. Do not reuse old localhost
+  URLs, pids, ports, cache markers, file mtimes, or runtime state as current
+  configuration.
