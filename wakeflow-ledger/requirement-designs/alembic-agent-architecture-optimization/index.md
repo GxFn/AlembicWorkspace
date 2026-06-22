@@ -4,6 +4,17 @@ Status: COMPLETE — user-accepted 2026-06-19. Direct-execution mode (commit-per
 Maintained Window: AlembicWorkspace
 Date: 2026-06-19
 
+Branch reconciliation (2026-06-19): the whole session was committed on a DETACHED
+HEAD (the repo was not on `main` at start), so the 14 AAO commits landed off-main and
+were auto-preserved on `codex/preserve-agent-detached-6256d46`. Meanwhile `main`
+advanced with the parallel PCV observe-only work (AP-0..AP-5, 7 commits). The two
+lines forked at `03bab90` and overlapped in only one file (AgentRuntime.ts, a 1-line
+doc edit vs main's refactor). Reconciled by merging the branch into local `main`
+(merge commit `953e665`) — auto-merged with NO conflicts; full gate green on the merged
+tree (279 tests, smoke 13 exports, all boundary lints), cross-repo Alembic `tsc` exit 0.
+The preserve branch was then deleted. The AAO commit SHAs cited below are preserved by
+the merge (they live in main's history). `main` is +15 ahead of origin/main, UNPUSHED.
+
 ## Execution Log
 
 - **AAO1 dead-code removal — COMPLETE** (~900+ LOC). Agent commits: 6 dead local
