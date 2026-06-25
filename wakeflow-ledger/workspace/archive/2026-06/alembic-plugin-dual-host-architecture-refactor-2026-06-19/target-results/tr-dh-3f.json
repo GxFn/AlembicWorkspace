@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-dh-3f",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-3f-decodex-bulk-complete",
+  "dispatchGroup": "dh3f-plugin-decodex-bulk",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-3f",
+  "status": "needs-review",
+  "summary": "DH-3f de-Codex 全量收尾：误命名清零 + 接口收口 + routing 全部完成并验证直提 main（基线 ebb960f → HEAD a297e9d，3 个绿 commit）；唯一剩余=物理迁入(委托外观清除)因存在 cc/codex 共享设计问题 flag DH-3g。完成比例≈85%（rename+collision+interface+routing 全完；physical migration 待 Design/controller 定结构）。\n\n【已完成并验证】\n1) b0cdf0b de-Codex 批量改名：~200 个误命名 host-AGNOSTIC Codex*/CODEX_* 去前缀归 L1/L2（ToolPolicy/ProjectRuntimeContext/KnowledgeState/EnhancementRoute/Diagnostics/Preflight/StatusService/ModuleBoundary/HostProjectAlignment/ProjectSkillDelivery/local-tools/mcp-host 等，含 export-grep 初次漏掉的中位 CODEX_ 如 EMPTY_CODEX_KNOWLEDGE_STATE/getVisibleCodexTools 二次补齐）。\n2) b87b351 接口收口：DH-3c 发现 isTrustedProjectRoot(纯 resolution.trust 谓词)/resolveEffectiveTier(tier 回退) 实为 host-AGNOSTIC，从 HostAdapter 接口 + 两 impl 移除（原为纯委托；resolveEffectiveTier 零 adapter 调用=死委托）；isTrustedProjectRoot 的 3 个 L2 调用方(project-root-scope/tool-visibility/HostMcpServer)改直用 L1 自由函数；L1 resolveEffectiveCodexTier→resolveEffectiveTier。\n3) a297e9d routing 收尾：StatusService 是最后一个直接 import host-specific 函数的 L2 文件，3 调用改经 resolveHostAdapter()（resolveProjectRoot/readInitMarker + 新增 host-specific initMarkerPath() 方法 = getCodexInitMarkerPath 的对应路径方法）。所有 host-operation 现经 adapter，host-name 分支仅 L3。\n\n【4 个 collision 定名】① CODEX_AGENT_PUBLIC_TOOL_NAMES→TOOL_POLICY_AGENT_PUBLIC_TOOL_NAMES（contract.ts 已有 AGENT_PUBLIC_TOOL_NAMES）；② buildCodexStatusOnboardingContract→buildStatusOnboardingContract（StatusService 同名本地包装函数改名 composeStatusOnboardingContract 让位）；③ buildCodexRecommendedAction→buildRecommendedAction（与 Diagnostics 本地非导出同名函数不同文件、安全）；④ SourceBoundary CODEX_HOST_AGENT_SOURCE re-export 删除，5 个 consumer 改直 import core HOST_AGENT_SOURCE。\n\n【KEEP（真 host-specific，残留仅此 + 在 L3/迁入领地）】RuntimeContext host 配置(CODEX_PLUGIN_HOST/CODEX_SETUP_PROFILE/CODEX_*_ENV…)、ProjectRootResolver host 标记 I/O(CodexInitMarker/CodexSavedProjectRoot + resolve/read/write 标记)、PluginRegistry 清单 seam(CodexPluginHostShape/CodexPluginMcpDeclaration/CodexPluginRegistry)、parseCodexJobFile、CodexHostAdapter。另：wire-frozen MCP 错误码(CODEX_TOOL_RETIRED/CODEX_AUTO_INIT_FAILED/… 作为 error.code 字符串返回)有意保留——改名会破四工具对外 MCP 语义。\n\n【DH-3g flag — physical migration（物理迁入）】把 host-specific 函数体(resolveCodexProjectRoot/标记 I/O/ensureRuntimeEnvironment/清单读取)迁入 CodexHostAdapter、去委托外观。真阻塞=设计问题：DH-1 已确认 cc 与 codex「工作区身份簇」共享同一组 workspace I/O（ClaudeCodeHostAdapter 现委托同一批函数）；迁入 codex 专属 adapter 会破 cc 共享，需 shared-base / cc 委托 codex 单例 / 复制三选一的结构决策 + 保 F-V2-2 wire-byte，属 Design/controller 裁决而非 target 窗口机械猜测。DH-2/3.1 本就把物理迁入列为「留 DH-3③」。当前委托设计有效且行为不变，物理迁入是组织性精炼。建议：controller 验收本 3 commit；physical migration 作 DH-3g 配 cc/codex 共享结构裁决。",
+  "evidenceRefs": [
+    "commit b0cdf0b refactor(runtime): DH-3f de-Codex bulk rename — strip cosmetic Codex prefix from host-agnostic symbols",
+    "commit b87b351 refactor(runtime): DH-3f remove host-agnostic isTrustedProjectRoot/resolveEffectiveTier from HostAdapter interface",
+    "commit a297e9d refactor(runtime): DH-3f route StatusService host-operations through HostAdapter",
+    "baseline HEAD ebb960f → final HEAD a297e9d",
+    "scope: 56 files (Phase A) + 8 (Phase B) + 4 (Phase C), 全在 lib/test/bin；无 per-host 产物/submodule/skills/templates 触动"
+  ],
+  "verification": [
+    "tsc --noEmit 绿（每 phase 后）",
+    "biome lint 0 error（lint:fix 后；16 warning 为 scripts/ 既存 console 非本次引入）",
+    "全量 unit 失败集与基线 IDENTICAL：39 failed | 87 passed (126)，diff 空=零回归（每 phase 后各跑一次：Phase A/B/C 三次均一致）",
+    "基线 /tmp/dh1_base.txt = 39 pre-existing 沙箱失败（HEAD ebb960f 同集）",
+    "残留误命名 host-agnostic Codex* 定义 = 0（只剩 KEEP host-specific + wire error codes）",
+    "host-name 分支仅 L3（resolveHostAdapter 选择器 + RuntimeContext shape 检测器）；Diagnostics 一处为 pluginHost===expectedPluginHost 通用相等诊断、非 host-name 字面分支",
+    "F-V2-2 wire-byte：PluginRegistry/清单读取逻辑零非改名变更（git diff ebb960f..HEAD 仅 Codex 符号改名）",
+    "纯 MCP 非强进程不变量未触；四工具对外 MCP 语义未变（error codes 保留）"
+  ],
+  "risks": [
+    "DH-3g(physical migration)未做：委托外观仍在，host-specific 函数体仍在 ProjectRootResolver/RuntimeContext/PluginRegistry（adapter 委托）；DH-3 阶段完成定义的『委托外观清除』项未达 → 故 status=needs-review 非 completed",
+    "physical migration 有未决设计问题：迁入目标函数为 cc+codex 共享，需结构裁决（shared-base vs cc 委托 codex vs 复制）+ wire-byte 保全，建议路由 Design",
+    "wire-frozen CODEX_* error codes 保留：若未来要去前缀需独立带版本迁移（改 error.code 破对外契约），本 pass 有意不动",
+    "未做真实 cc 运行验收（DH-6 领地）；本 pass 仅 tsc+unit 失败集等价证明 codex 行为不变 + cc 经 adapter"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh3f-plugin-decodex-bulk__AlembicPlugin__DH-3f",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3f-plugin-decodex-bulk__AlembicPlugin__DH-3f.json",
+    "deliveryRunId": "run-delivery-dh3f-plugin-decodex-bulk__AlembicPlugin__DH-3f",
+    "dispatchGroup": "dh3f-plugin-decodex-bulk",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3f-plugin-decodex-bulk__AlembicPlugin__DH-3f.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 39,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-3f-decodex-bulk-complete",
+    "targetTaskId": "DH-3f",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh3f-plugin-decodex-bulk",
+    "resultId": "tr-dh-3f",
+    "createdAt": "2026-06-20T06:33:59.676Z"
+  },
+  "createdAt": "2026-06-20T06:33:59.676Z",
+  "stateRevisionObserved": 39,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -52,7 +52,7 @@
 - 来源文档：
   - [Progressive Chain Validation Metrics 原始计划](../../../../requirement-designs/progressive-chain-validation-metrics/progressive-chain-validation-metrics-original-plan-2026-05-25.md)
   - [Progressive Chain Validation Metrics 需求设计](../../../../requirement-designs/progressive-chain-validation-metrics/progressive-chain-validation-metrics-requirement-design-2026-05-25.md)
-  - [Design Handoff Inbox](../../../../../codex-control-workspace/.workspace-active/workspace/current/design-handoff-inbox.md)
+  - [Design Handoff Inbox](../../../../../codex-control-workspace/.wakeflow-active/current/design-handoff-inbox.md)
   - [代码实现依赖调研](../../../../requirement-designs/progressive-chain-validation-metrics/code-implementation-dependency-research-2026-05-25.md)
 - 用户确认状态：Design 侧记录为用户已确认；用户已在总控确认 PCV 单独拉出，并要求后续修改 / 删除 `Alembic` 与 `AlembicPlugin` 内部引入。
 - 总控接收结论：接收 `PCVM-2026-05-25`，并入 `GTODO-2026-05-25-003`；该 TODO 从“下一主线候选”提升为“目标阶段确认中”。
@@ -231,11 +231,11 @@ git diff --check
 
 - 是否需要 `AlembicTest`：需要，但不是当前第一波；等 `Alembic` producer 回填 PCV scorecard / baseline / comparison 格式后创建测试单。
 - 测试单：暂未创建。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)。
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)。
 - 真实项目保护说明：当前不改真实测试项目；后续若用真实项目做 cold-start / rescan 验证，必须通过 `AlembicTest` 测试单执行。
 
 ## 回填区
 
 - 2026-05-25 18:30 CST：总控接收用户“开始推进 `GTODO-2026-05-25-003 / Progressive Chain Validation Metrics`”指令；读取 Design handoff、全局 TODO、PCV skill / artifact / trace / metrics / N9 analyze / AlembicTest probe 代码事实，判定当前应停在目标阶段确认，发送给无。
 - 2026-05-25 18:45 CST：用户指出 PCV 已较久未更新，且 `Alembic` / `AlembicPlugin` 都引入同一 skill。总控复核发现两边均为 `skills/progressive-chain-validation` submodule，远程为 `https://github.com/GxFn/progressive-chain-validation.git`，当前 hash 均为 `a6c371c8b123fc79f218d362cd6bae61a0679d61` 且目录内容一致。结论：不应直接在 `Alembic` 父仓库开发 PCV；应先确认独立 PCV source 作为 canonical producer，再由 `Alembic` 和 `AlembicPlugin` 更新 submodule pointer。
-- 2026-05-25 19:05 CST：用户确认 PCV 单独拉出，并要求后续修改 / 删除 `Alembic` 与 `AlembicPlugin` 内部引入。总控已创建当前 Wave 0 分派文档 [progressive-chain-validation-metrics-wave-0-2026-05-25.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-0-2026-05-25.md)，当前发送给 `progressive-chain-validation`。
+- 2026-05-25 19:05 CST：用户确认 PCV 单独拉出，并要求后续修改 / 删除 `Alembic` 与 `AlembicPlugin` 内部引入。总控已创建当前 Wave 0 分派文档 [progressive-chain-validation-metrics-wave-0-2026-05-25.md](../../../../../codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-0-2026-05-25.md)，当前发送给 `progressive-chain-validation`。

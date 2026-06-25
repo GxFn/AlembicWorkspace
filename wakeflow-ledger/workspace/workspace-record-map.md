@@ -11,7 +11,7 @@ archive files.
 
 | Type | Entry | Description |
 | --- | --- | --- |
-| Active workspace | ../../.workspace-active/workspace/ | Current index, status, TODOs, Design/Test intake, and state roots. |
+| Active workspace | ../../.wakeflow-active/ | Current index, status, TODOs, Design/Test intake, and state roots. |
 | Requirement designs | ../requirement-designs/ | Original plans, requirement designs, and code implementation dependency research. |
 | AFAPI remaining demands | ../requirement-designs/plugin-agent-facing-public-api-redesign/ | AFAPI 08-12 rebuilt for the new Wakeflow controller surface; AFAPI 01-07 are completed upstream and not recreated. |
 | Goal-stage confirmation | ../goal-stage-confirmation/ | Reusable goal/stage confirmation process. |
@@ -21,7 +21,7 @@ archive files.
 
 | Record | Entry | Description |
 | --- | --- | --- |
-| Active TODO board | ../../.workspace-active/workspace/current/global-todo-board.md | Current non-completed TODO, hold, and scheduling rows. |
+| Active TODO board | ../../.wakeflow-active/current/global-todo-board.md | Current non-completed TODO, hold, and scheduling rows. |
 | Completed TODO archive | archive/2026-06/global-todo/ | Completed AFAPI 08-12 demand rows, closed probe-policy history, and the AFAPI-REQ-08 transient runtime-snapshot judgment compacted from the active TODO board. |
 
 ## Requirement Completion Records
@@ -53,9 +53,12 @@ Each window ledger keeps collaboration notes, acceptance evidence, and handoff
 records that are too project-specific for the reusable Wakeflow package.
 
 ## Archive Topics
-
 | Topic | Directory | Description |
 | --- | --- | --- |
+| `2026-06/alembic-main-capability-inventory-cleanup` | [alembic-main-capability-inventory-cleanup](archive/2026-06/alembic-main-capability-inventory-cleanup/) | Archived 1 workspace documents; the current index keeps only the directory entry. |
+| `2026-06/alembic-plugin-core-responsibility-interface-cleanup-2026-06-17` | [alembic-plugin-core-responsibility-interface-cleanup-2026-06-17](archive/2026-06/alembic-plugin-core-responsibility-interface-cleanup-2026-06-17/) | Archived 1 workspace documents; the current index keeps only the directory entry. |
+| `2026-06/alembic-graph-recipe-map-projectcontext-recipe-mounting-2026-06-17` | [alembic-graph-recipe-map-projectcontext-recipe-mounting-2026-06-17](archive/2026-06/alembic-graph-recipe-map-projectcontext-recipe-mounting-2026-06-17/) | Archived 1 workspace documents; the current index keeps only the directory entry. |
+| `2026-06/alembic-four-tool-plugin-cleanup-sequencing-2026-06-18` | [alembic-four-tool-plugin-cleanup-sequencing-2026-06-18](archive/2026-06/alembic-four-tool-plugin-cleanup-sequencing-2026-06-18/) | Archived 1 workspace documents; the current index keeps only the directory entry. |
 | 2026-06/afapi-completed-demands | archive/2026-06/afapi-completed-demands/ | AFAPI 08-12 demand-level completion summary with final revisions, conclusions, and evidence map. |
 | 2026-06/current-demand-rollup | archive/2026-06/current-demand-rollup/ | Current demand-state rollup after the 2026-06-13 R-group closeout. |
 | 2026-06/global-todo | archive/2026-06/global-todo/ | Completed TODO history compacted through 2026-06-13. |

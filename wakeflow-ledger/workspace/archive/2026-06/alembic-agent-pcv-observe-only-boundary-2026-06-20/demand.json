@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "title": "AlembicAgent PCV/PCVM Observe-Only Boundary Convergence",
+  "interfaceLanguage": "zh",
+  "goal": "把 AlembicAgent 内 PCV 从「默认占用并控制 LLM 主循环」收敛为「默认 observe-only 旁路证据层」。grounding enforcement（analyze 阻断+nudge+grounding-policy 指令注入）默认关闭、改名归位独立 AnalyzeGroundingGuard（显式 groundingEnforcement='guard' 开启）；DeepSeek V4 tool-choice 作为 provider 正确性收敛独立 ProviderToolChoicePolicy（默认保留、不回归、与 grounding 解耦）；PcvNodeEvidence 保留为纯观察、剥离 provider mode 计算。跨仓：AlembicAgent(主实现) + Alembic主体(lib/workflows/ai-execution 证据消费改判审计语义) + PCVM/Test(per-run opt-in 开 guard)；AlembicCore observing 无改动。不改四工具/LLM 循环对外业务语义；不删 PCV/PCVM 证据结构；不关 insightGate quality gate(PD3)。开关粒度=全局默认 off + per-run/per-invocation 覆盖(PD7)。",
+  "completionDefinition": "① 默认 observe-only：默认下主循环行为(prompt/toolChoice/graceful-exit/阶段推进/成功条件)与「完全不读 PCV」一致(除少量 trace 字段)。② enforcement 显式化且改名归位：grounding 阻断/nudge/政策注入收敛进默认关闭的 AnalyzeGroundingGuard(命名去 Pcv 前缀)。③ provider 与 grounding 解耦：ProviderToolChoicePolicy 默认保留、DeepSeek V4 不回归。④ 证据契约不破+additive enforcement-mode 标记：PcvNodeEvidenceSummary 及被主体/PCVM/Test 消费字段继续产出。⑤ 主体跨仓 consumer 对齐：ai-execution observe-only 下 grounding summary 改判审计语义、不误判回归、消费 enforcement-mode 标记。⑥ guard 有真实消费者：≥1 条质量运行链路(PCVM/Test)显式开 guard、回路端到端非空开关。⑦ 测试覆盖五场景：observe-only 默认/guard-enabled/DeepSeek V4/graceful exit/analyze 无证据；跨仓证据回归通过。⑧ 可观测性不降：sourceRef diagnostics/quality gate metadata/missing-link diagnostics 仍可审计读取。",
+  "createdAt": "2026-06-20T11:12:20.360Z",
+  "source": {
+    "kind": "wakeflow-state-init",
+    "trackedTemplates": "templates/wakeflow-state-machine",
+    "generatedStateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary"
+  }
+}

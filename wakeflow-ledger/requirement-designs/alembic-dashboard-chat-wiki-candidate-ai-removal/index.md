@@ -36,9 +36,9 @@ capabilities.
 DCR0-DCR7 are completed and accepted by AlembicWorkspace total control.
 
 - Final state root:
-  `.workspace-active/workspace/current/alembic-dashboard-chat-wiki-candidate-ai-removal-dcr7-validation-acceptance`
+  `.wakeflow-active/current/alembic-dashboard-chat-wiki-candidate-ai-removal-dcr7-validation-acceptance`
 - Final controller evidence:
-  `.workspace-active/workspace/current/alembic-dashboard-chat-wiki-candidate-ai-removal-dcr7-validation-acceptance/evidence/dcr7-final-validation-acceptance-2026-06-11.md`
+  `.wakeflow-active/current/alembic-dashboard-chat-wiki-candidate-ai-removal-dcr7-validation-acceptance/evidence/dcr7-final-validation-acceptance-2026-06-11.md`
 - Accepted product heads:
   - AlembicDashboard: `0a61a00137079f1951934683ce521dc95d5b60b9`
   - AlembicPlugin: `b8982d0933f3be69d98cadf07e5606201fb238ac`

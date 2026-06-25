@@ -20,7 +20,7 @@
 - 来源文档：
   - [Progressive Chain Validation Metrics 原始计划](../../../../requirement-designs/progressive-chain-validation-metrics/progressive-chain-validation-metrics-original-plan-2026-05-25.md)
   - [Progressive Chain Validation Metrics 需求设计](../../../../requirement-designs/progressive-chain-validation-metrics/progressive-chain-validation-metrics-requirement-design-2026-05-25.md)
-  - [PCVM 目标阶段确认](../../../../../codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-goal-stage-confirmation-2026-05-25.md)
+  - [PCVM 目标阶段确认](../../../../../codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-goal-stage-confirmation-2026-05-25.md)
   - [PCVM 代码实现依赖调研](../../../../requirement-designs/progressive-chain-validation-metrics/code-implementation-dependency-research-2026-05-25.md)
 - 用户确认状态：用户已确认“单独出来”，并要求后续修改 / 删除 `Alembic` 和 `AlembicPlugin` 内部引入；2026-05-25 21:10 CST 用户确认 Wave 3A 只做 N9 producer observability linkage baseline，先派 `AlembicAgent` + `Alembic`，`AlembicCore` 观察，完成后由 `AlembicTest` 做最小 test-mode 验证；当前 Wave 3D `AlembicTest` 重跑已通过。
 - 总控接收结论：顶层 `progressive-chain-validation/` 已从现有 submodule checkout 本地克隆出来，远端保持 `https://github.com/GxFn/progressive-chain-validation.git`，workspace `.gitignore` 已加入 `/progressive-chain-validation/`，避免被 AlembicWorkspace 仓库误跟踪。
@@ -1077,7 +1077,7 @@ git diff --check
 
 - 是否需要 `AlembicTest`：本轮已执行、回填并通过总控验收。
 - 测试单：`Test-2026-05-25-11 / PCVM-P3B-N9-Observability-Linkage-Minimal` 已由总控验收为有效未通过、完成源仓库返修并完成 rerun；`Test-2026-05-25-10 / PCVM-P2-Canonical-Source-Baseline` 已通过总控验收，作为前置证据。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)。
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)。
 - 真实项目保护说明：Wave 0 不改真实测试项目；后续若用真实项目做 cold-start / rescan 验证，必须通过 `AlembicTest` 测试单执行。
 
 ## 回填区

@@ -1,0 +1,59 @@
+{
+  "kind": "ControllerRawEvidenceReview",
+  "version": 1,
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+  "targetTaskId": "p3-plugin-executor-planselection-gate-job-forwarding-t1",
+  "targetWindow": "AlembicPlugin",
+  "decision": "request-rework",
+  "reviewedCommit": "be2120510a5d0a4eb9d258c3b553ebe1ef40e5ba",
+  "scopeReviewed": [
+    "Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md sections 1.5, 4.1, 4.3 and P3",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/task-packages/p3-plugin-executor-planselection-gate-job-forwarding-p1.json",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/target-results/tr-p3-plugin-executor-planselection-gate-job-forwarding-t1-evidence-repair-1.json",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p3-plugin-executor-planselection-gate-job-forwarding-t1.md",
+    "AlembicPlugin commit be2120510a5d0a4eb9d258c3b553ebe1ef40e5ba"
+  ],
+  "positiveEvidence": [
+    "BootstrapInput and RescanInput now require planSelection at the shared schema surface.",
+    "resolvePlanGenerationGate returns PLAN_REQUIRED before container dependency reads when planSelection is missing.",
+    "Gate ready path reads dimensions, moduleBindings, maxFiles, contentMaxLines, and totalRecipeBudget from planSelection.",
+    "HostMcpServer.enqueueJob forwards planSelection and gate-affecting args to bootstrap/rescan workflows.",
+    "rg found no routePlanTool, PlanRepository, planRepository, getActiveConfirmed, readConfirmed, active confirmed plan, active confirmed Plan, confirmed Plan, or confirmed plan matches in plan-generation-gate and the updated tool text files.",
+    "Controller reran npx vitest run test/unit/PlanSelectionGateStateless.test.ts test/unit/HostMcpServerPlanSelectionJobForwarding.test.ts: 2 files passed, 6 tests passed.",
+    "Controller reran npm run build:check and npm run build: both passed with Core 38d074fa64a014ef458044cac7881e092c0c6b8d.",
+    "Controller reran npm run lint, npm run lint:repo-boundary, npm run lint:layer-boundary, git diff --check, and git diff --cached --check: all exit 0; lint still reports only the 17 pre-existing unrelated warnings."
+  ],
+  "blockingFinding": {
+    "severity": "P1",
+    "title": "P3 gate validates presence but not executor-stage compatibility",
+    "whyItBlocksAcceptance": "P3 requires executor tools to consume the planSelection for the run they are about to execute. alembic_bootstrap is the coldStart executor, while alembic_rescan is the deepMining/moduleMining executor. The current implementation derives generationStage from planSelection before comparing it, so a mismatched planSelection changes the tool stage instead of being rejected at the gate entry.",
+    "rawProbeCommand": "node --input-type=module <<'NODE' ... import dist plan-generation-gate and mcp-tools; safeParse and resolvePlanGenerationGate for bootstrap+deepMining and rescan+coldStart ... NODE",
+    "rawProbeOutput": {
+      "bootstrapDeepSchema": true,
+      "bootstrapGateOk": true,
+      "bootstrapGateStage": "deepMining",
+      "rescanColdSchema": true,
+      "rescanGateOk": true,
+      "rescanGateStage": "coldStart"
+    },
+    "sourceFacts": [
+      "AlembicPlugin/lib/recipe-generation/plan-generation-gate.ts line 106-108 sets generationStage = input.planSelection.generationStage ?? input.generationStage ?? defaultStage.",
+      "Because validatePlanSelection receives that already-overridden generationStage, the mismatch branch at line 145 cannot catch a bootstrap deepMining selection or rescan coldStart selection.",
+      "AlembicPlugin/lib/shared/schemas/mcp-tools.ts PlanSelectionInput allows all three stages and BootstrapInput/RescanInput reuse it without stage-specific narrowing."
+    ],
+    "requiredRepair": [
+      "Keep P3 scope narrow.",
+      "Make bootstrap reject planSelection.generationStage other than coldStart.",
+      "Make rescan reject planSelection.generationStage coldStart; allow only deepMining or moduleMining.",
+      "Make resolvePlanGenerationGate compare planSelection.generationStage against the executor/requested/default stage instead of allowing planSelection to override the executor stage.",
+      "Add regression tests for bootstrap+deepMining and rescan+coldStart mismatches at both schema or gate level as appropriate.",
+      "Keep P4 checkpoint/SOP/missionBriefing and P5 BiliDili e2e untouched."
+    ]
+  },
+  "residualRisks": [
+    "P4 checkpoint HEAD rewire and SOP/missionBriefing derivation are still future phases.",
+    "P5 real-project e2e is still future phase."
+  ],
+  "controllerConclusion": "Request rework for P3. The implementation handles missing planSelection and forwarding, but does not yet enforce that the planSelection belongs to the executor's stage."
+}

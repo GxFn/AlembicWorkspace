@@ -40,8 +40,8 @@
 
 - 来源类型：`GTODO-2026-05-25-003` 提升 + 用户直接确认继续 PCV。
 - 来源文档：
-  - [PCVM Wave 0 / Wave 3 当前历史](../../../../../codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-0-2026-05-25.md)
-  - [PCVM 目标阶段确认](../../../../../codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-goal-stage-confirmation-2026-05-25.md)
+  - [PCVM Wave 0 / Wave 3 当前历史](../../../../../codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-0-2026-05-25.md)
+  - [PCVM 目标阶段确认](../../../../../codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-goal-stage-confirmation-2026-05-25.md)
   - [PCVM 代码实现依赖调研](../../../../requirement-designs/progressive-chain-validation-metrics/code-implementation-dependency-research-2026-05-25.md)
   - [Workspace PCV bridge](../../../../../codex-control-workspace/skills/dev/progressive-chain-validation/SKILL.md)
 - 用户确认状态：已确认回归 PCV；本轮按 Stage 0 调研，不提前实现。
@@ -167,7 +167,7 @@
 ```text
 git -C progressive-chain-validation rev-parse HEAD
 git -C Alembic rev-parse HEAD
-cd codex-control-workspace && node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md --check
+cd codex-control-workspace && node scripts/sync-current-plan.mjs --plan .wakeflow-active/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md --check
 cd codex-control-workspace && node scripts/verify-control-center.mjs --require-todo --require-task-packages
 cd codex-control-workspace && git diff --check
 ```
@@ -857,7 +857,7 @@ npm test -- <targeted producer / knowledge submit / sourceRef grounding tests>
 发送给：无（历史提示词保留供验收追溯，不再发送）。
 
 ```text
-先读取 AGENTS.md、codex-control-workspace/.workspace-active/workspace/index.md、codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md，以及你所在窗口/目标仓库的 AGENTS.md。
+先读取 AGENTS.md、codex-control-workspace/.wakeflow-active/index.md、codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md，以及你所在窗口/目标仓库的 AGENTS.md。
 
 先明确声明当前窗口定位：你是 AlembicTest 窗口；当前仓库职责是真实 / 默认 AI test-mode runtime 验证，不代替总控验收，不改产品源码。
 
@@ -876,8 +876,8 @@ npm test -- <targeted producer / knowledge submit / sourceRef grounding tests>
 - 总控自测结论：总控已复核 W4I commit / diff / targeted unit / full check；代码侧 grounding 通过。
 - 需要真实场景的理由：after-change 指标必须从真实 / 默认 AI runtime report 中读取，才能判断 producer output 是否改善；总控无法用源码测试替代真实 AI 输出。
 - 测试前边界与多条件判断：本轮唯一问题是“Wave 4I 后，真实 / 默认 AI runtime report 中 N11 invalid sourceRef ratio 是否改善或出现可解释变化”。成功只能证明 after-run surface 可读并给出当前 output 指标；失败需区分 report / persistence 失败、Agent linkage 失败、AI output 漂移或环境问题；不能推出 full cold-start 完成、Dashboard comparison UI 完成或所有 N0-N14 节点可度量。
-- 最近测试单：`PCVM-W4J-ALEMBICTEST-SOURCEREF-GROUNDING-AFTER-RUN`，总控验收通过，见 [test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 最近测试单：`PCVM-W4J-ALEMBICTEST-SOURCEREF-GROUNDING-AFTER-RUN`，总控验收通过，见 [test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)。
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：本轮不触碰真实项目。
 
 ## 回填区
@@ -910,7 +910,7 @@ npm test -- <targeted producer / knowledge submit / sourceRef grounding tests>
   "indexRows": [
     {
       "type": "PCVM Wave 4A cold-start baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
       "status": "Wave 4J 总控验收通过 / Wave 4A 待归档",
       "description": "PCV 产物进入 Workspace current；AlembicTest after-run 已通过总控验收，N11 0/11 invalid。"
     }
@@ -918,7 +918,7 @@ npm test -- <targeted producer / knowledge submit / sourceRef grounding tests>
   "currentIndexRows": [
     {
       "type": "PCVM Wave 4A cold-start baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
       "description": "N0-N14 节点级源码事实、Alembic node-local evidence 验收和 AlembicTest runtime scorecard 派发。"
     }
   ]

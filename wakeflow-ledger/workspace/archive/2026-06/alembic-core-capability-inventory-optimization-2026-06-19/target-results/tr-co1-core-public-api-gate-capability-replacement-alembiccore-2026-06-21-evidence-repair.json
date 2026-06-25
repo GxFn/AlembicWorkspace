@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-co1-core-public-api-gate-capability-replacement-alembiccore-2026-06-21-evidence-repair",
+  "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+  "taskPackageId": "co-1-core-public-api-gate-capability-replacement",
+  "dispatchGroup": "co1-core-public-api-gate-capability-replacement",
+  "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "CO-1",
+  "status": "completed",
+  "summary": "Controller evidence-ref repair for the already completed AlembicCore CO-1 result. Source result tr-co1-core-public-api-gate-capability-replacement-alembiccore-2026-06-21 reported commit d92b97f57d35cc0ccbd66e362e043d9133f2c137 and completed scope. This repaired envelope keeps the same completion conclusion but normalizes file evidence refs from file:AlembicCore/... to AlembicCore/... so Wakeflow review/reducer can resolve paths. Controller independently verified the implementation and gates after the repair. CO-1 added stable @alembic/core/capability facade backed by the real CapabilityProbe implementation, updated package exports/public-api policy/smoke/test coverage, preserved legacy @alembic/core/core/capability compatibility, and did not edit sibling repos, vendor snapshots, release pointers, RecipeContext unused kinds, or remove old core/capability.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19/target-results/tr-co1-core-public-api-gate-capability-replacement-alembiccore-2026-06-21.json",
+    "commit:d92b97f57d35cc0ccbd66e362e043d9133f2c137",
+    "guard-result:guard-public-mqmomjk6-1",
+    "AlembicCore/src/capability.ts",
+    "AlembicCore/package.json",
+    "AlembicCore/config/public-api-boundary.json",
+    "AlembicCore/scripts/smoke-public-api.mjs",
+    "AlembicCore/test/CapabilityProbe.test.ts",
+    "AlembicCore/test/PublicResidualReadinessEntrypoints.test.ts"
+  ],
+  "verification": [
+    "Controller reran git status --short --branch in AlembicCore: ## main...origin/main [ahead 1].",
+    "Controller verified HEAD d92b97f57d35cc0ccbd66e362e043d9133f2c137 and commit changed only config/public-api-boundary.json, package.json, scripts/smoke-public-api.mjs, src/capability.ts, test/CapabilityProbe.test.ts, test/PublicResidualReadinessEntrypoints.test.ts.",
+    "Controller inspected src/capability.ts: stable facade exports default and named CapabilityProbe/types from real core/capability implementation, not a placeholder.",
+    "Controller verified package exports keep both ./capability and ./core/capability; public-api-boundary classifies ./capability as stable and ./core/capability as provisional compatibility.",
+    "Controller verified sibling refs still include Alembic test/config references to @alembic/core/core/capability, so no deletion is authorized in CO-1.",
+    "Controller reran npm run build:check: OK.",
+    "Controller reran npm run lint:public-api-boundary: OK, 59 package exports classified, exact=52, wildcard=7, stable=20, provisional=10, transitional=29.",
+    "Controller reran npm run lint:consumer-core-imports: OK, AlembicAgent refs=46 issues=0; Alembic refs=407 issues=0; AlembicPlugin refs=430 issues=0.",
+    "Controller reran npm run test -- test/CapabilityProbe.test.ts test/PublicResidualReadinessEntrypoints.test.ts test/PublicApiInventory.test.ts: OK, 3 files passed, 9 tests passed.",
+    "Controller reran npm run build: OK.",
+    "Controller reran npm run test: OK, 128 files passed, 1342 tests passed.",
+    "Controller reran npm run lint: OK, Biome checked 612 files, no fixes applied.",
+    "Controller reran npm run smoke:public-api after build: OK, Imported 52 exact public API entrypoints.",
+    "Controller reran git diff --check and git diff --cached --check: OK."
+  ],
+  "risks": [
+    "Legacy @alembic/core/core/capability remains exported and classified as provisional compatibility; CO-3 should migrate remaining sibling test/config refs to @alembic/core/capability before CO-4 considers internalization/removal.",
+    "No destructive removal was attempted because current authority allows replacement preparation, not deletion without fresh zero-reference migration evidence.",
+    "RecipeContext detail/search/prime/relations unused kinds were not touched; they remain pending controller/user decision as required by CO-0 acceptance.",
+    "Generated dist/ was rebuilt for smoke verification but remains build output and is not part of the committed source diff."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-co1-core-public-api-gate-capability-replacement__AlembicCore__CO-1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co1-core-public-api-gate-capability-replacement__AlembicCore__CO-1.json",
+    "deliveryRunId": "run-delivery-co1-core-public-api-gate-capability-replacement__AlembicCore__CO-1",
+    "dispatchGroup": "co1-core-public-api-gate-capability-replacement",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co1-core-public-api-gate-capability-replacement__AlembicCore__CO-1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+    "stateRevision": 7,
+    "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+    "taskPackageId": "co-1-core-public-api-gate-capability-replacement",
+    "targetTaskId": "CO-1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "co1-core-public-api-gate-capability-replacement",
+    "resultId": "tr-co1-core-public-api-gate-capability-replacement-alembiccore-2026-06-21-evidence-repair",
+    "createdAt": "2026-06-20T18:26:08.719Z"
+  },
+  "createdAt": "2026-06-20T18:26:08.719Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

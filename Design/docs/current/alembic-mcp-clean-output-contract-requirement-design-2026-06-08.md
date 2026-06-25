@@ -11,7 +11,7 @@ Design Key: alembic-mcp-clean-output-contract-2026-06-08
 Create a clean, unified Alembic MCP input/output contract across all MCP tools and complete the modification across the full AlembicPlugin MCP surface. "Unified" means a minimal common response base plus one independent output schema and projector per tool. It does not mean a global field bag shared by every tool.
 
 Original plan: `Design/docs/current/alembic-mcp-clean-output-contract-original-plan-2026-06-08.md`.
-Source demand: `.workspace-active/workspace/current/alembic-mcp-clean-output-contract/demand.json`.
+Source demand: `.wakeflow-active/current/alembic-mcp-clean-output-contract/demand.json`.
 
 Confirmed user decisions:
 

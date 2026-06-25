@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p2-plugin-bootstrap-recipemap-output-budgeting-p1",
+  "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+  "summary": "P2 AlembicPlugin: budget bootstrap and recipe_map outputs so MCP-visible inline payloads stay under the design threshold and oversized complete details move to transient refs. Authority: requirement design P2. This depends on accepted P1 and must not include P3 target fileCount or P5 recipeCount semantics.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-coldstart-chain-repair-2026-06-25.md#p2",
+  "createdAt": "2026-06-24T17:27:39.983Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p2-plugin-bootstrap-recipemap-output-budgeting-t1",
+      "taskPackageId": "p2-plugin-bootstrap-recipemap-output-budgeting-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, Design/docs/current/alembic-coldstart-chain-repair-original-plan-2026-06-25.md, Design/docs/current/alembic-coldstart-chain-repair-2026-06-25.md P2, and AlembicPlugin/AGENTS.md. Declare identity as AlembicPlugin. Execute only P2. Goal: every MCP-visible bootstrap and recipe_map response should keep inline payload about <=20KB; complete oversized detail must be recoverable from transient file refs. Implement bootstrap budgeting in lib/recipe-generation/host-agent-workflows/cold-start.ts after P1 onboarding assembly: inline only compact dimension id/label/tier list plus full analysisGuide/submissionSpec for the current executionPlan tier; write full briefing/SOP detail to meta.fullBriefingRef{path,bytes} when truncated; non-truncated responses should keep full inline data and have ref null/absent. Implement recipe_map output budgeting where recipe_map bypasses the core projector: in lib/service/project-knowledge-context/recipe-map/RecipeMapProvider.ts trim high-volume recipeMounts sourceRefs/matchedRefs by byte budget and, when total output exceeds threshold, write a transient full map and expose meta.fullMapRef; update lib/runtime/mcp/handlers or AlembicRecipeMapOutput schema as needed to allow the ref without weakening other fields. Extract or reuse a generic writeTransientTransport(name,payload) equivalent to alembic_plan's existing full tree writer so plan/bootstrap/recipe_map share the same transient transport pattern without duplicating ad hoc file writes. Required evidence: commit hash; changed files; tests proving bootstrap small payload stays untruncated, large payload returns inline under threshold with meta.fullBriefingRef readable and complete; tests proving recipe_map large refs are trimmed inline under threshold with meta.fullMapRef readable and complete; output schema/clean-output tests prove fullBriefingRef/fullMapRef survive; a non-destructive BiliDili or large-fixture probe recording inline byte counts, ref path readability, and full-detail restoration for bootstrap and recipe_map; npm run build:check under Node 22, targeted tests, git diff --check; rg/diff evidence that P3 target fileCount, P5 recipeCount, evidence gate strictness, and alembic_plan two-part contract were not changed. Do not run a destructive full cold-start on BiliDili unless testMode/non-destructive scope is proven safe. Do not touch Core, Test, P3, P5, P6, alembic_plan semantics, evidence-gate strictness, or recipeCount.",
+      "status": "pending",
+      "createdAt": "2026-06-24T17:27:39.983Z"
+    }
+  ]
+}

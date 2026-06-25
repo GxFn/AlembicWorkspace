@@ -8,7 +8,7 @@
 ## 目标判断
 
 - 用户目标：VAD 自动化模式下按 1 分钟 heartbeat 跳转，由代码保证无人值守接续；窗口线程 ID 单独开派发任务交给各窗口收集；后续真实验证另找时机；关闭模式后，下一次窗口完成不再携带自动化下一跳。
-- 最终完成定义：`visible-dispatch.mjs arm` 生成的 heartbeat payload 固定使用 `FREQ=MINUTELY;INTERVAL=1`，并携带目标窗口 claim / finish / 创建下一跳 heartbeat / record-arm / record-stop 的完整无人值守步骤；`mode --disable --write` 后，即使已有目标 heartbeat 已经被 armed，目标窗口醒来并执行 `finish --chain-next` 也只能得到 `modeDisabled`，没有 `chain.payload`，因此不会继续跳转；当前计划单独派发窗口线程登记任务，等待各窗口把 thread id 写入本地 ignored runtime `.workspace-local/visible-dispatch/window-registry.json`，不得写入 Git 跟踪文档或提交到 GitHub。
+- 最终完成定义：`visible-dispatch.mjs arm` 生成的 heartbeat payload 固定使用 `FREQ=MINUTELY;INTERVAL=1`，并携带目标窗口 claim / finish / 创建下一跳 heartbeat / record-arm / record-stop 的完整无人值守步骤；`mode --disable --write` 后，即使已有目标 heartbeat 已经被 armed，目标窗口醒来并执行 `finish --chain-next` 也只能得到 `modeDisabled`，没有 `chain.payload`，因此不会继续跳转；当前计划单独派发窗口线程登记任务，等待各窗口把 thread id 写入本地 ignored runtime `.wakeflow-local/visible-dispatch/window-registry.json`，不得写入 Git 跟踪文档或提交到 GitHub。
 - 当前是否已经达到：脚本侧已达到；窗口线程登记尚待各窗口回填。
 - 未达到时剩余差距：需要 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin`、`AlembicTest` 把各自可见 Codex thread id 登记到本地 ignored runtime；真实多窗口无人值守 smoke 留后续用户确认时机。
 - 已达到时验收 / 归档判断：脚本侧可先验收为已实现；线程登记完成后再准备真实 heartbeat smoke。
@@ -43,7 +43,7 @@
 - 关键入口：
   - `scripts/visible-dispatch.mjs`
   - `scripts/visible-dispatch.test.mjs`
-  - `.workspace-local/visible-dispatch/`
+  - `.wakeflow-local/visible-dispatch/`
 - producer / consumer 依赖：
   - Producer：`arm` 生成 heartbeat payload；目标窗口按 payload 执行 claim / finish / next-arm / record-arm / record-stop；`mode` 状态决定是否允许下一跳。
   - Consumer：总控使用 `controller-tick` / `accept` 做显式验收和 TODO 选择；目标窗口只按当前计划领取自己窗口任务。
@@ -144,7 +144,7 @@ node scripts/verify-control-center.mjs --require-todo --require-task-packages --
 主线动作：
 
 - 每个窗口只确认自己的当前 thread id、窗口名称、工作目录和是否可接收 heartbeat。
-- 在 AlembicWorkspace 工作目录执行 `node scripts/visible-dispatch.mjs register --window <窗口名> --thread <threadId> --write --json`，把 raw thread id 写入 `.workspace-local/visible-dispatch/window-registry.json`；该目录已被 `.gitignore` 忽略，不提交 GitHub。
+- 在 AlembicWorkspace 工作目录执行 `node scripts/visible-dispatch.mjs register --window <窗口名> --thread <threadId> --write --json`，把 raw thread id 写入 `.wakeflow-local/visible-dispatch/window-registry.json`；该目录已被 `.gitignore` 忽略，不提交 GitHub。
 - 回填到聊天或文档时只写“已本地登记 / 未能登记”和命令结果中的 redacted 字段；不得把 raw thread id 写入当前计划、回填文档或其它 Git 跟踪文件。
 
 合并 TODO：
@@ -259,7 +259,7 @@ node scripts/visible-dispatch.mjs register --window <你的窗口名> --thread <
 - 2026-05-26 03:07 CST：`node --test scripts/visible-dispatch.test.mjs` 通过，27 个测试全绿。
 - 2026-05-26 03:10 CST：`node scripts/check-script-docs.mjs`、`node scripts/sync-current-plan.mjs --check`、`node scripts/verify-control-center.mjs --require-todo --require-task-packages --with-script-tests` 均通过；总控验证覆盖 workspace boundary、docs、dispatch coverage、test boundary、TODO board、task packages、`git diff --check` 和 50 个 workspace script tests。
 - 2026-05-26 03:10 CST：已执行 `node scripts/visible-dispatch.mjs mode --disable --write --reason "Wave 8 close switch baseline" --json`，当前 `controller-tick` 返回 `mode=disabled` / `topAction=stopped` / `nextAction=modeDisabled`，不会自动 enqueue、arm 或选择 TODO。
-- 2026-05-26 03:18 CST：按用户纠偏，`AlembicTest` 纳入本轮 thread registry 收集，但仍不是测试交接；thread id 只写入本地 ignored runtime `.workspace-local/visible-dispatch/window-registry.json`，不写入 Git 跟踪文档，不提交 GitHub。
+- 2026-05-26 03:18 CST：按用户纠偏，`AlembicTest` 纳入本轮 thread registry 收集，但仍不是测试交接；thread id 只写入本地 ignored runtime `.wakeflow-local/visible-dispatch/window-registry.json`，不写入 Git 跟踪文档，不提交 GitHub。
 - 2026-05-26 11:02 CST：`visible-dispatch register` 已改为 JSON 输出 redacted thread id，raw thread id 仅保存在 ignored runtime；`check-test-boundary` 增加 `AlembicTest` 非测试型 registry-only 例外，普通测试 / 验证任务仍必须有测试单与边界判断。
 
 <!-- workspace-sync

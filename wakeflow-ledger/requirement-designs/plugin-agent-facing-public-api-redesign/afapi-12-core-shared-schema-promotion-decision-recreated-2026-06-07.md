@@ -5,7 +5,7 @@ Demand Key: `AFAPI-REQ-12-CORE-SHARED-SCHEMA-PROMOTION-DECISION`
 Sequence Order: 12
 Maintainer: AlembicWorkspace
 Document Role: Wakeflow demand definition for the remaining AFAPI track
-State Authority: a future Wakeflow state root under `.workspace-active/workspace/current/`; this document is not a dispatch packet.
+State Authority: a future Wakeflow state root under `.wakeflow-active/current/`; this document is not a dispatch packet.
 
 ## Unified Status
 

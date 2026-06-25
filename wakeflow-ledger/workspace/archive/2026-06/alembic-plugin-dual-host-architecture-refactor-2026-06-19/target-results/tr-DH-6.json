@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-6",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-6-cc-real-acceptance",
+  "dispatchGroup": "dh6-test-cc-acceptance",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "Test",
+  "targetTaskId": "DH-6",
+  "status": "needs-review",
+  "summary": "DH-6 cc 在 workspace 内真实验收 = PASS(cc 功能验收通过)+ 1 个 needs-controller finding(F1)+ 2 notes(N1/N2)。方法:经真 cc 插件 shell bin/alembic-start.mjs → bootstrap → pinned @gxfn/alembic-runtime@0.2.0 → stdio MCP server,自写 MCP client 在一个真实 MCP 会话内驱动;Node v22.22.1;ALEMBIC_HOME sandbox 隔离;offline cache 复用(无 npm/网络)。对象=AlembicPlugin/plugins/alembic-claude-code(gitlink 15fce77)+ runtime;基线干净 AlembicPlugin 532a7d1 / cc 15fce77 / Core 2086188。\n\n核心问题(cc 加载后 init/status/工具行为是否正确、host=claude-code、与 codex 语义对等、纯 MCP 非强进程)→ 全部 YES:\n1) 安装/加载:fresh build(Core@2086188)+ prepare:codex-runtime-package 出 staged 包(bin host-mcp.js);cc shell --dry-run + 真跑均 offline 复用 staged cache(driver stderr 全 0 字节,无 npm);initialize OK(protocol 2024-11-05,serverInfo alembic@0.2.0),exit 0。\n2) 工具面:10 个 agent-tier 工具(status/init/job/prime/work/code_guard/submit_knowledge/bootstrap/rescan/dimension_complete)。\n3) host 身份=claude-code(结构化):status.codex.pluginHost=claude-code;runtimeIdentity pluginHost==expectedPluginHost==claude-code(自洽,派生自 ALEMBIC_PLUGIN_HOST);checks.runtimePluginHost/pluginHost=true。cc 不自认 codex。\n4) init marker:codex-init.json + codex-project-root.json(frozen 文件名,未因 cc 改名)落 sandbox;route=explicit,dataRoot/profile=codex-plugin(frozen),ghost,pluginVersion 0.2.0;projects.json 注册 e8c5530a;post-init status initialized:true round-trip 正确。\n5) 工具调用对真项目全 isError=false:status/init/prime(补 locator facet 后;首次 isError 是我漏传 facet 的输入校验,非产品故障)/code_guard(文件+inline)/work(start)。\n6) 非强进程不变量 HOLD:整会话进程树恒=2(alembic-start.mjs shell + host-mcp.js runtime,stdio),runtime 未拉起任何 daemon/常驻子进程;daemon.removed=true(PDR-3);init startsDaemon:false;exit 后零残留(预存在的 Alembic/dist/bin/daemon-server.js 是主仓 daemon,非插件、非本会话所起)。\n7) codex 语义对等(Test 内部参照,同一 runtime 翻转 host env,独立 ALEMBIC_HOME;非 codex-host 验收,后者按已决#9 用户外部):10 工具面一致、status/init/code_guard/work 输出契约 shape 一致;status/runtime 差异仅 (a) host 身份值 pluginHost(claude-code vs codex,各自自洽) (b) plugin.assets.required(cc=[] vs codex=3 个品牌 SVG,两侧 ok:true,属 per-host 打包/非功能)→ 语义对等成立。\n8) 隔离:真实 ~/.asd 未被本验收触碰(sandbox 项目 id e8c5530a 在真 projects.json count=0,非真实 workspace 目录)。\n\n未改产品代码;AlembicPlugin 仅 rebuild dist + .tmp staged(均 gitignored,tracked source 仍 0 dirty,无 commit);sandbox 在 Test/tmp/dh6(gitignored)。详见 evidence/DH-6-REPORT.md。需控制器:接受 cc 功能验收 + 裁定 F1 是否属本需求范围(RC-1 消除硬编码 codex)还是 follow-up。",
+  "evidenceRefs": [
+    "Test/tmp/dh6/evidence/DH-6-REPORT.md",
+    "Test/tmp/dh6/evidence/01-bootstrap-dry-run.json",
+    "Test/tmp/dh6/evidence/02-tools-list.json",
+    "Test/tmp/dh6/evidence/03-pass2-cc.json",
+    "Test/tmp/dh6/evidence/04-pass2b-cc.json",
+    "Test/tmp/dh6/evidence/05-pass3-codex.json",
+    "Test/tmp/dh6/asd-home/.asd/workspaces/e8c5530a/.asd/codex-init.json",
+    "Test/tmp/dh6/asd-home/.asd/codex-project-root.json"
+  ],
+  "verification": [
+    "node v22.22.1 (.nvmrc=22); npm run build (Core @2086188) + npm run prepare:codex-runtime-package -> staged @gxfn/alembic-runtime@0.2.0 (bin dist/bin/host-mcp.js, imports without #http)",
+    "cc bin/alembic-start.mjs --dry-run + real launches: runtimeCache.source=env, offline=true, env.ALEMBIC_PLUGIN_HOST=claude-code; offline cache reuse, no npm/network (all 4 driver stderr = 0 bytes)",
+    "MCP initialize OK protocolVersion 2024-11-05 serverInfo alembic@0.2.0; tools/list = 10 agent-tier tools; session exit 0",
+    "alembic_status aspect=runtime: codex.pluginHost=claude-code, runtimeIdentity.pluginHost==expectedPluginHost==claude-code, checks.runtimePluginHost=true",
+    "alembic_init OK mode=ghost; markers codex-init.json (route=explicit, profile=codex-plugin, dataRoot=sandbox) + codex-project-root.json frozen names in sandbox; projects.json id e8c5530a; post-init status initialized:true",
+    "tools isError=false: status, init, prime (after locator facet scenario/capability), code_guard (explicit file + inline code, findings=0 clean file), work phase=start (workRef)",
+    "non-resident: in-session process tree = {alembic-start.mjs, host-mcp.js} only across all calls; daemon.removed=true (PDR-3); init startsDaemon:false; 0 plugin residue after exit code 0",
+    "codex parity (Test-internal, same runtime host-env flipped, separate ALEMBIC_HOME): identical 10-tool surface; identical output contract shapes for status/init/code_guard/work; differs only by pluginHost value + plugin.assets.required (cc=[] vs codex=3 branding SVGs, both ok:true)",
+    "isolation: real ~/.asd untouched - sandbox project id e8c5530a absent from real ~/.asd/projects.json (count 0), not a real workspace dir",
+    "AlembicPlugin tracked source still 0 dirty after test build (dist/.tmp gitignored); no product code changed; no commits"
+  ],
+  "risks": [
+    "F1 (minor, needs-controller; repair -> AlembicPlugin if in scope): per-call agentHost falls back to hardcoded literal 'codex' when omitted, even under cc runtime (pluginHost=claude-code). Source: lib/runtime/mcp/handlers/agent-public-tools.ts:905 & :925 (args.agentHost ?? ('codex' as const)); lib/shared/schemas/mcp-tools.ts:128 (AgentHostSchema.default('codex')). Explicit agentHost:'claude-code' is accepted+recorded. Runtime host identity itself is correct; this is a per-call intent-field default, not 'runtime self-identifying as codex'. Controller/Design decides if RC-1 covers this or it's a follow-up. Test did not change product code.",
+    "N1 (known, out of DH-6 scope): human-facing wording still says 'Codex' (e.g. 'Alembic Codex workspace initialized', 'Codex host-agent bootstrap') + frozen ids (status block key 'codex', profile 'codex-plugin', projector 'codex-local-clean-output-projector', frozen filenames codex-init.json). Documented hostWordingDebt (PLUGIN-SOURCE.json), owned by CC3, explicitly excluded from DH-6. Structured host identity is claude-code. Not a defect.",
+    "N2 (informational): DH-6 task parenthetical named cc tools alembic_search/alembic_project_matrix; the real agent-tier surface has neither (10 tools listed). Task instructed reading the real tool names, which was done.",
+    "Not exercised (deliberate, non-destructive scope): alembic_bootstrap (DESTRUCTIVE cold-start host-agent flow), alembic_rescan, alembic_submit_knowledge, alembic_dimension_complete, alembic_job (resident-or-embedded). If full cc cold-start knowledge-build evidence is wanted, that is a separate heavier interactive run.",
+    "Environment note: this cc session already has a live 'alembic' MCP dev-install configured ALEMBIC_PLUGIN_HOST=codex (desktop app) pointing at real ~/.asd; DH-6 deliberately did NOT use it as the object (wrong host identity + unsandboxed) and instead drove the freshly-built cc plugin in an isolated sandbox."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh6-test-cc-acceptance__Test__DH-6",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh6-test-cc-acceptance__Test__DH-6.json",
+    "deliveryRunId": "run-delivery-dh6-test-cc-acceptance__Test__DH-6",
+    "dispatchGroup": "dh6-test-cc-acceptance",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh6-test-cc-acceptance__Test__DH-6.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 67,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-6-cc-real-acceptance",
+    "targetTaskId": "DH-6",
+    "targetWindow": "Test",
+    "dispatchGroup": "dh6-test-cc-acceptance",
+    "resultId": "tr-DH-6",
+    "createdAt": "2026-06-20T10:18:56.255Z"
+  },
+  "createdAt": "2026-06-20T10:18:56.255Z",
+  "stateRevisionObserved": 67,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

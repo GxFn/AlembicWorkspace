@@ -1,0 +1,677 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "title": "Recipe Generation Conformance Correction (Plan Full-Authority + No-Guess + Truthfulness + Panorama Retire / Frontend Pyramid)",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Completed no-guess correction state root must be archived before intaking supplemental residual gap closure demand.",
+  "revision": 77,
+  "activeStageId": null,
+  "updatedAt": "2026-06-22T19:36:50.040Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-p1",
+      "summary": "P1/P2 Core producer: implement the Core side of Plan full-authority and no-guess/canonical dimension repair for alembic-recipe-plan-no-guess-correction-2026-06-22. Authority is Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md plus P0 evidence. Scope: (1) Plan draft information package and PlanLedger must no longer derive authoritative PlanIntent dimensions/stages/moduleBindings from recommendedDimensions/top/order. Draft may expose factual ProjectContext/dynamic/domain/planning-aid reports, but Plan intent must be complete Agent-authored payload on confirm and generation-state remains read-time projection only. (2) Core contracts/tests must support complete Plan payload, full dimensions, stages, moduleBindings, plannedNextActions, scale/budget, rationale/evidenceRefs without double-writing generation state. (3) Prepare canonical signal-aware dimension path required by PD-2 while avoiding R6 no-signal shrinkage for generation scope; generation scope must be represented by confirmed Plan ids rather than recalculating with legacy resolveActiveDimensions. (4) Identify and implement Core-side public API/export changes needed for downstream Plugin and Alembic migration; do not leave a thin interface or fake compatibility. (5) Characterization/repair tests required: Plan draft no longer auto-fills from recommendations, confirm requires full complete payload, persisted intent remains complete, generation-state projection reads from repositories, signal-aware/domain facts are required for dimension relevance. Boundaries: do not edit AlembicPlugin/Alembic/Dashboard; do not change Codex MCP tool text or four-tool external semantics; do not delete evidence/proposal/vector structures; do not implement GPT5.5 nuclear delete rule; do not remove old exports in a way that leaves known downstream consumers broken unless the task also provides an explicit migration path and reports exact downstream follow-up. Return TargetResultEnvelope with commit hash, changed files, exact tests/build/lint, API/export changes, and downstream consumer migration instructions.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/evidence/p0-controller-consumer-inventory-and-self-checks.md",
+      "createdAt": "2026-06-22T11:40:01.021Z"
+    },
+    {
+      "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+      "summary": "Rework P1/P2 Core producer after controller review evt-20260622121836-0005. The previous commit fe563ee correctly removed draftPackage.intent and added complete-confirm validation, but it still leaves recommendation/top/order semantics in the Core Plan facts path: DimensionPlanningAidReport still defines/builds recommendedDimensions, dimensionOrder, maxRecommendedDimensions, subsetHints, and recommended constraint severity, and buildPlanDraftInformationPackage exposes the entire planningAids object through sourceReports. This conflicts with Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md lines 28-37 and group A lines 43-56: Plan facts are confirmed facts, not recommendations/top-N/order; Plugin/Core must not recommend, rank, top-slice, or curate dimensions for the authoritative Plan. Scope: remove or neutralize these Core public/report fields from the Plan path; expose only factual dimension signal/selection/evidence reports for the Agent; information-gathering steps must be derived without top-N slicing/order-as-decision; tests must assert no recommended/top/order/subset/default-order leak from the draft information package or Plan-path report. If a non-Plan legacy consumer truly still needs old fields, keep it out of the Plan path with an explicit consumer/migration note rather than exposing it to sourceReports. Preserve the good work from fe563ee: no draft intent, confirm requires complete Agent PlanIntent+rationale, stop-write planning_brief_json, read-time generation-state projection, and resolvePlanDimensionDefinitions canonical confirmed-id API. Do not edit AlembicPlugin/Alembic/Dashboard in this package; do not add compatibility/fallback/renamed recommendation semantics. Return TargetResultEnvelope with commit, changed files, exact tests, and rg evidence for recommendedDimensions/dimensionOrder/maxRecommendedDimensions/subsetHints/top in Core Plan path.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/target-results/tr-p1p2-core-plan-authority-dimension-canonical-t1.json",
+      "createdAt": "2026-06-22T12:19:08.226Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+      "summary": "Rework P1/P2 Core producer after controller review evt-20260622123449-0009. Previous rework commit e1de391 removed recommendedDimensions/dimensionOrder/scaleDecision/subsetHints/maxRecommendedDimensions/defaultOrder/top leaks, but controller raw review found one remaining original-requirement mismatch: Core still exposes DimensionPlanningAidReport.crossDimensionConstraints and keeps buildCrossDimensionConstraints in the Plan facts path, and AlembicPlugin still consumes that field. Original Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md lines 28-37 say Plan inputs are facts/reference material, not recommendations/top/pre-decisions; group A line 51 explicitly says to delete buildCrossDimensionConstraints with the recommendation/sorting symbols; line 53 removes Plan-facing subset/constraint recommendation semantics. Scope for this Core-only rework: delete CrossDimensionConstraint, DimensionPlanningAidReport.crossDimensionConstraints, and buildCrossDimensionConstraints from Core Plan-facing dimensionPlanning contracts/report output; do not rename it to an auxiliary/factual/relation/fallback field; do not keep it for internal Plan path use. Update Core tests to assert the draft information package and buildDimensionPlanningAids output do not contain crossDimensionConstraints/CrossDimensionConstraint/buildCrossDimensionConstraints as well as the already-removed recommended/top/order/subset/default-order fields. Preserve all accepted-good work from fe563ee/e1de391: no draftPackage.intent, confirm requires complete Agent PlanIntent+rationale, draftSource plugin-collected-facts, stop-write planning_brief_json, read-time generation-state projection, and resolvePlanDimensionDefinitions canonical confirmed-id API. Do not edit AlembicPlugin/Alembic/Dashboard in this package; report downstream Plugin migration need explicitly. Return TargetResultEnvelope with commit, changed files, exact tests, and rg evidence proving no Core Plan-path matches for crossDimensionConstraints/CrossDimensionConstraint/buildCrossDimensionConstraints plus the prior recommended/top/order/subset leak scan.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/target-results/tr-p1p2-core-plan-authority-dimension-canonical-rework-1-t1.json",
+      "createdAt": "2026-06-22T12:35:15.517Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+      "summary": "P1/P2 AlembicPlugin consumer migration after accepted Core producer commits fe563ee/e1de391/bedbe2b. Original authority: Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md lines 28-37 (Plan facts only; Agent authors complete authoritative Plan; no recommendation/top/curation), group A lines 43-56 (delete Plugin maxRecommendedDimensions schema/scenarios, no recommendedDimensions/dimensionOrder/subset/top, A7 targetCount default keep), group B lines 58-66 (confirmed Plan dimension IDs must be canonical; generation stage direct resolves confirmed Plan IDs, not legacy language/framework recomputation), group C lines 68-74 (confirm requires complete Agent payload; delete inheritance/optional no-payload path; no public stale/signature escape valves), group D lines 76-84 (no planningBrief persistence/signature authority; delete public escape valves), group E lines 86-95 (delete Plugin fallback fs/regex scan; expose partial/understandingGaps instead of guessing; mark truncation partial; no fake previousModules delta), and phase lines 157-180. Current raw Plugin evidence shows lib/recipe-generation/plan-tool.ts still passes maxRecommendedDimensions to Core, summarizes removed planningAids fields recommendedDimensions/dimensionOrder/scaleDecision/subsetHints/crossDimensionConstraints, keeps public allowSignatureMismatch/allowStaleVersion flow, silently inherits existing selectedDimensions/scale/moduleBindings/plannedNextActions in confirm normalizers, keeps fallback fs/regex project context path and moduleSeeds top/truncation, and host-agent workflows still use resolveActiveDimensions primaryLang fallback. Scope: implement only AlembicPlugin-owned P1/P2 changes. Remove schema/tool/scenario/test use of maxRecommendedDimensions and any recommended/top/order/subset/crossDimensionConstraints Plan output; make draft return fact package only without intent or deterministic selection, and update nextAction/descriptions/scenarios to require Agent-authored complete confirm payload. Confirm must require non-empty selectedDimensions, scale, moduleBindings, plannedNextActions, and rationale; remove silent inheritance from draft/existing; remove public allowSignatureMismatch/allowStaleVersion from public schema/tool path rather than keeping fallback/admin escape valves. Adapt to Core bedbe2b DimensionPlanningAidReport contract without compatibility shims. For generation stage, consume confirmed Plan dimension IDs directly through Core canonical resolution/available API rather than recomputing language/framework active dimensions; test Plan-confirmed SwiftUI/framework dimensions are not intersected away. Delete Plugin fallback fs/regex ProjectContext guess path for Plan draft; when Core ProjectContext is incomplete, return partial draft/understandingGaps with observable omitted/partial markers, not success with guessed facts. Keep A7 targetCount/targetPerModuleDimension only if still strictly coverage-gap factual target per design line 54; do not touch Core/Alembic/Dashboard/Test; do not use auxiliary/compatibility/fallback/top recommendation semantics. Return TargetResultEnvelope with commit, changed files, exact tests/build/lint, and rg evidence proving removed Plugin Plan path tokens are gone or only appear in explicit negative tests/comments allowed by task.",
+      "status": "accepted",
+      "sourceRef": "evt-20260622124435-0013 accepted Core rework-2; Core HEAD bedbe2b80a51b658d33c677e691e07d83cfef48b",
+      "createdAt": "2026-06-22T12:46:09.556Z"
+    },
+    {
+      "taskPackageId": "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1",
+      "summary": "Rework AlembicPlugin P1/P2 Plan authority consumer migration after controller rejection of p1p2-plugin-plan-authority-no-guess-consumer-t1. Keep accepted positive work from commit 30333e85254179d0fc0ec3461fd78beb787c7d83; fix only two Design-line mismatches. Authority lines: Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md lines 68-74 (C1: confirm schema optional + silent inheritance is deviation; confirm must require complete Agent-authored payload with selectedDimensions, scale, moduleBindings, plannedNextActions, evidenceRefs, rationale; use operation/discriminator/superRefine or equivalent schema-level routed validation, not only late handler fallback) and lines 76-84 (D1: planningBrief persistence + exposure must stop; stop-write alone is insufficient if public plan projector still exposes planningBrief). Raw controller evidence: AlembicPlugin/lib/shared/schemas/mcp-tools.ts lines 830-868 still defines PlanInput as one optional-field object with no PlanInput superRefine/discriminated confirm enforcement; plan-tool.ts lines 1036-1101 blocks missing payload later but public schema/runtime schema path still preserves optional-confirm shape and tests do not cover schema parse. plan-tool.ts lines 1237-1253 still returns planningBrief in projectPlanRecord, so draft/confirm/get plan objects expose planningBrief as a public field, even if storage is null; tests only assert stored planningBrief is null. Required fixes: (1) add operation-aware PlanInput schema/routed validation so confirm without non-empty selectedDimensions, scale, moduleBindings, plannedNextActions, evidenceRefs, and rationale fails at the schema/runtime validation boundary; keep draft/get valid; add direct regression tests for PlanInput safeParse or the routed schema validation path plus handler error behavior. (2) remove planningBrief from public projectPlanRecord/plan outputs for draft/confirm/get; keep draft top-level fact materials/sourceReports/planningBrief only if explicitly treated as Agent fact package, not persisted plan record; add tests asserting public plan object does not have planningBrief while stored planningBrief remains null. (3) rerun build:check, targeted Plan tests, targeted HostMcpServer bootstrap test, scoped Biome, git diff --check, scenario JSON parse, and rg proving no recommendation/top/fallback/escape-valve terms reappear except allowed negative tests/non-Plan top-area/top-level wording. Do not touch Core/Alembic/Dashboard/Test; do not reintroduce compatibility, fallback, recommendation, top, or optional confirm semantics.",
+      "status": "accepted",
+      "sourceRef": "evt-20260622131858-0017 rework decision for p1p2-plugin-plan-authority-no-guess-consumer-t1",
+      "createdAt": "2026-06-22T13:19:24.104Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p3-core-durable-checkpoint-primitives-p1",
+      "summary": "P3 Core producer: implement only Core-owned durable git-diff checkpoint primitives required by the confirmed no-guess correction demand. Authority is the requirement design group G and P3 phase: checkpoint must be durable, keyed by projectRoot+scopeId+folderId, initialized from active confirmed Plan lastUpdatedFromCommit instead of HEAD^ guessing, and must support merge-base/catch-up semantics so skipped/truncated/non-ancestor scans do not silently advance the checkpoint. Scope is Core-owned BUILD/REWIRE only: add migration 013/checkpoint table and repository/service primitives, public API/export surface needed by downstream AlembicPlugin, tests for persistence/upsert/read/composite keys/initial-from-plan/non-advance semantics, and evidence naming the exact downstream Plugin integration contract. Do not edit AlembicPlugin/Alembic/AlembicDashboard/Test; do not implement Plugin routing, fallback, recommendation/top, changeLog-only shortcuts, in-memory-only checkpoint, or compatibility shims without a named consumer and cleanup condition. Return TargetResultEnvelope with commit hash, changed files, exact build/test/lint commands, public API/export changes, and downstream Plugin migration instructions.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md#组-g--checkpoint-持久化must-build; Design/docs/current/alembic-recipe-plan-no-guess-correction-workspace-handoff-2026-06-22.md#Phase-Candidates-P3",
+      "createdAt": "2026-06-22T14:03:10.395Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-evolution-checkpoint-consumer-p1",
+      "summary": "P3 Plugin consumer: implement only AlembicPlugin-owned evolution/checkout truthfulness work from confirmed requirement design groups F and G, consuming accepted Core commit be6f442 durable checkpoint primitives. Authority is Design lines F1-F5 and G plus P0 duplicate-path evidence: route logic modifications to real proposals, route new modules to file-level/scoped moduleMining with PD-4 exemption, delete dead opportunistic fallbacks/extractTaskCloseOutcome, keep dimensions/moduleScope/scaleOverride as testMode/execution overlays only, replace in-process/HEAD^ checkpoint guessing with Core durable GitDiffCheckpointService/repository contract, preserve unresolved/catch-up ranges, and handle duplicate git-diff-checkpoint compatibility paths only after a consumer sweep or with explicit consumer+cleanup condition. Do not edit Core/Alembic/Dashboard/Test; do not add recommendation/top/changeLog-only shortcuts/fallback compatibility without authority. Return TargetResultEnvelope with commit hash, exact tests/build/lint/rg evidence, public API usage, duplicate-path decision, and remaining downstream validation needs.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:97-116; Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:161-171; .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/evidence/p0-controller-consumer-inventory-and-self-checks.md:34-54; .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/evidence/p0-controller-consumer-inventory-and-self-checks.md:102-109; AlembicCore commit be6f4425dd53776561169bff8480d8acaa813a59",
+      "createdAt": "2026-06-22T14:25:14.440Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-evolution-checkpoint-consumer-rework-1-p1",
+      "summary": "AlembicPlugin P3 G2 catch-up rework only. Preserve valid F1-F5 cleanup and existing Core durable service consumption from commit a7db73d; do not expand scope and do not edit Core/Alembic/Dashboard/Test. Required fix: implement original G2 semantics so checkpoint advances only after successful route/catch-up, GitDiffScanResult exposes mergeBase, non-ancestor with available merge-base routes mergeBase..HEAD through unified evolution instead of stopping/dropping events, unresolved/unavailable ranges remain preserved, and route outcome records mergeBaseCommit / catch-up-routed as supported by Core. Replace tests that assert stop-on-non-ancestor with tests proving catch-up diff is routed and checkpoint advancement waits for successful catch-up route. No recommendation/top/fallback/changeLog-only compatibility paths.",
+      "status": "accepted",
+      "sourceRef": "controller rework decision evt-20260622145804-0029; Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:109,114,168; target result tr-p3-plugin-evolution-checkpoint-consumer-t1; commit a7db73d3ac7c5757c0cb26ec348229a39954aa07",
+      "createdAt": "2026-06-22T14:58:26.352Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p4-core-source-ref-plan-ledger-truthfulness-p1",
+      "summary": "P4 Core producer: implement only Core-owned source-reference and plan-ledger truthfulness fixes for H1/H4/H5/H6. Authority: H1 SourceRefReconciler parse-error/missing reasoning sources must not clear refs; only valid-empty may clear. H4 PlanLedger codeRecipeMapping must not fabricate generated source refs from sourceFile when source_refs are absent; use existing missing state. H5 add byModuleDimension coverage matrix contract derived from mapping.modulePath x dimensionIds and binding.dimensions. H6 PlanRepository must distinguish missing rows from damaged/unknown status/bad JSON typed errors while preserving public PlanRecord|null contract where required and handling listByProject row-by-row. Boundaries: Core only; no AlembicPlugin/Alembic/Dashboard/Test edits; no recommendation/top/fallback compatibility; do not delete plans/evidence/proposals/vector structures; preserve package exports and downstream migration notes. Backfill exact commit, changed files, tests/build/lint/check evidence, public API/export changes, and Plugin consumer migration notes for H4/H5 if any.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:117-127,159,169,203,208; Design/docs/current/alembic-recipe-plan-no-guess-correction-workspace-handoff-2026-06-22.md:57-58,83,95; prior accepted P1/P2/P3 controller decisions through evt-20260622151113-0033",
+      "createdAt": "2026-06-22T15:12:49.774Z"
+    },
+    {
+      "taskPackageId": "p4-plugin-freshness-grounding-consumer-p1",
+      "summary": "P4 Plugin consumer: implement only Plugin-owned source freshness / relationship grounding public truthfulness and Core H4/H5 consumption. Authority: H2/H3 user-confirmed behavior is degraded/non-final, Recipe still created, not failed, not silent success; H4/H5 require Plugin outputs to consume Core PlanCodeRecipeMapping status=missing and coverage.byModuleDimension instead of treating missing source refs as generated or collapsing coverage to one dimension. Boundaries: AlembicPlugin only; no Core/Alembic/Dashboard/Test edits; no recommendation/top/fallback compatibility; do not delete plans/evidence/proposals/vector structures; do not change four-tool external semantics beyond confirmed degraded/non-final truthfulness. Backfill exact commit, changed files, tests/build/lint/check evidence, public output/API shape notes, and any downstream P6/Test implications.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:118-127,159,169,203,208; Design/docs/current/alembic-recipe-plan-no-guess-correction-workspace-handoff-2026-06-22.md:57-58,80-85,95; .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/evidence/p0-controller-consumer-inventory-and-self-checks.md:109; accepted Core P4 decision evt-20260622153433-0037 / commit 85461a80acb4eed44b3edebde5ff8c299b1c0bd2",
+      "createdAt": "2026-06-22T15:36:10.993Z"
+    },
+    {
+      "taskPackageId": "p5-core-panorama-retire-architecture-signals-p1",
+      "summary": "P5 Core producer: implement only Core-owned Panorama retirement and architectureIntelligence cleanup from confirmed group I. Authority: Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:129-143,170,207-210; P0 evidence lines 22-33 and 102-110. User decision S4/I3 is direct Panorama delete and no complex architecture understanding rebuild: delete dead Core Panorama service surface/tests/exports that have no active DI consumer; remove ProjectIntelligenceRunner.materializeProjectPanorama dead code and project-intelligence/test-fixtures Panorama exports/tests as appropriate; delete architectureIntelligence hollow rich analysis roles/coupling/layers/callflow and change default FAB-046-style unknown, while preserving the domain/style signals needed by Plan signature and dimension relevance. KEEP ProjectContext phase runners, code_entities/knowledge_edges, /modules/dep-graph source capability, and domain-signal detection. Do not edit AlembicPlugin/AlembicDashboard/Alembic/Test; do not rebuild Panorama under another name; do not delete resolveActiveDimensions or ProjectContext graph capabilities outside the confirmed P5 scope. Backfill commit hash, exact changed files, import/export sweep evidence, tests/build/lint/check evidence, and downstream Plugin/Dashboard/Alembic cleanup notes.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:129-143,170,207-210; .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/evidence/p0-controller-consumer-inventory-and-self-checks.md:22-33,102-110; accepted P4 Plugin decision evt-20260622155734-0041",
+      "createdAt": "2026-06-22T15:59:06.007Z"
+    },
+    {
+      "taskPackageId": "p5-dashboard-project-pyramid-primary-view-p1",
+      "summary": "P5 Dashboard consumer: implement only frontend I2 user-confirmed scope: make the ProjectContext module dependency pyramid the primary surface and remove Panorama/knowledge coverage UI. Authority: Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:129-143,170,207-210; handoff lines 58-60 and 80-85; P0 evidence line 110. Existing DepGraphView uses /modules/dep-graph and ProjectContext-backed pyramid layout; lift it from Panorama dependencies sub-tab to the main Project Pyramid / module dependency view. Remove PanoramaView coverage/overview/health/gaps panels, knowledge coverage tiles such as guardHits/searchHits, dead getPanorama*/knowledgeStats API client usage that exists only for removed coverage/Panorama surfaces. Preserve other functional tabs: recipes, candidates, guard, jobs, skills. Handle loading/empty/error/partial data states and provide browser/screenshot evidence if the repo workflow supports it. Boundaries: Dashboard only; no Core/Plugin/Alembic/Test edits; no mock/static replacement; no new backend contract beyond existing /modules/dep-graph. Backfill commit, changed files, typecheck/build/test/lint and UI verification evidence.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:129-143,170,207-210; Design/docs/current/alembic-recipe-plan-no-guess-correction-workspace-handoff-2026-06-22.md:58-60,80-85,95-97; .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/evidence/p0-controller-consumer-inventory-and-self-checks.md:110",
+      "createdAt": "2026-06-22T15:59:19.835Z"
+    },
+    {
+      "taskPackageId": "p5-alembic-main-panorama-route-cleanup-p1",
+      "summary": "P5 Alembic main cleanup: implement only main-repository Panorama retirement pieces authorized by group I. Authority: Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:129-143,170,207-210; handoff lines 58-60 and 80-85; P0 evidence line 110. Scope: remove or retire Alembic main stale Panorama route/API/generated client surfaces and tests that only serve the deleted Panorama surface; preserve /governance/* routes and any non-Panorama CLI/daemon/HTTP/Dashboard server capabilities. If generated dashboard API types or route families still expose /panorama only as 410-retired surface, either clean them as required by the confirmed deletion or report the exact remaining consumer/blocker; do not delete unrelated local runtime, dashboard server, native/IDE, release, sandbox, or provider capabilities. Boundaries: Alembic main only; no Core/Plugin/Dashboard/Test edits; no thin adapter or mock replacement; no rebranding Panorama under another name. Backfill commit, changed files, import/route sweep, build/test/lint/check evidence, and downstream Dashboard/API-client implications.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:129-143,170,207-210; Design/docs/current/alembic-recipe-plan-no-guess-correction-workspace-handoff-2026-06-22.md:58-60,80-85,95-97; .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/evidence/p0-controller-consumer-inventory-and-self-checks.md:110",
+      "createdAt": "2026-06-22T15:59:34.456Z"
+    },
+    {
+      "taskPackageId": "p5-plugin-panorama-consumer-cleanup-p1",
+      "summary": "P5 Plugin consumer cleanup: implement only Plugin-owned cleanup for confirmed Panorama retirement. Authority: Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:129-143,170,207-210; handoff lines 57 and 80-85; P0 evidence line 110. Scope: remove/update Plugin tests, MCP output contracts, Codex/runtime adapters, and any client/test fixtures that still import or assert deleted Core Panorama services (PanoramaIntegration, PanoramaWiring, panorama mocks, alembic_panorama clean output surface if it only wraps the deleted Panorama route). Preserve ProjectContext graph/module-layers capabilities and Recipe-generation domain signals; do not remove plans/evidence/proposals/vector structures or four-tool semantics; do not touch Core/Alembic/Dashboard/Test. If a public plugin surface cannot be deleted without a confirmed external compatibility decision, return blocked/needs-review with exact consumer evidence rather than keeping fake compatibility. Backfill commit, changed files, rg/import sweep for Panorama remnants, build/check/lint/test evidence, and downstream P6 implications.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:129-143,170,207-210; Design/docs/current/alembic-recipe-plan-no-guess-correction-workspace-handoff-2026-06-22.md:57,80-85,95-97; .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/evidence/p0-controller-consumer-inventory-and-self-checks.md:110",
+      "createdAt": "2026-06-22T16:00:00.163Z"
+    },
+    {
+      "taskPackageId": "p6-test-bilidili-final-scenario-acceptance-p1",
+      "summary": "P6 Test final scenario acceptance for alembic-recipe-plan-no-guess-correction-2026-06-22. Authority: original requirement design P6 requires BiliDili real Swift project test mode plus restored RG-10 four-step acceptance after accepted P1/P2/P3/P4/P5 product repairs. Scope: Test window only. Validate the complete corrected behavior without adding product-code scope: (1) Plan truthfulness/no-guess: draft uses real ProjectContext/dynamic/domain facts as fact package, confirm requires complete authoritative Plan payload, no recommendation/top/order/fallback semantics in outputs; (2) scoped recipe generation: confirmed Plan drives selected dimensions/module bindings/stages, Recipe creation anchors ProjectContext and created recipe is immediately retrievable; (3) commit-driven unified evolution: real commit changes route through durable checkpoint / merge-base catch-up / module-mining or proposal paths truthfully, no fake previousModules/changeLog-only fallback, and checkpoint advances only after successful route; (4) freshness/vector degradation: stop/unavailable vector/Ollama path is visible as degraded/non-final/retrievalMayBeStale rather than silent success; (5) P5 UI/route cleanup smoke: Dashboard Project Pyramid backed by /modules/dep-graph is primary surface, /panorama public route/API/tool/client surfaces are gone or retired as accepted, governance route remains. Use BiliDili test mode/small scoped dimensions, not full cold-start. Evidence must include exact repo SHAs under test, commands, runtime JSON/logs/screenshots where applicable, and explicit pass/fail per step. Do not edit AlembicCore/AlembicPlugin/Alembic/AlembicDashboard product code. If product defect appears, return blocked/needs-review with exact failing step and raw evidence rather than repairing in Test.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md:P6; Design/docs/current/alembic-recipe-plan-no-guess-correction-workspace-handoff-2026-06-22.md:Phase Candidates P6; accepted controller decisions through evt-20260622171913-0055",
+      "createdAt": "2026-06-22T17:19:48.361Z"
+    },
+    {
+      "taskPackageId": "p6-core-checkpoint-empty-initialization-repair-p1",
+      "summary": "P6 rework from Test final scenario: repair Core git-diff checkpoint initialization so the durable checkpoint cannot remain empty after a confirmed Plan exists. Authoritative requirement is Group G in Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md: G1 initial value must be getActiveConfirmed().lastUpdatedFromCommit, G2 unresolved/skipped ranges must not be lost or advanced as success, G* active duplicate paths must stay covered. Raw evidence: Test controlled BiliDili diff from baseline 06b7bb86fcd7432409b3a32ed210c3c1eb0f0e16 to changed 3fc61ed94ac8df7ff115c8c7736f4f0db5667761 had A/M/R100 events, but alembic_rescan reported previousHead=null, eventCount=0, headRangeStatus=none, routeStatus=skipped; SQLite plans had last_updated_from_commit=06b7bb86fcd7432409b3a32ed210c3c1eb0f0e16 while git_diff_checkpoints had checkpoint_commit=null and initial_from_plan_commit=null. Scope: AlembicCore only. Fix GitDiffCheckpointService/Repository behavior so an existing checkpoint row with null checkpointCommit and null initialFromPlanCommit is treated as uninitialized when an active confirmed Plan has lastUpdatedFromCommit; seed checkpointCommit and initialFromPlanCommit from that Plan commit and preserve normal existing non-null checkpoints. Do not advance checkpoint on skipped/no-event/truncated/unresolved route. Add/adjust focused Core tests for: no row initializes from confirmed Plan, existing empty row after pre-confirm/no-op is repaired from confirmed Plan, existing non-null checkpoint is preserved, skipped route does not advance. Do not change Plugin, Test, Dashboard, or requirement semantics; do not add fallback/top/recommend/guess logic.",
+      "status": "accepted",
+      "sourceRef": "review tc-20260622175025-0058 / P6 Test blocked evidence",
+      "createdAt": "2026-06-22T17:51:27.687Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+      "summary": "P6 final scenario revalidation after accepted Core checkpoint repair. This is not a new requirement and not a product-code task. Authoritative requirement remains Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md Final Completion Definition and Validation Strategy: BiliDili real Swift project, test mode subset/small scale, original RG-10 four-step chain must pass without replacement evidence. Re-run the BiliDili final scenario with accepted product inputs including AlembicCore commit 313d7ccced63a3fe83cd1e9ac1f3097c0c061bb4 (repair for G1/G2 empty checkpoint initialization), prior accepted AlembicPlugin/Alembic/AlembicDashboard/BiliDili inputs from the current no-guess root, and no unreviewed product edits. Required evidence: (1) planning truthfulness: draft facts and confirmed complete Plan from ProjectContext/domain/dynamic signals, no recommendation/top/subset-as-plan; (2) scoped recipe creation anchored to ProjectContext and immediately retrievable; (3) real controlled BiliDili commit produces git diff A/M/R events and commit-driven evolution routes: rename direct sourceRef repair, modified logic pending proposal, new module file-level moduleMining recommendation/route, checkpoint initialized from Plan baseline and advances only after successful route/catch-up; (4) stop Ollama or equivalent vector-lane unavailability shows degraded/non-final/retrievalMayBeStale observability, not silent success. Return raw artifacts: repo SHAs, command outputs/runtime JSON, controlled git diff, rescan JSON, DB checkpoint/proposal/source_ref evidence, and final summary. If any step fails, block with exact failing artifact and owner attribution. Do not edit product repos from Test; do not relax acceptance, do not use old Test failure as completion, and do not invent fallback/top/recommend semantics.",
+      "status": "accepted",
+      "sourceRef": "Core repair accepted: commit 313d7ccced63a3fe83cd1e9ac1f3097c0c061bb4 / decision tc-20260622180256-0062",
+      "createdAt": "2026-06-22T18:03:32.123Z"
+    },
+    {
+      "taskPackageId": "p6-plugin-module-mining-persistence-repair-p1",
+      "summary": "P6 rework after Test BiliDili final acceptance after Core repair: repair Plugin commit-driven unified evolution so original F2/G/H/P6 acceptance passes without relaxing RG-10. Raw Test evidence shows Core empty-checkpoint repair is active and real git diff routing runs, but final acceptance is blocked because created file Sources/Features/RG10AcceptanceProbe/index.swift is classified coveredCreated and does not produce a file-level moduleMining route; DB also persists git_diff_checkpoints.last_route_status=skipped despite routed response and keeps the renamed VideoRepository source ref stale with new_path null despite source-ref-repaired response. Scope is AlembicPlugin owning code/tests only; do not edit Test or weaken acceptance.",
+      "status": "accepted",
+      "sourceRef": "target-results/tr-p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1.json",
+      "createdAt": "2026-06-22T18:17:32.623Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1",
+      "summary": "Final P6 Test revalidation after accepted Core checkpoint repair and accepted AlembicPlugin module-mining/persistence repair. The previous Test after-Core run proved the chain reached real git diff but blocked on Plugin F2/G/H persistence; Plugin commit 41f708bf1355963d47e60ec893eeca3eb3a8da01 is now controller accepted with fresh evidence. Test must independently rerun the BiliDili final RG-10 scenario from a fresh/safe workspace and return raw pass/fail evidence; Plugin self-run evidence is not a substitute for Test final acceptance.",
+      "status": "accepted",
+      "sourceRef": "target-results/tr-p6-plugin-module-mining-persistence-repair-t1.json",
+      "createdAt": "2026-06-22T18:43:00.962Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-t1",
+      "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only task p1p2-core-plan-authority-dimension-canonical-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read AlembicCore/AGENTS.md, parent AGENTS.md, active index/status, requirement design, workspace handoff, and P0 evidence before editing. Implement only Core-owned P1/P2 producer work described in the task package. Backfill exact commit/tests and downstream Plugin/Alembic migration needs.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T11:40:01.021Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1p2-core-plan-authority-dimension-canonical-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-t1.json",
+        "deliveryRunId": "run-delivery-p1p2-core-plan-authority-dimension-canonical-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-t1",
+        "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-p1",
+        "sentAt": "2026-06-22T12:00:10.417Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-t1"
+    },
+    {
+      "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+      "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only rework task p1p2-core-plan-authority-dimension-canonical-rework-1-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicCore/AGENTS.md, requirement design, P0 evidence, previous target result, and controller rework decision evt-20260622121836-0005 before editing. Fix only the Core P1/P2 recommendation/top/order leak in the Plan facts path; preserve complete confirm validation and canonical confirmed Plan ID resolution; backfill commit/tests/rg evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T12:19:08.226Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1p2-core-plan-authority-dimension-canonical-rework-1-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-rework-1-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-1-t1.json",
+        "deliveryRunId": "run-delivery-p1p2-core-plan-authority-dimension-canonical-rework-1-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+        "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+        "sentAt": "2026-06-22T12:19:32.348Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-rework-1-t1"
+    },
+    {
+      "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+      "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only rework task p1p2-core-plan-authority-dimension-canonical-rework-2-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicCore/AGENTS.md, requirement design, P0 evidence, previous target results, and controller rework decision evt-20260622123449-0009 before editing. Fix only the remaining Core Plan-path crossDimensionConstraints/buildCrossDimensionConstraints leak; preserve all previous correct Plan authority fixes; backfill commit/tests/rg evidence and downstream Plugin migration need.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T12:35:15.517Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1p2-core-plan-authority-dimension-canonical-rework-2-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-rework-2-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-2-t1.json",
+        "deliveryRunId": "run-delivery-p1p2-core-plan-authority-dimension-canonical-rework-2-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+        "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+        "sentAt": "2026-06-22T12:35:37.380Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-rework-2-t1"
+    },
+    {
+      "targetTaskId": "p1p2-plugin-plan-authority-no-guess-consumer-t1",
+      "taskPackageId": "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Current window: AlembicPlugin. Claim only task p1p2-plugin-plan-authority-no-guess-consumer-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicPlugin/AGENTS.md, requirement design, P0 evidence, accepted Core commits fe563ee/e1de391/bedbe2b, and controller acceptance evt-20260622124435-0013 before editing. Implement only Plugin-owned P1/P2 Plan authority/no-guess consumer migration; do not edit Core/Alembic/Dashboard/Test; backfill commit/tests/rg evidence and any strictly in-scope downstream blockers.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T12:46:09.556Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1p2-plugin-plan-authority-no-guess-consumer-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-plugin-plan-authority-no-guess-consumer-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-t1.json",
+        "deliveryRunId": "run-delivery-p1p2-plugin-plan-authority-no-guess-consumer-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-t1",
+        "dispatchGroup": "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+        "sentAt": "2026-06-22T12:48:06.758Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1p2-plugin-plan-authority-no-guess-consumer-t1"
+    },
+    {
+      "targetTaskId": "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1",
+      "taskPackageId": "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Current window: AlembicPlugin. Claim only task p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicPlugin/AGENTS.md, original Design lines 68-84, previous target result, and controller rework decision evt-20260622131858-0017. Preserve positive commit 30333e85254179d0fc0ec3461fd78beb787c7d83; implement only the two public-surface fixes named by controller: schema-level/routed confirm complete-payload validation, and removal of planningBrief from public plan record outputs. Backfill commit hash, exact tests/build/lint/rg evidence, and no unrelated repo edits.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T13:19:24.104Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1.json",
+        "deliveryRunId": "run-delivery-p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1",
+        "dispatchGroup": "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1",
+        "sentAt": "2026-06-22T13:19:55.132Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1"
+    },
+    {
+      "targetTaskId": "p3-core-durable-checkpoint-primitives-t1",
+      "taskPackageId": "p3-core-durable-checkpoint-primitives-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only task p3-core-durable-checkpoint-primitives-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicCore/AGENTS.md, requirement design group G/P3, workspace handoff, P0 evidence, and accepted P1/P2 Core/Plugin decisions before editing. Implement only Core-owned durable checkpoint primitives/migration/repository/API for P3; do not touch Plugin/Alembic/Dashboard/Test. Backfill commit, exact validation, public API/export changes, and downstream Plugin contract.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T14:03:10.395Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-core-durable-checkpoint-primitives-p1__AlembicCore__p3-core-durable-checkpoint-primitives-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-durable-checkpoint-primitives-p1__AlembicCore__p3-core-durable-checkpoint-primitives-t1.json",
+        "deliveryRunId": "run-delivery-p3-core-durable-checkpoint-primitives-p1__AlembicCore__p3-core-durable-checkpoint-primitives-t1",
+        "dispatchGroup": "p3-core-durable-checkpoint-primitives-p1",
+        "sentAt": "2026-06-22T14:03:49.086Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-core-durable-checkpoint-primitives-t1"
+    },
+    {
+      "targetTaskId": "p3-plugin-evolution-checkpoint-consumer-t1",
+      "taskPackageId": "p3-plugin-evolution-checkpoint-consumer-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Current window: AlembicPlugin. Claim only task p3-plugin-evolution-checkpoint-consumer-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicPlugin/AGENTS.md, requirement design lines 97-116 and 161-171, workspace handoff P3, P0 evidence lines 34-54 and 102-109, and accepted Core P3 commit be6f442 before editing. Implement only Plugin-owned P3 consumer work: F1 proposal rewire, F2 file-level/scoped moduleMining route with PD-4 gate semantics, F3/F4 dead fallback deletion, F5 testMode-only overlays, and G durable checkpoint consumption/catch-up/no-advance semantics. No Core/Alembic/Dashboard/Test edits. Backfill exact commit/tests/build/lint/rg evidence and any strictly in-scope blockers.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T14:25:14.440Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-evolution-checkpoint-consumer-p1__AlembicPlugin__p3-plugin-evolution-checkpoint-consumer-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-evolution-checkpoint-consumer-p1__AlembicPlugin__p3-plugin-evolution-checkpoint-consumer-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-evolution-checkpoint-consumer-p1__AlembicPlugin__p3-plugin-evolution-checkpoint-consumer-t1",
+        "dispatchGroup": "p3-plugin-evolution-checkpoint-consumer-p1",
+        "sentAt": "2026-06-22T14:25:52.754Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-evolution-checkpoint-consumer-t1"
+    },
+    {
+      "targetTaskId": "p3-plugin-evolution-checkpoint-consumer-rework-1-t1",
+      "taskPackageId": "p3-plugin-evolution-checkpoint-consumer-rework-1-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Current window: AlembicPlugin. Claim only task p3-plugin-evolution-checkpoint-consumer-rework-1-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicPlugin/AGENTS.md, requirement design lines 107-116 and 161-171, previous task package/result for p3-plugin-evolution-checkpoint-consumer-p1, and controller rework decision evt-20260622145804-0029 before editing. Preserve valid F1-F5 cleanup and Core durable service consumption from a7db73d. Implement only G2 catch-up repair: GitDiffScanResult exposes mergeBase, non-ancestor with merge-base routes mergeBase..HEAD through unified evolution on both rescan and opportunistic paths, recordRouteOutcome carries mergeBaseCommit and uses catch-up-routed after successful catch-up route, unresolved/unavailable ranges are not lost and checkpoint does not advance on failed/skipped/unresolved paths. Replace old stop-on-non-ancestor tests with positive catch-up route/checkpoint tests. No Core/Alembic/Dashboard/Test edits; no recommendation/top/fallback/changeLog-only semantics. Backfill exact commit, tests/build/lint/rg evidence and any strictly in-scope blockers.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T14:58:26.352Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-evolution-checkpoint-consumer-rework-1-p1__AlembicPlugin__p3-plugin-evolution-checkpoint-consumer-rework-1-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-evolution-checkpoint-consumer-rework-1-p1__AlembicPlugin__p3-plugin-evolution-checkpoint-consumer-rework-1-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-evolution-checkpoint-consumer-rework-1-p1__AlembicPlugin__p3-plugin-evolution-checkpoint-consumer-rework-1-t1",
+        "dispatchGroup": "p3-plugin-evolution-checkpoint-consumer-rework-1-p1",
+        "sentAt": "2026-06-22T14:59:00.949Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-evolution-checkpoint-consumer-rework-1-t1"
+    },
+    {
+      "targetTaskId": "p4-core-source-ref-plan-ledger-truthfulness-t1",
+      "taskPackageId": "p4-core-source-ref-plan-ledger-truthfulness-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only task p4-core-source-ref-plan-ledger-truthfulness-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicCore/AGENTS.md, requirement design lines 117-127, 159, 169, 203, 208, workspace handoff P4/Core responsibility lines 57-58, 83, 95, P0 evidence line 109, and prior accepted P1/P2/P3 controller decisions before editing. Implement only Core-owned P4 H1/H4/H5/H6: SourceRefReconciler parse-error/missing must not delete refs; only valid-empty clears; PlanLedger must mark missing source refs as missing instead of fabricating generated from sourceFile; add byModuleDimension coverage matrix contract; PlanRepository must surface typed row damage/unknown status/bad JSON errors internally while preserving required public contract and listByProject handling. Do not edit AlembicPlugin/Alembic/Dashboard/Test. Do not add recommendation/top/fallback compatibility or delete evidence/proposal/vector/plans structures. Backfill commit hash, exact changed files, validation commands/results, public API/export changes, and downstream Plugin migration needs for H4/H5.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T15:12:49.774Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-core-source-ref-plan-ledger-truthfulness-p1__AlembicCore__p4-core-source-ref-plan-ledger-truthfulness-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-source-ref-plan-ledger-truthfulness-p1__AlembicCore__p4-core-source-ref-plan-ledger-truthfulness-t1.json",
+        "deliveryRunId": "run-delivery-p4-core-source-ref-plan-ledger-truthfulness-p1__AlembicCore__p4-core-source-ref-plan-ledger-truthfulness-t1",
+        "dispatchGroup": "p4-core-source-ref-plan-ledger-truthfulness-p1",
+        "sentAt": "2026-06-22T15:14:45.403Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-core-source-ref-plan-ledger-truthfulness-t1"
+    },
+    {
+      "targetTaskId": "p4-plugin-freshness-grounding-consumer-t1",
+      "taskPackageId": "p4-plugin-freshness-grounding-consumer-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Current window: AlembicPlugin. Claim only task p4-plugin-freshness-grounding-consumer-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicPlugin/AGENTS.md, requirement design lines 118-127, 159, 169, 203, 208, workspace handoff P4/Plugin responsibility lines 57-58, 80-85, 95, P0 evidence line 109, accepted Core P4 commit 85461a80acb4eed44b3edebde5ff8c299b1c0bd2, and controller acceptance evt-20260622153433-0037 before editing. Implement only Plugin-owned P4 H2/H3/H4/H5 consumer work: H2 freshness unavailable/failed/stale outputs must be visible as degraded/non-final with retrievalMayBeStale and reasons while preserving Recipe creation and not flipping the whole tool to failed; H3 relationship grounding missing graph/source evidence must be visible as non-final/degraded rather than silent success:true; H4 plan get/output must treat PlanCodeRecipeMapping status=missing as unanchored/no generated source anchor; H5 expose/consume Core coverage.byModuleDimension and module x dimension gaps without collapsing to dimensions[0]. Do not edit Core/Alembic/Dashboard/Test. Do not add recommendation/top/fallback compatibility or raw-read-as-graph-equivalent behavior. Validate with targeted unit tests for submit/create freshness degraded, relationship grounding non-final, plan get missing mapping, and byModuleDimension coverage; run build:check, relevant vitest, lint, git diff --check, and any repo check that is in scope. Backfill commit hash, exact changed files, validation command outputs, public output shape, and downstream P6/Test implications.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T15:36:10.993Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-plugin-freshness-grounding-consumer-p1__AlembicPlugin__p4-plugin-freshness-grounding-consumer-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-freshness-grounding-consumer-p1__AlembicPlugin__p4-plugin-freshness-grounding-consumer-t1.json",
+        "deliveryRunId": "run-delivery-p4-plugin-freshness-grounding-consumer-p1__AlembicPlugin__p4-plugin-freshness-grounding-consumer-t1",
+        "dispatchGroup": "p4-plugin-freshness-grounding-consumer-p1",
+        "sentAt": "2026-06-22T15:36:38.481Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-plugin-freshness-grounding-consumer-t1"
+    },
+    {
+      "targetTaskId": "p5-core-panorama-retire-architecture-signals-t1",
+      "taskPackageId": "p5-core-panorama-retire-architecture-signals-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only task p5-core-panorama-retire-architecture-signals-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicCore/AGENTS.md, requirement design group I lines 129-143 and decisions 207-210, P0 evidence lines 22-33 and 102-110, plus prior accepted P1/P2/P3/P4 decisions before editing. Implement only Core-owned P5 I1/I3: delete dead Panorama Core service/exports/tests and ProjectIntelligenceRunner materializeProjectPanorama dead path; delete architectureIntelligence hollow rich analysis roles/coupling/layers/callflow while preserving Plan signature/domain-signal source needed by Plugin and dimensions. Keep ProjectContext graph/module dependency capabilities. Do not edit Plugin/Dashboard/Alembic/Test. Backfill commit, exact validation, grep/import sweep, public API/export changes, and downstream cleanup needs.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T15:59:06.007Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-core-panorama-retire-architecture-signals-p1__AlembicCore__p5-core-panorama-retire-architecture-signals-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-core-panorama-retire-architecture-signals-p1__AlembicCore__p5-core-panorama-retire-architecture-signals-t1.json",
+        "deliveryRunId": "run-delivery-p5-core-panorama-retire-architecture-signals-p1__AlembicCore__p5-core-panorama-retire-architecture-signals-t1",
+        "dispatchGroup": "p5-core-panorama-retire-architecture-signals-p1",
+        "sentAt": "2026-06-22T16:02:21.732Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-core-panorama-retire-architecture-signals-t1"
+    },
+    {
+      "targetTaskId": "p5-dashboard-project-pyramid-primary-view-t1",
+      "taskPackageId": "p5-dashboard-project-pyramid-primary-view-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "Current window: AlembicDashboard. Claim only task p5-dashboard-project-pyramid-primary-view-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicDashboard/AGENTS.md, requirement design group I lines 129-143 and decisions 207-210, workspace handoff lines 58-60/80-85/95-97, and P0 evidence line 110 before editing. Implement only Dashboard P5 I2: promote existing ProjectContext-backed DepGraphView module dependency pyramid to primary view, remove Panorama/coverage UI and dead getPanorama*/knowledgeStats client usage, preserve recipes/candidates/guard/jobs/skills tabs. Do not edit other repos or invent backend/mock data. Backfill commit, exact validation and UI evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T15:59:19.835Z",
+      "resultId": "tr-p5-dashboard-project-pyramid-primary-view-t1",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-dashboard-project-pyramid-primary-view-p1__AlembicDashboard__p5-dashboard-project-pyramid-primary-view-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-dashboard-project-pyramid-primary-view-p1__AlembicDashboard__p5-dashboard-project-pyramid-primary-view-t1.json",
+        "deliveryRunId": "run-delivery-p5-dashboard-project-pyramid-primary-view-p1__AlembicDashboard__p5-dashboard-project-pyramid-primary-view-t1",
+        "dispatchGroup": "p5-dashboard-project-pyramid-primary-view-p1",
+        "sentAt": "2026-06-22T16:25:08.804Z",
+        "readbackOk": true
+      }
+    },
+    {
+      "targetTaskId": "p5-alembic-main-panorama-route-cleanup-t1",
+      "taskPackageId": "p5-alembic-main-panorama-route-cleanup-p1",
+      "targetWindow": "Alembic",
+      "summary": "Current window: Alembic. Claim only task p5-alembic-main-panorama-route-cleanup-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, Alembic/AGENTS.md, requirement design group I lines 129-143 and decisions 207-210, handoff lines 58-60/80-85/95-97, and P0 evidence line 110 before editing. Implement only Alembic main P5 I1 route/API cleanup: remove/retire stale Panorama main surfaces and tests, preserve /governance/* and non-Panorama local runtime capabilities. Do not edit Core/Plugin/Dashboard/Test. Backfill commit, exact validation, route/import sweep, and any downstream blocker.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T15:59:34.456Z",
+      "resultId": "tr-p5-alembic-main-panorama-route-cleanup-t1",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-alembic-main-panorama-route-cleanup-p1__Alembic__p5-alembic-main-panorama-route-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-alembic-main-panorama-route-cleanup-p1__Alembic__p5-alembic-main-panorama-route-cleanup-t1.json",
+        "deliveryRunId": "run-delivery-p5-alembic-main-panorama-route-cleanup-p1__Alembic__p5-alembic-main-panorama-route-cleanup-t1",
+        "dispatchGroup": "p5-alembic-main-panorama-route-cleanup-p1",
+        "sentAt": "2026-06-22T16:25:30.965Z",
+        "readbackOk": true
+      }
+    },
+    {
+      "targetTaskId": "p5-plugin-panorama-consumer-cleanup-t1",
+      "taskPackageId": "p5-plugin-panorama-consumer-cleanup-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Current window: AlembicPlugin. Claim only task p5-plugin-panorama-consumer-cleanup-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicPlugin/AGENTS.md, requirement design group I lines 129-143 and decisions 207-210, handoff line 57/80-85/95-97, and P0 evidence line 110 before editing. Implement only Plugin-owned P5 cleanup for Panorama retirement: remove/update obsolete Panorama tests, MCP output contract/client/runtime references that only wrap deleted Core Panorama, preserve ProjectContext graph/module-layers and Recipe domain-signal paths, and stop if public compatibility needs a user/controller decision. No Core/Alembic/Dashboard/Test edits. Backfill commit, exact validation and rg/import sweep evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T16:00:00.163Z",
+      "resultId": "tr-p5-plugin-panorama-consumer-cleanup-t1",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-plugin-panorama-consumer-cleanup-p1__AlembicPlugin__p5-plugin-panorama-consumer-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-panorama-consumer-cleanup-p1__AlembicPlugin__p5-plugin-panorama-consumer-cleanup-t1.json",
+        "deliveryRunId": "run-delivery-p5-plugin-panorama-consumer-cleanup-p1__AlembicPlugin__p5-plugin-panorama-consumer-cleanup-t1",
+        "dispatchGroup": "p5-plugin-panorama-consumer-cleanup-p1",
+        "sentAt": "2026-06-22T16:25:51.214Z",
+        "readbackOk": true
+      }
+    },
+    {
+      "targetTaskId": "p6-test-bilidili-final-scenario-acceptance-t1",
+      "taskPackageId": "p6-test-bilidili-final-scenario-acceptance-p1",
+      "targetWindow": "Test",
+      "summary": "Current window: Test. Claim only task p6-test-bilidili-final-scenario-acceptance-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, Test/AGENTS.md, requirement design P6/final acceptance, P0 evidence, and accepted controller events through evt-20260622171913-0055. Execute BiliDili real Swift project test-mode acceptance for the corrected Plan no-guess demand: Plan truthfulness/no-guess, scoped Recipe creation anchored to ProjectContext and immediately retrievable, commit-driven unified evolution with durable checkpoint/merge-base/module-mining/proposal routing, vector/Ollama degraded/non-final observability, plus Dashboard Project Pyramid/Panorama route cleanup smoke. Do not edit product repos; return TargetResultEnvelope with exact SHAs, commands, logs/screenshots/runtime JSON, pass/fail by step, blockers and next action.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T17:19:48.361Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-test-bilidili-final-scenario-acceptance-p1__Test__p6-test-bilidili-final-scenario-acceptance-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-test-bilidili-final-scenario-acceptance-p1__Test__p6-test-bilidili-final-scenario-acceptance-t1.json",
+        "deliveryRunId": "run-delivery-p6-test-bilidili-final-scenario-acceptance-p1__Test__p6-test-bilidili-final-scenario-acceptance-t1",
+        "dispatchGroup": "p6-test-bilidili-final-scenario-acceptance-p1",
+        "sentAt": "2026-06-22T17:22:55.576Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p6-test-bilidili-final-scenario-acceptance-t1"
+    },
+    {
+      "targetTaskId": "p6-core-checkpoint-empty-initialization-repair-t1",
+      "taskPackageId": "p6-core-checkpoint-empty-initialization-repair-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Repair Core durable git-diff checkpoint G1/G2 so empty existing rows seed from active confirmed Plan commit and skipped/unresolved routes do not advance or erase the range.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T17:51:27.687Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-core-checkpoint-empty-initialization-repair-p1__AlembicCore__p6-core-checkpoint-empty-initialization-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-core-checkpoint-empty-initialization-repair-p1__AlembicCore__p6-core-checkpoint-empty-initialization-repair-t1.json",
+        "deliveryRunId": "run-delivery-p6-core-checkpoint-empty-initialization-repair-p1__AlembicCore__p6-core-checkpoint-empty-initialization-repair-t1",
+        "dispatchGroup": "p6-core-checkpoint-empty-initialization-repair-p1",
+        "sentAt": "2026-06-22T17:52:03.193Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p6-core-checkpoint-empty-initialization-repair-t1"
+    },
+    {
+      "targetTaskId": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+      "taskPackageId": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+      "targetWindow": "Test",
+      "summary": "Re-run P6 BiliDili final scenario acceptance after accepted Core checkpoint repair; prove original RG-10 four-step chain with raw artifacts or block with exact failing owner/evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T18:03:32.123Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1.json",
+        "deliveryRunId": "run-delivery-p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+        "dispatchGroup": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+        "sentAt": "2026-06-22T18:04:00.546Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1"
+    },
+    {
+      "targetTaskId": "p6-plugin-module-mining-persistence-repair-t1",
+      "taskPackageId": "p6-plugin-module-mining-persistence-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Declare AlembicPlugin identity, read parent/state root/task package/repo AGENTS, and repair only the in-scope P6 defects proven by Test evidence. Required fixes: (1) FileChangeHandler created-file handling must satisfy original F2/PD-4: a new created file/module-area from commit-driven git diff routes through the existing file-level/scoped moduleMining path even when a coarse parent moduleId already has unrelated sourceRefs; preserve exact same-file duplicate protection only if justified by sourceRef evidence. Remove or rewrite the existing unit expectation that covered modules never route, and add a BiliDili-like regression with existing Sources/Features/VideoFeed sourceRef plus created Sources/Features/RG10AcceptanceProbe/index.swift producing moduleMiningRoutes>0. (2) Repair/verify durable checkpoint persistence so routed rescan persists last_route_status/last_route_reason matching response and only advances checkpoint after successful route; investigate possible duplicate/out-of-order route outcome writes if DB remains skipped after response routed. (3) Repair/verify rename source-ref persistence so a high-confidence rename response source-ref-repaired is reflected durably in recipe_source_refs according to Core contract, not old stale path with new_path null. Constraints: no recommendation/top/fallback semantics, no full-rescan/cold-start Plan gate weakening, no Test edits, no acceptance relaxation, no invented compatibility. Validation: targeted FileChangeHandler/evolution checkpoint/sourceRef tests, Plugin typecheck/build/lint as repo rules require, and raw evidence showing DB checkpoint/sourceRef state matches response. Backfill with commits, exact commands, evidence files, and residual risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T18:17:32.623Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-plugin-module-mining-persistence-repair-p1__AlembicPlugin__p6-plugin-module-mining-persistence-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-plugin-module-mining-persistence-repair-p1__AlembicPlugin__p6-plugin-module-mining-persistence-repair-t1.json",
+        "deliveryRunId": "run-delivery-p6-plugin-module-mining-persistence-repair-p1__AlembicPlugin__p6-plugin-module-mining-persistence-repair-t1",
+        "dispatchGroup": "p6-plugin-module-mining-persistence-repair-p1",
+        "sentAt": "2026-06-22T18:18:01.438Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p6-plugin-module-mining-persistence-repair-t1"
+    },
+    {
+      "targetTaskId": "p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1",
+      "taskPackageId": "p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1",
+      "targetWindow": "Test",
+      "summary": "Current window: Test. Claim only task p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, Test/AGENTS.md, requirement design P6/final acceptance, previous Test blocked results, accepted Core repair commit 313d7ccced63a3fe83cd1e9ac1f3097c0c061bb4, and accepted AlembicPlugin repair commit 41f708bf1355963d47e60ec893eeca3eb3a8da01/controller decision evt-20260622184234-0071. Execute an independent fresh BiliDili real Swift project test-mode acceptance for the corrected Plan no-guess demand; do not reuse stale run1 or treat Plugin's run-codex-p6-plugin-repair-4 as Test acceptance. Required checks: (1) Plan draft/confirm/get is authoritative and no-guess, with no recommended/top/fallback/subset/signatureScope leak; (2) scoped Recipe creation is ProjectContext-anchored and immediately retrievable; (3) real commit diff from confirmed Plan baseline routes rename direct repair, modified source pending proposal/review-needed signal, new created file through file-level moduleMining, durable checkpoint last_route_status=routed and DB/sourceRefs truth matches response; (4) vector/Ollama unavailable path remains degraded/non-final and observable; (5) P5 Panorama route cleanup/dashboard project-pyramid smoke remains true if included in existing P6 script. No product repo edits. Return TargetResultEnvelope with exact SHAs, command outputs, summary.json/rescan/DB snapshot/log paths, pass/fail by step, and any blocker owner. Acceptance cannot be relaxed and cannot be replaced by recommendation/top/fallback evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-22T18:43:00.962Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1.json",
+        "deliveryRunId": "run-delivery-p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1",
+        "dispatchGroup": "p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1",
+        "sentAt": "2026-06-22T18:43:24.647Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1p2-core-plan-authority-dimension-canonical-p1",
+        "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+        "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+        "p3-core-durable-checkpoint-primitives-p1",
+        "p4-core-source-ref-plan-ledger-truthfulness-p1",
+        "p5-core-panorama-retire-architecture-signals-p1",
+        "p6-core-checkpoint-empty-initialization-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p1p2-core-plan-authority-dimension-canonical-t1",
+        "p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+        "p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+        "p3-core-durable-checkpoint-primitives-t1",
+        "p4-core-source-ref-plan-ledger-truthfulness-t1",
+        "p5-core-panorama-retire-architecture-signals-t1",
+        "p6-core-checkpoint-empty-initialization-repair-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+        "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1",
+        "p3-plugin-evolution-checkpoint-consumer-p1",
+        "p3-plugin-evolution-checkpoint-consumer-rework-1-p1",
+        "p4-plugin-freshness-grounding-consumer-p1",
+        "p5-plugin-panorama-consumer-cleanup-p1",
+        "p6-plugin-module-mining-persistence-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p1p2-plugin-plan-authority-no-guess-consumer-t1",
+        "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1",
+        "p3-plugin-evolution-checkpoint-consumer-t1",
+        "p3-plugin-evolution-checkpoint-consumer-rework-1-t1",
+        "p4-plugin-freshness-grounding-consumer-t1",
+        "p5-plugin-panorama-consumer-cleanup-t1",
+        "p6-plugin-module-mining-persistence-repair-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicDashboard",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p5-dashboard-project-pyramid-primary-view-p1"
+      ],
+      "targetTaskIds": [
+        "p5-dashboard-project-pyramid-primary-view-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p5-alembic-main-panorama-route-cleanup-p1"
+      ],
+      "targetTaskIds": [
+        "p5-alembic-main-panorama-route-cleanup-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p6-test-bilidili-final-scenario-acceptance-p1",
+        "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+        "p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p6-test-bilidili-final-scenario-acceptance-t1",
+        "p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+        "p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-22T18:04:04.264Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1",
+    "lastDeliveryRunId": "run-delivery-p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1",
+    "lastDispatchGroup": "p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-p1",
+    "lastTargetTaskId": "p6-test-bilidili-final-scenario-acceptance-after-plugin-repair-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-22T18:43:24.651Z"
+  }
+}

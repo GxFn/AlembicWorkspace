@@ -16,10 +16,10 @@ This review is limited to AlembicPlugin-owned Codex MCP, skills, channel/marketp
 
 - `AGENTS.md`
 - `AlembicPlugin/AGENTS.md`
-- `codex-control-workspace/.workspace-active/workspace/index.md`
-- `codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md`
-- `codex-control-workspace/.workspace-active/workspace/current/afapi-req-01-runtime-identity-multi-project-runtime/developer-progress.md`
-- `codex-control-workspace/.workspace-active/workspace/current/afapi-req-01-runtime-identity-multi-project-runtime/task-packages/AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-CODE-FACT-P1.json`
+- `codex-control-workspace/.wakeflow-active/index.md`
+- `codex-control-workspace/.wakeflow-active/current/workspace-current-status.md`
+- `codex-control-workspace/.wakeflow-active/current/afapi-req-01-runtime-identity-multi-project-runtime/developer-progress.md`
+- `codex-control-workspace/.wakeflow-active/current/afapi-req-01-runtime-identity-multi-project-runtime/task-packages/AFAPI-REQ-01-RUNTIME-IDENTITY-MULTI-PROJECT-RUNTIME-CODE-FACT-P1.json`
 - `workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-01-runtime-identity-multi-project-runtime-landing-2026-06-05.md`
 
 ## Code Facts

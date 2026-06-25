@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "resultId": "result-co5d-core-residual-test-fixture-support__AlembicCore__CO-5D-evidence-repair",
+  "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+  "taskPackageId": "co-5d-core-residual-test-fixture-support",
+  "dispatchGroup": "co5d-core-residual-test-fixture-support",
+  "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "CO-5D",
+  "status": "completed",
+  "summary": "AlembicCore CO-5D completed in commit 4646d76 Add residual test fixture helpers. This evidence-repair envelope supersedes the previous CO-5D result's prose-shaped evidence refs; code and validation are unchanged. The existing stable @alembic/core/test-fixtures subpath now exposes real Core-backed residual helpers needed before AlembicPlugin CO-5C rework-2: buildEntityGraphInput, materializeCallGraph, resolveProjectAnalysisMaterialization, runPhase1_7_CallGraph, runPhase2_DependencyGraph, detectConflict, loadPreference, and savePreference, plus related exported types for materialization/discovery fixture consumers. The implementation only re-exports existing Core call chains from service/project-intelligence/AnalysisPhaseRunners and core/discovery/DiscovererPreference via core/discovery/index; it does not add or resurrect ./project-intelligence, does not delete/internalize legacy routes, does not edit siblings/vendor/release/runtime files, and does not change production behavior. test/PublicTestFixturesSurface.test.ts now preserves the dropped ProjectAnalysisMaterialization semantics and DiscovererPreference behavior through @alembic/core/test-fixtures. scripts/smoke-public-api.mjs guards the new runtime/type fixture exports, and config/public-api-boundary.json records the downstream migration map from @alembic/core/project-intelligence and @alembic/core/core/discovery residual test imports to ./test-fixtures. Package export counts remain unchanged: 60 total, 53 exact, 7 wildcard; package.json still has ./test-fixtures and no ./project-intelligence or workflows/capabilities/project-intelligence export. Downstream Plugin migration map: ProjectAnalysisMaterialization.test.ts can restore behavior-preserving imports from @alembic/core/test-fixtures for buildEntityGraphInput/materializeCallGraph/resolveProjectAnalysisMaterialization/runPhase1_7_CallGraph/runPhase2_DependencyGraph; the remaining @alembic/core/core/discovery preference residual can migrate detectConflict/loadPreference/savePreference to @alembic/core/test-fixtures. No Core blocker remains; legacy route shrink still waits for consumer rework and clean downstream scans.",
+  "evidenceRefs": [
+    "commit:4646d76",
+    "guard-result:guard-public-mqmv2e3n-6",
+    "AlembicCore/src/test-fixtures.ts",
+    "AlembicCore/test/PublicTestFixturesSurface.test.ts",
+    "AlembicCore/scripts/smoke-public-api.mjs",
+    "AlembicCore/config/public-api-boundary.json",
+    "AlembicCore/package.json",
+    ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19/controller-events.jsonl",
+    ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19/target-results/result-co5b-core-test-fixture-public-surface-support__AlembicCore__CO-5B.json",
+    ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19/target-results/result-co5c-plugin-test-fixture-consumer-migration-rework-1__AlembicPlugin__CO-5C.json",
+    ".wakeflow-local/wakeflow-delivery/dispatch-packets/co5d-core-residual-test-fixture-support__AlembicCore__CO-5D.json",
+    ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co5d-core-residual-test-fixture-support__AlembicCore__CO-5D.json"
+  ],
+  "verification": [
+    "pre status: git status --short --branch => ## main...origin/main",
+    "Focused pre-change helper scan confirmed current @alembic/core/test-fixtures lacked all CO-5D named helpers.",
+    "node -e JSON.parse(config/public-api-boundary.json) => public-api-boundary json ok",
+    "Focused rg after edits confirmed all 8 CO-5D helper names in src/test-fixtures.ts, test/PublicTestFixturesSurface.test.ts, scripts/smoke-public-api.mjs, and config/public-api-boundary.json.",
+    "package export check: package.json still exposes ./test-fixtures and does not expose ./project-intelligence or ./workflows/capabilities/project-intelligence.",
+    "npx vitest run test/PublicTestFixturesSurface.test.ts test/PublicCapabilityOutputEntrypoints.test.ts test/PublicProjectIntelligenceEntrypoints.test.ts => 3 files passed, 13 tests passed",
+    "npx vitest run test/PublicTestFixturesSurface.test.ts test/unit/Phase2PanoramaIntegration.test.ts test/PublicCapabilityOutputEntrypoints.test.ts test/PublicProjectIntelligenceEntrypoints.test.ts => 4 files passed, 46 tests passed",
+    "npm run build:check => passed; tsc -p tsconfig.json --noEmit",
+    "npm run build => passed; tsc -p tsconfig.json",
+    "npm run smoke:public-api => passed; Imported 53 exact public API entrypoints",
+    "npm run lint:public-api-boundary => passed; 60 package exports classified; exact=53; wildcard=7; stable=23; provisional=8; transitional=29",
+    "npm run lint:consumer-core-imports => passed; AlembicAgent issues=0, Alembic issues=0, AlembicPlugin issues=0",
+    "npm run lint => passed; biome checked 618 files, no fixes applied after scoped safe import/export organization",
+    "git diff --check => passed with no output",
+    "git diff --cached --check => passed with no output before commit",
+    "Alembic status knowledge check => ok true, status ready, knowledge not_initialized; explicit Alembic Guard still ran successfully",
+    "Alembic code guard guard-public-mqmv2e3n-6 => passed; 4 files checked, 0 violations",
+    "commit created: 4646d76 Add residual test fixture helpers",
+    "post status: git status --short --branch => ## main...origin/main [ahead 1]"
+  ],
+  "risks": [
+    "Downstream AlembicPlugin CO-5C remains rework-needed until its tests/config import the new @alembic/core/test-fixtures helpers and restore behavior-preserving assertions.",
+    "CO-5D intentionally does not authorize Core legacy route deletion/internalization; @alembic/core/core/analysis, @alembic/core/core/ast/*, and @alembic/core/core/discovery stay available until consumer scans are clean and controller accepts shrink work.",
+    "The new helpers are test-fixture migration support only; product project-information/project-context public API remains unchanged."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-co5d-core-residual-test-fixture-support__AlembicCore__CO-5D",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co5d-core-residual-test-fixture-support__AlembicCore__CO-5D.json",
+    "deliveryRunId": "run-delivery-co5d-core-residual-test-fixture-support__AlembicCore__CO-5D",
+    "dispatchGroup": "co5d-core-residual-test-fixture-support",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co5d-core-residual-test-fixture-support__AlembicCore__CO-5D.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+    "stateRevision": 46,
+    "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+    "taskPackageId": "co-5d-core-residual-test-fixture-support",
+    "targetTaskId": "CO-5D",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "co5d-core-residual-test-fixture-support",
+    "resultId": "result-co5d-core-residual-test-fixture-support__AlembicCore__CO-5D-evidence-repair",
+    "createdAt": "2026-06-20T21:22:21.859Z"
+  },
+  "createdAt": "2026-06-20T21:22:21.859Z",
+  "stateRevisionObserved": 46,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

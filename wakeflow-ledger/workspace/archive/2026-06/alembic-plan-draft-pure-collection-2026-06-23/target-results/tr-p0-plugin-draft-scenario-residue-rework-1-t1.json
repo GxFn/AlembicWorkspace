@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p0-plugin-draft-scenario-residue-rework-1-t1",
+  "demandKey": "alembic-plan-draft-pure-collection-2026-06-23",
+  "taskPackageId": "p0-plugin-draft-scenario-residue-rework-1-p1",
+  "dispatchGroup": "p0-plugin-draft-scenario-residue-rework-1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-draft-pure-collection-2026-06-23",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p0-plugin-draft-scenario-residue-rework-1-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin fixed the P0a cold-start Codex session scenario residue. The active cold-start fixtures now derive confirm selectedDimensions/moduleBindings from data.projectContextCreationGuide.confirmedPlanBoundary.dimensionIds instead of deleted sourceReports.planningAids.selection.activeDimensionIds. Scenario expectation analysis now resolves nested $toolResult placeholders and uses deep equality so verify:codex-session proves the dynamic confirm payload actually matches prior draft output. Added a regression guard that the two Plan-gated cold-start scenarios contain the confirmedPlanBoundary path and contain no planningAids.selection/activeDimensionIds/skippedDimensionIds/lowConfidenceDimensions residue. Committed AlembicPlugin fa9faf728d14c2744b435ad2b5a40ceac2b16f3a.",
+  "evidenceRefs": [
+    "commit:fa9faf728d14c2744b435ad2b5a40ceac2b16f3a",
+    "AlembicPlugin/test/codex-scenarios/cold-start/bootstrap-missing-ai.json",
+    "AlembicPlugin/test/codex-scenarios/cold-start/init-then-bootstrap-ai-ready.json",
+    "AlembicPlugin/test/support/codex-session/AgentOutputAnalyzer.ts",
+    "AlembicPlugin/test/unit/CodexSessionScenarioRunner.test.ts"
+  ],
+  "verification": [
+    "rg -n \"planningAids\\\\.selection|activeDimensionIds|skippedDimensionIds|lowConfidenceDimensions\" test/codex-scenarios lib/recipe-generation -> no matches (rg exit 1)",
+    "git diff --check -> passed",
+    "npm run test:unit -- test/unit/CodexSessionScenarioRunner.test.ts -t \"cold-start Plan-gate\" -> 1 passed",
+    "npm run verify:codex-session -- --scenario bootstrap-missing-ai-uses-host-agent -> passed; host-agent bootstrap reached ProjectContext Mission Briefing ready",
+    "npm run verify:codex-session -- --scenario init-then-codex-host-bootstrap -> passed; host-agent bootstrap reached ProjectContext Mission Briefing ready",
+    "npm run test:unit -- test/unit/AlembicPlanTool.test.ts test/unit/PlanDrivenGenerationGate.test.ts test/unit/CodexSessionScenarioRunner.test.ts -> 22 passed",
+    "npm run build:check -> passed; Core build used ../AlembicCore @ 2675af699350ce8ab1730e3db2c7529b840f2b9c",
+    "npm run typecheck -> passed",
+    "npm run lint -> exit 0 with existing warnings outside changed files",
+    "./node_modules/.bin/biome check test/support/codex-session/AgentOutputAnalyzer.ts test/unit/CodexSessionScenarioRunner.test.ts -> passed"
+  ],
+  "risks": [
+    "alembic_code_guard still fails with plugin internal schema error unrecognized key \"data\" / CODEX_MCP_ERROR; no guard pass could be recorded.",
+    "P1/P2/P3 full draft payload/SOP/full-catalog confirm work remains outside this P0a residue rework by the current task package."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p0-plugin-draft-scenario-residue-rework-1-p1__AlembicPlugin__p0-plugin-draft-scenario-residue-rework-1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-plugin-draft-scenario-residue-rework-1-p1__AlembicPlugin__p0-plugin-draft-scenario-residue-rework-1-t1.json",
+    "deliveryRunId": "run-delivery-p0-plugin-draft-scenario-residue-rework-1-p1__AlembicPlugin__p0-plugin-draft-scenario-residue-rework-1-t1",
+    "dispatchGroup": "p0-plugin-draft-scenario-residue-rework-1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-plugin-draft-scenario-residue-rework-1-p1__AlembicPlugin__p0-plugin-draft-scenario-residue-rework-1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-draft-pure-collection-2026-06-23",
+    "stateRevision": 9,
+    "demandKey": "alembic-plan-draft-pure-collection-2026-06-23",
+    "taskPackageId": "p0-plugin-draft-scenario-residue-rework-1-p1",
+    "targetTaskId": "p0-plugin-draft-scenario-residue-rework-1-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p0-plugin-draft-scenario-residue-rework-1-p1",
+    "resultId": "tr-p0-plugin-draft-scenario-residue-rework-1-t1",
+    "createdAt": "2026-06-23T18:29:31.282Z"
+  },
+  "createdAt": "2026-06-23T18:29:31.282Z",
+  "stateRevisionObserved": 9,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

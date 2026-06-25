@@ -152,7 +152,7 @@
 - 需要真实场景的理由：无。
 - 测试前边界与多条件判断：
   - 测试要回答的问题：dispatch group 能否批量生成 payload，目标窗口 finish 是否只在最后任务回跳总控，旧 target-courier 行为是否保持。
-  - 测试对象 / 目标窗口 / 线程 / 项目边界：只限临时 fixture workspace 与 `.workspace-local/visible-dispatch` 结构，不触碰产品仓库。
+  - 测试对象 / 目标窗口 / 线程 / 项目边界：只限临时 fixture workspace 与 `.wakeflow-local/visible-dispatch` 结构，不触碰产品仓库。
   - 成功能推出的结论：VAD unattended controller Wave 0 的脚本状态机可用。
   - 失败能推出的结论：脚本状态机或 README / skill 索引仍需修复，不能用于真实 037 自动化。
   - 不能推出的结论：不能证明 037 产品需求已实现。

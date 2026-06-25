@@ -16,7 +16,7 @@ Design Key：`PLUGIN-AGENT-FACING-PUBLIC-API-REDESIGN-2026-06-04`
 
 - 开发者可读入口：本目录 12 篇 `AFAPI xx ... Progress` 标准文档。
 - 机器顺序入口：`afapi-independent-demand-sequence-2026-06-06.json`。
-- 状态 authority：每个需求领取后生成的 `.workspace-active/workspace/current/<demand-key>/controller-state.json`。
+- 状态 authority：每个需求领取后生成的 `.wakeflow-active/current/<demand-key>/controller-state.json`。
 - 文档状态同步：在 `codex-control-workspace/` 下执行 `node scripts/workspace-control.mjs sequence sync-doc --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --demand-key <DEMAND-KEY> --write --json`。
 - 领取下一个需求：在 `codex-control-workspace/` 下执行 `node scripts/workspace-control.mjs sequence claim-next --root .. --manifest workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-independent-demand-sequence-2026-06-06.json --write --json`。
 - 领取只创建 state-root 和初始任务包，不创建 dispatch、不发送线程、不验收证据、不自动完成需求。

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-alembic-main-panorama-route-cleanup-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p5-alembic-main-panorama-route-cleanup-p1",
+  "dispatchGroup": "p5-alembic-main-panorama-route-cleanup-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p5-alembic-main-panorama-route-cleanup-t1",
+  "status": "completed",
+  "summary": "Alembic main P5 I1 cleanup completed in commit eaa53198946702d622ffc2feeadae6cc264a4854 (feat(http): retire panorama route surface). Deleted the stale /panorama HTTP route family, panorama CLI command, alembic_panorama schema binding, legacy Panorama helper/skipped tests, and Panorama provider/generated Dashboard API contract. Preserved non-Panorama governance services by moving decay/staging/enhancement routes to lib/http/routes/governance.ts and mounting /api/v1/governance; regenerated lib/generated/dashboard-api-types.ts with I22.getGovernance and added route/delete regression tests. No Core/Plugin/Dashboard/Test edits.",
+  "evidenceRefs": [
+    "commit:eaa53198946702d622ffc2feeadae6cc264a4854",
+    "Alembic/bin/cli.ts",
+    "Alembic/lib/http/HttpServer.ts",
+    "Alembic/lib/http/provider-contracts.ts",
+    "Alembic/lib/http/routes/governance.ts",
+    "Alembic/lib/shared/schemas/mcp-tools.ts",
+    "Alembic/lib/generated/dashboard-api-types.ts",
+    "Alembic/test/unit/PresentationRoutes.test.ts",
+    "Alembic/test/unit/PanoramaSurfaceDeletes.test.ts"
+  ],
+  "verification": [
+    "pre-change git status --short --branch: ## main...origin/main",
+    "npm run build:check: passed",
+    "npm run build: passed",
+    "npm run generate:dashboard-types: wrote lib/generated/dashboard-api-types.ts",
+    "npm run test -- test/unit/PresentationRoutes.test.ts test/unit/PanoramaSurfaceDeletes.test.ts test/unit/AlembicProviderContracts.test.ts test/unit/DashboardApiTypesDrift.test.ts: passed (4 files, 19 tests)",
+    "npm run test:unit with approved unsandboxed execution: passed (122 files, 977 tests, 1 skipped); initial sandboxed run failed only due listen EPERM 127.0.0.1 and sandbox-exec Operation not permitted",
+    "npm run lint: passed exit 0 with 5 pre-existing noExplicitAny warnings in lib/service/handler-runtime/types.ts and lib/workflows/ai-execution/AgentRunProjections.ts",
+    "npx biome check test/unit/PresentationRoutes.test.ts test/unit/PanoramaSurfaceDeletes.test.ts: passed",
+    "npm run lint:repo-boundary: passed",
+    "npm run lint:consumer-core-imports: passed (361 files, 407 @alembic/core imports)",
+    "npm run check:dashboard-types-drift: passed",
+    "git diff --check: passed",
+    "git diff --cached --check: passed before commit",
+    "rg \"getPanorama|/api/v1/panorama|/panorama|alembic_panorama|RETIRED_PROJECT_INFO_ROUTE|routes/panorama|panorama\\.ts\" lib bin config scripts package.json: no matches",
+    "rg \"getGovernance|/api/v1/governance|/governance|Governance route family\" lib/http lib/generated: shows /api/v1/governance mount, I22.getGovernance, generated API contract, and governance route endpoints",
+    "post-commit git status --short --branch: ## main...origin/main [ahead 1]"
+  ],
+  "risks": [
+    "Alembic Dashboard generated API copy is downstream work: Alembic main regenerated lib/generated/dashboard-api-types.ts to replace /panorama with /governance, but AlembicDashboard was not edited by this Alembic-only task.",
+    "alembic_code_guard returned internal CODEX_MCP_ERROR/core.failure.internal-error with unrecognized key \"data\"; no product-code guard diagnostics were produced.",
+    "npm run lint:layer-contract remains blocked by 6 pre-existing layer-contract violations outside this P5 route cleanup chain; touched files are not in the reported violation set.",
+    "Residual internal ai-execution fields/tests named panoramaResult/buildPanoramaContext remain outside the P5 I1 route/API/generated-client cleanup; they are not HTTP route/provider/generated API surfaces and were not authorized for deletion in this Alembic main route task."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p5-alembic-main-panorama-route-cleanup-p1__Alembic__p5-alembic-main-panorama-route-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-alembic-main-panorama-route-cleanup-p1__Alembic__p5-alembic-main-panorama-route-cleanup-t1.json",
+    "deliveryRunId": "run-delivery-p5-alembic-main-panorama-route-cleanup-p1__Alembic__p5-alembic-main-panorama-route-cleanup-t1",
+    "dispatchGroup": "p5-alembic-main-panorama-route-cleanup-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-alembic-main-panorama-route-cleanup-p1__Alembic__p5-alembic-main-panorama-route-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 51,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p5-alembic-main-panorama-route-cleanup-p1",
+    "targetTaskId": "p5-alembic-main-panorama-route-cleanup-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p5-alembic-main-panorama-route-cleanup-p1",
+    "resultId": "tr-p5-alembic-main-panorama-route-cleanup-t1",
+    "createdAt": "2026-06-22T16:53:08.153Z"
+  },
+  "createdAt": "2026-06-22T16:53:08.153Z",
+  "stateRevisionObserved": 51,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

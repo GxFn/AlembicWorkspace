@@ -22,7 +22,7 @@
 
 - 原始计划书：[AlembicDesign original plan](../../../../../AlembicDesign/docs/current/ai-mock-removal-original-plan-2026-05-28.md)。
 - 需求设计文档：[AlembicDesign requirement design](../../../../../AlembicDesign/docs/current/ai-mock-removal-requirement-design-2026-05-28.md)。
-- 代码实现依赖调研：[Stage 0 code fact baseline](../../../../../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-stage-0-code-fact-baseline-2026-05-28.md)。
+- 代码实现依赖调研：[Stage 0 code fact baseline](../../../../../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-stage-0-code-fact-baseline-2026-05-28.md)。
 - 调研结论：产品 mock 暴露集中在 `AlembicAgent` provider / public export / registry / fallback、`Alembic` runtime mock bootstrap / HTTP AI routes / DI fallback、`AlembicDashboard` mock switch UI / cleanup API client / copy；`AlembicCore` 与 `AlembicPlugin` 当前只需观察或历史文案清理。
 - 当前已有能力：真实 provider 配置、AI unavailable 事件路径、Dashboard provider config modal、AlembicTest 默认 AI 配置 fallback 规则已存在。
 - 主要缺口：无 AI key fallback 仍返回 product mock provider；internal dimension execution 遇 mock 进入 `MockBootstrapPipeline`；Dashboard 仍展示 mock cleanup / switch 逻辑。
@@ -95,7 +95,7 @@
 - 本阶段形成的功能闭环：已确认 product mock 入口、消费方、历史数据状态和第一波删除边界。
 - 下一处真实阻塞点：`AlembicAgent` 与 `Alembic` product mock 入口还存在，导致下游仍能进入 mock runtime。
 - 阻塞点之前还能一波完成的主线动作：第一波可同时派 `AlembicAgent` 删除 provider producer 和 `Alembic` 删除 runtime consumer / HTTP API；Dashboard 可在 API contract 清楚后跟进。
-- 确认后第一波可启动窗口：`AlembicAgent`、`Alembic`；已进入 [Deletion Wave 1](../../../../../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-deletion-wave-1-2026-05-28.md)。
+- 确认后第一波可启动窗口：`AlembicAgent`、`Alembic`；已进入 [Deletion Wave 1](../../../../../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-deletion-wave-1-2026-05-28.md)。
 - 等待窗口：`AlembicDashboard` 观察 API contract；`AlembicTest` 等产品删除完成；`AlembicCore` / `AlembicPlugin` 观察。
 - 确认后是否需要新建 wave 执行计划：是，建议新建 `ai-mock-removal-deletion-wave-1-2026-05-28.md`。
 
@@ -169,7 +169,7 @@
 
 ### 确认后第一波
 
-- 启动文档：[ai-mock-removal-deletion-wave-1-2026-05-28.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-deletion-wave-1-2026-05-28.md)。
+- 启动文档：[ai-mock-removal-deletion-wave-1-2026-05-28.md](../../../../../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-deletion-wave-1-2026-05-28.md)。
 - 发送窗口：`AlembicAgent`、`Alembic`。
 - 阻塞窗口：`AlembicTest` 等产品删除完成。
 - 观察窗口：`AlembicCore`、`AlembicDashboard`、`AlembicPlugin`。

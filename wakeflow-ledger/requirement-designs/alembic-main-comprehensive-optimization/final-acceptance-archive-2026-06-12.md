@@ -64,6 +64,6 @@ it requires a future user-confirmed demand if it should become blocking.
 
 Primary evidence:
 
-- `.workspace-active/workspace/current/alembic-main-comprehensive-optimization-ao5-final-acceptance-archive/evidence/ao5-final-acceptance-archive-2026-06-12.md`
-- AO0-AO4 state roots under `.workspace-active/workspace/current/`
+- `.wakeflow-active/current/alembic-main-comprehensive-optimization-ao5-final-acceptance-archive/evidence/ao5-final-acceptance-archive-2026-06-12.md`
+- AO0-AO4 state roots under `.wakeflow-active/current/`
 - Alembic commits `5eb0067d5a7dcdd26086f4d9be73a47623e47b4f`, `8b277fe134bd85ba6566ce28a694aafb7feaf5d2`, `ff1dc6bcdf11dc803e88117a23db0e47d5792afb`, and `a7dea7eb48605a6e287d05f71ac982c484ccc28b`

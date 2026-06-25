@@ -19,7 +19,7 @@ architecture advice.
 - Trigger: The Alembic workspace now has multiple source repositories with
   overlapping runtime, API, MCP, Agent, Dashboard, and contract surfaces.
 - Workspace status: idle; new work requires a new demand or Design handoff.
-- State root: `.workspace-active/workspace/current/alembic-cross-repo-interface-contract/`.
+- State root: `.wakeflow-active/current/alembic-cross-repo-interface-contract/`.
 - Industry research was explicitly requested by the user and completed before
   this draft.
 - Existing local facts:

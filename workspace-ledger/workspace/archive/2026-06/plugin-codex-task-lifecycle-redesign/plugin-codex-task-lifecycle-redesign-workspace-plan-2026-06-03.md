@@ -21,14 +21,14 @@
 - 需求 / 测试结果理解：这是独立 Plugin task lifecycle UX-contract 需求。用户已确认核心目标和 6 个裁决点；当前第一步不是实现，而是复核代码事实最新性并裁决 implementation contract。
 - 已核对证据：
   - `AGENTS.md` 最高停止卡。
-  - `codex-control-workspace/.workspace-active/workspace/index.md`。
-  - `codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md`。
+  - `codex-control-workspace/.wakeflow-active/index.md`。
+  - `codex-control-workspace/.wakeflow-active/current/workspace-current-status.md`。
   - `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-original-plan-2026-06-03.md`。
   - `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-requirement-design-2026-06-03.md`。
   - `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-code-fact-review-2026-06-03.md`。
   - `AlembicPlugin/AGENTS.md`。
   - AlembicPlugin 父仓 / runtime 子仓当前 `git status --short` 均 clean；父仓当前 HEAD 为 `f0a94e9 align codex plugin runtime artifact pointer`，runtime 子仓当前 HEAD 为 `e8ae215 align packaged runtime artifacts`。
-  - `codex-control-workspace/.workspace-local/codex-automation-loop/target-results/AlembicPlugin__PCTL-STAGE0-PLUGIN-P0.json`。
+  - `codex-control-workspace/.wakeflow-local/codex-automation-loop/target-results/AlembicPlugin__PCTL-STAGE0-PLUGIN-P0.json`。
   - `workspace-ledger/AlembicPlugin/plugin-codex-task-lifecycle-implementation-contract-dossier-2026-06-03.md`。
   - `codex-automation-loop review-pack` for `PCTL-STAGE0-PLUGIN-FACTS-20260603`：`groupStatus=ready`、controller-return `sent/readbackOk=true`。
   - 总控抽查 `AlembicPlugin/lib/codex/mcp/handlers/task.ts`、`guard.ts`、`HostIntentFrame.ts`、`ToolPolicy.ts`、tool schema/description 和 built-in skills，确认 Stage 0 dossier 的关键代码事实与当前代码一致。
@@ -308,7 +308,7 @@ npm run verify:codex-plugin
   - 不能推出的结论：无。
   - 停止或不开始条件：focused tests 与 plugin smoke 已覆盖本轮完成定义，不启动 Test。
 - 测试单：无。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：BiliDili / Playground 不参与本轮。
 
 ## 回填区
@@ -327,7 +327,7 @@ npm run verify:codex-plugin
   "indexStatusDescription": "Plugin Codex Task Lifecycle Redesign 当前状态：已完成；AlembicPlugin 父仓与 runtime 子仓提交、focused tests、schema integration、runtime artifact、plugin verify 和 smoke 均通过。",
   "currentIndexType": "当前计划",
   "currentIndexDescription": "Plugin Codex Task Lifecycle Redesign：已通过总控验收。",
-  "currentStatusSummary": "当前计划：[plugin-codex-task-lifecycle-redesign-workspace-plan-2026-06-03.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/plugin-codex-task-lifecycle-redesign-workspace-plan-2026-06-03.md)。当前用户目标：领取 `PLUGIN-CODEX-TASK-LIFECYCLE-REDESIGN-2026-06-03` 并开启无人值守自动化。当前裁决：Stage 0 code-fact review 与 Stage 1 AlembicPlugin implementation 均已通过总控复核；父仓 commit `81a6d2c45c10befe89c76a6431cc19eb7693d1ed`、runtime 子仓 commit `a9840e6f6df824e7c82fda3f6eba0a31066accab`、focused tests、schema integration、runtime artifact、plugin verify 和 smoke 均通过；不派 AlembicTest、不创建下一跳，automation / keep-live 已停止。",
+  "currentStatusSummary": "当前计划：[plugin-codex-task-lifecycle-redesign-workspace-plan-2026-06-03.md](../../../../../codex-control-workspace/.wakeflow-active/current/plugin-codex-task-lifecycle-redesign-workspace-plan-2026-06-03.md)。当前用户目标：领取 `PLUGIN-CODEX-TASK-LIFECYCLE-REDESIGN-2026-06-03` 并开启无人值守自动化。当前裁决：Stage 0 code-fact review 与 Stage 1 AlembicPlugin implementation 均已通过总控复核；父仓 commit `81a6d2c45c10befe89c76a6431cc19eb7693d1ed`、runtime 子仓 commit `a9840e6f6df824e7c82fda3f6eba0a31066accab`、focused tests、schema integration、runtime artifact、plugin verify 和 smoke 均通过；不派 AlembicTest、不创建下一跳，automation / keep-live 已停止。",
   "indexRows": [],
   "currentIndexRows": []
 }

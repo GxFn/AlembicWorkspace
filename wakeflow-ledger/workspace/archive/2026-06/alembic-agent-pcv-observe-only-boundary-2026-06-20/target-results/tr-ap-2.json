@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-ap-2",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "taskPackageId": "ap-2-extract-analyze-grounding-guard",
+  "dispatchGroup": "ap2-agent-grounding-guard",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "AP-2",
+  "status": "completed",
+  "summary": "AP-2 完成（抽取 AnalyzeGroundingGuard；行为对等、默认仍开；不切默认 / 不引 groundingEnforcement(AP-3) / 不动 provider policy(AP-1 已抽)）。AlembicAgent main ad6f74c→c206e7a（仅 AlembicAgent，3 文件 +71/-37）。\n\n诚实标注：本窗口启动时工作树已存在一份未提交的 AP-2 改动（疑似前次会话中断遗留：新 AnalyzeGroundingGuard.ts + AgentRuntime.ts/LLMInputAssembly.ts 改动）。本窗口未重写，而是对其做端到端核验（结构完整性 / 行为对等 / PD5 边界 / 依赖方向 / 全量验证门）确认正确后提交；commit c206e7a + 下列验证门即评审证据。\n\n做了：\n- 新模块 src/agent/runtime/AnalyzeGroundingGuard.ts（runtime 质量门层，无 Pcv 前缀；函数体逐字迁移）：\n  · buildAnalyzeGroundingPolicy（CP1 grounding-policy 指令文本，analyze always-on，按 modelRef/refCount 参数化）← 迁出 LLMInputAssembly.buildAnalyzeGroundingPolicy\n  · evaluateAnalyzeTextGroundingGate（CP4 invalid-no-evidence 阻断/nudge 决策，只读消费 PCV grounding classification，不反写证据）← 迁出 AgentRuntime.#evaluateAnalyzeTextGroundingGate\n- AgentRuntime.ts:1589 调用点改 evaluateAnalyzeTextGroundingGate(ctx, this.#modelRef)；删私有 #evaluateAnalyzeTextGroundingGate 整段 + 迁出后无用的 getLatestPcvBurnGrounding / isDeepSeekV4AnalyzeFirstBurn import。block/nudge/rollback 的*应用*（appendUserNudge / rollbackTick / 诊断 / 进度事件）仍由主循环执行——guard 只产决策。\n- LLMInputAssembly.ts:526 buildGroundingContext 从 guard import buildAnalyzeGroundingPolicy。\n\nPD5 硬边界：证据 ref 列表注入 deterministicEvidenceRefs/evidenceStarterRefs（LLMInputAssembly.ts:433-439）*保留在默认 analyze 上下文、不入 guard*；仅 policy 文本与 gate 决策入 guard。表征测试未把 ref 列表当 grounding-policy。\n\nAP-1 结转裁断（避循环）：isDeepSeekV4AnalyzeFirstBurn 归属保持 ProviderToolChoicePolicy（provider 层），guard 单向下行读取（guard→provider）；provider 不依赖 guard。core-import-boundary 绿佐证无 guard↔provider 循环。\n\n不变量保持：行为对等（默认仍开、未引 groundingEnforcement）；guard 只读消费 classification 不反写证据；PcvNodeEvidence 保持纯观察、PcvNodeEvidenceSummary/PcvBurnGroundingLedgerEntry schema 不变；命名无 Pcv 前缀；四工具/LLM 对外语义不变；Node 22。\n\n结论：AP-2 完成定义全部满足；无 blocker、无需用户决策。建议控制器审阅后推进 AP-3（引 groundingEnforcement 默认 off：guard + 政策注入仅显式 guard 生效；provider 不受控）。",
+  "evidenceRefs": [
+    "AlembicAgent commit c206e7a on main (baseline ad6f74c=AP-1; AlembicAgent-only, 3 files +71/-37)",
+    "NEW src/agent/runtime/AnalyzeGroundingGuard.ts (buildAnalyzeGroundingPolicy CP1 / evaluateAnalyzeTextGroundingGate CP4; imports getLatestPcvBurnGrounding + isDeepSeekV4AnalyzeFirstBurn one-way)",
+    "src/agent/runtime/AgentRuntime.ts:54 import + :1589 call site -> evaluateAnalyzeTextGroundingGate(ctx, this.#modelRef); removed #evaluateAnalyzeTextGroundingGate + 2 now-unused imports (residual-ref grep clean: only import+callsite remain)",
+    "src/agent/runtime/LLMInputAssembly.ts:2 import + :526 buildGroundingContext uses guard buildAnalyzeGroundingPolicy",
+    "PD5 proof: deterministicEvidenceRefs/evidenceStarterRefs injection LLMInputAssembly.ts:433-439 unchanged in default analyze context, NOT moved to guard",
+    "No-cycle proof: guard->ProviderToolChoicePolicy.isDeepSeekV4AnalyzeFirstBurn one-way; ProviderToolChoicePolicy does not import guard; lint:core-import-boundary OK",
+    "test/pcv-observe-only-baseline.characterization.test.ts CP1(3 cases)+CP4(1 case) green post-extraction (behavior-equivalent); CP2/CP3 untouched (AP-1 provider territory)"
+  ],
+  "verification": [
+    "npm run build (tsc emit): pass, exit 0",
+    "npm run build:check (typecheck noEmit): exit 0",
+    "npm run lint (biome src scripts test): exit 0, 4 warnings (= AP-0/AP-1 baseline, 0 new; all pre-existing in scripts/, none in AP-2 files)",
+    "npm run lint:core-import-boundary: OK, scanned 260 files / 46 @alembic/core imports (AP-1 was 259; +1 = new AnalyzeGroundingGuard.ts)",
+    "npm test (full vitest): 35 files / 252 tests passed, 0 failed (= AP-0/AP-1 baseline; incl. CP1-CP4 characterization + original AgentRuntime DeepSeek V4 / invalid-no-evidence cases)",
+    "Node 22 (nvm v22.22.1); ambient node v18.20.8 too old for vitest/rolldown — used explicit v22 bin"
+  ],
+  "risks": [
+    "本窗口启动时 AP-2 diff 已存在于工作树（未提交，疑似前次中断会话遗留）；本窗口未重写而是端到端核验后提交。证据=commit c206e7a + 全量验证门；逐字 diff 已在该 commit 内供控制器复核",
+    "CP1 grounding-policy 注入对所有 analyze always-on（不止 DeepSeek V4）；guard.buildAnalyzeGroundingPolicy 现仍无条件被 analyze stage 调用——本阶段按设计仍开，AP-3 关默认须覆盖全 analyze 路径而非仅 DeepSeek 分支",
+    "isDeepSeekV4AnalyzeFirstBurn 仍 provider 层导出、被 guard CP4 复用；AP-3 引 groundingEnforcement 关 guard 时须确保不影响 provider 侧 DeepSeek V4 toolChoice（两者已解耦：provider 不随 grounding 开关，见 AP-1）",
+    "block/nudge/rollback 的*应用*仍在 AgentRuntime 主循环（guard 只产决策）；AP-3 切默认 off 应在调用点按 groundingEnforcement 短路 guard 决策，而非改 guard 内部逻辑"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-ap2-agent-grounding-guard__AlembicAgent__AP-2",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap2-agent-grounding-guard__AlembicAgent__AP-2.json",
+    "deliveryRunId": "run-delivery-ap2-agent-grounding-guard__AlembicAgent__AP-2",
+    "dispatchGroup": "ap2-agent-grounding-guard",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap2-agent-grounding-guard__AlembicAgent__AP-2.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 11,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "taskPackageId": "ap-2-extract-analyze-grounding-guard",
+    "targetTaskId": "AP-2",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "ap2-agent-grounding-guard",
+    "resultId": "tr-ap-2",
+    "createdAt": "2026-06-20T13:37:37.538Z"
+  },
+  "createdAt": "2026-06-20T13:37:37.538Z",
+  "stateRevisionObserved": 11,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

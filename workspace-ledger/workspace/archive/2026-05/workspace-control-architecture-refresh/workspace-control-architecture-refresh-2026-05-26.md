@@ -21,7 +21,7 @@
 - 需求 / 测试结果理解：自动化可以参与推进，但不能替代总控判断；先要清理旧 VAD runtime，避免 037 armed task 和新治理主线混在一起。
 - 已核对证据：`AGENTS.md`、workspace index、当前状态、workspace control skill、skill-creator skill、`scripts/visible-dispatch.mjs status/controller-tick`。
 - 是否需要先验证 / 重新计划 / 用户确认：需要重新计划；用户已确认可以继续推进并建议自动化。
-- 本次允许更新：workspace 文档、workspace skill、templates、scripts、脚本测试、`.workspace-local/visible-dispatch` 本地运行态。
+- 本次允许更新：workspace 文档、workspace skill、templates、scripts、脚本测试、`.wakeflow-local/visible-dispatch` 本地运行态。
 - 本次不得更新：产品子仓库源码、真实测试项目、AlembicTest 测试单结论、037 产品实现结论。
 
 ## Design / 需求来源
@@ -209,7 +209,7 @@ node scripts/visible-dispatch.mjs status --json
 - 需要真实场景的理由：无。
 - 测试前边界与多条件判断：
   - 测试要回答的问题：workspace 控制面是否结构一致，脚本验证是否通过，自动化状态是否不会误派旧任务。
-  - 测试对象 / 目标窗口 / 线程 / 项目边界：只测试 AlembicWorkspace 文档、脚本、skill、templates 和本地 `.workspace-local/visible-dispatch` runtime。
+  - 测试对象 / 目标窗口 / 线程 / 项目边界：只测试 AlembicWorkspace 文档、脚本、skill、templates 和本地 `.wakeflow-local/visible-dispatch` runtime。
   - 成功能推出的结论：总控治理面一致性提升，脚本表面验证通过，旧自动化残留不再抢跑。
   - 失败能推出的结论：对应脚本、模板或文档契约仍存在缺口。
   - 不能推出的结论：不能推出 037 产品实现已完成，不能推出真实项目环境通过。
@@ -223,7 +223,7 @@ node scripts/visible-dispatch.mjs status --json
 - 2026-05-26 20:45 CST：总控运行 `node scripts/visible-dispatch.mjs mode --disable --write --json`，发现 keep-awake `kill EPERM`；经用户授权外部命令确认并停止 `caffeinate -dims`，再次 disable 后 keep-awake inactive。
 - 2026-05-26 20:46 CST：总控对旧 037 `visible-dispatch-alembic` / `visible-dispatch-alembicplugin` 运行 `record-stop`，并把两个旧 armed task block 为“用户停止旧 037 automation before workspace architecture refresh”，避免新治理主线被旧任务抢跑。
 - 2026-05-26 20:50 CST：总控运行 `node scripts/visible-dispatch.mjs prune-history --write --json`，本地 VAD queue / runs / groups 清为 0；创建当前总控线程 heartbeat `workspace-control-architecture-refresh`，用于继续本计划自执行并暴露自动化边界问题，不作为子窗口派发。
-- 2026-05-26 20:55 CST：完成 WCR-W1-ARCHITECTURE-MAP 第一版：新增 `skills/dev/alembic-workspace-control/references/control-architecture.md`，定义 `AGENTS.md` / 当前计划 / workspace skill / VAD skills / templates / scripts / `.workspace-local` 的层级职责、Resident Rule Test、Pointer Contract、Template Contract、Script Contract 和自动化分类；同步更新 skill 与模板 / 脚本索引。
+- 2026-05-26 20:55 CST：完成 WCR-W1-ARCHITECTURE-MAP 第一版：新增 `skills/dev/alembic-workspace-control/references/control-architecture.md`，定义 `AGENTS.md` / 当前计划 / workspace skill / VAD skills / templates / scripts / `.wakeflow-local` 的层级职责、Resident Rule Test、Pointer Contract、Template Contract、Script Contract 和自动化分类；同步更新 skill 与模板 / 脚本索引。
 - 2026-05-26 20:57 CST：heartbeat 复查 `visible-dispatch status/controller-tick`：VAD mode disabled、queue / runs / groups 均为 0，`controller-tick` 返回 `modeDisabled` 符合本轮 controller self heartbeat 设计；同时确认 `workspace-current-status.md` summary 重复、长模板、长脚本 README 和 PCV skill 占位问题，已写入问题清单。
 - 2026-05-26 21:14 CST：完成 WCR-W1-CONSISTENCY-AUDIT 与 WCR-W1-AUTOMATION-LOOP-PLAN 收口：补齐 `AGENTS.md` 使用地图；新增 `visible-automation-dispatch.md` 与 `phased-migration.md` references；压缩 VAD 脚本索引和 phased migration 模板；新增 `workspace-control.mjs vad ...` 聚合入口和 `workspace-control.test.mjs` 覆盖；明确 PCV 目录是 source ledger。
 - 2026-05-26 21:14 CST：已运行 targeted 验证：`node --test scripts/workspace-control.test.mjs` 通过 8/8；`node scripts/workspace-control.mjs vad status --json` 显示 mode disabled、loop false、automationRuns 0、dispatchGroups 0、keep-awake inactive；`vad controller --json` 返回 `modeDisabled`，符合本轮停止派发状态；`vad preflight --json` ready true，仅提示当前计划没有 required dispatch windows。

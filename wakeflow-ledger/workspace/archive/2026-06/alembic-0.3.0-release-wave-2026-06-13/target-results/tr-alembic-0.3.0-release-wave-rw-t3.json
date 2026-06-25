@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-alembic-0.3.0-release-wave-rw-t3",
+  "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+  "taskPackageId": "alembic-0.3.0-release-wave-p3",
+  "dispatchGroup": "rw3",
+  "stateRoot": ".wakeflow-active/current/alembic-0.3.0-release-wave",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "alembic-0.3.0-release-wave-rw-t3",
+  "status": "completed",
+  "summary": "RW3 / SN4 Core src-naming wave executed and PUSHED: 3 single-purpose commits fd940f2..a59bbcf on origin/main (e1a4d58 rename wave, dfc822d naming-lint src-flip, a59bbcf blame-ignore-revs), tree clean, renames-only, ZERO behavior change, NO version bump (0.2.0; publish held), ZERO export-key/target change (package.json exports diff = 0 lines). Un-parked by rw-t1's SD-5 deletion. CENSUS (rw-t3-sn4-census.md, saved before --apply): 44 kebab src files + 1 .impl straggler. DECISION (export-shape SN0 §1): 32 RENAMED — shared/ 10 + ast ensure-grammars/parser-init 2 + types/project-snapshot-builder -> camelCase (utils/functions); 14 enhancement packs -> PascalCase (exact internal class name; loaded via literal import('./X-enhancement.js') which the NodeNext codemod rewrote); 4 type models (knowledge-wire/project-snapshot/snapshot-views/reactive-evolution) -> PascalCase; KnowledgeRepository.impl -> KnowledgeRepositoryImpl (lint caught the .impl dot-suffix my kebab census missed; one-off, not a family). 13 kebab KEPT as documented lint exceptions {file,owner,reason}: 10 lang-<id> grammar-plugin family (kebab mirrors the core/ast registry langId; loaded via await import(entry.module) registry-STRING the codemod cannot rewrite — renaming would desync/risk behavior change, so exempt like migrations) + 3 package-facade entry barrels (project-intelligence/source-graph/host-agent-workflows — they ARE the export targets; renaming would churn public dist paths and ripple through consumers via the export path; exempt like index.ts). CODEMOD (fa464c7 lineage, a43519e printing): dry-run saved to evidence BEFORE apply; 108 specifier + path-string rewrites incl. all 14 enhancement dynamic imports; readdirSync case validation. GATE-CONFIG IN-COMMIT: blessed-singletons lintExemptions (parser-init->parserInit, developer-identity->developerIdentity) auto-rewritten + descriptive parser-init.ts hand-fixed; wire-type-manifest module (knowledge-wire->KnowledgeWire) auto + declaration dist path hand-fixed (dist/types/KnowledgeWire.d.ts); CoreContractSpine source-contracts sourceFile auto; stem-derived @module/header doc comments updated (comment-lines only, behavior strings protected). MANDATORY post-apply stale grep CLEAN of functional refs — remaining hits are intentional keeps: source:'project-snapshot' discriminant VALUES (SN1 lesson 1), [ensure-grammars] observable log labels, and 9 facadeReadiness deep-path doc keys that are RW2-residue (those deep paths were deleted in RW2, independent of this rename). LINT FLIP (dfc822d): parked src rules moved active, migrations NNN_snake family FIRST (first-match-wins), 13 exceptions; naming lint now scans src/ GREEN (437 files, 14 exceptions). PROOF: full Core check exit 0 at TRUE baselines (108 files/1193 tests held; boundary 59 keys, smoke 52 entrypoints, doctrine 379, layer-contract green — no report regen needed, no renamed stem referenced); DOWNSTREAM builds green vs renamed Core HEAD (AlembicAgent tsc --noEmit exit 0, Alembic build:check exit 0, AlembicPlugin build:check exit 0 — exported specifiers stable so consumers unaffected); mechanical-diff = renames + in-file specifier/comment rewrites + gate-config only. SCOPE/STOP honored: no export PATH a consumer imports changed (facades+lang exempt; the 32 renamed are all internal, reached via barrels); no migration renamed; no behavior change. HANDS-OFF: AlembicPlugin worktree carries the Plugin window's concurrent rw-t2 changes (lib/runtime/mcp/source-graph/status.ts +81 etc.) — NOT mine; I ran only read-only build:check.",
+  "evidenceRefs": [
+    "evidence/raw/rw-t3-sn4-census.md",
+    "evidence/raw/rw-t3-sn4-rename-map.json",
+    "evidence/raw/rw-t3-sn4-dryrun-plan.txt",
+    "evidence/raw/rw-t3-sn4-evidence.md"
+  ],
+  "verification": [
+    "codemod dry-run (saved pre-apply) -> 31 git mv + 108 specifier/path rewrites incl 14 enhancement dynamic imports; +1 .impl rename = 32 total",
+    "post-apply stale grep -> clean of functional refs (only behavior strings / log labels / RW2-residue facade doc keys remain, documented)",
+    "node scripts/lint-naming.mjs (src ACTIVE) -> passed 437 files, 14 exceptions",
+    "npm run check -> exit 0 (108 files/1193 tests; boundary 59, smoke 52, doctrine 379, layer-contract green)",
+    "downstream: AlembicAgent tsc --noEmit exit 0; Alembic build:check exit 0; AlembicPlugin build:check exit 0 (read-only)",
+    "git diff fd940f2..a59bbcf -- package.json exports = 0 changed lines; version 0.2.0 unchanged",
+    "git push origin main -> fd940f2..a59bbcf"
+  ],
+  "risks": [
+    "13 kebab files kept as documented lint exceptions (10 lang-<id> grammar-plugin family, 3 facade-entry barrels) rather than renamed — a scope/convention judgment under the export-shape rule (lang-* registry-string loading makes mechanical rename unsafe; facades are export-target barrels). Controller may rule differently; recorded for independent review.",
+    "The 1 file below git's 90% rename-similarity threshold is a rename + in-file specifier/comment rewrite (not a content change) — mechanical-diff audit confirms renames+rewrites only.",
+    "AlembicPlugin vendor copy of Core still predates this rename until the next standing SD-5/vendor refresh; Plugin builds green against the live file: link today."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3.json",
+    "deliveryRunId": "run-delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3",
+    "dispatchGroup": "rw3",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-0.3.0-release-wave",
+    "stateRevision": 9,
+    "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+    "taskPackageId": "alembic-0.3.0-release-wave-p3",
+    "targetTaskId": "alembic-0.3.0-release-wave-rw-t3",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "rw3",
+    "resultId": "tr-alembic-0.3.0-release-wave-rw-t3",
+    "createdAt": "2026-06-13T06:58:03.558Z"
+  },
+  "createdAt": "2026-06-13T06:58:03.558Z",
+  "stateRevisionObserved": 9,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-co3a-alembic-consumer-capability-output-migration-alembic-2026-06-21",
+  "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+  "taskPackageId": "co-3a-alembic-consumer-capability-output-migration",
+  "dispatchGroup": "co3-consumer-capability-output-migration",
+  "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+  "targetWindow": "Alembic",
+  "targetTaskId": "CO-3A",
+  "status": "completed",
+  "summary": "Alembic CO-3A consumer migration completed in commit 75b76ee173109bf0257b0ef38fd0f39c059e4069. Migrated Alembic-only consumers from legacy Core routes to CO-1/CO-2 replacement surfaces: ServiceContainer and KnowledgeModule now use @alembic/core/enhancement framework facade; ProjectContext execution in ProjectContextConsumerFacts and ProjectContextWorkflowFacts now uses @alembic/core/project-context-capabilities while preserving public @alembic/core/project-context contract/presenter types; SourceResolver integration test now imports CapabilityProbe from @alembic/core/test-fixtures. Updated config/core-import-boundary.json to remove old @alembic/core/core/capability and @alembic/core/core/enhancement allowances and add the new enhancement/project-context-capabilities/test-fixtures routes. No sibling repositories, vendor snapshots, runtime adapter/CLI/daemon/local host responsibilities, or RecipeContext unused-kind classifications were changed.",
+  "evidenceRefs": [
+    "commit:75b76ee173109bf0257b0ef38fd0f39c059e4069",
+    "Alembic/config/core-import-boundary.json",
+    "Alembic/lib/injection/ServiceContainer.ts",
+    "Alembic/lib/injection/modules/KnowledgeModule.ts",
+    "Alembic/lib/project-context/ProjectContextConsumerFacts.ts",
+    "Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts",
+    "Alembic/test/integration/SourceResolver.test.ts"
+  ],
+  "verification": [
+    "pre-change git status --short --branch: ## main...origin/main",
+    "rg \"@alembic/core/core/(capability|enhancement)|@alembic/core/project-context\" -n lib test config: old core/capability and core/enhancement zero matches; remaining @alembic/core/project-context imports are public contract/types/presenter usage paired with @alembic/core/project-context-capabilities execution imports",
+    "npm run build:check: passed",
+    "npx vitest run test/integration/SourceResolver.test.ts test/integration/ServiceContainer.test.ts test/unit/ProjectContextWorkflowFacts.test.ts: passed (3 files, 26 tests)",
+    "npm run lint: passed (Biome checked 210 files; 5 pre-existing noExplicitAny warnings in unrelated files)",
+    "npm run lint:repo-boundary: passed",
+    "npm run lint:consumer-core-imports: passed (scanned 365 files, 408 @alembic/core imports)",
+    "npm run build: passed",
+    "git diff --check: passed",
+    "git diff --cached --check: passed",
+    "post-commit git status --short --branch: ## main...origin/main [ahead 1]"
+  ],
+  "risks": [
+    "Residual @alembic/core/project-context imports remain in Alembic for public types/presenter contracts only; execution has migrated to ProjectContextCapabilities. These residual public contract imports do not block CO-4 deletion of legacy deep execution routes but should be reviewed by the controller before any future ProjectContext public-route internalization.",
+    "Older @alembic/core/core/ast/lang-* allowances and counts remain in config/core-import-boundary.json because CO-3A did not touch AST test imports and the task package did not authorize unrelated migration/deletion.",
+    "Commit is local and not pushed; current branch is main...origin/main [ahead 1], consistent with target-window commit evidence handoff unless the controller separately requests push."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-co3-consumer-capability-output-migration__Alembic__CO-3A",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co3-consumer-capability-output-migration__Alembic__CO-3A.json",
+    "deliveryRunId": "run-delivery-co3-consumer-capability-output-migration__Alembic__CO-3A",
+    "dispatchGroup": "co3-consumer-capability-output-migration",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co3-consumer-capability-output-migration__Alembic__CO-3A.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+    "stateRevision": 20,
+    "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+    "taskPackageId": "co-3a-alembic-consumer-capability-output-migration",
+    "targetTaskId": "CO-3A",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "co3-consumer-capability-output-migration",
+    "resultId": "tr-co3a-alembic-consumer-capability-output-migration-alembic-2026-06-21",
+    "createdAt": "2026-06-20T19:12:25.691Z"
+  },
+  "createdAt": "2026-06-20T19:12:25.691Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

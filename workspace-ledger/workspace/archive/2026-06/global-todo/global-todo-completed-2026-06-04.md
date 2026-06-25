@@ -1,9 +1,9 @@
 # Global TODO Completed Archive
 
 归档日期：2026-06-04
-来源：../../../../../codex-control-workspace/.workspace-active/workspace/current/global-todo-board.md
+来源：../../../../../codex-control-workspace/.wakeflow-active/current/global-todo-board.md
 
-本文件保存从 `.workspace-active/workspace/current/global-todo-board.md` 压缩下来的已完成 TODO 和旧同步记录。活动项和观察项仍留在全局 TODO 列表。
+本文件保存从 `.wakeflow-active/current/global-todo-board.md` 压缩下来的已完成 TODO 和旧同步记录。活动项和观察项仍留在全局 TODO 列表。
 
 ## 已完成 TODO
 

@@ -5,7 +5,7 @@ Demand Key: `alembic-interface-contract-d16-interface-reasonability-review-2026-
 Sequence Order: 17
 Maintainer: AlembicWorkspace
 Document Role: Wakeflow demand definition
-State Authority: a future Wakeflow state root under `.workspace-active/workspace/current/`; this document is not a dispatch packet.
+State Authority: a future Wakeflow state root under `.wakeflow-active/current/`; this document is not a dispatch packet.
 Design Basis: [post-d14-interface-governance-real-code-analysis-2026-06-10.md](post-d14-interface-governance-real-code-analysis-2026-06-10.md)
 
 ## Goal

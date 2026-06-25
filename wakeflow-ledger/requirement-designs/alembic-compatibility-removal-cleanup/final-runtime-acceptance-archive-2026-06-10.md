@@ -5,7 +5,7 @@ Date: 2026-06-10
 Demand: `alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive-2026-06-10`
 
 Controller state root:
-`.workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive`
+`.wakeflow-active/current/alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive`
 
 ## Final Result
 
@@ -34,10 +34,10 @@ state of the confirmed compatibility-removal cleanup sequence.
 - Product repositories remained clean after CR7 validation.
 
 State-root evidence:
-`.workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive/evidence/controller-acceptance-cr7-runtime-archive-2026-06-10.md`
+`.wakeflow-active/current/alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive/evidence/controller-acceptance-cr7-runtime-archive-2026-06-10.md`
 
 Machine-readable evidence:
-`.workspace-active/workspace/current/alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive/evidence/controller-acceptance-cr7-runtime-archive-2026-06-10.json`
+`.wakeflow-active/current/alembic-compatibility-removal-cleanup-cr7-runtime-acceptance-archive/evidence/controller-acceptance-cr7-runtime-archive-2026-06-10.json`
 
 ## Deleted From Public Or Ordinary Surfaces
 

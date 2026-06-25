@@ -160,7 +160,7 @@
 ```text
 继续当前总控任务：PCVM Wave 6D / AlembicTest canonical node after-run。
 
-先读：AGENTS.md、codex-control-workspace/.workspace-active/workspace/index.md、codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md，以及本窗口/目标仓库 AGENTS.md。
+先读：AGENTS.md、codex-control-workspace/.wakeflow-active/index.md、codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md，以及本窗口/目标仓库 AGENTS.md。
 
 定位：声明你是 AlembicTest，本轮只做受保护真实 / 默认 AI after-run 验证，不修改产品源码。
 
@@ -193,13 +193,13 @@
   "indexRows": [
     {
       "type": "PCVM Wave 6D canonical node after-run",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md",
       "status": "Wave 6D 总控验收完成 / 转 Wave 6E",
       "description": "验证 Wave 6B/6C 后 canonical pcvStageNodeMap / pcvChainNodes 是否进入真实 runtime evidence / report；回填显示 runtime input 有，report 无，总控复核归因为当轮 Agent dist 陈旧，需 fresh dist 重测。"
     },
     {
       "type": "PCVM Wave 6C Alembic stage node map injection",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6c-alembic-stage-node-map-injection-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6c-alembic-stage-node-map-injection-2026-05-29.md",
       "status": "总控验收通过",
       "description": "Alembic commit acd273e 已注入 bootstrap canonical stage node map，并通过 targeted tests 与总控复核。"
     }
@@ -207,7 +207,7 @@
   "currentIndexRows": [
     {
       "type": "PCVM Wave 6D canonical node after-run",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md",
       "description": "最小真实 / 默认 AI after-run，复核运行时 canonical node identity。"
     }
   ]

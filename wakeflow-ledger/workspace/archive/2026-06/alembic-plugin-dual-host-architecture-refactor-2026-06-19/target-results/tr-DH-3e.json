@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-3e",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-3e-decodex-full-rename-finale",
+  "dispatchGroup": "dh3e-plugin-decodex-full",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-3e",
+  "status": "needs-review",
+  "summary": "DH-3e de-Codex 续批（用户决策 A 全量做透的分批推进）：JobContext + EmbeddedRuntimeContract 两个 self-contained host-agnostic 模块去前缀，完成+验证+【commit ebb960f15014c5f5236e5e4c34d7cfbefe5ad6c1】（基线 ca1f9ab，纯父仓）。残留 Codex*/CODEX_* in lib(excl host-adapter) 268→257（含 ~118 真 host-specific 保留）。剩余 ~140 个 de-prefix 符号【flag 给 DH-3f，每批独立绿、需 fresh context 分批做】。\n\n【交付（本批，已提交）】\n- JobContext: CODEX_JOB_CLIENT→JOB_CLIENT、CodexJobContextInput→JobContextInput、createCodexJobContext→createJobContext（值 'codex-plugin' 不变；该模块全自含、0 外部 ref）。\n- EmbeddedRuntimeContract: CODEX_EMBEDDED_RUNTIME_REQUIRED_{FILES,ROUTES}→EMBEDDED_RUNTIME_REQUIRED_{FILES,ROUTES}（+ ModuleBoundary 的 import/usage refs）。\n纯改名、行为不变。tsc 绿；旧名 grep=0；全量 unit 失败集与基线 IDENTICAL（39）。\n\n【de-Codex 总进度】DH-3d（ServiceRequestBoundary 6 符号）+ DH-3e（JobContext 3 + EmbeddedRuntimeContract 2）= 11 符号去前缀；残留 ~140 待 DH-3f。\n\n【flag DH-3f（~140 符号，需 fresh context 分批，每批 tsc 绿即 commit）】ToolPolicy CODEX_*_TOOL_NAMES 族（含 collision①）、ProjectRuntimeContext、KnowledgeState、ModuleBoundary 自身符号、EnhancementRoute、Diagnostics、Preflight、StatusService、ProjectSkillDelivery、SourceBoundary（含 collision②）、isTrustedProjectRoot/resolveEffectiveTier 接口移除裁决、余 host-operation routing（含 buildHostProjectAlignment）、物理迁入。完整 symbol→新名→refs 测绘清单已由本窗 2 Explore agent 产出，DH-3f 可直接用、勿重测绘。\n\n【边界遵守】host-name 分支仅 L3；未动 per-host 产物/cc 子模块/3 漂移资产；AlembicCore 不动；codex .mcp.json:8 不变；纯 MCP 非强进程不变量不回退；四工具对外 MCP 语义不变。",
+  "evidenceRefs": [
+    "父仓 commit ebb960f15014c5f5236e5e4c34d7cfbefe5ad6c1 (直提 main，基线 ca1f9ab；改 3 文件 JobContext/EmbeddedRuntimeContract/ModuleBoundary，纯父仓)",
+    "JobContext: CODEX_JOB_CLIENT→JOB_CLIENT, CodexJobContextInput→JobContextInput, createCodexJobContext→createJobContext (值 'codex-plugin' 不变)",
+    "EmbeddedRuntimeContract: CODEX_EMBEDDED_RUNTIME_REQUIRED_{FILES,ROUTES}→EMBEDDED_RUNTIME_REQUIRED_{FILES,ROUTES} (+ ModuleBoundary refs)",
+    "进度: 残留 Codex*/CODEX_* in lib(excl host-adapter) 268→257; DH-3d+DH-3e 共去前缀 11 符号; 剩 ~140 待 DH-3f",
+    "2 collision 已识别: ① CODEX_AGENT_PUBLIC_TOOL_NAMES ↔ contract.ts AGENT_PUBLIC_TOOL_NAMES; ② SourceBoundary CODEX_HOST_AGENT_SOURCE re-export ↔ core HOST_AGENT_SOURCE"
+  ],
+  "verification": [
+    "tsc --noEmit: exit 0",
+    "旧名 grep=0 (CodexJobContextInput/createCodexJobContext/CODEX_JOB_CLIENT/CODEX_EMBEDDED_RUNTIME_REQUIRED 全去)",
+    "全量 unit: 失败集与基线(39 pre-existing)逐文件 IDENTICAL → 无回归; 纯改名行为不变",
+    "biome lint 0 error(16 既有 warning)"
+  ],
+  "risks": [
+    "需控制器再派 DH-3f(按 task '确需跨上下文 flag DH-3f' + 用户 A 决策): 剩 ~140 de-prefix 符号 + 余 routing + 物理迁入。de-Codex 是 268 标识符/255+ refs/~20 文件的多会话机械重构; 本会话已连做 DH-1..DH-3e(7 任务)、为守正确性不在降质上下文硬塞宽面改名。建议 DH-3f 以 fresh context 按模块分批(每批 tsc 绿即 commit、独立绿)，用已产出的测绘清单直接执行。用户 A(全量)已被尊重——de-Codex 会跨 DH-3d/3e/3f... 多 pass 完成。",
+    "2 collision 需定名: ① CODEX_AGENT_PUBLIC_TOOL_NAMES→不冲突名(如 TOOL_POLICY_AGENT_PUBLIC_TOOL_NAMES); ② SourceBoundary CODEX_HOST_AGENT_SOURCE re-export → 建议调用方直 import core HOST_AGENT_SOURCE、SourceBoundary 去该 re-export。DH-3f 逐一定名。",
+    "isTrustedProjectRoot/resolveEffectiveTier 裁决(DH-3c 发现 host-agnostic): 推荐 DH-3f 从 HostAdapter 接口移除、去前缀归 L1/L2 纯函数。物理迁入 F-V2-2 wire-byte 敏感。cc 真实验收 DH-6。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh3e-plugin-decodex-full__AlembicPlugin__DH-3e",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3e-plugin-decodex-full__AlembicPlugin__DH-3e.json",
+    "deliveryRunId": "run-delivery-dh3e-plugin-decodex-full__AlembicPlugin__DH-3e",
+    "dispatchGroup": "dh3e-plugin-decodex-full",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3e-plugin-decodex-full__AlembicPlugin__DH-3e.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 35,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-3e-decodex-full-rename-finale",
+    "targetTaskId": "DH-3e",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh3e-plugin-decodex-full",
+    "resultId": "tr-DH-3e",
+    "createdAt": "2026-06-20T05:43:46.475Z"
+  },
+  "createdAt": "2026-06-20T05:43:46.475Z",
+  "stateRevisionObserved": 35,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

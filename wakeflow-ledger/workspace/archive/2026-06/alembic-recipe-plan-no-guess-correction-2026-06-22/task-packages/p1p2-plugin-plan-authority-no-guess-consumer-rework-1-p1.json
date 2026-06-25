@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "summary": "Rework AlembicPlugin P1/P2 Plan authority consumer migration after controller rejection of p1p2-plugin-plan-authority-no-guess-consumer-t1. Keep accepted positive work from commit 30333e85254179d0fc0ec3461fd78beb787c7d83; fix only two Design-line mismatches. Authority lines: Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md lines 68-74 (C1: confirm schema optional + silent inheritance is deviation; confirm must require complete Agent-authored payload with selectedDimensions, scale, moduleBindings, plannedNextActions, evidenceRefs, rationale; use operation/discriminator/superRefine or equivalent schema-level routed validation, not only late handler fallback) and lines 76-84 (D1: planningBrief persistence + exposure must stop; stop-write alone is insufficient if public plan projector still exposes planningBrief). Raw controller evidence: AlembicPlugin/lib/shared/schemas/mcp-tools.ts lines 830-868 still defines PlanInput as one optional-field object with no PlanInput superRefine/discriminated confirm enforcement; plan-tool.ts lines 1036-1101 blocks missing payload later but public schema/runtime schema path still preserves optional-confirm shape and tests do not cover schema parse. plan-tool.ts lines 1237-1253 still returns planningBrief in projectPlanRecord, so draft/confirm/get plan objects expose planningBrief as a public field, even if storage is null; tests only assert stored planningBrief is null. Required fixes: (1) add operation-aware PlanInput schema/routed validation so confirm without non-empty selectedDimensions, scale, moduleBindings, plannedNextActions, evidenceRefs, and rationale fails at the schema/runtime validation boundary; keep draft/get valid; add direct regression tests for PlanInput safeParse or the routed schema validation path plus handler error behavior. (2) remove planningBrief from public projectPlanRecord/plan outputs for draft/confirm/get; keep draft top-level fact materials/sourceReports/planningBrief only if explicitly treated as Agent fact package, not persisted plan record; add tests asserting public plan object does not have planningBrief while stored planningBrief remains null. (3) rerun build:check, targeted Plan tests, targeted HostMcpServer bootstrap test, scoped Biome, git diff --check, scenario JSON parse, and rg proving no recommendation/top/fallback/escape-valve terms reappear except allowed negative tests/non-Plan top-area/top-level wording. Do not touch Core/Alembic/Dashboard/Test; do not reintroduce compatibility, fallback, recommendation, top, or optional confirm semantics.",
+  "status": "pending",
+  "sourceRef": "evt-20260622131858-0017 rework decision for p1p2-plugin-plan-authority-no-guess-consumer-t1",
+  "createdAt": "2026-06-22T13:19:24.104Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1",
+      "taskPackageId": "p1p2-plugin-plan-authority-no-guess-consumer-rework-1-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Current window: AlembicPlugin. Claim only task p1p2-plugin-plan-authority-no-guess-consumer-rework-1-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicPlugin/AGENTS.md, original Design lines 68-84, previous target result, and controller rework decision evt-20260622131858-0017. Preserve positive commit 30333e85254179d0fc0ec3461fd78beb787c7d83; implement only the two public-surface fixes named by controller: schema-level/routed confirm complete-payload validation, and removal of planningBrief from public plan record outputs. Backfill commit hash, exact tests/build/lint/rg evidence, and no unrelated repo edits.",
+      "status": "pending",
+      "createdAt": "2026-06-22T13:19:24.104Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

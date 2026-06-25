@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-dh-5",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-5-cleanup-test-parity-rc678",
+  "dispatchGroup": "dh5-plugin-cleanup-test-parity",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-5",
+  "status": "completed",
+  "summary": "DH-5（最终清理收口 + 测试对等 RC-6/7/8 + DH-4 结转）。基线 764dfc6 → 父 HEAD 532a7d1，3 commit 直提 main。**RC-1~8 实现全部 DONE，无 flag，需求进入 DH-6 验收。**\n\n【RC-7 cc 测试对等（主交付）】b523ee7：test/unit/ClaudeCodeHostRuntime.test.ts **14 个 cc 路径 RUNTIME 测试**（cc 原覆盖~5%/纯 schema）。覆盖 cc runtime-context/identity、cc 项目根经 CLAUDE_PROJECT_DIR 发现（trusted 非 fail-closed）、cc init-marker/saved-root 持久化经 cc adapter 往返、cc env bootstrap、cross-host parity（codex↔cc 共享 host-agnostic runtime context + 项目根解析对等、仅 L3 选 host）、HostMcpServer cc 路径 dispatch + codex/cc dispatch 对等。cc adapter 经 CODEX_PLUGIN_ROOT_ENV→cc 壳根强制（生产 shape-detection，无 test-only 注入）。14/14 绿；全量 unit 失败集与基线 IDENTICAL（39 files；+14 计入 passed 1105→1119）。\n\n【RC-6 layer-contract 固化】f985c68：scripts/lint-layer-boundary.mjs + npm run lint:layer-boundary（接入 check）。强制 MCP 面单向契约 L2(runtime/mcp)→L1(service/workflows)、禁 L1→L2 backslip。修 1 处 backslip（ModuleService 经 L2 re-export LanguageExtensions 取 core 的 inferLang → 改直 import @alembic/core/host-agent-workflows，删 dead LanguageExtensions.ts）。门禁起步即 GREEN；26 处干净 L2→L1 seam 不受影响。\n\n【RC-8 兼容残留决策（无 intent 返工，已 sanity 核实）】HostDeclaredIntentInput(host-turn-meta.ts:9, 被 agent-public-tools/mcp-tools 消费、optional+size-limit slice 1600)=LIVE→保留；file-monitor(EnhancementRoute.ts)=纯诊断投影（无行为分支，FileChangeHandler/GitDiffCheckpoint 已 PDR-1 删）→保留（保 status 形状、不删用户可见字段）；intent paradigm 删除=daemon-removal PDR-1（2026-06-18 已完成）所有，DH-5 不重新拥有、仅保四工具 MCP 语义=跨需求边界。\n\n【DH-4 结转项】AGENTS.md「共享资产单源与漂移门禁」同步 DH-4b perHostSections 模型（skill-shared-sections 可声明 host-divergent per-host 段、门禁 cross-host coherence-skip）；structure skill 现 0 cross-host-coherent 共享段（两段均 host-divergent→per-host）记为已接受取舍（插件资产不可改前提）；cc setupProfile 控制器已裁=CC3/不在本需求（'codex-plugin' 持久化冻结 + cc 复用功能正确，独立 cc profile 仅命名实益=CC3）→本阶段不改代码、仅记录。决策记录 ledger: wakeflow-ledger/AlembicPlugin/dh-5-cleanup-test-parity-rc678-2026-06-20.md。\n\n【RC-1~8 全量完成】两漂移门禁 GREEN（Node≥22）+ lint:layer-boundary/repo-boundary GREEN + tsc 绿 + lint 0 + 全量 unit 失败集 IDENTICAL(39)。de-Codex 误命名清零、host-name 分支仅 L3、四工具语义/wire-persistence-frozen 值不变、纯 MCP 非强进程不变量持。**需求实现进入 DH-6 验收（Test 真实 cc 验收；codex 外部）。** 非阻塞：cc 子模块 commit（f2c2929/15fce77）本地未 push=独立 release 步。",
+  "evidenceRefs": [
+    "parent f985c68 feat(lint): DH-5 RC-6 lint:layer-boundary gate — forbid L1→L2 backslip; fix ModuleService backslip",
+    "parent b523ee7 test(runtime): DH-5 RC-7 cc host-path runtime tests + cross-host parity (14 tests)",
+    "parent 532a7d1 docs(agents): DH-5 RC-8/DH-4 carry-over — perHostSections + structure 0-coherence tradeoff",
+    "decision record wakeflow-ledger/AlembicPlugin/dh-5-cleanup-test-parity-rc678-2026-06-20.md",
+    "baseline 764dfc6 → parent HEAD 532a7d1"
+  ],
+  "verification": [
+    "tsc --noEmit 绿；biome lint 0 error",
+    "lint:layer-boundary PASS（起步即 GREEN，修 1 处 backslip）；pattern sanity 捕 relative + #codex/mcp backslip",
+    "lint:repo-boundary PASS（0 escape-hatch）",
+    "shared-asset-drift PASS（Node 22：11 checks, 0 drift）；cross-shell-drift PASS（per-host）",
+    "14 个 cc runtime 测试全绿；全量 unit 失败集与基线 IDENTICAL（39 failed | 88 passed (127)；+14 计入 passed，零回归）",
+    "RC-8 sanity 核实：HostDeclaredIntentInput 有 2+ 消费者+size-limit；file-monitor 仅诊断投影无行为分支",
+    "父仓 3 commit（f985c68 RC-6, b523ee7 RC-7, 532a7d1 RC-8/DH-4）；tree clean；不改 Alembic(88a2abf)/Core",
+    "host-name 分支仅 L3；四工具对外 MCP 语义/落盘名/'codex-plugin'/error codes 不变；CC3 文案未动"
+  ],
+  "risks": [
+    "cc 子模块 commit f2c2929(DH-4a)/15fce77(DH-4c) 本地未 push：gitlink 指向本地，clone/CI 前需 push（独立 release 步，用户/控制器决）——非 DH-5 遗留",
+    "cc setupProfile 归 CC3（控制器裁）：本 pass 不改代码、仅记录；若未来要独立 cc profile 是 persistence 迁移（归 CC3 波次）",
+    "drift 门禁需 Node≥22（.nvmrc=22）；Node18 假红；npm run check 需在 Node22 跑才全绿",
+    "structure skill 0 cross-host-coherent 共享段：接受取舍（插件资产不可改前提）；未来双侧重构可恢复 host-agnostic coherence",
+    "未做真实 cc 运行验收（DH-6 领地）；cc 路径现有 14 runtime 测试 + adapter/HostMcpServer dispatch 覆盖，但未在真实 cc shell 运行"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh5-plugin-cleanup-test-parity__AlembicPlugin__DH-5",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh5-plugin-cleanup-test-parity__AlembicPlugin__DH-5.json",
+    "deliveryRunId": "run-delivery-dh5-plugin-cleanup-test-parity__AlembicPlugin__DH-5",
+    "dispatchGroup": "dh5-plugin-cleanup-test-parity",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh5-plugin-cleanup-test-parity__AlembicPlugin__DH-5.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 63,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-5-cleanup-test-parity-rc678",
+    "targetTaskId": "DH-5",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh5-plugin-cleanup-test-parity",
+    "resultId": "tr-dh-5",
+    "createdAt": "2026-06-20T09:38:42.539Z"
+  },
+  "createdAt": "2026-06-20T09:38:42.539Z",
+  "stateRevisionObserved": 63,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -27,9 +27,9 @@ Each row binds a CodeGraph subsystem or pattern to:
 Use raw evidence first:
 
 - Core TargetResultEnvelope:
-  `.workspace-active/workspace/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-core-audit-t1.json`
+  `.wakeflow-active/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-core-audit-t1.json`
 - Plugin TargetResultEnvelope:
-  `.workspace-active/workspace/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-plugin-audit-t2.json`
+  `.wakeflow-active/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-plugin-audit-t2.json`
 - Local code anchors listed in the target results.
 - CodeGraph source references listed in the target results and requirement
   design.
@@ -111,8 +111,8 @@ Immediate next waves after CGK-11/CGK-13 review:
 
 ## Source References
 
-- `.workspace-active/workspace/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-core-audit-t1.json`
-- `.workspace-active/workspace/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-plugin-audit-t2.json`
+- `.wakeflow-active/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-core-audit-t1.json`
+- `.wakeflow-active/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-plugin-audit-t2.json`
 - `AlembicCore/src/core/ast/ProjectGraph.ts:1`
 - `AlembicCore/src/core/analysis/CallGraphAnalyzer.ts:84`
 - `AlembicCore/src/service/knowledge/CodeEntityGraph.ts:214`

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "kind": "ControllerRawEvidenceReview",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p5-test-bilidili-stateless-plan-e2e-p1",
+  "taskId": "p5-test-bilidili-stateless-plan-e2e-t1",
+  "targetWindow": "Test",
+  "reviewedAt": "2026-06-24T01:44:19Z",
+  "controller": "AlembicWorkspace",
+  "verdict": "rework-required",
+  "blockingRequirement": "P5 PASS criterion requires DB inspection after a full run to show no plans table and no plan rows; the strict design also deletes the entire plan persistence layer, including 012_plans and PlanRepository.",
+  "rawEvidenceReviewed": [
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/summary.json",
+      "finding": "Test classified the run as product-runtime-contract-failure: draft/confirm/bootstrap/rescan route succeeded, but no-plan-persistence failed because runtime DB still materializes plans."
+    },
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/db-after-open.json",
+      "finding": "plansTableExists=true, plansRowCount=0, plansMigrationApplied=true, and migrations include 012_plans immediately after opening a fresh ghost-mode runtime DB."
+    },
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/db-after-run.json",
+      "finding": "plansTableExists=true, plansRowCount=0, plansMigrationApplied=true, and migrations still include 012_plans after the full BiliDili e2e run."
+    },
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/draft.raw.json",
+      "finding": "Draft payload has only operation, projectRoot, projectInfoTree, candidateDimensions, agentDecisionChecklist, and nextActions; projectInfoTree is compact and includes the pyramid meta marker."
+    },
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/confirm-coldStart-result.raw.json",
+      "finding": "Confirm coldStart returns planSelection without removed persistence fields."
+    },
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/confirm-deepMining-result.raw.json",
+      "finding": "Confirm deepMining returns planSelection without removed persistence fields."
+    },
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/bootstrap-result.raw.json",
+      "finding": "Bootstrap consumed planSelection in testMode and exposed planGate; no storage-read evidence was found in the payload review."
+    },
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/rescan-result.raw.json",
+      "finding": "Rescan consumed planSelection in testMode and exposed planGate; checkpoint/sourceRef path remained present."
+    },
+    {
+      "ref": "Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/suite-results.json",
+      "finding": "AlembicPlugin related unit suite passed with 6 files and 39 tests; AlembicCore checkpoint/public entrypoint suite passed with 2 files and 10 tests; rg evidence shows AlembicCore/dist still contains 012_plans and PlanRepository."
+    }
+  ],
+  "independentChecks": [
+    {
+      "command": "rg -n \"plans table|plans|PlanRepository|012_plans|no-plan|persistence|P5|delete\" Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md",
+      "result": "Confirmed strict design lines require deleting plan persistence and P5 DB inspection with no plans table."
+    },
+    {
+      "command": "python3 parse of Test/tmp/p5-test-bilidili-stateless-plan-e2e-20260624/evidence/db-after-open.json and db-after-run.json",
+      "result": "Both raw DB evidence files report plansTableExists=true and plansMigrationApplied=true."
+    },
+    {
+      "command": "rg -n \"CREATE TABLE IF NOT EXISTS plans|plans_plan_version_unique|idx_plans_project_status|class PlanRepository|PlanRepository|012_plans\" AlembicCore/src AlembicCore/dist AlembicPlugin/src AlembicPlugin/dist",
+      "result": "AlembicCore/dist/infrastructure/database/migrations/012_plans.js and AlembicCore/dist/repository/plan/* still contain active plan persistence artifacts; the AlembicPlugin/src path does not exist in this repo layout."
+    },
+    {
+      "command": "git -C AlembicCore rev-parse HEAD && git -C AlembicPlugin rev-parse HEAD && git -C BiliDili rev-parse HEAD",
+      "result": "Reviewed commits are AlembicCore 1bac46009524e03ce6b90bf69367a608613c750c, AlembicPlugin 1d17f0f833ee2704d30f7b1bd9cf9816f982b54b, and BiliDili a3ea6a2519b0cbd39cee76b32ad844eae0e5feec."
+    }
+  ],
+  "acceptedFindings": [
+    "Draft and confirm stateless contract behavior is covered by raw payloads and is not the failing surface.",
+    "Bootstrap and rescan route planSelection through the execution gate in the Test scenario.",
+    "The failure is a product runtime contract gap, not a Test harness missing-evidence issue."
+  ],
+  "reworkBoundary": {
+    "owningWindow": "AlembicCore",
+    "reason": "AlembicCore runtime build artifacts still include the deleted 012_plans migration and PlanRepository, causing a fresh runtime DB to create the forbidden plans table.",
+    "minimumRepair": [
+      "Remove or regenerate AlembicCore runtime distribution artifacts so dist no longer ships 012_plans or PlanRepository.",
+      "Ensure a clean AlembicCore build cannot resurrect deleted plan persistence artifacts.",
+      "Provide rg evidence over AlembicCore/src and AlembicCore/dist showing no production 012_plans/PlanRepository/plans table artifacts.",
+      "Provide a focused DB-open verification that a fresh runtime DB no longer applies 012_plans and has no plans table."
+    ],
+    "nonGoals": [
+      "Do not change the already verified alembic_plan draft/confirm output shape unless the Core repair requires an integration adjustment.",
+      "Do not reintroduce plan persistence under a new name.",
+      "Do not accept zero plan rows as sufficient while the plans table still exists."
+    ]
+  },
+  "decision": {
+    "type": "rework",
+    "reason": "P5 strict DB hard gate failed: a fresh BiliDili runtime DB applied 012_plans and created the forbidden plans table from AlembicCore dist artifacts."
+  }
+}

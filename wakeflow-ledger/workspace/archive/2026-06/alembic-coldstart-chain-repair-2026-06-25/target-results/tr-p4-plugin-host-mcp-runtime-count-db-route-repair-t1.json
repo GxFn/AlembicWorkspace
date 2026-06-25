@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-plugin-host-mcp-runtime-count-db-route-repair-t1",
+  "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+  "taskPackageId": "p4-plugin-host-mcp-runtime-count-db-route-repair-p1",
+  "dispatchGroup": "p4-plugin-host-mcp-runtime-count-db-route-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-coldstart-chain-repair-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p4-plugin-host-mcp-runtime-count-db-route-repair-t1",
+  "status": "completed",
+  "summary": "Host MCP runtime stale-route issue repaired by rebuilding AlembicPlugin, refreshing installed Codex plugin caches to local dist, and proving fresh MCP plus non-MCP HostMcpServer write/read route. Current source/dist returns real ProjectContext counts, writes DB-backed Recipes, and status/recipe_map/graph/search read the same data root. No tracked source change was required.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-coldstart-chain-repair-2026-06-25/evidence/p4-plugin-host-mcp-runtime-count-db-route-repair-t1.md",
+    "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+    "AlembicPlugin/scratch/codex-plugin-dev-reload-probe-report.json",
+    "AlembicPlugin/scratch/p4-host-mcp-db-route-probe-report.json"
+  ],
+  "verification": [
+    "npm run dev:codex-plugin:reload -- --project-root /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili -> PASS; fresh MCP probe ok for both installed cache roots, entryMode=local-dev-direct-dist",
+    "npm run build:check -> PASS",
+    "npm run test:unit -- test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts test/unit/SubmitKnowledgeRouter.test.ts test/unit/HostAgentRecipeEvidenceGate.test.ts -> PASS (37 tests)",
+    "node scratch/p4-host-mcp-db-route-probe.mjs -> PASS; status recipeCount/dbRecipeCount/databaseEntryCount=3, recipe_map/graph/search/get ok",
+    "git diff --check -> PASS; git status --short -> clean"
+  ],
+  "risks": [
+    "Already-open Codex MCP transports are not stopped by plugin reload. Fresh startup is proven correct; live-session retest may still require the user to restart/reconnect Codex if it reuses an old MCP process.",
+    "Broader attempted unit batch still has stale non-P4 expectations in AlembicPlanTool.test.ts and HostMcpServer.test.ts; P4 route-relevant test subset passed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-plugin-host-mcp-runtime-count-db-route-repair-p1__AlembicPlugin__p4-plugin-host-mcp-runtime-count-db-route-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-host-mcp-runtime-count-db-route-repair-p1__AlembicPlugin__p4-plugin-host-mcp-runtime-count-db-route-repair-t1.json",
+    "deliveryRunId": "run-delivery-p4-plugin-host-mcp-runtime-count-db-route-repair-p1__AlembicPlugin__p4-plugin-host-mcp-runtime-count-db-route-repair-t1",
+    "dispatchGroup": "p4-plugin-host-mcp-runtime-count-db-route-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-host-mcp-runtime-count-db-route-repair-p1__AlembicPlugin__p4-plugin-host-mcp-runtime-count-db-route-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-coldstart-chain-repair-2026-06-25",
+    "stateRevision": 36,
+    "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+    "taskPackageId": "p4-plugin-host-mcp-runtime-count-db-route-repair-p1",
+    "targetTaskId": "p4-plugin-host-mcp-runtime-count-db-route-repair-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p4-plugin-host-mcp-runtime-count-db-route-repair-p1",
+    "resultId": "tr-p4-plugin-host-mcp-runtime-count-db-route-repair-t1",
+    "createdAt": "2026-06-24T23:06:28.559Z"
+  },
+  "createdAt": "2026-06-24T23:06:28.559Z",
+  "stateRevisionObserved": 36,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

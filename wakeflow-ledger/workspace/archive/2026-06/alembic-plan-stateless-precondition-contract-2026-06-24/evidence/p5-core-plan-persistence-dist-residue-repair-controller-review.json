@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "kind": "ControllerRawEvidenceReview",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p5-core-plan-persistence-dist-residue-repair-p1",
+  "taskId": "p5-core-plan-persistence-dist-residue-repair-t1",
+  "targetWindow": "AlembicCore",
+  "reviewedAt": "2026-06-24T01:52:37Z",
+  "controller": "AlembicWorkspace",
+  "verdict": "accept-target-result",
+  "acceptedScope": "Accept the AlembicCore repair that prevents stale dist/runtime artifacts from carrying deleted plan persistence into fresh runtime DBs.",
+  "notAcceptedAs": [
+    "This is not final P5 demand acceptance.",
+    "This does not replace the required BiliDili e2e rerun after the Core repair.",
+    "This does not permit plan persistence under another name."
+  ],
+  "targetEvidenceReviewed": [
+    {
+      "ref": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/target-results/tr-p5-core-plan-persistence-dist-residue-repair-t1.json",
+      "finding": "Target reports commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93, build clean-dist before tsc, src/dist residue scans clean, fresh DB-open check with no plans table, focused tests, full tests, public API smoke, and known pre-existing lint:naming only in npm run check."
+    },
+    {
+      "ref": "AlembicCore/package.json",
+      "finding": "npm run build now runs node scripts/clean-dist.mjs before tsc -p tsconfig.json, so stale dist files are deleted before emission."
+    },
+    {
+      "ref": "AlembicCore/scripts/clean-dist.mjs",
+      "finding": "The script resolves packageRoot/dist and refuses unexpected paths before rmSync(dist, recursive:true, force:true)."
+    },
+    {
+      "ref": "AlembicCore commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93",
+      "finding": "Commit changes only package.json and scripts/clean-dist.mjs; product source P0 deletion stays unchanged."
+    }
+  ],
+  "independentChecks": [
+    {
+      "command": "npm run build",
+      "cwd": "AlembicCore",
+      "result": "passed; command executed node scripts/clean-dist.mjs && tsc -p tsconfig.json."
+    },
+    {
+      "command": "rg -n \"012_plans|PlanRepository|planRepository|getActiveConfirmed|CREATE TABLE IF NOT EXISTS plans|sqliteTable\\\\('plans'|sqliteTable\\\\(\\\\\\\"plans\\\\\\\"\" src dist scripts package.json",
+      "cwd": "AlembicCore",
+      "result": "exit 1 with no matches after the controller rebuild."
+    },
+    {
+      "command": "rg --files src dist | rg '(^|/)(012_plans|PlanRepository)\\\\.(js|d\\\\.ts|ts)$|(^|/)plan(/|$)'",
+      "cwd": "AlembicCore",
+      "result": "exit 1 with no matching files after the controller rebuild."
+    },
+    {
+      "command": "node --input-type=module fresh DB-open check using ./dist/database.js",
+      "cwd": "AlembicCore",
+      "result": "plansTableExists=false, plansRowCount=null, plansMigrationApplied=false, migrationCount=10, tableCount=21; migrations were 001_initial_schema, 004_evolution_proposals, 005_recipe_source_refs, 006_lifecycle_transition_events, 007_evolution_type_simplification, 008_recipe_warnings, 009_knowledge_dimension_id, 010_source_graph, 011_guard_violations_attribution, 013_git_diff_checkpoints."
+    },
+    {
+      "command": "npm run test -- DatabaseRepository.test.ts MigrationsRerunIdempotency.test.ts PublicDatabaseRepositoryEntrypoints.test.ts GitDiffCheckpointRepository.test.ts PublicEvolutionEntrypoints.test.ts",
+      "cwd": "AlembicCore",
+      "result": "5 files passed, 22 tests passed."
+    },
+    {
+      "command": "git -C AlembicCore diff --check",
+      "cwd": "AlembicWorkspace",
+      "result": "passed."
+    },
+    {
+      "command": "git -C AlembicCore status --short",
+      "cwd": "AlembicWorkspace",
+      "result": "clean."
+    }
+  ],
+  "acceptanceReason": "The original P5 blocker was stale AlembicCore dist/runtime plan persistence. After commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93 and a controller rebuild, src/dist no longer contain 012_plans or PlanRepository residue, and a fresh runtime DB no longer applies 012_plans or creates the plans table.",
+  "residualRisk": [
+    "dist is ignored by AlembicCore policy, so downstream runtime packaging must run npm run build after taking commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93.",
+    "Alembic Guard did not produce a verdict because the Alembic project status is degraded/not_initialized for this host; repository-local validation passed."
+  ],
+  "nextAction": {
+    "type": "create-next-package",
+    "reason": "Final P5 completion still requires Test to rerun the BiliDili stateless plan e2e after the Core dist repair and prove the full plan draft -> confirm -> bootstrap/rescan(planSelection) route plus no plans table in a fresh runtime DB."
+  }
+}

@@ -23,7 +23,7 @@
   - `AlembicDesign/docs/current/plugin-mcp-multi-project-runtime-original-plan-2026-06-03.md`
   - `AlembicDesign/docs/current/plugin-mcp-multi-project-runtime-requirement-design-2026-06-03.md`
   - `AlembicDesign/docs/current/workspace-handoff-board.md`
-  - `codex-control-workspace/.workspace-active/workspace/current/design-handoff-inbox.md`
+  - `codex-control-workspace/.wakeflow-active/current/design-handoff-inbox.md`
   - `codex-control-workspace/skills/dev/codex-automation-controller/SKILL.md`
 - 是否需要先验证 / 重新计划 / 用户确认：不需要用户二次确认；P7 raw evidence 已满足当前完成定义，当前只允许验收收口、同步状态和停止本条自动化，不允许继续派发或扩大为新需求。
 - 本次允许更新：当前计划、当前状态同步面、全局 TODO、Design inbox 刷新结果、automation dispatch / delivery / keep-live 本地运行态。
@@ -858,7 +858,7 @@ git -C plugins/alembic-codex status --short
   - 不能推出的结论：不能推出所有项目、Dashboard UX、Codex host reload 全场景或 release 已完成。
   - 停止或不开始条件：测试会修改真实项目源码、需要启动未授权产品实现、插件 runtime 不可用、无法采集 raw report/runtime JSON、或发现需求设计外问题需要用户裁决。
 - 测试单：`Test-PMMPR-STAGE5-PLUGIN-MCP-RUNTIME-SMOKE-001`。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：BiliDili / Playground 仅作为后续可能 smoke 场景，不作为可改仓库。
 - 当前测试结论：P7 已通过，总控已验收。
 
@@ -894,7 +894,7 @@ git -C plugins/alembic-codex status --short
   "indexStatusDescription": "Plugin MCP Multi Project Runtime 当前状态：P7 raw evidence 通过，当前完成定义已满足；PMMPR automation / keep-live 已停止，无下一跳。",
   "currentIndexType": "当前计划",
   "currentIndexDescription": "Plugin MCP Multi Project Runtime：P7 passed, accepted by total control。",
-  "currentStatusSummary": "当前计划：[plugin-mcp-multi-project-runtime-workspace-plan-2026-06-03.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/plugin-mcp-multi-project-runtime-workspace-plan-2026-06-03.md)。当前用户目标：接收 `PLUGIN-MCP-MULTI-PROJECT-RUNTIME-2026-06-03` 并开启无人值守自动化；Stage 0 只读 inventory 已验收，Stage 1A producer contract 已验收，Stage 1B Plugin consumer 已验收，Stage 2 Plugin startup/reload 已验收，Stage 3/4 P4R runtime context surface 已通过总控复核；Stage 5 AlembicTest real smoke 曾回填 blocked；AlembicPlugin P6 功能修复和 P6R runtime artifact consistency 已通过总控复核；AlembicTest P7 真实 installed / packaged Plugin MCP runtime smoke 已通过总控复核。当前完成定义已满足，PMMPR automation / keep-live 已停止，无下一跳。",
+  "currentStatusSummary": "当前计划：[plugin-mcp-multi-project-runtime-workspace-plan-2026-06-03.md](../../../../../codex-control-workspace/.wakeflow-active/current/plugin-mcp-multi-project-runtime-workspace-plan-2026-06-03.md)。当前用户目标：接收 `PLUGIN-MCP-MULTI-PROJECT-RUNTIME-2026-06-03` 并开启无人值守自动化；Stage 0 只读 inventory 已验收，Stage 1A producer contract 已验收，Stage 1B Plugin consumer 已验收，Stage 2 Plugin startup/reload 已验收，Stage 3/4 P4R runtime context surface 已通过总控复核；Stage 5 AlembicTest real smoke 曾回填 blocked；AlembicPlugin P6 功能修复和 P6R runtime artifact consistency 已通过总控复核；AlembicTest P7 真实 installed / packaged Plugin MCP runtime smoke 已通过总控复核。当前完成定义已满足，PMMPR automation / keep-live 已停止，无下一跳。",
   "indexRows": [],
   "currentIndexRows": []
 }

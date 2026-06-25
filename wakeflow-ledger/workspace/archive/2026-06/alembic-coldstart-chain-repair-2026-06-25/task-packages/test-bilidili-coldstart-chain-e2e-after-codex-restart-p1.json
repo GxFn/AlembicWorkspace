@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "test-bilidili-coldstart-chain-e2e-after-codex-restart-p1",
+  "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+  "summary": "重启 Codex 后最终 Test 复验：上一轮 final e2e 被控制器判定为 host-session stale transport blocker，而非产品代码失败。用户已重启 Codex；现在按同一 coldstart-chain 完成定义复跑 BiliDili 真机/安全副本 e2e，确认当前 Codex Alembic MCP transport 是否已加载 accepted Plugin commit 458fda52430f44b180563ba2429fd4d7aedaa4ce 并完成 plan→bootstrap→submit→dimension_complete→Recipe persistence 闭环。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-coldstart-chain-repair-2026-06-25.md#Test-e2e + unblock/rework evt-20260624235541-0052 + user restart confirmation 2026-06-25",
+  "createdAt": "2026-06-24T23:55:57.155Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "test-bilidili-coldstart-chain-e2e-after-codex-restart-t1",
+      "taskPackageId": "test-bilidili-coldstart-chain-e2e-after-codex-restart-p1",
+      "targetWindow": "Test",
+      "summary": "你是 Test 窗口。先读父 AGENTS.md、Test/AGENTS.md、.wakeflow-active/index.md、.wakeflow-active/current/workspace-current-status.md、stateRoot、原始 plan/design、上一轮 stale transport 失败证据 Test/tmp/test-bilidili-coldstart-chain-e2e-after-real-host-route-rework-20260625/evidence/run-summary.md / route-status.json / source-snippet-checks.md，以及已接受的 Plugin 修复证据 .wakeflow-active/current/alembic-coldstart-chain-repair-2026-06-25/evidence/p4-plugin-real-host-route-dataroot-count-rework-1-t1.md、AlembicPlugin/scratch/p4-real-host-mcp-e2e-probe-controller-rerun.json、commit 458fda52430f44b180563ba2429fd4d7aedaa4ce。背景：上一轮 Test 使用的当前 Codex Alembic MCP session 仍标记 gitHead=b94cc36 且行为像 pre-rework，控制器判定为 host-session blocker；用户现在已重启 Codex，控制器已用 evt-20260624235541-0052 记录 rework/unblock 决策。任务目标：只做重启后的最终 e2e 复验，不改任何产品代码。第一步必须通过当前 Codex Alembic MCP path 采集 runtime marker/status：确认 runtime gitHead 或等价 dist 标记不再是 b94cc36 stale；如果仍是 stale transport，不要得出产品代码失败结论，回填明确 blocker（marker、进程/连接证据、已尝试的刷新动作），控制器已获用户授权可新建临时 Test 窗口并让临时窗口回调总控。若 transport 已刷新，继续完整复验：1) alembic_plan draft/confirm → alembic_bootstrap，draft 看到 BiliDili 真实 file/module counts，bootstrap projectMeta/projectIdentity 不得退化为 4/0，targets 至少覆盖 AOXFoundationKit≈22、AOXNetworkKit≈30、Sources≈61 或解释真实项目文件数差异；2) bootstrap 是单一 planSelection 驱动，不出现旧 7-domain/domainQueue/sopPack/D1-runtime-entrypoints，inline 预算与 fullBriefingRef 仍有效；3) 用宿主方式提交 architecture/coding-standards/design-patterns 或设计允许的维度子集，提交项必须过严格 evidence gate，source refs 可打开，snippet 与源码逐字一致，graphRefs 能支撑门禁；4) dimension_complete 后 status initialized/knowledge_ready，recipeCount/dbRecipeCount/databaseEntryCount 与真实 DB 一致且 >0；5) recipe_map/graph/search/get public routes 不再 output-contract mismatch，不再 projectRoot='.' 或 project:unknown，能检索刚提交 Recipe；6) 抽查 1-2 条 Recipe：真实、准确、有价值，对开发有指导。边界：Test 只验证，不修 AlembicPlugin/Core/BiliDili；不放松 evidence gate；不修改 alembic_plan 两部分契约；不恢复 7-domain；P6 Dashboard/UI handoff/projectId 漂移仍暂缓，除非直接阻断上述 host cold-start loop。回填必须包含 run-summary、runtime marker/status JSON、DB path/count 证据、bootstrap full briefing 路径、public route outputs、source snippet check、样本 Recipe id/title/source refs、明确 pass/fail 结论与失败归因。",
+      "status": "pending",
+      "createdAt": "2026-06-24T23:55:57.155Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

@@ -91,7 +91,7 @@
 
 | 资产 | 当前事实 | 应负责 | Stage 0 判断 |
 | --- | --- | --- | --- |
-| `.workspace-active/workspace/index.md` | 当前第一行仍指向 PCVM Wave 6F。 | 活跃总控入口。 | 本轮应切到 Workspace Workflow Optimization 当前计划；PCVM 作为观察主线保留。 |
+| `.wakeflow-active/index.md` | 当前第一行仍指向 PCVM Wave 6F。 | 活跃总控入口。 | 本轮应切到 Workspace Workflow Optimization 当前计划；PCVM 作为观察主线保留。 |
 | `workspace-current-status.md` | 当前状态仍是 PCVM Wave 6F 等 Alembic。 | 短状态快照。 | 本轮应同步为 WWO Stage 0 接收 / 资产地图。 |
 | `design-handoff-inbox.md` | 由 import script 生成。 | 等待总控接收的 Design 候选。 | 本轮 import check 暴露矛盾 issue；暂不写入，避免把脚本问题覆盖掉。 |
 | `global-todo-board.md` | 活跃 TODO 账本。 | 已裁决要跟踪的问题。 | WWO 已成为当前计划，不必先新增 TODO；Stage 1/2 再决定是否补具体治理 TODO。 |
@@ -102,8 +102,8 @@
 | 资产 | 当前事实 | 应负责 | Stage 0 判断 |
 | --- | --- | --- | --- |
 | `workspace.config.json` | 通用 BaseWindow / CoreWindow 等 generic 配置。 | GitHub 通用安装默认。 | 归属正确。 |
-| `.workspace-local/workspace.config.json` | Alembic 安装实例覆盖，包含 Alembic*、AlembicDesign、AlembicTest、BiliDili 和 runtime matcher。 | 本机项目专属窗口名、路径、role、managedAgents。 | 归属正确且不提交；Stage 4 可从它生成 ChildWindowAccessProfile。 |
-| `.workspace-local/codex-automation-loop/` | 本地 thread / packet / envelope / result runtime。 | 本地 automation 状态。 | Stage 0 未展开读取；Stage 5 小闭环时再验证。 |
+| `.wakeflow-local/workspace.config.json` | Alembic 安装实例覆盖，包含 Alembic*、AlembicDesign、AlembicTest、BiliDili 和 runtime matcher。 | 本机项目专属窗口名、路径、role、managedAgents。 | 归属正确且不提交；Stage 4 可从它生成 ChildWindowAccessProfile。 |
+| `.wakeflow-local/codex-automation-loop/` | 本地 thread / packet / envelope / result runtime。 | 本地 automation 状态。 | Stage 0 未展开读取；Stage 5 小闭环时再验证。 |
 
 ### 7. Delivery / result surfaces
 
@@ -121,7 +121,7 @@
 | WWO-S0-002 | P1 | 当前 active ledgers 仍指向 PCVM Wave 6F；用户已明确切换到 WWO。 | index/status 当前行。 | 本轮通过 sync 切到 WWO；PCVM 不关闭，只记录为被打断观察主线。 |
 | WWO-S0-003 | P2 | 旧 skill 路径 `alembic-workspace-control` 仍可能存在于旧文档或用户截图语境；当前真实路径是 `control-workspace-governance`。 | `sed codex-control-workspace/skills/dev/alembic-workspace-control/SKILL.md` 失败；真实 skill 列表无该路径。 | Stage 2 清理旧路径引用，不改硬规则。 |
 | WWO-S0-004 | P2 | 脚本分类已经在 README 描述，但代码 / JSON 输出层面没有统一分类 metadata。 | scripts README。 | Stage 3 选择轻量方式补分类索引，不让脚本承担判断。 |
-| WWO-S0-005 | P2 | 子窗口接入卡已覆盖最小门禁，但 `ChildWindowAccessProfile` 还没有作为可复核视图输出。 | managed AGENTS block + `.workspace-local/workspace.config.json`。 | Stage 4 生成或文档化 profile 视图；不新增任务状态系统。 |
+| WWO-S0-005 | P2 | 子窗口接入卡已覆盖最小门禁，但 `ChildWindowAccessProfile` 还没有作为可复核视图输出。 | managed AGENTS block + `.wakeflow-local/workspace.config.json`。 | Stage 4 生成或文档化 profile 视图；不新增任务状态系统。 |
 | WWO-S0-006 | P3 | 模板 README 提到 starter / window-support 目录，Stage 0 粗略 `find -maxdepth 2` 未列出具体文件，需要确认是深层目录还是文档漂移。 | `find codex-control-workspace/templates -maxdepth 2 -type f`。 | Stage 3 模板整理时复核。 |
 
 ## 状态枚举化规划
@@ -194,10 +194,10 @@ Stage 2 的目标是把“哪些内容应该常驻、哪些内容应该按需加
 | Automation controller / target skills | `ControllerDispatchPacket` / `DeliveryEnvelope` / `TargetResultEnvelope` 的机械步骤、一次性唤醒、role guard 和 review-results 操作。 | 用户目标、验收裁决、跨窗口调度、TestWindow 边界回到当前计划和总控。 | heartbeat 只保留语义首行、动态变量、规则名和 skill 指向。 | 旧 `claim / finish / chain-next / VAD` 路线不再作为 active protocol。 |
 | Templates | 必要标题、表格形状、脚本锚点、枚举字段、占位标签和短边界提醒。 | 长 playbook、命令手册、仓库特例、当前任务事实。 | 模板应拆到能直接复制；超长条件移入 reference。 | commit hash、本机路径、当前状态、一次性决策。 |
 | Scripts | 机械校验、同步、导入、归档、状态、安装 scope 写入和本地 automation contract；必须有 dry-run / write gate。 | ready 判断、TODO 优先级、证据接受、下一目标选择留给总控。 | Codex 续跑相关脚本输出必须有 `scriptComplete` / `agentNext` 或等价提示。 | 静默写子仓库、接受证据、改变范围或绕过当前计划的脚本行为。 |
-| `.workspace-active/workspace/current/` | 当前目标、完成定义、任务包、当前证据、回填、TODO、测试交流和短期状态。 | 永久规则进 `AGENTS.md` / reference；历史归档进 `workspace-ledger`。 | 写 sync block 前先写清触发、证据、允许结论和禁止结论。 | 过期提示词、已归档 wave 噪声、重复历史。 |
+| `.wakeflow-active/current/` | 当前目标、完成定义、任务包、当前证据、回填、TODO、测试交流和短期状态。 | 永久规则进 `AGENTS.md` / reference；历史归档进 `workspace-ledger`。 | 写 sync block 前先写清触发、证据、允许结论和禁止结论。 | 过期提示词、已归档 wave 噪声、重复历史。 |
 | `workspace-ledger/` | 需求设计、阶段确认、长期契约、历史验收、归档地图和 repo-specific 长期协作文档。 | 活跃状态不进 ledger；通用骨架不进 ledger。 | 仍相关的历史要从 index 或 current plan 挂回。 | 临时 runtime、raw thread id、本机绝对路径和 active 噪声。 |
 | 子仓库 `AGENTS.md` managed block | scope card、父级入口、窗口职责、读取顺序、本地停止卡、active plan pointer 和 role guard。 | 当前 wave 任务书、总控验收结论、其它窗口任务、完整提示词。 | managed block 由安装脚本生成，避免手写漂移。 | 不适用于该窗口的重复总控硬规则、旧路径、占位 thread id。 |
-| `.workspace-local/` | 本地 config overlay、真实 thread id、automation runtime、stop marker 和本机状态。 | 人读状态进 current plan；长期历史进 ledger。 | 脚本可读，但不能要求进入 Git。 | 任何 tracked 或 prompt-visible raw thread id。 |
+| `.wakeflow-local/` | 本地 config overlay、真实 thread id、automation runtime、stop marker 和本机状态。 | 人读状态进 current plan；长期历史进 ledger。 | 脚本可读，但不能要求进入 Git。 | 任何 tracked 或 prompt-visible raw thread id。 |
 | PCV / PCVM | 分阶段计划方法、stage-node 词汇、scorecard readiness 和 evidence labels。 | Workspace 控制状态机和验收裁决仍归总控当前计划。 | PCVM 输出要投影为 workspace task package / evidence section。 | 第二套独立控制状态机。 |
 
 ### Stage 2 裁决
@@ -243,12 +243,12 @@ Stage 3 的目标是按资产归属矩阵减少脚本索引和模板里的重复
 
 - `node scripts/check-script-docs.mjs`：通过，32 个脚本均有 README 索引，22 个 runtime / 10 个 test。
 - `node scripts/workspace-control.mjs scripts --tests`：通过，62 个脚本测试全部通过。
-- `node scripts/sync-current-plan.mjs --write --json`：已同步 `.workspace-active/workspace/index.md`、`.workspace-active/workspace/current/index.md` 和 `.workspace-active/workspace/current/workspace-current-status.md`。
+- `node scripts/sync-current-plan.mjs --write --json`：已同步 `.wakeflow-active/index.md`、`.wakeflow-active/current/index.md` 和 `.wakeflow-active/current/workspace-current-status.md`。
 - `node scripts/verify-control-center.mjs --with-script-tests --json`：通过，workspace boundary / repo status / docs / script docs / current sync / decision preflight / current layout / dispatch / test boundary / TODO / task package / whitespace / script tests 全部 PASS。
 
 ## Stage 4 子窗口接入边界整理
 
-Stage 4 的目标是把 `workspace.config.json` / `.workspace-local/workspace.config.json` 与子窗口 `AGENTS.md` managed block 的接入事实汇成一张可复核视图。它只检查窗口坐标和自动化边界是否一致，不替总代控派发、验收或证据裁决。
+Stage 4 的目标是把 `workspace.config.json` / `.wakeflow-local/workspace.config.json` 与子窗口 `AGENTS.md` managed block 的接入事实汇成一张可复核视图。它只检查窗口坐标和自动化边界是否一致，不替总代控派发、验收或证据裁决。
 
 ### 实现证据
 
@@ -268,7 +268,7 @@ Stage 4 的目标是把 `workspace.config.json` / `.workspace-local/workspace.co
 | `AlembicDashboard` | yes | 无 | 坐标 / ledger / automation gate 全部通过 |
 | `AlembicPlugin` | yes | 无 | 坐标 / ledger / automation gate 全部通过 |
 | `AlembicDesign` | no | `docs/current/workspace-handoff-board.md` | 坐标 / Design handoff board / automation gate 全部通过 |
-| `AlembicTest` | no | `.workspace-active/workspace/current/test-exchange.md` | 坐标 / Test exchange / automation gate 全部通过 |
+| `AlembicTest` | no | `.wakeflow-active/current/test-exchange.md` | 坐标 / Test exchange / automation gate 全部通过 |
 
 `BiliDili` 是受保护真实测试项目，默认不进入 `access-profiles` 复核；需要显式传 `--include-real-project` 才会显示。
 
@@ -290,7 +290,7 @@ Stage 4 的目标是把 `workspace.config.json` / `.workspace-local/workspace.co
 真实测试对象：
 
 - 使用真实 Design handoff 或专门的 WWO smoke handoff，不使用纯虚构的脚本 fixture 代替总控入口。
-- 使用真实 active ledger：Design input / current plan / task package / result envelope / review / record 均落到 `.workspace-active/workspace/current/` 的正式入口。
+- 使用真实 active ledger：Design input / current plan / task package / result envelope / review / record 均落到 `.wakeflow-active/current/` 的正式入口。
 - 使用至少一个真实已配置子窗口或受控目标窗口完成一项低风险任务，并返回 `TargetResultEnvelope` 或等价回填；若测试只需要验证总控自执行，也必须说明为何不需要子窗口。
 - 不触碰真实产品源码，除非当前计划明确授权；不把 `AlembicTest` 当默认测试队列。
 
@@ -387,7 +387,7 @@ node scripts/verify-control-center.mjs --with-script-tests --json
   - `node scripts/codex-automation-loop.mjs create-dispatch ... --write --json`：成功创建 dispatch packet。
   - `node scripts/codex-automation-loop.mjs build-delivery ... --require-thread --write --json`：成功创建 delivery envelope；thread ready，thread id 已在输出中 redacted。
   - Codex heartbeat：成功创建 `codex-automation-alembic-wwo-stage5` 并投递给 Alembic。
-  - `TargetResultEnvelope`：`.workspace-local/codex-automation-loop/target-results/Alembic__WWO-S5-ALEMBIC-ACCESS-PROFILE-ROUNDTRIP.json`，状态 `completed`。
+  - `TargetResultEnvelope`：`.wakeflow-local/codex-automation-loop/target-results/Alembic__WWO-S5-ALEMBIC-ACCESS-PROFILE-ROUNDTRIP.json`，状态 `completed`。
   - `node scripts/codex-automation-loop.mjs review-results --group workspace-workflow-optimization-stage5-real-closed-loop-2026-05-30 --json`：`packetCount=1`，`missing=[]`，`blocked=[]`，`decision=needs-controller-review`。
   - `node scripts/control-workspace-install.mjs access-profiles --window Alembic --json`：`ok=true`，坐标检查和 automation checks 全部通过。
   - `git -C ../Alembic status --short --branch`：仅显示 `## main...origin/main`，无产品源码改动。
@@ -516,7 +516,7 @@ node scripts/verify-control-center.mjs --json
   - 不能推出的结论：不能推出 Alembic 产品 cold-start / Dashboard / runtime 已通过；这些仍需各自任务或 `AlembicTest` 边界。
   - 停止或不开始条件：枚举冲突、目标窗口定位不明、delivery/thread id 不合规、缺原始证据、或需要真实项目但未写测试边界。
 - 测试单：无。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：不触碰 `BiliDili`。
 
 ## 回填区
@@ -541,7 +541,7 @@ node scripts/verify-control-center.mjs --json
   "indexRows": [
     {
       "type": "PCVM Wave 6F report canonical projection",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6f-report-canonical-projection-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6f-report-canonical-projection-2026-05-29.md",
       "status": "被用户切换打断 / 暂停推进",
       "description": "原当前主线，等待后续恢复；本轮不归档、不关闭。"
     }
@@ -549,7 +549,7 @@ node scripts/verify-control-center.mjs --json
   "currentIndexRows": [
     {
       "type": "PCVM Wave 6F report canonical projection",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6f-report-canonical-projection-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6f-report-canonical-projection-2026-05-29.md",
       "description": "原当前主线，被用户切换到 Workspace Workflow Optimization 后暂停推进；后续恢复时继续验收 Alembic 回填。"
     }
   ]

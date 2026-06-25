@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-dh-3g",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-3g-decodex-shared-workspace-cluster",
+  "dispatchGroup": "dh3g-exec-decodex-shared",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-3g",
+  "status": "needs-review",
+  "summary": "DH-3g（共享 workspace-identity 簇 de-Codex，DH-3 收尾）。基线 a297e9d → HEAD 0221525，1 commit 直提 main。**§6.A 交付项 100% 完成并验证**；唯一残留=§6.C 明确划出本 pass 的 wire-byte manifest seam，已 flag 待控制器裁 DH-3 DONE / 是否另起小清理。\n\n【执行控制器裁断（基于 Design §6）】否决物理迁入（Design 一手核读证：共享簇 host-agnostic shape-aware、函数体零 host-name 分支、cc/codex 共享，委托=合法 L3→L1 分层）；改做 §6.A de-Codex + 确认 L1 归位。\n\n【§6.A 已 de-Codex（17 符号）】ProjectRootResolver(13)：resolveCodexProjectRoot→**resolveProjectRootFromEnv**（§6 註的定名，避与 core resolveProjectRoot + adapter 方法 resolveProjectRoot 双重撞名）、CodexInitMarker→InitMarker、CodexSavedProjectRoot→SavedProjectRoot、ResolveCodexProjectRootOptions→ResolveProjectRootOptions、get/read/write/is{InitMarker,SavedProjectRoot}+getCodexGlobalRoot→去前缀。RuntimeContext(4)：ensureCodexRuntimeEnvironment→ensureRuntimeEnvironment、host-neutral 值的 env 常量 CODEX_DEFAULT_MCP_TIER→DEFAULT_MCP_TIER/CODEX_MCP_MODE_ENV→MCP_MODE_ENV/CODEX_MCP_TIER_ENV→MCP_TIER_ENV（仅改常量名、env 值字符串不动）。两 adapter 委托新名；4+1 个与 adapter 方法同名的 free fn 在 adapter import 处 alias 为 ...Impl（消歧义，避免方法体看似自递归的 shadow）。**另捕获 2 个 §6.A-邻接 host-agnostic 漏项**（DH-3f+§6.A 均漏）：persistTrustedCodexProjectRootScope→persistTrustedProjectRootScope、parseCodexJobFile→parseJobFile。\n\n【严守 §6.B KEEP（未动，frozen strings 校验=8 不变）】落盘文件名 codex-init.json/codex-project-root.json；profile 值 'codex-plugin'(CODEX_SETUP_PROFILE)；含 CODEX 的 env 值(CODEX_MCP_SHIM_ENV/CODEX_ADMIN_ENABLE_ENV/CODEX_PLUGIN_ROOT_ENV)；host label CODEX_PLUGIN_HOST；L4 产物(CODEX_PLUGIN_SHELL_DIR/CODEX_RUNTIME_BIN/CODEX_MARKETPLACE_SHELL_ENTRY)；isCodexPluginCachePath；resolveCodexPluginRoot 回退；MCP error codes；用户可见 Codex 文案(CC3)。\n\n【L1 归位 + 文档纠正】确认共享簇为 L1 host-agnostic、两 adapter 委托；修正 CodexHostAdapter/ClaudeCodeHostAdapter 过时注释（原写「codex 实现 / 物理迁入留 DH-3③」误导→改为「host-agnostic 共享 L1、委托=合法分层、DH-3g 否决物理迁入」），落实 §8 ADR-候选「避免未来 Codex=host 误读触发返工」之意（是否落正式 ADR 属控制器决定，本窗未自建 ADR）。\n\n【DH-3 DONE 判断 + 唯一 flag】§6.A 共享簇误命名清零。lib 残留 Codex*/CODEX_*：§6.B KEEP 类 + **PluginRegistry manifest seam（CodexPluginHostShape/CodexPluginMcpDeclaration/CodexPluginRegistry/loadCodexPluginRegistry/readCodexPluginMcpDeclaration）**。后者=§6.C 明示的 codex .mcp.json 读取/wire-byte 敏感路径、且为 DH-3f 既存 KEEP、host-aware shape-dispatch——**§6 刻意划出 DH-3g 范围**，本窗按「§6.A 清单为准 + 不碰 wire-byte 路径」未动它。请控制器裁：(a) 接受 §6.A 完成 = DH-3 DONE、manifest seam 归 DH-5（或确认 host-specific KEEP）；或 (b) 另派一个针对 PluginRegistry 的小 de-Codex pass（需带 wire-byte 谨慎）。Design 不替控制器定最终范围。",
+  "evidenceRefs": [
+    "commit 0221525 refactor(runtime): DH-3g de-Codex shared workspace-identity I/O cluster — DH-3 final",
+    "baseline a297e9d → HEAD 0221525",
+    "scope 19 files 全在 lib/test/bin；无 per-host 产物/cc 子模块/AlembicCore 触动",
+    "Design 依据 Design/docs/current/alembic-plugin-dual-host-shared-workspace-io-structure-option-planning-2026-06-20.md §6.A/§6.B/§6.C/§6.D"
+  ],
+  "verification": [
+    "tsc --noEmit 绿",
+    "biome lint 0 error（lint:fix 后）",
+    "全量 unit 失败集与基线 a297e9d IDENTICAL：39 failed | 87 passed (126)，diff 空=零回归",
+    "§6.B frozen strings 校验：codex-init.json/codex-project-root.json/'codex-plugin'/codex-plugin-init-on-demand/ALEMBIC_CODEX_* env 值 计数=8 改名前后不变",
+    "§6.A 共享簇误命名清零：grep lib(excl host-adapter) 残留 Codex*/CODEX_* 仅 §6.B KEEP + manifest seam(§6.C 划出)",
+    "host-name 分支仅 L3（resolveHostAdapter 选择器 + RuntimeContext shape 检测）；lib 其余无 'codex'/'claude-code' 字面分支",
+    "codex 逐行不变：仅符号改名，落盘文件名/profile 值/env 值/.mcp.json 读取路径未动（wire-byte 保全）",
+    "5 个 adapter 方法-free fn 同名 shadow 已经 ...Impl alias 消除（grep 证无裸 return readInitMarker 等）"
+  ],
+  "risks": [
+    "残留 manifest seam(5 符号 CodexPluginHostShape/CodexPluginMcpDeclaration/CodexPluginRegistry/loadCodexPluginRegistry/readCodexPluginMcpDeclaration)：§6.C wire-byte 敏感 PluginRegistry .mcp.json 读路、DH-3f 既存 KEEP、host-aware shape-dispatch——本 pass 按§6 范围未动，需控制器裁 KEEP 或另派 DH-5 de-Codex（带 wire-byte 谨慎）；故 status=needs-review 非 completed",
+    "§6.A 邻接漏项 de-Codex(persistTrustedProjectRootScope/parseJobFile)超出§6.A 字面清单但属同类 host-agnostic 误命名且非 wire，为达误命名清零而收；如控制器认为应严守§6.A 可回退",
+    "未做真实 cc 运行验收（DH-6 领地）；本 pass 仅 tsc+unit 失败集等价证 codex 不变 + cc 经 adapter 委托同一共享实现"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh3g-exec-decodex-shared__AlembicPlugin__DH-3g",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3g-exec-decodex-shared__AlembicPlugin__DH-3g.json",
+    "deliveryRunId": "run-delivery-dh3g-exec-decodex-shared__AlembicPlugin__DH-3g",
+    "dispatchGroup": "dh3g-exec-decodex-shared",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3g-exec-decodex-shared__AlembicPlugin__DH-3g.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 47,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-3g-decodex-shared-workspace-cluster",
+    "targetTaskId": "DH-3g",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh3g-exec-decodex-shared",
+    "resultId": "tr-dh-3g",
+    "createdAt": "2026-06-20T07:21:55.161Z"
+  },
+  "createdAt": "2026-06-20T07:21:55.161Z",
+  "stateRevisionObserved": 47,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

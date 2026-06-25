@@ -13,7 +13,7 @@ PCVM 是 AlembicWorkspace 下的 Progressive Chain Validation artifact 工作面
 - 多轮次模型：[docs/pcvm-round-model.md](docs/pcvm-round-model.md)
 - 局部链路优化：[docs/pcvm-local-chain-optimization.md](docs/pcvm-local-chain-optimization.md)
 - Canonical PCV source：`../progressive-chain-validation/progressive-chain-validation/`
-- 总控当前计划：`../codex-control-workspace/.workspace-active/workspace/current/`
+- 总控当前计划：`../codex-control-workspace/.wakeflow-active/current/`
 
 ## 当前默认 Run
 

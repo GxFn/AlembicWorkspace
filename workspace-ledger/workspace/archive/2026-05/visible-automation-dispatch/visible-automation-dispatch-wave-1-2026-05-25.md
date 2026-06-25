@@ -36,7 +36,7 @@
   - `scripts/visible-dispatch.test.mjs`
   - `scripts/README.md`
   - `scripts/verify-control-center.mjs`
-  - `.workspace-local/visible-dispatch/`
+  - `.wakeflow-local/visible-dispatch/`
 - producer / consumer 依赖：
   - Producer：当前计划窗口分派 / global TODO / visible-dispatch queue generator。
   - Consumer：后续目标 Alembic 系列可见 Codex 窗口。
@@ -78,7 +78,7 @@
 
 - 新增 `scripts/visible-dispatch.mjs`。
 - 新增 `scripts/visible-dispatch.test.mjs`。
-- 更新 `.gitignore`，忽略 `.workspace-local/` 本机运行态。
+- 更新 `.gitignore`，忽略 `.wakeflow-local/` 本机运行态。
 - 更新 `scripts/README.md`、`verify-control-center.mjs`、`workspace-control.mjs` 和 script pipeline skill reference。
 - 明确 `arm` 只输出 Codex heartbeat automation payload，不在 Node 脚本里伪装调用 Codex 工具。
 
@@ -177,7 +177,7 @@ node scripts/workspace-control.mjs sync --write --verify --dispatch
 
 ## 回填区
 
-- 2026-05-25 23:46 CST：Wave 1 总控验收通过。完成 `scripts/visible-dispatch.mjs`、`scripts/visible-dispatch.test.mjs`、`.workspace-local/` git ignore、脚本 README / verifier / workspace-control test list / skill reference 更新；验证 `node scripts/verify-control-center.mjs --require-todo --require-task-packages --with-script-tests` 通过，22 个脚本测试全部通过。遗留：Wave 2 仍需把 `arm` payload 与总控 `codex_app.automation_update` 工具调用连接，不得在 Node 脚本中伪装直接调用 automation API。
+- 2026-05-25 23:46 CST：Wave 1 总控验收通过。完成 `scripts/visible-dispatch.mjs`、`scripts/visible-dispatch.test.mjs`、`.wakeflow-local/` git ignore、脚本 README / verifier / workspace-control test list / skill reference 更新；验证 `node scripts/verify-control-center.mjs --require-todo --require-task-packages --with-script-tests` 通过，22 个脚本测试全部通过。遗留：Wave 2 仍需把 `arm` payload 与总控 `codex_app.automation_update` 工具调用连接，不得在 Node 脚本中伪装直接调用 automation API。
 - 2026-05-25 23:34 CST：Wave 1 创建并开始 AlembicWorkspace 自执行；当前发送给无。
 
 <!-- workspace-sync

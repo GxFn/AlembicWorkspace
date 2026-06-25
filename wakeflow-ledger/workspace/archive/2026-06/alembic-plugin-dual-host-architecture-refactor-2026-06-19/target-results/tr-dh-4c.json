@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-dh-4c",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap",
+  "dispatchGroup": "dh4c-plugin-cross-shell-selfcheck",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-4c",
+  "status": "needs-review",
+  "summary": "DH-4c（DH-4 Plugin 侧收尾）。基线 53f9258 → 父 HEAD 1b53b5d。**Part 1-3 完成、两漂移门禁均 GREEN = DH-4 主体 DONE**；Part 4 cc setupProfile 经评估 flag DH-5（带理由）。控制器 line-39 裁断（per-host overlay 放行）已落实。\n\n【已完成并验证】\n1) self-check 同步（父 d70a705）：应用 DH-4b patch，config/shared-asset-manifest.json + scripts/check-shared-asset-drift.mjs 同步到 Alembic main 88a2abf（仅这 2 self-check 文件、不改任何 plugin skill/template 资产）。**shared-asset-drift GREEN：11 checks, 0 drift, 0 pending-sync（Node 22；alembic-recipes/structure host-divergent 段 per-host coherence-skipped）。**\n2) cross-shell-drift 门禁 per-host 重塑（父 ef2a804）：byte-identical['bin','skills','LICENSE'] → per-host-aware。LICENSE 保字节一致；bin/ 归一化 per-host ALEMBIC_PLUGIN_HOST 默认后比较；skills 中 manifest 声明的 skill-shared-sections（alembic-create/guard/recipes/structure，host-divergent 工具面、各壳自为 per-host 权威）presence-checked 但内容 per-host。host-divergent 集从 manifest 派生保持同步。**期望翻转：基线 RED（alembic-recipes line-39 codex semantic/cc auto）→ per-host 下 GREEN。** 注：shell skill 无 wakeflow-shared 标记（全量副本），故跨壳 coherence 为 file 粒度，marked-section coherence vs Alembic 由 shared-asset 门禁负责。\n3) cc bootstrap fork（cc 子模块 15fce77 + 父 gitlink bump 1b53b5d，用户已授权）：cc bin/alembic-start.mjs:100 默认 ALEMBIC_PLUGIN_HOST → claude-code（manifest 已设 host，此为 defense-in-depth）。cc bin 仅此一行 diverge；cross-shell-drift 经归一化保持 GREEN。子模块提交本地，push 属独立 release 步（未做）。\n\n【Part 4 cc setupProfile — flag DH-5（带理由，任务明示可 flag）】评估：profile 是**功能性**非标签——SetupService.ts:142/258 据 profile==='codex-plugin' 决定 ghost 模式默认 + profile-specific 行为；且**持久化冻结**（InitMarker.profile 类型锁 typeof CODEX_SETUP_PROFILE，type guard ProjectRootResolver:421 拒绝其它值，3 处写点 ProjectRootResolver:261/HostMcpServer:469,611 硬编码该值）。cc 与 codex 同为 marketplace 插件，'codex-plugin'(=marketplace-plugin/ghost 模式)对 cc **功能正确**；引入独立 cc profile 值=wire/persistence 迁移（SetupProfile 类型并集 + guard 放宽 + 写点改 host-aware adapter.setupProfile + 现存落盘 marker 前后向兼容），其唯一实益是**名字**（'codex-plugin' 对 cc 误导）属 **CC3 文案统一领地、明确不在本需求**。故按 Highest Stop Card（不为 cosmetic/CC3 实益冒 persistence 迁移风险）+ 任务明示 → flag DH-5（或并入 CC3）。其余 1-3 完成 = DH-4 主体 DONE。\n\n【完成判断】两门禁 GREEN + cc bootstrap per-host + gitlink + setupProfile flag DH-5（带理由）= **DH-4 阶段主体 DONE**。请控制器裁：确认 DH-4 DONE + 接受 setupProfile DH-5 flag（或并 CC3）；cc 子模块 2 commit（f2c2929/15fce77）push 属 release 步。",
+  "evidenceRefs": [
+    "parent d70a705 chore(drift): DH-4c sync self-check copies to DH-4b (Alembic 88a2abf)",
+    "parent ef2a804 refactor(drift): DH-4c cross-shell-drift gate per-host",
+    "parent 1b53b5d chore(submodule): DH-4c bump alembic-claude-code gitlink → cc bootstrap claude-code default",
+    "cc submodule 15fce77 fix(bin): cc bootstrap default ALEMBIC_PLUGIN_HOST → claude-code (local, unpushed)",
+    "baseline 53f9258 → parent HEAD 1b53b5d; gitlink → 15fce77; DH-4b landed Alembic 88a2abf"
+  ],
+  "verification": [
+    "shared-asset-drift GREEN（Node 22）：11 checks, 0 drift, 0 pending-sync, PASS",
+    "cross-shell-drift GREEN：per-host 重塑后 PASS（line-39 per-host overlay 放行 + bin host-identity 默认归一）",
+    "tsc --noEmit 绿；biome lint 0 error",
+    "全量 unit 失败集与基线 IDENTICAL：39 failed | 87 passed (126)，零回归（DH-4c 动 config/scripts/cc-submodule、不动 lib/）",
+    "self-check 同步仅动 2 个 self-check 文件（manifest+script）、未改 plugin skill/template 资产（DH-4b mirror-proof：同步后 0 drift）",
+    "cc bin 仅 host-identity 行 diverge（diff 证）；归一化后 cross-shell GREEN",
+    "父仓 3 commit（d70a705/ef2a804/1b53b5d）+ cc 子模块 1 commit（15fce77）；gitlink→15fce77；tree clean",
+    "纯 MCP 非强进程 + 四工具对外 MCP 语义不变；host-name 分支仅 L3；Alembic/Core 未改（DH-4b 已落 88a2abf）"
+  ],
+  "risks": [
+    "cc setupProfile flag DH-5：profile 是功能性（SetupService ghost 模式）+ 持久化冻结；cc 复用 'codex-plugin' 功能正确，独立 cc profile = persistence 迁移且实益为名字（CC3 领地、不在本需求）——故 flag；DH-4 主体仍 DONE",
+    "cc 子模块 2 commit（f2c2929 DH-4a + 15fce77 DH-4c）为本地未 push：gitlink 指向本地，clone/CI 前需 push（独立 release 步，用户/控制器决）",
+    "cross-shell 门禁覆盖权衡：4 个 manifest-host-divergent skill 内容跨壳豁免（当前仅 alembic-recipes 实际 diverge，其余 3 仍相同）——为对齐 per-host 模型（各壳自为权威）；若控制器要更紧可改仅豁 alembic-recipes",
+    "drift 门禁需 Node≥22（.nvmrc=22）；Node18 假红；本次用 v22.22.1 验证 shared-asset-drift GREEN",
+    "未做真实 cc 运行验收（DH-6 领地）；cc host 身份/bootstrap 经 manifest+bin 静态正确 + 门禁/tsc/unit 等价证"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh4c-plugin-cross-shell-selfcheck__AlembicPlugin__DH-4c",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4c-plugin-cross-shell-selfcheck__AlembicPlugin__DH-4c.json",
+    "deliveryRunId": "run-delivery-dh4c-plugin-cross-shell-selfcheck__AlembicPlugin__DH-4c",
+    "dispatchGroup": "dh4c-plugin-cross-shell-selfcheck",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4c-plugin-cross-shell-selfcheck__AlembicPlugin__DH-4c.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 59,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap",
+    "targetTaskId": "DH-4c",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh4c-plugin-cross-shell-selfcheck",
+    "resultId": "tr-dh-4c",
+    "createdAt": "2026-06-20T09:01:38.585Z"
+  },
+  "createdAt": "2026-06-20T09:01:38.585Z",
+  "stateRevisionObserved": 59,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

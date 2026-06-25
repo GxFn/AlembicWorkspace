@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-3",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-3-claude-code-adapter-l2-rewire-decodex",
+  "dispatchGroup": "dh3-plugin-cc-adapter-decodex",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-3",
+  "status": "needs-review",
+  "summary": "DH-3 子步①（cc adapter + host-aware 选择 + cc 项目根信任）完成并验证；按 task 明示授权的安全拆分，余下 ②（L2 全面改调 L3，~102 处）③（~52 de-Codex 改名 + 物理迁入函数体）【flag 给 DH-3b，需控制器再派】。父仓 AlembicPlugin 已【直提 main commit 651f96a209d5b4cd2e2323f9f0db267e51da4004】（基线 348bea2，纯父仓无子模块）。tsc 绿；cc adapter 单测 4/4；全量 unit 失败集与基线逐文件 IDENTICAL（39）。\n\n【子步① 交付（最高价值双宿主检查点）】\n1. 新建 ClaudeCodeHostAdapter（implements HostAdapter，hostId=claude-code）：身份簇方法委托同一组 shape/env-aware 函数——cc shell 上即产出 cc 行为（identity 已 DH-1 shape 派生）。\n2. 新建 resolveHostAdapter.ts 工厂（**L3 唯一 host-name 分支**）：按物理 shell 形态（resolveHostRuntimeContext().expectedPluginHost）选 codex/cc；CodexHostAdapter 改 export class + singleton、工厂迁出。**codex 路径行为逐行不变**。\n3. cc 项目根信任（DH-0 #1 修复）：ProjectRootResolver 把 CLAUDE_PROJECT_DIR 纳入可信候选，cc 工作区不再 fail-closed。**加性、codex-safe**（codex 不设此 env）。\n4. cc 单测 ClaudeCodeHostAdapter.test.ts 4/4：cc shell→选 ClaudeCodeHostAdapter + claude-code identity；codex shell→CodexHostAdapter；默认→codex（不回归）；CLAUDE_PROJECT_DIR trusted。\n\n【按 task 授权 flag 给 DH-3b/DH-4】②③ 余项 + cc 簇级降级/profile，见 risks。\n\n【边界遵守】host-name 分支只在 L3（resolveHostAdapter）；未动 per-host 产物 / cc 子模块 / 3 漂移资产；AlembicCore 不动；codex .mcp.json:8 不变；四工具对外 MCP 语义不变；纯 MCP 非强进程不变量不回退。",
+  "evidenceRefs": [
+    "父仓 commit 651f96a209d5b4cd2e2323f9f0db267e51da4004 (直提 main，基线 348bea2；新增 3 文件 + 改 3 文件，纯父仓无子模块)",
+    "cc 实现: lib/runtime/host-adapter/ClaudeCodeHostAdapter.ts (class ClaudeCodeHostAdapter implements HostAdapter, hostId=CLAUDE_CODE_PLUGIN_HOST; 身份簇委托 shape/env-aware 函数)",
+    "host-aware 工厂(L3 唯一 host 分支): lib/runtime/host-adapter/resolveHostAdapter.ts (按 expectedPluginHost[shell 派生] 选 codex/cc); CodexHostAdapter.ts 改 export class + CODEX_HOST_ADAPTER singleton、工厂迁出",
+    "cc 项目根信任(DH-0 #1): lib/runtime/ProjectRootResolver.ts CodexProjectRootSource 加 'CLAUDE_PROJECT_DIR' + buildProjectRootCandidates pushCandidate(trusted, codex-safe)",
+    "barrel: lib/runtime/index.ts 加 ClaudeCodeHostAdapter + resolveHostAdapter 导出",
+    "cc 单测: test/unit/ClaudeCodeHostAdapter.test.ts (4 用例)"
+  ],
+  "verification": [
+    "tsc --noEmit: exit 0 (commit 前后两次)",
+    "cc adapter 单测: 4/4 passed (cc→ClaudeCodeHostAdapter + resolveRuntimeContext.pluginHost=claude-code; codex→CodexHostAdapter; default(无 env)→codex 不回归; CLAUDE_PROJECT_DIR source+trusted+未拒绝)",
+    "全量 unit(vitest.unit.config): 失败集与基线(39 pre-existing 沙箱/MTC-7)逐文件 IDENTICAL(stash 基线 diff 空) → 无 DH-3① 回归; codex 路径不变(default 选 codex adapter + 失败集不增长)",
+    "biome lint 0 error(16 既有无关 warning); lint:repo-boundary PASS(0/75 escape); host-name 分支只在 resolveHostAdapter(L3)、grep 证 cc/codex 选择集中此处"
+  ],
+  "risks": [
+    "需控制器决策(按 task 授权的安全拆分，非阻塞缺陷): DH-3 余下 ②③ flag 给 DH-3b，需控制器再派。② L2 全面改调 L3(~102 处 Codex* 直依赖: StatusService / project-root-scope / ToolPolicy / host-agent-workflows 的 resolveProjectRoot/readInitMarker/resolveEffectiveTier/buildCodexHostProjectAlignment 等)使 L2 无 host 分支; ③ ~52 误命名 de-Codex 去前缀归 L1/L2(resolveCodexServiceRequestBoundary / 全部 CODEX_*_TOOL_NAMES / buildCodexProjectRuntimeContext 等) + 物理迁入真 host-specific codex 函数体到 CodexHostAdapter(去 DH-2 委托外观)。理由: ②③ 是宽面机械重构(102 改调 + 52 改名 + 函数体搬运)、单次回归风险高; task 明示'若判断整 DH-3 太大/单次不安全，可在①绿+commit 后返回 flag ②③ 给 DH-3b'。①是最高价值、自足、绿检查点(双宿主 identity 选择 + cc 项目根可用)，先落地不裸断。",
+    "cc adapter 现态较薄(已 flag DH-3b/DH-4): cc 与 codex 身份簇共享 host-agnostic 委托(DH-0② 判定 cc seam 已部分存在、niceties 较窄); cc 簇级专属差异(cluster 5 静态 tool list / 6 无 host introspection→自生成 / 8 无 turn-meta 的优雅降级)留 DH-3b; cc 专属 setupProfile 现复用 codex-plugin(init-marker profile 字段类型 + SetupService profile 锁定，属 DH-4 per-host 产物)。①已交付核心 cc 能力: 经 shell 形态选中 cc adapter + claude-code identity + CLAUDE_PROJECT_DIR 项目根信任。",
+    "cc 真实端验收在 DH-6(Test，workspace 内): ① 的 cc 证据=单测/targeted(本窗边界内); 真实 cc init/status/工具行为对等由 DH-6 验收。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh3-plugin-cc-adapter-decodex__AlembicPlugin__DH-3",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3-plugin-cc-adapter-decodex__AlembicPlugin__DH-3.json",
+    "deliveryRunId": "run-delivery-dh3-plugin-cc-adapter-decodex__AlembicPlugin__DH-3",
+    "dispatchGroup": "dh3-plugin-cc-adapter-decodex",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3-plugin-cc-adapter-decodex__AlembicPlugin__DH-3.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 19,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-3-claude-code-adapter-l2-rewire-decodex",
+    "targetTaskId": "DH-3",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh3-plugin-cc-adapter-decodex",
+    "resultId": "tr-DH-3",
+    "createdAt": "2026-06-20T04:25:48.479Z"
+  },
+  "createdAt": "2026-06-20T04:25:48.479Z",
+  "stateRevisionObserved": 19,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-alembic-0.3.0-release-wave-rw-t2",
+  "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+  "taskPackageId": "alembic-0.3.0-release-wave-p2",
+  "dispatchGroup": "rw2",
+  "stateRoot": ".wakeflow-active/current/alembic-0.3.0-release-wave",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "alembic-0.3.0-release-wave-rw-t2",
+  "status": "completed",
+  "summary": "RW4 A3 overlay-route delete + C2 version-pin tail, dual-shell parity byte-stable, no publish. LEG1 (A3 delete, RC4-style proof): deleted lib/http/routes/{evolution,panorama}.ts + their HttpServer mounts + the panorama-only PresentationRoutes.test.ts (route inventory 11->9; neither in CODEX_EMBEDDED_RUNTIME_REQUIRED_ROUTES). Fresh 5-repo scan (dynamic import( + HTTP path literals) = ZERO plugin consumers: the only importers were the mount + that test; the Dashboard's /panorama + /evolution calls (relative /api/v1) reach the MAIN Alembic daemon whose twins are contract-mounted (provider-contracts I22) and STAY. Behavior-neutral: the MCP alembic_panorama tool + PanoramaService capability are untouched and reachable elsewhere; only dead HTTP read surfaces removed; recorded as legacy-register D3; git-recoverable. STOP-condition check cleared: no live plugin consumer, no served-wire byte move. LEG2 (C2 tail): exact-version pins kept, NO bump (D3) — CC manifest 0.2.0, Codex manifest 0.2.0, bin specifier + channel specifier @gxfn/alembic-runtime@0.2.0; marketplace confirmed alembic@gxfn hosted in GxFn/AlembicClaudeCode; negative-cache clear step (/mcp Reconnect or delete mcp-needs-auth-cache.json) added to CC shell install docs (CC4 fix-D, docs-only). LEG3 (proof, unified tree, clean rebuild): suite 2459/2459 (164 files; -5 panorama-route tests/-1 file vs 2464/165 baseline = the deleted surface's only tests); check exit 0; validate --strict PASS; verify:codex-plugin PASS; cross-shell drift PASS; smoke ok:true; DUAL-SHELL PARITY diff -rq p5t4-probe rwt2-final exit 0 (served MCP wire surface byte-stable). Commits: CC shell 0f002f2 pushed first (ls-remote verified), parent 28ed99c with gitlink->0f002f2 verified, pushed (ls-remote verified); Codex shell untouched (c452de3); publish NOT run (C1 held for user). Process note: a git stash inside an exit-1 && chain during smoke diagnosis stranded the deletion edits mid-task; recovered via git stash pop and re-ran the FULL proof set on the unified tree, so all green gates are from one coherent tree. SN5 residue found+fixed (verification script, behavior-neutral, unrelated to A3): scripts/smoke-codex-plugin.mjs:114 imported the runtime via split-segment join('dist','lib','codex','mcp',...) that the SN5 path-string codemod could not catch (only slash-bearing literals; sibling line 255 was updated) — corrected codex->runtime; surfaced only because smoke is in this task's proof set.",
+  "evidenceRefs": [
+    "evidence/rw-t2/rw-t2-report-2026-06-13.md",
+    "evidence/rw-t2/route-inventory-and-scan.txt",
+    "evidence/rw-t2/parity-after",
+    "evidence/rw-t2/parity-baseline-p5t4",
+    "docs/legacy-register.md (D3 entry, parent 28ed99c)"
+  ],
+  "verification": [
+    "route inventory 11->9 (deleted evolution.ts, panorama.ts); neither in CODEX_EMBEDDED_RUNTIME_REQUIRED_ROUTES (8)",
+    "fresh 5-repo import/HTTP-literal scan: zero plugin consumers; Dashboard reaches MAIN daemon (contract I22); main twins stay",
+    "npm test -> 2459/2459 passed (164 files) after clean rebuild",
+    "npm run check -> exit 0",
+    "claude plugin validate plugins/alembic-claude-code --strict -> Validation passed",
+    "npm run verify:codex-plugin -> passed (@gxfn/alembic-runtime@0.2.0 via ./bin/alembic-start.mjs)",
+    "cross-shell drift gate -> PASS",
+    "npm run smoke:codex-plugin -> ok:true",
+    "diff -rq parity/p5t4-probe parity/rwt2-final -> exit 0 (served MCP wire byte-stable)",
+    "C2: exact pins 0.2.0 both shells + bin + channel (no bump); marketplace alembic@gxfn in GxFn/AlembicClaudeCode",
+    "git ls-remote verified: CC shell 0f002f2, parent 28ed99c; parent gitlink->0f002f2; Codex untouched c452de3"
+  ],
+  "risks": [
+    "Invisible-external-consumer residual: deletion rests on two clean scans (RC4 + this fresh scan) — the RC4 auth-falsification precedent shows zero-consumer scans can miss dynamic/cross-repo callers; mitigated by git-recoverability and the byte-stable served surface, but a Codex-host-only HTTP consumer would not be visible in-repo (same caveat the A3 ruling accepted)",
+    "SN5 codemod blind spot (split path.join segment arrays) likely affects other scripts beyond smoke line 114 — recommend a follow-up sweep for join('...','lib','codex',...) forms across scripts/; only the proof-blocking smoke occurrence was fixed here",
+    "C1 publish remains held for the user; the staged @gxfn/alembic-runtime@0.2.0 is unchanged by this task"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rw2__AlembicPlugin__alembic-0.3.0-release-wave-rw-t2",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw2__AlembicPlugin__alembic-0.3.0-release-wave-rw-t2.json",
+    "deliveryRunId": "run-delivery-rw2__AlembicPlugin__alembic-0.3.0-release-wave-rw-t2",
+    "dispatchGroup": "rw2",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw2__AlembicPlugin__alembic-0.3.0-release-wave-rw-t2.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-0.3.0-release-wave",
+    "stateRevision": 5,
+    "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+    "taskPackageId": "alembic-0.3.0-release-wave-p2",
+    "targetTaskId": "alembic-0.3.0-release-wave-rw-t2",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "rw2",
+    "resultId": "tr-alembic-0.3.0-release-wave-rw-t2",
+    "createdAt": "2026-06-13T06:19:06.311Z"
+  },
+  "createdAt": "2026-06-13T06:19:06.311Z",
+  "stateRevisionObserved": 5,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

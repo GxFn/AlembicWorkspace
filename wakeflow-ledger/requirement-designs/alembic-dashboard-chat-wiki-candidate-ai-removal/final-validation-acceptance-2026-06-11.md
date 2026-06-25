@@ -22,7 +22,7 @@ and Core signal/report infrastructure.
 
 State-root final acceptance:
 
-`.workspace-active/workspace/current/alembic-dashboard-chat-wiki-candidate-ai-removal-dcr7-validation-acceptance/evidence/dcr7-final-validation-acceptance-2026-06-11.md`
+`.wakeflow-active/current/alembic-dashboard-chat-wiki-candidate-ai-removal-dcr7-validation-acceptance/evidence/dcr7-final-validation-acceptance-2026-06-11.md`
 
 Accepted product heads:
 

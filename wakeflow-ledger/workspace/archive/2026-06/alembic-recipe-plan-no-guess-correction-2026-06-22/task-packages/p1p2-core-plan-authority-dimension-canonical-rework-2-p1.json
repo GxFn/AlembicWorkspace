@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "summary": "Rework P1/P2 Core producer after controller review evt-20260622123449-0009. Previous rework commit e1de391 removed recommendedDimensions/dimensionOrder/scaleDecision/subsetHints/maxRecommendedDimensions/defaultOrder/top leaks, but controller raw review found one remaining original-requirement mismatch: Core still exposes DimensionPlanningAidReport.crossDimensionConstraints and keeps buildCrossDimensionConstraints in the Plan facts path, and AlembicPlugin still consumes that field. Original Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md lines 28-37 say Plan inputs are facts/reference material, not recommendations/top/pre-decisions; group A line 51 explicitly says to delete buildCrossDimensionConstraints with the recommendation/sorting symbols; line 53 removes Plan-facing subset/constraint recommendation semantics. Scope for this Core-only rework: delete CrossDimensionConstraint, DimensionPlanningAidReport.crossDimensionConstraints, and buildCrossDimensionConstraints from Core Plan-facing dimensionPlanning contracts/report output; do not rename it to an auxiliary/factual/relation/fallback field; do not keep it for internal Plan path use. Update Core tests to assert the draft information package and buildDimensionPlanningAids output do not contain crossDimensionConstraints/CrossDimensionConstraint/buildCrossDimensionConstraints as well as the already-removed recommended/top/order/subset/default-order fields. Preserve all accepted-good work from fe563ee/e1de391: no draftPackage.intent, confirm requires complete Agent PlanIntent+rationale, draftSource plugin-collected-facts, stop-write planning_brief_json, read-time generation-state projection, and resolvePlanDimensionDefinitions canonical confirmed-id API. Do not edit AlembicPlugin/Alembic/Dashboard in this package; report downstream Plugin migration need explicitly. Return TargetResultEnvelope with commit, changed files, exact tests, and rg evidence proving no Core Plan-path matches for crossDimensionConstraints/CrossDimensionConstraint/buildCrossDimensionConstraints plus the prior recommended/top/order/subset leak scan.",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/target-results/tr-p1p2-core-plan-authority-dimension-canonical-rework-1-t1.json",
+  "createdAt": "2026-06-22T12:35:15.517Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+      "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only rework task p1p2-core-plan-authority-dimension-canonical-rework-2-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicCore/AGENTS.md, requirement design, P0 evidence, previous target results, and controller rework decision evt-20260622123449-0009 before editing. Fix only the remaining Core Plan-path crossDimensionConstraints/buildCrossDimensionConstraints leak; preserve all previous correct Plan authority fixes; backfill commit/tests/rg evidence and downstream Plugin migration need.",
+      "status": "pending",
+      "createdAt": "2026-06-22T12:35:15.517Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

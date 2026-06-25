@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-core-durable-checkpoint-primitives-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p3-core-durable-checkpoint-primitives-p1",
+  "dispatchGroup": "p3-core-durable-checkpoint-primitives-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p3-core-durable-checkpoint-primitives-t1",
+  "status": "completed",
+  "summary": "AlembicCore P3 durable checkpoint producer implemented in commit be6f442: added migration 013 git_diff_checkpoints keyed by projectRoot+scopeId+folderId, Drizzle schema, GitDiffCheckpointRepository, GitDiffCheckpointService, repositories/evolution facade exports, and tests. Service initializes missing checkpoints from active confirmed Plan lastUpdatedFromCommit and advances only for routed/catch-up-routed outcomes; skipped/truncated/failed/non-ancestor/unresolved outcomes persist route metadata and unresolved range without advancing the checkpoint. No AlembicPlugin/Alembic/AlembicDashboard/Test code was edited.",
+  "evidenceRefs": [
+    "commit be6f442 Add durable git diff checkpoint primitives",
+    "AlembicCore/src/infrastructure/database/migrations/013_git_diff_checkpoints.ts",
+    "AlembicCore/src/infrastructure/database/drizzle/schema.ts gitDiffCheckpoints table",
+    "AlembicCore/src/repository/evolution/GitDiffCheckpointRepository.ts",
+    "AlembicCore/src/service/evolution/GitDiffCheckpointService.ts",
+    "AlembicCore/src/repositories.ts gitDiffCheckpointRepository bundle/key/export",
+    "AlembicCore/src/evolution.ts GitDiffCheckpointService and checkpoint types facade",
+    "AlembicCore/test/GitDiffCheckpointRepository.test.ts",
+    "AlembicCore/test/DatabaseRepository.test.ts",
+    "AlembicCore/test/MigrationsRerunIdempotency.test.ts",
+    "AlembicCore/test/PublicDatabaseRepositoryEntrypoints.test.ts"
+  ],
+  "verification": [
+    "npm run build:check PASS",
+    "npx vitest run test/GitDiffCheckpointRepository.test.ts test/DatabaseRepository.test.ts test/MigrationsRerunIdempotency.test.ts test/PublicDatabaseRepositoryEntrypoints.test.ts PASS: 4 files, 16 tests",
+    "npm run lint PASS",
+    "npm run build PASS",
+    "npm run test PASS: 136 files, 1381 tests",
+    "git diff --check PASS",
+    "npm run check PARTIAL: build:check, public-api-boundary, layer-contract, consumer-core-imports, smoke:public-api, output-budgets, space-edges, doctrine passed; stopped at existing lint:naming violations in src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts, none touched by this task",
+    "Alembic status degraded/not_initialized with host selected-project mismatch; alembic_code_guard failed with CODEX_MCP_ERROR internal schema validation error, no guard result produced"
+  ],
+  "risks": [
+    "Downstream AlembicPlugin must wire its active git-diff checkpoint path to repositories.gitDiffCheckpointRepository and GitDiffCheckpointService; Core did not implement Plugin routing or duplicate Plugin path cleanup by scope.",
+    "Plugin route success must call recordRouteOutcome only after proposal/area-scan routing succeeds; skipped/truncated/non-ancestor/failed outcomes must be recorded as non-advancing to preserve unresolved ranges.",
+    "Full npm run check remains blocked by pre-existing naming lint files outside this diff: src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts.",
+    "Alembic guard could not run because the Alembic MCP returned an internal CODEX_MCP_ERROR while this project is not initialized/selected for Alembic."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-core-durable-checkpoint-primitives-p1__AlembicCore__p3-core-durable-checkpoint-primitives-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-durable-checkpoint-primitives-p1__AlembicCore__p3-core-durable-checkpoint-primitives-t1.json",
+    "deliveryRunId": "run-delivery-p3-core-durable-checkpoint-primitives-p1__AlembicCore__p3-core-durable-checkpoint-primitives-t1",
+    "dispatchGroup": "p3-core-durable-checkpoint-primitives-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-durable-checkpoint-primitives-p1__AlembicCore__p3-core-durable-checkpoint-primitives-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 23,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p3-core-durable-checkpoint-primitives-p1",
+    "targetTaskId": "p3-core-durable-checkpoint-primitives-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p3-core-durable-checkpoint-primitives-p1",
+    "resultId": "tr-p3-core-durable-checkpoint-primitives-t1",
+    "createdAt": "2026-06-22T14:19:05.262Z"
+  },
+  "createdAt": "2026-06-22T14:19:05.262Z",
+  "stateRevisionObserved": 23,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

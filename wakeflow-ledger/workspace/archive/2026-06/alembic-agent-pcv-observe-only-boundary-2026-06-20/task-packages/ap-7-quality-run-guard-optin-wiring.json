@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "ap-7-quality-run-guard-optin-wiring",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "summary": "AP-7（PCVM/Test guard opt-in wiring：质量运行 per-run 显式开 guard + grounding enforcement 回路端到端验证，避免空开关）。PCV observe-only 并行波最后一路（主体仓，AP-6 已完成、工作树空闲）。上游 AP-3 per-run 能力已落：AgentRunExecutionOptions.groundingEnforcement?:'off'|'guard'（AlembicAgent AgentRunContracts.ts:177，经 @alembic/agent/service 可达）。范围=主体构建 dimension AgentRunInput.execution 时为质量运行（PCVM/Test）传 groundingEnforcement='guard'，使 enforcement 回路有真实 opt-in 消费者。完成定义=质量运行真实开启 guard 并恢复 grounding 约束、端到端回路通；非质量运行保持默认 observe-only。PD6：仅加 opt-in wiring、不改方法包本体；不碰 AlembicAgent。",
+  "status": "pending",
+  "sourceRef": "需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md 相位表 AP-7（line 181）+ PD6（line 243，PCVM/Test 升 participates 仅加 opt-in wiring 不改方法包本体）+ PD7（全局默认 off + per-run 覆盖）+ FC4（tr-ap-0：注入点=主体 DimensionRuntimeBuilder/AgentRunInputBuilders 构建 AgentRunInput.execution，PCVM/Test 经主体 AiDimensionSessionRunner:282 agentService.run 进程内发起）。上游=AP-3 per-run 能力（已落）。",
+  "createdAt": "2026-06-20T15:05:46.890Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "AP-7",
+      "taskPackageId": "ap-7-quality-run-guard-optin-wiring",
+      "targetWindow": "Alembic",
+      "summary": "本窗口=Alembic（主体仓 ~/Documents/AlembicWorkspace/Alembic，main 直提）。先读父 CLAUDE.md + 本仓 CLAUDE.md + 状态根 + 需求设计，声明窗口/仓库身份，仅领 AP-7。\n\n上游已落（控制器已核）：AP-3 per-run 通道 = AlembicAgent `AgentRunExecutionOptions.groundingEnforcement?:'off'|'guard'`（AgentRunContracts.ts:177、dist .d.ts:162，经 @alembic/agent/service symlink 可达；AP-5/AP-6 已验收）。**默认 off=observe-only 已是全局默认**；本任务只为质量运行 opt-in 开 guard。\n\n任务=主体为 **PCVM/Test 质量运行** per-run 显式开 guard（FC4 注入点）：\n1. 在主体构建 dimension AgentRunInput.execution 处传 `groundingEnforcement:'guard'`——注入点候选 `lib/workflows/ai-execution/AgentRunInputBuilders.ts:141` execution 块（`execution?: AgentRunExecutionOptions` 入参，:198/:254 合并）+ `DimensionRuntimeBuilder.ts` 构建链。\n2. **确定质量运行 opt-in 触发判定**（哪些运行是 PCVM/Test「质量运行」需开 guard——读本仓 dimension/质量门/PCVM-Test 配置上下文裁定，须是真实 opt-in、非空开关）。\n3. **端到端回路验证**：证明质量运行真实开启 guard 并恢复 grounding 约束（CP1 政策文本注入 + CP4 invalid-no-evidence 阻断），非质量运行仍 observe-only。\n\n**必做并发核查**（控制器标记）：AP-3 per-run 经 AgentRuntime 实例字段 `#groundingEnforcement` 桥接到 LoopContext（AgentRuntime.ts:259，与 startTime/tokenUsage 同 per-execute 实例状态模式→既有契约=一实例一次 execute）。**须验证主体 AiDimensionPipeline 并发维度运行是否用独立 AgentService/AgentRuntime 实例**——若并发共享单实例，per-run guard（及既有 startTime/tokenUsage 等）会串值，属影响全部 per-run 状态的既有问题，**须暴露并回填**（不静默依赖；若确为独立实例则记录证据）。\n\n边界（PD6）：**仅加 opt-in wiring**、不改方法包本体；不碰 AlembicAgent（生产者完成）；不必要不动 AP-5/AP-6 文件（PcvNodeEvidence.ts 消费方）；不改四工具/LLM 对外语义；非质量运行默认 observe-only 不变。\n\n验证（**Node>=22**，nvm use 22）：build:check + lint:*-boundary + test:unit；**端到端 guard 回路证据**（质量运行 guard 真开、约束恢复）；并发模型核查证据。\n完成自检：真实 opt-in 非空开关、端到端回路通、非质量运行 observe-only、并发安全已核、契约/对外语义不破。\n回填 TargetResultEnvelope：commit hash + 改动文件 + 质量运行触发判定依据 + 端到端 guard 回路证据 + 并发模型结论 + 门禁输出。returnRoute=controller 回 AlembicWorkspace。",
+      "status": "pending",
+      "createdAt": "2026-06-20T15:05:46.890Z"
+    }
+  ]
+}

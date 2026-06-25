@@ -43,7 +43,7 @@
 - 关键入口：
   - `scripts/visible-dispatch.mjs`
   - `scripts/visible-dispatch.test.mjs`
-  - `.workspace-local/visible-dispatch/`
+  - `.wakeflow-local/visible-dispatch/`
 - producer / consumer 依赖：
   - Producer：当前计划或队列中已存在的 send-eligible task，以及各窗口主动传入的 `--thread` 与 `--backfill`。
   - Consumer：目标窗口可使用 `finish` 返回的 payload 调起下一已排队窗口；总控使用 `controller-tick` 和 `accept` 做验收与下一 TODO 判断。

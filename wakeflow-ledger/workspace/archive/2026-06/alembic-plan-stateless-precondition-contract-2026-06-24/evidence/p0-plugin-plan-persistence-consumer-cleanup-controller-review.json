@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "kind": "ControllerRawEvidenceSummary",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+  "targetTaskId": "p0-plugin-plan-persistence-consumer-cleanup-t1",
+  "targetWindow": "AlembicPlugin",
+  "controllerWindow": "AlembicWorkspace",
+  "reviewedAt": "2026-06-24T07:59:00+08:00",
+  "commit": {
+    "repository": "AlembicPlugin",
+    "hash": "e99451fbbf4a114e393148b1e5847eca9444b50e",
+    "subject": "fix(plan): remove plugin plan persistence consumers",
+    "authorDate": "2026-06-24T07:55:11+08:00"
+  },
+  "upstreamCoreCommit": {
+    "repository": "AlembicCore",
+    "hash": "38d074fa64a014ef458044cac7881e092c0c6b8d"
+  },
+  "changedFiles": [
+    "lib/injection/ServiceMap.ts",
+    "lib/injection/modules/InfraModule.ts",
+    "lib/recipe-generation/evolution/git-diff-checkpoint/DurableGitDiffCheckpointRouting.ts",
+    "lib/recipe-generation/plan-generation-gate.ts",
+    "lib/recipe-generation/plan-tool.ts",
+    "lib/runtime/mcp/HostMcpServer.ts",
+    "lib/shared/schemas/mcp-tools.ts",
+    "test/unit/GitDiffCheckpoint.test.ts",
+    "test/unit/PlanSelectionGateStateless.test.ts"
+  ],
+  "controllerResidueChecks": [
+    {
+      "command": "rg -n \"PlanRepository|planRepository|saveDraft|getActiveConfirmed|getPlanView|012_plans\" lib",
+      "cwd": "AlembicPlugin",
+      "exitCode": 1,
+      "meaning": "no Plugin production hits"
+    },
+    {
+      "command": "rg -n \"PlanRepository|planRepository|saveDraft|getActiveConfirmed|getPlanView|sqliteTable\\('plans'|012_plans\" AlembicCore/src AlembicPlugin/lib",
+      "cwd": "AlembicWorkspace",
+      "exitCode": 1,
+      "meaning": "no Core/Plugin production hits"
+    }
+  ],
+  "controllerVerification": [
+    {
+      "command": "npm run build:check",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "PASS; Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "PASS; build:core, clean-dist, tsc, and postbuild completed"
+    },
+    {
+      "command": "npm run test:unit -- test/unit/GitDiffCheckpoint.test.ts test/unit/PlanSelectionGateStateless.test.ts",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "PASS; 2 files, 13 tests"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "PASS with pre-existing Biome warnings in unrelated host-adapter/scripts"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "PASS"
+    },
+    {
+      "command": "git status --short --branch",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "clean worktree, main ahead 4"
+    }
+  ],
+  "controllerFindings": [
+    "P0 production persistence consumers are removed from AlembicPlugin lib and AlembicCore src.",
+    "Plan generation gate now requires stateless planSelection and returns PLAN_REQUIRED when missing.",
+    "Durable git-diff checkpoint routing now injects a current HEAD baseline provider.",
+    "Remaining draft/get/output-schema contract work is outside P0 and belongs to later P1/P2/P3 packages."
+  ]
+}

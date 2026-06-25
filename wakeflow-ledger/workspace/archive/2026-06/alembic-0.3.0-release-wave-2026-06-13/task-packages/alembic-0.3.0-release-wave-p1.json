@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "alembic-0.3.0-release-wave-p1",
+  "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+  "summary": "Release p1 (AlembicCore SD-5 wave): RW0 fresh re-scan + RW1 ./shared re-point to root facade [B2] + RW2 delete 67 zero-consumer wildcard keys + fold keep-alive [C3]. Behavior-neutral, downstream green. NO src/ renames (SN4 is a separate later package).",
+  "status": "pending",
+  "sourceRef": "wakeflow-ledger/requirement-designs/alembic-post-portfolio-followthrough/r-group-rulings-2026-06-13.md + alembic-0.3.0-release-wave RW0-RW2",
+  "createdAt": "2026-06-13T06:02:32.674Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "alembic-0.3.0-release-wave-rw-t1",
+      "taskPackageId": "alembic-0.3.0-release-wave-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore SD-5 phase-2 release wave per the user's B2=re-point + C3=delete rulings (renames/deletions of ZERO-CONSUMER public surface only — behavior-neutral, git-recoverable). REQUIRED READS: wakeflow-ledger/requirement-designs/alembic-post-portfolio-followthrough/r-group-rulings-2026-06-13.md + the release-wave requirement design RW0-RW2 + the SD-5 staging doc in the P3 state root (sd5-phase2-staging-2026-06-12.md — the exact 67 keys, keep-alive 36/37, per-row zero-served proof) + 0.3.0 ledger row 1. LEGS: (1) RW0 FRESH RE-SCAN: re-run the 4-repo reference-resolution scan; RE-CONFIRM all 67 wildcard keys are still zero-consumer and the keep-alive set (only ./infrastructure/database/drizzle exact-row survives, 5 consumers) — if ANY key now shows a live consumer, STOP that key, do NOT delete it, backfill. (2) RW1 ./shared RE-POINT [B2=re-point]: re-point MT2 OutputBudget + CO3 PersistenceError/DivergenceError doc/import references to the ROOT facade (not ./shared) so deleting ./shared wildcards breaks no import path; prove the root-facade path resolves for every consumer. (3) RW2 DELETE: remove the 67 verified-zero-consumer wildcard export keys from package.json exports + fold the keep-alive set; update expectedCounts/closeout target to the new truth; closeout report shows candidates 0. (4) PROOF: boundary gate + public-api smoke + 3-consumer import scans green; DOWNSTREAM Alembic+Agent+Plugin builds green against the new Core HEAD; full Core check green at TRUE baselines (1193+ from h1 2823939); mechanical-diff audit = zero behavior change (export-map deletion + import-path re-point only). SINGLE-PURPOSE COMMITS: re-point commit, then deletion commit; push. STOP CONDITIONS: any key shows a live consumer on the fresh re-scan; any deletion changes behavior or a non-zero-consumer specifier; a downstream build breaks (do NOT weaken a gate); SN4 src/ renames are FORBIDDEN here (separate later package — only export-map deletion + ./shared re-point in this one). Backfill TargetResultEnvelope: re-scan evidence, the 67-key deletion list, expectedCounts delta, boundary/smoke/downstream outputs, commit hashes.",
+      "status": "pending",
+      "createdAt": "2026-06-13T06:02:32.674Z"
+    }
+  ]
+}

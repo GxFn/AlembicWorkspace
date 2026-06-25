@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-stateless-confirm-plan-selection-t1",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "taskPackageId": "p2-plugin-stateless-confirm-plan-selection-p1",
+  "dispatchGroup": "p2-plugin-stateless-confirm-plan-selection-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-stateless-confirm-plan-selection-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin P2 completed. Commit 7afd28c1f40d25216ecfeffb2160e1b407eca541 implements stateless single-stage alembic_plan confirm -> planSelection. confirm now reads no draft, writes no plan row, no longer builds plan/projectContextCreationGuide/planId/version/signature output, requires generationStage and projectProfile from the Agent payload, validates selectedDimensions/scale/moduleBindings/plannedNextActions/evidenceRefs/rationale through the single-stage Core PlanIntent validator, and returns only status confirmed plus planSelection and nextActions. PlanInput schema removes legacy confirm identity fields and multi-stage residue: basePlanId, planId, baseVersion, version, projectContextSignature, per-dimension stage, scale budgetLevel/scale/perStage. Added targeted unit coverage for incomplete payload errors, complete flat planSelection output, no ProjectContext collection via hoisted mock, strict input-schema legacy rejection, and clean-output legacy-key rejection. P3 executor planSelection gate/job forwarding, P4 checkpoint/SOP derivation, and P5 broad test rewrite/e2e were intentionally left untouched.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-generation/plan-tool.ts",
+    "AlembicPlugin/lib/shared/schemas/mcp-tools.ts",
+    "AlembicPlugin/test/unit/PlanConfirmStatelessSelection.test.ts"
+  ],
+  "verification": [
+    "git commit 7afd28c1f40d25216ecfeffb2160e1b407eca541 created in AlembicPlugin; git status --short clean after commit.",
+    "npm run build:check PASS; Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d.",
+    "npm run build PASS; Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d and postbuild completed.",
+    "npm run test:unit -- test/unit/PlanConfirmStatelessSelection.test.ts test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts PASS: 3 files, 18 tests.",
+    "npx biome check lib/recipe-generation/plan-tool.ts lib/shared/schemas/mcp-tools.ts test/unit/PlanConfirmStatelessSelection.test.ts test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts PASS.",
+    "npm run lint PASS exit 0 with existing warnings in unrelated ClaudeCodeHostAdapter/scripts files; no new lint errors.",
+    "npm run lint:repo-boundary PASS; npm run lint:layer-boundary PASS.",
+    "git diff --cached --check PASS before commit; git diff --check PASS after validation.",
+    "Production rg over lib/recipe-generation/plan-tool.ts and lib/shared/schemas/mcp-tools.ts for PlanRepository|planRepository|saveDraft|getActiveConfirmed|getPlanView|getPlan(|sqliteTable('plans'|012_plans|projectContextSignature|currentProjectContextSignature|projectContextCreationGuide|planId|basePlanId|baseVersion|version|stages|perStage returned no output.",
+    "Exact alembic_plan allow-list probe from dist returned fields [agentDecisionChecklist,candidateDimensions,nextActions,operation,planDiagnostics,planSelection,projectInfoTree,projectRoot,warnings] with forbiddenHits [].",
+    "Dist confirm probe on a nonexistent projectRoot returned success true with keys [nextActions,operation,planSelection,projectRoot,status], flat planSelection {generationStage,dimensions,scale,moduleBindings}, and forbiddenHits []."
+  ],
+  "risks": [
+    "P3 executor planSelection gate/job forwarding remains a later phase by task boundary.",
+    "P4 checkpoint/SOP/missionBriefing derivation remains a later phase by task boundary.",
+    "P5 broad test rewrite and real-project e2e remain a later phase by task boundary."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-stateless-confirm-plan-selection-p1__AlembicPlugin__p2-plugin-stateless-confirm-plan-selection-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-stateless-confirm-plan-selection-p1__AlembicPlugin__p2-plugin-stateless-confirm-plan-selection-t1.json",
+    "deliveryRunId": "run-delivery-p2-plugin-stateless-confirm-plan-selection-p1__AlembicPlugin__p2-plugin-stateless-confirm-plan-selection-t1",
+    "dispatchGroup": "p2-plugin-stateless-confirm-plan-selection-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-stateless-confirm-plan-selection-p1__AlembicPlugin__p2-plugin-stateless-confirm-plan-selection-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+    "stateRevision": 16,
+    "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+    "taskPackageId": "p2-plugin-stateless-confirm-plan-selection-p1",
+    "targetTaskId": "p2-plugin-stateless-confirm-plan-selection-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-stateless-confirm-plan-selection-p1",
+    "resultId": "tr-p2-plugin-stateless-confirm-plan-selection-t1",
+    "createdAt": "2026-06-24T00:27:41.822Z"
+  },
+  "createdAt": "2026-06-24T00:27:41.822Z",
+  "stateRevisionObserved": 16,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -50,8 +50,8 @@
 - 暂不纳入仓库：Alembic、AlembicCore、AlembicAgent、AlembicDashboard、AlembicPlugin、AlembicDesign、AlembicTest、真实测试项目。
 - 关键入口文件：
   - `AGENTS.md`
-  - `codex-control-workspace/.workspace-active/workspace/index.md`
-  - `codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md`
+  - `codex-control-workspace/.wakeflow-active/index.md`
+  - `codex-control-workspace/.wakeflow-active/current/workspace-current-status.md`
   - `codex-control-workspace/scripts/codex-automation-loop.mjs`
   - `codex-control-workspace/scripts/sync-current-plan.mjs`
   - `codex-control-workspace/scripts/workspace-control.mjs`
@@ -175,7 +175,7 @@
 | 脚本 | 写入面 | 当前问题 |
 | --- | --- | --- |
 | `import-design-handoffs.mjs --write` | `design-handoff-inbox.md` | 生成 intake evidence，但容易被误读为正式 TODO。 |
-| `next-control-work.mjs --write` | `.workspace-local/control-intake/next-control-work.json` | 候选扫描缓存，不应成为领取裁决。 |
+| `next-control-work.mjs --write` | `.wakeflow-local/control-intake/next-control-work.json` | 候选扫描缓存，不应成为领取裁决。 |
 | `archive-global-todo-board.mjs --apply` | `global-todo-board.md` + TODO archive | 改变 TODO 可见状态，需要明确不能由 archive 自动决定完成。 |
 | `archive-workspace-docs.mjs --apply` | archive docs / workspace index / record map | 维护索引，但可能改变当前入口可见状态。 |
 | `compact-workspace-index.mjs --apply` | index / manifest / record map | 压缩历史，不应改变当前主线事实。 |
@@ -308,7 +308,7 @@ AGENTS 当前列出窗口状态枚举：`待启动`、`执行中`、`待验收`�
 
 ### 自动化运行态职责
 
-自动化运行态必须完全独立于文档，保存在 `.workspace-local` 或明确的机器数据目录，只回答运行问题：
+自动化运行态必须完全独立于文档，保存在 `.wakeflow-local` 或明确的机器数据目录，只回答运行问题：
 
 - 哪个窗口注册了真实 thread id。
 - 哪个 dispatch packet 已生成。
@@ -341,7 +341,7 @@ AGENTS 当前列出窗口状态枚举：`待启动`、`执行中`、`待验收`�
 | `Transition` | 状态变化事件、原因、actor、证据 | `controller-events.jsonl` |
 | `Stage` | 当前需求中的阶段 | `controller-state.json.stages[]` |
 | `TargetTask` | 分派给某窗口的任务 | `controller-state.json.tasks[]` + dispatch packet |
-| `AutomationRun` | 自动化投递 / 回跳 / keep-live 运行态 | `.workspace-local/codex-automation-loop/*.json` |
+| `AutomationRun` | 自动化投递 / 回跳 / keep-live 运行态 | `.wakeflow-local/codex-automation-loop/*.json` |
 | `TargetResult` | 目标窗口回填 | target result JSON |
 | `Evidence` | 提交、命令、报告、日志、截图等原始证据引用 | evidence JSON / referenced files |
 | `Projection` | 开发者推进文档固定区域的投影数据 | `projection/*.json` + renderer |
@@ -416,9 +416,9 @@ AGENTS 当前列出窗口状态枚举：`待启动`、`执行中`、`待验收`�
 新增或改造为独立机器状态，例如：
 
 ```text
-.workspace-active/workspace/current/<demand-key>/controller-state.json
-.workspace-active/workspace/current/<demand-key>/controller-events.jsonl
-.workspace-active/workspace/current/<demand-key>/projection.json
+.wakeflow-active/current/<demand-key>/controller-state.json
+.wakeflow-active/current/<demand-key>/controller-events.jsonl
+.wakeflow-active/current/<demand-key>/projection.json
 ```
 
 状态机负责：
@@ -528,7 +528,7 @@ developer-progress.md -> controller-state.json
 
 但运行路线必须完全独立：
 
-- **总控流程路线**是人 / 总控主导的决策路线。它可以完全不启用无人值守，不需要线程投递，不依赖 `.workspace-local/codex-automation-loop`。只要有 state root、任务包、证据和总控裁决，就能推进。
+- **总控流程路线**是人 / 总控主导的决策路线。它可以完全不启用无人值守，不需要线程投递，不依赖 `.wakeflow-local/codex-automation-loop`。只要有 state root、任务包、证据和总控裁决，就能推进。
 - **无人值守自动化路线**是 transport / callback 路线。它只做投递、readback、result envelope、review pack、keep-live 和 controller return；它不拥有目标定义、不决定任务是否完成、不读取 Markdown，也不能替总控写主状态。
 
 两条路线共享概念模型，不共享推进权。唯一允许交汇的点只有机器契约：
@@ -549,7 +549,7 @@ developer-progress.md -> controller-state.json
 落地后，一个活跃需求只有一个开发者可读目录面和一个机器状态目录。推荐根目录：
 
 ```text
-codex-control-workspace/.workspace-active/workspace/current/<demand-key>/
+codex-control-workspace/.wakeflow-active/current/<demand-key>/
   developer-progress.md
   controller-state.json
   controller-events.jsonl
@@ -575,7 +575,7 @@ codex-control-workspace/.workspace-active/workspace/current/<demand-key>/
 线程注册、真实 thread id、keep-live worker pid 和其它本机敏感运行态仍放在：
 
 ```text
-codex-control-workspace/.workspace-local/
+codex-control-workspace/.wakeflow-local/
 ```
 
 不把 raw thread id、token、绝对本机路径写进 tracked 文档或开发者推进文档。
@@ -598,7 +598,7 @@ intake/design -> state init -> progress template -> task package -> evidence/res
 - direct-thread delivery。
 - keep-live。
 - controller return。
-- `.workspace-local/codex-automation-loop`。
+- `.wakeflow-local/codex-automation-loop`。
 
 它必须拥有：
 
@@ -642,7 +642,7 @@ state allowed task -> dispatch packet -> delivery envelope -> direct-thread send
 它必须拥有：
 
 - 已确认的 `controller-state.json` 和 `task-packages/*.json`。
-- `.workspace-local` 下真实线程注册。
+- `.wakeflow-local` 下真实线程注册。
 - dispatch group / packet / delivery envelope。
 - delivery run readback evidence。
 - target result envelope。
@@ -920,12 +920,12 @@ keepLiveStatus
 真实 Codex thread id 只允许保存在本地运行态：
 
 ```text
-codex-control-workspace/.workspace-local/codex-automation-loop/thread-registry/<window>.json
+codex-control-workspace/.wakeflow-local/codex-automation-loop/thread-registry/<window>.json
 ```
 
 线程注册规则：
 
-- `windowName` 必须匹配 `workspace.config.json` 或 `.workspace-local/workspace.config.json` 中的窗口身份。
+- `windowName` 必须匹配 `workspace.config.json` 或 `.wakeflow-local/workspace.config.json` 中的窗口身份。
 - `deliveryRole` 只允许 `controller`、`target`、`test-target`、`design` 或 `observer`；只有 `controller`、`target`、`test-target` 可参与投递。
 - registry 可以保存 raw thread id，但 tracked 文档、推进文档、提示词、回填正文、GitHub 和 target result 中都不得出现 raw thread id。
 - `cwd` 与 `responsibilityRoot` 不一致时，提示词必须声明窗口职责来源，不能只从 cwd 推断仓库职责。
@@ -1254,7 +1254,7 @@ fixture 必须分别证明：
 
 1. **进入 automation gate**
    - 用户明确开启无人值守，且 state 允许 `dispatch` 或 `dispatch-rework`。
-   - 总控线程和目标线程已在 `.workspace-local` 注册。
+   - 总控线程和目标线程已在 `.wakeflow-local` 注册。
    - keep-live 启动或记录 readiness risk。
 
 2. **从 state 生成投递**
@@ -1302,7 +1302,7 @@ fixture 必须分别证明：
 - `projection.json.sourceRevision` 必须等于 state revision，否则 `Unified Status` 标为 stale。
 - `developer-progress.md` 必须且只能有一个 `<!-- unified-status:start -->` / `<!-- unified-status:end -->`。
 - Markdown 正文中禁止新增 `状态：` 主状态行；validator 发现则失败。
-- 自动化 JSON 不能包含 raw thread id；raw thread id 只在 `.workspace-local` registry。
+- 自动化 JSON 不能包含 raw thread id；raw thread id 只在 `.wakeflow-local` registry。
 - `target-results/*.json` 不能直接触发下一跳；必须先 reducer，再总控 decide。
 - archive 脚本必须验证 state 为 `completed` / `paused` / `archived`，且 progress doc 不再是 active demand。
 
@@ -1332,7 +1332,7 @@ fixture 必须分别证明：
    - 初始化需求 state root。
    - 从模板生成唯一推进文档。
    - 添加任务包并追加北京时间条目。
-   - 不创建 `.workspace-local/codex-automation-loop`。
+   - 不创建 `.wakeflow-local/codex-automation-loop`。
    - import target result / evidence。
    - reducer 输出 candidate。
    - 总控 decide 写 state transition。
@@ -1482,7 +1482,7 @@ projection.json                    # 文档统一状态区投影输入
   - `controller-events.jsonl`：状态 transition 审计。
   - automation JSON：dispatch / delivery / result / review / keep-live 机器运行态。
   - projection renderer：只把机器投影写入推进文档 `Unified Status` 统一状态区域。
-  - `.workspace-local`：保存本地运行态、thread id、delivery evidence、keep-live，不进 tracked 文档。
+  - `.wakeflow-local`：保存本地运行态、thread id、delivery evidence、keep-live，不进 tracked 文档。
 - 数据 / 状态模型：`ControllerState.state` 为主状态；`deliveryStatus`、`resultStatus`、`groupReviewStatus`、`keepLiveStatus`、`projectionStatus` 为机器附属状态；附属状态只能作为 reducer input。
 - API / contract：当前不引入外部 API；脚本 CLI 输出需增加 state authority / evidence boundary / decision-required 字段。
 - UI / handoff：无 Dashboard UI；开发者阅读面是唯一推进文档；其它 UI-like docs 降级为机器投影或历史归档。
@@ -1527,7 +1527,7 @@ projection.json                    # 文档统一状态区投影输入
 
 已完成的 tracked 能力：
 
-- Stage 0 只读 inventory 已完成，明确 `.workspace-active/` 与 `.workspace-local/` 不跟随 `codex-control-workspace` 开源仓库提交；tracked 只提交模板、schema、脚本、skill、fixture 和测试。
+- Stage 0 只读 inventory 已完成，明确 `.wakeflow-active/` 与 `.wakeflow-local/` 不跟随 `codex-control-workspace` 开源仓库提交；tracked 只提交模板、schema、脚本、skill、fixture 和测试。
 - 已新增 `codex-control-workspace/templates/control-state-machine/`，包含唯一开发者推进文档、`Unified Status`、任务包追加、回填摘要追加和决策日志追加模板。
 - 已新增 `codex-control-workspace/schemas/control-state-machine/`，覆盖 `controller-state`、`controller-event`、`task-package`、`target-result`、`transition-candidate`、`projection`、`automation-dispatch`。
 - 已新增 `scripts/controller-state.mjs`：
@@ -1584,8 +1584,8 @@ projection.json                    # 文档统一状态区投影输入
 本轮保留边界：
 
 - 没有物理删除 `sync-current-plan.mjs`、`workspace-control-plan-template.md`、旧 `create-dispatch` / `prepare-dispatch --control-plan`，因为当前活跃历史文档和既有测试仍需要 migration compatibility；它们已从默认新路线降级为 legacy compatibility，不再作为新需求 authority。旧 `example-control-plan.md` starter 默认入口已物理删除。
-- 没有迁移历史 `.workspace-active` current docs、global TODO、Design inbox 或历史 `.workspace-local/codex-automation-loop` 文件；该迁移属于后续单独兼容 / 归档策略，不影响新状态机路线落地。
-- 未启动 automation、未注册或修改 thread、未写真实 `.workspace-active` / `.workspace-local` 运行态、未修改产品仓库、未切换 current status。
+- 没有迁移历史 `.wakeflow-active` current docs、global TODO、Design inbox 或历史 `.wakeflow-local/codex-automation-loop` 文件；该迁移属于后续单独兼容 / 归档策略，不影响新状态机路线落地。
+- 未启动 automation、未注册或修改 thread、未写真实 `.wakeflow-active` / `.wakeflow-local` 运行态、未修改产品仓库、未切换 current status。
 
 ## TODO / Backlog
 
@@ -1608,7 +1608,7 @@ projection.json                    # 文档统一状态区投影输入
 | CSMR-TODO-08 | 已完成 | 文档 | P1 | AlembicWorkspace | 更新 AGENTS / governance skill / script-pipeline / automation-loop reference，写明文档最小化和自动化独立原则 | 是 | 源 AGENTS 和父级 AGENTS 已同步 | AlembicWorkspace |
 | CSMR-TODO-09 | 已完成 | 验证 | P1 | AlembicWorkspace | 增加 fixture：manual-route 不依赖 automation、unattended-route 不读 Markdown、shared candidate/decide 边界、failure fail-closed | 是 | `control-state-machine-route-fixtures.test.mjs` 3 routes 通过 | AlembicWorkspace |
 | CSMR-TODO-10 | 默认入口已删除 / 历史兼容待迁移 | 迁移 | P1 | AlembicWorkspace | 制定旧 current plan / current status / index / TODO / inbox 人读面减量迁移策略 | 是 | `workspace-control sync` 和 starter 已切到 state-root；旧 current-plan mirror 仅保留 legacy compatibility；历史迁移另需用户裁决 | AlembicWorkspace |
-| CSMR-TODO-11 | 观察 | 迁移 | P2 | AlembicWorkspace | 评估历史 `.workspace-local/codex-automation-loop` 运行态只兼容读取还是迁移到新 schema | 否 / 待裁决 | 用户确认迁移策略 | AlembicWorkspace |
+| CSMR-TODO-11 | 观察 | 迁移 | P2 | AlembicWorkspace | 评估历史 `.wakeflow-local/codex-automation-loop` 运行态只兼容读取还是迁移到新 schema | 否 / 待裁决 | 用户确认迁移策略 | AlembicWorkspace |
 
 ## 后续拆分候选方向
 
@@ -1629,12 +1629,12 @@ projection.json                    # 文档统一状态区投影输入
 
 - 需要用户确认：
   - 已确认主方向并已按推荐路线实现：唯一开发者可读推进文档、独立机器状态机、自动化 JSON 独立、模板最干净简洁。
-  - 已采用默认根目录：新机器数据根目录由 `controller-state.mjs init` 默认写入 `.workspace-active/workspace/current/<demand-key>/`；`.workspace-active` / `.workspace-local` 仍不跟随开源仓库，tracked 仓库只提供模板、schema、脚本和 fixture。
+  - 已采用默认根目录：新机器数据根目录由 `controller-state.mjs init` 默认写入 `.wakeflow-active/current/<demand-key>/`；`.wakeflow-active` / `.wakeflow-local` 仍不跟随开源仓库，tracked 仓库只提供模板、schema、脚本和 fixture。
   - 后续仍需确认：旧 `workspace-current-status.md`、workspace index、current index、global TODO、Design inbox 的历史减量边界，是直接停止作为日常人读面，还是保留兼容入口一段时间。
-  - 后续仍需确认：历史 `.workspace-local/codex-automation-loop` 文件是否只兼容读取，不迁移。
+  - 后续仍需确认：历史 `.wakeflow-local/codex-automation-loop` 文件是否只兼容读取，不迁移。
 - 需要后续代码验证：
   - 历史 `sync-current-plan.mjs` 是否在下一轮迁移中完全退场，还是继续作为 legacy mirror。
-  - 历史 `.workspace-active` current docs 是否迁入 state root，或只在新需求后停止新增。
+  - 历史 `.wakeflow-active` current docs 是否迁入 state root，或只在新需求后停止新增。
   - `workspace-control.mjs` wrapper 是否会隐藏底层 JSON 写入边界。
   - `next-control-work.mjs` 是否需要取消 `--write` 候选缓存或改为 machine demand JSON。
   - archive scripts 是否需要 state guard，确保归档不改变主状态。

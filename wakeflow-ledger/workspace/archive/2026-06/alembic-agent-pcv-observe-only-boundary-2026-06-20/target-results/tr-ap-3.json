@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-ap-3",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "taskPackageId": "ap-3-grounding-enforcement-default-off",
+  "dispatchGroup": "ap3-agent-default-off",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "AP-3",
+  "status": "completed",
+  "summary": "AP-3 完成（引 groundingEnforcement 默认 off = 切默认，PCV 默认 observe-only 正式落地）。AlembicAgent main c206e7a→dd1bf0c（仅 AlembicAgent，8 文件 +260/-116）。这是迁移序里唯一有意行为变更步。\n\n做了：\n1. 引 `groundingEnforcement: 'off' | 'guard'`（新 type，AgentRuntimeTypes.ts）。全局默认挂 RuntimeConfig（不设=off）；per-run 覆盖经 AgentRunExecutionOptions→buildRuntimeOptions→AgentRuntimeRunOptions→runtime.execute（镜像 toolChoiceOverride 先例，PD7）；reactLoop 级亦支持 ReactLoopOpts.groundingEnforcement。有效值 = per-run override ?? 全局默认。\n   - 桥接：execute() 在 per-run 重置区解析 effective 到实例字段 #groundingEnforcement（因 PipelineStrategy 逐字段构建 reactLoop opts、不透传任意 opts；与 startTime/tokenUsage 同 per-run 实例模式，每次 execute 重置）；#initLoop 再允许 reactLoop 直调 opts 覆盖，最终注入 LoopContext.groundingEnforcement（CP1/CP4 共同读取点）。\n2. CP1 短路（LLMInputAssembly.buildGroundingContext:528）：policy 仅 effective==='guard' 且 stage==='analyze' 注入——覆盖全 analyze 路径（非仅 DeepSeek）；off 不注入。\n3. CP4 调用点短路（AgentRuntime.#processTextResponse:1612）：仅 effective==='guard' 才调 evaluateAnalyzeTextGroundingGate；off 时三元短路到惰性 {block:false}（不调 guard/不读决策/不阻断/不 nudge/不 rollback）。**AnalyzeGroundingGuard.ts 内部零改动**（AP-2 carry：调用点决定采用与否）。\n4. provider 不受开关（PD1）：ProviderToolChoicePolicy 未碰；resolveProviderToolChoice 不读 groundingEnforcement；CP2 guard 模式测试佐证两模式 provider toolChoice 完全一致。\n\n表征测试改两模式（test/pcv-observe-only-baseline.characterization.test.ts，7→11 例）：CP1 默认 off=无 evidenceGroundingPolicy 注入 + PD5 ref 列表仍注入；CP1 guard=恢复政策文本（含 DeepSeek 子句、refCount 参数化）；CP4 默认 off=首轮无证据文本 NOT 阻断（chatWithTools 1 次、无 rollbackTick、ledger 仍观察 invalid-no-evidence、无 nudge）；CP4 guard=恢复阻断+nudge+rollback；CP2/CP3 两模式 provider 不变。另：原 AgentRuntime.test.ts 'blocks DeepSeek V4 analyze...' 阻断测试加 groundingEnforcement='guard' 保留意图。\n\n不变量保持：provider 不受开关（DeepSeek V4 不回归）；guard 内部不改（调用点短路）；PD5 ref 列表不随开关；PcvNodeEvidence 纯观察、schema 不变（off 下 classification 仍记录、仅不强制）；命名无 Pcv 前缀；四工具/LLM 对外语义不变；Node 22。\n\n结论：AP-3 完成定义全部满足；默认 observe-only 达成；无 blocker、无需用户决策。建议控制器审阅后推进 AP-4（证据纯化 + additive enforcement-mode 标记）。",
+  "evidenceRefs": [
+    "AlembicAgent commit dd1bf0c on main (baseline c206e7a=AP-2; AlembicAgent-only, 8 files +260/-116)",
+    "src/agent/runtime/AgentRuntimeTypes.ts: new `export type GroundingEnforcement='off'|'guard'`; RuntimeConfig.groundingEnforcement (global default) + ReactLoopOpts.groundingEnforcement (per-call)",
+    "src/agent/service/AgentRunContracts.ts: AgentRunExecutionOptions.groundingEnforcement + AgentRuntimeRunOptions.groundingEnforcement; AgentService.ts buildRuntimeOptions maps input.execution?.groundingEnforcement (mirrors toolChoiceOverride, PD7)",
+    "src/agent/runtime/AgentRuntime.ts: ctor #groundingEnforcementDefault=config??off; execute() resolves per-run effective onto #groundingEnforcement (instance bridge; PipelineStrategy does not forward opts); #initLoop override ?? effective -> LoopContext",
+    "src/agent/runtime/LoopContext.ts: carries groundingEnforcement:'off'|'guard' (default off) — shared read point for CP1+CP4",
+    "CP1 src/agent/runtime/LLMInputAssembly.ts:528 policy gated by ctx.groundingEnforcement==='guard' && stage==='analyze' (all analyze paths); PD5 ref-list injection :433-439 unchanged",
+    "CP4 src/agent/runtime/AgentRuntime.ts:1612 call-site short-circuit; AnalyzeGroundingGuard.ts UNCHANGED (not in diff) — guard internals intact",
+    "PD1 proof: ProviderToolChoicePolicy untouched; CP2 guard-mode characterization test asserts identical provider toolChoice (none->auto, schema visible) in both modes",
+    "test/pcv-observe-only-baseline.characterization.test.ts rewritten two-mode (7->11 cases); test/AgentRuntime.test.ts block test opts into groundingEnforcement='guard'"
+  ],
+  "verification": [
+    "npm run build (tsc emit): pass, exit 0",
+    "npm run build:check (typecheck noEmit): exit 0",
+    "npm run lint (biome src scripts test): exit 0, 4 warnings (= AP-0/AP-1/AP-2 baseline, 0 new; all pre-existing in scripts/, none in AP-3 files)",
+    "npm run lint:core-import-boundary: OK, scanned 260 files / 46 @alembic/core imports (= AP-2; no new files)",
+    "npm test (full vitest): 35 files / 256 tests passed, 0 failed (baseline 252; +4 = characterization two-mode split 7->11; 0 failed preserved)",
+    "characterization file isolated run: 11/11 pass (CP1 off/guard, CP2 off/guard, CP3 off+contrast, CP4 off/guard)",
+    "Node 22 (nvm v22.22.1); ambient node v18.20.8 too old for vitest/rolldown — used explicit v22 bin"
+  ],
+  "risks": [
+    "默认切换=有意行为变更：默认 off 下主循环不再被 analyze grounding 控制（无政策注入 / analyze 文本轮不阻断）。跨仓主体 lib/workflows/ai-execution 消费 grounding ledger summary 时，增多的 invalid-no-evidence/partial 是 observe-only 预期、非回归——AP-6 须据 AP-4 additive enforcement-mode 标记改判审计语义（R6）",
+    "per-run 通道端到端：AgentService 路径经实例字段桥接（execute 解析 effective），因 PipelineStrategy 不透传任意 opts 到 reactLoop。该桥接假设 runtime 实例 per-run（与现有 startTime/tokenUsage per-run 实例字段同模式）；若未来出现同一实例并发 execute 不同 groundingEnforcement，需改为线程化 opts。AP-7 PCVM/Test guard opt-in wiring 落地时建议复核该通道",
+    "AP-7 per-run guard opt-in 注入点 = AgentRunExecutionOptions.groundingEnforcement（同 FC3 通道）；主体 DimensionRuntimeBuilder/AgentRunInputBuilders 构建 AgentRunInput.execution 时传入即可，本窗口未改跨仓",
+    "PcvNodeEvidence schema 与跨仓消费字段本阶段未改（AP-4 领地）；deepseekV4ToolChoiceMode 等 enforcement-derived 字段仍由 PCV 观察产出，AP-4 additive 标记时需区分 observe-only/guard 两模式语义"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-ap3-agent-default-off__AlembicAgent__AP-3",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap3-agent-default-off__AlembicAgent__AP-3.json",
+    "deliveryRunId": "run-delivery-ap3-agent-default-off__AlembicAgent__AP-3",
+    "dispatchGroup": "ap3-agent-default-off",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap3-agent-default-off__AlembicAgent__AP-3.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 15,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "taskPackageId": "ap-3-grounding-enforcement-default-off",
+    "targetTaskId": "AP-3",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "ap3-agent-default-off",
+    "resultId": "tr-ap-3",
+    "createdAt": "2026-06-20T14:04:22.304Z"
+  },
+  "createdAt": "2026-06-20T14:04:22.304Z",
+  "stateRevisionObserved": 15,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

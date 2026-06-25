@@ -20,7 +20,7 @@ representative validation proves the replacement path.
 ## Entry Points
 
 - Sequence manifest: [alembic-compatibility-removal-cleanup-demand-sequence-2026-06-10.json](alembic-compatibility-removal-cleanup-demand-sequence-2026-06-10.json)
-- D29 deletion wave evidence: [../alembic-cross-repo-interface-contract/../../../.workspace-active/workspace/current/alembic-interface-contract-d29-compatibility-deletion-wave/evidence/d29-compatibility-deletion-wave-2026-06-10.md](../alembic-cross-repo-interface-contract/../../../.workspace-active/workspace/current/alembic-interface-contract-d29-compatibility-deletion-wave/evidence/d29-compatibility-deletion-wave-2026-06-10.md)
+- D29 deletion wave evidence: [../alembic-cross-repo-interface-contract/../../../.wakeflow-active/current/alembic-interface-contract-d29-compatibility-deletion-wave/evidence/d29-compatibility-deletion-wave-2026-06-10.md](../alembic-cross-repo-interface-contract/../../../.wakeflow-active/current/alembic-interface-contract-d29-compatibility-deletion-wave/evidence/d29-compatibility-deletion-wave-2026-06-10.md)
 - D32 final acceptance archive: [../alembic-cross-repo-interface-contract/final-governance-acceptance-archive-2026-06-10.md](../alembic-cross-repo-interface-contract/final-governance-acceptance-archive-2026-06-10.md)
 
 ## Final Goal

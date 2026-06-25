@@ -11,8 +11,8 @@ long-term history.
 Keep current state in:
 
 ```text
-.workspace-active/workspace/
-.workspace-active/workspace/current/
+.wakeflow-active/
+.wakeflow-active/current/
 ```
 
 This area may contain current status, TODOs, Design/Test intake projections,

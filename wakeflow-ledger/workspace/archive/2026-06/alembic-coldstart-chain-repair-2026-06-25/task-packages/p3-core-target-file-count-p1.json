@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-core-target-file-count-p1",
+  "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+  "summary": "P3 AlembicCore: fix MissionBriefingBuilder target file counts so bootstrap targets report real owned-file counts instead of ProjectContextRef anchor counts. This follows accepted P0/P1/P2 and must not touch AlembicPlugin P5 recipeCount or any Plugin/Codex transport semantics.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-coldstart-chain-repair-2026-06-25.md#p3",
+  "createdAt": "2026-06-24T21:32:51.069Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-core-target-file-count-t1",
+      "taskPackageId": "p3-core-target-file-count-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read ../AGENTS.md, ../.wakeflow-active/index.md, ../.wakeflow-active/current/workspace-current-status.md, this state root, Design/docs/current/alembic-coldstart-chain-repair-original-plan-2026-06-25.md, Design/docs/current/alembic-coldstart-chain-repair-2026-06-25.md P3, and AlembicCore/AGENTS.md. Declare identity as AlembicCore. Execute only P3. Goal: bootstrap/mission briefing targets[].fileCount must reflect real module ownedFiles counts, not target.refs anchor count. Required implementation: in src/workflows/capabilities/host-agent/MissionBriefingBuilder.ts buildProjectContextTargets, derive fileCount by matching target.name to input.modules[].ownedFiles.length, or an equivalent targetFileMap approach; if no matching module exists, fall back to target.refs.length to preserve compatibility. buildArchitectureOverview and buildKeyAbstractions should then naturally receive corrected fileCount values; do not change DTO field names, output shape, sorting, or public exports unless tests prove it is required. Add/adjust Core unit coverage that proves a target with one ref but many ownedFiles reports the many-file count, and architecture/key abstraction aggregate counts use that value. Use a realistic fixture with multiple targets/modules, including a fallback target with refs and no module match. Required evidence: Core commit hash on main; changed files; test names/results; npm run build:check under Node 22; targeted unit test output; git diff --check; diff/rg evidence that only Core P3 surfaces changed and AlembicPlugin/P5 recipeCount/evidence gate/alembic_plan/transport semantics were not touched. Do not modify AlembicPlugin, Test, Dashboard, P5 recipeCount, P6 handoff/projectId, or evidence gate strictness. If real BiliDili numbers can be non-destructively probed from Core fixtures, include them; otherwise provide deterministic Core fixture evidence and leave real BiliDili to final Test e2e.",
+      "status": "pending",
+      "createdAt": "2026-06-24T21:32:51.069Z"
+    }
+  ]
+}

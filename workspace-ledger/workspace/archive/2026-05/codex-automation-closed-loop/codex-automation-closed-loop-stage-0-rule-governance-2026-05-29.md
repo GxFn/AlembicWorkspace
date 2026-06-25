@@ -59,7 +59,7 @@ Design 已确认的核心方向仍有效：
 - 需求 / 测试结果理解：当前问题不是提示词长度单点问题，而是旧 VAD 把总控派发、投递、子窗口执行、回跳和验收混成一套脚本状态机，导致总控职责被脚本侵占、子窗口职责不清、提示词机制名过重、JS 执行后推进边界不清。
 - 已核对证据：Design 原始计划、需求设计、规则统一补充、当前总控计划和 workspace index/status；这些证据足以裁决 Stage 0 路线重置，不需要真实项目测试。
 - 是否需要先验证 / 重新计划 / 用户确认：用户已直接确认推翻旧实现并重做 Stage 0；本轮不再询问是否重写。后续若 Stage 1 需要删除旧命令或改变外部使用方式，再按确认门禁判断。
-- 本次允许更新：`.workspace-active/workspace/current/` 当前计划、index/status、TODO 账本；下一步允许只读检查 `codex-control-workspace` 未提交变更并生成隔离清单。
+- 本次允许更新：`.wakeflow-active/current/` 当前计划、index/status、TODO 账本；下一步允许只读检查 `codex-control-workspace` 未提交变更并生成隔离清单。
 - 本次不得更新：产品子仓库源码、真实测试项目、真实 heartbeat、子窗口任务和 PCVM Wave 6D 验收结论。
 - 与当前 PCVM 主线关系：PCVM Wave 6D 暂停在待验收，不关闭、不归档；CODEX-AUTOMATION Stage 0 完成后再恢复。
 
@@ -435,7 +435,7 @@ Stage 0B 结论：新实现不能从 `visible-dispatch.mjs` 内部继续拆补�
 验证命令：
 
 ```text
-cd codex-control-workspace && node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/codex-automation-closed-loop-stage-0-rule-governance-2026-05-29.md --write
+cd codex-control-workspace && node scripts/sync-current-plan.mjs --plan .wakeflow-active/current/codex-automation-closed-loop-stage-0-rule-governance-2026-05-29.md --write
 cd codex-control-workspace && node scripts/verify-control-center.mjs --require-todo --require-task-packages
 ```
 
@@ -523,13 +523,13 @@ cd codex-control-workspace && node scripts/verify-control-center.mjs --require-t
   "indexRows": [
     {
       "type": "Codex Automation Closed Loop Stage 0",
-      "doc": ".workspace-active/workspace/current/codex-automation-closed-loop-stage-0-rule-governance-2026-05-29.md",
+      "doc": ".wakeflow-active/current/codex-automation-closed-loop-stage-0-rule-governance-2026-05-29.md",
       "status": "Stage 5 旧 VAD 退场完成 / 待恢复 PCVM",
       "description": "已按用户最新指令推翻旧 VAD 补丁路线，完成新闭环最小脚本、skill/reference 切换、本地闭环 smoke 和旧 VAD 退场。"
     },
     {
       "type": "PCVM Wave 6D canonical node after-run",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md",
       "status": "暂停 / 待总控验收",
       "description": "PCVM Wave 6D 已回填，因 CODEX-AUTOMATION 新需求临时暂停；后续恢复验收。"
     }
@@ -537,7 +537,7 @@ cd codex-control-workspace && node scripts/verify-control-center.mjs --require-t
   "currentIndexRows": [
     {
       "type": "Codex Automation Closed Loop Stage 0",
-      "doc": ".workspace-active/workspace/current/codex-automation-closed-loop-stage-0-rule-governance-2026-05-29.md",
+      "doc": ".wakeflow-active/current/codex-automation-closed-loop-stage-0-rule-governance-2026-05-29.md",
       "description": "旧 VAD 已从可执行脚本、workspace-control 映射、skill 入口、README 和模板规则中退场；新入口 `codex-automation-loop.mjs` 已提供 thread registry / packet / delivery / result / review / stop 最小闭环，并通过本地 smoke。"
     }
   ]

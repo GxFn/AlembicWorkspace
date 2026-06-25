@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "resultId": "result-co5c-plugin-test-fixture-consumer-migration__AlembicPlugin__CO-5C-evidence-repair",
+  "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+  "taskPackageId": "co-5c-plugin-test-fixture-consumer-migration",
+  "dispatchGroup": "co5c-plugin-test-fixture-consumer-migration",
+  "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "CO-5C",
+  "status": "completed",
+  "summary": "AlembicPlugin CO-5C completed in commit a810b9db4044990e8c3ac688f8e023fb626f789b. Migrated Plugin test/config consumers from Core transitional AST/analysis/discovery/project-intelligence imports to the CO-5B @alembic/core/test-fixtures surface where equivalent real helpers exist. Updated AlembicPlugin/config/core-import-boundary-allowlist.json from CO-3B counts to current CO-5C facts: 401 @alembic/core references, 36 unique specifiers, @alembic/core/test-fixtures has 27 references, @alembic/core/core/analysis and @alembic/core/core/ast/lang-* are zero, and residual shrink-only exceptions are @alembic/core/core/discovery=1 plus @alembic/core/project-intelligence=1. No production runtime, vendor, release snapshot, sibling repository, Core source, or tool schema files were edited. This evidence-repair result uses workspace-relative evidence refs for controller review.",
+  "evidenceRefs": [
+    "commit:a810b9db4044990e8c3ac688f8e023fb626f789b",
+    "guard-result:guard-public-mqmtxn4k-1",
+    ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19/task-packages/co-5c-plugin-test-fixture-consumer-migration.json",
+    "AlembicCore/src/test-fixtures.ts",
+    "AlembicPlugin/config/core-import-boundary-allowlist.json",
+    "AlembicPlugin/test/unit/CallGraphAnalyzer.test.ts",
+    "AlembicPlugin/test/unit/Phase2-PanoramaIntegration.test.ts",
+    "AlembicPlugin/test/unit/ProjectAnalysisMaterialization.test.ts"
+  ],
+  "verification": [
+    "pre status: git status --short before edits => clean AlembicPlugin worktree",
+    "pre focused rg for @alembic/core/(core/analysis|core/ast/lang-|core/discovery|project-intelligence|test-fixtures) showed 29 allowlist refs, 1 core/analysis test import, 16 core/ast/lang-* test refs, 3 core/discovery test imports, 27 project-intelligence residual imports, and existing test-fixtures usage.",
+    "node -e JSON.parse(config/core-import-boundary-allowlist.json) => allowlist json ok",
+    "npm run lint:consumer-core-imports => passed; Core import boundary OK: scanned 383 files and 401 @alembic/core imports",
+    "focused scanner summary after edits => referencesScanned=401, uniqueSpecifierCount=36, residuals: @alembic/core/core/discovery=1, @alembic/core/project-intelligence=1, @alembic/core/test-fixtures=27",
+    "npm run test -- 16 touched unit test files => passed; 16 files, 335 tests",
+    "npm run test -- 7 touched integration test files => passed; 7 files, 338 tests; missing real sample repositories skipped by existing test logic",
+    "npm run build:check => passed; Core build used ../AlembicCore @ 377ecb4d3b295aaf23bdfff37d727faefdbef05a",
+    "npm run lint => exit 0; existing repository warnings reported in unrelated lib/scripts files, no fixes applied",
+    "npm run lint:repo-boundary => passed",
+    "npm run build => passed; Core build used ../AlembicCore @ 377ecb4d3b295aaf23bdfff37d727faefdbef05a",
+    "git diff --check => passed with no output",
+    "git diff --cached --check => passed with no output",
+    "Alembic code guard guard-public-mqmtxn4k-1 => ok true; guard surfaced existing test-style warnings in touched legacy test files, not introduced by this import migration",
+    "post status: git status --short --branch => ## main...origin/main [ahead 1]"
+  ],
+  "risks": [
+    "@alembic/core/project-intelligence remains once in AlembicPlugin/test/unit/ProjectAnalysisMaterialization.test.ts because CO-5B test-fixtures does not export buildEntityGraphInput, materializeCallGraph, resolveProjectAnalysisMaterialization, runPhase1_7_CallGraph, or runPhase2_DependencyGraph. This is an exact Core fixture/export gap and blocks a later shrink-to-zero package until Core exposes equivalent real helpers or moves the test into AlembicCore.",
+    "@alembic/core/core/discovery remains once in AlembicPlugin/test/unit/Phase2-PanoramaIntegration.test.ts for detectConflict/loadPreference/savePreference because CO-5B test-fixtures does not export discoverer preference helpers. The retired project-intelligence aggregate was not used for this residual because it is no longer package-exported.",
+    "Alembic code guard reported pre-existing warning-style issues such as non-null assertions and a long helper in legacy test files; CO-5C did not expand into unrelated test-style refactoring.",
+    "Plugin smoke/session/distribution checks were not run because only test/config imports changed; no production runtime, MCP tool schema, package export, release asset, or Codex delivery surface changed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-co5c-plugin-test-fixture-consumer-migration__AlembicPlugin__CO-5C",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co5c-plugin-test-fixture-consumer-migration__AlembicPlugin__CO-5C.json",
+    "deliveryRunId": "run-delivery-co5c-plugin-test-fixture-consumer-migration__AlembicPlugin__CO-5C",
+    "dispatchGroup": "co5c-plugin-test-fixture-consumer-migration",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co5c-plugin-test-fixture-consumer-migration__AlembicPlugin__CO-5C.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+    "stateRevision": 39,
+    "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+    "taskPackageId": "co-5c-plugin-test-fixture-consumer-migration",
+    "targetTaskId": "CO-5C",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "co5c-plugin-test-fixture-consumer-migration",
+    "resultId": "result-co5c-plugin-test-fixture-consumer-migration__AlembicPlugin__CO-5C-evidence-repair",
+    "createdAt": "2026-06-20T20:51:04.612Z"
+  },
+  "createdAt": "2026-06-20T20:51:04.612Z",
+  "stateRevisionObserved": 39,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -2,7 +2,7 @@
 
 Use this directory when the user does not have an external Design repository.
 
-- Handoff board: `.workspace-active/workspace/current/design-handoff-board.md`
+- Handoff board: `.wakeflow-active/current/design-handoff-board.md`
 - Local rules: `AGENTS.md`
 - Documentation index: `docs/index.md`
 - Current Design work: `docs/current/`

@@ -31,10 +31,10 @@
 
 - 来源类型：DesignWindow handoff + 用户直接确认 + Wave 1 / Wave 2 总控验收。
 - 来源文档：
-  - [Stage 0 baseline](../../../../../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-stage-0-code-fact-baseline-2026-05-28.md)
-  - [goal stage confirmation](../../../../../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md)
-  - [Wave 1](../../../../../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-deletion-wave-1-2026-05-28.md)
-  - [Wave 2](../../../../../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-dashboard-wave-2-2026-05-28.md)
+  - [Stage 0 baseline](../../../../../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-stage-0-code-fact-baseline-2026-05-28.md)
+  - [goal stage confirmation](../../../../../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md)
+  - [Wave 1](../../../../../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-deletion-wave-1-2026-05-28.md)
+  - [Wave 2](../../../../../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-dashboard-wave-2-2026-05-28.md)
 - 用户确认状态：已确认按 Design 推荐执行，并允许 AI-MOCK 自动化推进。
 - 总控接收结论：本 wave 只做真实 / 默认 AI 配置 smoke。
 - 是否需要目标阶段确认：已完成。
@@ -87,7 +87,7 @@
 
 主线动作：
 
-- 读取本计划和 [test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md) 中的 Test-AI-MOCK-W3。
+- 读取本计划和 [test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md) 中的 Test-AI-MOCK-W3。
 - 使用 `AlembicTest/config/defaults.json` 的 AI 配置 fallback 规则：先读目标项目 Ghost / standard runtime AI 配置；没有可用配置时允许使用默认测试 AI 配置。
 - 运行最小 smoke：可以是 Alembic daemon/API、CLI、test-mode runtime 或 AlembicTest 既有脚本，必须能观察 provider 选择、key presence、无 mock provider fallback、显式 unavailable / 成功路径和关键日志。
 - 若启动或使用 Dashboard / localhost 页面，必须用 Codex in-app browser 打开最相关页面观察。
@@ -182,7 +182,7 @@
 发送给：无（AI-MOCK 已完成，下一步恢复 PCVM）
 
 ```text
-先读取 AGENTS.md、../AGENTS.md、../codex-control-workspace/.workspace-active/workspace/index.md、../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-real-ai-smoke-wave-3-2026-05-28.md、../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md，以及你所在窗口/目标仓库的 AGENTS.md。
+先读取 AGENTS.md、../AGENTS.md、../codex-control-workspace/.wakeflow-active/index.md、../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-real-ai-smoke-wave-3-2026-05-28.md、../codex-control-workspace/.wakeflow-active/current/test-exchange.md，以及你所在窗口/目标仓库的 AGENTS.md。
 
 先明确声明当前窗口定位和本轮测试职责。
 
@@ -205,8 +205,8 @@
   - 失败能推出的结论：需要区分配置缺失、runtime 问题、残留 fallback、Dashboard/API 消费问题或测试环境问题。
   - 不能推出的结论：不能推出 full cold-start 通过，不能推出 PCV N0-N14 全链路可度量，不能推出 Dashboard comparison UI 可用。
   - 停止或不开始条件：需要修改真实项目业务代码、需要打印 secret、找不到可保护测试目标或命令会破坏用户数据。
-- 测试单：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md#test-ai-mock-w3-real-ai-smoke)
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试单：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md#test-ai-mock-w3-real-ai-smoke)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：`BiliDili` 只作为受保护测试目标，不直接派发，不改源码。
 
 ## 回填区
@@ -227,31 +227,31 @@
   "indexRows": [
     {
       "type": "AI-MOCK Wave 2",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-dashboard-wave-2-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-dashboard-wave-2-2026-05-28.md",
       "status": "总控验收通过",
       "description": "`AlembicDashboard` commit 7fdb4863c61a 已删除 product AI mock UI/API consumer，`npm run check` 与负向扫描通过。"
     },
     {
       "type": "AI-MOCK Wave 1",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-deletion-wave-1-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-deletion-wave-1-2026-05-28.md",
       "status": "总控验收通过",
       "description": "`AlembicAgent` commit 26fe915366ea7198ffc37889752644fc5028be3c 与 `Alembic` commit 1ee39b1eed5ab3fbffaaea309c8a9c966cc61499 已删除 product mock producer / consumer。"
     },
     {
       "type": "AI-MOCK 目标阶段确认",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md",
       "status": "已确认 / 主线完成",
       "description": "用户已确认 Design 推荐方向；Wave 1 / Wave 2 / Wave 3 均已通过总控验收。"
     },
     {
       "type": "AI-MOCK Stage 0 code fact baseline",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-stage-0-code-fact-baseline-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-stage-0-code-fact-baseline-2026-05-28.md",
       "status": "已完成",
       "description": "跨仓库 mock 入口和历史数据状态已查清；Wave 3 基于上游删除验收执行真实 smoke。"
     },
     {
       "type": "PCVM Wave 4A cold-start baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
       "status": "可恢复",
       "description": "AI-MOCK 阻塞已解除；下一步回到 PCVM Wave 4D runtime-gap 归口。"
     }
@@ -259,27 +259,27 @@
   "currentIndexRows": [
     {
       "type": "AI-MOCK Wave 2",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-dashboard-wave-2-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-dashboard-wave-2-2026-05-28.md",
       "description": "AlembicDashboard product mock UI/API consumer 删除验收记录。"
     },
     {
       "type": "AI-MOCK Wave 1",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-deletion-wave-1-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-deletion-wave-1-2026-05-28.md",
       "description": "AlembicAgent / Alembic product mock producer / consumer 删除验收记录。"
     },
     {
       "type": "AI-MOCK 目标阶段确认",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md",
       "description": "产品 runtime AI mock 删除的完成定义、阶段顺序和 Deletion Wave 确认。"
     },
     {
       "type": "AI-MOCK Stage 0 code fact baseline",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-stage-0-code-fact-baseline-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-stage-0-code-fact-baseline-2026-05-28.md",
       "description": "跨仓库 mock 入口、历史数据状态和 wave 边界事实基线。"
     },
     {
       "type": "PCVM Wave 4A cold-start baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
       "description": "AI-MOCK 删除已完成；保留 PCVM 当前 runtime-gap 事实和后续入口。"
     }
   ]

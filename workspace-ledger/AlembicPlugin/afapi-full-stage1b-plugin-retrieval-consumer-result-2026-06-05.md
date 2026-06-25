@@ -5,7 +5,7 @@
 - Window: AlembicPlugin
 - Task id: AFAPI-FULL-STAGE1B-PLUGIN-RETRIEVAL-CONSUMER-P2
 - Dispatch group: AFAPI-FULL-STAGE1B-PLUGIN-RETRIEVAL-CONSUMER-20260605
-- Control plan: codex-control-workspace/.workspace-active/workspace/current/plugin-agent-facing-public-api-redesign-workspace-plan-2026-06-05.md
+- Control plan: codex-control-workspace/.wakeflow-active/current/plugin-agent-facing-public-api-redesign-workspace-plan-2026-06-05.md
 
 ## Scope Completed
 

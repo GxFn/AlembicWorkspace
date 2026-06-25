@@ -76,7 +76,7 @@
 ## Stage 0 总控验收结论
 
 - 窗口自述：`AlembicPlugin`、`Alembic`、`AlembicCore` 均声明只读调研完成，子仓库 `git status --short` 输出为空，并回填读取文件、搜索命令、关键事实、Stage 1 建议和不应提前做事项。
-- 原始证据：VAD group `g037-stage0-code-baseline-2026-05-26` 三个任务均 completed；总控已读取 `.workspace-local/visible-dispatch/dispatch-queue.json` 回填、复核三仓库 `git status --short`、检查 Plugin MCP schema / handler、Alembic resident task / prime search pipeline、Core ProjectScope / source contracts / SearchTypes，并用 `rg` 确认当前无 `hostDeclaredIntent`、`hostTurnMeta`、`IntentExtractionFrame`、`RecognizedIntentDraft`、`IntentEpisode`、`IntentSearchPlan`、`PrimeInjectionPackage` 既有类型。
+- 原始证据：VAD group `g037-stage0-code-baseline-2026-05-26` 三个任务均 completed；总控已读取 `.wakeflow-local/visible-dispatch/dispatch-queue.json` 回填、复核三仓库 `git status --short`、检查 Plugin MCP schema / handler、Alembic resident task / prime search pipeline、Core ProjectScope / source contracts / SearchTypes，并用 `rg` 确认当前无 `hostDeclaredIntent`、`hostTurnMeta`、`IntentExtractionFrame`、`RecognizedIntentDraft`、`IntentEpisode`、`IntentSearchPlan`、`PrimeInjectionPackage` 既有类型。
 - 总控裁决：Stage 0 验收通过。回填证据回答了本阶段唯一问题：当前没有现成完整 host intent contract；Plugin 是 Codex-facing 输入生产 / 传递边界；Alembic 已有 prime / search 消费链路和 `sessionHistory` / `language` / `intent` 上下文承载位；Core 已有 ProjectScope、source refs、SearchTypes 和 source contracts，但 Stage 1 不应为了结构好看新增 Core intent contract。
 - 不能推出的结论：不能证明 Stage 1 实现已完成；不能证明 Codex SDK 当前真实提供 `request._meta`；不能证明 search / vector / relation / PrimeInjectionPackage 可用；不能证明需要 `AlembicTest`。
 

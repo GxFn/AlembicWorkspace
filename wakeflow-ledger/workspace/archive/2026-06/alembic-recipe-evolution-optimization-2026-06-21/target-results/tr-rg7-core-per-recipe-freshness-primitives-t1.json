@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rg7-core-per-recipe-freshness-primitives-t1",
+  "demandKey": "alembic-recipe-evolution-optimization-2026-06-21",
+  "taskPackageId": "rg7-core-per-recipe-freshness-primitives-p1",
+  "dispatchGroup": "rg7-core-per-recipe-freshness-primitives-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-evolution-optimization-2026-06-21",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "rg7-core-per-recipe-freshness-primitives-t1",
+  "status": "completed",
+  "summary": "RG-7 Core producer completed in AlembicCore commit a156e0d796d396e02d815ca22147c83d59bf880b. Added an additive per-recipe freshness primitive: SourceRefReconciler.reconcileRecipeSourceRefs() refreshes only one affected recipe's recipe_source_refs, including dropped-ref cleanup, and RecipeFreshnessService coordinates source_refs refresh with VectorService.getAvailability(), syncEntry(), and syncRecipeSemanticRegions(). Public surface is exposed through @alembic/core/knowledge with smoke coverage. No AlembicPlugin files were edited.",
+  "evidenceRefs": [
+    "commit:AlembicCore:a156e0d796d396e02d815ca22147c83d59bf880b",
+    "changed-file:AlembicCore/src/service/knowledge/SourceRefReconciler.ts",
+    "changed-file:AlembicCore/src/service/knowledge/RecipeFreshnessService.ts",
+    "changed-file:AlembicCore/src/service/knowledge/index.ts",
+    "changed-file:AlembicCore/src/knowledge.ts",
+    "changed-file:AlembicCore/test/RecipeFreshnessService.test.ts",
+    "changed-file:AlembicCore/scripts/smoke-public-api.mjs",
+    "public-api:@alembic/core/knowledge exports RecipeFreshnessService and RecipeFreshness* result/deps/vector types",
+    "source-ref-behavior:single-recipe refresh inserts active refs, marks stale refs, removes dropped refs only for that recipe, and leaves other recipe rows untouched",
+    "vector-behavior:RecipeFreshnessService checks VectorService.getAvailability before syncEntry/syncRecipeSemanticRegions and reports degraded availability without silent success",
+    "downstream-plugin-note:Plugin create/evolve wiring should call RecipeFreshnessService.refreshRecipe or refreshRecipes after KnowledgeService/RecipeProductionGateway save, replacing local _populateSourceRefsForEntry-style sourceRef rules"
+  ],
+  "verification": [
+    "npm run build:check: passed",
+    "npx vitest run test/RecipeFreshnessService.test.ts test/unit/SourceRefReconcilerSignal.test.ts test/RecipeSourceRefRepositoryFloor.test.ts test/VectorAvailability.test.ts test/RecipeRegionVectorIndex.test.ts: passed (5 files, 36 tests)",
+    "git diff --check: passed",
+    "npm run build: passed",
+    "npm run lint:public-api-boundary: passed",
+    "npm run lint:layer-contract && npm run lint:consumer-core-imports && npm run check:output-budgets && npm run check:space-edges && npm run lint:doctrine: passed",
+    "npm run smoke:public-api: passed",
+    "npm run test: passed (135 files, 1372 tests)",
+    "npm run lint: passed",
+    "npm run lint:naming: failed only on pre-existing src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts kebab-case filenames",
+    "npm run check: failed at the same pre-existing lint:naming gate after preceding gates passed",
+    "Alembic status: degraded/not initialized for AlembicCore; selected project mismatch points at parent workspace",
+    "Alembic Guard: attempted and failed with plugin internal output schema error"
+  ],
+  "risks": [
+    "RecipeFreshnessService depends on the downstream caller providing the saved Recipe entry payload after create/evolve; Plugin wiring is still pending in the next package.",
+    "VectorService.syncEntry currently swallows internal embed/upsert errors by design, so RecipeFreshnessService can only report thrown errors plus semantic-region sync status; deeper vector entry failures still need existing VectorService logs.",
+    "If recipe_source_refs table is inaccessible, the new service reports table-inaccessible and retrievalMayBeStale instead of attempting a fallback local rule.",
+    "Alembic Guard did not provide a valid review result because the local Alembic project is uninitialized/mismatched and code_guard returned an internal schema error."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rg7-core-per-recipe-freshness-primitives-p1__AlembicCore__rg7-core-per-recipe-freshness-primitives-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rg7-core-per-recipe-freshness-primitives-p1__AlembicCore__rg7-core-per-recipe-freshness-primitives-t1.json",
+    "deliveryRunId": "run-delivery-rg7-core-per-recipe-freshness-primitives-p1__AlembicCore__rg7-core-per-recipe-freshness-primitives-t1",
+    "dispatchGroup": "rg7-core-per-recipe-freshness-primitives-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rg7-core-per-recipe-freshness-primitives-p1__AlembicCore__rg7-core-per-recipe-freshness-primitives-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-evolution-optimization-2026-06-21",
+    "stateRevision": 42,
+    "demandKey": "alembic-recipe-evolution-optimization-2026-06-21",
+    "taskPackageId": "rg7-core-per-recipe-freshness-primitives-p1",
+    "targetTaskId": "rg7-core-per-recipe-freshness-primitives-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "rg7-core-per-recipe-freshness-primitives-p1",
+    "resultId": "tr-rg7-core-per-recipe-freshness-primitives-t1",
+    "createdAt": "2026-06-21T19:43:15.840Z"
+  },
+  "createdAt": "2026-06-21T19:43:15.840Z",
+  "stateRevisionObserved": 42,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

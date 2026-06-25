@@ -215,9 +215,9 @@ Stage 1+ 约束：
 ```text
 sed -n '1,320p' AGENTS.md
 sed -n '1,260p' AlembicPlugin/AGENTS.md
-sed -n '1,260p' codex-control-workspace/.workspace-active/workspace/index.md
-sed -n '1,320p' codex-control-workspace/.workspace-active/workspace/current/plugin-architecture-interface-refactor-workspace-plan-2026-05-31.md
-sed -n '1,260p' codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md
+sed -n '1,260p' codex-control-workspace/.wakeflow-active/index.md
+sed -n '1,320p' codex-control-workspace/.wakeflow-active/current/plugin-architecture-interface-refactor-workspace-plan-2026-05-31.md
+sed -n '1,260p' codex-control-workspace/.wakeflow-active/current/workspace-current-status.md
 sed -n '1,420p' AlembicDesign/docs/current/plugin-architecture-interface-refactor-*.md
 git status --short
 git submodule status

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-1",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-1-host-abstraction-unify-delete-generic",
+  "dispatchGroup": "dh1-plugin-host-abstraction",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-1",
+  "status": "needs-review",
+  "summary": "DH-1 host 抽象统一(RC-1) + 删 generic-host-agent(RC-5)。父仓 AlembicPlugin 改动已【直提 main commit 6cd4c889f1f9023c92efef61747c6e3ed9b25fe1】(基线 afbf25e，不开分支)。tsc --noEmit 绿；全量 unit 失败集与基线【逐文件 IDENTICAL(39 failed|86 passed，无 DH-1 回归)】；新增 1 个 RC-1 cc 派生证据单测。状态 needs-review 因 2 项需控制器决策(见 risks①②)。\n\n【RC-1 改点·父仓(已提交)】RuntimeContext.ts: 加 CLAUDE_CODE_PLUGIN_HOST 常量(对称 CODEX_PLUGIN_HOST)；新增 detectPluginHostShape()(物理 shell 形态探测：codex shell 旁挂 .mcp.json / cc shell 内联 .claude-plugin/plugin.json 且无 .mcp.json) + derivePluginHostFromShape()，作为 host identity 单一来源；ensureCodexRuntimeEnvironment 去 codex 硬默认(原:45)改 shape 派生(env 已声明则短路)；resolveHostRuntimeContext 的 expectedPluginHost(原:62 恒 codex)与 pluginHost 回退(原:69 || codex)均改 shape 派生。PluginRegistry.ts: readCodexPluginMcpDeclaration 形态判定下沉复用 detectPluginHostShape(单一来源，两侧 wire bytes 不变)。Diagnostics.ts:542 比较改 pluginHostValue===registry.context.expectedPluginHost(原恒 CODEX_PLUGIN_HOST)，并去掉随之未用的 CODEX_PLUGIN_HOST import。\n\n【RC-5 改点·父仓(已提交)】contract.ts:11 AGENT_HOSTS=[codex,claude-code]；cross-host-readiness.ts:58 删 generic label(satisfies Record<AgentHost> 强制)；mcp-tools.ts:103 内联 enum=[codex,claude-code](本地保留、不 import runtime/contract 以守 lib/shared 不依赖 lib/runtime 的层级，经 lint:repo-boundary 确认)；KnowledgeContextStatus.ts:29 KNOWLEDGE_CONTEXT_AGENT_HOSTS=[codex,claude-code](并删未实现且无消费者的 desktop/terminal/automation future-host stub)；测试 KnowledgeContextContracts.test.ts:26(改 toEqual 双宿主)与 AgentPublicToolsCrossHostReadiness.test.ts:16/35(仅同步 generic 维度)。全仓 grep generic-host-agent 已清零(改动仅这 6 文件)。\n\n【hostShape→identity 证据】新增 CodexRuntimeContext.test.ts 用例 'derives claude-code host identity from the Claude Code shell shape (RC-1)'：以 ALEMBIC_CODEX_PLUGIN_ROOT 指向 cc shell → expectedPluginHost=claude-code 且 pluginHost=claude-code；codex shell 仍 codex。该文件 11/11 绿。证明 cc 运行时自认 claude-code、codex 不回归。\n\n【边界遵守】未建 L3、未做 de-Codex 改名、未动 per-host 产物分叉(分属 DH-2/3/4)；未改 codex .mcp.json:8 与 codex bootstrap；四工具对外 MCP 语义不变；未下沉 Core；未碰 3 项漂移 skill/template 资产(归 DH-4)；AlembicCore 未动；纯 MCP 非强进程不变量不回退。",
+  "evidenceRefs": [
+    "父仓 commit 6cd4c889f1f9023c92efef61747c6e3ed9b25fe1 (直提 main；lib 7 文件 + test 3 文件；submodule 排除在外)",
+    "RC-1 lib: lib/runtime/runtime/RuntimeContext.ts (CLAUDE_CODE_PLUGIN_HOST + detectPluginHostShape/derivePluginHostFromShape + expectedPluginHost/pluginHost 由 shell 形态派生)",
+    "RC-1 lib: lib/runtime/PluginRegistry.ts readCodexPluginMcpDeclaration 复用 detectPluginHostShape",
+    "RC-1 lib: lib/runtime/diagnostics/Diagnostics.ts:540 pluginHost === registry.context.expectedPluginHost",
+    "RC-1 子模块(内容已改·未提交·flag): plugins/alembic-claude-code/.claude-plugin/plugin.json (删 ALEMBIC_CHANNEL_ID=codex、ALEMBIC_PLUGIN_HOST→claude-code) — 属 alembic-claude-code submodule = AlembicClaudeCode.git",
+    "RC-5 lib: contract.ts:11 / cross-host-readiness.ts:58 / mcp-tools.ts:103 / KnowledgeContextStatus.ts:29；grep -r generic-host-agent 全仓=0 残留",
+    "证据单测: test/unit/CodexRuntimeContext.test.ts (RC-1 cc 派生用例 + codex 不回归)",
+    "ALEMBIC_CHANNEL_ID 删除一致性: verify-codex-plugin.mjs:155 / verify-plugin-distribution.mjs:131 已断言其为 removed；CodexPluginCacheSync.test.ts:74 断言 undefined"
+  ],
+  "verification": [
+    "tsc --noEmit: exit 0(baseline 与 post-commit 两次均无错误输出)",
+    "全量 unit(vitest.unit.config): baseline 39 failed|86 passed → post-edit 39 failed|86 passed；stash 法逐文件 diff 失败集 = IDENTICAL(零 DH-1 回归)",
+    "受影响测试: CodexRuntimeContext 10→11 全绿(含 cc 派生证据)；KnowledgeContextContracts 绿(:26 toEqual([codex,claude-code]))",
+    "AgentPublicToolsCrossHostReadiness.test.ts 仍 2 failed = PRE-EXISTING MTC-7 沙箱基线(测试引用已退役 alembic_intent/alembic_work_start/alembic_work_finish/alembic_decision_record 及 TOOL_SCHEMAS.alembic_prime)；与 generic 无关、与 DH-1 无关，DH-1 仅同步其 generic 维度、未扩面修 MTC-7",
+    "cross-shell-drift: baseline 与 post-edit 均 1 issue(skills/alembic-recipes/SKILL.md = DH-0B/DH-4 漂移资产)，无新增 bin/ 漂移 → 印证 cc bootstrap 不应改",
+    "lint:repo-boundary: PASS(0/75 escape-hatch；lib/shared 未引入对 lib/runtime 的依赖)",
+    "biome lint(lib/bin/config/scripts): 0 error；16 warning 均为既有无关 scripts/ 文件，非本次改动"
+  ],
+  "risks": [
+    "需控制器决策①(cross-repo 子模块提交): cc manifest 改动(.claude-plugin/plugin.json)物理落在 alembic-claude-code 子模块(独立仓 AlembicClaudeCode.git)。task '直提 main' 指 AlembicPlugin 父仓，未涵盖子模块提交+gitlink。按本窗最高停止卡(未授权不改相邻仓/不 bump 子模块指针)，内容已改且已验证(cross-shell-drift 豁免 manifest)，但【未在子模块提交、未 bump 父仓 gitlink，子模块工作树当前 dirty】。请控制器决定: (A) 授权在子模块提交+父仓 bump gitlink 作为 DH-1 收尾; (B) 作为独立 cross-repo 步骤处理。注: cc 运行时 identity 已由 RuntimeContext 的 shell 形态派生(不依赖 manifest 内容)，manifest 改动仅使 Diagnostics 的 host 一致性检查在 cc shell 转绿。",
+    "需控制器知会②(偏离命名改点·保不变量): cc bootstrap(plugins/alembic-claude-code/bin/alembic-start.mjs:100)【未改】。理由: scripts/check-cross-shell-drift.mjs 强制 bin/(及 skills/、LICENSE)在两 shell 字节一致，host 分叉只允许在 per-host manifest(已豁免)；改 cc bootstrap 默认会新增一处 bin/ 漂移(架构明确禁止)且功能无意义(manifest 已声明 ALEMBIC_PLUGIN_HOST=claude-code，未声明时 ensureCodexRuntimeEnvironment 亦按 shell 派生)。若必须让 bootstrap 字面声明 claude-code，则需 per-host bootstrap 模型=DH-4 门禁 territory，超出 DH-1。已确认两 bootstrap 当前字节一致、cross-shell-drift 现红仅因 skills 漂移而非 bin/。",
+    "mcp-tools.ts:103 未按 task 字面'合并到 contract import'：因 lib/shared 不得依赖 lib/runtime(经 grep 确认 shared 从不 import runtime + lint:repo-boundary 强制)，故就地把内联 enum 收敛为 [codex,claude-code] 与 contract.AGENT_HOSTS 等价，避免层级反转。完成定义(generic 删净)已满足。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh1-plugin-host-abstraction__AlembicPlugin__DH-1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh1-plugin-host-abstraction__AlembicPlugin__DH-1.json",
+    "deliveryRunId": "run-delivery-dh1-plugin-host-abstraction__AlembicPlugin__DH-1",
+    "dispatchGroup": "dh1-plugin-host-abstraction",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh1-plugin-host-abstraction__AlembicPlugin__DH-1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 11,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-1-host-abstraction-unify-delete-generic",
+    "targetTaskId": "DH-1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh1-plugin-host-abstraction",
+    "resultId": "tr-DH-1",
+    "createdAt": "2026-06-19T16:35:17.337Z"
+  },
+  "createdAt": "2026-06-19T16:35:17.337Z",
+  "stateRevisionObserved": 11,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

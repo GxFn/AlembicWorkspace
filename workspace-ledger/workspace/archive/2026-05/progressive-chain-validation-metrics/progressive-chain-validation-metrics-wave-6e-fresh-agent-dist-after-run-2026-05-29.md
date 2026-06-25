@@ -179,7 +179,7 @@ skipGuard=true
 ```text
 继续当前总控任务：PCVM Wave 6E / fresh Agent dist after-run。
 
-先读：AGENTS.md、codex-control-workspace/.workspace-active/workspace/index.md、codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6e-fresh-agent-dist-after-run-2026-05-29.md，以及本窗口/目标仓库 AGENTS.md。
+先读：AGENTS.md、codex-control-workspace/.wakeflow-active/index.md、codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-6e-fresh-agent-dist-after-run-2026-05-29.md，以及本窗口/目标仓库 AGENTS.md。
 
 定位：声明你是 AlembicTest，本轮只做受保护真实 / 默认 AI after-run 验证，不修改产品源码。
 
@@ -201,7 +201,7 @@ skipGuard=true
   - 不能推出的结论：不能推出 full cold-start、全 N0-N14 baseline、Dashboard comparison UI 或真实 AI 输出稳定。
   - 停止或不开始条件：无法证明 dist fresh、找不到可保护测试目标 / 默认 AI 配置、需要打印 secret、需要修改真实项目业务源码、或只能用 product mock / 静态假数据替代。
 - 测试单：`Test-PCVM-W6E-ALEMBICTEST-FRESH-AGENT-DIST-AFTER-RUN`，已写入 `test-exchange.md`。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：`BiliDili` 只作为受保护真实测试目标，不直接分派、不修改业务源码、不提交其变更。
 
 ## 回填区
@@ -221,13 +221,13 @@ skipGuard=true
   "indexRows": [
     {
       "type": "PCVM Wave 6E fresh Agent dist after-run",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6e-fresh-agent-dist-after-run-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6e-fresh-agent-dist-after-run-2026-05-29.md",
       "status": "Wave 6E 总控验收通过 / 待 Wave 6F",
       "description": "fresh dist 后用户手动 Dashboard cold-start completed；runtime events 有 canonical identity，latest/session/persisted report 仍未承接 canonical pcvm identity；下一步优先派 Alembic 修 projection。"
     },
     {
       "type": "PCVM Wave 6D canonical node after-run",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6d-canonical-node-after-run-2026-05-29.md",
       "status": "Wave 6D 总控验收完成 / 转 Wave 6E",
       "description": "W6D 验证 canonical map 进入 runtime input，但当轮 Agent dist 陈旧；不能直接判定产品 report projection 失败。"
     }
@@ -235,7 +235,7 @@ skipGuard=true
   "currentIndexRows": [
     {
       "type": "PCVM Wave 6E fresh Agent dist after-run",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6e-fresh-agent-dist-after-run-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6e-fresh-agent-dist-after-run-2026-05-29.md",
       "description": "fresh Agent dist after-run 已通过总控验收；下一步进入 Wave 6F Alembic report / observability projection 返修。"
     }
   ]

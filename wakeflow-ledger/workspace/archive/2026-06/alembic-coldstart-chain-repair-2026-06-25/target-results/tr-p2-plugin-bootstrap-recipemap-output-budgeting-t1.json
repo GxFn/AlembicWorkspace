@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-bootstrap-recipemap-output-budgeting-t1",
+  "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+  "taskPackageId": "p2-plugin-bootstrap-recipemap-output-budgeting-p1",
+  "dispatchGroup": "p2-plugin-bootstrap-recipemap-output-budgeting-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-coldstart-chain-repair-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-bootstrap-recipemap-output-budgeting-t1",
+  "status": "completed",
+  "summary": "Implemented P2 output budgeting in AlembicPlugin: shared transient transport, alembic_bootstrap meta.fullBriefingRef budgeting, alembic_recipe_map meta.fullMapRef budgeting, clean-output/schema allow-list updates, targeted tests, build check, large fixture probe, and commit 5be4be6.",
+  "evidenceRefs": [
+    "commit:5be4be6",
+    "probe:/private/tmp/alembic-plugin-p2-output-budget-probe.mjs bootstrap.inlineBytes=20316 fullRefExists=true fullRefBytes=418470 recipeMap.inlineBytes=19910 fullRefExists=true fullRefBytes=239355 maxInlineSourceRefs=0",
+    "test:npm run test:unit -- test/unit/RecipeMapTool.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts => 22 passed",
+    "test:npm run test:unit -- test/unit/HostMcpServer.test.ts -t \"Codex host-agent bootstrap runs\" => 1 passed, 41 skipped",
+    "build:npm run build:check => passed",
+    "check:git diff --check => passed",
+    "rg:git diff -- lib | rg \"recipeCount|evidenceGate|candidateDimensions|fullTreeRef\" => no matches",
+    "guard:alembic_code_guard unavailable as code review evidence because tool returned clean-output schema internal error: unrecognized key data"
+  ],
+  "verification": [
+    "bootstrap large MCP structuredContent inline <=20KB and exposes readable meta.fullBriefingRef during probe/test",
+    "recipe_map normal fixture inline <=20KB with fullMapRef null; large source-ref fixture inline <=20KB and exposes readable meta.fullMapRef with full details restored",
+    "clean-output contract preserves fullBriefingRef/fullMapRef metadata keys",
+    "alembic_plan two-part transport semantics reused shared writer only; no candidateDimensions/fullTreeRef semantic changes detected"
+  ],
+  "risks": [
+    "Bootstrap single-dimension real HostMcpServer path still exceeds the inline threshold before budgeting because P1 final response data includes large plan/gate/briefing detail; it correctly takes the fullBriefingRef path rather than proving a small untruncated bootstrap path."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-bootstrap-recipemap-output-budgeting-p1__AlembicPlugin__p2-plugin-bootstrap-recipemap-output-budgeting-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-bootstrap-recipemap-output-budgeting-p1__AlembicPlugin__p2-plugin-bootstrap-recipemap-output-budgeting-t1.json",
+    "deliveryRunId": "run-delivery-p2-plugin-bootstrap-recipemap-output-budgeting-p1__AlembicPlugin__p2-plugin-bootstrap-recipemap-output-budgeting-t1",
+    "dispatchGroup": "p2-plugin-bootstrap-recipemap-output-budgeting-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-bootstrap-recipemap-output-budgeting-p1__AlembicPlugin__p2-plugin-bootstrap-recipemap-output-budgeting-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-coldstart-chain-repair-2026-06-25",
+    "stateRevision": 12,
+    "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+    "taskPackageId": "p2-plugin-bootstrap-recipemap-output-budgeting-p1",
+    "targetTaskId": "p2-plugin-bootstrap-recipemap-output-budgeting-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-bootstrap-recipemap-output-budgeting-p1",
+    "resultId": "tr-p2-plugin-bootstrap-recipemap-output-budgeting-t1",
+    "createdAt": "2026-06-24T21:26:58.237Z"
+  },
+  "createdAt": "2026-06-24T21:26:58.237Z",
+  "stateRevisionObserved": 12,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -4,7 +4,7 @@ Date: 2026-06-06
 Window: AlembicPlugin
 Task: AFAPI-REQ-07-SCOPED-CODE-GUARD-RUNTIME-GOLDEN-T3
 Dispatch group: AFAPI-REQ-07-SCOPED-CODE-GUARD-RUNTIME-GOLDEN-GROUP
-State root: codex-control-workspace/.workspace-active/workspace/current/afapi-req-07-scoped-code-guard
+State root: codex-control-workspace/.wakeflow-active/current/afapi-req-07-scoped-code-guard
 
 ## Scope
 

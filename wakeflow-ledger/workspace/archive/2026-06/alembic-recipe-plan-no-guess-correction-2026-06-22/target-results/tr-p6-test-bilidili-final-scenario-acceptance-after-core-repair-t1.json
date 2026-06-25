@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+  "dispatchGroup": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "Test",
+  "targetTaskId": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+  "status": "blocked",
+  "summary": "Core checkpoint-empty-initialization repair is active in the runtime and the after-core BiliDili final scenario advanced the checkpoint from confirmed Plan baseline 56c31cedbb736066543ab479e8390030a8744423 to controlled commit 0d0f58e85855c04b5bac04bd022eddc930d97632, with git diff evidence A/M/R and modified-source proposal plus rename repair in the rescan response. Final acceptance remains blocked because the created file Sources/Features/RG10AcceptanceProbe/index.swift was classified as coveredCreated and no moduleMining route was created: classificationCounts.moduleMiningRoutes=0, moduleMiningRoutes=[], generationChangeLog has only source-modified-review-needed and source-ref-repaired. Owner attribution: AlembicPlugin FileChangeHandler #handleCreated returns early for any created file whose moduleId is already in coveredModules (FileChangeHandler.ts lines 401-417), while the accepted scenario requires this new module/file to route through file-level moduleMining.",
+  "evidenceRefs": [
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/p6-test-bilidili-final-scenario-acceptance-after-core-repair-20260623/run-p6-bilidili-final-acceptance-after-core-repair.mjs",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/p6-test-bilidili-final-scenario-acceptance-after-core-repair-20260623/run1/evidence/summary.json",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/p6-test-bilidili-final-scenario-acceptance-after-core-repair-20260623/run1/evidence/14-controlled-git-diff.json",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/p6-test-bilidili-final-scenario-acceptance-after-core-repair-20260623/run1/evidence/15-rescan-module-mining-evolution.json",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/p6-test-bilidili-final-scenario-acceptance-after-core-repair-20260623/run1/evidence/18-db-snapshot.json",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/evolution/FileChangeHandler.ts:401",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/FileChangeHandler.test.ts:591",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/src/service/evolution/GitDiffCheckpointService.ts:115",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/evolution/git-diff-checkpoint/DurableGitDiffCheckpointRouting.ts:109"
+  ],
+  "verification": [
+    "Ran: node /Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/p6-test-bilidili-final-scenario-acceptance-after-core-repair-20260623/run-p6-bilidili-final-acceptance-after-core-repair.mjs from /Users/gaoxuefeng/Documents/AlembicWorkspace/Test; exit code 1 due to exactly one failed check: new module routed through moduleMining path.",
+    "Runtime evidence: AlembicPlugin node_modules/@alembic/core resolves to AlembicCore; /Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/dist/service/evolution/GitDiffCheckpointService.js contains the empty-checkpoint repair marker, and summary.runtimeEvidence.coreRuntimeHasEmptyCheckpointRepair=true.",
+    "Repositories at run time were clean and pinned: AlembicCore 313d7ccced63a3fe83cd1e9ac1f3097c0c061bb4, AlembicPlugin e70bbd95eaa9f1d0da16936cd1579829cf0b5565, Alembic eaa53198946702d622ffc2feeadae6cc264a4854, AlembicDashboard e18444a50353c404bace7f47c176f691d64c3983, original BiliDili a3ea6a2519b0cbd39cee76b32ad844eae0e5feec; git status --short empty for checked product repos.",
+    "Controlled isolated BiliDili diff: baseline 56c31cedbb736066543ab479e8390030a8744423, changed 0d0f58e85855c04b5bac04bd022eddc930d97632, git diff name-status A Sources/Features/RG10AcceptanceProbe/index.swift, M Sources/Infrastructure/Networking/Repository/FeedRepository.swift, R100 VideoRepository.swift to VideoRepositoryRenamed.swift.",
+    "Passing scenario evidence: Plan draft/confirm truthfulness passed with no recommendation/top/subset planning aids; submitted 3 source-grounded recipes; recipe_map/search/prime retrieval worked while vector unavailable surfaced degraded/non-final/retrievalMayBeStale; legacy selectedDimensions-only confirm rejected; gitDiffEvidence eventCount=3 with previousHead baseline; checkpoint response routeStatus=routed and advanced=true.",
+    "Failing scenario evidence: 15-rescan-module-mining-evolution.json has classificationCounts.created=1, coveredCreated=1, moduleMiningRoutes=0 and moduleMiningRoutes=[] for Sources/Features/RG10AcceptanceProbe/index.swift."
+  ],
+  "risks": [
+    "Acceptance cannot mark P6 complete: accepted F2 requires the new module/file change to route through moduleMining, but actual Plugin behavior treats it as coveredCreated and exits before moduleMining.",
+    "Raw DB snapshot shows a persistence discrepancy after the same rescan: git_diff_checkpoints checkpoint_commit advanced to 0d0f58e85855c04b5bac04bd022eddc930d97632 but last_route_status remains skipped / no dispatchable file events, while response checkpoint routeStatus is routed.",
+    "Raw DB snapshot also shows recipe_source_refs for the renamed VideoRepository recipe as stale old source_path with new_path=null, despite rescan response generationChangeLog reporting source-ref-repaired to VideoRepositoryRenamed.swift:44-61. Controller should treat rename repair as response-level pass with DB persistence risk pending owner review."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1.json",
+    "deliveryRunId": "run-delivery-p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+    "dispatchGroup": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1__Test__p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 65,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+    "targetTaskId": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "p6-test-bilidili-final-scenario-acceptance-after-core-repair-p1",
+    "resultId": "tr-p6-test-bilidili-final-scenario-acceptance-after-core-repair-t1",
+    "createdAt": "2026-06-22T18:12:58.224Z"
+  },
+  "createdAt": "2026-06-22T18:12:58.224Z",
+  "stateRevisionObserved": 65,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

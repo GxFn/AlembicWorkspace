@@ -26,11 +26,11 @@
 
 样本 state root：
 
-- `.workspace-active/workspace/current/afapi-full-17-dashboard-diagnostics-ui-state-machine-audit-2026-06-05/`
-- 开发者推进文档：`.workspace-active/workspace/current/afapi-full-17-dashboard-diagnostics-ui-state-machine-audit-2026-06-05/developer-progress.md`
+- `.wakeflow-active/current/afapi-full-17-dashboard-diagnostics-ui-state-machine-audit-2026-06-05/`
+- 开发者推进文档：`.wakeflow-active/current/afapi-full-17-dashboard-diagnostics-ui-state-machine-audit-2026-06-05/developer-progress.md`
 - 证据来源：`workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-11-dashboard-runtime-diagnostics-ui-landing-2026-06-05.md`
 
-该 state root 位于 ignored `.workspace-active`，不进入开源仓库提交；tracked 仓库只承载模板、schema、脚本、skill 和测试。
+该 state root 位于 ignored `.wakeflow-active`，不进入开源仓库提交；tracked 仓库只承载模板、schema、脚本、skill 和测试。
 
 ## 真实链路验证
 
@@ -136,7 +136,7 @@
 
 通过的边界：
 
-- `.workspace-active` / `.workspace-local` 继续作为 ignored 本机 / 项目运行态；开源仓库只提交模板、schema、脚本、skill、fixtures 和测试。
+- `.wakeflow-active` / `.wakeflow-local` 继续作为 ignored 本机 / 项目运行态；开源仓库只提交模板、schema、脚本、skill、fixtures 和测试。
 - 自动化 JSON 不解析 `developer-progress.md`，只读取 `controller-state.json` / task package JSON / local runtime JSON。
 - 缺真实 thread id 时，`--require-thread` fail closed；无 host send/readback 时只能记录 blocked，不允许伪装 sent。
 - target result、review pack、delivery run 均不能关闭任务或完成需求。
@@ -148,7 +148,7 @@
 - 未真实发送 direct-thread 消息，因为本次没有注册真实测试目标线程；用 blocked delivery 证明 fail-closed 边界。
 - 未修改 Alembic / AlembicPlugin / AlembicDashboard / AlembicCore 等产品仓库。
 - 未清理 `BiliDili/.agents/skills` residue；这是既有真实项目 residue，需要用户另行裁决。
-- 未迁移历史 `.workspace-active` current docs / global TODO / Design inbox；该方向仍是历史减量迁移问题。
+- 未迁移历史 `.wakeflow-active` current docs / global TODO / Design inbox；该方向仍是历史减量迁移问题。
 
 ## 复杂度与精简判断
 

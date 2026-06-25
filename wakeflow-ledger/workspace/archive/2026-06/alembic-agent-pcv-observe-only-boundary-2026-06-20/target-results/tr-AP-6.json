@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-AP-6",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "taskPackageId": "ap-6-main-consumer-audit-semantics",
+  "dispatchGroup": "ap6-main-consumer-audit",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+  "targetWindow": "Alembic",
+  "targetTaskId": "AP-6",
+  "status": "completed",
+  "summary": "AP-6（主体消费方据上游 AP-4 标记把 grounding ledger summary 改判审计语义）。基线 40b877b → main 提交 016f6bb（直提 main，2 文件 +108/-2，tree clean）。仅改 PcvNodeEvidence.ts 消费判读 additive + 新单测；不碰 AlembicAgent/DimensionRuntimeBuilder/AgentRunInputBuilders。\n\n【实现】buildPcvAnalyzeGroundingLedgerSummary 读 result.pcvNodeEvidence.groundingEnforcement（经 @alembic/agent symlink dist PcvNodeEvidence.d.ts:138 可达，未 rebuild/改 Agent）：\n- observe-only('off')：增多的 invalid-no-evidence 记为审计材料，不推 missingLinkReasons('analyze_grounding_invalid_no_evidence')、不降级 status（R6 不误判回归）。\n- guard('guard') 或标记缺失：保持原质量判定（invalid-no-evidence 仍是真实信号）。\n- 纯 additive：新增 collectPcvAnalyzeGroundingEnforcement helper（与 ledger collector 同源遍历）+ 可选输出字段 groundingEnforcement（缺失省略）+ observe-only summary 文案；既有字段未改名/删；invalidNoEvidenceCount/classifications 计数始终保留作审计材料；缺失标记=向后兼容原行为（保既有测试绿）。\n\n【两模式语义断言】test/unit/PcvNodeEvidence.test.ts（固定 ledger=1 evidence-produced+1 invalid-no-evidence，只改 enforcement）：off→missingLinkReasons 不含该 reason + status 'linked' + groundingEnforcement 'off' + summary 含 'audit material'；guard→含 reason + 'partial-evidence' + 'guard'；absent→含 reason + 'partial-evidence' + 字段省略。3 passed。\n\n【验证 Node v22.22.1（.nvmrc=22）】build:check（Core build + 主仓 tsc --noEmit）exit 0；test:unit 975 passed|4 skipped exit 0（含新 3 测 + 受影响 AiDimensionFinalizer/BootstrapDimensionConsumer 零回归）；biome 改动文件 clean；lint:repo-boundary/core-import-boundary/consumer-core-imports/agent-extraction-boundary pass；跨仓类型解析 OK。\n\n【完成自检】observe-only 不误判回归 ✓ / guard 原判定 ✓ / 契约字段未破（additive 可选字段）✓ / 跨仓 build + full unit test 绿 ✓。\n\n【边界】只改 PcvNodeEvidence.ts；不碰 AlembicAgent（未 rebuild/改）；不碰 DimensionRuntimeBuilder/AgentRunInputBuilders（AP-7）；AlembicCore 不动。",
+  "evidenceRefs": [
+    "Alembic main commit 016f6bb feat(pcv): AP-6 consume groundingEnforcement marker — observe-only grounding ledger as audit, not regression (baseline 40b877b; 2 files +108/-2; tree clean)",
+    "upstream reachability: Alembic/node_modules/@alembic/agent -> AlembicAgent symlink; dist/agent/runtime/PcvNodeEvidence.d.ts:138 groundingEnforcement:'off'|'guard' (AP-4 commit 8118dbe; NOT rebuilt/modified)",
+    "two-mode+absent unit: test/unit/PcvNodeEvidence.test.ts 3 passed (off→no regression+status linked; guard→reason+partial-evidence; absent→backward-compat original)",
+    "no-regression: test/unit/AiDimensionFinalizer.test.ts (10) + test/unit/BootstrapDimensionConsumer.test.ts (10) green — fixtures lack the marker so original behavior preserved",
+    "changed files: lib/workflows/ai-execution/PcvNodeEvidence.ts (M) + test/unit/PcvNodeEvidence.test.ts (new) only"
+  ],
+  "verification": [
+    "Node v22.22.1 (.nvmrc=22) for all gates",
+    "npm run build:check: exit 0 (Core build via ../AlembicCore + main tsc --noEmit; cross-repo @alembic/agent type resolution OK, no TS errors)",
+    "npm run test:unit: 975 passed | 4 skipped, exit 0 (full main unit suite incl. new AP-6 two-mode assertions)",
+    "npx biome check (PcvNodeEvidence.ts + test): clean, no fixes; pre-commit lint-staged biome check/format ran clean",
+    "lint:repo-boundary PASS; lint:core-import-boundary + lint:consumer-core-imports OK (scanned 365 files); lint:agent-extraction-boundary exit 0",
+    "git status: only the 2 intended files changed; git diff --check: no whitespace errors"
+  ],
+  "risks": [
+    "PRE-EXISTING (NOT AP-6): npm run lint:layer-contract exits 1 with 6 violations in unrelated files (project-context area undeclared + BootstrapRefine service→injection + AiDimensionPipeline/ProjectContextWorkflowFacts workflows→infrastructure). Proven IDENTICAL with/without this change via git-stash A/B; none reference PcvNodeEvidence.ts. Out of AP-6 scope (forbidden unrelated refactor) — flagged for controller routing if a separate layer-contract cleanup is wanted.",
+    "DEFAULT-SEMANTICS decision to confirm: an ABSENT groundingEnforcement marker is treated as original judgment (NOT observe-only). Rationale: upstream type now REQUIRES the marker so real PCV runs carry it; absence only occurs for legacy/foreign data where original behavior is correct, and this keeps the change purely additive (existing marker-less fixtures stay green). If product intends absent→observe-only under the default-off world, flag and I will flip the default.",
+    "AUDIT-FIELD decision to confirm: added an optional output field groundingEnforcement to PcvAnalyzeGroundingLedgerSummary for audit traceability (slightly beyond 'read+branch'). Additive and verified non-breaking (omitted when absent; all downstream assertions are toMatchObject/partial). If the controller prefers zero output-shape change, it can be reduced to a pure internal branch."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-ap6-main-consumer-audit__Alembic__AP-6",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap6-main-consumer-audit__Alembic__AP-6.json",
+    "deliveryRunId": "run-delivery-ap6-main-consumer-audit__Alembic__AP-6",
+    "dispatchGroup": "ap6-main-consumer-audit",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap6-main-consumer-audit__Alembic__AP-6.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 26,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "taskPackageId": "ap-6-main-consumer-audit-semantics",
+    "targetTaskId": "AP-6",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "ap6-main-consumer-audit",
+    "resultId": "tr-AP-6",
+    "createdAt": "2026-06-20T14:54:48.977Z"
+  },
+  "createdAt": "2026-06-20T14:54:48.977Z",
+  "stateRevisionObserved": 26,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

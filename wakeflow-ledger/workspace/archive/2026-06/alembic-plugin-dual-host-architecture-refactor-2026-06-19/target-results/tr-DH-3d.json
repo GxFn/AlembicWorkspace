@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-3d",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-3d-decodex-rename-migration-finale",
+  "dispatchGroup": "dh3d-plugin-decodex-finale",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-3d",
+  "status": "needs-review",
+  "summary": "DH-3d 首批 de-Codex 改名（ServiceRequestBoundary，host-agnostic 服务边界面）完成+验证+【commit ca1f9ab3b24c018c756b1c2ff8e5d1818c454936】（基线 f38e268，纯父仓）；并带回关键 SCOPE FINDING：de-Codex 真实面是 task 估算的 ~4-5 倍，需控制器 re-scope 决策。\n\n【交付（首批，已提交）】ServiceRequestBoundary host-agnostic 面去 Codex 前缀（plugin-owned vs resident-service 路由，与 host 无关）：CodexServiceBoundary{Owner,ExecutionPath,Decision}→ServiceBoundary*；resolveCodexServiceRequestBoundary→resolveServiceRequestBoundary；attachCodexServiceBoundary→attachServiceBoundary；isPluginOwnedCodexFacingTool→isPluginOwnedTool。5 文件全 ref 更新（ServiceRequestBoundary/results/embedded-executor/HostMcpServer/单测）。纯改名、行为不变。tsc 绿；旧名 grep=0；失败集与基线 IDENTICAL（39）。\n\n【⚠️ SCOPE FINDING（需控制器决策，重要）】2 个 Explore 子代理测绘 + grep 核实：de-Codex 真实面 = lib（excl host-adapter）【268 个 distinct Codex*/CODEX_* 标识符】（含须保留的 host-specific），其中【~150 个须去前缀、255+ 引用、~20 文件】——远超 task 估算的「~52/65」（4-5 倍）。【且有 collision】：CODEX_AGENT_PUBLIC_TOOL_NAMES 不能去前缀为 AGENT_PUBLIC_TOOL_NAMES（contract.ts 已存在同名 host-agnostic 导出）。这是多会话机械重构，非单次 finale。\n\n【建议（需控制器决策）】功能性双宿主架构已 DONE（DH-1/2/3.1/3b/3c：L3 adapter 体系 + host-branch 清零 + cc adapter + cc 项目根可信）；de-Codex 是纯命名整洁（去误导前缀），非功能能力。请控制器决定 DH-3e 范围：(A) 专设多批 de-Codex（每模块一批、tsc 绿即 commit，DH-3e/f/...）；(B) 定义有界子集；(C) 鉴于功能已达成，推迟/降优先 cosmetic de-Codex。并处理 collision。完整测绘清单（symbol→新名→refs）已由本窗 2 个 Explore agent 产出，可供 DH-3e 直接执行。\n\n【flag DH-3e 余项】批1 余 ~149 符号 de-Codex + 批2（Preflight/StatusService/host-agent-workflows host-operation routing，含 buildHostProjectAlignment）+ 批3（真 host-specific 函数体物理迁入 CodexHostAdapter，去委托外观，保 F-V2-2 wire-byte）；cosmetic 文件名（如 CodexServiceRequestBoundary.test.ts）未改。\n\n【边界遵守】host-name 分支仍仅 L3；未动 per-host 产物/cc 子模块/3 漂移资产；AlembicCore 不动；codex .mcp.json:8 不变；纯 MCP 非强进程不变量不回退；四工具对外 MCP 语义不变。",
+  "evidenceRefs": [
+    "父仓 commit ca1f9ab3b24c018c756b1c2ff8e5d1818c454936 (直提 main，基线 f38e268；改 5 文件，纯父仓)",
+    "首批改名: CodexServiceBoundary{Owner,ExecutionPath,Decision}→ServiceBoundary*; resolveCodexServiceRequestBoundary→resolveServiceRequestBoundary; attachCodexServiceBoundary→attachServiceBoundary; isPluginOwnedCodexFacingTool→isPluginOwnedTool (lib/runtime/ServiceRequestBoundary.ts + results.ts + embedded-executor.ts + HostMcpServer.ts + test)",
+    "SCOPE FINDING: grep distinct Codex*/CODEX_* in lib(excl host-adapter)=268; ~150 须去前缀 / 255+ refs / ~20 文件 (2 Explore agent 测绘)",
+    "COLLISION: CODEX_AGENT_PUBLIC_TOOL_NAMES → AGENT_PUBLIC_TOOL_NAMES 与 contract.ts 现有 host-agnostic 导出冲突"
+  ],
+  "verification": [
+    "tsc --noEmit: exit 0",
+    "旧 ServiceBoundary 名 grep=0 (CodexServiceBoundary/resolveCodexServiceRequestBoundary/attachCodexServiceBoundary/isPluginOwnedCodexFacingTool 全去)",
+    "全量 unit: 失败集与基线(39 pre-existing)逐文件 IDENTICAL → 无回归; 纯改名行为不变",
+    "biome lint 0 error(16 既有 warning, import 排序已 --fix); CodexServiceRequestBoundary 单测过"
+  ],
+  "risks": [
+    "需控制器 re-scope 决策(关键): DH-3d 按 task '~52/65' 估算为单次 finale，但实测 de-Codex 面=268 distinct 标识符 / ~150 去前缀 / 255+ refs / ~20 文件(4-5 倍)，是多会话机械重构。请决定 DH-3e: (A) 专设多批 de-Codex(每模块一批、tsc 绿即 commit); (B) 有界子集; (C) 鉴于功能双宿主已 DONE(L3 adapter+host 分支清零+cc adapter+cc 项目根)、de-Codex 为纯 cosmetic，推迟/降优。完整测绘清单已由 2 Explore agent 产出。",
+    "需处理 collision: CODEX_AGENT_PUBLIC_TOOL_NAMES 去前缀与 contract.ts AGENT_PUBLIC_TOOL_NAMES 冲突; 需定名(如保留前缀 / TOOL_POLICY_AGENT_PUBLIC_TOOL_NAMES)。",
+    "flag DH-3e: 批1 余 ~149 符号 de-Codex + 批2 routing(Preflight/StatusService/host-agent-workflows 含 buildHostProjectAlignment 需加接口方法) + 批3 物理迁入(F-V2-2 wire-byte 敏感); cosmetic 测试文件名未改。cc 真实验收在 DH-6。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh3d-plugin-decodex-finale__AlembicPlugin__DH-3d",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3d-plugin-decodex-finale__AlembicPlugin__DH-3d.json",
+    "deliveryRunId": "run-delivery-dh3d-plugin-decodex-finale__AlembicPlugin__DH-3d",
+    "dispatchGroup": "dh3d-plugin-decodex-finale",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3d-plugin-decodex-finale__AlembicPlugin__DH-3d.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 31,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-3d-decodex-rename-migration-finale",
+    "targetTaskId": "DH-3d",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh3d-plugin-decodex-finale",
+    "resultId": "tr-DH-3d",
+    "createdAt": "2026-06-20T05:24:23.425Z"
+  },
+  "createdAt": "2026-06-20T05:24:23.425Z",
+  "stateRevisionObserved": 31,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

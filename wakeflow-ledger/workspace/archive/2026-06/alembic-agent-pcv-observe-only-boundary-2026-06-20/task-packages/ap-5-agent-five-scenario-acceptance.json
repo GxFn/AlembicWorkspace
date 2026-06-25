@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "ap-5-agent-five-scenario-acceptance",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "summary": "AP-5（AlembicAgent 五场景测试 + Agent 侧端到端验收）。PCV observe-only 边界收敛第 6 步（AP-5∥AP-6∥AP-7 并行波之 Agent 路）。上游 AP-1~4 全落（HEAD 8118dbe）：ProviderToolChoicePolicy/AnalyzeGroundingGuard 抽取 + groundingEnforcement 默认 off(per-run guard opt-in) + PcvNodeEvidenceSummary additive enforcement-mode 标记。范围=从 Agent 侧补齐/固化五场景集成测试、验收 PCV observe-only 边界端到端正确。完成定义=五场景全绿 + 全量 vitest 0 failed + Node 22 四门禁(build/build:check/lint/core-import-boundary)绿。不变量：provider 不被 grounding 门控、guard 内部不改、PcvNodeEvidence 纯观察、四工具/LLM 对外语义不变。",
+  "status": "pending",
+  "sourceRef": "需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md 相位表 AP-5（line 179）：AlembicAgent 五场景测试 + Agent 侧验收；上游=AP-4（HEAD 8118dbe）；完成=observe-only/guard/DeepSeek V4/graceful exit/无证据 analyze 测试全绿。四控制点 CP1-CP4 file:line 见 AP-0 tr-ap-0 表征锚点。",
+  "createdAt": "2026-06-20T14:35:37.265Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "AP-5",
+      "taskPackageId": "ap-5-agent-five-scenario-acceptance",
+      "targetWindow": "AlembicAgent",
+      "summary": "本窗口=AlembicAgent（仓 ~/Documents/AlembicWorkspace/AlembicAgent，基线 HEAD=8118dbe=AP-4，main 直提）。先读父 CLAUDE.md + 本仓 CLAUDE.md + 状态根 + 需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md，声明窗口/仓库身份，仅领 AP-5。\n\n任务=补齐/固化 AlembicAgent 侧五场景集成测试，断言落在可观察 seam（assembled LLM input / provider 收到的 toolChoice / 工具调用抑制 / analyze 阻断+nudge），验收 PCV observe-only 边界：\n① observe-only（默认 off）：analyze 不阻断、provider toolChoice 不受 grounding 影响、PcvNodeEvidence 仍记 classification 作审计、summary.groundingEnforcement='off'；\n② guard opt-in（per-run groundingEnforcement='guard'）：恢复 CP1 grounding-policy 文本注入 + CP4 invalid-no-evidence 阻断+nudge+rollbackTick；summary 标记='guard'；\n③ DeepSeek V4：analyze 首轮 toolChoice none→auto + schema 可见（CP2），provider 正确性两模式一致、不被 grounding 门控（PD1）；\n④ graceful exit：抑制例外路径（CP3 deepseekV4ToolChoiceMode）正确；\n⑤ 无证据 analyze：off 下照常首轮终结、guard 下阻断+nudge。\n\n已有 test/pcv-observe-only-baseline.characterization.test.ts（14 例两模式表征，AP-0~4）可复用/扩展为五场景显式集合；如已覆盖则固化命名并补缺口，不重复造轮子。\n\n验证（Node 22，nvm use 22）：五场景测试全绿 + npm test 全量 0 failed + npm run build/build:check/lint/lint:core-import-boundary 全绿。\n完成自检：五场景端到端覆盖、provider 两模式一致、不改 guard 内部/provider 门控/PcvNodeEvidence 纯观察。\n回填 TargetResultEnvelope：commit hash + 五场景测试名与结果 + vitest 计数 + 四门禁输出；如发现真实缺口（非新需求）标注来源。returnRoute=controller 回 AlembicWorkspace。",
+      "status": "pending",
+      "createdAt": "2026-06-20T14:35:37.265Z"
+    }
+  ]
+}

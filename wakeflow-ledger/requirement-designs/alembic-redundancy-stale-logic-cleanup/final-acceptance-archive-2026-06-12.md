@@ -18,7 +18,7 @@ Controller: AlembicWorkspace. User authorization: claim + unattended automation
 | RC7 final acceptance & archive | Alembic (p1) + AlembicWorkspace (p2) | 1bd60af | this demand | p1: DynamicComposer root-cause (intentional D23 contract masked by stale linked dist; pins updated, zero production code) + strict-gate flag removal; p2: final gate sweep + this archive. |
 
 Event-level acceptance records live in each state root's `controller-events.jsonl`
-under `.workspace-active/workspace/current/alembic-redundancy-stale-logic-cleanup-*/`.
+under `.wakeflow-active/current/alembic-redundancy-stale-logic-cleanup-*/`.
 
 ## Final Gate Sweep (RC7 p2, raw logs in the RC7 state root `evidence/raw/`)
 

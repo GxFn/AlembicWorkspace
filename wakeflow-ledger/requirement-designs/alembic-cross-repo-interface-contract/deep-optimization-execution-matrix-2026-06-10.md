@@ -8,7 +8,7 @@ Status: controller-produced input for D9-D14. This matrix authorizes product-win
 
 ## Controller Gates
 
-- D7 status was verified from `.workspace-active/workspace/current/alembic-interface-contract-d7-acceptance-cleanup/wakeflow-state.json`: state `completed`, revision `12`, no blockers or missing target results.
+- D7 status was verified from `.wakeflow-active/current/alembic-interface-contract-d7-acceptance-cleanup/wakeflow-state.json`: state `completed`, revision `12`, no blockers or missing target results.
 - D8 inputs reviewed: D0 inventory, D1 ADR and registry, accepted D2-D7 target result envelopes, D7 final acceptance state, and current source scans across AlembicCore, AlembicAgent, Alembic, AlembicPlugin, and AlembicDashboard.
 - Version and long-term evolution strategy remain deferred.
 - Preserve full existing functionality. A candidate may be deleted only with no-consumer proof, connected replacement proof, and representative validation evidence.

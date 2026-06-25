@@ -27,11 +27,11 @@ at a time when total control claims the next demand.
 - Post-D14 real-code analysis and landing-plan basis: [post-d14-interface-governance-real-code-analysis-2026-06-10.md](post-d14-interface-governance-real-code-analysis-2026-06-10.md)
 - Design requirement: [../../../Design/docs/current/alembic-cross-repo-interface-contract-requirement-design-2026-06-09.md](../../../Design/docs/current/alembic-cross-repo-interface-contract-requirement-design-2026-06-09.md)
 - Design handoff: [../../../Design/docs/current/alembic-cross-repo-interface-contract-workspace-handoff-2026-06-09.md](../../../Design/docs/current/alembic-cross-repo-interface-contract-workspace-handoff-2026-06-09.md)
-- Current controller status: [../../../.workspace-active/workspace/current/workspace-current-status.md](../../../.workspace-active/workspace/current/workspace-current-status.md)
+- Current controller status: [../../../.wakeflow-active/current/workspace-current-status.md](../../../.wakeflow-active/current/workspace-current-status.md)
 
 ## Controller Artifacts
 
-- D0 accepted inventory evidence: [../../../.workspace-active/workspace/current/alembic-interface-contract-d0-inventory/evidence/contract-inventory-2026-06-09.md](../../../.workspace-active/workspace/current/alembic-interface-contract-d0-inventory/evidence/contract-inventory-2026-06-09.md)
+- D0 accepted inventory evidence: [../../../.wakeflow-active/current/alembic-interface-contract-d0-inventory/evidence/contract-inventory-2026-06-09.md](../../../.wakeflow-active/current/alembic-interface-contract-d0-inventory/evidence/contract-inventory-2026-06-09.md)
 - D1 contract registry: [contract-registry-2026-06-09.json](contract-registry-2026-06-09.json)
 - D1 source-of-truth ADR: [source-of-truth-adr-2026-06-09.md](source-of-truth-adr-2026-06-09.md)
 - Final governance acceptance archive: [final-governance-acceptance-archive-2026-06-10.md](final-governance-acceptance-archive-2026-06-10.md)

@@ -79,7 +79,7 @@ This recommendation is for Wakeflow review only. It is not an execution-window p
 
 ## Evidence And Links
 
-- Existing state root: `../.workspace-active/workspace/current/alembic-mcp-clean-output-contract/`
+- Existing state root: `../.wakeflow-active/current/alembic-mcp-clean-output-contract/`
 - Original plan: `Design/docs/current/alembic-mcp-clean-output-contract-original-plan-2026-06-08.md`
 - Requirement design: `Design/docs/current/alembic-mcp-clean-output-contract-requirement-design-2026-06-08.md`
 - Handoff: `Design/docs/current/alembic-mcp-clean-output-contract-workspace-handoff-2026-06-08.md`

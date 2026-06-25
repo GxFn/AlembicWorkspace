@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-co4-core-internalize-cleared-legacy-routes-alembiccore-2026-06-21",
+  "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+  "taskPackageId": "co-4-core-internalize-cleared-legacy-routes",
+  "dispatchGroup": "co4-core-internalize-cleared-legacy-routes",
+  "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "CO-4",
+  "status": "completed",
+  "summary": "AlembicCore CO-4 completed in commit 0f7af28a7ad8fc9f2ba0b934da11c7413f9ab4d3. Retired only the cleared legacy package public routes ./core/capability, ./core/enhancement, and ./recipe-context from package.json, public-api-boundary policy, smoke coverage, and contract-spine required legacy exports. Replacement routes remain public and verified: ./capability, ./enhancement, ./test-fixtures, ./project-context-capabilities, and ./recipe-context-capabilities. Core implementation files remain for internal wiring/tests; no sibling repositories, vendor snapshots, release pointers, ProjectContext public route, AST/analysis/discovery/project-intelligence routes, Plugin residuals, or RecipeContext detail/search/prime/relations kinds were changed or reclassified.",
+  "evidenceRefs": [
+    "commit:0f7af28a7ad8fc9f2ba0b934da11c7413f9ab4d3",
+    "AlembicCore/package.json",
+    "AlembicCore/config/public-api-boundary.json",
+    "AlembicCore/scripts/smoke-public-api.mjs",
+    "AlembicCore/src/recipe-context.ts",
+    "AlembicCore/src/shared/CoreContractSpine.ts",
+    "AlembicCore/test/PublicResidualReadinessEntrypoints.test.ts",
+    "guard-result:guard-public-mqmrtlg5-4",
+    ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19/task-packages/co-4-core-internalize-cleared-legacy-routes.json",
+    ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co4-core-internalize-cleared-legacy-routes__AlembicCore__CO-4.json"
+  ],
+  "verification": [
+    "pre-change git status --short --branch: ## main...origin/main [ahead 3]",
+    "pre-change focused consumer scan excluding vendor: rg -n -P --glob '!**/vendor/**' \"@alembic/core/(?:core/(?:enhancement|capability)|recipe-context(?!-capabilities))\" ../Alembic ../AlembicPlugin ../AlembicAgent => zero matches (exit 1/no output)",
+    "pre-change scan including vendor found only out-of-scope AlembicPlugin/vendor/AlembicCore/config/public-api-boundary.json legacy snapshot; vendor was not edited per CO-4 boundary",
+    "npm run lint:public-api-boundary: passed; 60 package exports classified, exact=53, wildcard=7, stable=23, provisional=8, transitional=29",
+    "npm run build:check: passed",
+    "npm run lint:consumer-core-imports: passed; AlembicAgent issues=0, Alembic issues=0, AlembicPlugin issues=0",
+    "npm run build: passed",
+    "npm run smoke:public-api: passed; Imported 53 exact public API entrypoints and forbidden old exports absent",
+    "npx vitest run test/PublicCapabilityOutputEntrypoints.test.ts test/PublicResidualReadinessEntrypoints.test.ts test/RecipeContextAdapters.test.ts test/RecipeContextService.test.ts test/CoreContractSpine.test.ts: passed; 5 files / 45 tests",
+    "post-change focused consumer scan excluding vendor: same rg command => zero matches (exit 1/no output)",
+    "package export probe: ./core/capability=false, ./core/enhancement=false, ./recipe-context=false; exports=60, exact=53",
+    "npm run lint: passed; Biome checked 617 files, no fixes applied",
+    "git diff --check: passed",
+    "npm run test: passed; 129 files / 1346 tests",
+    "alembic_code_guard: guard-public-mqmrtlg5-4 passed; 6 files checked, 0 violations",
+    "git diff --cached --check: passed",
+    "post-commit git status --short --branch: ## main...origin/main [ahead 4]"
+  ],
+  "risks": [
+    "AlembicPlugin/vendor/AlembicCore still contains an old public-api-boundary snapshot reference to @alembic/core/core/enhancement; this is an out-of-scope vendor/release snapshot explicitly forbidden for CO-4 edits.",
+    "Residual @alembic/core/project-context public type/presenter contract usage in Alembic/AlembicPlugin remains intentionally untouched; @alembic/core/project-context was not deleted/internalized because CO-4 forbids it.",
+    "Residual AST, core/analysis, core/discovery, and project-intelligence test routes are out of CO-4 scope and remain documented shrink-only/consumer-backed routes for future controller decisions.",
+    "RecipeContext detail/search/prime/relations unused kinds remain implemented and were not reclassified; any removal needs a separate controller/user decision."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-co4-core-internalize-cleared-legacy-routes__AlembicCore__CO-4",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co4-core-internalize-cleared-legacy-routes__AlembicCore__CO-4.json",
+    "deliveryRunId": "run-delivery-co4-core-internalize-cleared-legacy-routes__AlembicCore__CO-4",
+    "dispatchGroup": "co4-core-internalize-cleared-legacy-routes",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co4-core-internalize-cleared-legacy-routes__AlembicCore__CO-4.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+    "stateRevision": 24,
+    "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+    "taskPackageId": "co-4-core-internalize-cleared-legacy-routes",
+    "targetTaskId": "CO-4",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "co4-core-internalize-cleared-legacy-routes",
+    "resultId": "tr-co4-core-internalize-cleared-legacy-routes-alembiccore-2026-06-21",
+    "createdAt": "2026-06-20T19:50:20.169Z"
+  },
+  "createdAt": "2026-06-20T19:50:20.169Z",
+  "stateRevisionObserved": 24,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

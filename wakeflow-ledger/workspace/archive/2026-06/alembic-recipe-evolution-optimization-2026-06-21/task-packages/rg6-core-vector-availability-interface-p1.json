@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rg6-core-vector-availability-interface-p1",
+  "demandKey": "alembic-recipe-evolution-optimization-2026-06-21",
+  "summary": "RG-6 Core producer: add the standard vector availability interface in AlembicCore as an additive public surface before Plugin consumers are migrated.",
+  "status": "pending",
+  "sourceRef": "requirement-design:RG-6; dependency:RG-0 accepted; parallelAllowedWithD:true; downstream:Plugin vector consumer package after Core acceptance",
+  "createdAt": "2026-06-21T18:41:49.167Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rg6-core-vector-availability-interface-t1",
+      "taskPackageId": "rg6-core-vector-availability-interface-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only task rg6-core-vector-availability-interface-t1 under stateRoot .wakeflow-active/current/alembic-recipe-evolution-optimization-2026-06-21. Context: RG-0 through RG-4 are accepted; RG-6 may run in parallel with RG-5, but Plugin consumer migration must wait until this Core producer surface is accepted. Goal: implement the Core side of RG-6 vector availability isolation as a real additive Core capability, not a Plugin workaround. Required behavior: (1) inspect AlembicCore vector/public API rules and current VectorService/EmbedProvider/getStats availability behavior first; preserve existing embed/provider/search semantics. (2) Add a standard Core availability surface, preferably `VectorService.isAvailable()` or an equivalent `VectorAvailabilityChecker`, that centralizes vector readiness instead of consumers comparing `getStats().embedProviderAvailable` or provider internals. The surface should return at least a deterministic boolean and, where consistent with Core style, structured reason/status details useful for observable degradation. (3) Keep EmbedProvider lanes and existing vector APIs backwards compatible; this task must be additive and package-boundary clean. (4) Expose only the minimum Core public API needed by later Plugin RG-6 consumer migration, following AlembicCore AGENTS/package export/public-api gate rules. (5) Add focused tests for available/unavailable provider states, deterministic degraded reason/status behavior, backwards compatibility of getStats where relevant, and public API/export boundary if exports change. (6) Document in the target result exactly which Plugin call sites remain to migrate next; do not edit AlembicPlugin in this Core producer package. Boundaries: do not implement Plugin consumer dedupe/output changes, RG-7 create/evolve source_refs/vector timing repair, RG-8 commit-driven evolution/rename/new-module routing, Test/BiliDili, daemon/watch behavior, or deletion of evidence/proposal/vector structures. Do not create a type-only shell or duplicate Plugin-local availability helper. If the Core surface requires a smaller split, return blocked/needs-review with raw evidence and the smallest safe producer package. Expected validation: npm run build:check; targeted vector availability tests; existing vector/search tests touched by the change; public API/export/boundary tests if exports change; npm run lint or npm run check when feasible; git diff --check; Alembic Guard. Return TargetResultEnvelope with commit hash, changed files, validation output, public API notes, downstream Plugin migration notes, risks, and next-step notes.",
+      "status": "pending",
+      "createdAt": "2026-06-21T18:41:49.167Z"
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "kind": "ControllerRawEvidenceReview",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p4-core-checkpoint-current-head-primitives-p1",
+  "targetTaskId": "p4-core-checkpoint-current-head-primitives-t1",
+  "targetWindow": "AlembicCore",
+  "decision": "accept-target-result",
+  "reviewedAt": "2026-06-24T09:13:00+08:00",
+  "scope": {
+    "taskPackage": "p4-core-checkpoint-current-head-primitives-p1",
+    "commit": "1bac46009524e03ce6b90bf69367a608613c750c",
+    "requiredCoreBehavior": [
+      "GitDiffCheckpointService no longer depends on PlanRepository/getActiveConfirmed/plan storage.",
+      "A baseline provider returns the current git HEAD for a project root.",
+      "When HEAD exists, checkpoint initialization source is current-head and the stored checkpoint/initial commit is the real HEAD SHA.",
+      "Existing empty checkpoints are repaired from current HEAD instead of remaining empty when HEAD exists.",
+      "P4 Plugin SOP/missionBriefing wiring and P5 BiliDili e2e stay out of this Core producer package."
+    ]
+  },
+  "rawEvidenceReviewed": [
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/task-packages/p4-core-checkpoint-current-head-primitives-p1.json",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/target-results/tr-p4-core-checkpoint-current-head-primitives-t1.json",
+    "Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md",
+    "AlembicCore/AGENTS.md",
+    "AlembicCore commit 1bac46009524e03ce6b90bf69367a608613c750c",
+    "AlembicCore/src/service/evolution/GitDiffCheckpointService.ts",
+    "AlembicCore/src/evolution.ts",
+    "AlembicCore/test/GitDiffCheckpointRepository.test.ts",
+    "AlembicCore/test/PublicEvolutionEntrypoints.test.ts"
+  ],
+  "implementationReality": {
+    "changedFiles": [
+      "AlembicCore/src/service/evolution/GitDiffCheckpointService.ts",
+      "AlembicCore/src/evolution.ts",
+      "AlembicCore/test/GitDiffCheckpointRepository.test.ts",
+      "AlembicCore/test/PublicEvolutionEntrypoints.test.ts"
+    ],
+    "behavior": [
+      "CurrentGitHeadBaselineProvider runs git -C <projectRoot> rev-parse --verify HEAD and returns a non-empty SHA or null.",
+      "GitDiffCheckpointService.ensureCheckpoint stores baselineCommit as checkpointCommit and initialFromPlanCommit and returns source current-head when the provider returns a HEAD.",
+      "An existing empty checkpoint is repaired to current-head while preserving route metadata.",
+      "Existing non-empty checkpoints are preserved as existing-checkpoint.",
+      "The stable evolution facade exports CurrentGitHeadBaselineProvider and createCurrentGitHeadBaselineProvider."
+    ],
+    "scopeContainment": "git show for 1bac460 shows only Core evolution service/facade and two Core tests changed."
+  },
+  "controllerVerification": [
+    {
+      "command": "rg -n \"PlanRepository|getActiveConfirmed|planRepository|plans\" AlembicCore/src/service/evolution/GitDiffCheckpointService.ts AlembicCore/test/GitDiffCheckpointRepository.test.ts AlembicCore/src/evolution.ts",
+      "cwd": "AlembicWorkspace",
+      "exitCode": 1,
+      "summary": "No plan persistence or active confirmed plan references remain in the checkpoint service/test/facade path."
+    },
+    {
+      "command": "rg -n \"plans\" AlembicCore/src/infrastructure/database/drizzle/schema.ts AlembicCore/src/infrastructure/database/migrations AlembicCore/src/repository AlembicCore/src/service/evolution/GitDiffCheckpointService.ts AlembicCore/test/GitDiffCheckpointRepository.test.ts",
+      "cwd": "AlembicWorkspace",
+      "exitCode": 1,
+      "summary": "No plans table/migration/repository residue found in the relevant Core storage and checkpoint paths."
+    },
+    {
+      "command": "git -C AlembicCore diff --check && git -C AlembicCore diff --cached --check",
+      "cwd": "AlembicWorkspace",
+      "exitCode": 0,
+      "summary": "Whitespace checks passed."
+    },
+    {
+      "command": "npm run test -- GitDiffCheckpointRepository.test.ts PublicEvolutionEntrypoints.test.ts",
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "summary": "2 files passed, 10 tests passed; includes real temporary git repository HEAD current-head test."
+    },
+    {
+      "command": "npm run build:check",
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "summary": "TypeScript no-emit check passed."
+    },
+    {
+      "command": "npm run build",
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "summary": "Core dist build passed."
+    },
+    {
+      "command": "npm run smoke:public-api",
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "summary": "Imported 54 exact public API entrypoints."
+    },
+    {
+      "command": "npm run lint:public-api-boundary",
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "summary": "61 package exports classified; public API boundary passed."
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "summary": "Biome checked 616 files with no fixes applied."
+    },
+    {
+      "command": "npm run test",
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "summary": "126 files passed, 1308 tests passed."
+    },
+    {
+      "command": "npm run check",
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "summary": "Combination check progressed through build:check, public API boundary, layer contract, consumer imports, public API smoke, output budgets, space edges, doctrine; failed only at pre-existing lint:naming for src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts."
+    },
+    {
+      "command": "git -C AlembicCore status --short --branch",
+      "cwd": "AlembicWorkspace",
+      "exitCode": 0,
+      "summary": "main is ahead of origin/main by 3 commits; no uncommitted changes."
+    }
+  ],
+  "blockers": [],
+  "missingEvidence": [],
+  "residualRisks": [
+    "Repository-local checks prove the Core behavior, but Alembic Guard did not produce a verdict due host project mismatch/schema validation issue reported by the target. This is non-blocking for this Core package because the Core build/lint/test/API evidence is complete.",
+    "P4 Plugin consumer work remains: route/wire the current-head provider and derive SOP/missionBriefing from planSelection dimensions during generation.",
+    "P5 Test/BiliDili e2e remains future scope."
+  ],
+  "todoBacklogRollup": {
+    "closedByThisReview": [
+      "P4 Core producer checkpoint current-head primitive"
+    ],
+    "keptForFutureAuthorizedPhases": [
+      "P4 Plugin checkpoint route wiring plus SOP/missionBriefing derivation",
+      "P5 named suite rewrites and BiliDili e2e"
+    ],
+    "newItems": []
+  }
+}

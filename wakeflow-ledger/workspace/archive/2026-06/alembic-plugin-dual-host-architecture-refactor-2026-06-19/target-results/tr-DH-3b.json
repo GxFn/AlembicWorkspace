@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-3b",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-3b-l2-rewire-decodex-migration",
+  "dispatchGroup": "dh3b-plugin-l2-rewire-decodex",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-3b",
+  "status": "needs-review",
+  "summary": "DH-3b ② 主 criterion 达成：**host-name 分支清零（L2 及非-L3 层 0 host 分支，3 个残留分支全部收口入 L3，grep 证）**。父仓 AlembicPlugin 已【直提 main commit ea22f922ee7a2eb413791d4cb9b6089acc473f5f】（基线 651f96a，纯父仓无子模块）。tsc 绿；registry+cc 测试 15/15（manifest wire-byte 安全）+ 新增 adapter 能力 guard（cc 5/5）；全量 unit 失败集与基线逐文件 IDENTICAL（39）。③（~52 de-Codex 改名 + 物理迁入函数体）+ 余项 host-operation routing【flag 给 DH-3c，需控制器再派】。\n\n【交付（② 可测量主 criterion：host 分支清零）】原 3 个残留 host-name 分支（PluginRegistry:64/:89、Diagnostics:583）全部收口入 L3：\n1. 新增 hostAdapterForShape(shape) L3 选择器 + allowsEmptyPluginAssets adapter 能力（codex=false/cc=true）；Diagnostics:583 不再判 registry.plugin.hostShape，经 L3 选择器取能力。\n2. 新增 per-host 清单布局方法（pluginMcpManifestPath / pluginManifestPath / normalizePluginMcpArg）；PluginRegistry 的 readCodexPluginMcpDeclaration + loadCodexPluginRegistry 去 hostShape 分支，经 adapter 取 per-host 清单路径 + arg 归一化。**readJsonObject 仍留 PluginRegistry，故 codex .mcp.json byte-for-byte 不变、codex arg 归一化为恒等（F-V2-2 守住）**。\n\n【flag 给 DH-3c（建议一次聚焦的 物理迁入/改名 pass）】③ ~52 误命名 host-agnostic Codex*/CODEX_* 去前缀归 L1/L2 + 真 host-specific codex 函数体物理迁入 CodexHostAdapter（去委托外观）；以及 ~19 host-operation call-site routing（与 ③ 改名触同一批 Codex*-named 调用点、避免双重 churn）。见 risks。\n\n【边界遵守】host-name 分支只在 L3（grep 证 0 outside L3）；未动 per-host 产物 / cc 子模块 / 3 漂移资产；AlembicCore 不动；codex .mcp.json:8 不变；四工具对外 MCP 语义不变；纯 MCP 非强进程不变量不回退。",
+  "evidenceRefs": [
+    "父仓 commit ea22f922ee7a2eb413791d4cb9b6089acc473f5f (直提 main，基线 651f96a；改 6 lib + 1 test，纯父仓无子模块)",
+    "L3 选择器 + 能力: lib/runtime/host-adapter/resolveHostAdapter.ts hostAdapterForShape(shape); HostAdapter/Codex/ClaudeCode 加 allowsEmptyPluginAssets(codex=false/cc=true)",
+    "Diagnostics 收口: lib/runtime/diagnostics/Diagnostics.ts emptyIsHealthy = hostAdapterForShape(registry.plugin.hostShape).allowsEmptyPluginAssets (原 :583 hostShape 分支去除)",
+    "PluginRegistry 收口: lib/runtime/PluginRegistry.ts readCodexPluginMcpDeclaration + loadCodexPluginRegistry 去 hostShape 分支，经 adapter 取 pluginMcpManifestPath/pluginManifestPath/normalizePluginMcpArg；readJsonObject 留原处(wire bytes 不动)",
+    "per-host 清单布局方法: HostAdapter + Codex(.mcp.json/.codex-plugin, arg 恒等) + ClaudeCode(.claude-plugin, replaceAll ${CLAUDE_PLUGIN_ROOT})",
+    "回归 guard: test/unit/ClaudeCodeHostAdapter.test.ts +1 用例(per-host 清单路径 + allowsEmptyPluginAssets + arg 归一化)"
+  ],
+  "verification": [
+    "tsc --noEmit: exit 0 (commit 前后)",
+    "host-name 分支 outside L3: grep === 'claude-code'/'codex' / hostShape === 排除 host-adapter+RuntimeContext = 0 命中 (改动前 3: PluginRegistry:64/:89 + Diagnostics:583)→「全部 host 分支入 L3」达成",
+    "registry-reading + cc adapter 测试: 15/15 (CodexRuntimeContext '解析 Codex 插件 registry' 过→.mcp.json 读取+args wire-byte 不变); ClaudeCodeHostAdapter.test.ts 5/5(含新能力 guard)",
+    "全量 unit(vitest.unit.config): 失败集与基线(39 pre-existing 沙箱/MTC-7)逐文件 IDENTICAL → 无 DH-3b 回归",
+    "biome lint 0 error(16 既有 warning); lint:repo-boundary PASS(0/75)"
+  ],
+  "risks": [
+    "需控制器决策(按 task 授权拆分，非阻塞): ③ + 余项 routing flag 给 DH-3c，需控制器再派。③ = ~52 误命名 host-agnostic Codex*/CODEX_*(全部 CODEX_*_TOOL_NAMES / resolveCodexServiceRequestBoundary / buildCodexProjectRuntimeContext 等，全仓 65 处引用) 去前缀归 L1/L2 + 真 host-specific codex 函数体物理迁入 CodexHostAdapter(去委托外观)。余项 routing = ~19 host-operation call site(StatusService/project-root-scope/ToolPolicy/tool-visibility/Preflight/host-agent-workflows 的 resolveProjectRoot/readInitMarker/resolveEffectiveTier/buildCodexHostProjectAlignment 等)经 adapter 走。理由: 这些 call site 均为 Codex*-named，③ 改名会触同一批(routing 现改 + ③ 再改名 = 双重 churn)；且物理迁入是 F-V2-2 类 wire-byte 敏感。建议 DH-3c 把 routing + de-Codex 改名 + 物理迁入捆成一次聚焦 pass。DH-3b 已达成可测量主 criterion「host 分支清零 outside L3」。",
+    "说明(非缺陷): ② 完成定义的可测量项「host-name 分支清零 outside L3」已达成(grep=0)；「L2 改调 L3 ~102 直依赖」中的 host-OPERATION routing(~19) 与 ③ de-Codex 改名重叠(同一批 Codex*-named 调用点)，归 DH-3c 一并做。cc adapter 现仍与 codex 共享身份簇委托(cluster 5/6/8 降级 + cc 专属 setupProfile 属 DH-3c/DH-4)。",
+    "cc 真实端验收在 DH-6(Test，workspace 内)；DH-3b 证据=单测/grep/targeted(本窗边界内)。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh3b-plugin-l2-rewire-decodex__AlembicPlugin__DH-3b",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3b-plugin-l2-rewire-decodex__AlembicPlugin__DH-3b.json",
+    "deliveryRunId": "run-delivery-dh3b-plugin-l2-rewire-decodex__AlembicPlugin__DH-3b",
+    "dispatchGroup": "dh3b-plugin-l2-rewire-decodex",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3b-plugin-l2-rewire-decodex__AlembicPlugin__DH-3b.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 23,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-3b-l2-rewire-decodex-migration",
+    "targetTaskId": "DH-3b",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh3b-plugin-l2-rewire-decodex",
+    "resultId": "tr-DH-3b",
+    "createdAt": "2026-06-20T04:50:38.191Z"
+  },
+  "createdAt": "2026-06-20T04:50:38.191Z",
+  "stateRevisionObserved": 23,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

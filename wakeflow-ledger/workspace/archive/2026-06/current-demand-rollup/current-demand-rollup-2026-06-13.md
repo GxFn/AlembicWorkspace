@@ -2,7 +2,7 @@
 
 Archive Date: 2026-06-13
 Maintained Window: AlembicWorkspace
-Source: `.workspace-active/workspace/current/`
+Source: `.wakeflow-active/current/`
 
 This record compacts the current AlembicWorkspace demand state after the
 R-group closeout and TODO archive pass. It does not accept unfinished work. It
@@ -18,12 +18,12 @@ user-gated boundaries.
 - Dry-ran workspace document archiving for the current status file; Wakeflow
   correctly refused to archive the active current plan.
 - Moved generated CKG real-project cold-start test mirrors out of active
-  current scanning into `.workspace-local/archive/ckg-real-project-cold-start-tests-2026-06-13/`.
+  current scanning into `.wakeflow-local/archive/ckg-real-project-cold-start-tests-2026-06-13/`.
   These are local test artifacts, not active demands or long-term ledger docs.
 
 ## State-Root Census
 
-Controller scan of `.workspace-active/workspace/current/*/wakeflow-state.json`
+Controller scan of `.wakeflow-active/current/*/wakeflow-state.json`
 found:
 
 | State | Count | Meaning |
@@ -82,7 +82,7 @@ for AlembicPlugin, which has a separate dirty worktree from the Codex cold-start
 work. This rollup did not touch product source repositories.
 
 Local generated CKG mirror artifacts were moved out of
-`.workspace-active/workspace/current/` so Wakeflow workspace-doc verification no
+`.wakeflow-active/current/` so Wakeflow workspace-doc verification no
 longer scans their copied repository docs as controller documents.
 
 ## Next Controller Boundary

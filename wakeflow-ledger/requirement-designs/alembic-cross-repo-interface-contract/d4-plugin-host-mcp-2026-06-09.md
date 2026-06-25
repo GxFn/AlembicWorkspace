@@ -5,7 +5,7 @@ Demand Key: `alembic-interface-contract-d4-plugin-host-mcp-2026-06-09`
 Sequence Order: 5
 Maintainer: AlembicWorkspace
 Document Role: Wakeflow demand definition
-State Authority: a future Wakeflow state root under `.workspace-active/workspace/current/`; this document is not a dispatch packet.
+State Authority: a future Wakeflow state root under `.wakeflow-active/current/`; this document is not a dispatch packet.
 
 ## Goal
 

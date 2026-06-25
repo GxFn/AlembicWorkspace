@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "kind": "ControllerReviewEvidence",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p1-plugin-stateless-draft-two-block-projector-p1",
+  "targetTaskId": "p1-plugin-stateless-draft-two-block-projector-t1",
+  "targetWindow": "AlembicPlugin",
+  "controllerWindow": "AlembicWorkspace",
+  "reviewedCommit": {
+    "repository": "AlembicPlugin",
+    "commit": "5fbc5b95c2dc92c5b31d340252fa29e36909da71",
+    "subject": "fix(plan): project stateless draft output",
+    "changedFiles": [
+      "lib/recipe-generation/plan-tool.ts",
+      "lib/runtime/mcp/core-tools/output.ts",
+      "test/unit/McpCoreToolsCleanOutputContract.test.ts",
+      "test/unit/PlanDraftTwoBlockProjector.test.ts"
+    ]
+  },
+  "p1ContractReview": {
+    "acceptedScope": "P1 only: stateless alembic_plan draft two-block projector and clean-output allow-list.",
+    "conforms": true,
+    "draftBusinessFields": [
+      "agentDecisionChecklist",
+      "candidateDimensions",
+      "nextActions",
+      "operation",
+      "projectInfoTree",
+      "projectRoot"
+    ],
+    "projectInfoTreeBudget": {
+      "defaultBudgetBytes": 65536,
+      "unitLargeFixtureBudgetBytes": 8192,
+      "unitLargeFixtureAssertsTruncated": true,
+      "unitSmallFixtureAssertsTruncatedFalse": true
+    },
+    "candidateDimensions": {
+      "count": 25,
+      "allowedFields": [
+        "id",
+        "label",
+        "languageApplicable",
+        "layer",
+        "miningGuidance"
+      ],
+      "languageApplicableFactualOnly": true,
+      "miningGuidanceRequired": true
+    },
+    "removedDraftInternals": [
+      "plan",
+      "planState",
+      "planView",
+      "planningBrief",
+      "projectContextSignature",
+      "currentProjectContextSignature",
+      "projectContextCreationGuide",
+      "sourceReports",
+      "missionBriefing",
+      "onboardingContract",
+      "sop",
+      "analysisGuide",
+      "submissionSpec",
+      "matchTopics",
+      "weight"
+    ],
+    "notClaimedComplete": [
+      "P2 confirm planSelection contract",
+      "P3 executor/job planSelection gate",
+      "P4 checkpoint/SOP/missionBriefing derivation",
+      "P5 stale broad test-suite rewrite"
+    ]
+  },
+  "controllerCommands": [
+    {
+      "cwd": "AlembicPlugin",
+      "command": "git show --format=fuller --stat --patch --find-renames 5fbc5b95c2dc92c5b31d340252fa29e36909da71 -- lib/recipe-generation/plan-tool.ts lib/runtime/mcp/core-tools/output.ts test/unit/McpCoreToolsCleanOutputContract.test.ts test/unit/PlanDraftTwoBlockProjector.test.ts",
+      "result": "reviewed changed files and confirmed draft no longer builds plan snapshot/signature/sourceReports; clean-output allow-list removes legacy plan/planning/sourceReport/signature fields"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npm run test:unit -- test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts",
+      "result": "PASS; 2 files, 10 tests"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npm run build:check",
+      "result": "PASS; Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npm run build",
+      "result": "PASS; Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d and postbuild completed"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npx biome check lib/recipe-generation/plan-tool.ts lib/runtime/mcp/core-tools/output.ts test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts",
+      "result": "PASS; Checked 4 files in 42ms. No fixes applied."
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "git diff --check && git diff --cached --check",
+      "result": "PASS"
+    }
+  ],
+  "distBiliDiliDraftSmoke": {
+    "cwd": "AlembicPlugin",
+    "projectRoot": "BiliDili",
+    "command": "node --input-type=module dist routePlanTool draft smoke with hints.maxBudget=64",
+    "result": {
+      "success": true,
+      "businessKeys": [
+        "agentDecisionChecklist",
+        "candidateDimensions",
+        "nextActions",
+        "operation",
+        "projectInfoTree",
+        "projectRoot"
+      ],
+      "projectInfoTreeBytes": 48616,
+      "budgetBytes": 65536,
+      "truncated": false,
+      "deliveredDepth": "files",
+      "omitted": {},
+      "candidateDimensions": 25,
+      "invalidDimensionCount": 0,
+      "forbiddenHits": []
+    }
+  },
+  "residueReview": {
+    "draftProductionForbiddenHits": "No forbidden P1 draft output fields were present in the BiliDili dist draft raw business payload.",
+    "broadRepositoryScanNote": "Existing broad tests still reference old alembic_plan projectContextSignature/planningBrief/sourceReports behavior; those are not P1 production-output residue and remain explicit P5 test rewrite scope."
+  },
+  "decision": {
+    "controllerFinding": "P1 AlembicPlugin stateless draft two-block projector is acceptable for this package only.",
+    "forbiddenConclusion": "This evidence does not accept P2, P3, P4, P5, or final demand completion."
+  }
+}

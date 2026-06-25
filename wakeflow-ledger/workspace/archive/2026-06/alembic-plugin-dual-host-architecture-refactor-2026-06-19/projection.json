@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "title": "AlembicPlugin Dual-Host (Codex + Claude Code) Architecture Refactor And Layering",
+  "interfaceLanguage": "zh",
+  "sourceRevision": 74,
+  "sourceEventId": "evt-20260620105757-0074",
+  "progressDoc": "developer-progress.md",
+  "unifiedStatus": {
+    "demand": "alembic-plugin-dual-host-architecture-refactor-2026-06-19 - AlembicPlugin Dual-Host (Codex + Claude Code) Architecture Refactor And Layering",
+    "mainState": "completed",
+    "stage": "无",
+    "currentTaskPackages": "dh-0-precheck-cc-host-feasibility(accepted), dh-0b-alembic-drift-backport(accepted), dh-1-host-abstraction-unify-delete-generic(accepted), dh-2-l3-hostadapter-interface-codex-migration(accepted), dh-3-claude-code-adapter-l2-rewire-decodex(accepted), dh-3b-l2-rewire-decodex-migration(accepted), dh-3c-decodex-rename-routing-migration(accepted), dh-3d-decodex-rename-migration-finale(accepted), dh-3e-decodex-full-rename-finale(accepted), dh-3f-decodex-bulk-complete(accepted), dh-3g-design-shared-workspace-io-structure(accepted), dh-3g-decodex-shared-workspace-cluster(accepted), dh-4a-plugin-per-host-products-cc-shell-gitlink(accepted), dh-4b-alembic-shared-asset-drift-per-host(accepted), dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap(accepted), dh-5-cleanup-test-parity-rc678(accepted), dh-6-cc-real-acceptance(accepted), dh-7-agenthost-default-from-pluginhost(accepted)",
+    "windows": "AlembicPlugin(accepted), Alembic(accepted), Design(accepted), Test(accepted)",
+    "blockers": "无",
+    "nextAction": "wakeflow-render-progress",
+    "review": "demand-completed",
+    "automation": "未启用",
+    "userDecisionsNeeded": "无",
+    "lastUpdated": "2026-06-20T10:58:25.604Z"
+  },
+  "slices": {
+    "windows": [
+      {
+        "windowName": "AlembicPlugin",
+        "windowState": "accepted",
+        "taskPackageIds": [
+          "dh-0-precheck-cc-host-feasibility",
+          "dh-1-host-abstraction-unify-delete-generic",
+          "dh-2-l3-hostadapter-interface-codex-migration",
+          "dh-3-claude-code-adapter-l2-rewire-decodex",
+          "dh-3b-l2-rewire-decodex-migration",
+          "dh-3c-decodex-rename-routing-migration",
+          "dh-3d-decodex-rename-migration-finale",
+          "dh-3e-decodex-full-rename-finale",
+          "dh-3f-decodex-bulk-complete",
+          "dh-3g-decodex-shared-workspace-cluster",
+          "dh-4a-plugin-per-host-products-cc-shell-gitlink",
+          "dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap",
+          "dh-5-cleanup-test-parity-rc678",
+          "dh-7-agenthost-default-from-pluginhost"
+        ],
+        "targetTaskIds": [
+          "DH-0",
+          "DH-1",
+          "DH-2",
+          "DH-3",
+          "DH-3b",
+          "DH-3c",
+          "DH-3d",
+          "DH-3e",
+          "DH-3f",
+          "DH-3g",
+          "DH-4a",
+          "DH-4c",
+          "DH-5",
+          "DH-7"
+        ]
+      },
+      {
+        "windowName": "Alembic",
+        "windowState": "accepted",
+        "taskPackageIds": [
+          "dh-0b-alembic-drift-backport",
+          "dh-4b-alembic-shared-asset-drift-per-host"
+        ],
+        "targetTaskIds": [
+          "DH-0B",
+          "DH-4b"
+        ]
+      },
+      {
+        "windowName": "Design",
+        "windowState": "accepted",
+        "taskPackageIds": [
+          "dh-3g-design-shared-workspace-io-structure"
+        ],
+        "targetTaskIds": [
+          "DH-3g-design"
+        ]
+      },
+      {
+        "windowName": "Test",
+        "windowState": "accepted",
+        "taskPackageIds": [
+          "dh-6-cc-real-acceptance"
+        ],
+        "targetTaskIds": [
+          "DH-6"
+        ]
+      }
+    ],
+    "taskPackages": [
+      {
+        "taskPackageId": "dh-0-precheck-cc-host-feasibility",
+        "status": "accepted",
+        "summary": "DH-0 盘点+前置（硬前置，不重构）：① pre-existing 漂移门禁 RED 同步绿诊断（alembic-recipes/structure shared + recipes-setup/README；精确 diff + 正确同步方向 + Plugin 侧做 / Alembic 侧 apply 清单标 needs-controller）；② cc-host hooks 8 簇可行性研究（open question，缺口大 STOP+回报）；③ CC3 文案划界；④ 跨仓协调点清单；⑤ 基线 + 92 Codex* surface 分类复核（40 host-specific→L3 / 52 误命名→L1/L2）。不进 DH-1。"
+      },
+      {
+        "taskPackageId": "dh-0b-alembic-drift-backport",
+        "status": "accepted",
+        "summary": "DH-0B Alembic 侧共享资产漂移回填（跨仓前置；DH-1 硬前置）。把 3 项漂移共享资产从 AlembicPlugin 回填到 Alembic main，漂移门禁转绿。仅动这 3 项；真 host-divergent 工具名行保留为 wakeflow-host:main 不覆盖；无法作为 shared 对齐的段 flag 给 DH-4。完成=check-shared-asset-drift.mjs GREEN + commit hash。"
+      },
+      {
+        "taskPackageId": "dh-1-host-abstraction-unify-delete-generic",
+        "status": "accepted",
+        "summary": "DH-1 host 抽象统一（RC-1）+ 删 generic-host-agent（RC-5）。AlembicPlugin 基线 afbf25e，直提 main。host identity 由 hostShape 派生（去 RuntimeContext.ts:45 codex 硬默认、:62 expectedPluginHost 派生、加 CLAUDE_CODE_PLUGIN_HOST 常量）；cc manifest:32/33 + bootstrap:100 声明 claude-code；Diagnostics.ts:542 比较走 expectedPluginHost；AGENT_HOSTS 去 generic（6 文件 contract.ts:11/mcp-tools.ts:103/KnowledgeContextStatus.ts:29-36/cross-host-readiness.ts:55-59 + 2 测试）。不建 L3、不做 de-Codex 改名、不动 per-host 产物（DH-2/3/4）。漂移门禁 RED 已解耦（归 DH-4）。完成=identity 派生正确 + generic 删净 + tsc 绿 + 受影响测试绿 + 非强进程不变量 + commit hash。"
+      },
+      {
+        "taskPackageId": "dh-2-l3-hostadapter-interface-codex-migration",
+        "status": "accepted",
+        "summary": "DH-2 建 L3 HostAdapter 接口 + codex 实现迁入（RC-2，行为不变）。AlembicPlugin 基线 6cd4c88，直提 main。抽 HostAdapter 接口（项目根/workspace init/runtime env/execution/MCP server 生命周期/diagnostics 方法集）+ 现有 codex 真 host-specific 逻辑迁入 CodexHostAdapter 并经其走（codex 单实现、逐行等价、非死代码）。DH-2→3 硬序：不建 cc adapter、不做 host-aware 选择/L2 host 分派、不做 52 de-Codex 改名、不动 per-host 产物/cc 子模块（DH-3/DH-4）。完成=接口被 codex 真实消费 + 行为逐行等价 + tsc 绿 + 受影响测试绿 + 失败集 vs 基线 IDENTICAL + 非强进程不变量 + commit hash。"
+      },
+      {
+        "taskPackageId": "dh-3-claude-code-adapter-l2-rewire-decodex",
+        "status": "accepted",
+        "summary": "DH-3 双宿主对等执行（RC-2/3/3b）。AlembicPlugin 基线 348bea2，直提 main，大重构分步增量绿。① 新建 ClaudeCodeHostAdapter + host-aware resolveHostAdapter 选择（cc 项目根加 CLAUDE_PROJECT_DIR 可信，DH-0 #1；codex 不变）；② L2 全面改调 L3（~102 Codex* 直依赖，L2 去 host 分支）；③ 52 误命名 de-Codex 去前缀归 L1/L2 + 物理迁入 codex 函数体。host-name 分支只在 L3。不动 per-host 产物/cc 子模块（DH-4）。可在 ① 绿后 flag 余项给 DH-3b。完成=cc 选中+行为正确 + codex 不回归 + L2 无 host 分支 + de-Codex 清零误命名 + tsc/测试绿 + 非强进程不变量 + commit hash。"
+      },
+      {
+        "taskPackageId": "dh-3b-l2-rewire-decodex-migration",
+        "status": "accepted",
+        "summary": "DH-3b（DH-3 余项 ②③）双宿主对等执行收尾。AlembicPlugin 基线 651f96a，直提 main，分步增量绿。② L2 全面改调 L3（~102 Codex* 直依赖经 resolveHostAdapter 取 HostAdapter 走）+ 收口残留 host 分支（PluginRegistry:64/89 形态检测/manifest 选择、Diagnostics:583 asset-skip）到 L3，使 L2/非-L3 层无 host 分支；③ 52 误命名 de-Codex 去前缀归 L1/L2 + 真 host-specific codex 函数体物理迁入 CodexHostAdapter（去委托外观）。先替代/对等、不裸断。可在 ② 绿后 flag ③ 给 DH-3c。完成=L2 无 host 分支 + de-Codex 清零误命名 + codex 等价/cc 经 adapter + tsc/测试绿 + 非强进程不变量 + commit hash。不动 per-host 产物/cc 子模块（DH-4）。"
+      },
+      {
+        "taskPackageId": "dh-3c-decodex-rename-routing-migration",
+        "status": "accepted",
+        "summary": "DH-3c（DH-3 收尾 ③+routing）de-Codex 改名 + 物理迁入 + host-operation routing。AlembicPlugin 基线 ea22f92，直提 main，一次聚焦 pass 增量绿。A：~19 host-operation call site 经 resolveHostAdapter 的 HostAdapter 走 + ~52 误命名 Codex*/CODEX_*（65 引用）去前缀归 L1/L2（同批避免双重 churn）；B：真 host-specific codex 函数体物理迁入 CodexHostAdapter（去委托外观，保 F-V2-2 wire-byte 安全）。行为等价。完成=de-Codex 清零误命名（残留仅真 host-specific 在 L3）+ routing 经 adapter + 委托外观清除 + codex 等价(含 .mcp.json wire-byte)/cc 经 adapter + tsc/测试绿 + 非强进程不变量 + commit hash。不动 per-host 产物/cc 子模块（DH-4）。可在 A 绿后 flag B 给 DH-3d。此步完成即 DH-3 阶段收尾。"
+      },
+      {
+        "taskPackageId": "dh-3d-decodex-rename-migration-finale",
+        "status": "accepted",
+        "summary": "DH-3d（DH-3 收尾大头）de-Codex 改名 + 物理迁入 + 余 routing。AlembicPlugin 基线 f38e268，直提 main，分批增量绿（建议 Explore 子代理先测绘 65 引用再分组改名）。批1：~52 误命名 Codex*/CODEX_*（65 引用：CODEX_*_TOOL_NAMES/resolveCodexServiceRequestBoundary/buildCodexProjectRuntimeContext 等）去前缀归 L1/L2 + 裁决 isTrustedProjectRoot/resolveEffectiveTier（host-agnostic，推荐去前缀归 L1/L2）；批2：余 host-operation routing（Preflight/StatusService/host-agent-workflows 含 buildHostProjectAlignment）经 adapter；批3：真 host-specific 函数体物理迁入 CodexHostAdapter（去委托外观，保 wire-byte）。完成即 DH-3 阶段 DONE。可 flag DH-3e 但优先完成。不动 per-host 产物/cc 子模块（DH-4）。"
+      },
+      {
+        "taskPackageId": "dh-3e-decodex-full-rename-finale",
+        "status": "accepted",
+        "summary": "DH-3e（DH-3 de-Codex 全量收尾，用户决策 A=做透）多批 de-Codex + collision + 余 routing + 物理迁入。AlembicPlugin 基线 ca1f9ab，直提 main。用已产出的完整 symbol→新名→refs 测绘清单直接执行，本步尽量多推进、每批 tsc 绿即 commit，确需跨上下文再 flag DH-3f（每批独立绿）。含 collision 定名（CODEX_AGENT_PUBLIC_TOOL_NAMES 撞 contract.ts）+ isTrustedProjectRoot/resolveEffectiveTier 去前缀裁决 + 余 host-operation routing（Preflight/StatusService/host-agent-workflows 含 buildHostProjectAlignment）+ 真 host-specific 函数体物理迁入 CodexHostAdapter（保 wire-byte）。完成即 DH-3 DONE。不动 per-host 产物/cc 子模块（DH-4）。"
+      },
+      {
+        "taskPackageId": "dh-3f-decodex-bulk-complete",
+        "status": "accepted",
+        "summary": "DH-3f（DH-3 de-Codex 全量收尾，本 pass 力求完成）。AlembicPlugin 基线 ebb960f，直提 main。用已产出测绘清单 + 子代理并行，一个 dispatch 内按模块逐个改名（每模块 tsc 绿即 commit），覆盖残留 ~140 误命名 host-agnostic Codex*/CODEX_*（ToolPolicy CODEX_*_TOOL_NAMES 族/ProjectRuntimeContext/KnowledgeState/EnhancementRoute/Diagnostics/Preflight/StatusService/ProjectSkillDelivery/SourceBoundary 等）+ 2 collision 定名 + isTrustedProjectRoot/resolveEffectiveTier 接口移除归 L1/L2 + 余 host-operation routing + 物理迁入（保 wire-byte）。完成即 DH-3 DONE；仅真阻塞才 flag DH-3g。不动 per-host 产物/cc 子模块（DH-4）。"
+      },
+      {
+        "taskPackageId": "dh-3g-design-shared-workspace-io-structure",
+        "status": "accepted",
+        "summary": "DH-3g-design（Design 结构裁决请求，option-planning）：cc/codex 共享 workspace-identity I/O 在 5 层架构 L3 的组织结构。Design 只出选项对比+推荐+风险，不改产品代码/不派发/不改控制器状态。候选：(i)保持共享 L1+两 adapter 委托(现状) /(ii)shared-base 基类 /(iii)cc 委托 codex 单例 /(iv)各自复制。约束：保 F-V2-2 wire-byte、行为不变、host 分支仅 L3、cc+codex 确共享、不碰 per-host 产物/cc 子模块(DH-4)。产出推荐+理由+每候选风险+控制器执行要点，供据此派 DH-3g 执行。"
+      },
+      {
+        "taskPackageId": "dh-3g-decodex-shared-workspace-cluster",
+        "status": "accepted",
+        "summary": "DH-3g（执行：共享簇 de-Codex 收尾，DH-3 最后一步）。AlembicPlugin 基线 a297e9d，直提 main。控制器裁断（基于 Design 裁决）：否决物理迁入（共享簇是 host-agnostic、委托=合法分层），改做共享 workspace-identity 簇剥 Codex 前缀 + L1 归位、两 adapter 委托新名。必读 Design doc §6（符号清单 + KEEP 边界）。严守 §6.B KEEP（落盘文件名/profile 值/CODEX env 值/MCP error codes/CODEX_PLUGIN_HOST label/isCodexPluginCachePath/resolveCodexPluginRoot 回退 不动）。完成=误命名清零(残留仅 KEEP) + 两 adapter 委托新名 + codex 逐行不变(wire-byte/落盘/profile 不变) + tsc/测试绿 + 失败集 vs a297e9d IDENTICAL = DH-3 DONE。不动 per-host 产物/cc 子模块(DH-4)。"
+      },
+      {
+        "taskPackageId": "dh-4a-plugin-per-host-products-cc-shell-gitlink",
+        "status": "accepted",
+        "summary": "DH-4a（AlembicPlugin 侧 per-host 产物 + cc 壳 + gitlink + manifest-seam de-Codex；产出 Alembic 门禁 per-host 规格）。基线 0221525，直提 main。用户已授权 cc 子模块提交 + 父仓 gitlink bump。做：① skills/templates/constitution per-host 分叉（codex/cc 各承载本host工具名；DH-0B 3 项 host-divergent 资产出 per-host 变体）；② cc 子模块 manifest identity(删 ALEMBIC_CHANNEL_ID=codex+ALEMBIC_PLUGIN_HOST→claude-code)+cc bootstrap per-host+cc setupProfile，子模块 main 提交+父仓 gitlink bump；③ manifest-seam de-Codex(PluginRegistry 5 符号 host-agnostic 去前缀，wire-byte 保全)；④ 产出 Alembic 漂移门禁 per-host 规格(manifest 单path→per-host、check-shared-asset-drift per-host 比较、3 资产转绿预期)供 DH-4b。不改 Alembic/Core。可 subagent+增量绿+flag。完成=AlembicPlugin per-host 就位+cc 壳+gitlink+manifest-seam+Alembic 规格+tsc/测试绿。"
+      },
+      {
+        "taskPackageId": "dh-4b-alembic-shared-asset-drift-per-host",
+        "status": "accepted",
+        "summary": "DH-4b（Alembic 侧 shared-asset-drift 门禁 per-host + 3 资产转绿）。本窗口=Alembic（治理权威），基线 cf3b171，直提 main。据 DH-4a 规格 §C：把 3 项资产(alembic-recipes/structure shared 段 + recipes-setup/README)的真 host-divergent 工具名行提升为 wakeflow-host:<host> 段(codex=alembic_knowledge/guard, claude-code=alembic_search/code_guard)；check-shared-asset-drift.mjs 加 per-host 比较 + 可选 cross-host coherence；重跑门禁 RED→GREEN(0 drift)。Plugin self-check 脚本同步 diff 标 needs-controller(不改 Plugin)。Node≥22 跑门禁。完成=门禁绿 + 每项 diff + commit hash。不改四工具语义(main 真实工具名保留在 codex 段)、AlembicCore 不动。"
+      },
+      {
+        "taskPackageId": "dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap",
+        "status": "accepted",
+        "summary": "DH-4c（DH-4 Plugin 侧收尾，完成即 DH-4 DONE）。AlembicPlugin 基线 53f9258，直提 main。① self-check 同步：Plugin config/shared-asset-manifest.json + scripts/check-shared-asset-drift.mjs 同步到 Alembic 88a2abf 版（应用 dh-4b patch，仅这 2 文件、不改 plugin 资产）→ shared-asset-drift 0 drift GREEN(Node≥22)；② cross-shell-drift 门禁 per-host 重塑(§D.1)：byte-identical→section/per-host-aware，line-39 overlay 放行→GREEN；③ cc bootstrap fork(bin:100→claude-code)，子模块提交+gitlink bump(用户授权)；④ cc setupProfile per-host(谨慎保 persistence，高风险可 flag DH-5)。完成=两门禁绿+cc bootstrap+setupProfile(或 flag)+tsc/测试绿。不改 Alembic/Core；CC3 不在本需求。"
+      },
+      {
+        "taskPackageId": "dh-5-cleanup-test-parity-rc678",
+        "status": "accepted",
+        "summary": "DH-5（最终清理收口 + 测试对等 RC-6/7/8 + DH-4 结转项；完成即 RC-1~8 全部 DONE，仅余 DH-6 验收）。AlembicPlugin 基线 1b53b5d 直提 main。RC-7 主交付=补 cc 路径 runtime 测试 ~10-15 用例 + cross-host parity（现 cc 覆盖仅 ~5%）；RC-6=固化 layer-contract（mcp→service/workflows 26 处已干净单向 L2→L1、无 backslip，加 lint:layer-boundary 起步绿 或文档化+flag）；RC-8=兼容残留决策（HostDeclaredIntentInput LIVE 保留、file-monitor 纯诊断保留、intent 删除已归 PDR-1 不返工、保 4-tool 语义）；DH-4 结转=AGENTS.md 差异声明表同步 + structure 0-coherence 取舍 note + cc setupProfile 归 CC3 记录。完成=cc runtime 测试绿(failed 不增于基线 39)+RC-6 固化+RC-8 决策+DH-4 结转+tsc 绿+两漂移门禁仍绿(Node≥22)。不改 Alembic(88a2abf)/Core；CC3 文案不在本需求；四工具语义/落盘名/'codex-plugin'/frozen strings 不动；纯 MCP 非强进程。"
+      },
+      {
+        "taskPackageId": "dh-6-cc-real-acceptance",
+        "status": "accepted",
+        "summary": "DH-6 cc 在 workspace 内真实验收（Test）= 本需求最后验收的 cc 半边（codex 半边由用户在 codex host 外部验收，已决#9，不在本卡）。真实 cc host 加载 alembic-claude-code 插件(gitlink 15fce77, manifest ALEMBIC_PLUGIN_HOST=claude-code) + init/status/四工具真 MCP 调用 + 纯 MCP 非强进程验证 + 与 codex 语义对等。控制器已自验单测/门禁/tsc 全绿（tsc、14 cc runtime 单测、shared-asset-drift 权威方向 0 drift、cross-shell-drift、lint:layer-boundary/repo-boundary、全量 vitest 39-failed sandbox 基线无回归），故 Test 只做单测证明不了的真实 cc 运行验收。ALEMBIC_HOME sandbox 隔离保护真实 ~/.asd；安装(runtime 本地 build + 离线 mcp add)受阻则回精确 blocker、勿反复试。不改产品代码（缺陷回 AlembicPlugin）。"
+      },
+      {
+        "taskPackageId": "dh-7-agenthost-default-from-pluginhost",
+        "status": "accepted",
+        "summary": "DH-7（F1 修复，用户选「现修」）= 收尾 RC-1 消除硬编码最后一处。AlembicPlugin 基线 532a7d1 直提 main。把 agentHost 省略时的默认从硬编码 'codex' 改为「取 runtime 已解析 pluginHost」：codex runtime → 仍默认 codex（不变）；cc runtime → 默认 claude-code。改点 mcp-tools.ts:128（AgentHostSchema.default('codex')）+ agent-public-tools.ts:905/925（args.agentHost ?? 'codex'）；默认值取 RuntimeContext/L3 已解析的 pluginHost（与 status.runtimeIdentity.pluginHost 同源），**不在 L2 handler 引入 host-name 字面分支**（读已解析值）。加回归测试（cc 省略→claude-code、codex 省略→codex、显式 agentHost 保留）。约束：wire-safe（codex 行为不变）、显式 agentHost 仍接受、AGENT_HOSTS 校验不变、output/contract 仍始终携带已解析 agentHost、四工具对外 MCP 语义不变。验证 tsc + 新测试 + 全量 unit 失败集不增于 39 基线 + 两漂移门禁 + lint:layer-boundary/repo-boundary 绿（Node≥22）。若 schema-default 移除波及 contract/output/测试超出小修预期，评估后回报。"
+      }
+    ],
+    "targetTasks": [
+      {
+        "targetTaskId": "DH-0",
+        "taskPackageId": "dh-0-precheck-cc-host-feasibility",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-0B",
+        "taskPackageId": "dh-0b-alembic-drift-backport",
+        "targetWindow": "Alembic",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-1",
+        "taskPackageId": "dh-1-host-abstraction-unify-delete-generic",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-2",
+        "taskPackageId": "dh-2-l3-hostadapter-interface-codex-migration",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-3",
+        "taskPackageId": "dh-3-claude-code-adapter-l2-rewire-decodex",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-3b",
+        "taskPackageId": "dh-3b-l2-rewire-decodex-migration",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-3c",
+        "taskPackageId": "dh-3c-decodex-rename-routing-migration",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-3d",
+        "taskPackageId": "dh-3d-decodex-rename-migration-finale",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-3e",
+        "taskPackageId": "dh-3e-decodex-full-rename-finale",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-3f",
+        "taskPackageId": "dh-3f-decodex-bulk-complete",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-3g-design",
+        "taskPackageId": "dh-3g-design-shared-workspace-io-structure",
+        "targetWindow": "Design",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-3g",
+        "taskPackageId": "dh-3g-decodex-shared-workspace-cluster",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-4a",
+        "taskPackageId": "dh-4a-plugin-per-host-products-cc-shell-gitlink",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-4b",
+        "taskPackageId": "dh-4b-alembic-shared-asset-drift-per-host",
+        "targetWindow": "Alembic",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-4c",
+        "taskPackageId": "dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-5",
+        "taskPackageId": "dh-5-cleanup-test-parity-rc678",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-6",
+        "taskPackageId": "dh-6-cc-real-acceptance",
+        "targetWindow": "Test",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "DH-7",
+        "taskPackageId": "dh-7-agenthost-default-from-pluginhost",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      }
+    ],
+    "blockers": [],
+    "decisionsRequired": []
+  }
+}

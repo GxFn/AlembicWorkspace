@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "dh-3g-design-shared-workspace-io-structure",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "summary": "DH-3g-design（Design 结构裁决请求，option-planning）：cc/codex 共享 workspace-identity I/O 在 5 层架构 L3 的组织结构。Design 只出选项对比+推荐+风险，不改产品代码/不派发/不改控制器状态。候选：(i)保持共享 L1+两 adapter 委托(现状) /(ii)shared-base 基类 /(iii)cc 委托 codex 单例 /(iv)各自复制。约束：保 F-V2-2 wire-byte、行为不变、host 分支仅 L3、cc+codex 确共享、不碰 per-host 产物/cc 子模块(DH-4)。产出推荐+理由+每候选风险+控制器执行要点，供据此派 DH-3g 执行。",
+  "status": "pending",
+  "sourceRef": "用户决策 B(本会话: 路由 Design 定结构) + DH-3f 验收 evt-20260620063852-0041 (物理迁入=cc/codex 共享 workspace I/O 真架构问题) + Design RC-2/3 物理迁入项",
+  "createdAt": "2026-06-20T06:46:42.292Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-3g-design",
+      "taskPackageId": "dh-3g-design-shared-workspace-io-structure",
+      "targetWindow": "Design",
+      "summary": "DH-3g-design —— **Design 结构裁决请求（option-planning / 架构推荐，不改产品代码）**。本窗口=Design（仓库内置 Design 面）。**职责边界：只出选项对比、推荐、风险、给控制器的执行要点；不编辑产品代码、不派发实现、不改 Wakeflow 控制器状态。** 读父 `CLAUDE.md`、本需求状态根、`Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md`，声明窗口身份。\n\n**背景**：AlembicPlugin dual-host 重构 DH-1~DH-3f 已完成——功能性双宿主（L3 `HostAdapter` 接口 + `CodexHostAdapter` + `ClaudeCodeHostAdapter` + `resolveHostAdapter`/`hostAdapterForShape` 选择器；host-name 分支仅 L3）+ de-Codex 误命名清零 + 接口收口 + 全 host-operation routing。**唯一剩余 = 物理迁入**（把 host-specific 函数体搬进 `CodexHostAdapter`、去 DH-2/3.1 的委托外观），但 AlembicPlugin 窗口揭示**真架构问题**需 Design 裁决。\n\n**问题**：cc 与 codex **共享同一组 workspace-identity I/O 函数**——`resolveCodexProjectRoot`（DH-3.1 后已同时信任 codex 的 ALEMBIC_PROJECT_DIR/CODEX_WORKSPACE_* 与 cc 的 CLAUDE_PROJECT_DIR）、init-marker/saved-root I/O、`ensureCodexRuntimeEnvironment`（shape 派生 host）、清单读取。两 adapter（Codex/ClaudeCode）现都**委托同一批函数**。把这些函数体物理迁入 `CodexHostAdapter`（codex 专属）会**破坏 cc 共享**。当前委托设计有效、行为不变。\n\n**请 Design 出结构裁决（option-planning）**，候选至少：\n- (i) **保持现状**：共享函数留 L1（host-agnostic），两 adapter 委托——「委托外观」实为正确分层（L3=host 契约，共享逻辑在低层），不做物理迁入。\n- (ii) **shared-base 基类**：抽 `BaseHostAdapter` 持共享 I/O，Codex/ClaudeCode 继承 + 各自覆盖真 host-specific 点。\n- (iii) **cc 委托 codex 单例**：保留 codex 为主实现，cc adapter 显式委托。\n- (iv) **各自复制**：每 adapter 复制一份（弃 DRY）。\n\n**约束/不变量**：保 F-V2-2 wire-byte（codex `.mcp.json` 读取/arg 字节不变）；行为逐行不变；host-name 分支仅 L3；cc+codex 确实共享这组 I/O（DH-0/DH-1 已证）；纯 MCP 非强进程；不改四工具对外 MCP 语义。**判据**：分层正确性、DRY、cc/codex 对等、与 DH-4 per-host 产物分叉的兼容、迁移/wire-byte 风险、是否值得（当前委托已有效）。\n\n**产出（回 TargetResultEnvelope 或 Design handoff）**：推荐结构 + 理由；每候选风险/代价；给控制器的**执行要点**（哪些函数去哪层/哪类、调用方如何改、wire-byte 注意点、是否需要 + 收益），供控制器据此派 DH-3g 执行 pass（或裁定保持现状=DH-3 DONE）。**不改任何代码；不碰 per-host 产物/cc 子模块（DH-4 领地）；不改控制器状态。**",
+      "status": "pending",
+      "createdAt": "2026-06-20T06:46:42.292Z"
+    }
+  ]
+}

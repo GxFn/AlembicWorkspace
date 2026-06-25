@@ -245,8 +245,8 @@ Recommended controller action after review:
 
 ## Source References
 
-- `.workspace-active/workspace/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-core-audit-t1.json`
-- `.workspace-active/workspace/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-plugin-audit-t2.json`
+- `.wakeflow-active/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-core-audit-t1.json`
+- `.wakeflow-active/current/alembic-codegraph-knowledge-base-capability/target-results/tr-alembic-codegraph-knowledge-base-capability-cgk0-plugin-audit-t2.json`
 - `wakeflow-ledger/requirement-designs/alembic-codegraph-knowledge-base-capability/cgk11-learning-decision-ledger-2026-06-10.md`
 - `AlembicCore/src/core/ast/ProjectGraph.ts:1`
 - `AlembicCore/src/core/analysis/CallGraphAnalyzer.ts:84`

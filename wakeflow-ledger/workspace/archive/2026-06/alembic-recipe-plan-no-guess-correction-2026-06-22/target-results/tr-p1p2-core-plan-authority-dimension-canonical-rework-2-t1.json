@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+  "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+  "status": "completed",
+  "summary": "AlembicCore rework-2 completed in commit bedbe2b80a51b658d33c677e691e07d83cfef48b (Remove plan cross-dimension constraint leak). The remaining Core Plan-facing cross-dimension constraint path was removed: CrossDimensionConstraint is no longer exported from dimensionPlanning contracts, DimensionPlanningAidReport no longer exposes crossDimensionConstraints, buildDimensionPlanningAids no longer builds or returns that field, and buildCrossDimensionConstraints was deleted instead of renamed or retained as an auxiliary/factual/relation fallback. Core tests now assert buildDimensionPlanningAids output and Plan draft information packages do not contain crossDimensionConstraints/CrossDimensionConstraint/buildCrossDimensionConstraints, while preserving prior absence checks for recommendedDimensions, dimensionOrder, maxRecommendedDimensions, subsetHints, defaultOrder, and top/order recommendation leaks. Previous accepted-good work from fe563ee/e1de391 was preserved: no draftPackage.intent, confirm requires complete Agent PlanIntent+rationale, draftSource plugin-collected-facts, stop-write planning_brief_json, read-time generation-state projection, and resolvePlanDimensionDefinitions canonical confirmed-id API remain in place. No AlembicPlugin/Alembic/Dashboard files were edited; downstream Plugin still needs its assigned migration away from consuming crossDimensionConstraints.",
+  "evidenceRefs": [
+    "commit:bedbe2b80a51b658d33c677e691e07d83cfef48b Remove plan cross-dimension constraint leak",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/src/service/project-context/dimensionPlanning/contracts.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/src/service/project-context/dimensionPlanning/dimensionPlanning.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/test/DimensionPlanningDynamicSignals.test.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/test/PlanLedgerProjection.test.ts",
+    "rg-no-match-plan-path: rg -n \"CrossDimensionConstraint|crossDimensionConstraints|buildCrossDimensionConstraints\" src/service/project-context/dimensionPlanning src/service/planLedger src/project-context-capabilities.ts src/dimensions.ts",
+    "rg-no-match-prior-leak-scan: rg -n \"recommendedDimensions|dimensionOrder|maxRecommendedDimensions|maxDimensionsPerDraft|subsetHints|defaultOrder|severity: 'recommended'|'recommended'|\\btop\\b|top-N|topN\" src/service/project-context/dimensionPlanning src/service/planLedger src/project-context-capabilities.ts src/dimensions.ts",
+    "git-status: AlembicCore main ahead 3 with clean worktree"
+  ],
+  "verification": [
+    "PASS npm run build:check",
+    "PASS npm run lint",
+    "PASS npx vitest run test/PlanLedgerProjection.test.ts test/DimensionPlanningDynamicSignals.test.ts (2 files, 9 tests)",
+    "PASS npm run test (135 files, 1377 tests)",
+    "PASS npm run build",
+    "PASS git diff --check",
+    "PASS Plan-path crossDimensionConstraints leak scan returned no matches in src/service/project-context/dimensionPlanning src/service/planLedger src/project-context-capabilities.ts src/dimensions.ts",
+    "PASS prior recommended/top/order/subset leak scan returned no matches in the same Core Plan path",
+    "PARTIAL npm run check: passed build:check, lint:public-api-boundary, lint:layer-contract, lint:consumer-core-imports, smoke:public-api, check:output-budgets, check:space-edges, lint:doctrine; failed at existing lint:naming in src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts (files not modified by this rework)",
+    "BLOCKED Alembic code guard returned internal schema/CODEX_MCP_ERROR, so no guardRef was produced"
+  ],
+  "risks": [
+    "AlembicPlugin still has a known downstream consumer of crossDimensionConstraints and must remove/adapt that consumption in its own assigned package; this Core task intentionally did not edit Plugin/Alembic/Dashboard.",
+    "Existing npm run check lint:naming blocker remains outside this rework scope and should be resolved or blessed separately.",
+    "Alembic status for AlembicCore is degraded/not initialized with selected-project mismatch, and alembic_code_guard failed internally; repository validation and Wakeflow evidence are the available verification."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1p2-core-plan-authority-dimension-canonical-rework-2-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-rework-2-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-2-t1.json",
+    "deliveryRunId": "run-delivery-p1p2-core-plan-authority-dimension-canonical-rework-2-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+    "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-rework-2-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-2-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 11,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+    "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-rework-2-p1",
+    "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-rework-2-t1",
+    "createdAt": "2026-06-22T12:40:47.044Z"
+  },
+  "createdAt": "2026-06-22T12:40:47.044Z",
+  "stateRevisionObserved": 11,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

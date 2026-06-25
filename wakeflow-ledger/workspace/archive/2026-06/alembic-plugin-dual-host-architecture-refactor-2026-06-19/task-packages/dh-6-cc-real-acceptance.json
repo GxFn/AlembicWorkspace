@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "dh-6-cc-real-acceptance",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "summary": "DH-6 cc 在 workspace 内真实验收（Test）= 本需求最后验收的 cc 半边（codex 半边由用户在 codex host 外部验收，已决#9，不在本卡）。真实 cc host 加载 alembic-claude-code 插件(gitlink 15fce77, manifest ALEMBIC_PLUGIN_HOST=claude-code) + init/status/四工具真 MCP 调用 + 纯 MCP 非强进程验证 + 与 codex 语义对等。控制器已自验单测/门禁/tsc 全绿（tsc、14 cc runtime 单测、shared-asset-drift 权威方向 0 drift、cross-shell-drift、lint:layer-boundary/repo-boundary、全量 vitest 39-failed sandbox 基线无回归），故 Test 只做单测证明不了的真实 cc 运行验收。ALEMBIC_HOME sandbox 隔离保护真实 ~/.asd；安装(runtime 本地 build + 离线 mcp add)受阻则回精确 blocker、勿反复试。不改产品代码（缺陷回 AlembicPlugin）。",
+  "status": "pending",
+  "sourceRef": "需求设计 DH-6 定义(Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md:118) + 已决#9(cc 在 workspace 内真实验收 / codex 路径用户外部不含本需求) + 控制器 DH-5 验收(RC-1~8 实现 DONE，tsc/14 cc 单测/两漂移门禁/layer-boundary 全绿，39-failed sandbox 基线无回归) + cc 安装方式(runtime 本地 build + 离线 claude mcp add, ALEMBIC_HOME sandbox 隔离)",
+  "createdAt": "2026-06-20T09:49:47.446Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-6",
+      "taskPackageId": "dh-6-cc-real-acceptance",
+      "targetWindow": "Test",
+      "summary": "DH-6（cc 在 workspace 内真实验收 = 本需求最后验收的 cc 半边；codex 半边由用户在 codex host 外部验收，已决#9，**不在本卡**）。本窗口=Test（workspace 内真实场景验收窗口）。**只做真实 cc 运行验收，不改产品代码**（发现产品缺陷回 AlembicPlugin 窗口修，不在 Test 改）。先读本仓 Test `CLAUDE.md` + 父 `CLAUDE.md`，声明窗口/角色身份。\n\n**前置（控制器已自验绿，勿把重跑单测/门禁当本验收交付）**：dual-host 实现 RC-1~8 全 DONE，控制器已亲验——tsc --noEmit GREEN；test/unit/ClaudeCodeHostRuntime.test.ts 14 cc runtime 单测全绿；shared-asset-drift（从 Alembic `--sibling=plugin` 权威方向 11 checks/0 drift）+ cross-shell-drift（从 plugin）+ lint:layer-boundary + lint:repo-boundary 全 PASS；全量 vitest 39 failed files=长期 sandbox 基线、无回归。**这些是单测/静态层、已绿。DH-6 要的是单测证明不了的「真实 cc host 加载插件 + 真 MCP 工具调用 + 真项目」运行行为。Node≥22 跑任何门禁（.nvmrc=22）。**\n\n**精确问题**：alembic-claude-code 插件在真实 Claude Code（cc）host 加载后，init/status/四个 MCP 工具的运行行为是否正确（cc host 身份=claude-code、与 codex 语义真对等、纯 MCP 非强进程不变量持）？\n\n**对象边界**：cc 插件产物 `AlembicPlugin/plugins/alembic-claude-code`（gitlink 15fce77；manifest 已 ALEMBIC_PLUGIN_HOST=claude-code，DH-4a 修）+ 其 runtime。**不含 codex（用户外部，已决#9）**；不动 Alembic/Core。\n\n**做（真实 cc 运行验收）**：\n1. **装**：cc runtime（`@gxfn/alembic-runtime` 不在 npm）本地 build + 离线 `claude mcp add` 进一个 cc 会话。**用 `ALEMBIC_HOME` sandbox 隔离**（保护真实 `~/.asd`）；无 AI 凭证也应能 boot 基本 MCP。\n2. **init**：对一个真实/沙箱项目跑 alembic_init → 核 init marker 正确：host 身份=claude-code、profile 持久化、route、dataRoot；落盘文件名 `codex-init.json`/`codex-project-root.json`（frozen，不因 cc 改名）round-trip 读回正确。\n3. **status**：alembic_status → cc 正确自认 claude-code（非 codex）、bootstrapState/toolCapabilities 合理。\n4. **四工具**：从 cc manifest/alembic_status 读出真实工具名（cc 侧 alembic_search/alembic_code_guard/alembic_project_matrix + prime 类）逐个对真项目调用 → 返回正确、与 codex 语义对等（同输入对等输出，仅 host 标识/工具名属 per-host 差异，外部 MCP 语义不变）。\n5. **非强进程不变量**：调用期间确认无 daemon/常驻进程被拉起（纯 MCP 非强进程）——ps/进程检查取证。\n\n**成功含义**：cc 插件在 cc host 成功加载；init marker host=claude-code 且持久化正确；status 正确；四工具对真项目返回正确且 codex 语义对等；零常驻进程。\n**失败含义**：插件加载失败 / host 身份错（自认 codex）/ marker 畸形 / 工具报错 / 出现常驻进程（违反不变量）/ 非 per-host 的语义分叉。\n**无效结论**：不得据此判 codex 坏（不在范围）；不重打单测/门禁基线当验收；安装机制摩擦先隔离、勿当产品缺陷。\n**停止条件**：若 runtime build / 离线 mcp add 在本环境无法完成 → **停并回精确 blocker**（写清卡在哪步、缺什么），勿反复试、勿动产品代码。\n\n**回 TargetResultEnvelope（原始证据）**：安装步骤+结果；alembic_status 原始输出（host 身份/capabilities）；init marker 文件原始内容；各工具调用原始输入/输出 + 对等性判断；非强进程检查证据（进程列表）；DH-6 cc 验收结论（通过/blocker/产品缺陷→回 AlembicPlugin）。",
+      "status": "pending",
+      "createdAt": "2026-06-20T09:49:47.446Z"
+    }
+  ]
+}

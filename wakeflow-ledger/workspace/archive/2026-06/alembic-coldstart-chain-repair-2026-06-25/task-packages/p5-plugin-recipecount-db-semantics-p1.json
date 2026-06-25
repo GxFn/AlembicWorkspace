@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p5-plugin-recipecount-db-semantics-p1",
+  "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+  "summary": "P5 AlembicPlugin: align status recipeCount semantics with DB persisted recipe reality and expose disk materialized recipe count separately, after P0/P1/P2/P3 accepted. This must preserve alembic_plan two-part contract and not touch Core/Test/P6.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-coldstart-chain-repair-2026-06-25.md#p5",
+  "createdAt": "2026-06-24T21:43:55.774Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p5-plugin-recipecount-db-semantics-t1",
+      "taskPackageId": "p5-plugin-recipecount-db-semantics-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, Design/docs/current/alembic-coldstart-chain-repair-original-plan-2026-06-25.md, Design/docs/current/alembic-coldstart-chain-repair-2026-06-25.md P5, and AlembicPlugin/AGENTS.md. Declare identity as AlembicPlugin. Execute only P5. Goal: status recipeCount must no longer mislead by reporting only disk .md exports when DB knowledge_entries contains staging recipes; align it with DB persisted recipe count consistent with databaseEntryCount/recipe_map rollup, and expose disk .md/materialized export count separately with a self-explanatory name such as materializedRecipeCount, or explicitly separate dbRecipeCount vs materializedRecipeCount if local API compatibility demands keeping recipeCount disk semantics. Required implementation starting point: lib/runtime/KnowledgeState.ts around the existing recipeCount calculation; inspect and update real consumers of status.recipeCount/onboarding/Dashboard if needed so no reader treats DB count as disk export count or vice versa. Required evidence: AlembicPlugin commit hash on main; changed files; consumer scan for recipeCount/materializedRecipeCount/dbRecipeCount; unit tests covering both DB knowledge_entries count and disk .md/materialized count sources; status output/probe or fixture showing recipeCount aligns with DB recipe reality and materialized count remains separately visible; npm run build:check under Node 22; targeted tests; git diff --check. Boundary: do not modify AlembicCore P3, Test e2e, P6 handoff/projectId, evidence-gate strictness, alembic_plan draft/confirm two-part contract, or reintroduce retired 7-domain onboarding logic. If status field compatibility forces a naming choice, state the exact compatibility reason and keep the two sources unambiguous.",
+      "status": "pending",
+      "createdAt": "2026-06-24T21:43:55.774Z"
+    }
+  ]
+}

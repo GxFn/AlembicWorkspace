@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "kind": "ControllerReviewEvidence",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p2-plugin-stateless-confirm-plan-selection-p1",
+  "targetTaskId": "p2-plugin-stateless-confirm-plan-selection-t1",
+  "targetWindow": "AlembicPlugin",
+  "controllerWindow": "AlembicWorkspace",
+  "reviewedCommit": {
+    "repository": "AlembicPlugin",
+    "commit": "7afd28c1f40d25216ecfeffb2160e1b407eca541",
+    "subject": "fix(plan): return stateless confirm selection",
+    "changedFiles": [
+      "lib/recipe-generation/plan-tool.ts",
+      "lib/shared/schemas/mcp-tools.ts",
+      "test/unit/PlanConfirmStatelessSelection.test.ts"
+    ]
+  },
+  "p2ContractReview": {
+    "acceptedScope": "P2 only: stateless single-stage alembic_plan confirm -> planSelection.",
+    "conforms": true,
+    "confirmPath": {
+      "readsDraft": false,
+      "writesPlanRow": false,
+      "recollectsProjectContext": false,
+      "usesProjectProfileFromInput": true,
+      "validatesViaSingleStagePlanIntent": true
+    },
+    "requiredRejectionsCovered": [
+      "missing rationale",
+      "targetRecipes <= 0",
+      "no dimensions",
+      "no totalRecipeBudget",
+      "module binding references unknown dimension"
+    ],
+    "confirmBusinessFields": [
+      "nextActions",
+      "operation",
+      "planSelection",
+      "projectRoot",
+      "status"
+    ],
+    "planSelectionShape": {
+      "generationStage": "single-stage",
+      "dimensions": "flat string ids",
+      "scale": [
+        "totalRecipeBudget",
+        "maxFiles",
+        "contentMaxLines",
+        "depthLevels"
+      ],
+      "moduleBindings": "flat bindings"
+    },
+    "removedConfirmInternals": [
+      "plan",
+      "planId",
+      "version",
+      "projectContextSignature",
+      "currentProjectContextSignature",
+      "projectContextCreationGuide",
+      "stages",
+      "perStage",
+      "sourceReports",
+      "planningBrief",
+      "missionBriefing",
+      "sop"
+    ],
+    "notClaimedComplete": [
+      "P3 executor planSelection gate/job forwarding",
+      "P4 checkpoint/SOP/missionBriefing derivation",
+      "P5 broad suite rewrite and BiliDili e2e",
+      "final demand completion"
+    ]
+  },
+  "controllerCommands": [
+    {
+      "cwd": "AlembicPlugin",
+      "command": "git show --patch --find-renames 7afd28c1f40d25216ecfeffb2160e1b407eca541 -- lib/recipe-generation/plan-tool.ts lib/shared/schemas/mcp-tools.ts test/unit/PlanConfirmStatelessSelection.test.ts",
+      "result": "reviewed; confirmed confirm no longer builds plan snapshot/projectContextCreationGuide/planId/version/signature and PlanInput rejects legacy confirm identity plus multi-stage residue"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npm run test:unit -- test/unit/PlanConfirmStatelessSelection.test.ts test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts",
+      "result": "PASS; 3 files, 18 tests"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npm run build:check",
+      "result": "PASS; Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npm run build",
+      "result": "PASS; Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d and postbuild completed"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npx biome check lib/recipe-generation/plan-tool.ts lib/shared/schemas/mcp-tools.ts test/unit/PlanConfirmStatelessSelection.test.ts test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts",
+      "result": "PASS; Checked 5 files. No fixes applied."
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "rg -n \"PlanRepository|planRepository|saveDraft|getActiveConfirmed|getPlanView|getPlan\\(|sqliteTable\\('plans'|012_plans|projectContextSignature|currentProjectContextSignature|projectContextCreationGuide|planId|basePlanId|baseVersion|\\bversion\\b|\\bstages\\b|perStage\" lib/recipe-generation/plan-tool.ts lib/shared/schemas/mcp-tools.ts",
+      "result": "PASS; exit 1 with no output"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "node --input-type=module dist routePlanTool confirm smoke with nonexistent projectRoot and throwing container.get",
+      "result": "PASS; success true; data keys nextActions,operation,planSelection,projectRoot,status; forbiddenHits []"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npm run lint:repo-boundary && npm run lint:layer-boundary",
+      "result": "PASS"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "npm run lint",
+      "result": "PASS exit 0; warnings are existing unrelated scripts/ClaudeCodeHostAdapter warnings, not P2 changed files"
+    },
+    {
+      "cwd": "AlembicPlugin",
+      "command": "git diff --check && git diff --cached --check && git status --short --branch",
+      "result": "PASS; worktree clean, branch main ahead of origin/main"
+    }
+  ],
+  "distConfirmSmoke": {
+    "cwd": "AlembicPlugin",
+    "projectRoot": "/tmp/nonexistent-stateless-confirm-controller-smoke",
+    "storageReadGuard": "container.get throws on any storage read",
+    "result": {
+      "success": true,
+      "dataKeys": [
+        "nextActions",
+        "operation",
+        "planSelection",
+        "projectRoot",
+        "status"
+      ],
+      "planSelection": {
+        "generationStage": "coldStart",
+        "dimensions": [
+          "architecture"
+        ],
+        "scale": {
+          "totalRecipeBudget": 3,
+          "maxFiles": 17,
+          "contentMaxLines": 41,
+          "depthLevels": [
+            "project",
+            "module"
+          ]
+        },
+        "moduleBindings": [
+          {
+            "modulePath": "Sources/App",
+            "dimensions": [
+              "architecture"
+            ],
+            "targetRecipes": 2,
+            "priority": 1
+          }
+        ]
+      },
+      "forbiddenHits": []
+    }
+  },
+  "decision": {
+    "controllerFinding": "P2 AlembicPlugin stateless confirm -> planSelection is acceptable for this package only.",
+    "forbiddenConclusion": "This evidence does not accept P3, P4, P5, or final demand completion."
+  }
+}

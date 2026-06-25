@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-ap-5",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "taskPackageId": "ap-5-agent-five-scenario-acceptance",
+  "dispatchGroup": "ap5-agent-five-scenario",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "AP-5",
+  "status": "completed",
+  "summary": "AP-5 完成（AlembicAgent 五场景端到端验收）。AlembicAgent main 8118dbe→8c9fd62（仅 AlembicAgent，纯测试新增 1 文件 +326，零 src 改动）。\n\n做了：新增场景导向的端到端验收套件 test/pcv-observe-only-five-scenario.acceptance.test.ts（统一 runScenario 跑完整 reactLoop、捕获 provider 调用 opts/progress/result），与 pcv-observe-only-baseline.characterization.test.ts（按 CP1-CP4 控制点组织的 behavior-equivalence 锚点）**互补不重复**——本套件按场景组织、每场景断言整条链路可观察 end-to-end 结果，验收 AP-1~4 收敛后对外行为：\n- 场景① observe-only 默认（off）：analyze 不阻断（首轮即终结）+ grounding-policy 不到达 provider messages（providerSawPolicy=false）+ classification 仍记 invalid-no-evidence 作审计 + summary.groundingEnforcement='off'。\n- 场景② guard opt-in（per-run guard）：grounding-policy 文本到达 provider messages（providerSawPolicy=true，CP1 端到端）+ invalid-no-evidence 阻断+nudge('不能推进阶段')+rollbackTick + ledger['invalid-no-evidence','planning-only'] + 标记='guard'。\n- 场景③ DeepSeek V4：analyze 首轮 toolChoice none→auto + schema 可见 + 工具实际执行 + ledger[0].deepseekV4ToolChoiceMode='tools-visible-no-forced-tool-choice'，**off/guard 两模式一致**（PD1 provider 不被 grounding 门控）。\n- 场景④ graceful exit：抑制例外路径——工具调用不执行（executeSpy 未调）+ tool_choice_violation 诊断。\n- 场景⑤ 无证据 analyze：同一无证据输入下 off 首轮终结（1 call、无 rollback、标记 off）/ guard 阻断续轮（2 call、rollback、标记 guard）——enforcement 开关决定主流程。\n\n补缺口（超出单元级表征）：端到端核实 CP1 grounding-policy 文本确实到达（guard）/ 不在（off）捕获的 provider messages——表征测试用 assembleLlmInput 单元级断言，本套件验证经完整 reactLoop 后真正注入 provider 调用。\n\n修复记录：场景③ guard 初版因第二轮文本未引证据 ref 被 gate 误阻断耗尽 mock，改用引用 src/known.ts:10 的文本使其分类非 invalid-no-evidence、两模式 2 轮终结（验收对象是 provider 首轮 toolChoice，非 gate）。biome format 自动整形新文件（仅排版）。\n\n不变量：仅 AlembicAgent；纯测试新增、零 src 改动；不改 guard 内部 / provider 门控 / PcvNodeEvidence 纯观察；四工具/LLM 对外语义不变；Node 22。\n\n结论：AP-5 完成定义全部满足；五场景全绿、全量 0 failed。无 blocker、无需用户决策；未发现需回流的真实缺口（仅补端到端验收覆盖，非新需求）。AP-5 为并行波 Agent 路；AP-6（主体跨仓消费本标记）/AP-7（PCVM/Test guard opt-in）为跨仓窗口、由控制器调度。",
+  "evidenceRefs": [
+    "AlembicAgent commit 8c9fd62 on main (baseline 8118dbe=AP-4; AlembicAgent-only, test-only +326, zero src change)",
+    "NEW test/pcv-observe-only-five-scenario.acceptance.test.ts: unified runScenario (full reactLoop, captures provider opts/progress/result) + 5 scenario tests",
+    "场景①②⑤ via NO_EVIDENCE_BURNS: off=1 call/no-block/marker off, guard=2 calls/block+nudge+rollback/marker guard; providerSawPolicy off=false guard=true (CP1 end-to-end reaches provider messages)",
+    "场景③ via deepSeekToolEvidenceBurns (toolVisible): captures[0].toolChoice='auto' + schemas visible + executeSpy called + ledger[0].deepseekV4ToolChoiceMode in BOTH off/guard (PD1)",
+    "场景④ graceful exit (isGracefulExit tracker): executeSpy NOT called + tool_choice_violation diagnostic",
+    "Complements (not duplicates) pcv-observe-only-baseline.characterization.test.ts: scenario-organized end-to-end acceptance vs control-point unit characterization"
+  ],
+  "verification": [
+    "npm test (full vitest): 36 files / 264 tests passed, 0 failed (AP-4 was 35/259; +1 file +5 acceptance scenarios)",
+    "five-scenario acceptance file isolated: 5/5 pass",
+    "npm run build (tsc emit): exit 0",
+    "npm run build:check (typecheck): exit 0",
+    "npm run lint (biome src scripts test): exit 0, 4 warnings (= AP-0..AP-4 baseline, 0 new; all pre-existing in scripts/; new acceptance file biome-formatted to pass)",
+    "npm run lint:core-import-boundary: OK, scanned 261 files / 46 @alembic/core imports (260->261 = new test file; no boundary violation)",
+    "Node 22 (nvm v22.22.1)"
+  ],
+  "risks": [
+    "五场景为单元/集成级（mock provider + tracker stub），验收 AlembicAgent 侧可观察 seam；真实 LLM provider / 跨仓端到端（主体 AiDimensionPipeline 驱动）不在本窗口范围（需时由 Test 窗口或 AP-6/AP-7 跨仓集成覆盖）",
+    "场景③为避免 guard 模式下 gate 误阻断耗尽 mock，第二轮文本引用 src/known.ts:10；该场景验收对象是 provider 首轮 toolChoice（ledger[0]）、与第二轮分类无关，两模式断言一致性成立",
+    "providerSawPolicy 通过 JSON.stringify(opts.messages).includes('evidenceGroundingPolicy') 粗粒度检测注入；足够区分 off/guard，但不断言政策全文（全文参数化已由表征测试 CP1 单元级覆盖）",
+    "本窗只加验收测试、未改 src；若实际跨仓运行发现行为偏差，AP-6 主体消费验证会另行揭示"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-ap5-agent-five-scenario__AlembicAgent__AP-5",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap5-agent-five-scenario__AlembicAgent__AP-5.json",
+    "deliveryRunId": "run-delivery-ap5-agent-five-scenario__AlembicAgent__AP-5",
+    "dispatchGroup": "ap5-agent-five-scenario",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap5-agent-five-scenario__AlembicAgent__AP-5.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 25,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "taskPackageId": "ap-5-agent-five-scenario-acceptance",
+    "targetTaskId": "AP-5",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "ap5-agent-five-scenario",
+    "resultId": "tr-ap-5",
+    "createdAt": "2026-06-20T14:46:41.990Z"
+  },
+  "createdAt": "2026-06-20T14:46:41.990Z",
+  "stateRevisionObserved": 25,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

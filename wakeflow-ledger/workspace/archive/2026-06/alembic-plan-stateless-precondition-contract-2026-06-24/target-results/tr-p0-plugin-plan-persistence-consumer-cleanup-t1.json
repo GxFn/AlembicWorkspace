@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p0-plugin-plan-persistence-consumer-cleanup-t1",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "taskPackageId": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+  "dispatchGroup": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p0-plugin-plan-persistence-consumer-cleanup-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin P0 plan-persistence consumer cleanup completed. Removed production PlanRepository/planRepository/saveDraft/getActiveConfirmed/getPlanView/012_plans consumers from lib, rewired plan draft/confirm/generation gate to stateless planSelection flow, removed InfraModule/ServiceMap planRepository DI, and changed durable git-diff checkpoint baseline to current HEAD provider. Committed as e99451fbbf4a114e393148b1e5847eca9444b50e.",
+  "evidenceRefs": [
+    "AlembicPlugin commit e99451fbbf4a114e393148b1e5847eca9444b50e (fix(plan): remove plugin plan persistence consumers)",
+    "Core upstream accepted commit used by build: 38d074fa64a014ef458044cac7881e092c0c6b8d",
+    "Exact residue sweep: rg -n \"PlanRepository|planRepository|saveDraft|getActiveConfirmed|getPlanView|012_plans\" lib -> exit 1, no output",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p0-plugin-plan-persistence-consumer-cleanup-controller-review.json"
+  ],
+  "verification": [
+    "npm run build:check -> PASS; Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d",
+    "npm run test:unit -- test/unit/GitDiffCheckpoint.test.ts test/unit/PlanSelectionGateStateless.test.ts -> PASS; 2 files, 13 tests",
+    "npm run lint -> PASS exit 0; existing Biome warnings remain in ClaudeCodeHostAdapter/scripts, unrelated to changed files",
+    "git diff --check -> PASS",
+    "git status --short after commit -> clean"
+  ],
+  "risks": [
+    "Remaining P1/P2/P3 scope intentionally not implemented in this P0 package: final draft output projector/two-block contract, codex scenario rewrites, and broader e2e cold-start contract still belong to later packages.",
+    "PlanScaleInput still tolerates legacy optional perStage for schema compatibility; P0 exact deleted-persistence residue is removed from production lib.",
+    "npm run lint has pre-existing warnings outside this task's changed files, but exits 0."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p0-plugin-plan-persistence-consumer-cleanup-p1__AlembicPlugin__p0-plugin-plan-persistence-consumer-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-plugin-plan-persistence-consumer-cleanup-p1__AlembicPlugin__p0-plugin-plan-persistence-consumer-cleanup-t1.json",
+    "deliveryRunId": "run-delivery-p0-plugin-plan-persistence-consumer-cleanup-p1__AlembicPlugin__p0-plugin-plan-persistence-consumer-cleanup-t1",
+    "dispatchGroup": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-plugin-plan-persistence-consumer-cleanup-p1__AlembicPlugin__p0-plugin-plan-persistence-consumer-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+    "stateRevision": 8,
+    "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+    "taskPackageId": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+    "targetTaskId": "p0-plugin-plan-persistence-consumer-cleanup-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+    "resultId": "tr-p0-plugin-plan-persistence-consumer-cleanup-t1",
+    "createdAt": "2026-06-23T23:55:31.119Z"
+  },
+  "createdAt": "2026-06-23T23:55:31.119Z",
+  "stateRevisionObserved": 8,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

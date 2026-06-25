@@ -13,8 +13,8 @@ This directory therefore rebuilds only AFAPI 08-12 for the new Wakeflow control 
 ## Entry Points
 
 - Remaining sequence manifest: [afapi-remaining-demand-sequence-2026-06-07.json](afapi-remaining-demand-sequence-2026-06-07.json)
-- Active queue projection: [../../../.workspace-active/workspace/current/global-todo-board.md](../../../.workspace-active/workspace/current/global-todo-board.md)
-- Current controller status: [../../../.workspace-active/workspace/current/workspace-current-status.md](../../../.workspace-active/workspace/current/workspace-current-status.md)
+- Active queue projection: [../../../.wakeflow-active/current/global-todo-board.md](../../../.wakeflow-active/current/global-todo-board.md)
+- Current controller status: [../../../.wakeflow-active/current/workspace-current-status.md](../../../.wakeflow-active/current/workspace-current-status.md)
 
 ## Completed Upstream Demands
 

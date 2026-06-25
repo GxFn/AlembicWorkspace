@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "ap-6-main-consumer-audit-semantics",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "summary": "AP-6（Alembic 主体跨仓 consumer 更新：消费 enforcement-mode 标记、把 grounding summary 改判审计语义）。PCV observe-only 并行波之主体路。上游 AP-4 标记已落：AlembicAgent PcvNodeEvidenceSummary.groundingEnforcement:'off'|'guard'（dist .d.ts:138 已 rebuild，经 @alembic/agent/service symlink 可达，无需也不要 rebuild/改 AlembicAgent）。范围=主体据标记把 grounding ledger summary 解读为审计而非质量判定：observe-only('off') 下增多的 invalid-no-evidence 是预期、不误判回归（R6）；guard 下保持原判定。完成定义=主体 observe-only 下不误判回归；N8/N9/N12 + linkage 两模式语义正确；跨仓回归全绿。不变量：只改消费方判读、不改既有字段名/契约；不碰 AlembicAgent；不碰 DimensionRuntimeBuilder/AgentRunInputBuilders（AP-7 领地）。",
+  "status": "pending",
+  "sourceRef": "需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md 相位表 AP-6（line 180）+ PD4（line 241，主体跨仓改造）+ R6（line 228，据标记改判审计）+ FC2（tr-ap-0：主体 lib/workflows/ai-execution/PcvNodeEvidence.ts buildPcvAnalyzeGroundingLedgerSummary 读 classification:278/deepseekV4ToolChoiceMode:286/invalidNoEvidenceCount:291→missingLinkReasons:305→status:329，纯观察）。上游=AP-4 标记（AlembicAgent 8118dbe）。",
+  "createdAt": "2026-06-20T14:36:20.225Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "AP-6",
+      "taskPackageId": "ap-6-main-consumer-audit-semantics",
+      "targetWindow": "Alembic",
+      "summary": "本窗口=Alembic（主体仓 ~/Documents/AlembicWorkspace/Alembic，main 直提）。先读父 CLAUDE.md + 本仓 CLAUDE.md + 状态根 + 需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md，声明窗口/仓库身份，仅领 AP-6。\n\n上游已落（控制器已核）：AlembicAgent AP-4=commit 8118dbe，PcvNodeEvidenceSummary additive 加 groundingEnforcement:'off'|'guard'（dist/agent/runtime/PcvNodeEvidence.d.ts:138 已就绪；主体经 @alembic/agent/service symlink 可达此类型）。**不要 rebuild 或修改 AlembicAgent（生产者已完成、跨仓边界）。**\n\n任务=在主体消费方 `lib/workflows/ai-execution/PcvNodeEvidence.ts` 的 `buildPcvAnalyzeGroundingLedgerSummary` 消费新标记 `result.pcvNodeEvidence.groundingEnforcement`，把 grounding ledger summary 改判**审计语义**：\n- observe-only（'off'）：增多的 invalid-no-evidence classification 是 PCV 纯观察的预期产物，**不**触发 missingLinkReasons('analyze_grounding_invalid_no_evidence')/status 降级误判回归（R6）——按审计材料记录；\n- guard（'guard'）：保持原有判定语义（grounding 强约束生效，invalid-no-evidence 仍是真实质量信号）。\n- 保留既有字段读取（classification:278/deepseekV4ToolChoiceMode:286 等不改名/不删），仅 additive 新增对标记的读取与分支。\n\n边界：**只改 PcvNodeEvidence.ts 消费判读**；不碰 `DimensionRuntimeBuilder.ts`/`AgentRunInputBuilders.ts`（AP-7 guard opt-in wiring 领地，后续同窗串行派发）；不改 AlembicAgent。\n\n验证（**Node>=22**，主体 lint:*-boundary + build:check 需 Node22，nvm use 22）：build:check + lint:*-boundary + 主体测试；两模式语义断言（N8/N9/N12 + linkage：off 不误判回归 / guard 原判定）；跨仓 build（确认能 import 到 AlembicAgent 新类型）。\n完成自检：observe-only 不误判回归、guard 原判定、契约字段未破、跨仓 build/test 绿。\n回填 TargetResultEnvelope：commit hash + 改动文件 + 两模式回归证据（N8/N9/N12+linkage）+ 跨仓 build/test 输出。returnRoute=controller 回 AlembicWorkspace。",
+      "status": "pending",
+      "createdAt": "2026-06-20T14:36:20.225Z"
+    }
+  ]
+}

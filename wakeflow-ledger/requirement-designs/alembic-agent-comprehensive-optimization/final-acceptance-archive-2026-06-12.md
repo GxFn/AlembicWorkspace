@@ -4,7 +4,7 @@ Date: 2026-06-12
 Controller window: AlembicWorkspace
 Sequence: `alembic-agent-comprehensive-optimization`
 Final Agent HEAD: `35901cf0e0f09e2221042b3a884c8ed16dd2d338`
-State-root evidence: `.workspace-active/workspace/current/alembic-agent-comprehensive-optimization-ag5-final-acceptance-archive/evidence/ag5-final-acceptance-archive-2026-06-12.md`
+State-root evidence: `.wakeflow-active/current/alembic-agent-comprehensive-optimization-ag5-final-acceptance-archive/evidence/ag5-final-acceptance-archive-2026-06-12.md`
 
 ## Final Decision
 
@@ -16,7 +16,7 @@ AG0-AG5 completed under the AG0/AG1 controller-adjusted scope: V1/core non-core 
 
 | Demand | Result | Commit or evidence |
 | --- | --- | --- |
-| AG0 fact freeze | Completed | `.workspace-active/workspace/current/alembic-agent-comprehensive-optimization-ag0-fact-freeze-decision-matrix/ag0-fact-freeze-decision-matrix-2026-06-12.md` |
+| AG0 fact freeze | Completed | `.wakeflow-active/current/alembic-agent-comprehensive-optimization-ag0-fact-freeze-decision-matrix/ag0-fact-freeze-decision-matrix-2026-06-12.md` |
 | AG1 V1/V2 convergence | Completed | `3c5da890205e42b2d14d2a378e6b21baa05072d6` |
 | AG2 responsibility semantics | Completed | `20fcb329471258c1f33ba54456efa44dd9b4561b` |
 | AG3 failure semantics | Completed | `e02bdd045622aeba04b0bb4d90da6d1241da572d` |

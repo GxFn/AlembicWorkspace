@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "ap-4-evidence-purify-enforcement-marker",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "summary": "AP-4（证据纯化收口 + additive enforcement-mode 标记；生产者侧，AP-6 主体消费）。AlembicAgent 基线 dd1bf0c 直提 main。确认 PcvNodeEvidence 纯观察、classification 仅审计；PcvNodeEvidenceSummary **additive** 加 enforcement-mode 标记（如 groundingEnforcement:'off'|'guard' + 可选 wouldBlockButAllowed 计数），让消费方区分 observe-only vs guard 运行、observe-only 下增多的 invalid-no-evidence 不被误判回归（R6）。**纯增量、不改名/不删既有字段**（AP-0 字段清单基线 PcvNodeEvidenceSummary:140-166/PcvBurnGroundingLedgerEntry:56-81，老消费者不受影响），区分 off/guard（AP-3 carry）。「关 PCV metadata 仅缺 trace 字段、主流程不变」核实=无残留控流耦合。完成=纯观察确认+additive 标记(schema additive)+关 metadata 对照+tsc/门禁/全量 vitest 0 failed。生产者侧(AP-6 主体消费跨仓、本窗不改主体)。完成后解锁 AP-5∥AP-6∥AP-7 并行。Node 22。",
+  "status": "pending",
+  "sourceRef": "需求设计 Implementation Decisions 模块拆分#5(证据 enforcement-mode 标记 additive,PD4) + 证据纯化收口 + AP-0 字段清单(PcvNodeEvidenceSummary:140-166 + PcvBurnGroundingLedgerEntry:56-81 不改名/不删基线) + AP-3 carry(标记区分 off/guard 语义) + R6(主体 AP-6 据标记改判审计)",
+  "createdAt": "2026-06-20T14:11:29.251Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "AP-4",
+      "taskPackageId": "ap-4-evidence-purify-enforcement-marker",
+      "targetWindow": "AlembicAgent",
+      "summary": "AP-4（证据层纯化收口 + additive 产出 enforcement-mode 标记，PCV observe-only 边界收敛第 5 步=**生产者/消费者分界**）。本窗口=AlembicAgent（仓库 `~/Documents/AlembicWorkspace/AlembicAgent`，基线 HEAD `dd1bf0c`=AP-3 后）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md` + 需求设计（Implementation Decisions 模块拆分#5 + 证据纯化收口 + PD4）。\n\n**目标**：在默认 observe-only（AP-3 已切）基础上，证据层纯化收口 + **additive 产出 enforcement-mode 标记**，供主体 ai-execution（AP-6 消费者）区分两模式、避免误判回归。**纯增量、不改既有字段名/不删；本窗只产出标记，不改主体（AP-6 领地）。**\n\n**做**：\n1. **证据纯化确认**：确认 `PcvNodeEvidence` 已纯观察（无控流、无 mutation；AP-1/AP-2/AP-3 后 enforcement 已迁出）；grounding `classification`、`deepseekV4ToolChoiceMode` 等仅作**审计/观察**产出（不据此控流）。如仍有任何残留的「证据派生信号驱动控流」收口清除。\n2. **additive enforcement-mode 标记**：在 `PcvNodeEvidenceSummary`（AP-0 清单 :140-166）**新增**一个表示本次运行 grounding enforcement 状态的字段（如 `groundingEnforcement: 'off' | 'guard'`，可选附「本可阻断但 observe-only 放行」计数 wouldBlockButAllowed）。**纯 additive**：不改既有字段名、不删字段、schemaVersion 处理向后兼容（老消费者忽略新字段不受影响）。标记须**区分 off/guard 语义**（AP-3 carry）——让 AP-6 主体把 grounding ledger summary 解读为审计而非质量判定、observe-only 下增多的 invalid-no-evidence 不误报回归（R6）。\n3. **「关 metadata 仅缺 trace 字段、主流程不变」核实**：验证关闭 PCV metadata 记录后主循环行为不变（仅缺 trace/artifact 字段）——证无残留控流耦合（纯化收口完成判据）。\n\n**关键不变量（AP-0/AP-3 carry）**：\n- **不改名/不删既有 schema 字段**：PcvNodeEvidenceSummary + PcvBurnGroundingLedgerEntry（:56-81，25 字段含 classification 7 值）跨仓被主体/PCVM 消费——只增不改（R3 跨仓不断链）。\n- `deepseekV4ToolChoiceMode` 等 enforcement-derived 字段仍由 PCV 观察产出，标记区分两模式语义。\n- 本窗**不改主体/PCVM/Test**（AP-6/AP-7 领地）；PcvNodeEvidence 纯观察；命名无 Pcv-enforcement 混淆；四工具/LLM 对外语义不变。\n\n**完成定义**：PcvNodeEvidence 纯观察确认（无残留控流）；PcvNodeEvidenceSummary additive enforcement-mode 标记落地（off/guard，向后兼容、不改既有字段）；关 metadata 对照测试通过（主流程不变、仅缺 trace）；新增/更新单测覆盖标记两模式产出；`npm run build`/`build:check`/`lint`/`lint:core-import-boundary`/`npm test`（Node 22）全绿、**全量 vitest 失败集不增于基线（0 failed）**。\n\n**边界/不变量**：仅 AlembicAgent（生产者）；additive 不改既有字段；不改主体/PCVM/Test；不删证据；Node 22。\n\n**回 TargetResultEnvelope**：纯观察确认证据（无残留控流）；enforcement-mode 标记 schema diff（additive 证明，字段清单不破）+ commit；标记两模式产出测试；关 metadata 对照结果；build/build:check/lint/core-import-boundary/全量 vitest vs 基线；AP-4 完成确认（解锁 AP-5∥AP-6∥AP-7）+ 任何 blocker。",
+      "status": "pending",
+      "createdAt": "2026-06-20T14:11:29.251Z"
+    }
+  ]
+}

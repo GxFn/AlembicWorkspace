@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "tc-20260620134348-0012",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "fromRevision": 12,
+  "candidateState": "accepting",
+  "reason": "All target results are present; total-control acceptance/rework decision is required.",
+  "reviewStatus": "ready-for-controller-review",
+  "readyResultIds": [
+    "tr-ap-2"
+  ],
+  "blockedResultIds": [],
+  "missingResultIds": [],
+  "reviewScope": "open-controller-review-targets",
+  "targetTaskIds": [
+    "AP-2"
+  ],
+  "excludedTargetTaskIds": [
+    "AP-0",
+    "AP-1"
+  ],
+  "allowedDecisions": [
+    "accept",
+    "rework",
+    "blocked"
+  ],
+  "evidenceRefs": [
+    "AlembicAgent commit c206e7a on main (baseline ad6f74c=AP-1; AlembicAgent-only, 3 files +71/-37)",
+    "NEW src/agent/runtime/AnalyzeGroundingGuard.ts (buildAnalyzeGroundingPolicy CP1 / evaluateAnalyzeTextGroundingGate CP4; imports getLatestPcvBurnGrounding + isDeepSeekV4AnalyzeFirstBurn one-way)",
+    "src/agent/runtime/AgentRuntime.ts:54 import + :1589 call site -> evaluateAnalyzeTextGroundingGate(ctx, this.#modelRef); removed #evaluateAnalyzeTextGroundingGate + 2 now-unused imports (residual-ref grep clean: only import+callsite remain)",
+    "src/agent/runtime/LLMInputAssembly.ts:2 import + :526 buildGroundingContext uses guard buildAnalyzeGroundingPolicy",
+    "PD5 proof: deterministicEvidenceRefs/evidenceStarterRefs injection LLMInputAssembly.ts:433-439 unchanged in default analyze context, NOT moved to guard",
+    "No-cycle proof: guard->ProviderToolChoicePolicy.isDeepSeekV4AnalyzeFirstBurn one-way; ProviderToolChoicePolicy does not import guard; lint:core-import-boundary OK",
+    "test/pcv-observe-only-baseline.characterization.test.ts CP1(3 cases)+CP4(1 case) green post-extraction (behavior-equivalent); CP2/CP3 untouched (AP-1 provider territory)",
+    "target-results/tr-ap-2.json"
+  ],
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "transition-candidate",
+    "source": "wakeflow-state",
+    "command": "reduce-results",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 12,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "candidateId": "tc-20260620134348-0012",
+    "createdAt": "2026-06-20T13:43:48.183Z"
+  },
+  "forbiddenConclusions": [
+    "transition-candidate-is-acceptance",
+    "reducer-decision-closes-task-package",
+    "reducer-decision-creates-next-dispatch"
+  ]
+}

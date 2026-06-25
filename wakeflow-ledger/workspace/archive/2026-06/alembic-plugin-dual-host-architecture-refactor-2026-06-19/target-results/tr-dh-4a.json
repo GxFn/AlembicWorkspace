@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-dh-4a",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-4a-plugin-per-host-products-cc-shell-gitlink",
+  "dispatchGroup": "dh4a-plugin-per-host-cc-shell",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-4a",
+  "status": "needs-review",
+  "summary": "DH-4a（per-host 产物 + cc 壳 + gitlink + manifest-seam + Alembic 规格）。基线 0221525 → 父 HEAD 53f9258。3 交付项完成并验证（含 release-sensitive cc 子模块提交 + 父仓 gitlink bump，用户已授权）；per-host 产物结构分叉（headline Part 1）因 1 个开放裁断 + 双门禁重塑 + DH-4b 跨仓耦合 flag 续作，并产出完整 per-host 规格供续作 + DH-4b。\n\n【已交付并验证】\n1) manifest-seam de-Codex（父 67ebfed，闭合 DH-3g flag）：PluginRegistry 5 个 host-agnostic shape-dispatch 符号 + CODEX_REQUIRED_SKILLS 去前缀（CodexPluginHostShape→PluginHostShape/CodexPluginMcpDeclaration→PluginMcpDeclaration/CodexPluginRegistry→PluginRegistry/readCodexPluginMcpDeclaration→readPluginMcpDeclaration/loadCodexPluginRegistry→loadPluginRegistry/CODEX_REQUIRED_SKILLS→REQUIRED_SKILLS）。codex .mcp.json wire-byte 保全（读路在 adapter pluginMcpManifestPath/normalizePluginMcpArg，未动）。PluginRegistry.ts 0 Codex 符号残留（仅描述性注释）。\n2) cc 壳 manifest identity + gitlink（子模块 f2c2929 + 父 gitlink bump 53f9258，用户已授权 release-sensitive）：cc .claude-plugin/plugin.json ALEMBIC_PLUGIN_HOST=claude-code（原 codex——DH-1 未提交的 bug，曾迫使 cc 自认 codex 并覆盖 shell-shape 探测）；删 stray ALEMBIC_CHANNEL_ID=codex（codex .mcp.json 无此字段、运行时不读）。ALEMBIC_CODEX_* env 变量名=冻结共享 runtime key 不动。子模块提交为本地，push 属独立 release 步（未做）。\n3) Alembic 漂移门禁 per-host 规格（Part 4）：写入 ledger wakeflow-ledger/AlembicPlugin/dh-4a-per-host-drift-gate-spec-2026-06-20.md——含 DH-4b 的 shared-asset-manifest 单 path→per-host path + check-shared-asset-drift per-host 比较 + 3 资产转绿预期（依 DH-0 §DH-4 line 47 权威模型），及 AlembicPlugin 侧 Part 1 续作精确规格。\n\n【flag 续作（Part 1 per-host 结构分叉 + Part 2 余项）——非 headline 漏做，是带开放裁断的结构单元，详见 ledger 规格 §D/§E】\n- per-host 产物分叉（skills/templates/constitution）：当前仅 alembic-recipes/SKILL.md 跨壳 DIVERGES（line 39 codex semantic / cc auto；其余 4 skill+bin+LICENSE 字节相同）。\n- cross-shell-drift 门禁重塑：现要求 bin/skills/LICENSE 字节相同（npm run check 一环、基线即 RED——alembic-recipes 跨壳分叉，pre-existing、非 DH-4a 回归、为 SCRIPT 门禁不在 39 unit 失败集）；per-host 模型需改为 section/per-host-aware。\n- cc bootstrap fork（bin:100 默认→claude-code）：耦合上条（bin/ 现字节相同；manifest 已设 host，故此为 defense-in-depth 非阻塞）。\n- cc setupProfile per-host：耦合 init-marker profile 类型 + SetupService（'codex-plugin' 为持久化冻结值，需谨慎引入独立 cc profile）。\n- 【开放裁断（需控制器/Design）】alembic-recipes line-39 跨壳分叉（codex semantic / cc auto）是 intentional host-divergence（→per-host overlay 两门禁均放行）还是 mirror lag（→镜像归一、保字节相同）？DH-0 §① caveat（line 23）明示此类需裁；驱动 cross-shell-drift 是放行还是归一。另：确认 DH-0 §① 的 Alembic backport（plugin→main 3 资产）是否已应用，否则 shared-asset-drift vs main 仍 RED（属 Alembic/DH-4b 侧）。\n\n【完成判断】cc 身份 + gitlink + manifest-seam + Alembic 规格 = DONE；per-host 结构分叉（含开放裁断 + 门禁重塑 + DH-4b 协同）flag。请控制器裁：派 Part 1 续作 pass（先解 alembic-recipes 裁断）+ DH-4b（Alembic 门禁 per-host），或调整范围。",
+  "evidenceRefs": [
+    "parent commit 67ebfed refactor(runtime): DH-4a manifest-seam de-Codex — PluginRegistry host-agnostic symbols (closes DH-3g flag)",
+    "parent commit 53f9258 chore(submodule): DH-4a bump alembic-claude-code gitlink → cc claude-code manifest identity",
+    "cc submodule commit f2c2929 fix(manifest): cc identity → claude-code host; drop stray ALEMBIC_CHANNEL_ID (local, unpushed)",
+    "spec doc wakeflow-ledger/AlembicPlugin/dh-4a-per-host-drift-gate-spec-2026-06-20.md (per-host gate model + Part 1 续作 + DH-4b)",
+    "baseline 0221525 → parent HEAD 53f9258; gitlink → f2c2929"
+  ],
+  "verification": [
+    "tsc --noEmit 绿（Part 3 后 + 最终）",
+    "biome lint 0 error（lint:fix 后）",
+    "全量 unit 失败集与基线 IDENTICAL：39 failed | 87 passed (126)（Part 3 后 + cc manifest 后各验一次，零回归）",
+    "cc .claude-plugin/plugin.json 合法 JSON；cc 运行时正确自认 claude-code（manifest 设 ALEMBIC_PLUGIN_HOST=claude-code）",
+    "manifest-seam wire-byte 保全：仅符号改名，codex .mcp.json 读路径(adapter)未动；PluginRegistry.ts 0 Codex 符号",
+    "父仓 2 commit（67ebfed manifest-seam, 53f9258 gitlink bump）+ 子模块 1 commit（f2c2929 cc identity）；gitlink→f2c2929；tree clean",
+    "cross-shell-drift 门禁 RED 为 pre-existing（alembic-recipes line-39，非 DH-4a 触动；我未改 plugins/*/skills/ 或 bin/）",
+    "纯 MCP 非强进程 + 四工具对外 MCP 语义不变；CC3 用户文案未动；AlembicCore/Alembic 未改"
+  ],
+  "risks": [
+    "Part 1 per-host 结构分叉 flag 续作：带开放裁断（alembic-recipes line-39 intentional vs mirror-lag）+ cross-shell-drift 门禁 per-host 重塑 + cc bootstrap/setupProfile + DH-4b 跨仓协同——故 status=needs-review 非 completed；headline per-host 分叉未在本 pass 落地",
+    "cross-shell-drift 门禁基线即 RED（pre-existing alembic-recipes 跨壳分叉）：为 SCRIPT 门禁不在 39 unit 失败集；DH-4a 未改它（不回归），Part 1 续作据 per-host 模型解；npm run check 因此仍会 RED 直到 Part 1",
+    "cc 子模块 commit f2c2929 为本地未 push：gitlink 指向本地 commit，clone/CI 前需 push（独立 release 步，用户/控制器决）",
+    "DH-0 §① Alembic backport（plugin→main 3 资产）状态未确认：若未应用 shared-asset-drift vs main 仍 RED（Alembic/DH-4b 侧，非本窗）",
+    "未做真实 cc 运行验收（DH-6 领地）；cc identity 修复经 manifest 静态正确 + tsc/unit 等价，未在真实 cc shell 运行验证"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh4a-plugin-per-host-cc-shell__AlembicPlugin__DH-4a",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4a-plugin-per-host-cc-shell__AlembicPlugin__DH-4a.json",
+    "deliveryRunId": "run-delivery-dh4a-plugin-per-host-cc-shell__AlembicPlugin__DH-4a",
+    "dispatchGroup": "dh4a-plugin-per-host-cc-shell",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4a-plugin-per-host-cc-shell__AlembicPlugin__DH-4a.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 51,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-4a-plugin-per-host-products-cc-shell-gitlink",
+    "targetTaskId": "DH-4a",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh4a-plugin-per-host-cc-shell",
+    "resultId": "tr-dh-4a",
+    "createdAt": "2026-06-20T08:03:46.508Z"
+  },
+  "createdAt": "2026-06-20T08:03:46.508Z",
+  "stateRevisionObserved": 51,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

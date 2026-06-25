@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-ap-1",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "taskPackageId": "ap-1-extract-provider-toolchoice-policy",
+  "dispatchGroup": "ap1-agent-provider-policy",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "AP-1",
+  "status": "completed",
+  "summary": "AP-1 完成（抽取 ProviderToolChoicePolicy；行为对等、默认仍生效；不切默认 / 不引 groundingEnforcement / 不碰 grounding guard）。AlembicAgent main 955bfc2→ad6f74c。\n\n做了：\n- 新模块 src/agent/runtime/ProviderToolChoicePolicy.ts（provider 层，无 Pcv 前缀；函数体原样迁移）：resolveProviderToolChoice(←AgentRuntime.buildDeepSeekV4AnalyzeGroundingPolicy)、isDeepSeekV4AnalyzeFirstBurn(←...FirstGroundingBurn)、observeDeepSeekV4ToolChoiceMode(←PcvNodeEvidence.buildDeepSeekV4ToolChoiceMode + isDeepSeekV4 门控)、allowsDeepSeekV4ToolCalls(工具抑制例外谓词)。\n- 消除 R4 读写往返：#callLLM 在 try 内随 effectiveToolChoice 一次性算出本地 carrier deepSeekV4ToolChoiceMode（observe-only），跨 try/catch 携带；工具抑制例外（AgentRuntime ~1129）改读本地 carrier，不再 getLatestPcvBurnGrounding 回读 PCV burn。现 AgentRuntime 的 getLatestPcvBurnGrounding 仅剩 1722（CP4 analyze grounding gate）。\n- PcvNodeEvidence 改 observe-only：recordPcvInputAssembly 新增 deepseekV4ToolChoiceMode 选项、记录 policy 传入值；buildDeepSeekV4ToolChoiceMode 从证据文件删除。PcvNodeEvidenceSummary / PcvBurnGroundingLedgerEntry schema 不变。\n- 清理：删除 isDeepSeekV4AnalyzeFirstGroundingBurn 迁出后变死的 AgentRuntime 私有 safeCall。\n\n不变量保持：\n- deepseekV4ToolChoiceMode 仍由 PCV 观察产出：observe 值 = isDeepSeekV4 ? 原 buildDeepSeekV4ToolChoiceMode(requested,effective) : null（恒等）→ 跨仓主体 PcvNodeEvidence.ts:286 计数不丢。\n- 行为对等：AP-0 CP2/CP3 表征测试全绿；默认 DeepSeek V4 行为不变；未引 groundingEnforcement（AP-3 领地）；CP1/CP4 未碰（CP4 gate 复用 isDeepSeekV4AnalyzeFirstBurn 同体）。\n\n结论：AP-1 完成定义全部满足；无 blocker、无需用户决策。建议控制器审阅后推进 AP-2（抽 AnalyzeGroundingGuard：迁 analyze 阻断/nudge/grounding-policy 文本注入；不含证据 ref 列表 PD5；暂仍开）。",
+  "evidenceRefs": [
+    "AlembicAgent commit ad6f74c on main (baseline 955bfc2; AlembicAgent-only, diff net -48 lines)",
+    "NEW src/agent/runtime/ProviderToolChoicePolicy.ts (resolveProviderToolChoice / observeDeepSeekV4ToolChoiceMode / allowsDeepSeekV4ToolCalls / isDeepSeekV4AnalyzeFirstBurn)",
+    "src/agent/runtime/AgentRuntime.ts (call site 884 -> resolveProviderToolChoice; local carrier deepSeekV4ToolChoiceMode threaded across try/catch; suppression reads carrier not PCV burn; CP4 gate uses isDeepSeekV4AnalyzeFirstBurn; removed 2 inline fns + dead safeCall)",
+    "src/agent/runtime/PcvNodeEvidence.ts (recordPcvInputAssembly observe-only deepseekV4ToolChoiceMode option; buildDeepSeekV4ToolChoiceMode removed)",
+    "Round-trip removal proof: getLatestPcvBurnGrounding now only at AgentRuntime.ts:1722 (CP4 gate); buildDeepSeekV4ToolChoiceMode absent from PcvNodeEvidence/evidence layer"
+  ],
+  "verification": [
+    "npm run build (tsc emit): pass, exit 0",
+    "npm run build:check (typecheck): exit 0",
+    "npm run lint (biome src scripts test): 4 warnings (= AP-0 baseline, 0 new; pre-existing script console.log), 0 errors",
+    "npm run lint:core-import-boundary: OK, 259 files / 46 @alembic/core imports",
+    "characterization CP1-CP4 (test/pcv-observe-only-baseline.characterization.test.ts): 7/7 pass (behavior-equivalence: CP2 toolChoice none->auto+schema visible, CP3 suppression exception + graceful-exit contrast)",
+    "npm test (full vitest): 35 files / 252 tests passed, 0 failed (= AP-0 baseline; incl. original AgentRuntime.test.ts DeepSeek V4 + invalid-no-evidence cases)",
+    "Node 22 (nvm v22.22.1)"
+  ],
+  "risks": [
+    "deepseekV4ToolChoiceMode 现由 ProviderToolChoicePolicy.observeDeepSeekV4ToolChoiceMode 计算并经 recordPcvInputAssembly 传入；值与原证据层计算恒等，AP-4 证据纯化 / AP-6 主体消费回归时应再确认两模式（observe-only / guard）下该字段语义",
+    "isDeepSeekV4AnalyzeFirstBurn 现由 provider 模块导出、被 CP4 analyze grounding gate(AgentRuntime:1722)复用；AP-2 抽 AnalyzeGroundingGuard 时需决定该首轮判定的最终归属（provider / guard / 共享），避免 guard→provider 反向依赖固化",
+    "保留了两套 mode 计算（policy decision mode 用于日志 AgentRuntime:996 vs observed burn mode 记录于 PCV），两者非首轮场景可不同——为行为对等故原样保留、未统一；若未来要统一需单独决策（避免静默改语义），非 AP-1 范围"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-ap1-agent-provider-policy__AlembicAgent__AP-1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap1-agent-provider-policy__AlembicAgent__AP-1.json",
+    "deliveryRunId": "run-delivery-ap1-agent-provider-policy__AlembicAgent__AP-1",
+    "dispatchGroup": "ap1-agent-provider-policy",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap1-agent-provider-policy__AlembicAgent__AP-1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 7,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "taskPackageId": "ap-1-extract-provider-toolchoice-policy",
+    "targetTaskId": "AP-1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "ap1-agent-provider-policy",
+    "resultId": "tr-ap-1",
+    "createdAt": "2026-06-20T13:00:09.797Z"
+  },
+  "createdAt": "2026-06-20T13:00:09.797Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -43,7 +43,7 @@
 - 关键入口：
   - `scripts/visible-dispatch.mjs`
   - `scripts/visible-dispatch.test.mjs`
-  - `.workspace-local/visible-dispatch/`
+  - `.wakeflow-local/visible-dispatch/`
 - producer / consumer 依赖：
   - Producer：fixture 当前计划提供 6 个 send-eligible Alembic 系列窗口任务；runtime queue 记录每轮 6 个任务。
   - Consumer：`controller-tick` 判定是否 enqueue、是否等待 queue、是否停在 close / refresh 当前计划门禁。

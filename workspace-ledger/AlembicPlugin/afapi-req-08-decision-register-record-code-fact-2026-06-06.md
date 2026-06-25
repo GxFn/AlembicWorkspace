@@ -4,7 +4,7 @@
 - Window: AlembicPlugin
 - Task: AFAPI-REQ-08-DECISION-REGISTER-RECORD-CODE-FACT-T1
 - Dispatch group: AFAPI-REQ-08-DECISION-REGISTER-RECORD-GROUP
-- State root: `codex-control-workspace/.workspace-active/workspace/current/afapi-req-08-decision-register-record`
+- State root: `codex-control-workspace/.wakeflow-active/current/afapi-req-08-decision-register-record`
 - Scope: Stage 0 read-only code fact for the AlembicPlugin host-facing consumer path.
 
 ## Window Boundary
@@ -81,13 +81,13 @@ All commands were run inside `/Users/gaoxuefeng/Documents/AlembicWorkspace/Alemb
 
 ## Target Result And Controller Return
 
-- `node scripts/controller-state.mjs import-target-result --state-root .workspace-active/workspace/current/afapi-req-08-decision-register-record ... --write --json`
+- `node scripts/controller-state.mjs import-target-result --state-root .wakeflow-active/current/afapi-req-08-decision-register-record ... --write --json`
   - Passed. Wrote `target-results/afapi-req-08-decision-register-record-code-fact-20260606.json`.
 - `node scripts/codex-automation-loop.mjs submit-result --target-window AlembicPlugin --task-id AFAPI-REQ-08-DECISION-REGISTER-RECORD-CODE-FACT-T1 ... --write --json`
-  - Passed. Wrote `.workspace-local/codex-automation-loop/target-results/AFAPI-REQ-08-DECISION-REGISTER-RECORD-GROUP__AlembicPlugin__AFAPI-REQ-08-DECISION-REGISTER-RECORD-CODE-FACT-T1.json`.
-- `node scripts/controller-state.mjs reduce-results --state-root .workspace-active/workspace/current/afapi-req-08-decision-register-record --write --json`
+  - Passed. Wrote `.wakeflow-local/codex-automation-loop/target-results/AFAPI-REQ-08-DECISION-REGISTER-RECORD-GROUP__AlembicPlugin__AFAPI-REQ-08-DECISION-REGISTER-RECORD-CODE-FACT-T1.json`.
+- `node scripts/controller-state.mjs reduce-results --state-root .wakeflow-active/current/afapi-req-08-decision-register-record --write --json`
   - Passed. State moved from `planned` to `review-ready`; candidate `tc-20260606122649-0003` was created for controller review.
-- `node scripts/codex-automation-loop.mjs review-pack --state-root .workspace-active/workspace/current/afapi-req-08-decision-register-record --json`
+- `node scripts/codex-automation-loop.mjs review-pack --state-root .wakeflow-active/current/afapi-req-08-decision-register-record --json`
   - Passed. `groupStatus=ready`, `decision=needs-controller-review`, evidence refs exist, and raw evidence pull is required by total control.
 - `node scripts/codex-automation-loop.mjs build-controller-return --group AFAPI-REQ-08-DECISION-REGISTER-RECORD-GROUP ... --write --json`
   - Failed closed with `No matching dispatch packets found for review.` No controller-return delivery envelope was generated. This is a transport metadata limitation for this directly delivered task, not a product-code failure.

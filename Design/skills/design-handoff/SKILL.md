@@ -83,6 +83,29 @@ write is justified, state what will be written and why before editing.
 - Intake status:
 ```
 
+## Handoff Board Status
+
+When you register a handoff row on the board, its `Status` decides how the controller
+picks it up — set it deliberately:
+
+- **`controller-claimable`** — recommended for a **fully designed, user-confirmed**
+  requirement. The controller may auto-claim and init it with no fresh prompt, so this
+  status doubles as the recorded "confirmed and ready for intake" gate. Only set it when
+  the row also links an Original Plan and a Requirement Design, records user confirmation
+  as `confirmed` or `not-required`, and carries the design key. A requirement that is not
+  fully designed cannot meet these invariants, so it cannot be made claimable — that is by
+  design, not a limitation.
+- **`ready-for-workspace`** — use when the design is ready for the controller to review but
+  you still want a controller/user confirmation before intake. The controller surfaces it
+  as a candidate and decides; it is not auto-claimed (unless explicitly claimed by design
+  key).
+- Still clarifying, comparing options, or designing — keep it in its upstream state and do
+  not put it up for intake yet.
+
+Map your readiness (Workflow step 4) to the board status: only an intake-ready design with
+the upstream facts complete and user confirmation recorded should become
+`controller-claimable`; otherwise use `ready-for-workspace`.
+
 ## Redaction Rules
 
 Never include:

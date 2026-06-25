@@ -7,7 +7,7 @@ Generated: 2026-06-06
 - Current window: AlembicPlugin execution window.
 - Task id: AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-CODE-FACT-T1.
 - Dispatch group: AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-GROUP.
-- State root: `.workspace-active/workspace/current/afapi-req-06-work-evidence-lifecycle`.
+- State root: `.wakeflow-active/current/afapi-req-06-work-evidence-lifecycle`.
 - Scope: Stage 0 code fact review only for Codex MCP, public agent tools, skill guidance, plugin runtime, install validation, and Codex host adaptation inside AlembicPlugin.
 - Explicit non-scope: no Alembic, AlembicCore, AlembicAgent, AlembicDashboard, AlembicDesign, or AlembicTest responsibility was claimed. No product implementation, runtime bundle mutation, submodule mutation, or commit was performed.
 
@@ -15,12 +15,12 @@ Generated: 2026-06-06
 
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/AGENTS.md`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/AGENTS.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/index.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/afapi-req-06-work-evidence-lifecycle/controller-state.json`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/afapi-req-06-work-evidence-lifecycle/demand.json`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/afapi-req-06-work-evidence-lifecycle/developer-progress.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/afapi-req-06-work-evidence-lifecycle/task-packages/AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-CODE-FACT-P1.json`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/index.md`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/workspace-current-status.md`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/afapi-req-06-work-evidence-lifecycle/controller-state.json`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/afapi-req-06-work-evidence-lifecycle/demand.json`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/afapi-req-06-work-evidence-lifecycle/developer-progress.md`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/afapi-req-06-work-evidence-lifecycle/task-packages/AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-CODE-FACT-P1.json`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-06-work-evidence-lifecycle-landing-2026-06-05.md`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/skills/dev/codex-automation-target/SKILL.md`
 

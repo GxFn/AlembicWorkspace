@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+  "title": "Alembic Core Capability Inventory And Interface Optimization",
+  "interfaceLanguage": "zh",
+  "sourceRevision": 45,
+  "sourceEventId": "evt-20260620211055-0045",
+  "progressDoc": "developer-progress.md",
+  "unifiedStatus": {
+    "demand": "alembic-core-capability-inventory-optimization-2026-06-19 - Alembic Core Capability Inventory And Interface Optimization",
+    "mainState": "planned",
+    "stage": "无",
+    "currentTaskPackages": "co-0-core-precheck-inventory(accepted), co-1-core-public-api-gate-capability-replacement(accepted), co-2-core-replacement-capability-outputs(accepted), co-3a-alembic-consumer-capability-output-migration(accepted), co-3b-plugin-consumer-capability-output-migration(accepted), co-4-core-internalize-cleared-legacy-routes(accepted), co-5a-core-internal-optimization-rebaseline(accepted), co-5b-core-test-fixture-public-surface-support(accepted), co-5c-plugin-test-fixture-consumer-migration(needs-rework), co-5d-core-residual-test-fixture-support(pending)",
+    "windows": "AlembicCore(pending), Alembic(accepted), AlembicPlugin(needs-rework)",
+    "blockers": "无",
+    "nextAction": "prepare-dispatch-from-state, add-task-package, wakeflow-render-progress",
+    "review": "decision-rework",
+    "automation": "未启用",
+    "userDecisionsNeeded": "无",
+    "lastUpdated": "2026-06-20T21:11:20.586Z"
+  },
+  "slices": {
+    "windows": [
+      {
+        "windowName": "AlembicCore",
+        "windowState": "pending",
+        "taskPackageIds": [
+          "co-0-core-precheck-inventory",
+          "co-1-core-public-api-gate-capability-replacement",
+          "co-2-core-replacement-capability-outputs",
+          "co-4-core-internalize-cleared-legacy-routes",
+          "co-5a-core-internal-optimization-rebaseline",
+          "co-5b-core-test-fixture-public-surface-support",
+          "co-5d-core-residual-test-fixture-support"
+        ],
+        "targetTaskIds": [
+          "CO-0",
+          "CO-1",
+          "CO-2",
+          "CO-4",
+          "CO-5A",
+          "CO-5B",
+          "CO-5D"
+        ]
+      },
+      {
+        "windowName": "Alembic",
+        "windowState": "accepted",
+        "taskPackageIds": [
+          "co-3a-alembic-consumer-capability-output-migration"
+        ],
+        "targetTaskIds": [
+          "CO-3A"
+        ]
+      },
+      {
+        "windowName": "AlembicPlugin",
+        "windowState": "needs-rework",
+        "taskPackageIds": [
+          "co-3b-plugin-consumer-capability-output-migration",
+          "co-5c-plugin-test-fixture-consumer-migration"
+        ],
+        "targetTaskIds": [
+          "CO-3B",
+          "CO-5C"
+        ]
+      }
+    ],
+    "taskPackages": [
+      {
+        "taskPackageId": "co-0-core-precheck-inventory",
+        "status": "accepted",
+        "summary": "CO-0 硬前置：在不改码的前提下，复核 Core 优化进入条件。覆盖：1) CCR/RIC/GMAP/MTC/D25/CO3/SD-5 等在途/已完成 Core 波次终态与本需求边界，避免重叠；2) `lint:public-api-boundary` 与 `smoke:public-api` 当前是否真实有效（PDR-0 提到疑似 path-error 失效），若失效给出最小修复范围但不实施；3) 复核跨仓 consumer 映射，尤其 ProjectContext/RecipeContext/AST/core/enhancement 的 production/test 消费实况；4) RecipeContext detail/search/prime/relations 4 个无 consumer kind 的事实归类：未来能力、死设计、或需控制器/用户决定；5) 输出 CO-1~CO-4 的安全边界、候选任务拆分、验证命令与风险。完成后回 TargetResultEnvelope，不能进入 CO-1 实现。"
+      },
+      {
+        "taskPackageId": "co-1-core-public-api-gate-capability-replacement",
+        "status": "accepted",
+        "summary": "AlembicCore / CO-1 producer package after accepted CO-0. Goal: turn the accepted precheck into the smallest safe Core-side implementation step for public API closeout: preserve green gates, prepare/implement a stable replacement path for `@alembic/core/core/capability` where feasible, and leave destructive removal/internalization for later consumer-migration evidence. This package must not delete RecipeContext detail/search/prime/relations or treat them as dead code; those four kinds are implemented but externally unused and need later controller/user confirmation. It must not edit sibling repositories, vendor snapshots, release pointers, or product runtime behavior unless the state root explicitly authorizes it later."
+      },
+      {
+        "taskPackageId": "co-2-core-replacement-capability-outputs",
+        "status": "accepted",
+        "summary": "AlembicCore CO-2: create the Core-side replacement capability/output layer needed before consumer migration. This phase must implement real stable/provisional public entrypoints for capability-oriented outputs, not a thin barrel-only reshuffle, while all old public routes remain available for downstream CO-3 migration."
+      },
+      {
+        "taskPackageId": "co-3a-alembic-consumer-capability-output-migration",
+        "status": "accepted",
+        "summary": "Alembic / CO-3A consumer migration after accepted CO-2. Migrate Alembic main-repo consumers away from legacy Core deep/transitional routes to the new capability-oriented outputs created in AlembicCore commits 5d85114741da7174c662f8de126baf91b1ebce7f and f3fc8e982dd79f388509aa2b1a64bf974f0aaae9. This is consumer migration only; it must not delete Core legacy routes, edit AlembicCore, touch AlembicPlugin/AlembicAgent/AlembicDashboard, update vendor snapshots/release pointers, or reclassify RecipeContext unused kinds."
+      },
+      {
+        "taskPackageId": "co-3b-plugin-consumer-capability-output-migration",
+        "status": "accepted",
+        "summary": "AlembicPlugin / CO-3B consumer migration after accepted CO-2. Migrate Codex/plugin consumers away from legacy Core deep/transitional routes to the new capability-oriented outputs created in AlembicCore commits 5d85114741da7174c662f8de126baf91b1ebce7f and f3fc8e982dd79f388509aa2b1a64bf974f0aaae9. This is consumer migration only; it must preserve plugin/Codex MCP behavior, not delete Core legacy routes, not update vendor snapshots/release pointers, not edit sibling repositories, and not reclassify RecipeContext unused kinds."
+      },
+      {
+        "taskPackageId": "co-4-core-internalize-cleared-legacy-routes",
+        "status": "accepted",
+        "summary": "AlembicCore / CO-4 after accepted CO-3. Internalize/delete only legacy public routes whose consumers were cleared by CO-3 and verified by controller zero scans: @alembic/core/core/enhancement, @alembic/core/core/capability, and old @alembic/core/recipe-context public route where the clean @alembic/core/recipe-context-capabilities facade fully replaces external usage. This phase is Core-only deletion/internalization after consumer migration; it must preserve replacement capability outputs and must not widen into AST/project-intelligence/ProjectContext public-contract cleanup."
+      },
+      {
+        "taskPackageId": "co-5a-core-internal-optimization-rebaseline",
+        "status": "accepted",
+        "summary": "AlembicCore / CO-5A after accepted CO-0..CO-4. Rebaseline the remaining CO-5 internal optimization scope against the current AlembicCore HEAD before implementation, because CO-0 found the original Design premise stale: AnalysisPhaseRunners.ts is currently about 1,075 LOC, not the 35k LOC giant described in the handoff. This package is a controller-blocker-removal task for CO-5: prove which internal optimization items are still real, safe, and in-scope, and return executable package recommendations with evidence. It must not delete public routes, change cross-repo behavior, edit sibling repositories, touch vendor/release snapshots, reclassify RecipeContext detail/search/prime/relations, or change ProjectContext/RecipeContext/AST public behavior. If a tiny Core-only implementation is obviously safe, defer it to a follow-up package unless the package's evidence proves it is within the existing completion definition and needs no product decision; default for CO-5A is read-only evidence and task slicing."
+      },
+      {
+        "taskPackageId": "co-5b-core-test-fixture-public-surface-support",
+        "status": "accepted",
+        "summary": "Current window/repository must be AlembicCore. Read parent AGENTS.md, this state root, accepted CO-5A controller decision evt-20260620201747-0033 and evidence-repaired CO-5A result, then AlembicCore AGENTS/CLAUDE and current Core source. Work only in AlembicCore. CO-5B is a producer-first replacement-support package, not a deletion/internalization task and not a sibling migration task. Starting from CO-5A facts, add or extend real supported AlembicCore replacement/test-fixture surfaces needed to let downstream AlembicPlugin/Alembic tests and configs migrate away from residual transitional imports such as @alembic/core/core/ast/*, @alembic/core/core/analysis, @alembic/core/core/discovery, and retired project-intelligence test imports. The replacement surface must be backed by existing Core implementation call chains or stable fixture helpers; avoid empty barrels, type-only placeholders, mock-only adapters, or compatibility aliases with no consumer path. Keep all old transitional exports/routes available for later CO-5C/consumer migration until scans and consumer changes prove they are removable. Do not delete or internalize @alembic/core/core/ast/*, @alembic/core/core/analysis, @alembic/core/core/discovery, @alembic/core/project-intelligence residual routes, KnowledgeService compatibility aliases, service/quality, service/bootstrap, or any RecipeContext unused-kind behavior in CO-5B. Do not edit sibling repositories, vendor snapshots, release pointers, plugin marketplace assets, runtime delivery files, or product behavior outside Core. Required work: 1) inspect residual sibling test/config imports from CO-5A and current scans; 2) decide the smallest stable Core-owned fixture/public support path, preferably @alembic/core/test-fixtures or another already-supported Core replacement export, for parser/discovery/analysis/project-intelligence test needs; 3) implement the support with focused unit/smoke coverage and public-api-boundary/package-export updates only if needed; 4) document exact downstream migration guidance in the TargetResultEnvelope, including which old imports can now move and which still require a controller/user decision. Verification expected before TargetResultEnvelope: pre/post git status; focused rg scans for residual relevant exports/imports; focused tests for new fixture/support helpers; npm run build:check; npm run build; npm run smoke:public-api; npm run lint:public-api-boundary; npm run lint:consumer-core-imports; npm run lint; git diff --check and git diff --cached --check. Return commit hash or explicit no-code-change reason, changed files, raw command outputs, export/boundary changes, downstream migration map, residual blockers, risks, and next-step recommendation. If implementation would require changing sibling consumers, deleting legacy routes, reclassifying RecipeContext kinds, or changing production behavior, stop and return blocked/needs-controller with evidence instead of expanding scope."
+      },
+      {
+        "taskPackageId": "co-5c-plugin-test-fixture-consumer-migration",
+        "status": "needs-rework",
+        "summary": "Current window/repository must be AlembicPlugin. Read parent AGENTS.md, this state root, accepted CO-5A and CO-5B controller decisions/results, AlembicPlugin AGENTS.md, and the AlembicCore CO-5B fixture surface at commit 377ecb4. Work only in AlembicPlugin. CO-5C is a consumer test/config migration package, not a production runtime refactor and not a Core deletion task. Starting from CO-5B, migrate AlembicPlugin residual test/config consumers away from transitional/retired Core routes where behavior can stay identical: @alembic/core/core/analysis, @alembic/core/core/ast/lang-*, @alembic/core/core/discovery, and @alembic/core/project-intelligence should move to @alembic/core/test-fixtures when CO-5B exports cover the symbol or helper. Expected targets include but are not limited to config/core-import-boundary-allowlist.json, test/unit/CallGraphAnalyzer.test.ts, test/integration/RealProjectBootstrap.test.ts, test/integration/GoSupport.test.ts, test/integration/RealProjectEnhancement.test.ts, test/integration/RealProjectAst.test.ts, test/integration/RealProjectDiscovery.test.ts, test/integration/RealProjectLanguage.test.ts, test/integration/PanoramaIntegration.test.ts, and project-intelligence residual unit tests such as CouplingAnalyzer, MultiLanguageParsers, ProjectIntelligenceIncrementalPlanner, LayerInferrer, FileDiffSnapshotStore, PanoramaService, LanguageServiceDetect, ProjectAnalysisMaterialization, RoleRefiner, CustomConfigDiscoverer, PanoramaAggregator, PanoramaScanner, and ModuleDiscoverer. If a symbol is not covered by @alembic/core/test-fixtures or migration would change tested behavior, leave the residual import in place with an exact blocker and updated allowlist reason instead of inventing a mock or editing Core. Do not edit vendor/AlembicCore, Alembic, AlembicAgent, plugin marketplace/release snapshots, tool schema semantics, production runtime files, or source behavior outside test/config migration. Do not delete Core routes, reintroduce @alembic/core/project-intelligence package exports, change KnowledgeService aliases, move service/quality or service/bootstrap, or reclassify RecipeContext unused kinds. Required work: 1) record pre-change git status and focused rg counts for the old specifiers and @alembic/core/test-fixtures; 2) migrate imports to @alembic/core/test-fixtures with behavior-preserving symbol replacements; 3) update config/core-import-boundary-allowlist.json counts/reasons to reflect current residuals, aiming for zero residuals only when raw rg proves it; 4) run focused tests for touched files plus build/lint/boundary checks; 5) return a TargetResultEnvelope with commit hash, changed files, exact old-route residuals, validation output, risks, and whether the remaining residuals block a later Core export shrink package. Verification expected before result: pre/post git status; focused rg scans for @alembic/core/core/analysis, @alembic/core/core/ast/lang-, @alembic/core/core/discovery, @alembic/core/project-intelligence, and @alembic/core/test-fixtures; npm run build:check; focused vitest for touched tests; npm run lint; npm run lint:repo-boundary; npm run build or clear reason if build:check is the repo's accepted seam; git diff --check and git diff --cached --check. Run plugin smoke/session/distribution only if production runtime, tool schema, package export, or release asset surfaces are touched; otherwise explicitly state why not. If migration requires production-code changes, sibling edits, Core changes, or user decisions, stop and return blocked/needs-controller with evidence."
+      },
+      {
+        "taskPackageId": "co-5d-core-residual-test-fixture-support",
+        "status": "pending",
+        "summary": "Current window/repository must be AlembicCore. Read parent AGENTS.md, this state root, accepted CO-5B controller decision/result, CO-5C original and rework controller decisions/results, AlembicCore AGENTS/CLAUDE, and current Core source. Work only in AlembicCore. CO-5D is a producer-side residual test-fixture support repair needed before another AlembicPlugin CO-5C rework; it is not a deletion/internalization task, not a sibling migration, and not a public @alembic/core/project-intelligence resurrection. Starting from the CO-5C rework blocker, extend the existing @alembic/core/test-fixtures surface with real Core-backed test-only exports only where semantics are already implemented and safe: project-analysis materialization/phase-runner helpers needed by AlembicPlugin/test/unit/ProjectAnalysisMaterialization.test.ts (buildEntityGraphInput, materializeCallGraph, resolveProjectAnalysisMaterialization, runPhase1_7_CallGraph, runPhase2_DependencyGraph) and the discovery preference helpers currently blocking the last resolvable Plugin residual (detectConflict, loadPreference, savePreference). Do not add a ./project-intelligence package export, do not edit AlembicPlugin/Alembic/AlembicAgent/vendor/release/runtime delivery files, do not delete or internalize @alembic/core/core/analysis, @alembic/core/core/ast/*, @alembic/core/core/discovery, or any old route, and do not change production behavior. The replacement surface must be backed by existing Core implementation call chains; avoid mocks, empty barrels, type-only placeholders, or compatibility aliases with no consumer path. If any requested helper cannot be safely exposed through @alembic/core/test-fixtures without widening production API or changing behavior, stop and return blocked/needs-controller with exact evidence rather than inventing a local substitute. Required work: 1) record pre-change git status and confirm current @alembic/core/test-fixtures lacks the named helpers; 2) add only the minimal test-fixtures exports and focused Core tests/smoke coverage needed to prove those exports resolve and preserve the helper semantics; 3) update public-api smoke/boundary metadata only if the existing ./test-fixtures exact export checks require symbol coverage changes; 4) keep downstream migration guidance explicit for AlembicPlugin CO-5C rework-2. Verification expected before TargetResultEnvelope: pre/post git status; focused rg scans for named helpers and @alembic/core/test-fixtures; focused tests for the new test-fixtures surface and relevant existing materialization/discovery behavior; npm run build:check; npm run build; npm run smoke:public-api; npm run lint:public-api-boundary; npm run lint:consumer-core-imports; npm run lint; git diff --check and git diff --cached --check. Return commit hash or explicit no-code-change/blocker reason, changed files, exact exports added, validation output, remaining blockers, risks, and a downstream Plugin migration map. If implementation would require sibling edits, resurrecting @alembic/core/project-intelligence, deleting legacy routes, changing production runtime behavior, or a user decision, stop and return blocked/needs-controller with evidence."
+      }
+    ],
+    "targetTasks": [
+      {
+        "targetTaskId": "CO-0",
+        "taskPackageId": "co-0-core-precheck-inventory",
+        "targetWindow": "AlembicCore",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "CO-1",
+        "taskPackageId": "co-1-core-public-api-gate-capability-replacement",
+        "targetWindow": "AlembicCore",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "CO-2",
+        "taskPackageId": "co-2-core-replacement-capability-outputs",
+        "targetWindow": "AlembicCore",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 2,
+          "reworkCount": 1
+        }
+      },
+      {
+        "targetTaskId": "CO-3A",
+        "taskPackageId": "co-3a-alembic-consumer-capability-output-migration",
+        "targetWindow": "Alembic",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "CO-3B",
+        "taskPackageId": "co-3b-plugin-consumer-capability-output-migration",
+        "targetWindow": "AlembicPlugin",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "CO-4",
+        "taskPackageId": "co-4-core-internalize-cleared-legacy-routes",
+        "targetWindow": "AlembicCore",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 2,
+          "reworkCount": 1
+        }
+      },
+      {
+        "targetTaskId": "CO-5A",
+        "taskPackageId": "co-5a-core-internal-optimization-rebaseline",
+        "targetWindow": "AlembicCore",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "CO-5B",
+        "taskPackageId": "co-5b-core-test-fixture-public-surface-support",
+        "targetWindow": "AlembicCore",
+        "status": "accepted",
+        "reviewDecision": "accept",
+        "counts": {
+          "dispatchCount": 1
+        }
+      },
+      {
+        "targetTaskId": "CO-5C",
+        "taskPackageId": "co-5c-plugin-test-fixture-consumer-migration",
+        "targetWindow": "AlembicPlugin",
+        "status": "needs-rework",
+        "reviewDecision": "rework",
+        "counts": {
+          "dispatchCount": 2,
+          "reworkCount": 2
+        }
+      },
+      {
+        "targetTaskId": "CO-5D",
+        "taskPackageId": "co-5d-core-residual-test-fixture-support",
+        "targetWindow": "AlembicCore",
+        "status": "pending",
+        "reviewDecision": null,
+        "counts": null
+      }
+    ],
+    "blockers": [],
+    "decisionsRequired": []
+  }
+}

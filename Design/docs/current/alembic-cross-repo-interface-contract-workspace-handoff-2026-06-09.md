@@ -59,7 +59,7 @@ window prompt.
 
 ## Evidence And Links
 
-- State root: `.workspace-active/workspace/current/alembic-cross-repo-interface-contract/`
+- State root: `.wakeflow-active/current/alembic-cross-repo-interface-contract/`
 - Original plan: `Design/docs/current/alembic-cross-repo-interface-contract-original-plan-2026-06-09.md`
 - Requirement design: `Design/docs/current/alembic-cross-repo-interface-contract-requirement-design-2026-06-09.md`
 - Independent demand sequence: `Design/docs/current/alembic-cross-repo-interface-contract-work-slicing-2026-06-09.md`

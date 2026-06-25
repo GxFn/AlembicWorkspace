@@ -13,7 +13,7 @@
 - 未达到时剩余差距：创建 Wave 10 队列、开启 mode、arm `Alembic` 第一跳，等待 5 个目标窗口真实唤醒并回填；最后由总控确认没有 `AlembicTest` 自动化被创建。
 - 已达到时验收 / 归档判断：若 5 个目标窗口完成且无 Test 下一跳 automation，VAD role guard 修复可验收；六窗口完整无人值守仍等待 `AlembicTest` 真实 thread id 重新登记。
 - 当前任务分区：总控脚本与自动化治理、窗口分派、TODO 状态滚动。
-- 不纳入本轮事项：不发送 `AlembicTest`；不运行真实项目测试；不改产品仓库源码；不领取真实全局 TODO；不提交 `.workspace-local`；不把 5 窗口通过解释为六窗口完整通过。
+- 不纳入本轮事项：不发送 `AlembicTest`；不运行真实项目测试；不改产品仓库源码；不领取真实全局 TODO；不提交 `.wakeflow-local`；不把 5 窗口通过解释为六窗口完整通过。
 
 ## 总控决策记录
 
@@ -22,7 +22,7 @@
 - 已核对证据：`node scripts/visible-dispatch.mjs status --json` 显示 mode disabled、registeredWindows=5、Wave 9 queue 已 completed；`register --window AlembicTest --thread current-codex-thread --write --json` 已被脚本拒绝；完整 `verify-control-center --with-script-tests` 已通过。
 - 是否需要先验证 / 重新计划 / 用户确认：用户已确认下一轮；当前可以新建 Wave 10 并准备队列，但只允许发送 5 个真实登记窗口。
 - 本次允许更新：当前 Wave 10 计划、总控索引 / 状态同步、全局 TODO 的 VAD 行、ignored VAD queue / mode / automation run runtime。
-- 本次不得更新：不得把 `AlembicTest` 标为待启动；不得创建 `AlembicTest` heartbeat；不得写产品源码；不得把 fake TODO 结果写成真实产品任务结论；不得提交 `.workspace-local`。
+- 本次不得更新：不得把 `AlembicTest` 标为待启动；不得创建 `AlembicTest` heartbeat；不得写产品源码；不得把 fake TODO 结果写成真实产品任务结论；不得提交 `.wakeflow-local`。
 
 ## Design / 需求来源
 
@@ -44,17 +44,17 @@
 - 关键入口：
   - `scripts/visible-dispatch.mjs`
   - `skills/dev/visible-automation-dispatch-target/SKILL.md`
-  - `.workspace-local/visible-dispatch/state.json`
-  - `.workspace-local/visible-dispatch/window-registry.json`
-  - `.workspace-local/visible-dispatch/dispatch-queue.json`
-  - `.workspace-local/visible-dispatch/automation-runs.json`
+  - `.wakeflow-local/visible-dispatch/state.json`
+  - `.wakeflow-local/visible-dispatch/window-registry.json`
+  - `.wakeflow-local/visible-dispatch/dispatch-queue.json`
+  - `.wakeflow-local/visible-dispatch/automation-runs.json`
 - producer / consumer 依赖：
   - Producer：总控 `mode --enable`、`enqueue --from-plan`、`arm --task`、Codex automation 创建 heartbeat、`record-arm`。
   - Consumer：5 个目标窗口 heartbeat 醒来后读取 VAD target skill、`claim`、执行只读 fake TODO、`finish --chain-next`、仅在 finish JSON 明确允许 target-courier 时机械创建下一跳、`record-arm`、`record-stop`。
   - Gate：`AlembicTest` 当前没有真实 registry，不是 producer / consumer；如果链路尝试触发 Test，必须停止并归因。
   - Acceptance：总控读取 queue / runs / backfill，逐项 `accept` 或裁决失败层。
 - 不可提前消费的上游：`AlembicTest` 真实 thread id 未登记前，不得把 Test 作为可发送窗口。
-- 不允许触碰的目录 / 仓库：不写 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 产品源码；不写真实测试项目业务代码；不提交 `.workspace-local`。
+- 不允许触碰的目录 / 仓库：不写 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 产品源码；不写真实测试项目业务代码；不提交 `.wakeflow-local`。
 - 真实测试项目是否涉及：不涉及；本轮不发送 `AlembicTest`，不创建测试单。
 
 ## 阶段顺序
@@ -225,7 +225,7 @@ node scripts/visible-dispatch.mjs record-stop --automation-id <当前 automation
 - 需要真实场景的理由：需要真实 Codex thread / heartbeat 才能验证目标窗口是否按 skill 执行；不需要真实项目环境。
 - 测试前边界与多条件判断：
   - 测试要回答的问题：修复后的真实 heartbeat 是否能让 5 个窗口完成，且 Plugin 不再自动调起 `AlembicTest`。
-  - 测试对象 / 目标窗口 / 线程 / 项目边界：`.workspace-local/visible-dispatch` runtime、5 个已登记 Alembic 系列可见 Codex 窗口；`AlembicTest` 不在本轮发送名单。
+  - 测试对象 / 目标窗口 / 线程 / 项目边界：`.wakeflow-local/visible-dispatch` runtime、5 个已登记 Alembic 系列可见 Codex 窗口；`AlembicTest` 不在本轮发送名单。
   - 成功能推出的结论：VAD target skill / role guard / no-Test-auto-arm 修复在 5 窗口真实链路中有效。
   - 失败能推出的结论：失败归因在 automation 投递、thread registry、窗口操作、脚本状态机或总控计划边界之一；不能直接归因到产品仓库。
   - 不能推出的结论：不能证明六窗口完整无人值守已通过；不能证明真实产品 TODO 可无人值守完成。

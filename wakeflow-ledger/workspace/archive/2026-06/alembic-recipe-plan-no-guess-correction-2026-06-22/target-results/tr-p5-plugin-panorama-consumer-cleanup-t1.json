@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-plugin-panorama-consumer-cleanup-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p5-plugin-panorama-consumer-cleanup-p1",
+  "dispatchGroup": "p5-plugin-panorama-consumer-cleanup-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p5-plugin-panorama-consumer-cleanup-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin P5 cleanup completed and committed at e70bbd95eaa9f1d0da16936cd1579829cf0b5565. Removed Plugin-owned live Panorama consumers after Core P5 retirement: obsolete Panorama service/import tests and fixtures were deleted, alembic_panorama was removed from clean MCP output/tool capability business surfaces, the completion finalizer no-op surface was renamed from panorama refresh to ProjectContext refresh, and docs/tests were aligned with the confirmed Panorama retirement. Preserved ProjectContext graph/module-layer behavior, Recipe-generation domain signals, explicit retired-tool diagnostics, and legacy snapshot DTO readers per Core producer evidence.",
+  "evidenceRefs": [
+    "commit:e70bbd95eaa9f1d0da16936cd1579829cf0b5565",
+    "commit:061db2d75da867d91b9fcce4a4f627a91fde1b1d",
+    ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/target-results/tr-p5-core-panorama-retire-architecture-signals-t1.json",
+    "AlembicPlugin/docs/declared-effects.md",
+    "AlembicPlugin/docs/legacy-register.md",
+    "AlembicPlugin/lib/runtime/mcp/core-tools/output.ts",
+    "AlembicPlugin/lib/runtime/status/OnboardingContract.ts",
+    "AlembicPlugin/lib/workflows/capabilities/completion/CompletionSteps.ts",
+    "AlembicPlugin/lib/workflows/capabilities/completion/WorkflowCompletionFinalizer.ts",
+    "AlembicPlugin/lib/workflows/capabilities/completion/WorkflowCompletionTypes.ts",
+    "AlembicPlugin/scripts/probe-mcp-core-tools-clean-output.mjs",
+    "AlembicPlugin/test/unit/HostMcpServer.test.ts",
+    "AlembicPlugin/test/unit/McpCoreToolsCleanOutputContract.test.ts",
+    "AlembicPlugin/test/unit/ProjectAnalysisMaterialization.test.ts",
+    "AlembicPlugin/test/unit/WorkflowCompletionFinalizer.test.ts"
+  ],
+  "verification": [
+    "npm run build:check: passed; Core build used ../AlembicCore @ 061db2d75da867d91b9fcce4a4f627a91fde1b1d and tsc --noEmit passed.",
+    "npm run build: passed; tsc and postbuild passed against the same Core producer commit.",
+    "npm run check: passed with exit 0; existing Biome warnings remained in unrelated broad scripts/ClaudeCodeHostAdapter surfaces.",
+    "npx biome check scoped changed files: passed.",
+    "git diff --check: passed.",
+    "node scripts/probe-mcp-core-tools-clean-output.mjs: passed; ok mcp-core-tools-clean-output-projector-probe tools=12 issues=0.",
+    "npm run test -- test/unit/McpCoreToolsCleanOutputContract.test.ts test/unit/WorkflowCompletionFinalizer.test.ts test/unit/ProjectAnalysisMaterialization.test.ts test/unit/KnowledgeContextPublicSurfaceGuidance.test.ts: passed; 4 files, 22 tests.",
+    "npm run test -- test/unit/HostMcpServer.test.ts -t \"Codex host-agent bootstrap runs in the Plugin without the daemon MCP bridge\": passed; 1 selected test, 41 skipped.",
+    "npm run test -- test/unit/AuditEmission-MissionBriefing.test.ts test/unit/HostAgentProjectContextDirectSwitch.test.ts: passed; 2 files, 7 tests.",
+    "rg --files -g '!vendor/**' | rg 'Panorama|panorama-mocks': no matching plugin files remained.",
+    "rg sweep for PanoramaAggregator/PanoramaScanner/PanoramaService/ModuleDiscoverer/RoleRefiner/LayerInferrer/CouplingAnalyzer/panorama-mocks/panoramaService under test lib scripts excluding vendor: no matches.",
+    "rg sweep for alembic_panorama under lib scripts test docs excluding vendor: only retired direct-call diagnostic, regression/doc references, and removedOrBlocked negative assertion remain.",
+    "alembic_code_guard attempted with full file scope and with minimal one-file scope; both failed with Alembic tool internal schema error `unrecognized key: data`, so no Guard verdict was available."
+  ],
+  "risks": [
+    "alembic_code_guard is currently blocked by an Alembic MCP internal schema error (`unrecognized key: data`) even for minimal input; implementation validation therefore relies on build/check/probe/targeted tests and import sweeps.",
+    "A full unscoped HostMcpServer.test.ts run still has unrelated pre-existing failures around alembic_plan/tool-list/search/projectRuntime resident-backed expectations; the touched HostMcpServer selected test passed.",
+    "alembic_panorama remains only as explicit retired direct-call diagnostic in McpServer plus regression/doc references, not as clean-output/business tool capability.",
+    "Legacy panoramaResult DTO reader behavior remains in MissionBriefing regression coverage because the Core P5 producer explicitly retained legacy ProjectSnapshot panorama DTO readers to avoid broad snapshot compatibility churn."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p5-plugin-panorama-consumer-cleanup-p1__AlembicPlugin__p5-plugin-panorama-consumer-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-panorama-consumer-cleanup-p1__AlembicPlugin__p5-plugin-panorama-consumer-cleanup-t1.json",
+    "deliveryRunId": "run-delivery-p5-plugin-panorama-consumer-cleanup-p1__AlembicPlugin__p5-plugin-panorama-consumer-cleanup-t1",
+    "dispatchGroup": "p5-plugin-panorama-consumer-cleanup-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-panorama-consumer-cleanup-p1__AlembicPlugin__p5-plugin-panorama-consumer-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 50,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p5-plugin-panorama-consumer-cleanup-p1",
+    "targetTaskId": "p5-plugin-panorama-consumer-cleanup-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p5-plugin-panorama-consumer-cleanup-p1",
+    "resultId": "tr-p5-plugin-panorama-consumer-cleanup-t1",
+    "createdAt": "2026-06-22T16:39:42.318Z"
+  },
+  "createdAt": "2026-06-22T16:39:42.318Z",
+  "stateRevisionObserved": 50,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

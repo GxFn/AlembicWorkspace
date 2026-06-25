@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-CO-3B",
+  "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+  "taskPackageId": "co-3b-plugin-consumer-capability-output-migration",
+  "dispatchGroup": "co3-consumer-capability-output-migration",
+  "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "CO-3B",
+  "status": "completed",
+  "summary": "AlembicPlugin CO-3B completed in commit 7b9a30306a349650348321349e15574d98e18899. Migrated Plugin consumers from retired Core routes to capability/stable facades: enhancement bootstrap uses @alembic/core/enhancement, recipe_map/prime use @alembic/core/recipe-context-capabilities, graph/module/host project-context calls use @alembic/core/project-context-capabilities, and focused AST/enhancement tests were moved to resolvable Core exports/test-fixtures. alembic_graph now exposes bounded ProjectContext request trace in meta.projectContext so tests and agents can verify preflight/focused graph execution without mocking MCP internals. Core import allowlist was recalibrated to 421 refs / 45 unique specifiers with shrink-only residual limits.",
+  "evidenceRefs": [
+    "AlembicPlugin commit 7b9a30306a349650348321349e15574d98e18899 (Migrate plugin core imports to capability facades).",
+    "Pre-work AlembicPlugin git status --short was clean; post-commit git status --short is clean.",
+    "Focused rg after migration: no exact @alembic/core/core/enhancement, @alembic/core/recipe-context, or @alembic/core/core/capability imports remain in lib/test/config. Remaining old/deep routes are documented shrink-only test residuals: @alembic/core/core AST language dynamic imports in CallGraphAnalyzer, @alembic/core/core/analysis, @alembic/core/core/discovery, @alembic/core/core for focused tests, and 27 out-of-scope @alembic/core/project-intelligence test residuals.",
+    "config/core-import-boundary-allowlist.json now records generatedAt 2026-06-21, referenceCount 421, uniqueSpecifierCount 45, and per-specifier referenceLimits for residual deep routes.",
+    "npx vitest run test/unit/RecipeMapTool.test.ts test/unit/AgentPublicToolsActive.test.ts test/unit/PrimeRegionEvidence.test.ts test/unit/ProjectGraphTool.test.ts test/unit/ProjectContextRegion.test.ts test/unit/HostAgentProjectContextDirectSwitch.test.ts test/unit/CallGraphAnalyzer.test.ts => 7 files passed, 186 tests passed.",
+    "npx vitest run test/integration/RealProjectEnhancement.test.ts test/integration/RealProjectBootstrap.test.ts test/integration/GoSupport.test.ts => 3 files passed, 146 tests passed; missing external sample projects followed existing skip paths.",
+    "npm run report:agent-extraction-boundary => sourceFilesScanned 383, all agent/ai/tool outside-boundary counts 0.",
+    "git diff --check and git diff --cached --check both passed."
+  ],
+  "verification": [
+    "npm run build:check => passed; Core build used ../AlembicCore @ f3fc8e982dd79f388509aa2b1a64bf974f0aaae9; tsc --noEmit passed.",
+    "npm run build => passed; Core build used ../AlembicCore @ f3fc8e982dd79f388509aa2b1a64bf974f0aaae9; postbuild completed.",
+    "npm run lint => exit 0; emitted existing warnings in unrelated host-adapter/scripts but no errors after CO-3B formatting fixes.",
+    "npm run lint:repo-boundary => passed; escape-hatch count 0 / 75.",
+    "npm run lint:consumer-core-imports => passed; scanned 383 files and 421 @alembic/core imports with config/core-import-boundary-allowlist.json.",
+    "Focused unit vitest suite => 186/186 passed.",
+    "Focused integration vitest suite => 146/146 passed with existing missing-sample-project skips."
+  ],
+  "risks": [
+    "27 @alembic/core/project-intelligence imports remain in legacy panorama/discovery/project-intelligence tests outside CO-3B; they are now explicitly documented and count-limited in the allowlist for CO-4 or a dedicated follow-up migration.",
+    "@alembic/core/core/analysis, @alembic/core/core/ast/lang-*, @alembic/core/core/discovery, and @alembic/core/core remain only for focused tests where no stable test-fixtures facade exposes the required low-level behavior; each is shrink-only count-limited.",
+    "test/unit/HostAgentProjectContextDirectSwitch.test.ts still expects Core-generated retrievalHints.structureTools to contain ProjectContext.execute; this string originates in AlembicCore packet metadata and was not changed because CO-3B forbids sibling Core edits.",
+    "Plugin smoke/session/distribution tests were not run because this change did not touch Codex runtime delivery, marketplace packaging, tool schemas, or distribution artifacts."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-co3-consumer-capability-output-migration__AlembicPlugin__CO-3B",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co3-consumer-capability-output-migration__AlembicPlugin__CO-3B.json",
+    "deliveryRunId": "run-delivery-co3-consumer-capability-output-migration__AlembicPlugin__CO-3B",
+    "dispatchGroup": "co3-consumer-capability-output-migration",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co3-consumer-capability-output-migration__AlembicPlugin__CO-3B.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+    "stateRevision": 20,
+    "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+    "taskPackageId": "co-3b-plugin-consumer-capability-output-migration",
+    "targetTaskId": "CO-3B",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "co3-consumer-capability-output-migration",
+    "resultId": "tr-CO-3B",
+    "createdAt": "2026-06-20T19:29:18.303Z"
+  },
+  "createdAt": "2026-06-20T19:29:18.303Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

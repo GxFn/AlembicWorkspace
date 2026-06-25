@@ -199,7 +199,7 @@ Use one subdirectory per substantial demand:
 - Requirement designs are not dispatch plans.
 - Design candidates are not accepted goals until the controller records that
   decision.
-- Current active execution belongs in `.workspace-active/workspace/current/` or
+- Current active execution belongs in `.wakeflow-active/current/` or
   a Wakeflow state root.
 - Per-window completion evidence belongs in the matching window ledger.
 

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "dh-7-agenthost-default-from-pluginhost",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "summary": "DH-7（F1 修复，用户选「现修」）= 收尾 RC-1 消除硬编码最后一处。AlembicPlugin 基线 532a7d1 直提 main。把 agentHost 省略时的默认从硬编码 'codex' 改为「取 runtime 已解析 pluginHost」：codex runtime → 仍默认 codex（不变）；cc runtime → 默认 claude-code。改点 mcp-tools.ts:128（AgentHostSchema.default('codex')）+ agent-public-tools.ts:905/925（args.agentHost ?? 'codex'）；默认值取 RuntimeContext/L3 已解析的 pluginHost（与 status.runtimeIdentity.pluginHost 同源），**不在 L2 handler 引入 host-name 字面分支**（读已解析值）。加回归测试（cc 省略→claude-code、codex 省略→codex、显式 agentHost 保留）。约束：wire-safe（codex 行为不变）、显式 agentHost 仍接受、AGENT_HOSTS 校验不变、output/contract 仍始终携带已解析 agentHost、四工具对外 MCP 语义不变。验证 tsc + 新测试 + 全量 unit 失败集不增于 39 基线 + 两漂移门禁 + lint:layer-boundary/repo-boundary 绿（Node≥22）。若 schema-default 移除波及 contract/output/测试超出小修预期，评估后回报。",
+  "status": "pending",
+  "sourceRef": "DH-6 cc 真实验收 finding F1（Test 报告 + 控制器代码核实 mcp-tools.ts:128 / agent-public-tools.ts:905/925）+ RC-1「消除硬编码 codex / 让 pluginHost 真正驱动派发」+ 用户决策「现修」(2026-06-20)",
+  "createdAt": "2026-06-20T10:32:01.772Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-7",
+      "taskPackageId": "dh-7-agenthost-default-from-pluginhost",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-7（F1 修复 = 收尾 RC-1「消除硬编码 codex」最后一处；用户已决「现修」）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`；基线 HEAD `532a7d1` = DH-5 后；纯 MCP 非强进程）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md`，声明窗口/仓库身份。\n\n**背景（DH-6 cc 真实验收 finding F1，控制器已代码核实）**：tool 调用省略 `agentHost` 字段时默认硬编码 `'codex'`，cc runtime 下把省略 agentHost 的 cc 调用误标为 codex。agentHost 是「calling host agent family」结构化字段，贯穿 intake→output echo + cross-host-readiness，**无 `if(agentHost===...)` 行为分支**（runtime host 身份本身已正确=claude-code）。这是 RC-1「消除硬编码 / 让 pluginHost 真正驱动派发」意图内、但 DH-1 枚举改点漏掉的最后一处硬编码 codex。\n\n**精确改点**：\n1. `lib/shared/schemas/mcp-tools.ts:128` `agentHost: AgentHostSchema.default('codex')` —— 移除 schema 级硬编码默认（改 `.optional()`，保留 `.describe`），使省略时 args.agentHost=undefined 交由 handler 按 runtime host 解析（否则 schema 在 parse 阶段就填了 'codex'，handler 的 `??` 成死码）。\n2. `lib/runtime/mcp/handlers/agent-public-tools.ts:905 & :925` `agentHost: args.agentHost ?? ('codex' as const)` —— 改为 `args.agentHost ?? <runtime 已解析 pluginHost>`：默认值取 **RuntimeContext / L3 host adapter 已解析的 pluginHost**（与 `status.runtimeIdentity.pluginHost` 同源，'codex'|'claude-code'）。把该 pluginHost 顺调用链传入 buildAgentToolContext/buildPrimeToolContext（找现成 RuntimeContext/host 注入点）。\n\n**架构约束**：\n- **host-name 分支仍仅 L3**：handler（L2）只**读已解析的 pluginHost 值**，不得在 L2 写 `=== 'codex'`/`'claude-code'` 字面分支。\n- **wire-safe / codex 行为不变**：codex runtime 下省略 agentHost 仍解析为 'codex'（与现状一致）；仅 cc runtime 下从 'codex' 纠正为 'claude-code'。\n- 显式传 agentHost 仍被接受并原样记录；AGENT_HOSTS 校验不变；output/contract（output.ts:150 / contract.ts requiredFields）仍**始终携带已解析 agentHost**（handler 解析后非空）——若移除 schema default 影响 contract requiredFields/输出 schema 的「必填」语义，相应调整使「省略可、解析后必有值」成立，勿破坏既有 contract/output 测试。\n- 四工具对外 MCP 语义不变；落盘名/'codex-plugin'/MCP error codes/KEEP frozen strings 不动；纯 MCP 非强进程。\n\n**回归测试**（锁定修复，建议落 `test/unit/ClaudeCodeHostRuntime.test.ts` 或就近）：cc runtime + 省略 agentHost → 解析 claude-code；codex runtime + 省略 → 解析 codex；显式 agentHost（任一 host）→ 原样保留。\n\n**完成定义**：上述改点落地 + 回归测试绿；`tsc --noEmit` 绿；biome lint 0；全量 unit 失败集**不增于基线 39 failed**（新测试计入 passed）；`lint:layer-boundary` + `lint:repo-boundary` + 两漂移门禁仍 GREEN（Node≥22，.nvmrc=22）；codex 行为不变（codex 省略仍 codex）。\n\n**边界**：本窗只动 AlembicPlugin lib/test；不改 Alembic/AlembicCore；CC3 文案不在本需求；若 schema-default 移除波及面超出小修（contract/output/大量测试），**评估后回报**而非强推。\n\n**回 TargetResultEnvelope**：改点 diff + commit hash；回归测试新增用例 + 运行结果；tsc/lint/两漂移门禁/layer-boundary 原始输出；全量 unit 失败集 vs 基线 39；codex 行为不变佐证；F1 闭合确认（RC-1 消除硬编码 100% 完成）；任何超预期波及/blocked。",
+      "status": "pending",
+      "createdAt": "2026-06-20T10:32:01.772Z"
+    }
+  ]
+}

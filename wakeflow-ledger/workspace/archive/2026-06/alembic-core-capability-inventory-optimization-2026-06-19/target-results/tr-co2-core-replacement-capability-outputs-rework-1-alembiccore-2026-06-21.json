@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-co2-core-replacement-capability-outputs-rework-1-alembiccore-2026-06-21",
+  "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+  "taskPackageId": "co-2-core-replacement-capability-outputs",
+  "dispatchGroup": "co2-core-replacement-capability-outputs-rework-1",
+  "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "CO-2",
+  "status": "completed",
+  "summary": "AlembicCore CO-2 rework-1 completed in commit f3fc8e982dd79f388509aa2b1a64bf974f0aaae9. Narrow fix for controller decision evt-20260620185043-0013: @alembic/core/recipe-context-capabilities now owns its public structural RecipeContextCoreServices input and createRecipeContextServiceFromCore wrapper, while internally delegating to the existing adapter factory. The generated dist/recipe-context-capabilities.d.ts no longer imports service/recipe-context/adapters/* or exposes RecipeContextCoreParts/KnowledgeReadFacade/SourceRefRepositoryFacade/SearchEngineFacade/VectorServiceFacade. Added smoke-public-api forbidden declaration refs so this clean-facade boundary stays locked. No old routes were deleted; no sibling repos, vendor snapshots, release pointers, or RecipeContext unused kind classifications were changed.",
+  "evidenceRefs": [
+    "commit:f3fc8e982dd79f388509aa2b1a64bf974f0aaae9",
+    "commit:5d85114741da7174c662f8de126baf91b1ebce7f",
+    "guard-result:guard-public-mqmpwkhb-3",
+    "AlembicCore/src/recipe-context-capabilities.ts",
+    "AlembicCore/scripts/smoke-public-api.mjs",
+    "AlembicCore/dist/recipe-context-capabilities.d.ts",
+    "AlembicCore/test/PublicCapabilityOutputEntrypoints.test.ts",
+    "AlembicCore/config/public-api-boundary.json",
+    "AlembicCore/package.json"
+  ],
+  "verification": [
+    "pre-rework git status --short --branch: ## main...origin/main [ahead 2]",
+    "npm run build:check: passed",
+    "npm run test -- test/PublicCapabilityOutputEntrypoints.test.ts test/PublicApiInventory.test.ts test/ProjectContextContract.test.ts: passed (3 files, 17 tests)",
+    "npm run lint: passed after formatting (Biome checked 617 files)",
+    "npm run build: passed",
+    "git diff --check: passed",
+    "npm run smoke:public-api: passed after build and now checks forbidden declaration refs (Imported 56 exact public API entrypoints)",
+    "rg -n \"service/recipe-context/adapters|RecipeContextCoreParts|KnowledgeReadFacade|SourceRefRepositoryFacade|SearchEngineFacade|VectorServiceFacade\" dist/recipe-context-capabilities.d.ts: no matches (exit 1/no output)",
+    "npm run lint:public-api-boundary: passed (stable=24 provisional=10 transitional=29, 56 exact exports)",
+    "npm run lint:consumer-core-imports: passed (AlembicAgent/Alembic/AlembicPlugin issues=0)",
+    "npm run test: passed (129 files, 1346 tests)",
+    "Alembic code guard: guard-public-mqmpwkhb-3 passed, 2 files, 0 violations",
+    "git diff --cached --check: passed",
+    "post-commit git status --short --branch: ## main...origin/main [ahead 3]"
+  ],
+  "risks": [
+    "The implementation still internally delegates to service/recipe-context/adapters/fromCore.js, but that path is no longer part of the stable public declaration surface; this preserves behavior while meeting the clean facade condition.",
+    "Legacy ./recipe-context and old core/AST routes remain intentionally available for CO-3 consumer migration and CO-4 internalization decisions.",
+    "RecipeContext detail/search/prime/relations unused-kind cleanup remains pending later controller/user confirmation and was not changed in this rework."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-co2-core-replacement-capability-outputs-rework-1__AlembicCore__CO-2",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co2-core-replacement-capability-outputs-rework-1__AlembicCore__CO-2.json",
+    "deliveryRunId": "run-delivery-co2-core-replacement-capability-outputs-rework-1__AlembicCore__CO-2",
+    "dispatchGroup": "co2-core-replacement-capability-outputs-rework-1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-co2-core-replacement-capability-outputs-rework-1__AlembicCore__CO-2.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-core-capability-inventory-optimization-2026-06-19",
+    "stateRevision": 14,
+    "demandKey": "alembic-core-capability-inventory-optimization-2026-06-19",
+    "taskPackageId": "co-2-core-replacement-capability-outputs",
+    "targetTaskId": "CO-2",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "co2-core-replacement-capability-outputs-rework-1",
+    "resultId": "tr-co2-core-replacement-capability-outputs-rework-1-alembiccore-2026-06-21",
+    "createdAt": "2026-06-20T18:56:17.525Z"
+  },
+  "createdAt": "2026-06-20T18:56:17.525Z",
+  "stateRevisionObserved": 14,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

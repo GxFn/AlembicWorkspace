@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-plugin-host-mcp-runtime-count-db-route-repair-p1",
+  "demandKey": "alembic-coldstart-chain-repair-2026-06-25",
+  "summary": "修复 Test 复验暴露的真实 Codex host MCP 路由缺口：本地 b94 修复未进入已安装 host runtime，bootstrap 仍输出 4/0 与 targets=1，dimension_complete 后 DB/status/recipe_map/graph/search 不可验收。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-coldstart-chain-repair-2026-06-25.md",
+  "createdAt": "2026-06-24T22:52:37.984Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-plugin-host-mcp-runtime-count-db-route-repair-t1",
+      "taskPackageId": "p4-plugin-host-mcp-runtime-count-db-route-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "你是 AlembicPlugin 窗口。先读父 AGENTS.md、AlembicPlugin/AGENTS.md、stateRoot、原始 plan/design、已接受的 p3-followup Plugin 证据，以及 Test 复验失败证据：Test/tmp/test-bilidili-coldstart-chain-e2e-after-plugin-count-repair-20260625/evidence/run-summary.md、db-inspection.json、source-snippet-checks.md 和 full briefing /Users/gaoxuefeng/.asd/workspaces/5a5ef302/.asd/tmp/bootstrap-briefing-5a5ef3025d093b01.json。本任务是产品修复，不是重跑 Test。原始完成定义要求 BiliDili 真链路 plan→bootstrap→submit→dimension_complete→DB Recipe 持久化，并且 targets fileCount 与 status recipeCount 真实准确。修复范围：1) 先证明/修复真实 Codex host MCP 运行面是否仍在旧插件缓存，确保当前 AlembicPlugin build/dist 的 b94 ProjectContext source-file-facts 修复能被 host MCP 路由实际加载；若需要本地插件 cache sync/reload，使用仓库既有脚本落地并给出可复查证据，不 push/tag/bump；若需要用户重连才能生效，先把可自动部分完成并明确 blocker。2) 修正 alembic_bootstrap 真实 MCP 路由，使 BiliDili safe/live 等真实 Swift 项目中 projectMeta.fileCount、bootstrapState.projectIdentity.fileCount/moduleCount、targets[].fileCount 来自真实 ProjectContext/source facts，不受 planSelection maxFiles 展示预算截断，AOXFoundationKit/AOXNetworkKit 不得退化为 1。3) 修正 submit/dimension_complete 后显式 projectRoot/dataRoot 的持久化与公共读路由：alembic_status 对该 projectRoot 返回 DB recipeCount/dbRecipeCount 真实，recipe_map/graph/search 不再 output-contract mismatch，不再投影 projectRoot='.' / project:unknown；若这与 selected-project mismatch 相关，只修阻断 host loop 的 projectRoot plumbing，不扩大到已暂缓的 P6 handoff/projectId UI 漂移。硬边界：不放松证据门禁；不恢复/改名 7-domain；不改 alembic_plan 两部分契约；不引入新 provider/runtime；不把 P6 暂缓项作为本任务可见范围；不把测试脚本通过当成功，必须给真实 host/MCP 路由证据。验收建议：Node22；npm run build:check、npm run build、相关 unit/public route tests；安装/缓存运行面 grep 或 probe 证明含 collectProjectSourceFileFacts/sourceFileFacts.length；BiliDili-like 或真实 safe-copy host MCP probe 证明 draft 与 bootstrap counts 对齐、DB/status/read routes 可用；git diff --check；回填 commit hash、改动文件、命令输出、probe JSON/路径、残余风险。",
+      "status": "pending",
+      "createdAt": "2026-06-24T22:52:37.984Z"
+    }
+  ]
+}

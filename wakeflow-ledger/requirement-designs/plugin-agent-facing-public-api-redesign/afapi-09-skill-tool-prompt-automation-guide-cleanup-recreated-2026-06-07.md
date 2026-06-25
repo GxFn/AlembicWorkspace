@@ -5,7 +5,7 @@ Demand Key: `AFAPI-REQ-09-SKILL-TOOL-PROMPT-AUTOMATION-GUIDE-CLEANUP`
 Sequence Order: 09
 Maintainer: AlembicWorkspace
 Document Role: Wakeflow demand definition for the remaining AFAPI track
-State Authority: a future Wakeflow state root under `.workspace-active/workspace/current/`; this document is not a dispatch packet.
+State Authority: a future Wakeflow state root under `.wakeflow-active/current/`; this document is not a dispatch packet.
 
 ## Unified Status
 

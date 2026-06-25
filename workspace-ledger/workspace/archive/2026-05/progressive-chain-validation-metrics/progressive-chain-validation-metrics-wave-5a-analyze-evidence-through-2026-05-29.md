@@ -247,7 +247,7 @@ cd codex-control-workspace && node scripts/verify-control-center.mjs --require-t
 验证命令：
 
 ```text
-cd codex-control-workspace && node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/progressive-chain-validation-metrics-wave-5a-analyze-evidence-through-2026-05-29.md --check
+cd codex-control-workspace && node scripts/sync-current-plan.mjs --plan .wakeflow-active/current/progressive-chain-validation-metrics-wave-5a-analyze-evidence-through-2026-05-29.md --check
 cd codex-control-workspace && node scripts/verify-control-center.mjs --require-todo --require-task-packages
 ```
 
@@ -467,7 +467,7 @@ cd Alembic && git diff --check
   - 不能推出的结论：不能推出 full cold-start、所有 N0-N14、Dashboard UI 或 golden set 完成。
   - 停止或不开始条件：若需要改变产品代码、跑真实项目或修改 prompt / tool policy，必须进入 Wave 5B 裁决。
 - 测试单：无。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：本轮不触碰真实项目。
 
 ## 回填区
@@ -496,7 +496,7 @@ cd Alembic && git diff --check
   "indexRows": [
     {
       "type": "PCVM Wave 5A analyze burn evidence baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-5a-analyze-evidence-through-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-5a-analyze-evidence-through-2026-05-29.md",
       "status": "Wave 5C 已验收 / 待归档",
       "description": "AlembicAgent grounding gate 与 Alembic groundingLedger report / pcvScorecard consumer 均已验收。"
     }
@@ -504,7 +504,7 @@ cd Alembic && git diff --check
   "currentIndexRows": [
     {
       "type": "PCVM Wave 5A analyze burn evidence baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-5a-analyze-evidence-through-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-5a-analyze-evidence-through-2026-05-29.md",
       "description": "Analyze burn 缺口表、Wave 5B 总控验收和 Wave 5C Alembic consumer 任务包。"
     }
   ]

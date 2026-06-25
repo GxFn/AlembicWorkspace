@@ -10,7 +10,7 @@
 - 自动化只替代“用户复制提示词到其它 Codex 窗口”的搬运动作，不替代总控对 TODO、目标阶段、窗口覆盖、producer / consumer 顺序和确认门禁的判断。
 - Codex thread automation 是可见窗口投递通道；但 Node 脚本不能直接调用本会话的 `codex_app.automation_update` 工具。第一版脚本应生成 queue / registry / arm payload 和校验结果，由总控窗口在自动化模式开启时通过 Codex 工具创建或清理 heartbeat automation。
 - 用户已确认第一版接受分钟级延迟、只覆盖 Alembic 系列窗口、不依赖 Lark Remote；关闭自动化模式不需要独立远程通道，用户用普通 Codex 输入关闭即可。
-- `windowName -> threadId` 属于本机运行态，不应写入长期文档或 git；建议保存在 `.workspace-local/visible-dispatch/window-registry.json`，并由 `.gitignore` 忽略。
+- `windowName -> threadId` 属于本机运行态，不应写入长期文档或 git；建议保存在 `.wakeflow-local/visible-dispatch/window-registry.json`，并由 `.gitignore` 忽略。
 
 ## 相关现有能力
 
@@ -50,7 +50,7 @@
 
 ### 本地运行态文件
 
-建议统一放在 `.workspace-local/visible-dispatch/`：
+建议统一放在 `.wakeflow-local/visible-dispatch/`：
 
 - `state.json`：`mode`、`loopEnabled`、`lastTickAt`、`stopRequestedAt`、`currentGoal`。
 - `window-registry.json`：`windowName`、`threadId`、`cwd`、`role`、`lastSeenAt`、`status`、`source`。
@@ -82,7 +82,7 @@
 
 ## 第一波实现建议
 
-1. 定义并测试 `.workspace-local/visible-dispatch/` 本地状态 schema。
+1. 定义并测试 `.wakeflow-local/visible-dispatch/` 本地状态 schema。
 2. 实现 `visible-dispatch.mjs status / mode / registry / enqueue / claim / complete / cleanup` 的 dry-run 与显式 `--write` 写入。
 3. `enqueue` 第一版只从当前计划的发送名单生成 queue，不先做 TODO 主线选择。
 4. `arm` 第一版不假装直接创建 automation，只输出可供总控工具调用的 payload 和目标 thread 信息。

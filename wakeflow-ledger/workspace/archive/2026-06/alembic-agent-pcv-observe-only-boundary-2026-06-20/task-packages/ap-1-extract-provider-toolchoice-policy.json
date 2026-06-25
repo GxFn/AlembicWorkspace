@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "ap-1-extract-provider-toolchoice-policy",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "summary": "AP-1（抽 ProviderToolChoicePolicy：把 DeepSeek V4 tool-choice 逻辑 + mode 计算迁出 PcvNodeEvidence/AgentRuntime inline，去 PCV 读写往返；**行为对等、默认仍生效**）。AlembicAgent 基线 955bfc2 直提 main。新模块吸收 buildDeepSeekV4AnalyzeGroundingPolicy(AgentRuntime:2207-2222)+isDeepSeekV4AnalyzeFirstGroundingBurn(:2224-2241)+toolChoice/schema 改写(:884-905)+抑制例外(:1129-1151)+buildDeepSeekV4ToolChoiceMode(从 PcvNodeEvidence:1350-1361 迁出)；模块自持 mode 状态、消除 policy 写 PCV burn 再读回(R4)；PCV 仅观察 effective vs requested。**定位=provider 正确性、非 grounding 质量门、不随 grounding 开关**。完成=AP-0 CP2/CP3 表征测试仍绿(行为对等)+deepseekV4ToolChoiceMode 仍由 PCV 观察产出(跨仓主体计数不可丢)+往返消除+build/lint/core-import-boundary/全量 vitest 绿(失败集不增于 AP-0 基线 0)+默认行为不变(grounding 此阶段不碰)。Node 22。",
+  "status": "pending",
+  "sourceRef": "需求设计 Implementation Decisions 模块拆分#1(ProviderToolChoicePolicy) + AP-0 表征基线(955bfc2, CP2/CP3) + AP-0 FC/字段清单(deepseekV4ToolChoiceMode 跨仓被主体计数不可丢) + 用户 PD1(provider 正确性默认保留)",
+  "createdAt": "2026-06-20T12:40:41.710Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "AP-1",
+      "taskPackageId": "ap-1-extract-provider-toolchoice-policy",
+      "targetWindow": "AlembicAgent",
+      "summary": "AP-1（抽取 `ProviderToolChoicePolicy`，PCV observe-only 边界收敛第 2 步）。本窗口=AlembicAgent（仓库 `~/Documents/AlembicWorkspace/AlembicAgent`，基线 HEAD `955bfc2`=AP-0 后）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md` + 需求设计 `../Design/docs/current/alembic-agent-pcv-observe-only-boundary-2026-06-20.md`（Implementation Decisions 模块拆分#1）。\n\n**目标（行为对等抽取，不切默认）**：把 DeepSeek V4 tool-choice **provider 正确性**逻辑收敛进新模块 `ProviderToolChoicePolicy`，与 PCV 证据层解耦、消除读写往返。**本阶段行为对等、默认仍生效**——DeepSeek V4 处理不变、不引 groundingEnforcement 开关（那是 AP-3）、不碰 analyze 阻断/grounding-policy 注入（那是 AP-2）。\n\n**做（迁入 ProviderToolChoicePolicy，provider 层）**：\n1. 迁入 `buildDeepSeekV4AnalyzeGroundingPolicy`(AgentRuntime.ts:2207-2222)、`isDeepSeekV4AnalyzeFirstGroundingBurn`(:2224-2241)、toolChoice/tool-schema 改写 none→auto+schema 可见(:884-905)、工具抑制 DeepSeek V4 例外(:1129-1151)。\n2. **把 `buildDeepSeekV4ToolChoiceMode` 从证据文件迁出**（PcvNodeEvidence.ts:1350-1361 → ProviderToolChoicePolicy）。\n3. **模块自持 mode 状态**：消除「policy 写 PcvNodeEvidence burn → policy 再读回」往返耦合（R4）。PCV 改为**仅观察** effective vs requested toolChoice（记录字段不变）。\n4. 定位=**provider 兼容正确性，非 grounding 质量门**；不随 grounding 开关（PD1 默认保留不回归）。\n\n**关键不变量（跨仓契约，AP-0 结转）**：\n- **`deepseekV4ToolChoiceMode` 字段不可丢**：主体 `buildPcvAnalyzeGroundingLedgerSummary` 计数它（PcvNodeEvidence.ts:286）。抽取后该字段**仍须由 PCV 观察 effective vs requested 产出**（PcvBurnGroundingLedgerEntry/PcvNodeEvidenceSummary schema 不变）——只是计算来源从证据文件迁到 policy、PCV 观察其结果。\n- **行为对等**：AP-0 CP2（DeepSeek V4 analyze toolChoice none→auto+schema 可见）+ CP3（抑制例外 + graceful-exit 对照）表征测试**必须仍全绿**（test/pcv-observe-only-baseline.characterization.test.ts）。\n- 不碰 CP1/CP4（grounding-policy 注入 / analyze 阻断）——AP-2 领地。\n- PcvNodeEvidence 保持纯观察；不删证据结构；不改四工具/LLM 对外语义。\n\n**完成定义**：`ProviderToolChoicePolicy` 模块建立、DeepSeek V4 逻辑+mode 计算迁出（证据文件不再含 buildDeepSeekV4ToolChoiceMode）、读写往返消除；AP-0 CP2/CP3 表征测试**仍绿**（行为对等）；deepseekV4ToolChoiceMode 仍产出（PCV 观察）；`npm run build`/`build:check`/`lint`/`lint:core-import-boundary`/`npm test`（Node 22）全绿，**全量 vitest 失败集不增于 AP-0 基线（0 failed）**；默认 DeepSeek V4 行为不变。\n\n**边界/不变量**：仅 AlembicAgent；行为对等（不切默认、不引 groundingEnforcement）；不碰 grounding guard（AP-2）；不删证据/不丢 deepseekV4ToolChoiceMode；命名硬约束=新模块不带 `Pcv*` 前缀（provider 层）；Node 22（ambient v18 太旧）。\n\n**回 TargetResultEnvelope**：ProviderToolChoicePolicy 模块 + 迁移 diff + commit hash；CP2/CP3 表征测试绿（行为对等证据）；deepseekV4ToolChoiceMode 仍 PCV 观察产出佐证 + 往返消除证据；build/build:check/lint/core-import-boundary/全量 vitest 结果 vs AP-0 基线；AP-1 完成确认 + 任何 blocker。",
+      "status": "pending",
+      "createdAt": "2026-06-20T12:40:41.710Z"
+    }
+  ]
+}

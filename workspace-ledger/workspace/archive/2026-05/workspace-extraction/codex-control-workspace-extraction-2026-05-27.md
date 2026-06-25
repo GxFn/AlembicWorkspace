@@ -205,7 +205,7 @@ git diff --check
 明确不包含：
 
 - 不复制 `docs/workspace/archive/` 历史执行记录。
-- 不复制 `.workspace-local/`。
+- 不复制 `.wakeflow-local/`。
 - 不写入真实 thread id、绝对私密路径或 token。
 - 不把本轮做成 Codex 插件。
 
@@ -354,7 +354,7 @@ rg -n "AlembicWorkspace|AlembicDesign|AlembicTest|AlembicPlugin|AlembicCore|Alem
   - 不能推出的结论：不能证明新仓库已经适配所有第三方项目，不能证明后续插件化完成。
   - 停止或不开始条件：发现私密 thread id、token、产品子仓库误提交、或远端无法访问。
 - 测试单：无。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：不触碰真实测试项目。
 
 ## 回填区

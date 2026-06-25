@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p0-core-plan-persistence-delete-relocate-engine-t1",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "taskPackageId": "p0-core-plan-persistence-delete-relocate-engine-p1",
+  "dispatchGroup": "p0-core-plan-persistence-delete-relocate-engine-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p0-core-plan-persistence-delete-relocate-engine-t1",
+  "status": "needs-review",
+  "summary": "AlembicCore Core-side P0 implementation is complete at commit 38d074fa64a014ef458044cac7881e092c0c6b8d: deleted the Core plan persistence repository/migration/schema/repository wiring, removed planRepository from the public repository bundle, extracted single-stage stateless plan intent validation, relocated the pure coverage/projection engine to service/recipeStatus, kept plans.ts as the stateless public facade, and changed GitDiffCheckpointService to use an injected current-HEAD baseline provider. Core residue scans are clean. Global P0 still needs controller review because the strict cross-repo scan shows AlembicPlugin production residual planRepository/getPlanView/saveDraft/getActiveConfirmed references outside this window's ownership.",
+  "evidenceRefs": [
+    "commit:38d074fa64a014ef458044cac7881e092c0c6b8d",
+    "AlembicCore/src/service/planIntent/contracts.ts",
+    "AlembicCore/src/service/planIntent/planIntent.ts",
+    "AlembicCore/src/service/recipeStatus/contracts.ts",
+    "AlembicCore/src/service/recipeStatus/recipeStatus.ts",
+    "AlembicCore/src/service/evolution/GitDiffCheckpointService.ts",
+    "AlembicCore/src/infrastructure/database/drizzle/schema.ts",
+    "deleted:AlembicCore/src/infrastructure/database/migrations/012_plans.ts",
+    "deleted:AlembicCore/src/repository/plan/PlanRepository.ts",
+    "deleted:AlembicCore/src/repository/plan/index.ts",
+    "AlembicCore/test/PlanLedgerProjection.test.ts",
+    "AlembicCore/test/GitDiffCheckpointRepository.test.ts",
+    "AlembicCore/test/DatabaseRepository.test.ts",
+    "AlembicCore/test/MigrationsRerunIdempotency.test.ts",
+    "AlembicCore/test/PublicDatabaseRepositoryEntrypoints.test.ts",
+    "AlembicCore/scripts/smoke-public-api.mjs",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/task-packages/p0-core-plan-persistence-delete-relocate-engine-p1.json",
+    ".wakeflow-local/wakeflow-delivery/dispatch-packets/p0-core-plan-persistence-delete-relocate-engine-p1__AlembicCore__p0-core-plan-persistence-delete-relocate-engine-t1.json"
+  ],
+  "verification": [
+    "PASS npm run build:check",
+    "PASS npm run build",
+    "PASS npm run lint",
+    "PASS npm run smoke:public-api",
+    "PASS npm run lint:public-api-boundary",
+    "PASS npm run test -- PlanLedgerProjection.test.ts GitDiffCheckpointRepository.test.ts DatabaseRepository.test.ts MigrationsRerunIdempotency.test.ts PublicDatabaseRepositoryEntrypoints.test.ts (5 files, 24 tests)",
+    "PASS npm run test (126 files, 1307 tests)",
+    "PASS git diff --check",
+    "PASS rg -n \"PlanRepository|planRepository|saveDraft|getActiveConfirmed|getPlanView|sqliteTable\\('plans'|012_plans\" AlembicCore/src (no output)",
+    "PASS rg --files AlembicCore/src/repository/plan AlembicCore/src/infrastructure/database/migrations | rg \"repository/plan|012_plans\" (no output)",
+    "PARTIAL npm run check: passes build:check, public-api-boundary, layer-contract, consumer-core-imports, smoke:public-api, output-budgets, space-edges, doctrine; fails at pre-existing lint:naming for src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts",
+    "BLOCKED Alembic Guard: alembic_status degraded/not_initialized with host project mismatch; alembic_code_guard failed with internal schema validation error",
+    "CROSS-REPO RESIDUAL rg over AlembicCore/src + AlembicPlugin/lib still reports AlembicPlugin planRepository/getPlanView/saveDraft/getActiveConfirmed references in lib/injection, lib/recipe-generation/plan-tool.ts, and git-diff checkpoint routing"
+  ],
+  "risks": [
+    "Global P0 acceptance criterion '(AlembicCore/src + AlembicPlugin/lib residue = 0)' is not satisfied because AlembicPlugin still imports/calls the deleted Core plan persistence surface. This requires AlembicPlugin owner work or explicit controller decision; AlembicCore window did not edit sibling repository source.",
+    "GitDiffCheckpointService constructor now requires a baselineProvider; Core tests and public facade are updated, but AlembicPlugin DurableGitDiffCheckpointRouting still wires planRepository and will fail until Plugin is rewired.",
+    "Alembic Guard could not provide semantic review because the Alembic project is not initialized/aligned for this host and the guard tool returned an internal schema error."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p0-core-plan-persistence-delete-relocate-engine-p1__AlembicCore__p0-core-plan-persistence-delete-relocate-engine-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-core-plan-persistence-delete-relocate-engine-p1__AlembicCore__p0-core-plan-persistence-delete-relocate-engine-t1.json",
+    "deliveryRunId": "run-delivery-p0-core-plan-persistence-delete-relocate-engine-p1__AlembicCore__p0-core-plan-persistence-delete-relocate-engine-t1",
+    "dispatchGroup": "p0-core-plan-persistence-delete-relocate-engine-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-core-plan-persistence-delete-relocate-engine-p1__AlembicCore__p0-core-plan-persistence-delete-relocate-engine-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+    "stateRevision": 4,
+    "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+    "taskPackageId": "p0-core-plan-persistence-delete-relocate-engine-p1",
+    "targetTaskId": "p0-core-plan-persistence-delete-relocate-engine-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p0-core-plan-persistence-delete-relocate-engine-p1",
+    "resultId": "tr-p0-core-plan-persistence-delete-relocate-engine-t1",
+    "createdAt": "2026-06-23T23:35:55.779Z"
+  },
+  "createdAt": "2026-06-23T23:35:55.779Z",
+  "stateRevisionObserved": 4,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

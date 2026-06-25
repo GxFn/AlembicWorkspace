@@ -1,0 +1,409 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "title": "Make alembic_plan a stateless precondition run before EACH cold-start/deep-scan/module-scan: draft returns only a byte-budget-bounded projectInfoTree pyramid (64KB stop-point) + all candidate dimensions with miningGuidance; Agent selects dimensions+scale for that one stage; confirm validates (no re-analysis, no DB) and returns single-stage planSelection; bootstrap/rescan require planSelection (gate storage-read deleted). DELETE the whole plan persistence layer (plans table/migration 012/PlanRepository/PlanLedgerService persistence/get/signature/version); RELOCATE the pure coverage-projection engine to a Recipe-domain module; git-diff checkpoint seeds from current HEAD; SOP+missionBriefing become fixed bindings from selected dimensions at generation. Developer-decision strict spec with per-field/interface/deletion/rewire file:line + per-phase pass criteria. Fixes the live 4.5MB draft. Supersedes pure-collection; reverses recipe-evolution plan-persistence.",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Archive completed stateless plan precondition contract before claiming the next coldstart-chain repair demand.",
+  "revision": 48,
+  "activeStageId": null,
+  "updatedAt": "2026-06-24T16:46:48.877Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p0-core-plan-persistence-delete-relocate-engine-p1",
+      "summary": "P0 producer task for strict stateless alembic_plan contract. In AlembicCore, delete the plan persistence layer and relocate/preserve the pure projection engine exactly as Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md specifies. This is a source-owner task, not an implementation redesign: remove PlanRepository/plans migration/schema/repository wiring, extract single-stage plan intent validation primitives, relocate plan generation-state/coverage projection to a Recipe-domain module, and prepare GitDiffCheckpointService for current-HEAD baseline wiring if it is Core-owned in this phase. Do not keep plan persistence under a new name; do not delete the projection engine; do not change public semantics beyond the strict deletion/relocation/rewire contract. Evidence must include commit hash, exact rg/import sweep results, build/typecheck/lint/test commands, and file-level notes proving Section 2 deletion + Section 3 preserve/relocate compliance.",
+      "status": "accepted",
+      "sourceRef": null,
+      "createdAt": "2026-06-23T23:21:43.143Z"
+    },
+    {
+      "taskPackageId": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+      "summary": "P0 consumer task for the strict stateless alembic_plan contract after Core commit 38d074fa64a014ef458044cac7881e092c0c6b8d was accepted. In AlembicPlugin, remove all production references to deleted Core plan persistence and make the Plugin compile against the new Core stateless/recipeStatus/checkpoint primitives. This includes removing planRepository DI from InfraModule/ServiceMap, deleting storage reads/calls to PlanRepository/getPlanView/saveDraft/getActiveConfirmed, and rewiring GitDiffCheckpoint routing away from planRepository toward a current HEAD baseline provider. Do not keep plan persistence under a new name, do not add a global field bag, do not implement fake storage-backed get, and do not silently degrade checkpoint baseline to empty. If deleting residuals requires P1/P2/P3 work, do only the minimal P0-compatible compile-safe seam or return blocked with exact file:line evidence.",
+      "status": "accepted",
+      "sourceRef": null,
+      "createdAt": "2026-06-23T23:39:25.374Z"
+    },
+    {
+      "taskPackageId": "p1-plugin-stateless-draft-two-block-projector-p1",
+      "summary": "P1 strict stateless draft task. Implement the alembic_plan draft contract from Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md Section 1.2/1.4/P1 after P0 Core+Plugin deletion accepted. Draft must be stateless and return only the clean base plus projectInfoTree, candidateDimensions, agentDecisionChecklist, and nextActions. Build projectInfoTree as the byte-budget-bounded ProjectContext pyramid with default 64KB stop point, breadth-first by L0/L1/L2/L3, truthful meta.truncated/deliveredDepth/omitted. candidateDimensions must be all 25 registry dimensions with id,label,layer,languageApplicable,miningGuidance=d.extractionGuide only. Edit alembic_plan output allow-list accordingly and remove old draft output leaks: plan/planState/planView/planningBrief/sourceReports/projectContextCreationGuide/projectContextSignature/currentProjectContextSignature/signature/presenterInput/envelopes/missionBriefing/onboardingContract/sop/analysisGuide/submissionSpec/matchTopics/weight. No persistence, no global field bag, no recommendation/top/fallback/subset/ranking. If a Core tree accessor is truly required and absent, return blocked with exact file:line and minimal required Core API instead of inventing a replacement.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md",
+      "createdAt": "2026-06-24T00:00:11.030Z"
+    },
+    {
+      "taskPackageId": "p2-plugin-stateless-confirm-plan-selection-p1",
+      "summary": "P2 AlembicPlugin: implement the strict stateless single-stage alembic_plan confirm -> planSelection contract from the 2026-06-24 developer-decision design. Scope is confirm only, after accepted P0/P1. confirm must read no draft, write no row, not call/recollect ProjectContext, and use projectProfile carried in the input. Adapt the preserved single-stage validateCompletePlanIntent path, normalize/validate selected dimensions, reject incomplete payloads with explicit field errors, and return only base/status confirmed plus planSelection { generationStage, dimensions, scale { totalRecipeBudget, maxFiles, contentMaxLines, depthLevels }, moduleBindings }. Forbidden: any plan persistence under any name, any planId/version/signature/supersede, stages{} or perStage, hidden global bag, output SOP/missionBriefing/sourceReports/planningBrief/projectContextCreationGuide, or re-analysis during confirm.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md#p2-stateless-single-stage-confirm-planselection-alembicplugin",
+      "createdAt": "2026-06-24T00:19:10.968Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+      "summary": "P3 strict executor wiring package for AlembicPlugin. Preconditions: P0 Core+Plugin, P1 draft, and P2 confirm have controller acceptance. Scope is only P3 from the strict design: require a single-stage stateless planSelection on alembic_bootstrap and alembic_rescan, delete any remaining gate storage-read/routePlanTool path, make gate selectors read the passed planSelection dimensions/moduleBindings/scale, validate planSelection at gate entry with a PLAN_REQUIRED-style refusal pointing to alembic_plan, and forward planSelection through the alembic_job bootstrap/rescan path. Do not implement P4 checkpoint/SOP/missionBriefing derivation or P5 real-project e2e in this package unless a tiny compile-only adjustment is unavoidable and explicitly backfilled.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md#p3-wire-executors-to-require-planselection-alembicplugin",
+      "createdAt": "2026-06-24T00:33:26.590Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-executor-planselection-stage-compat-rework-1-p1",
+      "summary": "P3 rework for AlembicPlugin. Fix only the controller-found stage compatibility gap in executor planSelection validation. Keep the accepted P3 work from commit be21205, but make bootstrap reject non-coldStart planSelection and make rescan reject coldStart planSelection; resolvePlanGenerationGate must compare planSelection.generationStage against the executor/requested/default stage instead of letting planSelection override the tool stage. Add regression tests and rerun the P3 validation set. Do not implement P4 checkpoint/SOP/missionBriefing or P5 BiliDili e2e.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p3-plugin-executor-planselection-controller-review.json",
+      "createdAt": "2026-06-24T00:50:25.957Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p4-core-checkpoint-current-head-primitives-p1",
+      "summary": "P4 Core producer package for the strict stateless plan contract. Rewire GitDiffCheckpointService away from deleted plan persistence to a getBaselineCommit(projectRoot) provider that returns current git HEAD; when HEAD exists the baseline source must be current-head, never empty. Keep Recipe projection relocation from P0 intact and keep getDimensionSOP/buildProjectContextMissionBriefing available for Plugin generation-time derivation. Do not implement Plugin route wiring or P5 Test e2e in this package.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md#p4-checkpoint-rewire-sopmissionbriefing-derivation",
+      "createdAt": "2026-06-24T01:05:10.468Z"
+    },
+    {
+      "taskPackageId": "p4-plugin-checkpoint-routing-sop-briefing-p1",
+      "summary": "P4 Plugin consumer package for the strict stateless plan contract. Consume AlembicCore commit 1bac46009524e03ce6b90bf69367a608613c750c by wiring DurableGitDiffCheckpointRouting / git-diff checkpoint construction to Core's current HEAD baseline provider instead of any deleted active confirmed Plan path; also ensure generation derives SOP via getDimensionSOP(dim, language) and missionBriefing via buildProjectContextMissionBriefing from planSelection.dimensions at generation time, while alembic_plan output remains free of SOP/missionBriefing. Do not implement P5 BiliDili e2e or test-window validation in this package.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p4-core-checkpoint-current-head-primitives-controller-review.json",
+      "createdAt": "2026-06-24T01:14:41.329Z"
+    },
+    {
+      "taskPackageId": "p5-test-bilidili-stateless-plan-e2e-p1",
+      "summary": "P5 final Test package for the strict alembic_plan stateless precondition contract after P0-P4 Core/Plugin packages are accepted. Validate the real-project BiliDili scenario against the exact design completion definition: stateless alembic_plan draft -> confirm -> bootstrap/rescan(planSelection), compact draft payload, no plan persistence, and no SOP/missionBriefing in plan output. This package is Test-only real-scenario evidence; do not edit product code or create product fixes.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p4-plugin-checkpoint-routing-sop-briefing-controller-review.json",
+      "createdAt": "2026-06-24T01:33:24.503Z"
+    },
+    {
+      "taskPackageId": "p5-core-plan-persistence-dist-residue-repair-p1",
+      "summary": "P5 rework: repair Core runtime/build artifact residue that still ships deleted plan persistence. Test raw evidence from BiliDili shows fresh runtime DB applies 012_plans and creates the forbidden plans table because AlembicCore/dist still contains dist/infrastructure/database/migrations/012_plans.js and dist/repository/plan/PlanRepository.js. Keep the strict stateless precondition contract unchanged; do not reintroduce persistence under another name.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p5-test-bilidili-stateless-plan-e2e-controller-review.json",
+      "createdAt": "2026-06-24T01:45:12.255Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+      "summary": "P5 retest after accepted AlembicCore dist-residue repair. Re-run the BiliDili stateless plan e2e using AlembicCore commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93 and rebuilt Core dist so final P5 can be accepted or rejected on fresh raw evidence.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p5-core-plan-persistence-dist-residue-repair-controller-review.json",
+      "createdAt": "2026-06-24T01:53:26.776Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p0-core-plan-persistence-delete-relocate-engine-t1",
+      "taskPackageId": "p0-core-plan-persistence-delete-relocate-engine-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, and AlembicCore/AGENTS.md. Declare identity as AlembicCore. Execute only P0 Core producer scope from the strict requirement design: delete Core plan persistence and relocate preserved pure engine. Stop and backfill blocker if any required deletion would force keeping persistence, deleting the projection engine, or changing the strict contract. Return TargetResultEnvelope with raw evidence paths, commit hash, rg/import sweep, and validation commands.",
+      "status": "accepted",
+      "createdAt": "2026-06-23T23:21:43.143Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0-core-plan-persistence-delete-relocate-engine-p1__AlembicCore__p0-core-plan-persistence-delete-relocate-engine-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-core-plan-persistence-delete-relocate-engine-p1__AlembicCore__p0-core-plan-persistence-delete-relocate-engine-t1.json",
+        "deliveryRunId": "run-delivery-p0-core-plan-persistence-delete-relocate-engine-p1__AlembicCore__p0-core-plan-persistence-delete-relocate-engine-t1",
+        "dispatchGroup": "p0-core-plan-persistence-delete-relocate-engine-p1",
+        "sentAt": "2026-06-23T23:22:46.667Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0-core-plan-persistence-delete-relocate-engine-t1-20260623233627"
+    },
+    {
+      "targetTaskId": "p0-plugin-plan-persistence-consumer-cleanup-t1",
+      "taskPackageId": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, and AlembicPlugin/AGENTS.md. Declare identity as AlembicPlugin. Execute only P0 Plugin consumer cleanup from Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md: remove production plan persistence consumers and checkpoint planRepository wiring after Core accepted commit 38d074fa64a014ef458044cac7881e092c0c6b8d. Required evidence: commit hash, exact rg sweep showing no PlanRepository/planRepository/saveDraft/getActiveConfirmed/getPlanView/012_plans production hits in AlembicPlugin/lib, build/typecheck/lint/test results, and notes for any remaining P1/P2/P3 outputs not touched.",
+      "status": "accepted",
+      "createdAt": "2026-06-23T23:39:25.374Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0-plugin-plan-persistence-consumer-cleanup-p1__AlembicPlugin__p0-plugin-plan-persistence-consumer-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-plugin-plan-persistence-consumer-cleanup-p1__AlembicPlugin__p0-plugin-plan-persistence-consumer-cleanup-t1.json",
+        "deliveryRunId": "run-delivery-p0-plugin-plan-persistence-consumer-cleanup-p1__AlembicPlugin__p0-plugin-plan-persistence-consumer-cleanup-t1",
+        "dispatchGroup": "p0-plugin-plan-persistence-consumer-cleanup-p1",
+        "sentAt": "2026-06-23T23:41:08.573Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0-plugin-plan-persistence-consumer-cleanup-t1"
+    },
+    {
+      "targetTaskId": "p1-plugin-stateless-draft-two-block-projector-t1",
+      "taskPackageId": "p1-plugin-stateless-draft-two-block-projector-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, active index/status as orientation only, this state root, the strict Design doc, and AlembicPlugin/AGENTS.md. Declare identity as AlembicPlugin. Execute only P1 draft two-block projector/output contract. Required evidence: commit hash; exact live/dist alembic_plan draft smoke on BiliDili or equivalent real Swift project proving only allowed top-level business fields, projectInfoTree <= ceiling with truthful meta, candidateDimensions count 25 and each has non-empty miningGuidance + boolean languageApplicable; small-project full-tree/truncated false evidence or focused fixture; negative scan over raw response/code for removed fields; clean-output projector unlisted-key test; npm run build:check, npm run build, target unit tests, npm run lint, git diff --check; explicit note that P2 confirm/P3 executor/P4 checkpoint-e2e are untouched unless necessary for compile.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T00:00:11.030Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-plugin-stateless-draft-two-block-projector-p1__AlembicPlugin__p1-plugin-stateless-draft-two-block-projector-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-stateless-draft-two-block-projector-p1__AlembicPlugin__p1-plugin-stateless-draft-two-block-projector-t1.json",
+        "deliveryRunId": "run-delivery-p1-plugin-stateless-draft-two-block-projector-p1__AlembicPlugin__p1-plugin-stateless-draft-two-block-projector-t1",
+        "dispatchGroup": "p1-plugin-stateless-draft-two-block-projector-p1",
+        "sentAt": "2026-06-24T00:01:52.746Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-plugin-stateless-draft-two-block-projector-t1"
+    },
+    {
+      "targetTaskId": "p2-plugin-stateless-confirm-plan-selection-t1",
+      "taskPackageId": "p2-plugin-stateless-confirm-plan-selection-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, active index/status as orientation only, this state root, the strict Design doc Section 1.3 and P2, and AlembicPlugin/AGENTS.md. Declare identity as AlembicPlugin. Execute only P2 confirm contract. Required evidence: commit hash; tests showing incomplete payload rejects explicit errors for missing rationale, targetRecipes<=0, no dimensions, no totalRecipeBudget, and binding references unknown dimension; complete payload returns planSelection with flat single-stage generationStage/dimensions/scale/moduleBindings and no stages/perStage; unit/probe proving confirm does not invoke ProjectContext collection or draft analysis; rg/import sweep proving confirm path has no planRepository/saveDraft/getActiveConfirmed/getPlanView/getPlan storage/DB call and no projectContextSignature/currentProjectContextSignature/planId/version in confirm output; clean-output allow-list still rejects unlisted legacy keys; npm run build:check, npm run build, targeted unit tests, npm run lint, git diff --check. Explicitly leave P3 executor planSelection gate/job forwarding, P4 checkpoint/SOP derivation, and P5 broad test rewrite/e2e untouched unless compile requires a narrow adjustment and backfill it.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T00:19:10.968Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-plugin-stateless-confirm-plan-selection-p1__AlembicPlugin__p2-plugin-stateless-confirm-plan-selection-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-stateless-confirm-plan-selection-p1__AlembicPlugin__p2-plugin-stateless-confirm-plan-selection-t1.json",
+        "deliveryRunId": "run-delivery-p2-plugin-stateless-confirm-plan-selection-p1__AlembicPlugin__p2-plugin-stateless-confirm-plan-selection-t1",
+        "dispatchGroup": "p2-plugin-stateless-confirm-plan-selection-p1",
+        "sentAt": "2026-06-24T00:19:55.973Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-plugin-stateless-confirm-plan-selection-t1"
+    },
+    {
+      "targetTaskId": "p3-plugin-executor-planselection-gate-job-forwarding-t1",
+      "taskPackageId": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, active index/status as orientation only, this state root, the strict Design doc Sections 1.5, 4.1, 4.3 and P3, and AlembicPlugin/AGENTS.md. Declare identity as AlembicPlugin. Execute only P3 executor planSelection gate/job forwarding. Required evidence: commit hash; unit/integration probes proving alembic_bootstrap and alembic_rescan without planSelection refuse before scan execution with a PLAN_REQUIRED-style block naming alembic_plan; probes proving calls with planSelection run from its dimensions/moduleBindings/scale and honor distinct scale.maxFiles/contentMaxLines values; job-driven bootstrap/rescan forwards planSelection and succeeds; exact rg/import sweep proving plan-generation-gate no longer imports/calls routePlanTool or reads active confirmed plan storage; schema/tool surface evidence showing BootstrapInput and RescanInput require planSelection; npm run build:check, npm run build, targeted tests, npm run lint or scoped lint with existing-warning note, and git diff --check. Explicitly leave P4 checkpoint HEAD/SOP/missionBriefing derivation and P5 BiliDili e2e/test rewrite untouched unless compile requires a narrow backfill.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T00:33:26.590Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-executor-planselection-gate-job-forwarding-p1__AlembicPlugin__p3-plugin-executor-planselection-gate-job-forwarding-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-executor-planselection-gate-job-forwarding-p1__AlembicPlugin__p3-plugin-executor-planselection-gate-job-forwarding-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-executor-planselection-gate-job-forwarding-p1__AlembicPlugin__p3-plugin-executor-planselection-gate-job-forwarding-t1",
+        "dispatchGroup": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+        "sentAt": "2026-06-24T00:34:09.801Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-executor-planselection-gate-job-forwarding-t1-evidence-repair-1"
+    },
+    {
+      "targetTaskId": "p3-plugin-executor-planselection-stage-compat-rework-1-t1",
+      "taskPackageId": "p3-plugin-executor-planselection-stage-compat-rework-1-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, active index/status as orientation only, this state root, the strict Design doc P3, AlembicPlugin/AGENTS.md, and controller evidence .wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p3-plugin-executor-planselection-controller-review.json. Declare identity as AlembicPlugin. Execute only P3 rework-1: repair stage compatibility validation for stateless planSelection executors. Required fix: alembic_bootstrap must reject planSelection.generationStage other than coldStart; alembic_rescan must reject coldStart and allow only deepMining/moduleMining; resolvePlanGenerationGate must not let planSelection.generationStage override the executor stage before validation. Required evidence: commit hash; regression tests proving BootstrapInput or gate rejects deepMining/moduleMining selection for bootstrap and RescanInput or gate rejects coldStart selection for rescan; existing missing-planSelection, with-planSelection scale/moduleScope, and alembic_job forwarding tests still pass; dist/runtime probe matching the controller failing probe now reports schema/gate rejection for mismatches; rg/import sweep still proves plan-generation-gate has no routePlanTool/storage read; npm run build:check, npm run build, targeted tests, lint or scoped lint with existing-warning note, boundary checks, git diff --check. Explicitly leave P4 checkpoint/SOP/missionBriefing derivation and P5 BiliDili e2e untouched.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T00:50:25.957Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-executor-planselection-stage-compat-rework-1-p1__AlembicPlugin__p3-plugin-executor-planselection-stage-compat-rework-1-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-executor-planselection-stage-compat-rework-1-p1__AlembicPlugin__p3-plugin-executor-planselection-stage-compat-rework-1-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-executor-planselection-stage-compat-rework-1-p1__AlembicPlugin__p3-plugin-executor-planselection-stage-compat-rework-1-t1",
+        "dispatchGroup": "p3-plugin-executor-planselection-stage-compat-rework-1-p1",
+        "sentAt": "2026-06-24T00:52:05.904Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-executor-planselection-stage-compat-rework-1-t1"
+    },
+    {
+      "targetTaskId": "p4-core-checkpoint-current-head-primitives-t1",
+      "taskPackageId": "p4-core-checkpoint-current-head-primitives-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, active index/status as stale orientation only, the state root .wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24, the strict design doc Section 4.2/P4, and AlembicCore/AGENTS.md. Declare identity as AlembicCore. Execute only P4 Core producer work: replace GitDiffCheckpointService planRepository/getActiveConfirmed dependency with a getBaselineCommit(projectRoot): string|null provider returning current git HEAD; baseline source label is current-head when HEAD exists and must not degrade to empty. Update Core tests covering real HEAD/current-head and no plan storage dependency. Preserve P0 relocated recipe projection engine and existing getDimensionSOP/buildProjectContextMissionBriefing exports/primitives for the later Plugin consumer. Required evidence: commit hash, exact changed files, rg/import sweep proving GitDiffCheckpointService no longer references PlanRepository/getActiveConfirmed/plans, unit tests for current-head baseline, build/typecheck/lint or repository-standard checks, and a probe or test with a real git repo HEAD. Explicitly do not touch AlembicPlugin, P4 Plugin SOP/missionBriefing wiring, or P5 BiliDili e2e.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T01:05:10.468Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-core-checkpoint-current-head-primitives-p1__AlembicCore__p4-core-checkpoint-current-head-primitives-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-checkpoint-current-head-primitives-p1__AlembicCore__p4-core-checkpoint-current-head-primitives-t1.json",
+        "deliveryRunId": "run-delivery-p4-core-checkpoint-current-head-primitives-p1__AlembicCore__p4-core-checkpoint-current-head-primitives-t1",
+        "dispatchGroup": "p4-core-checkpoint-current-head-primitives-p1",
+        "sentAt": "2026-06-24T01:05:53.299Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-core-checkpoint-current-head-primitives-t1"
+    },
+    {
+      "targetTaskId": "p4-plugin-checkpoint-routing-sop-briefing-t1",
+      "taskPackageId": "p4-plugin-checkpoint-routing-sop-briefing-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, active index/status as stale orientation only, this state root, the strict Design doc Section 4/P4, accepted Core evidence .wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p4-core-checkpoint-current-head-primitives-controller-review.json, AlembicPlugin/AGENTS.md, and current AlembicCore exports at commit 1bac46009524e03ce6b90bf69367a608613c750c. Declare identity as AlembicPlugin. Execute only P4 Plugin consumer work: wire git-diff checkpoint routing/construction to Core current-head baseline provider so HEAD exists => baseline source current-head, never empty; remove any route/read dependency on active confirmed Plan. Also ensure cold-start/generation derives SOP through getDimensionSOP(dim, language) and missionBriefing through buildProjectContextMissionBriefing(selectedDimensions, ...) from planSelection.dimensions at generation time; do not put SOP or missionBriefing back into alembic_plan draft/confirm output. Required evidence: commit hash, exact changed files, rg/import sweep proving no routePlanTool/PlanRepository/getActiveConfirmed/active confirmed Plan read in checkpoint/generation gate paths, tests/probe showing checkpoint source current-head with a real HEAD via Plugin route, tests/probe showing generated SOP+missionBriefing are derived from planSelection dimensions, output allow-list/plan output still excludes SOP/missionBriefing, build:check, build, targeted tests, plugin verification/smoke as applicable, lint/boundary checks, git diff --check. Explicitly do not touch AlembicCore code, P5 BiliDili e2e, or Test window work.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T01:14:41.329Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-plugin-checkpoint-routing-sop-briefing-p1__AlembicPlugin__p4-plugin-checkpoint-routing-sop-briefing-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-checkpoint-routing-sop-briefing-p1__AlembicPlugin__p4-plugin-checkpoint-routing-sop-briefing-t1.json",
+        "deliveryRunId": "run-delivery-p4-plugin-checkpoint-routing-sop-briefing-p1__AlembicPlugin__p4-plugin-checkpoint-routing-sop-briefing-t1",
+        "dispatchGroup": "p4-plugin-checkpoint-routing-sop-briefing-p1",
+        "sentAt": "2026-06-24T01:16:11.942Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-plugin-checkpoint-routing-sop-briefing-t1"
+    },
+    {
+      "targetTaskId": "p5-test-bilidili-stateless-plan-e2e-t1",
+      "taskPackageId": "p5-test-bilidili-stateless-plan-e2e-p1",
+      "targetWindow": "Test",
+      "summary": "Read Test/AGENTS.md, parent AGENTS.md, active index/status as stale orientation only, this state root, Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md Sections 1/P5, the accepted controller evidence for P0-P4 (especially .wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p4-plugin-checkpoint-routing-sop-briefing-controller-review.json), and Test skills/alembic-real-routes/SKILL.md if using BiliDili/Alembic runtime route. Declare identity as Test. Execute only P5 real-project acceptance on BiliDili or the configured real Swift test project route. Required evidence: exact repo/project path and route used; current AlembicCore commit 1bac46009524e03ce6b90bf69367a608613c750c and AlembicPlugin commit 1d17f0f833ee2704d30f7b1bd9cf9816f982b54b (or newer if already present, explain); raw MCP payloads or captured JSON for alembic_plan draft showing only allowed business fields and projectInfoTree <= configured ceiling with truthful meta plus all candidateDimensions with miningGuidance/languageApplicable; raw confirm payload proving stateless single-stage planSelection and no DB write/re-analysis; raw bootstrap or rescan(planSelection) payload proving executor consumes planSelection and runs from selected dimensions/scale; DB inspection after the run showing no plans table and no plan rows; check that plan output contains no missionBriefing/sop/analysisGuide/sourceReports/legacy plan fields; exact commands/log paths/screenshots/reports as applicable; project cleanliness before/after; conclusion PASS/BLOCKED/FAIL with failure classification. Do not repair product code, do not weaken the contract, do not use old accepted no-guess roots as authority, and do not broaden into unrelated Test work.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T01:33:24.503Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-test-bilidili-stateless-plan-e2e-p1__Test__p5-test-bilidili-stateless-plan-e2e-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-test-bilidili-stateless-plan-e2e-p1__Test__p5-test-bilidili-stateless-plan-e2e-t1.json",
+        "deliveryRunId": "run-delivery-p5-test-bilidili-stateless-plan-e2e-p1__Test__p5-test-bilidili-stateless-plan-e2e-t1",
+        "dispatchGroup": "p5-test-bilidili-stateless-plan-e2e-p1",
+        "sentAt": "2026-06-24T01:34:14.249Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-test-bilidili-stateless-plan-e2e-t1"
+    },
+    {
+      "targetTaskId": "p5-core-plan-persistence-dist-residue-repair-t1",
+      "taskPackageId": "p5-core-plan-persistence-dist-residue-repair-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS, state root, strict design, P5 Test raw evidence, and AlembicCore AGENTS. Fix only AlembicCore runtime/build residue so src and dist no longer contain 012_plans/PlanRepository/plans table production artifacts. Ensure clean build cannot resurrect deleted plan persistence. Validate with build/test plus rg over src/dist and a fresh DB-open check proving no 012_plans migration and no plans table. Backfill commit hash, exact commands, rg evidence, DB evidence, risks, and next steps.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T01:45:12.255Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-core-plan-persistence-dist-residue-repair-p1__AlembicCore__p5-core-plan-persistence-dist-residue-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-core-plan-persistence-dist-residue-repair-p1__AlembicCore__p5-core-plan-persistence-dist-residue-repair-t1.json",
+        "deliveryRunId": "run-delivery-p5-core-plan-persistence-dist-residue-repair-p1__AlembicCore__p5-core-plan-persistence-dist-residue-repair-t1",
+        "dispatchGroup": "p5-core-plan-persistence-dist-residue-repair-p1",
+        "sentAt": "2026-06-24T01:45:38.634Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-core-plan-persistence-dist-residue-repair-t1"
+    },
+    {
+      "targetTaskId": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+      "taskPackageId": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS, state root, strict design, P5 prior Test evidence, and Core repair controller review. Re-run the BiliDili real-project stateless plan e2e: alembic_plan draft -> confirm(coldStart) -> bootstrap(planSelection) -> confirm(deepMining/rescan stage as applicable) -> rescan(planSelection). Attach raw MCP payloads/results, commit hashes for AlembicCore/AlembicPlugin/BiliDili, exact commands, suite results, and DB inspections after open and after full run. Hard gate: fresh runtime DB must have no plans table, no plan rows, and no 012_plans migration applied. Also preserve checks that draft is compact with projectInfoTree marker and plan outputs contain no removed persistence fields.",
+      "status": "accepted",
+      "createdAt": "2026-06-24T01:53:26.776Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1.json",
+        "deliveryRunId": "run-delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+        "dispatchGroup": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+        "sentAt": "2026-06-24T01:53:54.542Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p0-core-plan-persistence-delete-relocate-engine-p1",
+        "p4-core-checkpoint-current-head-primitives-p1",
+        "p5-core-plan-persistence-dist-residue-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p0-core-plan-persistence-delete-relocate-engine-t1",
+        "p4-core-checkpoint-current-head-primitives-t1",
+        "p5-core-plan-persistence-dist-residue-repair-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p0-plugin-plan-persistence-consumer-cleanup-p1",
+        "p1-plugin-stateless-draft-two-block-projector-p1",
+        "p2-plugin-stateless-confirm-plan-selection-p1",
+        "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+        "p3-plugin-executor-planselection-stage-compat-rework-1-p1",
+        "p4-plugin-checkpoint-routing-sop-briefing-p1"
+      ],
+      "targetTaskIds": [
+        "p0-plugin-plan-persistence-consumer-cleanup-t1",
+        "p1-plugin-stateless-draft-two-block-projector-t1",
+        "p2-plugin-stateless-confirm-plan-selection-t1",
+        "p3-plugin-executor-planselection-gate-job-forwarding-t1",
+        "p3-plugin-executor-planselection-stage-compat-rework-1-t1",
+        "p4-plugin-checkpoint-routing-sop-briefing-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p5-test-bilidili-stateless-plan-e2e-p1",
+        "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p5-test-bilidili-stateless-plan-e2e-t1",
+        "p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-24T02:01:50.541Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+    "lastDeliveryRunId": "run-delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+    "lastDispatchGroup": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+    "lastTargetTaskId": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-24T01:53:54.545Z"
+  }
+}

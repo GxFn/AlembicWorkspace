@@ -80,7 +80,7 @@
 补充说明：
 
 - `AlembicWorkspace` 是实现和总控窗口，但不进入执行窗口发送名单。
-- `.workspace-local/visible-dispatch/` 是本机运行态，不提交 git。
+- `.wakeflow-local/visible-dispatch/` 是本机运行态，不提交 git。
 
 ## 依赖链判断
 
@@ -129,7 +129,7 @@
 - 阶段完成验证：`node scripts/workspace-control.mjs verify --dispatch --script-tests`。
 - 功能完整性验收：
   - 真实入口：`scripts/visible-dispatch.mjs` 和当前计划中的自动化模式说明。
-  - 真实数据来源：当前计划窗口分派、global TODO、`.workspace-local/visible-dispatch/` 本地状态。
+  - 真实数据来源：当前计划窗口分派、global TODO、`.wakeflow-local/visible-dispatch/` 本地状态。
   - 状态 / 数据变化：mode、queue task status、claim / lease、automation run cleanup。
   - 真实消费方：目标 Alembic 系列可见 Codex 窗口。
   - 错误 / 边界路径：mode off、threadId 缺失 / stale、非 Alembic 窗口、重复 claim、lease 过期、关闭后 cleanup。

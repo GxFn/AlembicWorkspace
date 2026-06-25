@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "taskPackageId": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+  "dispatchGroup": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+  "targetWindow": "Test",
+  "targetTaskId": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+  "status": "completed",
+  "summary": "PASS: P5 BiliDili stateless plan e2e after AlembicCore dist-residue repair completed on fresh evidence. AlembicCore commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93 was rebuilt with clean-dist; AlembicPlugin build used that Core commit. The real BiliDili ghost-mode chain ran alembic_plan draft -> confirm(coldStart) -> bootstrap(planSelection) -> confirm(deepMining) -> rescan(planSelection). Draft stayed compact at 48616 bytes <= 65536, candidateDimensions count was 25, both confirm calls returned stateless single-stage planSelection, and bootstrap/rescan consumed the provided planSelection. Fresh DB inspections after open and after the full run both showed plansTableExists=false, plansRowCount=0, plansMigrationApplied=false, with no 012_plans migration applied. Focused Core and Plugin suites passed; AlembicCore, AlembicPlugin, and BiliDili worktrees remained clean.",
+  "evidenceRefs": [
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/summary.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/suite-results.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/draft.raw.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/confirm-coldStart-result.raw.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/bootstrap-result.raw.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/confirm-deepMining-result.raw.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/rescan-result.raw.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/db-after-open.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/db-after-run.json",
+    "Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/evidence/host-agent-session-release.json"
+  ],
+  "verification": [
+    "git -C AlembicCore rev-parse HEAD => 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93; git -C AlembicPlugin rev-parse HEAD => 1d17f0f833ee2704d30f7b1bd9cf9816f982b54b; git -C BiliDili rev-parse HEAD => a3ea6a2519b0cbd39cee76b32ad844eae0e5feec.",
+    "npm run build in AlembicCore exited 0 and ran node scripts/clean-dist.mjs && tsc -p tsconfig.json.",
+    "npm run build in AlembicPlugin exited 0; build:core used ../AlembicCore @ 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93.",
+    "rg -n \"012_plans|PlanRepository|CREATE TABLE IF NOT EXISTS plans|sqliteTable\\('plans'|planRepository|getActiveConfirmed|getPlanView|saveDraft\" AlembicCore/src AlembicCore/dist AlembicPlugin/lib AlembicPlugin/dist --glob '!**/*.test.*' returned no production residue hits.",
+    "node Test/tmp/p5-test-bilidili-stateless-plan-e2e-after-core-repair-20260624/run-p5-bilidili-stateless-plan-e2e-after-core-repair.mjs exited 0; summary result pass=true, failureClassification=pass, failedAssertions=[].",
+    "Raw e2e DB evidence: after open and after run both plansTableExists=false, plansRowCount=0, plansMigrationApplied=false; migrations list includes 001,004,005,006,007,008,009,010,011,013 only.",
+    "Draft evidence: projectInfoTreeBytes=48616, budgetBytes=65536, truncated=false, deliveredDepth=files, candidateDimensions=25 with miningGuidance/languageApplicable checked by script assertions.",
+    "PlanSelection evidence: coldStart dimensions architecture,swift-objc-idiom bound to Sources; deepMining dimensions architecture,data-event-flow bound to Sources; bootstrap/rescan planGate status ready for the corresponding generationStage.",
+    "npm run test -- DatabaseRepository.test.ts MigrationsRerunIdempotency.test.ts PublicDatabaseRepositoryEntrypoints.test.ts GitDiffCheckpointRepository.test.ts PublicEvolutionEntrypoints.test.ts in AlembicCore exited 0: 5 files, 22 tests passed.",
+    "npm run test:unit -- test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/PlanConfirmStatelessSelection.test.ts test/unit/PlanSelectionGateStateless.test.ts test/unit/HostMcpServerPlanSelectionJobForwarding.test.ts test/unit/GitDiffCheckpoint.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts in AlembicPlugin exited 0: 6 files, 39 tests passed.",
+    "git -C AlembicCore status --short, git -C AlembicPlugin status --short, and git -C BiliDili status --short were empty after the run."
+  ],
+  "risks": [
+    "This TargetResultEnvelope is not controller acceptance; controller must review and decide final P5 acceptance/archive.",
+    "The Test harness released the HostAgent bootstrap session lease between bootstrap and rescan to simulate separate MCP calls and continue executor route validation without submitting dimension knowledge; this is recorded in host-agent-session-release.json.",
+    "Root AlembicWorkspace has pre-existing unrelated dirty files; product repositories used for this evidence were clean before/after."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1.json",
+    "deliveryRunId": "run-delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+    "dispatchGroup": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1__Test__p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+    "stateRevision": 44,
+    "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+    "taskPackageId": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+    "targetTaskId": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "p5-test-bilidili-stateless-plan-e2e-after-core-repair-p1",
+    "resultId": "tr-p5-test-bilidili-stateless-plan-e2e-after-core-repair-t1",
+    "createdAt": "2026-06-24T01:57:53.047Z"
+  },
+  "createdAt": "2026-06-24T01:57:53.047Z",
+  "stateRevisionObserved": 44,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

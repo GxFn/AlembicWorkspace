@@ -45,7 +45,7 @@
   - `scripts/visible-dispatch.test.mjs`
   - `scripts/README.md`
   - `skills/dev/alembic-workspace-control/references/script-pipeline.md`
-  - `.workspace-local/visible-dispatch/`
+  - `.wakeflow-local/visible-dispatch/`
 - producer / consumer 依赖：
   - Producer：当前总控计划和 `global-todo-board` 提供候选任务事实；`visible-dispatch` runtime 提供 mode、registry、queue 和 runs。
   - Consumer：总控窗口在追求目标模式下读取 `controller-tick`，再由总控人工裁决是否 enqueue、arm、等待、验收或选择新 TODO。

@@ -13,7 +13,7 @@ Create a clean unified input/output contract for all Alembic MCP tools. The user
 ## Background
 
 - Trigger: Alembic MCP tool results currently return too much content and include inconsistent, stale, or wrong fields.
-- Existing context: A Wakeflow demand state root already exists at `.workspace-active/workspace/current/alembic-mcp-clean-output-contract/`.
+- Existing context: A Wakeflow demand state root already exists at `.wakeflow-active/current/alembic-mcp-clean-output-contract/`.
 - Related repositories/windows: AlembicPlugin is the primary implementation owner; AlembicCore only participates if code research proves a shared multi-consumer contract.
 - Screenshots, logs, or links: User highlighted that a shared `refs` object listing all possible refs would let tools return values they do not need.
 

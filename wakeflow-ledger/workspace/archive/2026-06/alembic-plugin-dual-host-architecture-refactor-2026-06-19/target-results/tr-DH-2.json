@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-2",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-2-l3-hostadapter-interface-codex-migration",
+  "dispatchGroup": "dh2-plugin-l3-codex-adapter",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-2",
+  "status": "completed",
+  "summary": "DH-2 建 L3 HostAdapter 接口 + codex 实现迁入（RC-2，先对齐现状、行为不变）。父仓 AlembicPlugin 已【直提 main commit 348bea2e0ff69369e5398885ac6bb63090a93d87】（基线 6cd4c88，不开分支，纯父仓无子模块）。tsc --noEmit 绿；全量 unit 失败集与基线【逐文件 IDENTICAL（39）】；直接受影响的 HostMcpServer.test.ts 失败用例集【逐条 IDENTICAL（14 failed|30 passed，before==after）】= 纯委托零回归。\n\n【交付】新建 L3 模块 lib/runtime/host-adapter/：HostAdapter.ts（host-agnostic 接口 + HostInitMarkerInput）+ CodexHostAdapter.ts（CodexHostAdapter implements HostAdapter + resolveHostAdapter() 工厂）。接口覆盖「真 host-specific 工作区身份簇」：runtime env/身份（ensureRuntimeEnvironment / resolveRuntimeContext / resolveEffectiveTier）、项目根（resolveProjectRoot / isTrustedProjectRoot）、saved-root + init-marker 持久化（read/writeSavedProjectRoot、read/writeInitMarker）、hostId / setupProfile。CodexHostAdapter 每方法【逐行委托】现有 host-specific 函数（ensureCodexRuntimeEnvironment / resolveHostRuntimeContext / resolveEffectiveCodexTier / resolveCodexProjectRoot / isTrustedCodexProjectRoot / read+writeCodexSavedProjectRoot / read+writeCodexInitMarker）——行为逐行等价、非死代码、不引入常驻进程。\n\n【真实消费 6 处（非死代码/空壳）】bin/host-mcp.ts:11 ensureRuntimeEnvironment；HostMcpServer 新增 #hostAdapter 成员(:164) + 构造 resolveProjectRoot(:167)、resolveRuntimeContext(:393/:984)、isTrustedProjectRoot(:505)、writeInitMarker(:631)——并【删去 HostMcpServer 对这 4 个 host 函数的直 import】，使 L2 中央 host 对象不再直依赖 host-specific 实现、改经 L3 契约消费。\n\n【DH-2/DH-3 切线判断（控制器复核；task 明示授权\"按你的判断切在 codex 逐行等价处并 flag\"）】见 risks ①②。\n\n【边界遵守】未建 cc adapter、未做 host-aware 选择/L2 host 分派、未做 ~52 de-Codex 改名、未动 per-host 产物 / cc 子模块 alembic-claude-code、未碰 3 项漂移 skill/template 资产、AlembicCore 未动、未改 codex .mcp.json:8、四工具对外 MCP 语义不变、纯 MCP 非强进程不变量不回退（L3 不引入常驻进程）。",
+  "evidenceRefs": [
+    "父仓 commit 348bea2e0ff69369e5398885ac6bb63090a93d87 (直提 main，基线 6cd4c88；新增 2 文件 + 改 3 文件，纯父仓、未动子模块)",
+    "L3 接口: lib/runtime/host-adapter/HostAdapter.ts (interface HostAdapter + type HostInitMarkerInput)",
+    "L3 codex 实现: lib/runtime/host-adapter/CodexHostAdapter.ts (class CodexHostAdapter implements HostAdapter，逐行委托；resolveHostAdapter() 工厂，DH-2 恒返回 codex 单实现)",
+    "barrel: lib/runtime/index.ts 新增导出 host-adapter/CodexHostAdapter + HostAdapter",
+    "迁入映射(源 host 函数→adapter 方法，逐行委托): ensureCodexRuntimeEnvironment→ensureRuntimeEnvironment; resolveHostRuntimeContext→resolveRuntimeContext; resolveEffectiveCodexTier→resolveEffectiveTier; resolveCodexProjectRoot→resolveProjectRoot; isTrustedCodexProjectRoot→isTrustedProjectRoot; read/writeCodexSavedProjectRoot→read/writeSavedProjectRoot; read/writeCodexInitMarker→read/writeInitMarker; CODEX_PLUGIN_HOST→hostId; CODEX_SETUP_PROFILE→setupProfile",
+    "接入点(真实消费): bin/host-mcp.ts:11; HostMcpServer.ts #hostAdapter:164 + 调用 :167/:393/:505/:631/:984；并删 HostMcpServer 对 resolveCodexProjectRoot/resolveHostRuntimeContext/isTrustedCodexProjectRoot/writeCodexInitMarker 的直 import",
+    "测绘依据: wakeflow-ledger DH-0 ledger ⑤ (true L3≈5 files + ~80% Codex* 实为误命名 host-agnostic) + 本窗 4 路 Explore subagent map(项目根/身份、MCP lifecycle、diagnostics/status、setup/skill/alignment)"
+  ],
+  "verification": [
+    "tsc --noEmit: exit 0 (commit 前后两次均无错误输出)",
+    "全量 unit(vitest.unit.config): 失败集与基线(39 = pre-existing 沙箱/MTC-7)逐文件 IDENTICAL(stash 法 diff 空) → 无 DH-2 新增红文件; 总计 118 failed|1100 passed|13 skipped 与基线一致",
+    "HostMcpServer.test.ts(直接受影响、本就在 39 基线内): stash 法逐条对比失败用例标题 IDENTICAL(14 failed|30 passed，before==after) → 纯委托无 intra-file 回归(行为逐行等价的强证据)",
+    "biome lint: 0 error(16 既有无关 warning；新文件 import 排序已 biome --fix); lint:repo-boundary PASS(L3 模块放置不破层级，0/75 escape-hatch)",
+    "真实消费核验: grep resolveHostAdapter / #hostAdapter. → bin 1 处 + HostMcpServer 5 处真实调用，接口非死代码/空壳"
+  ],
+  "risks": [
+    "DH-2/DH-3 切线①(method-set 范围判断，控制器复核): Design「L3 HostAdapter 接口建议方法集」列了 MCP server lifecycle(start/shutdown/handleToolCall)、tool execution context、workspace init。但 DH-0 ledger⑤(控制器已验收)+ 本窗 4 路 Explore 测绘一致判定: 这些在现实代码里是 host-agnostic(codex/cc 同走 stdio + 同一 MCP SDK; scope keying/env 隔离机制相同)，属 DH-0 所述「~80% 误命名 Codex* 前缀」。故 HostAdapter 刻意只覆盖「真 host-specific 工作区身份簇」，未把 agnostic 机器纳入 L3(它们消费 adapter 产物 HostRuntimeContext/projectRoot，而非契约本身)，以守 5 层架构「L3=host-specific only」。若控制器要求把 lifecycle/execution 也纳入 L3，请明确(但那会把 agnostic 逻辑拖进 host 层)。",
+    "DH-2/DH-3 切线②('迁入'解读 + 消费深度，控制器复核): 'codex 实现迁入'采用【委托外观】而非物理搬运函数体——CodexHostAdapter 逐行委托现有函数(保证逐行等价、零回归)，被委托函数暂留原处作 codex 实现; 物理迁入 + 去 Codex 前缀留 DH-3(与 ~52 de-Codex 改名同批，避免双重 churn + 回归)。真实消费已落 bin + HostMcpServer 6 处(L2 中央 host 对象); 其余 host-specific call site(StatusService / project-root-scope / ToolPolicy / host-agent-workflows 的 resolveProjectRoot/readInitMarker/resolveEffectiveTier/buildCodexHostProjectAlignment 等)的 L2→L3 改调留 DH-3「L2 改调 L3、收敛 102 处 Codex* 直依赖」批次。接口含少量尚未被 adapter 路由消费的方法(read/writeSavedProjectRoot、readInitMarker、resolveEffectiveTier)——是为 DH-3 cc 对等 + 全面改调预留的契约，均有真实委托实现(非空壳)。",
+    "遵从 DH-0 的 1 个 Design 误分类: buildCodexMcpInitializeInstructions 是 host-agnostic(纯 tools→string，委托 buildCodexMcpGuidance)，未纳入 L3(与 DH-0 ledger⑤ 一致)。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh2-plugin-l3-codex-adapter__AlembicPlugin__DH-2",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh2-plugin-l3-codex-adapter__AlembicPlugin__DH-2.json",
+    "deliveryRunId": "run-delivery-dh2-plugin-l3-codex-adapter__AlembicPlugin__DH-2",
+    "dispatchGroup": "dh2-plugin-l3-codex-adapter",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh2-plugin-l3-codex-adapter__AlembicPlugin__DH-2.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 15,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-2-l3-hostadapter-interface-codex-migration",
+    "targetTaskId": "DH-2",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh2-plugin-l3-codex-adapter",
+    "resultId": "tr-DH-2",
+    "createdAt": "2026-06-20T04:01:22.405Z"
+  },
+  "createdAt": "2026-06-20T04:01:22.405Z",
+  "stateRevisionObserved": 15,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

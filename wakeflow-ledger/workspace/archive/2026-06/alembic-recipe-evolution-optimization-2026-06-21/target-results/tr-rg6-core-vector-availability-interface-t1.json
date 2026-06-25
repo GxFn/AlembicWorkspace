@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rg6-core-vector-availability-interface-t1",
+  "demandKey": "alembic-recipe-evolution-optimization-2026-06-21",
+  "taskPackageId": "rg6-core-vector-availability-interface-p1",
+  "dispatchGroup": "rg6-core-vector-availability-interface-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-evolution-optimization-2026-06-21",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "rg6-core-vector-availability-interface-t1",
+  "status": "completed",
+  "summary": "RG-6 Core producer completed in AlembicCore commit 9eec6303549c3678bc1b0910d5d7fd3b7d3b992f. Added additive VectorService.isAvailable()/getAvailability() availability surface, optional EmbedProvider.isAvailable probe support, structured VectorAvailability status/reason/probeStatus details, public vector type exports, and focused tests. getStats().embedProviderAvailable remains provider-presence compatible. No AlembicPlugin files were edited.",
+  "evidenceRefs": [
+    "commit:AlembicCore:9eec6303549c3678bc1b0910d5d7fd3b7d3b992f",
+    "changed-file:AlembicCore/src/service/vector/VectorService.ts",
+    "changed-file:AlembicCore/src/vector.ts",
+    "changed-file:AlembicCore/test/VectorAvailability.test.ts",
+    "changed-file:AlembicCore/scripts/smoke-public-api.mjs",
+    "public-api:@alembic/core/vector exports VectorAvailability, VectorAvailabilityStatus, VectorAvailabilityReason, VectorAvailabilityProbeStatus",
+    "downstream-plugin-callsite:AlembicPlugin/lib/runtime/mcp/host-agent-workflows/recipe-region-vector.ts still reads vectorService.getStats().embedProviderAvailable",
+    "downstream-plugin-callsite:AlembicPlugin/lib/runtime/mcp/handlers/search.ts still derives availability from stats",
+    "downstream-plugin-callsite:AlembicPlugin/lib/service/resident/AlembicResidentServiceClient.ts still derives availability from stats",
+    "downstream-plugin-callsite:AlembicPlugin/lib/cli/SetupService.ts still checks stats.embedProviderAvailable",
+    "downstream-plugin-callsite:AlembicPlugin/test/unit/VectorService.test.ts mirrors legacy stats expectations"
+  ],
+  "verification": [
+    "npm run build:check: passed",
+    "npx vitest run test/VectorAvailability.test.ts test/VectorService.test.ts test/EmbedProviderSelector.test.ts test/PublicSearchVectorGuardEntrypoints.test.ts: passed (4 files, 59 tests)",
+    "npm run build: passed",
+    "git diff --check: passed",
+    "npm run lint:public-api-boundary: passed",
+    "npm run smoke:public-api: passed",
+    "npm run test: passed (134 files, 1368 tests)",
+    "npm run lint:layer-contract && npm run lint:consumer-core-imports && npm run check:output-budgets && npm run check:space-edges && npm run lint:doctrine: passed",
+    "npm run lint: passed",
+    "npm run lint:naming: failed only on pre-existing src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts kebab-case filenames",
+    "npm run check: failed at the same pre-existing lint:naming gate after preceding gates passed",
+    "Alembic status: degraded/not initialized for AlembicCore; selected project mismatch points at parent workspace",
+    "Alembic Guard: attempted and failed with plugin internal output schema error"
+  ],
+  "risks": [
+    "VectorService.validate() now uses the standardized availability probe when a provider implements isAvailable(); this can surface configured-but-unreachable providers as degraded instead of presence-only healthy.",
+    "Plugin consumer migration is still pending and must replace direct getStats().embedProviderAvailable checks with the new Core availability surface after controller acceptance.",
+    "Alembic Guard did not provide a valid review result because the local Alembic project is uninitialized/mismatched and code_guard returned an internal schema error."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rg6-core-vector-availability-interface-p1__AlembicCore__rg6-core-vector-availability-interface-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rg6-core-vector-availability-interface-p1__AlembicCore__rg6-core-vector-availability-interface-t1.json",
+    "deliveryRunId": "run-delivery-rg6-core-vector-availability-interface-p1__AlembicCore__rg6-core-vector-availability-interface-t1",
+    "dispatchGroup": "rg6-core-vector-availability-interface-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rg6-core-vector-availability-interface-p1__AlembicCore__rg6-core-vector-availability-interface-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-evolution-optimization-2026-06-21",
+    "stateRevision": 33,
+    "demandKey": "alembic-recipe-evolution-optimization-2026-06-21",
+    "taskPackageId": "rg6-core-vector-availability-interface-p1",
+    "targetTaskId": "rg6-core-vector-availability-interface-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "rg6-core-vector-availability-interface-p1",
+    "resultId": "tr-rg6-core-vector-availability-interface-t1",
+    "createdAt": "2026-06-21T18:51:03.098Z"
+  },
+  "createdAt": "2026-06-21T18:51:03.098Z",
+  "stateRevisionObserved": 33,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -99,7 +99,7 @@
 
 总控复核证据：
 
-- result envelope：`.workspace-local/codex-automation-loop/target-results/AlembicPlugin__PTSR-PLUGIN-STAGE0-INVENTORY-P0.json`
+- result envelope：`.wakeflow-local/codex-automation-loop/target-results/AlembicPlugin__PTSR-PLUGIN-STAGE0-INVENTORY-P0.json`
 - review pack：`PTSR-STAGE0-PLUGIN-INVENTORY-20260602` 为 `ready`，controller return `sent/readback-ok`。
 - 代码事实：`AlembicPlugin/lib/codex/mcp/handlers/task.ts` 现有 `PrimeKnowledgeMaterial` 包含 `status`、`acceptedKnowledge`、`acceptedGuards`、`shoutInstruction`、`hostResponse`、`intentEvidence`、`primeInjectionPackage`，但没有 `trustPosture` / `receiptChecklist`；`_buildPrimeShoutInstruction` 只要求 accepted Recipe / Guard constraints 和 evidenceRefs 后续核验，没有结构化信任分层。
 - resident facts：`PrimeSearchPipeline` 和 `AlembicResidentServiceClient` 会把 `primeInjectionPackage` summary 传入 Plugin prime material；compact summary 保留 `injection.status`、`selectedKnowledge[].injectionStatus`、evidence/sourceRefs/trace。
@@ -262,7 +262,7 @@ rg -n "trustPosture|receiptChecklist|trusted-to-obey" plugins/alembic-codex/runt
 
 总控复核证据：
 
-- result envelope：`.workspace-local/codex-automation-loop/target-results/AlembicPlugin__PTSR-PLUGIN-STAGE1-RUNTIME-REFRESH-P3.json`
+- result envelope：`.wakeflow-local/codex-automation-loop/target-results/AlembicPlugin__PTSR-PLUGIN-STAGE1-RUNTIME-REFRESH-P3.json`
 - review pack：`PTSR-STAGE1-RUNTIME-REFRESH-20260602` 为 `ready`，controller return `sent/readback-ok`。
 - 父仓库 commit：`5b67386cf4e862fb757e3eae774fd75df9d5bc7c Update Codex plugin runtime snapshot`，`git ls-tree HEAD plugins/alembic-codex` 指向 `27758982aa7e2f344ab98cb006446d610d174c86`。
 - 子仓库 commit：`27758982aa7e2f344ab98cb006446d610d174c86 Refresh runtime for prime trust receipt`。
@@ -301,7 +301,7 @@ rg -n "trustPosture|receiptChecklist|trusted-to-obey" plugins/alembic-codex/runt
 
 总控复核证据：
 
-- result envelope：`.workspace-local/codex-automation-loop/target-results/AlembicPlugin__PTSR-PLUGIN-STAGE1-CODEX-RUNTIME-P4.json`
+- result envelope：`.wakeflow-local/codex-automation-loop/target-results/AlembicPlugin__PTSR-PLUGIN-STAGE1-CODEX-RUNTIME-P4.json`
 - review pack：`PTSR-STAGE1-CODEX-RUNTIME-P4-20260602` 为 `ready`，controller return `sent/readback-ok`。
 - 父仓库 commit：`1b186b0f120b1adf8224067631f2efda13b5fe2c Fix Codex plugin runtime cache startup`，只更新 diagnostics 与 `plugins/alembic-codex` pointer。
 - 子仓库 commit：`4491fd5db8fe1deaf8cf64b02ff602e78249c86a Isolate Codex runtime wrapper npm cache`，更新 wrapper、runtime.tgz、runtime dist diagnostics 和 README。
@@ -332,20 +332,20 @@ rg -n "trustPosture|receiptChecklist|trusted-to-obey" plugins/alembic-codex/runt
 - target task：`PTSR-PLUGIN-STAGE1-RUNTIME-REFRESH-P3`
 - skill：`codex-control-workspace/skills/dev/codex-automation-target/SKILL.md`
 - keep-live：用户明确开启自动化，投递前启动共享 keep-live watcher；keep-live 只作为无人值守 runtime 支持，不作为验收证据。
-- delivery envelope：`.workspace-local/codex-automation-loop/delivery-envelopes/delivery-PTSR-STAGE0-PLUGIN-INVENTORY-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE0-INVENTORY-P0.json`
-- delivery run：`.workspace-local/codex-automation-loop/delivery-runs/run-delivery-PTSR-STAGE0-PLUGIN-INVENTORY-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE0-INVENTORY-P0.json`
+- delivery envelope：`.wakeflow-local/codex-automation-loop/delivery-envelopes/delivery-PTSR-STAGE0-PLUGIN-INVENTORY-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE0-INVENTORY-P0.json`
+- delivery run：`.wakeflow-local/codex-automation-loop/delivery-runs/run-delivery-PTSR-STAGE0-PLUGIN-INVENTORY-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE0-INVENTORY-P0.json`
 - readback：`sent` / `readback.ok=true`，目标线程新 turn `inProgress`。
-- Stage 1 delivery envelope：`.workspace-local/codex-automation-loop/delivery-envelopes/delivery-PTSR-STAGE1-PLUGIN-CONTRACT-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-CONTRACT-P1.json`
-- Stage 1 delivery run：`.workspace-local/codex-automation-loop/delivery-runs/run-delivery-PTSR-STAGE1-PLUGIN-CONTRACT-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-CONTRACT-P1.json`
+- Stage 1 delivery envelope：`.wakeflow-local/codex-automation-loop/delivery-envelopes/delivery-PTSR-STAGE1-PLUGIN-CONTRACT-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-CONTRACT-P1.json`
+- Stage 1 delivery run：`.wakeflow-local/codex-automation-loop/delivery-runs/run-delivery-PTSR-STAGE1-PLUGIN-CONTRACT-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-CONTRACT-P1.json`
 - Stage 1 readback：`sent` / `readback.ok=true`，目标线程新 turn `inProgress`。
 - keep-live：Stage 0 run lease 已释放；Stage 1 验收后已通过 `stop-loop --automation-run-id PTSR-STAGE1-PLUGIN-CONTRACT-20260602` 释放本 run 租约，当前无 active leases，watcher `status=stopped`；不再为本轮创建下一跳。
 - Stage 1 P2：用户裁决允许分批提交后，重新开启 automation run `PTSR-STAGE1-BATCH-COMMIT-20260602`；投递目标为 `AlembicPlugin`。
-- Stage 1 P2 delivery envelope：`.workspace-local/codex-automation-loop/delivery-envelopes/delivery-PTSR-STAGE1-BATCH-COMMIT-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-BATCH-COMMIT-P2.json`
-- Stage 1 P2 delivery run：`.workspace-local/codex-automation-loop/delivery-runs/run-delivery-PTSR-STAGE1-BATCH-COMMIT-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-BATCH-COMMIT-P2.json`
+- Stage 1 P2 delivery envelope：`.wakeflow-local/codex-automation-loop/delivery-envelopes/delivery-PTSR-STAGE1-BATCH-COMMIT-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-BATCH-COMMIT-P2.json`
+- Stage 1 P2 delivery run：`.wakeflow-local/codex-automation-loop/delivery-runs/run-delivery-PTSR-STAGE1-BATCH-COMMIT-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-BATCH-COMMIT-P2.json`
 - Stage 1 P2 readback：`sent` / `readback.ok=true`，目标线程新 turn `inProgress`。
 - Stage 1 P3：P2 source commits 已验收，但 runtime/submodule 未同步；`PTSR-STAGE1-RUNTIME-REFRESH-20260602` 已 direct-thread sent/readback-ok。
-- Stage 1 P3 delivery envelope：`.workspace-local/codex-automation-loop/delivery-envelopes/delivery-PTSR-STAGE1-RUNTIME-REFRESH-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-RUNTIME-REFRESH-P3.json`
-- Stage 1 P3 delivery run：`.workspace-local/codex-automation-loop/delivery-runs/run-delivery-PTSR-STAGE1-RUNTIME-REFRESH-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-RUNTIME-REFRESH-P3.json`
+- Stage 1 P3 delivery envelope：`.wakeflow-local/codex-automation-loop/delivery-envelopes/delivery-PTSR-STAGE1-RUNTIME-REFRESH-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-RUNTIME-REFRESH-P3.json`
+- Stage 1 P3 delivery run：`.wakeflow-local/codex-automation-loop/delivery-runs/run-delivery-PTSR-STAGE1-RUNTIME-REFRESH-20260602__AlembicPlugin__PTSR-PLUGIN-STAGE1-RUNTIME-REFRESH-P3.json`
 - Stage 1 P3 readback：`sent` / `readback.ok=true`，目标线程新 turn `inProgress`。
 - keep-live：P2 lease 已通过 `stop-loop --automation-run-id PTSR-STAGE1-BATCH-COMMIT-20260602` 释放；watcher 由 P3 lease 保持，activeRunCount `1`，status `running`。
 - Stage 1 P4：用户裁决 Codex 插件运行态 / cache / transport 问题交给 AlembicPlugin；`PTSR-STAGE1-CODEX-RUNTIME-P4-20260602` 已 direct-thread sent/readback-ok，现已回填并通过总控证据复核。用户重启 Codex 后，总控当前 host tool prime 复验通过；不继续派发。

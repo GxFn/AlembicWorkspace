@@ -12,7 +12,7 @@ Receiving Window: AlembicWorkspace
 
 This is the G1 Design responsibility model for the active Wakeflow state root:
 
-`.workspace-active/workspace/current/alembic-responsibility-governance-cleanup`
+`.wakeflow-active/current/alembic-responsibility-governance-cleanup`
 
 It is not an implementation package, TODO mutation, acceptance record, product
 code edit, or Test request. It consumes the G0 fact scan and the user's
@@ -274,8 +274,8 @@ Recommended controller stance:
 
 ## Source References
 
-- `.workspace-active/workspace/current/alembic-responsibility-governance-cleanup/task-packages/alembic-responsibility-governance-cleanup-g1-responsibility-model-design-p1.json`
-- `.workspace-active/workspace/current/alembic-responsibility-governance-cleanup/evidence/g0-fact-scan-2026-06-13.md`
-- `.workspace-active/workspace/current/alembic-responsibility-governance-cleanup/developer-progress.md`
+- `.wakeflow-active/current/alembic-responsibility-governance-cleanup/task-packages/alembic-responsibility-governance-cleanup-g1-responsibility-model-design-p1.json`
+- `.wakeflow-active/current/alembic-responsibility-governance-cleanup/evidence/g0-fact-scan-2026-06-13.md`
+- `.wakeflow-active/current/alembic-responsibility-governance-cleanup/developer-progress.md`
 - `Design/docs/current/alembic-responsibility-governance-cleanup-requirement-design-2026-06-13.md`
 - User confirmation in this Design target thread on 2026-06-13.

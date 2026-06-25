@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "tc-20260620040823-0016",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "fromRevision": 16,
+  "candidateState": "accepting",
+  "reason": "All target results are present; total-control acceptance/rework decision is required.",
+  "reviewStatus": "ready-for-controller-review",
+  "readyResultIds": [
+    "tr-DH-2"
+  ],
+  "blockedResultIds": [],
+  "missingResultIds": [],
+  "reviewScope": "open-controller-review-targets",
+  "targetTaskIds": [
+    "DH-2"
+  ],
+  "excludedTargetTaskIds": [
+    "DH-0",
+    "DH-0B",
+    "DH-1"
+  ],
+  "allowedDecisions": [
+    "accept",
+    "rework",
+    "blocked"
+  ],
+  "evidenceRefs": [
+    "父仓 commit 348bea2e0ff69369e5398885ac6bb63090a93d87 (直提 main，基线 6cd4c88；新增 2 文件 + 改 3 文件，纯父仓、未动子模块)",
+    "L3 接口: lib/runtime/host-adapter/HostAdapter.ts (interface HostAdapter + type HostInitMarkerInput)",
+    "L3 codex 实现: lib/runtime/host-adapter/CodexHostAdapter.ts (class CodexHostAdapter implements HostAdapter，逐行委托；resolveHostAdapter() 工厂，DH-2 恒返回 codex 单实现)",
+    "barrel: lib/runtime/index.ts 新增导出 host-adapter/CodexHostAdapter + HostAdapter",
+    "迁入映射(源 host 函数→adapter 方法，逐行委托): ensureCodexRuntimeEnvironment→ensureRuntimeEnvironment; resolveHostRuntimeContext→resolveRuntimeContext; resolveEffectiveCodexTier→resolveEffectiveTier; resolveCodexProjectRoot→resolveProjectRoot; isTrustedCodexProjectRoot→isTrustedProjectRoot; read/writeCodexSavedProjectRoot→read/writeSavedProjectRoot; read/writeCodexInitMarker→read/writeInitMarker; CODEX_PLUGIN_HOST→hostId; CODEX_SETUP_PROFILE→setupProfile",
+    "接入点(真实消费): bin/host-mcp.ts:11; HostMcpServer.ts #hostAdapter:164 + 调用 :167/:393/:505/:631/:984；并删 HostMcpServer 对 resolveCodexProjectRoot/resolveHostRuntimeContext/isTrustedCodexProjectRoot/writeCodexInitMarker 的直 import",
+    "测绘依据: wakeflow-ledger DH-0 ledger ⑤ (true L3≈5 files + ~80% Codex* 实为误命名 host-agnostic) + 本窗 4 路 Explore subagent map(项目根/身份、MCP lifecycle、diagnostics/status、setup/skill/alignment)",
+    "target-results/tr-DH-2.json"
+  ],
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "transition-candidate",
+    "source": "wakeflow-state",
+    "command": "reduce-results",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 16,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "candidateId": "tc-20260620040823-0016",
+    "createdAt": "2026-06-20T04:08:23.734Z"
+  },
+  "forbiddenConclusions": [
+    "transition-candidate-is-acceptance",
+    "reducer-decision-closes-task-package",
+    "reducer-decision-creates-next-dispatch"
+  ]
+}

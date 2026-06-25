@@ -36,7 +36,7 @@
   - `scripts/visible-dispatch.test.mjs`
   - `scripts/README.md`
   - `skills/dev/alembic-workspace-control/references/script-pipeline.md`
-  - `.workspace-local/visible-dispatch/`
+  - `.wakeflow-local/visible-dispatch/`
 - producer / consumer 依赖：
   - Producer：当前计划窗口分派 / global TODO / visible-dispatch queue generator / total-control controller heartbeat。
   - Consumer：后续目标 Alembic 系列可见 Codex 窗口。

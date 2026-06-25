@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-0B",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-0b-alembic-drift-backport",
+  "dispatchGroup": "dh0b-alembic-drift",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "Alembic",
+  "targetTaskId": "DH-0B",
+  "status": "blocked",
+  "summary": "DH-0B BLOCKED — 3 项共享资产全部无法在 DH-0B 边界内 reconcile 到 shared==plugin 绿，全部 flag 给 DH-4 per-host fork；零文件改动、零 commit、门禁保持 RED。这是 DH-0 CAVEAT 明示 flag 分支（\"can't be reconciled as shared without forcing wrong content → DH-4 per-host fork — flag back to controller\"）的实际触发，非任务失败。\n\n【门禁 before==after】node scripts/check-shared-asset-drift.mjs → FAIL / 11 checks / 3 drift / exit 1：skill-alembic-recipes[intro-and-overview+use-context-tail]、skill-alembic-structure[title-intro+tools-and-graph]、templates-recipes-setup[README.md]。Alembic HEAD cf3b171 clean、未 commit（按 CAVEAT 正确零改动，故 after 不应转绿）。\n\n【逐段裁定】门禁按 shared 段整段归一化比较；README 为 directory-exact 整文件比较。5 个漂移段+README 的差异主体 100% 是真 host-divergent 工具名/能力：main 真实面 alembic_knowledge(list/get/confirm_usage)·alembic_guard·alembic_structure(targets/files/metadata)·alembic_graph(Recipe 知识图谱,ops=query/impact/path/stats)·alembic_search(mode=context) ↔ plugin 目标面 alembic_search(operation=search/get/expand,mode=auto/keyword/semantic)·alembic_code_guard·alembic_project_matrix·alembic_graph(项目图谱+neighborhood op)·Dashboard。把 main 对齐 plugin 必然 (a) 命名 plugin-only 工具(alembic_project_matrix/alembic_code_guard/alembic_search-operation 面)、(b) 宣称 main 不存在的 op/mode(alembic_graph neighborhood、search mode=semantic)、或 (c) 抹除 main 真实工具(alembic_knowledge/confirm_usage)——三者皆 forcing wrong content，违反 CAVEAT「不用 plugin 工具名覆盖 host-specific 行」+ demand 不变量「不改四工具对外 MCP 语义」。\n\n【三重证据收敛】①两侧 SKILL.md 全文逐段逐行对比；②DH-0 ledger CAVEAT 预设 flag-back 分支（已控制器验收）；③独立对抗复核(general-purpose subagent 主动尝试反驳「全部不可对齐」)→ UPHELD 无法反驳，并核对 main 真实源码 mcp-tools.ts 硬证（knowledge ops 含 confirm_usage、graph ops 仅 query/impact/path/stats 无 neighborhood、active source 无 alembic_project_matrix/alembic_code_guard）+ plugin McpServer.ts:109 把 alembic_knowledge 重定向到 alembic_search（证实 plugin-absent）。\n\n【整段比较的余项】structure/tools-and-graph 段内 3 行个别属纯 host-agnostic 文案（'## Project Structure Tools'→'## Project Navigation Tools'、metadata 工作流行→'Use raw reads/search, Guard, repository tests…'、'这两个模块有什么关联？'→'how are these modules connected?' CN→EN），可在 main host 保真重写；但被困在 ~13 行 host-divergent 主体内，整段门禁不因此转绿，且无法在不动 plugin（移行到 host overlay）前提下隔离 → 不改变结论，留 DH-4 顺带。\n\n【对 DH-1 硬前置的影响 — 需控制器决策】DH-1 硬前置「pre-existing 漂移门禁转绿」在 DH-0B 边界内不可达成，因漂移根因是工具面 host-divergent，结构上必须靠 DH-4 的 per-host 门禁模型（shared-asset-manifest 单 path→per-host path + check-shared-asset-drift.mjs per-host 比较，治理权威 Alembic）才能正确转绿。请控制器在以下决策，我不自行选择：(A) 将 DH-4「漂移门禁模型 per-host 化」提前到 DH-1 之前；(B) 重定义 DH-1 硬前置（接受门禁 RED 为已知 DH-4-pending、DH-1 不依赖其绿）；(C) 若坚持 main 追平 plugin 工具面，则属改 main 四工具语义=超出本 demand 不变量，须 Design 重新决策。\n\n【边界遵守】无任何文件改动、无 commit、未动 AlembicPlugin、未动 AlembicCore、未改四工具对外 MCP 语义、未进 DH-1 plugin 重构、未改门禁脚本/manifest。",
+  "evidenceRefs": [
+    "门禁 before/after 一致：Alembic/scripts/check-shared-asset-drift.mjs → FAIL / 11 checks / 3 drift / exit 1（recipes[intro-and-overview+use-context-tail] / structure[title-intro+tools-and-graph] / templates-recipes-setup[README.md]）",
+    "三对文件逐段 diff：Alembic ↔ AlembicPlugin 的 skills/alembic-recipes/SKILL.md、skills/alembic-structure/SKILL.md、templates/recipes-setup/README.md",
+    "DH-0 诊断 CAVEAT（已控制器验收）：wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md item ① — flag-back-to-controller 分支",
+    "main 真实工具源码：Alembic/lib/shared/schemas/mcp-tools.ts（knowledge ops ~180/198 含 confirm_usage；graph ops ~230 仅 query·impact·path·stats，无 neighborhood；active source 无 alembic_project_matrix·alembic_code_guard）",
+    "plugin 工具重定向：AlembicPlugin lib/.../McpServer.ts:109（alembic_knowledge→alembic_search，证实 confirm_usage/alembic_knowledge plugin-absent）",
+    "manifest host-specific 注记：Alembic/config/shared-asset-manifest.json（recipes/structure notes：search-mode + Guard tool naming + project-graph/matrix guidance 标注 host-specific）",
+    "Alembic 工作树 clean @ cf3b171（零改动、零 commit 证据）"
+  ],
+  "verification": [
+    "node scripts/check-shared-asset-drift.mjs：任务开始 before 与裁定后 after 均 FAIL / 11 checks / 3 drift / exit 1（按 CAVEAT 正确零改动，after 不应转绿）",
+    "逐段逐行 host-divergent 分类：recipes/intro-and-overview 5/5、recipes/use-context-tail 4/4、structure/title-intro 2/2、structure/tools-and-graph ~13/17、README 3/3 —— 每段/文件均含 ≥1 host-divergent 行，整段比较下无一能转绿",
+    "对抗复核（独立 subagent 主动反驳『零行可对齐』）：claim UPHELD；main 源码 mcp-tools.ts 核对确认 alembic_project_matrix/alembic_code_guard 不存在、alembic_graph 无 neighborhood、alembic_knowledge+confirm_usage 存在",
+    "git status clean、HEAD cf3b171 未变 —— 零改动、零 commit"
+  ],
+  "risks": [
+    "DH-1 硬前置『漂移门禁绿』在 DH-0B 边界内不可达成（根因工具面 host-divergent，需 DH-4 per-host 门禁模型）→ 需控制器决策：DH-4 门禁 per-host 化提前 / 重定义 DH-1 硬前置 / 若要 main 追平工具面则属改四工具语义超本 demand 不变量需 Design",
+    "structure/tools-and-graph 段 3 行纯文案（'Project Structure Tools→Project Navigation Tools'、metadata 工作流行、模块关联 CN→EN）个别可对齐但整段比较下不影响转绿，且无法在不动 plugin 前提下隔离 → 留 DH-4 顺带，DH-0B 不单独处理",
+    "本结论推翻控制器对 DH-0B『backport→绿』的预期产出；DH-0 CAVEAT 已预设此 flag 分支，但需控制器确认是否同意全部 3 项归 DH-4（而非部分可对齐）"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh0b-alembic-drift__Alembic__DH-0B",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh0b-alembic-drift__Alembic__DH-0B.json",
+    "deliveryRunId": "run-delivery-dh0b-alembic-drift__Alembic__DH-0B",
+    "dispatchGroup": "dh0b-alembic-drift",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh0b-alembic-drift__Alembic__DH-0B.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 7,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-0b-alembic-drift-backport",
+    "targetTaskId": "DH-0B",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dh0b-alembic-drift",
+    "resultId": "tr-DH-0B",
+    "createdAt": "2026-06-19T14:44:43.280Z"
+  },
+  "createdAt": "2026-06-19T14:44:43.280Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

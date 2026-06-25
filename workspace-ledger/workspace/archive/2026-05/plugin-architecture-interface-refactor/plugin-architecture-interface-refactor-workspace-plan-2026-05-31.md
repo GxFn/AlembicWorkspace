@@ -24,7 +24,7 @@
   - `AlembicDesign/docs/current/plugin-architecture-interface-refactor-requirement-design-2026-05-31.md`
   - `AlembicDesign/docs/current/plugin-architecture-interface-refactor-code-fact-review-2026-05-31.md`
   - `AlembicDesign/docs/current/plugin-architecture-interface-refactor-code-logic-research-2026-05-31.md`
-  - `codex-control-workspace/.workspace-active/workspace/current/design-handoff-inbox.md`：handoff 为 `confirmed / ready-for-workspace`，建议先做 Stage 0 contract dossier。
+  - `codex-control-workspace/.wakeflow-active/current/design-handoff-inbox.md`：handoff 为 `confirmed / ready-for-workspace`，建议先做 Stage 0 contract dossier。
   - 当前 AlembicPlugin 工作区存在 `plugins/alembic-codex` submodule dirty；Stage 0 必须先分类该状态，不得覆盖或回退。
 - 是否需要先验证 / 重新计划 / 用户确认：不需要额外确认即可启动 Stage 0；Stage 0 通过后原则上不再询问是否删除 / 是否合并实施，但需要总控基于 dossier 证据组织最小可验收 implementation wave，并在发现真实消费者或 runtime 契约冲突时调整顺序。
 - 本次允许更新：当前计划、global TODO、workspace index/status、Design handoff board/inbox、用户追加裁决记录，以及由 AlembicPlugin 执行窗口在本任务包内修改 AlembicPlugin 产品源码 / runtime package / tests / docs。
@@ -317,7 +317,7 @@ npm run smoke:codex-plugin
   - 不能推出的结论：不能推出 Dashboard / Alembic daemon 要改，不能推出真实项目 cold-start 成功，不能推出 release 发布完成。
   - 停止或不开始条件：dirty runtime artifact 归属无法解释，或 `daemon-server.js` / runtime package 改动会断 prepare / verify / smoke / packaged runtime 启动链路。
 - 测试单：无。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：不涉及真实项目。
 
 ## 回填区

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-plugin-executor-planselection-gate-job-forwarding-t1",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "taskPackageId": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+  "dispatchGroup": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p3-plugin-executor-planselection-gate-job-forwarding-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin P3 executor wiring completed. BootstrapInput and RescanInput now require stateless planSelection from a just-run alembic_plan confirm; plan-generation gate blocks missing planSelection with PLAN_REQUIRED before storage/scan, uses passed dimensions/moduleBindings/scale, and no longer carries legacy Plan id/version/signature in gate summary; alembic_job now forwards planSelection plus stage/moduleScope/testMode/scaleOverride/reason/idempotency args to bootstrap/rescan workflows; tool surface text no longer advertises active confirmed Plan. Commit: be21205 Require planSelection for generation executors.",
+  "evidenceRefs": [
+    "commit:be21205",
+    "test:npx vitest run test/unit/PlanSelectionGateStateless.test.ts test/unit/HostMcpServerPlanSelectionJobForwarding.test.ts -> 6 passed",
+    "test:npx vitest run test/unit/ClaudeCodeHostRuntime.test.ts -> 19 passed",
+    "build:npm run build:check -> passed",
+    "build:npm run build -> passed",
+    "static:npm run check -> passed with existing biome warnings only",
+    "plugin:npm run verify:codex-plugin -> passed",
+    "plugin:npm run verify:plugin-distribution -> passed",
+    "plugin:npm run smoke:codex-plugin -> passed",
+    "probe:dist schema BootstrapInput/RescanInput missing planSelection false, with planSelection true",
+    "probe:dist plan gate missing PLAN_REQUIRED, ready uses dimensions [architecture, swift-objc-idiom], moduleScope [Sources], scale maxFiles=37/contentMaxLines=91",
+    "rg:plan-generation-gate routePlanTool/PlanRepository/active confirmed Plan sweep -> no matches",
+    "rg:executor tool surface old active confirmed/confirmed Plan wording sweep -> no matches",
+    "check:git diff --check and git diff --cached --check -> passed"
+  ],
+  "verification": [
+    "BootstrapInput.safeParse({}) and RescanInput.safeParse({reason}) reject; both accept valid planSelection payloads.",
+    "Direct cold-start/rescan workflow calls without planSelection return PLAN_REQUIRED before any storage or scan dependency access.",
+    "resolvePlanGenerationGate with stateless planSelection returns selected dimensions/moduleScope and honors distinct scale.maxFiles=37/contentMaxLines=91.",
+    "HostMcpServer alembic_job bootstrap/rescan tests confirm completed local jobs and captured forwarding of planSelection plus gate-affecting args.",
+    "McpServer direct rescan route cast updated so required RescanInput compiles."
+  ],
+  "risks": [
+    "P4 checkpoint/SOP/missionBriefing derivation and P5 BiliDili e2e were intentionally not implemented in this P3 package.",
+    "npm run lint/check still print 17 pre-existing Biome warnings in unrelated scripts/host-adapter files, but commands exit 0."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-plugin-executor-planselection-gate-job-forwarding-p1__AlembicPlugin__p3-plugin-executor-planselection-gate-job-forwarding-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-executor-planselection-gate-job-forwarding-p1__AlembicPlugin__p3-plugin-executor-planselection-gate-job-forwarding-t1.json",
+    "deliveryRunId": "run-delivery-p3-plugin-executor-planselection-gate-job-forwarding-p1__AlembicPlugin__p3-plugin-executor-planselection-gate-job-forwarding-t1",
+    "dispatchGroup": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-executor-planselection-gate-job-forwarding-p1__AlembicPlugin__p3-plugin-executor-planselection-gate-job-forwarding-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+    "stateRevision": 20,
+    "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+    "taskPackageId": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+    "targetTaskId": "p3-plugin-executor-planselection-gate-job-forwarding-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p3-plugin-executor-planselection-gate-job-forwarding-p1",
+    "resultId": "tr-p3-plugin-executor-planselection-gate-job-forwarding-t1",
+    "createdAt": "2026-06-24T00:45:15.805Z"
+  },
+  "createdAt": "2026-06-24T00:45:15.805Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

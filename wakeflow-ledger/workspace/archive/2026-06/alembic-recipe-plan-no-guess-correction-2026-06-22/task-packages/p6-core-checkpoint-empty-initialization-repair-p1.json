@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p6-core-checkpoint-empty-initialization-repair-p1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "summary": "P6 rework from Test final scenario: repair Core git-diff checkpoint initialization so the durable checkpoint cannot remain empty after a confirmed Plan exists. Authoritative requirement is Group G in Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md: G1 initial value must be getActiveConfirmed().lastUpdatedFromCommit, G2 unresolved/skipped ranges must not be lost or advanced as success, G* active duplicate paths must stay covered. Raw evidence: Test controlled BiliDili diff from baseline 06b7bb86fcd7432409b3a32ed210c3c1eb0f0e16 to changed 3fc61ed94ac8df7ff115c8c7736f4f0db5667761 had A/M/R100 events, but alembic_rescan reported previousHead=null, eventCount=0, headRangeStatus=none, routeStatus=skipped; SQLite plans had last_updated_from_commit=06b7bb86fcd7432409b3a32ed210c3c1eb0f0e16 while git_diff_checkpoints had checkpoint_commit=null and initial_from_plan_commit=null. Scope: AlembicCore only. Fix GitDiffCheckpointService/Repository behavior so an existing checkpoint row with null checkpointCommit and null initialFromPlanCommit is treated as uninitialized when an active confirmed Plan has lastUpdatedFromCommit; seed checkpointCommit and initialFromPlanCommit from that Plan commit and preserve normal existing non-null checkpoints. Do not advance checkpoint on skipped/no-event/truncated/unresolved route. Add/adjust focused Core tests for: no row initializes from confirmed Plan, existing empty row after pre-confirm/no-op is repaired from confirmed Plan, existing non-null checkpoint is preserved, skipped route does not advance. Do not change Plugin, Test, Dashboard, or requirement semantics; do not add fallback/top/recommend/guess logic.",
+  "status": "pending",
+  "sourceRef": "review tc-20260622175025-0058 / P6 Test blocked evidence",
+  "createdAt": "2026-06-22T17:51:27.687Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p6-core-checkpoint-empty-initialization-repair-t1",
+      "taskPackageId": "p6-core-checkpoint-empty-initialization-repair-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Repair Core durable git-diff checkpoint G1/G2 so empty existing rows seed from active confirmed Plan commit and skipped/unresolved routes do not advance or erase the range.",
+      "status": "pending",
+      "createdAt": "2026-06-22T17:51:27.687Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

@@ -19,9 +19,9 @@
 
 - 本次决策触发：用户指出 VAD 不能只验证分段状态机，要求使用 037 做真实测试。
 - 需求 / 测试结果理解：上一轮 fixture 已发现并修复 open `controller-last` group 提前 review 风险，但 fixture 不能替代真实 Codex heartbeat。037 Wave 0 已有旧 backfill，被总控接受为事实基线证据；本轮新建独立 real-loop 任务，不复用旧 completed taskId。
-- 已核对证据：`docs/workspace/current/plugin-intent-knowledge-route-wave-0-2026-05-26.md`、`.workspace-local/visible-dispatch/window-registry.json`、`visible-dispatch status/controller-tick`、新增 fixture 测试 `unattended controller loop waits for full group, accepts, then arms the next refreshed plan`。
+- 已核对证据：`docs/workspace/current/plugin-intent-knowledge-route-wave-0-2026-05-26.md`、`.wakeflow-local/visible-dispatch/window-registry.json`、`visible-dispatch status/controller-tick`、新增 fixture 测试 `unattended controller loop waits for full group, accepts, then arms the next refreshed plan`。
 - 是否需要先验证 / 重新计划 / 用户确认：用户已要求使用 037 做真实测试；当前只需创建真实 VAD group 并启动，不需要额外 Design 确认。
-- 本次允许更新：当前计划、workspace index/status、`.workspace-local/visible-dispatch/` runtime 队列和 automation run 记录。
+- 本次允许更新：当前计划、workspace index/status、`.wakeflow-local/visible-dispatch/` runtime 队列和 automation run 记录。
 - 本次不得更新：不得改产品源码；不得把 raw thread id 写入 tracked 文档；不得把真实 heartbeat 结果写成 037 产品完成；不得派 `AlembicTest`。
 
 ## 代码事实与边界
@@ -130,7 +130,7 @@
 - 需要真实场景的理由：无；真实场景测试等 037 Stage 6。
 - 测试前边界与多条件判断：
   - 测试要回答的问题：真实 037 多窗口 heartbeat 是否能批量分发、各窗口各自 claim/finish、最后窗口才回跳总控、总控回跳后能 review 并进入下一计划。
-  - 测试对象 / 目标窗口 / 线程 / 项目边界：只限 AlembicWorkspace VAD runtime 和 `AlembicPlugin` / `Alembic` / `AlembicCore` 三个真实 Codex 窗口；thread id 只在 `.workspace-local/visible-dispatch/`。
+  - 测试对象 / 目标窗口 / 线程 / 项目边界：只限 AlembicWorkspace VAD runtime 和 `AlembicPlugin` / `Alembic` / `AlembicCore` 三个真实 Codex 窗口；thread id 只在 `.wakeflow-local/visible-dispatch/`。
   - 成功能推出的结论：VAD real-loop transport 可用于 037 后续自动化推进。
   - 失败能推出的结论：失败归因到 automation 投递、窗口 role guard、runtime queue/group、thread registry 或目标窗口操作；不能据此判 037 产品失败。
   - 不能推出的结论：不能证明 037 Stage 1-5 功能实现完成，不能证明真实项目 prime 注入有效。
@@ -139,7 +139,7 @@
 ## 回填区
 
 - 2026-05-26：用户要求使用 037 做真实测试；总控裁决旧 037 Wave 0 completed task 只作为已接受事实基线，不作为 VAD real-loop 证明。本计划将创建新的 `controller-last` dispatch group 和三条真实目标 heartbeat。
-- 2026-05-26：总控注册 `AlembicWorkspace` 本地 thread id 到 `.workspace-local/visible-dispatch/`；创建 `g037-real-loop-2026-05-26` dispatch group；通过 `arm-batch` 创建并 `record-arm` 三条真实 heartbeat：`visible-dispatch-alembicplugin-037-real-loop`、`visible-dispatch-alembic-037-real-loop`、`visible-dispatch-alembiccore-037-real-loop`。`group-status` 显示 `unfinishedCount=3`，`controller-tick` 显示 `topAction=wait / nextAction=waitForBackfill`。
+- 2026-05-26：总控注册 `AlembicWorkspace` 本地 thread id 到 `.wakeflow-local/visible-dispatch/`；创建 `g037-real-loop-2026-05-26` dispatch group；通过 `arm-batch` 创建并 `record-arm` 三条真实 heartbeat：`visible-dispatch-alembicplugin-037-real-loop`、`visible-dispatch-alembic-037-real-loop`、`visible-dispatch-alembiccore-037-real-loop`。`group-status` 显示 `unfinishedCount=3`，`controller-tick` 显示 `topAction=wait / nextAction=waitForBackfill`。
 - 2026-05-26：三窗口真实 heartbeat 均完成并回填；总控独立验收后将三条 queue task 记为 `accepted`。`group-status --group g037-real-loop-2026-05-26 --json` 显示 `terminal=true`、`missingTaskCount=0`、三任务均 accepted；`cleanup --json` 显示无 active automation run。
 - 2026-05-26：总控发现并修复自动化跳转边界缺口：controller-return automation run 已 stopped 时，dispatch group 仍可能停留在 `return-armed`。`record-stop` 已加固为 controller-return 幂等修复，现真实 group 状态已补为 `returned`。
 - 2026-05-26：脚本加固范围：`finish` / `accept` JSON 输出不再暴露本地 thread id；`preflight` / `arm` / `arm-batch` / controller-return payload 生成会先确认 registry thread id 能解析到本地 Codex session；`record-return` 阻止同 group 重复 controller-return；`group-status` 以 group declared taskIds 为准并暴露 missing task；`finish --chain-next` 对 missing group task 返回 inspect，对已 return-armed / returned group 返回 review；`accept` 拒绝 active automation run 未停止的任务；`prune-history` 同步清理旧 group 和 stopped controller-return run。

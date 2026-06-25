@@ -16,9 +16,9 @@ This dossier is Stage 0 code fact evidence for REQ-04. It only verifies the curr
 
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/AGENTS.md`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/AGENTS.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/index.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/afapi-req-04-prime-independent-knowledge-entry/*`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/index.md`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/workspace-current-status.md`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/afapi-req-04-prime-independent-knowledge-entry/*`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-04-prime-independent-knowledge-entry-landing-2026-06-05.md`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicDesign/docs/current/plugin-prime-task-decoupling-requirement-design-2026-06-04.md`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/workspace-ledger/requirement-designs/plugin-intent-knowledge-route/plugin-intent-knowledge-route-requirement-design-2026-05-26.md`

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "dh-3e-decodex-full-rename-finale",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "summary": "DH-3e（DH-3 de-Codex 全量收尾，用户决策 A=做透）多批 de-Codex + collision + 余 routing + 物理迁入。AlembicPlugin 基线 ca1f9ab，直提 main。用已产出的完整 symbol→新名→refs 测绘清单直接执行，本步尽量多推进、每批 tsc 绿即 commit，确需跨上下文再 flag DH-3f（每批独立绿）。含 collision 定名（CODEX_AGENT_PUBLIC_TOOL_NAMES 撞 contract.ts）+ isTrustedProjectRoot/resolveEffectiveTier 去前缀裁决 + 余 host-operation routing（Preflight/StatusService/host-agent-workflows 含 buildHostProjectAlignment）+ 真 host-specific 函数体物理迁入 CodexHostAdapter（保 wire-byte）。完成即 DH-3 DONE。不动 per-host 产物/cc 子模块（DH-4）。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (RC-3b 已决⑥ 全量做透) + DH-3d 验收 evt-20260620052848-0033 (SCOPE FINDING ~150 符号) + 用户决策 A(本会话: 全量 de-Codex 后再 DH-4)",
+  "createdAt": "2026-06-20T05:35:42.940Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-3e",
+      "taskPackageId": "dh-3e-decodex-full-rename-finale",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-3e（DH-3 de-Codex 全量收尾）多批 de-Codex 改名 + collision + 余 host-operation routing + 物理迁入。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `ca1f9ab` = DH-3d 后；纯 MCP 非强进程）。**直提 main，不开分支。**\n\n**用户决策（本会话）= A 全量做透**：剩余 ~150 误命名 host-agnostic `Codex*`/`CODEX_*` **全部**去前缀归 L1/L2，多批完成。**本步尽量多推进**（每批 tsc 绿即 commit），单次安全上限内尽量多做；确需跨上下文，在某批绿+commit 后 flag DH-3f（每批独立绿、不裸断）。这是 DH-3 阶段的全量收尾。\n\n**前置**：服务边界面 de-Codex 首批已落（ca1f9ab）；本窗 **2 个 Explore 子代理已产出完整 symbol→新名→refs 测绘清单——直接用它执行、勿重新测绘**（省上下文）。host-name 分支已清零 outside L3；L3 adapter 体系建成。\n\n**执行（每批一 commit、tsc 绿、先替代后删、不裸断）**：\n1. **de-Codex 余 ~150 符号去前缀归 L1/L2**：全部 `CODEX_*_TOOL_NAMES`、`buildCodexProjectRuntimeContext` 及测绘清单其余误命名 host-agnostic。\n   - **collision 定名**：`CODEX_AGENT_PUBLIC_TOOL_NAMES` 去前缀撞 contract.ts 现有 `AGENT_PUBLIC_TOOL_NAMES` → 定不冲突 host-agnostic 名（如 `TOOL_POLICY_AGENT_PUBLIC_TOOL_NAMES` 或 `PUBLIC_AGENT_TOOL_NAMES`），说明选择；其余 collision 同理逐一定名。\n   - `isTrustedProjectRoot`/`resolveEffectiveTier`（DH-3c 发现 host-agnostic）裁决：**推荐从 HostAdapter 接口移除、去前缀归 L1/L2 纯函数**（调用方直用 L1），或说明保留理由。\n2. **余 host-operation routing**：Preflight/StatusService/host-agent-workflows（含需在 HostAdapter 加方法的 `buildHostProjectAlignment`）的**真 host-specific**调用经 `resolveHostAdapter()` 走。\n3. **物理迁入**：真 host-specific codex 函数体进 `CodexHostAdapter`（去 DH-2/3.1 委托外观），**保 F-V2-2 wire-byte**（codex `.mcp.json` 读取/arg 归一化字节不变）。\n4. cosmetic 文件名（如 `CodexServiceRequestBoundary.test.ts`）按清单一并归正。\n\n**完成定义（达成即 DH-3 阶段 DONE）**：grep `Codex*`/`CODEX_*` 在 lib（excl host-adapter）残留仅**真 host-specific 且在 L3**（误命名清零）；所有 collision 已定名；所有 host-operation 经 adapter（host-name 分支仅 L3）；真 host-specific 函数体在 `CodexHostAdapter`（委托外观清除）；codex 行为**逐行不变**（含 `.mcp.json` wire-byte/arg）+ cc 经 adapter；`tsc --noEmit` 绿；受影响测试 + cc/registry 测试绿 + 全量 unit 失败集与基线（39 pre-existing 沙箱/MTC-7）对比（改名 import/名变更说明、**净失败集不增长**）；纯 MCP 非强进程不变量；四工具对外 MCP 语义不变。\n\n**边界/不变量（DH-4 排除）**：不动 per-host 产物（skills/templates/constitution per-host、manifest per-host、漂移门禁、cc 子模块提交/gitlink bump）；不碰 3 漂移资产；AlembicCore 不动；codex `.mcp.json:8` 不变；CC3 文案不在本需求。真实 cc 验收 DH-6。先读本仓 `CLAUDE.md`/`AGENTS.md`；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：每批 commit hash + diff 摘要；de-Codex 进度（本批改了哪些符号/族 + 剩余符号数 + grep 残留 host-agnostic Codex* 计数）；collision 定名结果；isTrustedProjectRoot/resolveEffectiveTier 裁决；routing/物理迁入清单 + wire-byte 证据；`tsc --noEmit` + 测试 + 全量 unit 失败集 vs 基线；codex 等价/cc 不回归；**DH-3 阶段完成确认**或 **flag DH-3f + 剩余符号数/已完成比例**；needs-controller/blocked。",
+      "status": "pending",
+      "createdAt": "2026-06-20T05:35:42.940Z"
+    }
+  ]
+}

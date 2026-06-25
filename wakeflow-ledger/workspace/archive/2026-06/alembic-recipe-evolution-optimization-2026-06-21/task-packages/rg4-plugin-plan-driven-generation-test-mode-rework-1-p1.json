@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rg4-plugin-plan-driven-generation-test-mode-rework-1-p1",
+  "demandKey": "alembic-recipe-evolution-optimization-2026-06-21",
+  "summary": "RG-4 AlembicPlugin rework: repair controller-found Plan-gate scenario coverage regression and adjacent idempotency evidence after initial Plan-driven generation/testMode implementation.",
+  "status": "pending",
+  "sourceRef": "review:tc-20260621182423-0024; previousTask:rg4-plugin-plan-driven-generation-test-mode-t1; previousCommit:3500437bb04e1dce4780e0a43c8e3bb387150d1d",
+  "createdAt": "2026-06-21T18:25:02.292Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "rg4-plugin-plan-driven-generation-test-mode-rework-1-t1",
+      "taskPackageId": "rg4-plugin-plan-driven-generation-test-mode-rework-1-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Current window: AlembicPlugin. Claim only task rg4-plugin-plan-driven-generation-test-mode-rework-1-t1 under stateRoot .wakeflow-active/current/alembic-recipe-evolution-optimization-2026-06-21. Context: initial RG-4 commit 3500437bb04e1dce4780e0a43c8e3bb387150d1d implemented real Plan-driven generation gates, moduleMining/testMode/no-cleanup paths, schema/output updates, and passed targeted controller validation (build:check, PlanDrivenGenerationGate/AlembicPlanTool/DataLossWorkflowGates/MCP clean-output contract tests, scoped HostMcpServer chain, lint, repo/core/layer boundary lints, diff checks, Alembic Guard). Controller did not accept it because full unit JSON showed one RG4-attributable Codex session scenario regression: CodexSessionScenarioRunner scenario `bootstrap-missing-ai-uses-host-agent` now receives `PLAN_REQUIRED` from alembic_bootstrap and fails its Mission Briefing expectation. This is not an unrelated pre-existing red item; RG4 intentionally introduced the Plan hard precondition, so the session scenario/harness must be updated to prove the new first-use flow or explicit gate guidance.\n\nRequired rework: (1) Preserve the RG4 confirmed-Plan hard precondition and no-destructive-side-effect behavior. (2) Repair CodexSessionScenarioRunner coverage so `bootstrap-missing-ai-uses-host-agent` or an equivalent first-use host-agent scenario no longer fails under the new design. The scenario must demonstrate a real user-facing path: when bootstrap is blocked by PLAN_REQUIRED, the flow either asserts clear nextActions for `alembic_plan draft` then `confirm` and then runs bootstrap successfully, or splits the gate assertion and planned bootstrap success into explicit scenarios. Keep the original story true: no missing AI provider should block the host-agent Plan/bootstrap path. (3) Add or tighten a direct test for Plan-generation lease/idempotency behavior introduced in RG4: duplicate same rescanId/idempotency key returns `PLAN_GENERATION_IN_PROGRESS` or equivalent in-progress diagnostic without duplicate destructive cleanup; release/next run behavior is clear. Cover rescan/moduleMining if feasible, otherwise explain the minimal covered path and why it proves the shared lease. (4) Rerun and report build:check, the RG4 targeted unit set, the repaired CodexSessionScenarioRunner scenario(s), HostMcpServer scoped chain if touched, lint plus repo/core/layer boundary lints, git diff --check, Alembic Guard, and a full unit JSON summary. The full unit suite may remain red only if remaining failures are proven pre-existing/outside RG4 and no RG4-attributable failure remains. (5) Do not implement RG-5 create-time ProjectContext anchor UX, RG-6 vector isolation, RG-7 timing repair, RG-8 commit-driven evolution/rename/new-module routing, RG-9, RG-10, daemon/watch behavior, or evidence/proposal/vector deletion. Return TargetResultEnvelope with commit hash, changed files, exact validation outputs, full-unit comparison, risks, and next-step notes.",
+      "status": "pending",
+      "createdAt": "2026-06-21T18:25:02.292Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

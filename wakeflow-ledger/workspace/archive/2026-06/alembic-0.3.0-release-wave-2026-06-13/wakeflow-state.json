@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+  "title": "Alembic 0.3.0 release wave (R-group member 1) — publish HELD for user trigger",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Cleanup residual completed active state root before claiming new Design demand; user confirmed no active development demand remains.",
+  "revision": 13,
+  "activeStageId": null,
+  "updatedAt": "2026-06-21T15:03:24.444Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "alembic-0.3.0-release-wave-p1",
+      "summary": "Release p1 (AlembicCore SD-5 wave): RW0 fresh re-scan + RW1 ./shared re-point to root facade [B2] + RW2 delete 67 zero-consumer wildcard keys + fold keep-alive [C3]. Behavior-neutral, downstream green. NO src/ renames (SN4 is a separate later package).",
+      "status": "accepted",
+      "sourceRef": "wakeflow-ledger/requirement-designs/alembic-post-portfolio-followthrough/r-group-rulings-2026-06-13.md + alembic-0.3.0-release-wave RW0-RW2",
+      "createdAt": "2026-06-13T06:02:32.674Z"
+    },
+    {
+      "taskPackageId": "alembic-0.3.0-release-wave-p2",
+      "summary": "Release p2 (AlembicPlugin): RW4 delete R-1 overlay routes with RC4 proof [A3=delete] + C2 version-pin tail (exact pins, marketplace confirm, negative-cache install-docs). Dual-shell parity byte-stable.",
+      "status": "accepted",
+      "sourceRef": "wakeflow-ledger/requirement-designs/alembic-post-portfolio-followthrough/r-group-rulings-2026-06-13.md + alembic-0.3.0-release-wave RW4",
+      "createdAt": "2026-06-13T06:02:49.397Z"
+    },
+    {
+      "taskPackageId": "alembic-0.3.0-release-wave-p3",
+      "summary": "Release p3 (RW3 SN4): AlembicCore src/ source-naming wave, now UN-PARKED by the SD-5 deletion. Renames-only, export specifiers stay stable, naming-lint src scope flipped active, downstream builds green.",
+      "status": "accepted",
+      "sourceRef": "SN0 convention + SN6 SN4 resumption pointer + release-wave RW3 (un-parked by rw-t1 SD-5 acceptance)",
+      "createdAt": "2026-06-13T06:34:14.981Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "alembic-0.3.0-release-wave-rw-t1",
+      "taskPackageId": "alembic-0.3.0-release-wave-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore SD-5 phase-2 release wave per the user's B2=re-point + C3=delete rulings (renames/deletions of ZERO-CONSUMER public surface only — behavior-neutral, git-recoverable). REQUIRED READS: wakeflow-ledger/requirement-designs/alembic-post-portfolio-followthrough/r-group-rulings-2026-06-13.md + the release-wave requirement design RW0-RW2 + the SD-5 staging doc in the P3 state root (sd5-phase2-staging-2026-06-12.md — the exact 67 keys, keep-alive 36/37, per-row zero-served proof) + 0.3.0 ledger row 1. LEGS: (1) RW0 FRESH RE-SCAN: re-run the 4-repo reference-resolution scan; RE-CONFIRM all 67 wildcard keys are still zero-consumer and the keep-alive set (only ./infrastructure/database/drizzle exact-row survives, 5 consumers) — if ANY key now shows a live consumer, STOP that key, do NOT delete it, backfill. (2) RW1 ./shared RE-POINT [B2=re-point]: re-point MT2 OutputBudget + CO3 PersistenceError/DivergenceError doc/import references to the ROOT facade (not ./shared) so deleting ./shared wildcards breaks no import path; prove the root-facade path resolves for every consumer. (3) RW2 DELETE: remove the 67 verified-zero-consumer wildcard export keys from package.json exports + fold the keep-alive set; update expectedCounts/closeout target to the new truth; closeout report shows candidates 0. (4) PROOF: boundary gate + public-api smoke + 3-consumer import scans green; DOWNSTREAM Alembic+Agent+Plugin builds green against the new Core HEAD; full Core check green at TRUE baselines (1193+ from h1 2823939); mechanical-diff audit = zero behavior change (export-map deletion + import-path re-point only). SINGLE-PURPOSE COMMITS: re-point commit, then deletion commit; push. STOP CONDITIONS: any key shows a live consumer on the fresh re-scan; any deletion changes behavior or a non-zero-consumer specifier; a downstream build breaks (do NOT weaken a gate); SN4 src/ renames are FORBIDDEN here (separate later package — only export-map deletion + ./shared re-point in this one). Backfill TargetResultEnvelope: re-scan evidence, the 67-key deletion list, expectedCounts delta, boundary/smoke/downstream outputs, commit hashes.",
+      "status": "accepted",
+      "createdAt": "2026-06-13T06:02:32.674Z",
+      "delivery": {
+        "deliveryId": "delivery-rw1__AlembicCore__alembic-0.3.0-release-wave-rw-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw1__AlembicCore__alembic-0.3.0-release-wave-rw-t1.json",
+        "deliveryRunId": "run-delivery-rw1__AlembicCore__alembic-0.3.0-release-wave-rw-t1",
+        "dispatchGroup": "rw1",
+        "sentAt": "2026-06-13T06:04:28.105Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-alembic-0.3.0-release-wave-rw-t1",
+      "reviewDecision": "accept"
+    },
+    {
+      "targetTaskId": "alembic-0.3.0-release-wave-rw-t2",
+      "taskPackageId": "alembic-0.3.0-release-wave-p2",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin release package per the A3=delete + C2-tail rulings (r-group-rulings-2026-06-13.md). REQUIRED READS: r-group-rulings doc + release-wave RW4 + AD2 register A3 (R-1 plugin evolution/panorama HTTP overlay routes — byte-identical twins, no named consumer) + 0.3.0 ledger. LEGS: (1) A3 DELETE the R-1 overlay routes with the RC4-style proof set: import/route-scan proving nothing references the overlay twins, the primary (non-overlay) route stays the live entrypoint, build/check/smoke green; git-recoverable. (2) C2 version-pin TAIL: confirm both shells keep EXACT-version pins (D3 — no bump); confirm marketplace hosting/naming under alembic@gxfn (AlembicClaudeCode); add the negative-cache clear step (clear mcp-needs-auth-cache.json or /mcp Reconnect after install) to the install docs (CC4 fix-D, docs-only). (3) PROOF: full Plugin suite green (2464+ baseline); validate --strict + verify:codex-plugin PASS; DUAL-SHELL PARITY tools/list + representative callTool BYTE-STABLE vs the latest p5t4-probe (the overlays are unused twins — deleting them must NOT move the served wire surface; ANY served-byte change = STOP + backfill); cross-shell drift gate green; CLEAN REBUILD before proof (stale-dist lesson). Commits shells-first if touched then parent (gitlink order, ls-remote each), push. STOP CONDITIONS: the overlay routes show a live consumer (keep + backfill, do not delete); any served-wire byte moves; publish prompts (publish is HELD for the user). Backfill TargetResultEnvelope: route inventory before/after + import-scan proof, parity diff result, check/validate outputs, C2 tail confirmations, commit hashes.",
+      "status": "accepted",
+      "createdAt": "2026-06-13T06:02:49.397Z",
+      "delivery": {
+        "deliveryId": "delivery-rw2__AlembicPlugin__alembic-0.3.0-release-wave-rw-t2",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw2__AlembicPlugin__alembic-0.3.0-release-wave-rw-t2.json",
+        "deliveryRunId": "run-delivery-rw2__AlembicPlugin__alembic-0.3.0-release-wave-rw-t2",
+        "dispatchGroup": "rw2",
+        "sentAt": "2026-06-13T06:04:33.661Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-alembic-0.3.0-release-wave-rw-t2",
+      "reviewDecision": "accept"
+    },
+    {
+      "targetTaskId": "alembic-0.3.0-release-wave-rw-t3",
+      "taskPackageId": "alembic-0.3.0-release-wave-p3",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore SN4 source-naming wave — the parked Core src/ normalization, UN-PARKED now that rw-t1 (accepted) deleted the src-covering wildcard exports. RENAMES/MOVES ONLY, zero behavior change, git-recoverable. REQUIRED READS: SN0 artifact sn0-convention-and-constraints-2026-06-13.md (§1 convention, §2 Core stragglers ~44 kebab+27 camel, §4 gate-config protocol, §6 commit protocol) + SN6 terminal review SN4 resumption pointer + release-wave RW3. CRITICAL CURRENT-STATE: SD-5 just landed (package.json exports 126→59 = 52 exact + 7 wildcard) — the export-map shield now applies to the CURRENT 59-key map; renaming an exported source FILE must keep its export KEY/PATH specifier byte-stable (rename the file, keep the path consumers import) and update only the internal target — do NOT reintroduce a deleted key, do NOT change any export path a consumer uses. LEGS: (1) confirm/refresh Core's own NodeNext codemod scripts/codemod-rename.mjs (a43519e-restored lineage; add the SN5 mkdirSync dir-precreate if a cross-dir move needs it) — own commit if changed. (2) Census Core src/ class-position stragglers by SN0 §1 export-shape rule (classes/services/contracts/presenters→PascalCase; functions/utils/middleware→camelCase; drizzle migrations NNN_snake EXEMPT — never rename); reviewed rename map + per-file rationale saved to evidence BEFORE --apply; readdirSync case validation; MANDATORY post-apply stale-name negative grep. (3) ONE batch rename commit carrying ALL affected gate-config rows IN-COMMIT per SN0 §4: the 59-key exports targets for any renamed exported file (KEYS stable), blessed-singletons + lintExemptions, layer-contract stems + regenerate the as-is report, side-effect-doctrine paths, wire-manifest/api-types constants if any. (4) FLIP the naming-lint src parkedScope to ACTIVE: move config/naming-lint.json parkedScopes(src) rules into the active rules array UNCHANGED — the migrations NNN_snake exempt family stays FIRST (first-match-wins) per the recorded SN4a note; naming lint now scans src/ and is GREEN with the renames. (5) .git-blame-ignore-revs append. (6) PROOF: full Core check green at TRUE baselines (108/1193); naming lint src-active + green; DOWNSTREAM Agent+Alembic+Plugin builds green against the renamed Core HEAD (hands-off, read-only) — exported renames keep specifiers stable so consumers are unaffected; mechanical-diff audit = renames + internal specifier rewrites + gate-config only. STOP CONDITIONS: any rename would change an export PATH/specifier a consumer imports (rename file, keep path; if impossible, STOP+backfill — that's a public-API change beyond scope); behavior change; a migration renamed; downstream build breaks. Single-purpose commits, push. Backfill TargetResultEnvelope: census+rename map, dry-run plan, stale-grep, exports-target updates (keys stable), lint-scope-flip evidence, downstream build outputs, commit hashes.",
+      "status": "accepted",
+      "createdAt": "2026-06-13T06:34:14.981Z",
+      "delivery": {
+        "deliveryId": "delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3.json",
+        "deliveryRunId": "run-delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3",
+        "dispatchGroup": "rw3",
+        "sentAt": "2026-06-13T06:35:55.543Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-alembic-0.3.0-release-wave-rw-t3",
+      "reviewDecision": "accept"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "alembic-0.3.0-release-wave-p1",
+        "alembic-0.3.0-release-wave-p3"
+      ],
+      "targetTaskIds": [
+        "alembic-0.3.0-release-wave-rw-t1",
+        "alembic-0.3.0-release-wave-rw-t3"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "alembic-0.3.0-release-wave-p2"
+      ],
+      "targetTaskIds": [
+        "alembic-0.3.0-release-wave-rw-t2"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-alembic-0.3.0-release-wave-rw-t3"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-13T06:01:24.701Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3",
+    "lastDeliveryRunId": "run-delivery-rw3__AlembicCore__alembic-0.3.0-release-wave-rw-t3",
+    "lastDispatchGroup": "rw3",
+    "lastTargetTaskId": "alembic-0.3.0-release-wave-rw-t3",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-13T06:35:55.546Z"
+  }
+}

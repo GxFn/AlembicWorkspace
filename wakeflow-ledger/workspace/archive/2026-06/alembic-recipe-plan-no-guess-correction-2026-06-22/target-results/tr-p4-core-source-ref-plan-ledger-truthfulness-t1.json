@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-core-source-ref-plan-ledger-truthfulness-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p4-core-source-ref-plan-ledger-truthfulness-p1",
+  "dispatchGroup": "p4-core-source-ref-plan-ledger-truthfulness-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p4-core-source-ref-plan-ledger-truthfulness-t1",
+  "status": "completed",
+  "summary": "AlembicCore P4 completed in commit 85461a80acb4eed44b3edebde5ff8c299b1c0bd2. H1 SourceRefReconciler now blocks missing/parse-error reasoning.sources without clearing existing refs and only clears on explicit valid-empty sources. H4 PlanLedger maps recipes lacking source_refs as missing instead of generated from sourceFile. H5 PlanLedger coverage exposes byModuleDimension and gap rows per module x dimension. H6 PlanRepository returns null only for absent rows while throwing PlanRepositoryDataError for unknown status or invalid JSON, including listByProject row mapping. No Plugin/CLI/Dashboard/Test repo edits.",
+  "evidenceRefs": [
+    "commit:85461a80acb4eed44b3edebde5ff8c299b1c0bd2",
+    "AlembicCore/src/service/knowledge/SourceRefReconciler.ts",
+    "AlembicCore/src/service/knowledge/RecipeFreshnessService.ts",
+    "AlembicCore/src/service/planLedger/contracts.ts",
+    "AlembicCore/src/service/planLedger/planLedger.ts",
+    "AlembicCore/src/repository/plan/PlanRepository.ts",
+    "AlembicCore/test/RecipeFreshnessService.test.ts",
+    "AlembicCore/test/PlanLedgerProjection.test.ts"
+  ],
+  "verification": [
+    "npm run build:check: passed",
+    "npm run test -- test/RecipeFreshnessService.test.ts test/PlanLedgerProjection.test.ts: passed (14 tests)",
+    "npm run test: passed (136 files, 1386 tests)",
+    "npm run build: passed",
+    "npm run lint: passed",
+    "git diff --check: passed",
+    "npm run check: failed at existing lint:naming for src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts after earlier gates passed"
+  ],
+  "risks": [
+    "Alembic code guard MCP returned an internal envelope schema validation error twice, so no guard conclusion was produced.",
+    "npm run check remains blocked by existing lint:naming violations in three pre-existing hyphenated src files unrelated to this P4 diff.",
+    "Plugin consumers should treat PlanCodeRecipeMapping status=missing as no generated source anchor when source_refs are absent, and can use coverage.byModuleDimension for module x dimension gaps. No Plugin consumer files were changed in this Core task."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-core-source-ref-plan-ledger-truthfulness-p1__AlembicCore__p4-core-source-ref-plan-ledger-truthfulness-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-source-ref-plan-ledger-truthfulness-p1__AlembicCore__p4-core-source-ref-plan-ledger-truthfulness-t1.json",
+    "deliveryRunId": "run-delivery-p4-core-source-ref-plan-ledger-truthfulness-p1__AlembicCore__p4-core-source-ref-plan-ledger-truthfulness-t1",
+    "dispatchGroup": "p4-core-source-ref-plan-ledger-truthfulness-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-source-ref-plan-ledger-truthfulness-p1__AlembicCore__p4-core-source-ref-plan-ledger-truthfulness-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 35,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p4-core-source-ref-plan-ledger-truthfulness-p1",
+    "targetTaskId": "p4-core-source-ref-plan-ledger-truthfulness-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p4-core-source-ref-plan-ledger-truthfulness-p1",
+    "resultId": "tr-p4-core-source-ref-plan-ledger-truthfulness-t1",
+    "createdAt": "2026-06-22T15:30:46.154Z"
+  },
+  "createdAt": "2026-06-22T15:30:46.154Z",
+  "stateRevisionObserved": 35,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

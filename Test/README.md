@@ -3,7 +3,7 @@
 Use this directory when the user does not have an external Test repository.
 
 - Test boundary machine cards: `<state-root>/test-cards/*.json`
-- Test exchange projection: `.workspace-active/workspace/current/test-exchange.md`
+- Test exchange projection: `.wakeflow-active/current/test-exchange.md`
 - Local rules: `AGENTS.md`
 - Documentation index: `docs/README.md`
 - Current Test work: `docs/current/`

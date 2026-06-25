@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1p2-plugin-plan-authority-no-guess-consumer-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+  "dispatchGroup": "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p1p2-plugin-plan-authority-no-guess-consumer-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin P1/P2 consumer migration completed at commit 30333e85254179d0fc0ec3461fd78beb787c7d83. Plugin alembic_plan draft now returns Core ProjectContext fact package without Plugin recommendation/top/order/subset/cross-dimension outputs, local fs/regex ProjectContext fallback, planningBrief persistence, or fake module delta. Confirm now requires complete Agent-authored payload (selectedDimensions, scale with depthLevels, moduleBindings, plannedNextActions, evidenceRefs, rationale) and writes Core ConfirmPlanInput.intent without draft inheritance or public stale/signature escape valves. Generation gate consumes confirmed Plan dimension IDs directly and treats dimensions narrowing as testMode-only.",
+  "evidenceRefs": [
+    "commit:30333e85254179d0fc0ec3461fd78beb787c7d83",
+    "files:lib/recipe-generation/plan-tool.ts",
+    "files:lib/shared/schemas/mcp-tools.ts",
+    "files:lib/recipe-generation/plan-generation-gate.ts",
+    "files:lib/recipe-generation/host-agent-workflows/project-context-analysis.ts",
+    "files:lib/runtime/mcp/tools.ts",
+    "tests:test/unit/AlembicPlanTool.test.ts",
+    "tests:test/unit/PlanDrivenGenerationGate.test.ts",
+    "tests:test/unit/HostMcpServer.test.ts",
+    "scenarios:test/codex-scenarios/cold-start/bootstrap-missing-ai.json",
+    "scenarios:test/codex-scenarios/cold-start/init-then-bootstrap-ai-ready.json"
+  ],
+  "verification": [
+    "npm run build:check (pass; Core build used ../AlembicCore @ bedbe2b80a51b658d33c677e691e07d83cfef48b; tsc --noEmit pass)",
+    "npm run test -- test/unit/AlembicPlanTool.test.ts test/unit/PlanDrivenGenerationGate.test.ts (pass; 12 tests)",
+    "npm run test -- test/unit/HostMcpServer.test.ts -t \"Codex host-agent bootstrap runs in the Plugin without the daemon MCP bridge\" (pass; 1 test, 41 skipped)",
+    "./node_modules/.bin/biome check lib/recipe-generation/plan-tool.ts lib/recipe-generation/plan-generation-gate.ts lib/recipe-generation/host-agent-workflows/project-context-analysis.ts lib/runtime/mcp/tools.ts lib/shared/schemas/mcp-tools.ts (pass)",
+    "git diff --check (pass)",
+    "node -e JSON.parse for both cold-start codex scenario JSON files (pass)",
+    "rg removed Plan path tokens: recommendedDimensions/dimensionOrder/maxRecommendedDimensions/subsetHints/crossDimensionConstraints/allowSignatureMismatch/allowStaleVersion/intentPatch/draftPackage.intent/project-context-repo-fallback/plan-fallback/resolveActiveDimensions/signatureScope/selectedDimensionsFromDraft across Plan/plugin paths returns only explicit negative assertions in test/unit/AlembicPlanTool.test.ts"
+  ],
+  "risks": [
+    "Full npm run lint still reports pre-existing repository-wide warnings/errors outside touched files: lib/runtime/host-adapter/ClaudeCodeHostAdapter.ts noTemplateCurlyInString and multiple scripts/* noConsole warnings. Scoped Biome on touched source files passes.",
+    "Full test/unit/HostMcpServer.test.ts still has unrelated broad-suite failures in existing tool-list/runtime/search/resident assertions; the Plan/bootstrap-specific HostMcpServer test passes."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1p2-plugin-plan-authority-no-guess-consumer-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-plugin-plan-authority-no-guess-consumer-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-t1.json",
+    "deliveryRunId": "run-delivery-p1p2-plugin-plan-authority-no-guess-consumer-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-t1",
+    "dispatchGroup": "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-plugin-plan-authority-no-guess-consumer-p1__AlembicPlugin__p1p2-plugin-plan-authority-no-guess-consumer-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": null,
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 15,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+    "targetTaskId": "p1p2-plugin-plan-authority-no-guess-consumer-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p1p2-plugin-plan-authority-no-guess-consumer-p1",
+    "resultId": "tr-p1p2-plugin-plan-authority-no-guess-consumer-t1",
+    "createdAt": "2026-06-22T13:13:25.174Z"
+  },
+  "createdAt": "2026-06-22T13:13:25.174Z",
+  "stateRevisionObserved": 15,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

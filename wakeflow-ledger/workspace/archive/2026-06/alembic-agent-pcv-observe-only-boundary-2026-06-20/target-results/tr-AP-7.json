@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-AP-7",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "taskPackageId": "ap-7-quality-run-guard-optin-wiring",
+  "dispatchGroup": "ap7-main-guard-optin",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+  "targetWindow": "Alembic",
+  "targetTaskId": "AP-7",
+  "status": "needs-review",
+  "summary": "AP-7（PCVM/Test guard opt-in wiring）：注入机制 + propagation + 并发安全已（自）验证就绪，但**质量运行触发判定真正欠定，须控制器/Design 决策**。无代码改动（不擅自做改变用户可见行为的过宽接线），工作树净，HEAD 016f6bb。\n\n【注入机制（就绪）】per-run guard opt-in = AgentRunInput.execution.groundingEnforcement（AP-3 通道）。主体注入点= **session 级**：SessionExecutionBuilder.ts:111 buildBootstrapSessionRunInput（当前不传 execution，默认取 children[0]）/ AgentRunInputBuilders.ts:141·198·254。propagation 端到端通（AlembicAgent 只读核验，AP-0/FC3 佐证）：execution.groundingEnforcement→AgentService.buildRuntimeOptions:187→runtime.execute:97→AgentRuntime.#groundingEnforcement:259→LoopContext:597→#processTextResponse:1605 guard 短路（ctx.groundingEnforcement==='guard' 才调 evaluateAnalyzeTextGroundingGate）。\n\n【并发核查（必做项·结论=SAFE·自验）】bootstrap-session 并发由 AgentRunCoordinator 服务层处理：agentService.run(sessionInput)→partition→runChildren Promise.all（AgentRunCoordinator:85）→每子维度递归 agentService.run(childInput)（AgentService:61）→各 runtimeBuilder.build() 建**独立 AgentRuntime**（AgentService:81）再 runtime.execute（:97）。故 #groundingEnforcement/startTime/tokenUsage **每子维度隔离、不串值**——无 per-run 状态竞争。partitioner 把 parent.execution 原样拷给所有 child（AgentRunCoordinator:366）⇒ session 级 groundingEnforcement 均匀传播全维度（session 级语义、安全）。初步'FanOutStrategy 共享单实例串值'假设=**证伪**（bootstrap-session 走 coordinator 每子建新 runtime，非 within-runtime fanout）。\n\n【触发判定欠定（BLOCKER·须决策）】AP-0/FC4 已证'PCVM/Test 无 TS 消费（仅 markdown skill）'——主体**无**区分'PCVM/Test 质量运行'的代码信号；全仓**无** grounding/guard 配置开关；唯一 session 级 run-type 信号= pipelineMode（preparation.view.mode：'bootstrap'|'rescan'）/ isIncremental。把 guard 接到 rescan/incremental 会**过宽**：guard=恢复 analyze grounding 阻断+nudge+rollback，改变**普通用户 rescan/增量运行**可见行为，超出设计'guard 仅限 PCVM/Test 质量运行'（doc line 87-88/137-139/243-244）、未授权（违反最高停止卡：改可见行为须确认）。仅加'默认 off 无真实激活者'的管道=设计 line37 禁止的'空开关'。⇒ 两难不可在本窗内单方消解。\n\n【裁定/建议】无安全的代码级 PCVM/Test 触发；正解=显式 per-invocation opt-in。请控制器/Design 三选一：(A) 定义 PCVM/Test 验证流进程内发起 bootstrap 时传 groundingEnforcement='guard' 的明确通道/上下文标志（最贴设计；需补 PCVM/Test 如何发起——FC4 只给机制未给触发源）；(B) 确认 rescan（或子模式 controller-authorized-gap-fill）即设计意图质量运行、接受其 guard 行为变化；(C) config 门禁式 opt-in。任一确认后 AP-7 接线= SessionExecutionBuilder 一处小改（加可选 groundingEnforcement 入参→session execution），可即时落地+端到端验证。\n\n【边界】未碰 AlembicAgent（只读）；未改 PcvNodeEvidence.ts（AP-6）；零代码改动=零行为变更；AlembicCore 不动。",
+  "evidenceRefs": [
+    "injection point (main): SessionExecutionBuilder.ts:111 buildBootstrapSessionRunInput (currently passes NO execution → session defaults to children[0].input.execution) + AgentRunInputBuilders.ts:141 (child execution block) /198 (execution param) /254 (session execution = execution || children[0]) ; agentService.run at AiDimensionSessionRunner.ts:282 (FC4)",
+    "propagation chain (AlembicAgent read-only, corroborated by AP-0/FC3): AgentService.ts:187 buildRuntimeOptions extracts input.execution.groundingEnforcement → :97 runtime.execute → AgentRuntime.ts:259 #groundingEnforcement (reset per execute) → :597 LoopContext.groundingEnforcement ?? #groundingEnforcement → :1605 #processTextResponse: ctx.groundingEnforcement==='guard' ? evaluateAnalyzeTextGroundingGate : no-block",
+    "concurrency SAFE (self-verified in AlembicAgent): AgentService.run:45 → runtimeBuilder.build():81 builds NEW AgentRuntime per call; AgentService.ts:61 runChild=this.run (recursive); AgentRunCoordinator.run:44 → partition:56 → runChildren Promise.all:85 → each child = agentService.run(childInput) → own runtime. AgentRunCoordinator:366 execution:input.execution copies parent execution to all children (session-level).",
+    "trigger gap: AP-0/FC4 (tr-ap-0.json) 'PCVM/Test 无 TS 消费（仅 markdown skill）'; repo-wide grep: NO groundingEnforcement/guard config flag in config|lib/service; only session run-type signals = preparation.view.mode (pipelineMode 'bootstrap'|'rescan', AiDimensionFinalizer.ts:247) + preparation.isIncremental (AiDimensionPreparation.ts:37)",
+    "design scope: Design/docs/current/alembic-agent-pcv-observe-only-boundary-2026-06-20.md line 37 (non-empty switch = ≥1 wired quality-run path) / 64 (guard=restore analyze block+nudge) / 87-88 (PCVM/Test participates) / 137-139+166 (injection point AP-0 verify/AP-7 land) / 243-244 (PD6/PD7)"
+  ],
+  "verification": [
+    "Read-only investigation only — NO code change made (intentional: enabling guard's analyze block/nudge for runs is a user-visible behavior change; no authorized PCVM/Test-only signal exists, so no wiring committed). git HEAD 016f6bb, working tree clean, no commit.",
+    "concurrency conclusion self-verified by direct read of AlembicAgent AgentService.ts (45/61/81/97) + AgentRunCoordinator.ts (44/56/85/103/366) — each concurrent dimension gets an independent AgentRuntime; per-run instance state isolated; NOT shared/raced.",
+    "propagation chain traced end-to-end (AlembicAgent read-only) and corroborated by AP-0/FC3 citations (AgentService.ts:187/:97, AgentRunContracts per-run seam).",
+    "build:check / lint:*-boundary / test:unit NOT run (no code change to validate); will run under Node 22 once the trigger decision lands and wiring is applied."
+  ],
+  "risks": [
+    "DECISION REQUIRED (blocker): which production run is a 'PCVM/Test quality run' that should enable guard? No code-level PCVM/Test signal exists (PCVM/Test = markdown skills, no TS path per AP-0/FC4). The only session-level proxies (pipelineMode='rescan', isIncremental) are TOO BROAD — wiring guard there enables grounding-enforcement block/nudge/rollback for normal user rescans/incremental runs, a user-visible behavior change beyond the design's 'guard only for PCVM/Test' scope. Recommend option (A) explicit per-invocation opt-in; controller/Design to choose A/B/C.",
+    "Completion definition NOT met by design: 'non-empty switch' requires ≥1 wired production quality-run path enabling guard (design line 37); a default-off plumbed channel alone would be the forbidden empty switch. Hence cannot self-complete without the trigger decision.",
+    "Concurrency model: SAFE for the bootstrap-session path (independent per-child runtimes). NOTE: this relies on the bootstrap-session profile using the AgentRunCoordinator partitioner path (verified for profile 'bootstrap-session'); if a future profile runs multiple execute() on a single shared runtime concurrently, per-run instance fields (incl. groundingEnforcement) would race — out of AP-7 scope but recorded as a structural caveat.",
+    "AlembicAgent internal line numbers for the propagation chain (AgentRuntime 259/597/1605) are from read-only tracing; the concurrency-critical citations (AgentService/AgentRunCoordinator) were self-verified this turn. AlembicAgent NOT modified."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-ap7-main-guard-optin__Alembic__AP-7",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap7-main-guard-optin__Alembic__AP-7.json",
+    "deliveryRunId": "run-delivery-ap7-main-guard-optin__Alembic__AP-7",
+    "dispatchGroup": "ap7-main-guard-optin",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap7-main-guard-optin__Alembic__AP-7.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 30,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "taskPackageId": "ap-7-quality-run-guard-optin-wiring",
+    "targetTaskId": "AP-7",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "ap7-main-guard-optin",
+    "resultId": "tr-AP-7",
+    "createdAt": "2026-06-20T15:29:36.828Z"
+  },
+  "createdAt": "2026-06-20T15:29:36.828Z",
+  "stateRevisionObserved": 30,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

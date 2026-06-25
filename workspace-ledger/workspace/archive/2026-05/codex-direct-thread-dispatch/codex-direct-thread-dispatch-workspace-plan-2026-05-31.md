@@ -8,7 +8,7 @@
 ## 目标判断
 
 - 用户目标：领取 `CODEX-DIRECT-THREAD-DISPATCH-2026-05-31` 并开始推进；基于 Codex 已支持直接向窗口线程投递提示词，将旧 1 分钟 automation 投递改为 direct thread dispatch，并把线程投递视为正常工作流水线。
-- 最终完成定义：Codex Automation Closed Loop 的普通 target fan-out 和 controller-return 只走 direct thread dispatch；旧投递路线从 active contract 中清理；thread id 仍只保存在 `.workspace-local/`；direct send 成败有 delivery log / thread readback 证据；真实两窗口 smoke 证明目标线程收到并处理，且普通路径不创建旧 1 分钟 automation；用户明确开启无人值守自动化时进入 continuous / infinite loop，并启用 keep-live 支撑。
+- 最终完成定义：Codex Automation Closed Loop 的普通 target fan-out 和 controller-return 只走 direct thread dispatch；旧投递路线从 active contract 中清理；thread id 仍只保存在 `.wakeflow-local/`；direct send 成败有 delivery log / thread readback 证据；真实两窗口 smoke 证明目标线程收到并处理，且普通路径不创建旧 1 分钟 automation；用户明确开启无人值守自动化时进入 continuous / infinite loop，并启用 keep-live 支撑。
 - 当前是否已经达到：功能完成定义已达到。Design 已完成需求设计、代码事实复核和 host thread-send probe；总控已完成 direct-thread 文档契约、子窗口文件配置设计、脚本 runtime contract、target direct smoke、controller-return 回跳当前总控线程 smoke、automation-enabled continuous + keep-live bounded smoke，以及 legacy runtime cleanup。host `send_message_to_thread` 投递、`read_thread` / 当前线程回读、`TargetResultEnvelope`、`ControllerReturnEnvelope`、`DirectThreadDeliveryRun`、keep-live state 和 stop marker 均在测试时生成并复核；按用户裁决，历史 runtime 记录已删除，不作为长期证据保留。
 - 未达到时剩余差距：无功能缺口，无 cleanup 阻塞。
 - 已达到时验收 / 归档判断：线程投递和自动化主链路可验收；当前可进入归档 / 提交整理。
@@ -27,7 +27,7 @@
   - `scripts/import-design-handoffs.mjs --write` 已更新 inbox，但因无关 `REPOSITORY-RESIDUE-CLEANUP-2026-05-31` 缺 original-plan / confirmation 整体返回失败；该校验问题不来自本需求。
 - 是否需要先验证 / 重新计划 / 用户确认：不需要额外确认即可实现 workspace 内 v2 runtime contract；真实线程投递 smoke 前需确认目标窗口和投递内容边界。
 - 本次允许更新：当前计划、global TODO、workspace index/status、README、AGENTS 源文件、automation target/controller skills、control-workspace governance references、scripts README、`codex-automation-loop.mjs` 及其聚焦测试。
-- 本次不得更新：产品源码、`.workspace-local` raw thread id、Codex Desktop 真实线程、真实 automation runtime、AlembicTest 测试单。
+- 本次不得更新：产品源码、`.wakeflow-local` raw thread id、Codex Desktop 真实线程、真实 automation runtime、AlembicTest 测试单。
 
 ## Design / 需求来源
 
@@ -72,7 +72,7 @@
 3. Stage 2：Runtime contract implementation。在 `codex-automation-loop.mjs` 中实现 v2 registry 兼容读写、window-config 生成、direct delivery envelope、controller return direct envelope、delivery-run 记录、keep-live state、direct-only skill 命令和聚焦测试。已完成聚焦验证。
 4. Stage 3：Host direct-send smoke。Stage 3A target direct-thread 已通过：`AlembicWorkspace -> AlembicTest-IDE` 投递和回读 ACK 成功；Stage 3B controller-return current-thread 已通过：`AlembicTest-IDE -> AlembicWorkspace` 回跳当前总控线程成功，且没有创建下一跳。
 5. Stage 4：Continuous automation loop smoke。已通过：automation-enabled delivery envelope 标记 `continuousLoop=true` / `keepLive=true`；`AlembicTest-IDE` 写入 `TargetResultEnvelope` 并生成 `ControllerReturnEnvelope`；总控收到回跳后复核 `review-results`，因无 eligible next task 写入 keep-live stopped 和 stop marker，不创建下一跳。
-6. Stage 5：Legacy runtime cleanup。已按用户裁决清理历史运行记录：删除 `.workspace-local/codex-automation-loop` 下的 dispatch packets、delivery envelopes、delivery runs、target results、prompts、keep-live state、stop marker 和旧一次性 `AlembicTest-IDE039` thread registry；保留当前职责窗口 thread registry 与 window-config。
+6. Stage 5：Legacy runtime cleanup。已按用户裁决清理历史运行记录：删除 `.wakeflow-local/codex-automation-loop` 下的 dispatch packets、delivery envelopes、delivery runs、target results、prompts、keep-live state、stop marker 和旧一次性 `AlembicTest-IDE039` thread registry；保留当前职责窗口 thread registry 与 window-config。
 
 - 下一处真实阻塞点：无功能阻塞；只剩提交 / 归档整理。
 - 阻塞点之前还能做：跑全量 workspace 脚本校验、同步当前计划和根 AGENTS。
@@ -134,7 +134,7 @@
 
 ```text
 node scripts/verify-control-center.mjs
-node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --check --json
+node scripts/sync-current-plan.mjs --plan .wakeflow-active/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --check --json
 ```
 
 回填要求：
@@ -174,7 +174,7 @@ node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/co
 主线动作：
 
 - 新增 direct thread 子窗口配置 reference。
-- 明确 `workspace.config.json`、`.workspace-local/workspace.config.json`、`thread-registry`、`window-config`、`delivery-envelopes`、`delivery-runs`、`target-results`、`keep-live/state.json` 和 `stop.json` 的 owner / tracked 边界。
+- 明确 `workspace.config.json`、`.wakeflow-local/workspace.config.json`、`thread-registry`、`window-config`、`delivery-envelopes`、`delivery-runs`、`target-results`、`keep-live/state.json` 和 `stop.json` 的 owner / tracked 边界。
 - 设计 `CodexWindowThreadRegistration` v2、`CodexSubwindowDispatchConfig`、direct-thread `DeliveryEnvelope` v2、`DirectThreadDeliveryRun` 和 `AutomationKeepLiveState` 字段。
 - 写清 v1 thread registry compatibility、raw thread id redaction、keep-live 层级、legacy schedule / codexAutomation 禁止项和实现 checklist。
 
@@ -185,7 +185,7 @@ node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/co
 明确不包含：
 
 - 不改 `scripts/codex-automation-loop.mjs`。
-- 不创建 `.workspace-local` 新 runtime 文件。
+- 不创建 `.wakeflow-local` 新 runtime 文件。
 - 不登记 / 替换真实 thread id。
 - 不运行 direct dispatch。
 
@@ -201,7 +201,7 @@ node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/co
 
 ```text
 node scripts/verify-control-center.mjs
-node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --check --json
+node scripts/sync-current-plan.mjs --plan .wakeflow-active/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --check --json
 ```
 
 回填要求：
@@ -244,7 +244,7 @@ node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/co
 - 不实际调用 host thread-send 工具。
 - 不登记或替换真实 thread id。
 - 不启动 automation / keep-live 进程。
-- 不清理历史 `.workspace-local` runtime 数据。
+- 不清理历史 `.wakeflow-local` runtime 数据。
 
 下一处真实阻塞点：
 
@@ -312,10 +312,10 @@ node --test scripts/check-dispatch-coverage.test.mjs scripts/check-test-boundary
 
 ```text
 node scripts/codex-automation-loop.mjs build-window-config --window AlembicTest-IDE --busy-policy append-if-steerable --require-thread --write --json
-node scripts/codex-automation-loop.mjs create-dispatch --target-window AlembicTest-IDE --task-id CDTDA-SMOKE-002 --group CDTDA-SMOKE-20260531 --control-plan .workspace-active/workspace/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --objective "Direct-thread delivery smoke only" --prompt-file /private/tmp/cdtda-smoke-prompt.txt --evidence "thread readback ack" --write --json
-node scripts/codex-automation-loop.mjs build-delivery --packet-file .workspace-local/codex-automation-loop/dispatch-packets/CDTDA-SMOKE-20260531__AlembicTest-IDE__CDTDA-SMOKE-002.json --require-thread --busy-policy append-if-steerable --write --json
+node scripts/codex-automation-loop.mjs create-dispatch --target-window AlembicTest-IDE --task-id CDTDA-SMOKE-002 --group CDTDA-SMOKE-20260531 --control-plan .wakeflow-active/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --objective "Direct-thread delivery smoke only" --prompt-file /private/tmp/cdtda-smoke-prompt.txt --evidence "thread readback ack" --write --json
+node scripts/codex-automation-loop.mjs build-delivery --packet-file .wakeflow-local/codex-automation-loop/dispatch-packets/CDTDA-SMOKE-20260531__AlembicTest-IDE__CDTDA-SMOKE-002.json --require-thread --busy-policy append-if-steerable --write --json
 codex_app.send_message_to_thread -> codex_app.read_thread observed ACK
-node scripts/codex-automation-loop.mjs record-delivery-run --delivery-file .workspace-local/codex-automation-loop/delivery-envelopes/delivery-CDTDA-SMOKE-20260531__AlembicTest-IDE__CDTDA-SMOKE-002.json --status sent --readback-ok true --evidence "codex_app send_message_to_thread returned target thread; read_thread observed final ack: DIRECT_THREAD_SMOKE_ACK CDTDA-SMOKE-002 AlembicTest-IDE" --write --json
+node scripts/codex-automation-loop.mjs record-delivery-run --delivery-file .wakeflow-local/codex-automation-loop/delivery-envelopes/delivery-CDTDA-SMOKE-20260531__AlembicTest-IDE__CDTDA-SMOKE-002.json --status sent --readback-ok true --evidence "codex_app send_message_to_thread returned target thread; read_thread observed final ack: DIRECT_THREAD_SMOKE_ACK CDTDA-SMOKE-002 AlembicTest-IDE" --write --json
 ```
 
 回填要求：
@@ -369,9 +369,9 @@ node scripts/codex-automation-loop.mjs record-delivery-run --delivery-file .work
 
 ```text
 node scripts/codex-automation-loop.mjs review-results --group CDTDA-RETURN-SMOKE-20260531 --json
-node scripts/codex-automation-loop.mjs build-controller-return --group CDTDA-RETURN-SMOKE-20260531 --last-completed-target AlembicTest-IDE --last-task-id CDTDA-RETURN-SMOKE-001 --control-plan .workspace-active/workspace/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --return-reason smoke --require-thread --write --json
+node scripts/codex-automation-loop.mjs build-controller-return --group CDTDA-RETURN-SMOKE-20260531 --last-completed-target AlembicTest-IDE --last-task-id CDTDA-RETURN-SMOKE-001 --control-plan .wakeflow-active/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --return-reason smoke --require-thread --write --json
 codex_app.send_message_to_thread -> current AlembicWorkspace thread received controller-return codex_delegation
-node scripts/codex-automation-loop.mjs record-delivery-run --delivery-file .workspace-local/codex-automation-loop/delivery-envelopes/controller-return-CDTDA-RETURN-SMOKE-20260531__AlembicTest-IDE__CDTDA-RETURN-SMOKE-001.json --status sent --readback-ok true --evidence "controller-return arrived in current AlembicWorkspace thread as codex_delegation for CDTDA-RETURN-SMOKE-20260531 / CDTDA-RETURN-SMOKE-001" --write --json
+node scripts/codex-automation-loop.mjs record-delivery-run --delivery-file .wakeflow-local/codex-automation-loop/delivery-envelopes/controller-return-CDTDA-RETURN-SMOKE-20260531__AlembicTest-IDE__CDTDA-RETURN-SMOKE-001.json --status sent --readback-ok true --evidence "controller-return arrived in current AlembicWorkspace thread as codex_delegation for CDTDA-RETURN-SMOKE-20260531 / CDTDA-RETURN-SMOKE-001" --write --json
 node --test scripts/codex-automation-loop.test.mjs
 ```
 
@@ -414,7 +414,7 @@ node --test scripts/codex-automation-loop.test.mjs
 - 不启动长期无人值守 automation。
 - 不派产品仓库。
 - 不修改 `AlembicTest` 文件。
-- 不清理历史 `.workspace-local` runtime。
+- 不清理历史 `.wakeflow-local` runtime。
 
 下一处真实阻塞点：
 
@@ -428,8 +428,8 @@ node --test scripts/codex-automation-loop.test.mjs
 
 ```text
 node scripts/codex-automation-loop.mjs keep-live-state --automation-run-id CDTDA-CONTINUOUS-SMOKE-20260531 --status running --mechanism manual --write --json
-node scripts/codex-automation-loop.mjs create-dispatch --target-window AlembicTest-IDE --task-id CDTDA-CONTINUOUS-SMOKE-001 --group CDTDA-CONTINUOUS-SMOKE-20260531 --control-plan .workspace-active/workspace/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --objective "Continuous automation direct-thread smoke with keep-live and no-task exit" --prompt-file /private/tmp/cdtda-continuous-smoke-prompt-20260531.txt --evidence "TargetResultEnvelope plus controller-return envelope plus current controller readback" --write --json
-node scripts/codex-automation-loop.mjs build-delivery --packet-file .workspace-local/codex-automation-loop/dispatch-packets/CDTDA-CONTINUOUS-SMOKE-20260531__AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json --return-route controller --automation-enabled --require-thread --busy-policy append-if-steerable --write --json
+node scripts/codex-automation-loop.mjs create-dispatch --target-window AlembicTest-IDE --task-id CDTDA-CONTINUOUS-SMOKE-001 --group CDTDA-CONTINUOUS-SMOKE-20260531 --control-plan .wakeflow-active/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --objective "Continuous automation direct-thread smoke with keep-live and no-task exit" --prompt-file /private/tmp/cdtda-continuous-smoke-prompt-20260531.txt --evidence "TargetResultEnvelope plus controller-return envelope plus current controller readback" --write --json
+node scripts/codex-automation-loop.mjs build-delivery --packet-file .wakeflow-local/codex-automation-loop/dispatch-packets/CDTDA-CONTINUOUS-SMOKE-20260531__AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json --return-route controller --automation-enabled --require-thread --busy-policy append-if-steerable --write --json
 codex_app.send_message_to_thread -> AlembicTest-IDE readback observed DIRECT_THREAD_CONTINUOUS_TARGET_ACK CDTDA-CONTINUOUS-SMOKE-001 AlembicTest-IDE
 node scripts/codex-automation-loop.mjs review-results --group CDTDA-CONTINUOUS-SMOKE-20260531 --json
 codex_app.send_message_to_thread -> current AlembicWorkspace thread received controller-return codex_delegation
@@ -439,12 +439,12 @@ node scripts/codex-automation-loop.mjs stop-loop --reason "CDTDA continuous smok
 
 本地 runtime 证据（测试时已生成并复核；随后按 Stage 5 cleanup 删除，不再长期保留）：
 
-- target delivery-run：`.workspace-local/codex-automation-loop/delivery-runs/run-delivery-CDTDA-CONTINUOUS-SMOKE-20260531__AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json`
-- target result：`.workspace-local/codex-automation-loop/target-results/AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json`
-- controller-return envelope：`.workspace-local/codex-automation-loop/delivery-envelopes/controller-return-CDTDA-CONTINUOUS-SMOKE-20260531__AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json`
-- controller-return delivery-run：`.workspace-local/codex-automation-loop/delivery-runs/run-controller-return-CDTDA-CONTINUOUS-SMOKE-20260531__AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json`
-- keep-live state：`.workspace-local/codex-automation-loop/keep-live/state.json`
-- stop marker：`.workspace-local/codex-automation-loop/stop.json`
+- target delivery-run：`.wakeflow-local/codex-automation-loop/delivery-runs/run-delivery-CDTDA-CONTINUOUS-SMOKE-20260531__AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json`
+- target result：`.wakeflow-local/codex-automation-loop/target-results/AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json`
+- controller-return envelope：`.wakeflow-local/codex-automation-loop/delivery-envelopes/controller-return-CDTDA-CONTINUOUS-SMOKE-20260531__AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json`
+- controller-return delivery-run：`.wakeflow-local/codex-automation-loop/delivery-runs/run-controller-return-CDTDA-CONTINUOUS-SMOKE-20260531__AlembicTest-IDE__CDTDA-CONTINUOUS-SMOKE-001.json`
+- keep-live state：`.wakeflow-local/codex-automation-loop/keep-live/state.json`
+- stop marker：`.wakeflow-local/codex-automation-loop/stop.json`
 
 回填要求：
 
@@ -469,14 +469,14 @@ node scripts/codex-automation-loop.mjs stop-loop --reason "CDTDA continuous smok
 
 主线动作：
 
-- 清空 `.workspace-local/codex-automation-loop/dispatch-packets`。
-- 清空 `.workspace-local/codex-automation-loop/delivery-envelopes`。
-- 清空 `.workspace-local/codex-automation-loop/delivery-runs`。
-- 清空 `.workspace-local/codex-automation-loop/target-results`。
-- 清空 `.workspace-local/codex-automation-loop/prompts`。
-- 删除 `.workspace-local/codex-automation-loop/keep-live/state.json`。
-- 删除 `.workspace-local/codex-automation-loop/stop.json`。
-- 删除旧一次性窗口登记 `.workspace-local/codex-automation-loop/thread-registry/AlembicTest-IDE039.json`。
+- 清空 `.wakeflow-local/codex-automation-loop/dispatch-packets`。
+- 清空 `.wakeflow-local/codex-automation-loop/delivery-envelopes`。
+- 清空 `.wakeflow-local/codex-automation-loop/delivery-runs`。
+- 清空 `.wakeflow-local/codex-automation-loop/target-results`。
+- 清空 `.wakeflow-local/codex-automation-loop/prompts`。
+- 删除 `.wakeflow-local/codex-automation-loop/keep-live/state.json`。
+- 删除 `.wakeflow-local/codex-automation-loop/stop.json`。
+- 删除旧一次性窗口登记 `.wakeflow-local/codex-automation-loop/thread-registry/AlembicTest-IDE039.json`。
 - 保留当前职责窗口 thread registry 和 window-config，以保证后续 direct-thread delivery 仍可直接使用。
 
 合并 TODO：
@@ -575,14 +575,14 @@ node scripts/codex-automation-loop.mjs status --json
   - 不能推出的结论：不能推出产品仓库功能正确、不能推出所有平台通用。
   - 停止或不开始条件：thread id 未登记、host thread-send capability 不可用、delivery-run evidence 无法记录；automation-enabled smoke 还要求 keep-live state 可记录并有明确无任务退出边界。
 - 测试单：无。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：不涉及真实项目。
 
 ## 回填区
 
 - 2026-05-31 21:05 CST：总控接收 `CODEX-DIRECT-THREAD-DISPATCH-2026-05-31`。已读取 Design original-plan / requirement-design / code-fact-review；确认本需求接续 closed-loop transport 优化，不重建派发协议，不打断 038/039 产品主线；本轮按用户在 Design 侧确认只落实文档，不直接改代码。
 - 2026-05-31 21:18 CST：用户进一步裁决旧投递路线可以直接清理；总控将 Stage 0 文档目标改为 `direct-thread only + fail closed`，并把代码中旧 transport 清理留到后续代码阶段。
-- 2026-05-31 21:18 CST：Stage 0 文档契约落实完成。已更新 `README.md`、`AGENTS.md`、`skills/dev/codex-automation-target/SKILL.md`、`skills/dev/codex-automation-controller/SKILL.md`、`skills/dev/control-workspace-governance/references/codex-automation-loop.md`、`skills/dev/control-workspace-governance/references/control-architecture.md`、当前计划和 global TODO；已同步根 `AGENTS.md` 与当前计划索引；`node scripts/verify-control-center.mjs`、`node scripts/sync-current-plan.mjs --plan .workspace-active/workspace/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --check --json` 均通过；active automation docs/skills/current plan 中已无旧投递关键字匹配。
+- 2026-05-31 21:18 CST：Stage 0 文档契约落实完成。已更新 `README.md`、`AGENTS.md`、`skills/dev/codex-automation-target/SKILL.md`、`skills/dev/codex-automation-controller/SKILL.md`、`skills/dev/control-workspace-governance/references/codex-automation-loop.md`、`skills/dev/control-workspace-governance/references/control-architecture.md`、当前计划和 global TODO；已同步根 `AGENTS.md` 与当前计划索引；`node scripts/verify-control-center.mjs`、`node scripts/sync-current-plan.mjs --plan .wakeflow-active/current/codex-direct-thread-dispatch-workspace-plan-2026-05-31.md --check --json` 均通过；active automation docs/skills/current plan 中已无旧投递关键字匹配。
 - 2026-05-31 21:23 CST：用户补充裁决：线程投递作为正常工作流水线；若开启自动化，走 continuous / infinite automation 并开启 keep-live。总控据此补充 Stage 0 文档契约：direct dispatch 是普通流水线；automation-enabled 才进入持续闭环；keep-live 是无人值守运行支撑，不是投递 transport 或验收证据。
 - 2026-05-31 21:27 CST：按用户要求继续推进“子窗口的文件配置”完整设计。新增 `skills/dev/control-workspace-governance/references/direct-thread-window-config.md`，并更新 governance skill、automation loop reference、control architecture reference 和 scripts README；明确 v2 thread registry、derived window-config、direct DeliveryEnvelope v2、delivery-runs、keep-live state、legacy schedule / codexAutomation 禁止项和实现 checklist。本轮仍不改脚本实现、不写 raw thread id、不创建 runtime 文件。
 - 2026-05-31 21:43 CST：Stage 2 runtime contract 实现完成。`scripts/codex-automation-loop.mjs` 已支持 `CodexWindowThreadRegistration` v2、`build-window-config`、v2 direct `DeliveryEnvelope` / `ControllerReturnEnvelope`、`record-delivery-run`、`keep-live-state`，并移除公开 `include-thread-id` / legacy schedule / `codexAutomation` 输出路径；controller / target skill、script pipeline 和安装脚本子窗口 access-card 口径已切到 direct-thread delivery。聚焦验证通过：`node --test scripts/codex-automation-loop.test.mjs`（16/16 pass，含 legacy `deliveryRole` 兼容）、`node --test scripts/check-dispatch-coverage.test.mjs scripts/check-test-boundary.test.mjs`（11/11 pass）。未启动真实 automation，未投递真实线程，未写 raw thread id。

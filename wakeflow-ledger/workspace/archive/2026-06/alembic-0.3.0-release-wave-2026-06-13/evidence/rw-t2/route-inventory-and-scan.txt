@@ -1,0 +1,35 @@
+RW-t2 A3 route deletion — inventory + import scan (2026-06-13)
+
+ROUTE INVENTORY
+  before (11): auth daemon evolution guard health jobs knowledge modules panorama search skills
+  after  (9):  auth daemon guard health jobs knowledge modules search skills
+  deleted: evolution.ts, panorama.ts (+ panorama-only test PresentationRoutes.test.ts)
+
+REQUIRED-ROUTE CONTRACT (CODEX_EMBEDDED_RUNTIME_REQUIRED_ROUTES, 8): health, daemon/health,
+  jobs, jobs/bootstrap, jobs/rescan, search, skills, knowledge — neither evolution nor panorama present.
+
+FRESH 5-REPO CONSUMER SCAN (dynamic import( + HTTP path literals; excl node_modules/dist/.git/vendor):
+  importers of routes/evolution|routes/panorama:
+    - AlembicPlugin/lib/http/HttpServer.ts (the mount — removed)
+    - AlembicPlugin/test/unit/PresentationRoutes.test.ts (panorama only — removed)
+    - Alembic (main) HttpServer.ts + PresentationRoutes.test.ts — main repo twins, STAY (contract I22)
+  HTTP path-literal consumers of /panorama + /evolution:
+    - AlembicDashboard/src/api.ts (relative baseURL '/api/v1') → reaches the MAIN Alembic daemon,
+      whose routes are contract-mounted (provider-contracts.ts I22, lines 540-541). NOT the plugin.
+    - AlembicAgent: none. AlembicCore: only service-layer panorama units (unrelated).
+  CONCLUSION: zero consumer of the PLUGIN HTTP twins. Byte-identical-twin premise (RC4/AD2 A3) confirmed.
+
+BEHAVIOR-NEUTRALITY: MCP alembic_panorama tool (lib/runtime/mcp/handlers/panorama.ts) imports only
+  envelope + McpContext — independent of the deleted HTTP routes. PanoramaService capability untouched.
+  Served MCP wire surface (tools/list + callTool) byte-stable: diff -rq p5t4-probe rwt2-final = exit 0.
+
+GATES (unified tree, clean rebuild): suite 2459/2459 (164 files; -5 panorama-route tests, -1 file vs
+  2464/165); npm run check exit 0; validate --strict PASS; verify:codex-plugin PASS; cross-shell drift
+  PASS; smoke ok:true. Git-recoverable (git rm; revert restores).
+
+SN5-RESIDUE FOUND+FIXED (verification script, behavior-neutral): scripts/smoke-codex-plugin.mjs:114
+  used join(packageRoot,'dist','lib','codex','mcp','CodexMcpServer.js') — split path segments the SN5
+  codemod path-string rule structurally could not catch (it rewrites '/'-bearing string literals, not
+  segmented join() args; sibling line 255 string literal WAS updated). Corrected 'codex'->'runtime'.
+  Unrelated to the A3 deletion; surfaced because smoke is in this task's proof set. Lesson: SN-style
+  codemods must also sweep path.join() segment-array forms, not only slash-bearing literals.

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-p1",
+  "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-t1",
+  "status": "completed",
+  "summary": "AlembicCore P1/P2 Plan authority repair completed in commit fe563ee8c6611a32714cef2bc328ca2ee08114c0. Core Plan draft packaging is facts-only: buildPlanDraftInformationPackage no longer emits authoritative PlanIntent or maps recommendedDimensions/dimensionOrder into dimensions/stages/moduleBindings/scale. PlanRepository draft save now writes a plugin-collected-facts placeholder intent and stop-writes planning_brief_json; confirm requires a complete Agent-authored PlanIntent and rationale, normalizes draftSource to host-agent, validates dimensions, stages, moduleBindings, scale/budgets, plannedNextActions, and evidenceRefs, and keeps generation state as read-time projection. Added canonical confirmed-Plan dimension resolution API resolvePlanDimensionDefinitions through domain/dimension, public dimensions export, and BaseDimensions adapter so downstream generation can resolve confirmed Plan ids without legacy resolveActiveDimensions/no-signal shrinkage. Updated characterization tests for facts-only draft, required complete confirm payload, persisted complete intent, read-time generation-state projection, and confirmed Plan id dimension resolution.",
+  "evidenceRefs": [
+    "AlembicCore commit fe563ee8c6611a32714cef2bc328ca2ee08114c0 (Enforce plan authority contracts)",
+    "Changed files: src/service/planLedger/contracts.ts; src/service/planLedger/planLedger.ts; src/repository/plan/PlanRepository.ts; src/domain/dimension/DimensionRegistry.ts; src/domain/dimension/index.ts; src/dimensions.ts; src/workflows/capabilities/planning/dimensions/BaseDimensions.ts; test/PlanLedgerProjection.test.ts; test/DimensionPlanningDynamicSignals.test.ts",
+    "API/export changes: PlanDraftInformationPackage.intent removed; PlanDraftInformationPackage now carries draftSource/planningBrief/sourceReports facts; SavePlanDraftInput.intent removed; ConfirmPlanInput.intent required and intentPatch removed; PlanDraftSource emits plugin-collected-facts/host-agent/test-fixture; resolvePlanDimensionDefinitions exported from src/dimensions.ts and domain/dimension/index.ts with BaseDimensions adapter.",
+    "Downstream migration instructions: AlembicPlugin/Alembic draft consumers must stop reading draftPackage.intent and read factual sourceReports/planningBrief instead; confirm callers must send full PlanIntent plus rationale rather than selectedDimensions/intentPatch/inherited draft fields; generation scope must use confirmed Plan dimension ids through resolvePlanDimensionDefinitions and must not call resolveActiveDimensions for confirmed generation scope; planningBrief persistence/signature consumers must migrate away because Core stop-writes planning_brief_json."
+  ],
+  "verification": [
+    "PASS: npm run build:check",
+    "PASS: npm run lint",
+    "PASS: npx vitest run test/PlanLedgerProjection.test.ts test/DimensionPlanningDynamicSignals.test.ts (2 files, 9 tests)",
+    "PASS: npm run test (135 files, 1377 tests)",
+    "PASS: git diff --check before commit",
+    "PARTIAL/EXPECTED BLOCKER: npm run check passed build:check, lint:public-api-boundary, lint:layer-contract, lint:consumer-core-imports, smoke:public-api, check:output-budgets, check:space-edges, lint:doctrine, then failed at existing lint:naming on src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts (not modified by this task).",
+    "BLOCKED TOOL CHECK: Alembic alembic_prime and alembic_code_guard both failed with internal schema validation/CODEX_MCP_ERROR before returning guard results."
+  ],
+  "risks": [
+    "AlembicPlugin and Alembic downstream code still need their assigned migration: full confirm payload schema/tool text, selectedDimensions/testMode overlay cleanup, generation-gate consumption of confirmed Plan ids, and no public escape valves.",
+    "Legacy resolveActiveDimensions remains exported for current non-generation consumers; Core provides the new canonical API but does not edit downstream repositories in this task boundary.",
+    "npm run check cannot complete until pre-existing kebab-case naming lint files are resolved or blessed outside this task scope.",
+    "Alembic prime/guard MCP surface returned internal schema errors, so no Alembic guardRef was produced; local repository checks and tests were used as validation evidence."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1p2-core-plan-authority-dimension-canonical-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-t1.json",
+    "deliveryRunId": "run-delivery-p1p2-core-plan-authority-dimension-canonical-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-t1",
+    "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 3,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-p1",
+    "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-p1",
+    "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-t1",
+    "createdAt": "2026-06-22T12:14:38.173Z"
+  },
+  "createdAt": "2026-06-22T12:14:38.173Z",
+  "stateRevisionObserved": 3,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

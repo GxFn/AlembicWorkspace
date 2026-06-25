@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "tc-20260620153436-0031",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "fromRevision": 31,
+  "candidateState": "accepting",
+  "reason": "All target results are present; total-control acceptance/rework decision is required.",
+  "reviewStatus": "ready-for-controller-review",
+  "readyResultIds": [
+    "tr-AP-7"
+  ],
+  "blockedResultIds": [],
+  "missingResultIds": [],
+  "reviewScope": "open-controller-review-targets",
+  "targetTaskIds": [
+    "AP-7"
+  ],
+  "excludedTargetTaskIds": [
+    "AP-0",
+    "AP-1",
+    "AP-2",
+    "AP-3",
+    "AP-4",
+    "AP-5",
+    "AP-6"
+  ],
+  "allowedDecisions": [
+    "accept",
+    "rework",
+    "blocked"
+  ],
+  "evidenceRefs": [
+    "injection point (main): SessionExecutionBuilder.ts:111 buildBootstrapSessionRunInput (currently passes NO execution → session defaults to children[0].input.execution) + AgentRunInputBuilders.ts:141 (child execution block) /198 (execution param) /254 (session execution = execution || children[0]) ; agentService.run at AiDimensionSessionRunner.ts:282 (FC4)",
+    "propagation chain (AlembicAgent read-only, corroborated by AP-0/FC3): AgentService.ts:187 buildRuntimeOptions extracts input.execution.groundingEnforcement → :97 runtime.execute → AgentRuntime.ts:259 #groundingEnforcement (reset per execute) → :597 LoopContext.groundingEnforcement ?? #groundingEnforcement → :1605 #processTextResponse: ctx.groundingEnforcement==='guard' ? evaluateAnalyzeTextGroundingGate : no-block",
+    "concurrency SAFE (self-verified in AlembicAgent): AgentService.run:45 → runtimeBuilder.build():81 builds NEW AgentRuntime per call; AgentService.ts:61 runChild=this.run (recursive); AgentRunCoordinator.run:44 → partition:56 → runChildren Promise.all:85 → each child = agentService.run(childInput) → own runtime. AgentRunCoordinator:366 execution:input.execution copies parent execution to all children (session-level).",
+    "trigger gap: AP-0/FC4 (tr-ap-0.json) 'PCVM/Test 无 TS 消费（仅 markdown skill）'; repo-wide grep: NO groundingEnforcement/guard config flag in config|lib/service; only session run-type signals = preparation.view.mode (pipelineMode 'bootstrap'|'rescan', AiDimensionFinalizer.ts:247) + preparation.isIncremental (AiDimensionPreparation.ts:37)",
+    "design scope: Design/docs/current/alembic-agent-pcv-observe-only-boundary-2026-06-20.md line 37 (non-empty switch = ≥1 wired quality-run path) / 64 (guard=restore analyze block+nudge) / 87-88 (PCVM/Test participates) / 137-139+166 (injection point AP-0 verify/AP-7 land) / 243-244 (PD6/PD7)",
+    "target-results/tr-AP-7.json"
+  ],
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "transition-candidate",
+    "source": "wakeflow-state",
+    "command": "reduce-results",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 31,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "candidateId": "tc-20260620153436-0031",
+    "createdAt": "2026-06-20T15:34:36.123Z"
+  },
+  "forbiddenConclusions": [
+    "transition-candidate-is-acceptance",
+    "reducer-decision-closes-task-package",
+    "reducer-decision-creates-next-dispatch"
+  ]
+}

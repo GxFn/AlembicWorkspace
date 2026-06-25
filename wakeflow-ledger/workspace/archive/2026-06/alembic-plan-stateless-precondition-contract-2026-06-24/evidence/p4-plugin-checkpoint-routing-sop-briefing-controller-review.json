@@ -1,0 +1,98 @@
+{
+  "kind": "ControllerAcceptanceEvidence",
+  "version": 1,
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p4-plugin-checkpoint-routing-sop-briefing-p1",
+  "targetTaskId": "p4-plugin-checkpoint-routing-sop-briefing-t1",
+  "targetWindow": "AlembicPlugin",
+  "decision": "accept-target-result",
+  "reviewedAt": "2026-06-24T01:31:40Z",
+  "originalRequirementAuthority": [
+    "Design/docs/current/alembic-plan-stateless-precondition-contract-2026-06-24.md#P4",
+    "Design/docs/current/alembic-plan-stateless-precondition-contract-workspace-handoff-2026-06-24.md",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/task-packages/p4-plugin-checkpoint-routing-sop-briefing-p1.json"
+  ],
+  "targetEvidenceReviewed": [
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/target-results/tr-p4-plugin-checkpoint-routing-sop-briefing-t1.json",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p4-plugin-checkpoint-routing-sop-briefing-t1.md",
+    "AlembicPlugin commit 1d17f0f833ee2704d30f7b1bd9cf9816f982b54b",
+    "AlembicCore commit 1bac46009524e03ce6b90bf69367a608613c750c"
+  ],
+  "implementationReality": {
+    "commit": "1d17f0f833ee2704d30f7b1bd9cf9816f982b54b",
+    "changedFiles": [
+      "lib/recipe-generation/evolution/git-diff-checkpoint/DurableGitDiffCheckpointRouting.ts",
+      "lib/recipe-generation/host-agent-workflows/cold-start.ts",
+      "lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+      "lib/recipe-generation/plan-generation-gate.ts",
+      "test/unit/GitDiffCheckpoint.test.ts",
+      "test/unit/PlanSelectionGateStateless.test.ts"
+    ],
+    "checkpointRouting": "Plugin checkpoint runtime imports Core createCurrentGitHeadBaselineProvider and passes it into GitDiffCheckpointService; local readCurrentHeadCommit and execFileSync HEAD reader were removed.",
+    "planSelectionAuthority": "PlanGenerationGateReady now carries normalized planSelection; selectPlanDimensions returns planSelection.dimensions without caller/testMode/moduleBinding narrowing; applyPlanGateToProjectAnalysisIntent sets intent.dimensionIds from gate.planSelection.dimensions.",
+    "briefingDerivation": "cold-start selects ProjectContext dimensions from input.planGate.planSelection.dimensions before buildProjectContextMissionBriefing; rescan builds intent dimensions from planGate.planSelection.dimensions and then builds mission briefing from the selected dimensions.",
+    "planOutputBoundary": "alembic_plan allowed business fields are agentDecisionChecklist, candidateDimensions, nextActions, operation, planDiagnostics, planSelection, projectInfoTree, projectRoot, warnings; missionBriefing, sop, analysisGuide, sourceReports and legacy plan fields are absent."
+  },
+  "controllerVerification": [
+    {
+      "command": "git -C AlembicPlugin status --short && git -C AlembicPlugin rev-parse HEAD",
+      "result": "clean; HEAD 1d17f0f833ee2704d30f7b1bd9cf9816f982b54b"
+    },
+    {
+      "command": "git -C AlembicCore rev-parse HEAD",
+      "result": "1bac46009524e03ce6b90bf69367a608613c750c"
+    },
+    {
+      "command": "npm run test:unit -- test/unit/GitDiffCheckpoint.test.ts test/unit/PlanSelectionGateStateless.test.ts test/unit/PlanDraftTwoBlockProjector.test.ts test/unit/PlanConfirmStatelessSelection.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts",
+      "cwd": "AlembicPlugin",
+      "result": "passed: 5 files, 37 tests; includes real temporary git repository route through createPluginGitDiffCheckpointRuntime with initializationSource current-head, and planSelection dimensions driving cold-start briefing SOP guides"
+    },
+    {
+      "command": "npm run build:check",
+      "cwd": "AlembicPlugin",
+      "result": "passed; Core build used ../AlembicCore @ 1bac46009524e03ce6b90bf69367a608613c750c"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "AlembicPlugin",
+      "result": "passed; Core build used ../AlembicCore @ 1bac46009524e03ce6b90bf69367a608613c750c"
+    },
+    {
+      "command": "npm run smoke:codex-plugin",
+      "cwd": "AlembicPlugin",
+      "result": "passed; runtime package boundary, startup runtime, install, shell bootstrap, and stdio passed"
+    },
+    {
+      "command": "npm run check",
+      "cwd": "AlembicPlugin",
+      "result": "passed with 17 pre-existing unrelated Biome warnings in host-adapter/script files; typecheck, core-import-boundary, layer-boundary, shared-asset drift, cross-shell drift, doctrine, and naming passed"
+    },
+    {
+      "command": "git diff --check && rg -n \"getActiveConfirmed|PlanRepository|active confirmed|activeConfirmed|baselineProvider: \\\\{|readCurrentHeadCommit|routePlanTool\" lib/recipe-generation/evolution lib/recipe-generation/host-agent-workflows lib/recipe-generation/plan-generation-gate.ts lib/runtime/mcp/handlers/host-agent lib/runtime/mcp/host || true",
+      "cwd": "AlembicPlugin",
+      "result": "passed; no matches in checkpoint/generation gate/workflow paths"
+    },
+    {
+      "command": "node dist allow-list probe",
+      "cwd": "AlembicPlugin",
+      "result": "alembic_plan forbiddenPresent=[] for missionBriefing, sop, analysisGuide, sourceReports, plan, planState, planView, planningBrief, projectContextSignature, signature"
+    }
+  ],
+  "blockers": [],
+  "missingEvidence": [],
+  "residualRisks": [
+    "alembic_code_guard MCP surface failed in the target window with CODEX_MCP_ERROR / unrecognized key data; controller did not receive guard findings. This is a guard-surface issue, not evidence of a product-code blocker for this P4 package.",
+    "P5 real-project BiliDili e2e remains outstanding and is the next requirement phase."
+  ],
+  "todoBacklogRollup": {
+    "close": [
+      "P4 Plugin checkpoint current-head consumer wiring",
+      "P4 Plugin generation-time SOP/missionBriefing derivation from planSelection dimensions",
+      "P4 Plugin plan output boundary check excluding SOP/missionBriefing"
+    ],
+    "remaining": [
+      "P5 Test rewrite / BiliDili e2e acceptance for stateless draft -> confirm -> execute chain and no plans table"
+    ]
+  },
+  "nextAction": "Accept p4-plugin-checkpoint-routing-sop-briefing-p1, render progress, then create and dispatch the authorized P5 Test package if no blocker appears."
+}

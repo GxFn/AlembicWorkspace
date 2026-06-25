@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-3g-design",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-3g-design-shared-workspace-io-structure",
+  "dispatchGroup": "dh3g-design-structure",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "Design",
+  "targetTaskId": "DH-3g-design",
+  "status": "completed",
+  "summary": "DH-3g-design 结构裁决（Design / option-planning，未改任何产品代码、未派发、未改控制器状态）。一手核读 AlembicPlugin HEAD a297e9d 的 L3 adapter + 共享 I/O 源。\n\n【核心更正】DH-3f KEEP 清单把 cc/codex 共享的 workspace-identity I/O 簇标为「真 host-specific」是误分类——代码证明其为 host-agnostic（shape-aware）共享实现：resolveCodexProjectRoot 统一读全部 host env 家族（ALEMBIC_PROJECT_DIR/CODEX_WORKSPACE_*/CLAUDE_PROJECT_DIR，ProjectRootResolver.ts:279-285）函数体内零 host-name 分支；runtime env 由 detectPluginHostShape 物理 shell 形态派生（RuntimeContext.ts:53/70）非硬编码 codex；两 adapter 逐行委托同一批 free function 且 cc 委托同样得对 cc 行为=独立证实共享。→「委托外观」不是要清除的 facade，而是 L3 adapter 委托 L1 共享逻辑（合法分层）；「物理迁入 CodexHostAdapter」的前提建立在 Codex* 误命名上、会破 cc 共享并错层。\n\n【4 候选裁决】(i) 保持委托=分层正确（推荐其结构）；(ii) shared-base 基类=解伪 DRY 问题、增继承耦合、否决；(iii) cc 委托 codex 单例=重编码 codex-centric 不对称、与需求顶层目标冲突、否决；(iv) 各自复制=主动制造重复、易漂移、否决。\n\n【推荐】否决物理迁入（错误操作）。但「原样含 Codex 误命名 = DH-3 DONE」不严格成立（DH-3 完成定义含 de-Codex 清零，本簇仍带误命名、被 DH-3f 误 KEEP）。DH-3 正确收尾 = 派 DH-3g「shared workspace-identity 簇 de-Codex + 确认 L1 归位」执行 pass（非物理迁入）：剥真 host-agnostic 成员的 cosmetic Codex 前缀、两 adapter 委托新名。属已决⑥原始 RC-3b 范围非追加 scope，且为 DH-3f 已验证安全的改名类（风险远低于迁入/基类）。完成即 DH-3 DONE。\n\n【执行要点已落文档 §6】A=de-Codex 符号清单（ProjectRootResolver/RuntimeContext）；B=KEEP 边界防过界（落盘文件名 codex-init.json/codex-project-root.json、profile 值 'codex-plugin'、含 CODEX 的 env 值、MCP error codes=wire/persistence-frozen；CODEX_PLUGIN_HOST host-label、alembic-codex shell 产物标识、isCodexPluginCachePath、resolveCodexPluginRoot 回退=真 host/L4-specific 保留；用户可见 \"Codex\" 文案=CC3 不在本需求）；C=wire-byte 与本簇正交（清单读路径不在本簇）；D=验证口径同 DH-3f（失败集 vs a297e9d IDENTICAL）。\n\n控制器最终裁断：(a) 派 §6 的 de-Codex pass（推荐），或 (b) 裁定 (i) 原样=DH-3 DONE 并把本簇 de-Codex 折叠 DH-5（须同改 DH-3f KEEP 理由为「host-agnostic、de-Codex 待办」）。Design 不替控制器定最终范围。",
+  "evidenceRefs": [
+    "Design/docs/current/alembic-plugin-dual-host-shared-workspace-io-structure-option-planning-2026-06-20.md（完整裁决：决定/系统形态/4候选 option-format/对比表/推荐/§6 执行要点/§7 须确认项/§8 ADR 候选）",
+    "核读 AlembicPlugin@a297e9d: lib/runtime/host-adapter/{HostAdapter.ts,CodexHostAdapter.ts,ClaudeCodeHostAdapter.ts,resolveHostAdapter.ts}",
+    "核读 lib/runtime/ProjectRootResolver.ts:76-292（resolveCodexProjectRoot 统一读 ALEMBIC_PROJECT_DIR/CODEX_WORKSPACE_*/CLAUDE_PROJECT_DIR、:217-271 marker I/O 经 Core WorkspaceResolver、文件名 codex-init.json/codex-project-root.json 冻结）",
+    "核读 lib/runtime/runtime/RuntimeContext.ts:47-117（ensureCodexRuntimeEnvironment/resolveHostRuntimeContext 由 detectPluginHostShape 派生、CODEX_SETUP_PROFILE='codex-plugin' 冻结、CODEX_PLUGIN_HOST='codex' label）",
+    "上游触发: target-results/tr-dh-3f.json（physical-migration flag + 误 KEEP 分类）",
+    "需求设计: Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md（5 层架构、RC-3b de-Codex、已决⑥、CC3 划界、F-V2-2）"
+  ],
+  "verification": [
+    "Design 边界遵守：只读未改任何产品代码、未派发实现、未改 Wakeflow 控制器状态/TODO/state root",
+    "结论基于一手代码核读（非凭 DH-0/DH-3f 转述）——独立证实 cc/codex 共享 + 共享簇 host-agnostic",
+    "范围核验：推荐的 de-Codex 属已决⑥原始 RC-3b 范围（非从代码证据追加 scope）；物理迁入前提被证为基于误命名故否决",
+    "未做产品 build/test（Design 边界）；推荐的 DH-3g 验证口径=失败集 vs 基线 a297e9d IDENTICAL，由 AlembicPlugin 窗口执行时验证"
+  ],
+  "risks": [
+    "最终范围决定属控制器/用户（Design 仅出推荐）：(a) 派 de-Codex pass 或 (b) 裁定原样=DH-3 DONE+折叠 DH-5；若选 (b) 须同步更正 DH-3f KEEP 理由避免落档不准",
+    "推荐的 de-Codex 是改名 pass，须严守 §6.B KEEP 边界：落盘文件名/profile 值/含 CODEX 的 env 值/MCP error codes 不可动，否则破 wire/persistence 兼容",
+    "isCodexPluginCachePath 只挡 codex 插件缓存、cc 无等价保护=真 host-specific 缺口，建议归 DH-5/DH-6 加固、不混入 DH-3g de-Codex pass",
+    "若 DH-3g 执行时发现某成员实为 host-name 字面分支或 host 专属落盘格式（当前核读未见），该成员应留 host-specific 不 de-Codex",
+    "用户可见 'Codex' 文案属 CC3（不在本需求）——DH-3g 只改符号不改用户串，勿与 RC-3b 符号 de-Codex 混淆"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh3g-design-structure__Design__DH-3g-design",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3g-design-structure__Design__DH-3g-design.json",
+    "deliveryRunId": "run-delivery-dh3g-design-structure__Design__DH-3g-design",
+    "dispatchGroup": "dh3g-design-structure",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3g-design-structure__Design__DH-3g-design.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 43,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-3g-design-shared-workspace-io-structure",
+    "targetTaskId": "DH-3g-design",
+    "targetWindow": "Design",
+    "dispatchGroup": "dh3g-design-structure",
+    "resultId": "tr-DH-3g-design",
+    "createdAt": "2026-06-20T06:56:52.344Z"
+  },
+  "createdAt": "2026-06-20T06:56:52.344Z",
+  "stateRevisionObserved": 43,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

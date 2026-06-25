@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "dh-2-l3-hostadapter-interface-codex-migration",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "summary": "DH-2 建 L3 HostAdapter 接口 + codex 实现迁入（RC-2，行为不变）。AlembicPlugin 基线 6cd4c88，直提 main。抽 HostAdapter 接口（项目根/workspace init/runtime env/execution/MCP server 生命周期/diagnostics 方法集）+ 现有 codex 真 host-specific 逻辑迁入 CodexHostAdapter 并经其走（codex 单实现、逐行等价、非死代码）。DH-2→3 硬序：不建 cc adapter、不做 host-aware 选择/L2 host 分派、不做 52 de-Codex 改名、不动 per-host 产物/cc 子模块（DH-3/DH-4）。完成=接口被 codex 真实消费 + 行为逐行等价 + tsc 绿 + 受影响测试绿 + 失败集 vs 基线 IDENTICAL + 非强进程不变量 + commit hash。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (RC-2 + ### L3 HostAdapter 接口建议方法集 + ### DH 可执行细化 真 host-specific ~40→L3) + wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md (⑤ true L3≈5 files) + DH-1 验收 evt-20260620033355-0013",
+  "createdAt": "2026-06-20T03:36:02.954Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-2",
+      "taskPackageId": "dh-2-l3-hostadapter-interface-codex-migration",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-2 建 L3 HostAdapter 接口 + codex 实现迁入（RC-2，先对齐现状、**不改行为**）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `6cd4c88` = DH-1 后；纯 MCP 非强进程）。**直提 main，不开分支。**\n\n**前置（DH-1 已验收）**：host identity 已由物理 shell 形态派生（`detectPluginHostShape`/`derivePluginHostFromShape`/`CLAUDE_CODE_PLUGIN_HOST`，RuntimeContext 为单一来源）；generic-host-agent 已删（AGENT_HOSTS=codex+claude-code）。DH-2 在此之上建 L3 适配层骨架。\n\n**DH-2→DH-3 硬序（关键边界）**：DH-2 **只**「建接口 + codex 实现迁入、行为逐行等价」。**不**建 cc adapter、**不**做 host-aware 选择（codex/cc 二选一）/L2 host 分派、**不**做 52 个误命名 de-Codex 改名、**不**动 per-host 产物 / cc 子模块 alembic-claude-code（分属 DH-3/DH-4）。先替代/对等、不裸断、每步门禁绿。\n\n**范围（RC-2）**：\n1. **抽 `HostAdapter` 接口**（host-agnostic 契约，方法集按需求设计）：项目根 `resolveProjectRoot/validate/save/loadSaved`；workspace init `initializeWorkspace/record+readInitMarker`；runtime env `ensureRuntimeEnvironment/resolveHostRuntimeContext/resolveEffectiveTier`；execution `buildToolExecutionContext`；MCP server 生命周期 `start/shutdown/handleToolCall`；diagnostics `buildPluginDiagnostics/probeRuntimeBinary`。\n2. **codex 实现迁入 `CodexHostAdapter`（实现该接口，逐行行为等价）**。真 host-specific 源（DH-0 测绘，~40 surface 集中 ~5 文件）：`ProjectRootResolver.ts`(:75-241)、`HostMcpServer.ts`(workspace init :425-499 + start/shutdown/handleToolCall)、`RuntimeContext.ts`(:43-87 runtime env，DH-1 已部分)、tool execution context、`HostProjectAlignment.ts`(:88-428)、`diagnostics/Diagnostics.ts`(:195-1103)、`StatusService.ts`(:128-851)、`ProjectSkillDelivery.ts`(:16-141)、SetupService/`CODEX_SETUP_PROFILE`。\n3. **接入（避免空壳/死代码）**：把现有 codex 调用点改为经 `CodexHostAdapter` 走（codex 单实现、行为不变），使接口被真实消费——不建无人调的接口。**仅 codex 路径**；host-aware 选择与 cc adapter 留 DH-3。若「建接口+codex 迁入」与 DH-3「L2 host 分派」的切线需要具体取舍，按你的判断切在「codex 行为逐行等价」处并 flag 回控制器（像 DH-1 那样诚实标注），不要越界进 DH-3/DH-4。\n\n**完成定义**：`HostAdapter` 接口存在且被 codex 路径**真实消费**（非死代码/空壳）；codex 行为**逐行等价**（四工具对外 MCP 语义不变、init/status/项目根/diagnostics 输出不变、tier/env/job 行为不变）；`tsc --noEmit` exit 0；受影响测试绿 + 全量 unit 失败集与基线（pre-existing 39 沙箱/MTC-7）逐文件 IDENTICAL（无 DH-2 回归，须明确区分、不扩面修 MTC-7）；纯 MCP 非强进程不变量不回退（L3 不引入常驻进程）；未建 cc adapter / 未做 host-aware 选择 / 未做 de-Codex 改名 / 未动 per-host 产物 / 未碰 3 项漂移 skill/template 资产 / 未动 cc 子模块 / AlembicCore 不动 / 不改 codex .mcp.json:8。先读本仓 `CLAUDE.md`/`AGENTS.md` 遵循更严规则；用本仓既有 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：`HostAdapter` 接口定义 file:line + `CodexHostAdapter` 迁入清单（每源 file:line→adapter 方法）+ 接入点（哪些 call site 改走 adapter）；行为逐行等价证据（diff 等价说明 / 关键路径单测）；`tsc --noEmit` + 受影响测试 + 全量 unit 失败集 vs 基线对比原始输出；AlembicPlugin main commit hash；DH-2/DH-3 切线的任何取舍/flag；所有 needs-controller/needs-user-decision/blocked。",
+      "status": "pending",
+      "createdAt": "2026-06-20T03:36:02.954Z"
+    }
+  ]
+}

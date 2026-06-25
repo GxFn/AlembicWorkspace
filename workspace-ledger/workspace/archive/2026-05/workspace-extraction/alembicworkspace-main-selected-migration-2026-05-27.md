@@ -34,7 +34,7 @@
 
 ## 当前可用入口
 
-- 当前状态：[workspace-current-status.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md)
-- 当前 TODO：[global-todo-board.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/global-todo-board.md)
+- 当前状态：[workspace-current-status.md](../../../../../codex-control-workspace/.wakeflow-active/current/workspace-current-status.md)
+- 当前 TODO：[global-todo-board.md](../../../../../codex-control-workspace/.wakeflow-active/current/global-todo-board.md)
 - 记录地图：[../workspace-record-map.md](../../../workspace-record-map.md)
-- 测试交流：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)

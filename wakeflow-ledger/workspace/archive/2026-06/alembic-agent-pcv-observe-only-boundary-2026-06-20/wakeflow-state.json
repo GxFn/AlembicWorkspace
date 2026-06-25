@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "title": "AlembicAgent PCV/PCVM Observe-Only Boundary Convergence",
+  "interfaceLanguage": "zh",
+  "controllerHost": "claude-code",
+  "state": "archived",
+  "stateReason": "PCV observe-only boundary 需求已 completed（complete_demand rev 36，AP-0~7 全验收）。归档到 committed ledger（wakeflow-ledger/workspace/archive/2026-06/）。dry-run 确认 redactNeeded=false（状态根无 real-id 串）；danglingRefs=18 delivery/controller-return envelope 按设计留 .wakeflow-local（含 thread id 不入 ledger）。user-external 待办（Test 真实场景验收）+ 独立观察（主体 6 pre-existing layer-contract）已记 complete 决策日志。",
+  "revision": 37,
+  "activeStageId": null,
+  "updatedAt": "2026-06-20T16:53:54.469Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "ap-0-pcv-baseline-characterization-factchecks",
+      "summary": "AP-0（PCV observe-only 边界收敛硬前置：四控制点表征测试 + 4 项事实核实 + 证据契约字段清单）。AlembicAgent 基线 95b5d6d 直提 main。表征测试锁四控制点现行行为（grounding-policy 注入 / DeepSeek V4 toolChoice / 抑制例外 / analyze 阻断+nudge）供 AP-1~3 证行为对等；4 事实核实（insightGate↔grounding 是否彻底解耦【或有用户决策：若发现耦合则停+带证据回控制器】、主体 buildPcvAnalyzeGroundingLedgerSummary 聚合字段、groundingEnforcement config 挂载层+per-run 支持、PCVM/Test Agent-run 注入点；跨仓只读不改）；列 PcvNodeEvidenceSummary 跨仓消费字段清单（AP-4 additive 标记的「不可破」基线）。**仅表征+调研，不抽取、不改行为、不切默认**（那是 AP-1~3）。完成=四控制点表征测试全绿(capture 现行) + 4 事实答复 file:line + config 层决定(支持 per-run) + 跨仓字段清单 + insightGate 解耦裁决。AlembicAgent build/lint/test/typecheck(+core-import-boundary) 绿。不改四工具/LLM 对外语义；PcvNodeEvidence 已纯观察不删证据。",
+      "status": "accepted",
+      "sourceRef": "需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20（Phase Candidates AP-0 + Code Facts 四控制点 file:line + Open Questions 4 项 + 兼容性字段清单）+ handoff 同名 + 用户 PD1-PD7 已决（领取并自动化推进 2026-06-20）",
+      "createdAt": "2026-06-20T11:18:15.042Z"
+    },
+    {
+      "taskPackageId": "ap-1-extract-provider-toolchoice-policy",
+      "summary": "AP-1（抽 ProviderToolChoicePolicy：把 DeepSeek V4 tool-choice 逻辑 + mode 计算迁出 PcvNodeEvidence/AgentRuntime inline，去 PCV 读写往返；**行为对等、默认仍生效**）。AlembicAgent 基线 955bfc2 直提 main。新模块吸收 buildDeepSeekV4AnalyzeGroundingPolicy(AgentRuntime:2207-2222)+isDeepSeekV4AnalyzeFirstGroundingBurn(:2224-2241)+toolChoice/schema 改写(:884-905)+抑制例外(:1129-1151)+buildDeepSeekV4ToolChoiceMode(从 PcvNodeEvidence:1350-1361 迁出)；模块自持 mode 状态、消除 policy 写 PCV burn 再读回(R4)；PCV 仅观察 effective vs requested。**定位=provider 正确性、非 grounding 质量门、不随 grounding 开关**。完成=AP-0 CP2/CP3 表征测试仍绿(行为对等)+deepseekV4ToolChoiceMode 仍由 PCV 观察产出(跨仓主体计数不可丢)+往返消除+build/lint/core-import-boundary/全量 vitest 绿(失败集不增于 AP-0 基线 0)+默认行为不变(grounding 此阶段不碰)。Node 22。",
+      "status": "accepted",
+      "sourceRef": "需求设计 Implementation Decisions 模块拆分#1(ProviderToolChoicePolicy) + AP-0 表征基线(955bfc2, CP2/CP3) + AP-0 FC/字段清单(deepseekV4ToolChoiceMode 跨仓被主体计数不可丢) + 用户 PD1(provider 正确性默认保留)",
+      "createdAt": "2026-06-20T12:40:41.710Z"
+    },
+    {
+      "taskPackageId": "ap-2-extract-analyze-grounding-guard",
+      "summary": "AP-2（抽 AnalyzeGroundingGuard：迁 analyze 阻断+nudge+rollback(CP4 AgentRuntime:1576-1605/1707-1732) + grounding-policy 指令文本注入(CP1 LLMInputAssembly:440-442/523-534)；**PD5 边界=证据 ref 列表注入(:432-438)不入 guard、保留默认 analyze 上下文**；输入=PCV grounding classification 只读消费，输出=block/nudge）。AlembicAgent 基线 ad6f74c 直提 main。**行为对等、暂仍开启**（默认 off 是 AP-3、不本阶段）。命名不带 Pcv 前缀。AP-1 结转：isDeepSeekV4AnalyzeFirstBurn(provider 导出，CP4 gate:1722 复用)→AP-2 裁定归属、**避免 guard↔provider 循环**（provider 不得依赖 guard；guard 单向读 provider 谓词可接受）。完成=AnalyzeGroundingGuard 建立+CP1/CP4 迁入+ref 列表不入 guard+AP-0 CP1/CP4 表征仍绿(行为对等)+无循环依赖+tsc/lint/core-import-boundary/全量 vitest=基线(252 passed 0 failed)+默认仍开。Node 22。",
+      "status": "accepted",
+      "sourceRef": "需求设计 Implementation Decisions 模块拆分#2(AnalyzeGroundingGuard) + PD5(ref 列表保留默认不入 guard) + AP-0 CP1/CP4 表征基线 + AP-1 结转(isDeepSeekV4AnalyzeFirstBurn 现 provider 导出被 CP4 gate 复用→裁归属避循环)",
+      "createdAt": "2026-06-20T13:10:51.231Z"
+    },
+    {
+      "taskPackageId": "ap-3-grounding-enforcement-default-off",
+      "summary": "AP-3（引 groundingEnforcement 默认 off = 切默认，PCV 默认 observe-only 行为变更正式落地）。AlembicAgent 基线 c206e7a 直提 main。引 `groundingEnforcement:'off'|'guard'`：全局默认 `'off'` 挂 RuntimeConfig（AP-0 FC3: AgentRuntimeTypes.ts:199）+ per-run/per-invocation 覆盖经 AgentRunExecutionOptions（toolChoiceOverride 先例 AgentRunContracts.ts:170-175）→buildRuntimeOptions→execute（PD7）。guard（AnalyzeGroundingGuard 政策文本注入 + evaluateAnalyzeTextGroundingGate 决策）仅 effective==='guard' 生效：CP1 注入(LLMInputAssembly:526)按开关短路、**覆盖全 analyze 路径**；CP4(AgentRuntime:1589)在**调用点**按开关短路 guard 决策（**勿改 guard 内部**，AP-2 carry）。ProviderToolChoicePolicy **不受此开关**（PD1，关 guard 不影响 DeepSeek V4 toolChoice）。表征测试改**两模式**：默认 off=主循环==无 PCV 控制（无 grounding-policy 注入/analyze 不阻断/退出不读 grounding），guard on(per-run)=恢复阻断+nudge+注入；CP2/CP3 provider 两模式不变。完成=默认对照测试绿+guard 恢复+provider 不变+tsc/门禁/全量 vitest 0 failed（CP1/CP4 默认断言改 off=预期变更）+默认 observe-only。Node 22。",
+      "status": "accepted",
+      "sourceRef": "需求设计 Implementation Decisions 模块拆分#4(groundingEnforcement 默认 off+per-run, PD7) + 默认与开关 + AP-0 FC3(config 层 RuntimeConfig:199 + per-run AgentRunExecutionOptions:170-175) + AP-2 carry(调用点短路 guard 决策、覆盖全 analyze、不影响 provider) + PD1/PD2",
+      "createdAt": "2026-06-20T13:45:38.255Z"
+    },
+    {
+      "taskPackageId": "ap-4-evidence-purify-enforcement-marker",
+      "summary": "AP-4（证据纯化收口 + additive enforcement-mode 标记；生产者侧，AP-6 主体消费）。AlembicAgent 基线 dd1bf0c 直提 main。确认 PcvNodeEvidence 纯观察、classification 仅审计；PcvNodeEvidenceSummary **additive** 加 enforcement-mode 标记（如 groundingEnforcement:'off'|'guard' + 可选 wouldBlockButAllowed 计数），让消费方区分 observe-only vs guard 运行、observe-only 下增多的 invalid-no-evidence 不被误判回归（R6）。**纯增量、不改名/不删既有字段**（AP-0 字段清单基线 PcvNodeEvidenceSummary:140-166/PcvBurnGroundingLedgerEntry:56-81，老消费者不受影响），区分 off/guard（AP-3 carry）。「关 PCV metadata 仅缺 trace 字段、主流程不变」核实=无残留控流耦合。完成=纯观察确认+additive 标记(schema additive)+关 metadata 对照+tsc/门禁/全量 vitest 0 failed。生产者侧(AP-6 主体消费跨仓、本窗不改主体)。完成后解锁 AP-5∥AP-6∥AP-7 并行。Node 22。",
+      "status": "accepted",
+      "sourceRef": "需求设计 Implementation Decisions 模块拆分#5(证据 enforcement-mode 标记 additive,PD4) + 证据纯化收口 + AP-0 字段清单(PcvNodeEvidenceSummary:140-166 + PcvBurnGroundingLedgerEntry:56-81 不改名/不删基线) + AP-3 carry(标记区分 off/guard 语义) + R6(主体 AP-6 据标记改判审计)",
+      "createdAt": "2026-06-20T14:11:29.251Z"
+    },
+    {
+      "taskPackageId": "ap-5-agent-five-scenario-acceptance",
+      "summary": "AP-5（AlembicAgent 五场景测试 + Agent 侧端到端验收）。PCV observe-only 边界收敛第 6 步（AP-5∥AP-6∥AP-7 并行波之 Agent 路）。上游 AP-1~4 全落（HEAD 8118dbe）：ProviderToolChoicePolicy/AnalyzeGroundingGuard 抽取 + groundingEnforcement 默认 off(per-run guard opt-in) + PcvNodeEvidenceSummary additive enforcement-mode 标记。范围=从 Agent 侧补齐/固化五场景集成测试、验收 PCV observe-only 边界端到端正确。完成定义=五场景全绿 + 全量 vitest 0 failed + Node 22 四门禁(build/build:check/lint/core-import-boundary)绿。不变量：provider 不被 grounding 门控、guard 内部不改、PcvNodeEvidence 纯观察、四工具/LLM 对外语义不变。",
+      "status": "accepted",
+      "sourceRef": "需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md 相位表 AP-5（line 179）：AlembicAgent 五场景测试 + Agent 侧验收；上游=AP-4（HEAD 8118dbe）；完成=observe-only/guard/DeepSeek V4/graceful exit/无证据 analyze 测试全绿。四控制点 CP1-CP4 file:line 见 AP-0 tr-ap-0 表征锚点。",
+      "createdAt": "2026-06-20T14:35:37.265Z"
+    },
+    {
+      "taskPackageId": "ap-6-main-consumer-audit-semantics",
+      "summary": "AP-6（Alembic 主体跨仓 consumer 更新：消费 enforcement-mode 标记、把 grounding summary 改判审计语义）。PCV observe-only 并行波之主体路。上游 AP-4 标记已落：AlembicAgent PcvNodeEvidenceSummary.groundingEnforcement:'off'|'guard'（dist .d.ts:138 已 rebuild，经 @alembic/agent/service symlink 可达，无需也不要 rebuild/改 AlembicAgent）。范围=主体据标记把 grounding ledger summary 解读为审计而非质量判定：observe-only('off') 下增多的 invalid-no-evidence 是预期、不误判回归（R6）；guard 下保持原判定。完成定义=主体 observe-only 下不误判回归；N8/N9/N12 + linkage 两模式语义正确；跨仓回归全绿。不变量：只改消费方判读、不改既有字段名/契约；不碰 AlembicAgent；不碰 DimensionRuntimeBuilder/AgentRunInputBuilders（AP-7 领地）。",
+      "status": "accepted",
+      "sourceRef": "需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md 相位表 AP-6（line 180）+ PD4（line 241，主体跨仓改造）+ R6（line 228，据标记改判审计）+ FC2（tr-ap-0：主体 lib/workflows/ai-execution/PcvNodeEvidence.ts buildPcvAnalyzeGroundingLedgerSummary 读 classification:278/deepseekV4ToolChoiceMode:286/invalidNoEvidenceCount:291→missingLinkReasons:305→status:329，纯观察）。上游=AP-4 标记（AlembicAgent 8118dbe）。",
+      "createdAt": "2026-06-20T14:36:20.225Z"
+    },
+    {
+      "taskPackageId": "ap-7-quality-run-guard-optin-wiring",
+      "summary": "AP-7（PCVM/Test guard opt-in wiring：质量运行 per-run 显式开 guard + grounding enforcement 回路端到端验证，避免空开关）。PCV observe-only 并行波最后一路（主体仓，AP-6 已完成、工作树空闲）。上游 AP-3 per-run 能力已落：AgentRunExecutionOptions.groundingEnforcement?:'off'|'guard'（AlembicAgent AgentRunContracts.ts:177，经 @alembic/agent/service 可达）。范围=主体构建 dimension AgentRunInput.execution 时为质量运行（PCVM/Test）传 groundingEnforcement='guard'，使 enforcement 回路有真实 opt-in 消费者。完成定义=质量运行真实开启 guard 并恢复 grounding 约束、端到端回路通；非质量运行保持默认 observe-only。PD6：仅加 opt-in wiring、不改方法包本体；不碰 AlembicAgent。",
+      "status": "accepted",
+      "sourceRef": "需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md 相位表 AP-7（line 181）+ PD6（line 243，PCVM/Test 升 participates 仅加 opt-in wiring 不改方法包本体）+ PD7（全局默认 off + per-run 覆盖）+ FC4（tr-ap-0：注入点=主体 DimensionRuntimeBuilder/AgentRunInputBuilders 构建 AgentRunInput.execution，PCVM/Test 经主体 AiDimensionSessionRunner:282 agentService.run 进程内发起）。上游=AP-3 per-run 能力（已落）。",
+      "createdAt": "2026-06-20T15:05:46.890Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "AP-0",
+      "taskPackageId": "ap-0-pcv-baseline-characterization-factchecks",
+      "targetWindow": "AlembicAgent",
+      "summary": "AP-0（PCV/PCVM 默认 observe-only 边界收敛的硬前置：盘点 + 锁基线 + 事实核实）。本窗口=AlembicAgent（仓库 `~/Documents/AlembicWorkspace/AlembicAgent`，standalone、依赖 @alembic/core via file:、有 lint:core-import-boundary；基线 HEAD `95b5d6d`）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md` + 需求设计 `../Design/docs/current/alembic-agent-pcv-observe-only-boundary-2026-06-20.md`，声明窗口/仓库身份。\n\n**需求背景**：把 PCV 从「默认控制 LLM 主循环」收敛为「默认 observe-only 旁路证据层」。AP-0 是第一证据步，**只表征+调研，不改任何行为/不抽取/不切默认**（抽取=AP-1/2，切默认=AP-3）。\n\n**做 ①：四控制点写表征测试（capture 现行行为，供 AP-1~3 证对等）**：\n1. grounding-policy 指令注入：`lib/.../LLMInputAssembly.ts:440-442` + `buildAnalyzeGroundingPolicy :523-534`（analyze 阶段 always-on、静态文本按 modelRef/refCount 参数化）——断言现行 analyze prompt 含 evidenceGroundingPolicy 文本。\n2. DeepSeek V4 toolChoice 改写：`AgentRuntime.ts:884-905`（none→auto、tool schema 可见）+ helper `:2207-2241`——断言 modelRef=deepseek-v4 + analyze + requestedToolChoice='none' 下 effective toolChoice=auto、schema 可见。\n3. 工具调用抑制的 DeepSeek V4 例外：`AgentRuntime.ts:1129-1151`（读 `groundingBurn.deepseekV4ToolChoiceMode`）。\n4. analyze 阻断 + nudge + rollback：`AgentRuntime.ts:1576-1605`，gate `:1707-1732`（读 `burn.classification==='invalid-no-evidence'`）——断言无证据 analyze 被阻断 + 追加 nudge + rollback tick。\n表征测试须**全绿、capture 当前（grounding-on 默认）行为**；命名清楚为 characterization/baseline。\n\n**做 ②：4 项事实核实（带 file:line 证据；跨仓为只读）**：\n1. **insightGate↔grounding 是否彻底解耦**（`insightGate.ts:751-848`）：其 action(retry/degrade/analysis_retry) 是否在任何 pipeline 间接依赖 grounding classification？**【或有用户决策】若发现依赖 → 「关 grounding 默认 + 保留 quality gate(PD3)」冲突 → 停止并带证据回控制器（不要擅自决定）。** 若确认独立 → 记证据。\n2. **主体聚合字段**：读 `../Alembic/lib/workflows/ai-execution/PcvNodeEvidence.ts` 的 `buildPcvAnalyzeGroundingLedgerSummary`/N9/N12——实际聚合哪些 grounding 字段？确认「保留 `classification` 等字段」即满足契约（判断主体 schema 是否需改）。\n3. **groundingEnforcement config 挂载层**：定位现有配置注入路径（LoopContextConfig / RuntimeConfig 等），定 `groundingEnforcement:'off'|'guard'` 挂哪层**且支持 per-run/per-invocation 覆盖**（PD7）——供 AP-3。\n4. **PCVM/Test Agent-run 注入点**：读 PCVM + Test progressive-chain-validation，定位质量运行**实际在哪发起 Agent run**（供 AP-7 per-run guard opt-in wiring 注入点）。\n\n**做 ③：证据契约字段清单**：枚举 `PcvNodeEvidenceSummary` 被跨仓（主体/PCVM/Test）消费的字段（含 grounding `classification`、`deepseekV4ToolChoiceMode` 等），作 AP-4 additive enforcement-mode 标记的「不改名/不删」基线。\n\n**完成定义**：四控制点表征测试全绿（capture 现行）；4 事实核实均有 file:line 答复；config 挂载层决定（支持 per-run）；跨仓消费字段清单；insightGate 解耦裁决（独立→记证据；耦合→停+回报）。AlembicAgent `npm run build|lint|test|typecheck`（+ core-import-boundary）绿；全量测试失败集与基线对照（如有 pre-existing 失败如实标注）。\n\n**边界/不变量**：本窗只在 AlembicAgent 写表征测试；**跨仓(主体/PCVM/Test)仅只读核实、不改**；不抽取/不切默认/不改四工具/LLM 对外语义；不删 PCV/PCVM 证据结构；不关 insightGate（PD3）。\n\n**回 TargetResultEnvelope**：四控制点表征测试文件 + 运行结果（全绿，capture 现行）；4 事实核实 file:line 答复（尤其 insightGate 解耦裁决：独立 OR 耦合→或有决策 flag）；config 挂载层建议（per-run 可行性）；跨仓字段清单；build/lint/test/typecheck 结果；AP-0 完成确认 + 任何 blocker/需用户决策项。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T11:18:15.042Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-ap0-agent-baseline__AlembicAgent__AP-0",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap0-agent-baseline__AlembicAgent__AP-0.json",
+        "deliveryRunId": "run-delivery-ap0-agent-baseline__AlembicAgent__AP-0",
+        "dispatchGroup": "ap0-agent-baseline",
+        "sentAt": "2026-06-20T11:18:50.521Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-ap-0"
+    },
+    {
+      "targetTaskId": "AP-1",
+      "taskPackageId": "ap-1-extract-provider-toolchoice-policy",
+      "targetWindow": "AlembicAgent",
+      "summary": "AP-1（抽取 `ProviderToolChoicePolicy`，PCV observe-only 边界收敛第 2 步）。本窗口=AlembicAgent（仓库 `~/Documents/AlembicWorkspace/AlembicAgent`，基线 HEAD `955bfc2`=AP-0 后）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md` + 需求设计 `../Design/docs/current/alembic-agent-pcv-observe-only-boundary-2026-06-20.md`（Implementation Decisions 模块拆分#1）。\n\n**目标（行为对等抽取，不切默认）**：把 DeepSeek V4 tool-choice **provider 正确性**逻辑收敛进新模块 `ProviderToolChoicePolicy`，与 PCV 证据层解耦、消除读写往返。**本阶段行为对等、默认仍生效**——DeepSeek V4 处理不变、不引 groundingEnforcement 开关（那是 AP-3）、不碰 analyze 阻断/grounding-policy 注入（那是 AP-2）。\n\n**做（迁入 ProviderToolChoicePolicy，provider 层）**：\n1. 迁入 `buildDeepSeekV4AnalyzeGroundingPolicy`(AgentRuntime.ts:2207-2222)、`isDeepSeekV4AnalyzeFirstGroundingBurn`(:2224-2241)、toolChoice/tool-schema 改写 none→auto+schema 可见(:884-905)、工具抑制 DeepSeek V4 例外(:1129-1151)。\n2. **把 `buildDeepSeekV4ToolChoiceMode` 从证据文件迁出**（PcvNodeEvidence.ts:1350-1361 → ProviderToolChoicePolicy）。\n3. **模块自持 mode 状态**：消除「policy 写 PcvNodeEvidence burn → policy 再读回」往返耦合（R4）。PCV 改为**仅观察** effective vs requested toolChoice（记录字段不变）。\n4. 定位=**provider 兼容正确性，非 grounding 质量门**；不随 grounding 开关（PD1 默认保留不回归）。\n\n**关键不变量（跨仓契约，AP-0 结转）**：\n- **`deepseekV4ToolChoiceMode` 字段不可丢**：主体 `buildPcvAnalyzeGroundingLedgerSummary` 计数它（PcvNodeEvidence.ts:286）。抽取后该字段**仍须由 PCV 观察 effective vs requested 产出**（PcvBurnGroundingLedgerEntry/PcvNodeEvidenceSummary schema 不变）——只是计算来源从证据文件迁到 policy、PCV 观察其结果。\n- **行为对等**：AP-0 CP2（DeepSeek V4 analyze toolChoice none→auto+schema 可见）+ CP3（抑制例外 + graceful-exit 对照）表征测试**必须仍全绿**（test/pcv-observe-only-baseline.characterization.test.ts）。\n- 不碰 CP1/CP4（grounding-policy 注入 / analyze 阻断）——AP-2 领地。\n- PcvNodeEvidence 保持纯观察；不删证据结构；不改四工具/LLM 对外语义。\n\n**完成定义**：`ProviderToolChoicePolicy` 模块建立、DeepSeek V4 逻辑+mode 计算迁出（证据文件不再含 buildDeepSeekV4ToolChoiceMode）、读写往返消除；AP-0 CP2/CP3 表征测试**仍绿**（行为对等）；deepseekV4ToolChoiceMode 仍产出（PCV 观察）；`npm run build`/`build:check`/`lint`/`lint:core-import-boundary`/`npm test`（Node 22）全绿，**全量 vitest 失败集不增于 AP-0 基线（0 failed）**；默认 DeepSeek V4 行为不变。\n\n**边界/不变量**：仅 AlembicAgent；行为对等（不切默认、不引 groundingEnforcement）；不碰 grounding guard（AP-2）；不删证据/不丢 deepseekV4ToolChoiceMode；命名硬约束=新模块不带 `Pcv*` 前缀（provider 层）；Node 22（ambient v18 太旧）。\n\n**回 TargetResultEnvelope**：ProviderToolChoicePolicy 模块 + 迁移 diff + commit hash；CP2/CP3 表征测试绿（行为对等证据）；deepseekV4ToolChoiceMode 仍 PCV 观察产出佐证 + 往返消除证据；build/build:check/lint/core-import-boundary/全量 vitest 结果 vs AP-0 基线；AP-1 完成确认 + 任何 blocker。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T12:40:41.710Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-ap1-agent-provider-policy__AlembicAgent__AP-1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap1-agent-provider-policy__AlembicAgent__AP-1.json",
+        "deliveryRunId": "run-delivery-ap1-agent-provider-policy__AlembicAgent__AP-1",
+        "dispatchGroup": "ap1-agent-provider-policy",
+        "sentAt": "2026-06-20T12:41:36.383Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-ap-1"
+    },
+    {
+      "targetTaskId": "AP-2",
+      "taskPackageId": "ap-2-extract-analyze-grounding-guard",
+      "targetWindow": "AlembicAgent",
+      "summary": "AP-2（抽取 `AnalyzeGroundingGuard`，PCV observe-only 边界收敛第 3 步）。本窗口=AlembicAgent（仓库 `~/Documents/AlembicWorkspace/AlembicAgent`，基线 HEAD `ad6f74c`=AP-1 后）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md` + 需求设计（Implementation Decisions 模块拆分#2 + PD5）。\n\n**目标（行为对等抽取，不切默认）**：把 analyze grounding **enforcement**（阻断/nudge/政策文本注入）收敛进新模块 `AnalyzeGroundingGuard`（runtime 质量门层）。**本阶段行为对等、暂仍开启**——不引 groundingEnforcement 开关（AP-3）、不动 provider policy（AP-1 已抽）。\n\n**做（迁入 AnalyzeGroundingGuard，质量门层，命名不带 Pcv 前缀）**：\n1. **CP4** analyze grounding 阻断 + nudge + rollback tick：AgentRuntime.ts:1576-1605，gate :1707-1732（读 `burn.classification==='invalid-no-evidence'`，经 getLatestPcvBurnGrounding:1722）。\n2. **CP1** grounding-policy **指令文本**注入：LLMInputAssembly.ts:440-442 + `buildAnalyzeGroundingPolicy`:523-534（analyze always-on 静态文本）。\n3. 输入=PCV grounding `classification`（**只读消费**，不反写证据）；输出=block/nudge 决策。\n\n**PD5 硬边界**：guard **仅含**「政策文本 + nudge + 阻断」；**证据 ref 列表注入 deterministicEvidenceRefs/evidenceStarterRefs（LLMInputAssembly.ts:432-438）不入 guard、保留为默认 analyze 上下文**（有用 grounding 材料、非强制控制）。表征测试勿把 ref 列表当 grounding-policy。\n\n**AP-1 结转裁断（避免循环依赖）**：`isDeepSeekV4AnalyzeFirstBurn` 现由 ProviderToolChoicePolicy 导出、被 CP4 gate(AgentRuntime:1722)复用。AP-2 把 CP4 迁入 guard 时须裁定该首轮判定归属：**guard 单向读 provider 谓词可接受（guard→provider 下行依赖），但 provider 不得依赖 guard（无反向/循环）**。如更清晰可设为中性共享 util；自行裁定并在回填说明，保 import 边界绿。\n\n**完成定义**：`AnalyzeGroundingGuard` 模块建立、CP1+CP4 逻辑迁入、ref 列表注入**留在默认 analyze 上下文不入 guard**；AP-0 CP1/CP4 表征测试**仍绿**（行为对等，guard 暂仍开启）；无 guard↔provider 循环依赖；`npm run build`/`build:check`/`lint`/`lint:core-import-boundary`/`npm test`（Node 22）全绿，**全量 vitest 失败集不增于基线（0 failed）**；默认 grounding enforcement 仍开（本阶段不切）。\n\n**边界/不变量**：仅 AlembicAgent；行为对等（不切默认、不引 groundingEnforcement）；PD5 ref 列表不入 guard；guard 只读消费 classification 不反写证据；PcvNodeEvidence 保持纯观察；命名不带 Pcv 前缀；不删证据/不改四工具/LLM 对外语义；Node 22。\n\n**回 TargetResultEnvelope**：AnalyzeGroundingGuard 模块 + 迁移 diff + commit hash；CP1/CP4 表征测试绿（行为对等）；PD5 ref 列表仍默认注入佐证（不入 guard）；isDeepSeekV4AnalyzeFirstBurn 归属裁断 + 无循环依赖佐证（import 边界绿）；build/build:check/lint/core-import-boundary/全量 vitest vs 基线；AP-2 完成确认 + 任何 blocker。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T13:10:51.231Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-ap2-agent-grounding-guard__AlembicAgent__AP-2",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap2-agent-grounding-guard__AlembicAgent__AP-2.json",
+        "deliveryRunId": "run-delivery-ap2-agent-grounding-guard__AlembicAgent__AP-2",
+        "dispatchGroup": "ap2-agent-grounding-guard",
+        "sentAt": "2026-06-20T13:11:34.337Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-ap-2"
+    },
+    {
+      "targetTaskId": "AP-3",
+      "taskPackageId": "ap-3-grounding-enforcement-default-off",
+      "targetWindow": "AlembicAgent",
+      "summary": "AP-3（引 `groundingEnforcement` 默认 off = **切默认**，PCV observe-only 边界收敛第 4 步、行为变更正式落地）。本窗口=AlembicAgent（仓库 `~/Documents/AlembicWorkspace/AlembicAgent`，基线 HEAD `c206e7a`=AP-2 后）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md` + 需求设计（Implementation Decisions 模块拆分#4 + 默认与开关 + PD7/PD2/PD1）。\n\n**目标（本阶段=有意行为变更：默认 observe-only）**：引入 grounding-enforcement 运行配置，把 AP-2 抽出的 AnalyzeGroundingGuard + grounding-policy 注入**默认关闭**，仅显式 guard 时生效。**这是迁移序里唯一\"切默认\"步**——默认下主循环不再被 grounding 控制。\n\n**做**：\n1. **引 `groundingEnforcement: 'off' | 'guard'`**：全局默认 `'off'` 挂 **RuntimeConfig**（AP-0 FC3 定位：AgentRuntimeTypes.ts:199 一带）；**per-run/per-invocation 覆盖**复用既有 per-run 通道 **AgentRunExecutionOptions**（toolChoiceOverride/budgetOverride 先例，AgentRunContracts.ts:170-175）→buildRuntimeOptions(AgentService.ts:187)→AgentRuntimeRunOptions→runtime.execute（PD7：全局 off + per-run 覆盖）。解析「有效值」= per-run override ?? 全局默认。\n2. **按开关短路 guard（仅 effective==='guard' 生效）**：\n   - **CP1 grounding-policy 注入**（LLMInputAssembly:526 调 guard.buildAnalyzeGroundingPolicy）：off 时**不注入**政策文本；**覆盖全 analyze 路径**（非仅 DeepSeek 分支，AP-2 carry）。\n   - **CP4 analyze 阻断/nudge**（AgentRuntime:1589 调 evaluateAnalyzeTextGroundingGate）：off 时在**调用点短路**（不读 gate 决策、不阻断/不 nudge/不 rollback）；**勿改 guard 内部逻辑**（AP-2 carry，guard 仍只产决策、调用点决定是否采用）。\n3. **provider 不受控**（PD1）：ProviderToolChoicePolicy（DeepSeek V4 toolChoice）**不随 groundingEnforcement 开关**——off/guard 两模式下 DeepSeek V4 工具可见性都正确、不回归。\n\n**表征测试改两模式**（AP-0 CP1/CP4 原断言 grounding-on，AP-3 后默认变 off，须改）：\n- **默认 off**：主循环行为 == 「无 PCV 控制」——prompt 无 `evidenceGroundingPolicy` 注入、toolChoice 不被 grounding 改写、analyze 不被阻断、退出条件不读 grounding。\n- **guard on（per-run override='guard'）**：恢复 CP1 注入 + CP4 阻断+nudge+rollback（= AP-0 捕获的旧行为）。\n- **CP2/CP3（DeepSeek V4 provider）两模式都不变**（provider 不受开关）。\n\n**完成定义**：groundingEnforcement 配置（RuntimeConfig 默认 off + per-run override）落地；guard/注入按 effective 值短路（调用点，全 analyze 路径）；两模式表征测试绿（off=无 PCV 控制对照、guard=恢复）；provider 两模式不变；`npm run build`/`build:check`/`lint`/`lint:core-import-boundary`/`npm test`（Node 22）全绿、**全量 vitest 0 failed**（CP1/CP4 默认断言改 off 是预期变更、非回归；新增/改写测试计入通过）；PcvNodeEvidence 仍纯观察、schema 不变；四工具/LLM 对外语义不变。\n\n**边界/不变量**：仅 AlembicAgent；**provider 不受开关**（PD1，DeepSeek V4 不回归）；guard 内部不改（调用点短路）；PD5 ref 列表注入仍默认（不随开关）；不删证据；命名无 Pcv 前缀；Node 22。\n\n**回 TargetResultEnvelope**：groundingEnforcement 配置+per-run 通道 diff + commit；guard/注入短路点 file:line；两模式表征测试（off=无控制对照 / guard=恢复 / provider 不变）+ 结果；build/build:check/lint/core-import-boundary/全量 vitest vs 基线（说明 CP1/CP4 默认断言变更）；默认 observe-only 达成确认；AP-3 完成确认 + 任何 blocker。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T13:45:38.255Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-ap3-agent-default-off__AlembicAgent__AP-3",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap3-agent-default-off__AlembicAgent__AP-3.json",
+        "deliveryRunId": "run-delivery-ap3-agent-default-off__AlembicAgent__AP-3",
+        "dispatchGroup": "ap3-agent-default-off",
+        "sentAt": "2026-06-20T13:46:33.386Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-ap-3"
+    },
+    {
+      "targetTaskId": "AP-4",
+      "taskPackageId": "ap-4-evidence-purify-enforcement-marker",
+      "targetWindow": "AlembicAgent",
+      "summary": "AP-4（证据层纯化收口 + additive 产出 enforcement-mode 标记，PCV observe-only 边界收敛第 5 步=**生产者/消费者分界**）。本窗口=AlembicAgent（仓库 `~/Documents/AlembicWorkspace/AlembicAgent`，基线 HEAD `dd1bf0c`=AP-3 后）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md` + 需求设计（Implementation Decisions 模块拆分#5 + 证据纯化收口 + PD4）。\n\n**目标**：在默认 observe-only（AP-3 已切）基础上，证据层纯化收口 + **additive 产出 enforcement-mode 标记**，供主体 ai-execution（AP-6 消费者）区分两模式、避免误判回归。**纯增量、不改既有字段名/不删；本窗只产出标记，不改主体（AP-6 领地）。**\n\n**做**：\n1. **证据纯化确认**：确认 `PcvNodeEvidence` 已纯观察（无控流、无 mutation；AP-1/AP-2/AP-3 后 enforcement 已迁出）；grounding `classification`、`deepseekV4ToolChoiceMode` 等仅作**审计/观察**产出（不据此控流）。如仍有任何残留的「证据派生信号驱动控流」收口清除。\n2. **additive enforcement-mode 标记**：在 `PcvNodeEvidenceSummary`（AP-0 清单 :140-166）**新增**一个表示本次运行 grounding enforcement 状态的字段（如 `groundingEnforcement: 'off' | 'guard'`，可选附「本可阻断但 observe-only 放行」计数 wouldBlockButAllowed）。**纯 additive**：不改既有字段名、不删字段、schemaVersion 处理向后兼容（老消费者忽略新字段不受影响）。标记须**区分 off/guard 语义**（AP-3 carry）——让 AP-6 主体把 grounding ledger summary 解读为审计而非质量判定、observe-only 下增多的 invalid-no-evidence 不误报回归（R6）。\n3. **「关 metadata 仅缺 trace 字段、主流程不变」核实**：验证关闭 PCV metadata 记录后主循环行为不变（仅缺 trace/artifact 字段）——证无残留控流耦合（纯化收口完成判据）。\n\n**关键不变量（AP-0/AP-3 carry）**：\n- **不改名/不删既有 schema 字段**：PcvNodeEvidenceSummary + PcvBurnGroundingLedgerEntry（:56-81，25 字段含 classification 7 值）跨仓被主体/PCVM 消费——只增不改（R3 跨仓不断链）。\n- `deepseekV4ToolChoiceMode` 等 enforcement-derived 字段仍由 PCV 观察产出，标记区分两模式语义。\n- 本窗**不改主体/PCVM/Test**（AP-6/AP-7 领地）；PcvNodeEvidence 纯观察；命名无 Pcv-enforcement 混淆；四工具/LLM 对外语义不变。\n\n**完成定义**：PcvNodeEvidence 纯观察确认（无残留控流）；PcvNodeEvidenceSummary additive enforcement-mode 标记落地（off/guard，向后兼容、不改既有字段）；关 metadata 对照测试通过（主流程不变、仅缺 trace）；新增/更新单测覆盖标记两模式产出；`npm run build`/`build:check`/`lint`/`lint:core-import-boundary`/`npm test`（Node 22）全绿、**全量 vitest 失败集不增于基线（0 failed）**。\n\n**边界/不变量**：仅 AlembicAgent（生产者）；additive 不改既有字段；不改主体/PCVM/Test；不删证据；Node 22。\n\n**回 TargetResultEnvelope**：纯观察确认证据（无残留控流）；enforcement-mode 标记 schema diff（additive 证明，字段清单不破）+ commit；标记两模式产出测试；关 metadata 对照结果；build/build:check/lint/core-import-boundary/全量 vitest vs 基线；AP-4 完成确认（解锁 AP-5∥AP-6∥AP-7）+ 任何 blocker。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T14:11:29.251Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-ap4-agent-evidence-marker__AlembicAgent__AP-4",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap4-agent-evidence-marker__AlembicAgent__AP-4.json",
+        "deliveryRunId": "run-delivery-ap4-agent-evidence-marker__AlembicAgent__AP-4",
+        "dispatchGroup": "ap4-agent-evidence-marker",
+        "sentAt": "2026-06-20T14:12:49.807Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-ap-4"
+    },
+    {
+      "targetTaskId": "AP-5",
+      "taskPackageId": "ap-5-agent-five-scenario-acceptance",
+      "targetWindow": "AlembicAgent",
+      "summary": "本窗口=AlembicAgent（仓 ~/Documents/AlembicWorkspace/AlembicAgent，基线 HEAD=8118dbe=AP-4，main 直提）。先读父 CLAUDE.md + 本仓 CLAUDE.md + 状态根 + 需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md，声明窗口/仓库身份，仅领 AP-5。\n\n任务=补齐/固化 AlembicAgent 侧五场景集成测试，断言落在可观察 seam（assembled LLM input / provider 收到的 toolChoice / 工具调用抑制 / analyze 阻断+nudge），验收 PCV observe-only 边界：\n① observe-only（默认 off）：analyze 不阻断、provider toolChoice 不受 grounding 影响、PcvNodeEvidence 仍记 classification 作审计、summary.groundingEnforcement='off'；\n② guard opt-in（per-run groundingEnforcement='guard'）：恢复 CP1 grounding-policy 文本注入 + CP4 invalid-no-evidence 阻断+nudge+rollbackTick；summary 标记='guard'；\n③ DeepSeek V4：analyze 首轮 toolChoice none→auto + schema 可见（CP2），provider 正确性两模式一致、不被 grounding 门控（PD1）；\n④ graceful exit：抑制例外路径（CP3 deepseekV4ToolChoiceMode）正确；\n⑤ 无证据 analyze：off 下照常首轮终结、guard 下阻断+nudge。\n\n已有 test/pcv-observe-only-baseline.characterization.test.ts（14 例两模式表征，AP-0~4）可复用/扩展为五场景显式集合；如已覆盖则固化命名并补缺口，不重复造轮子。\n\n验证（Node 22，nvm use 22）：五场景测试全绿 + npm test 全量 0 failed + npm run build/build:check/lint/lint:core-import-boundary 全绿。\n完成自检：五场景端到端覆盖、provider 两模式一致、不改 guard 内部/provider 门控/PcvNodeEvidence 纯观察。\n回填 TargetResultEnvelope：commit hash + 五场景测试名与结果 + vitest 计数 + 四门禁输出；如发现真实缺口（非新需求）标注来源。returnRoute=controller 回 AlembicWorkspace。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T14:35:37.265Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-ap5-agent-five-scenario__AlembicAgent__AP-5",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap5-agent-five-scenario__AlembicAgent__AP-5.json",
+        "deliveryRunId": "run-delivery-ap5-agent-five-scenario__AlembicAgent__AP-5",
+        "dispatchGroup": "ap5-agent-five-scenario",
+        "sentAt": "2026-06-20T14:38:48.146Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-ap-5"
+    },
+    {
+      "targetTaskId": "AP-6",
+      "taskPackageId": "ap-6-main-consumer-audit-semantics",
+      "targetWindow": "Alembic",
+      "summary": "本窗口=Alembic（主体仓 ~/Documents/AlembicWorkspace/Alembic，main 直提）。先读父 CLAUDE.md + 本仓 CLAUDE.md + 状态根 + 需求设计 alembic-agent-pcv-observe-only-boundary-2026-06-20.md，声明窗口/仓库身份，仅领 AP-6。\n\n上游已落（控制器已核）：AlembicAgent AP-4=commit 8118dbe，PcvNodeEvidenceSummary additive 加 groundingEnforcement:'off'|'guard'（dist/agent/runtime/PcvNodeEvidence.d.ts:138 已就绪；主体经 @alembic/agent/service symlink 可达此类型）。**不要 rebuild 或修改 AlembicAgent（生产者已完成、跨仓边界）。**\n\n任务=在主体消费方 `lib/workflows/ai-execution/PcvNodeEvidence.ts` 的 `buildPcvAnalyzeGroundingLedgerSummary` 消费新标记 `result.pcvNodeEvidence.groundingEnforcement`，把 grounding ledger summary 改判**审计语义**：\n- observe-only（'off'）：增多的 invalid-no-evidence classification 是 PCV 纯观察的预期产物，**不**触发 missingLinkReasons('analyze_grounding_invalid_no_evidence')/status 降级误判回归（R6）——按审计材料记录；\n- guard（'guard'）：保持原有判定语义（grounding 强约束生效，invalid-no-evidence 仍是真实质量信号）。\n- 保留既有字段读取（classification:278/deepseekV4ToolChoiceMode:286 等不改名/不删），仅 additive 新增对标记的读取与分支。\n\n边界：**只改 PcvNodeEvidence.ts 消费判读**；不碰 `DimensionRuntimeBuilder.ts`/`AgentRunInputBuilders.ts`（AP-7 guard opt-in wiring 领地，后续同窗串行派发）；不改 AlembicAgent。\n\n验证（**Node>=22**，主体 lint:*-boundary + build:check 需 Node22，nvm use 22）：build:check + lint:*-boundary + 主体测试；两模式语义断言（N8/N9/N12 + linkage：off 不误判回归 / guard 原判定）；跨仓 build（确认能 import 到 AlembicAgent 新类型）。\n完成自检：observe-only 不误判回归、guard 原判定、契约字段未破、跨仓 build/test 绿。\n回填 TargetResultEnvelope：commit hash + 改动文件 + 两模式回归证据（N8/N9/N12+linkage）+ 跨仓 build/test 输出。returnRoute=controller 回 AlembicWorkspace。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T14:36:20.225Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-ap6-main-consumer-audit__Alembic__AP-6",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap6-main-consumer-audit__Alembic__AP-6.json",
+        "deliveryRunId": "run-delivery-ap6-main-consumer-audit__Alembic__AP-6",
+        "dispatchGroup": "ap6-main-consumer-audit",
+        "sentAt": "2026-06-20T14:38:58.071Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-AP-6"
+    },
+    {
+      "targetTaskId": "AP-7",
+      "taskPackageId": "ap-7-quality-run-guard-optin-wiring",
+      "targetWindow": "Alembic",
+      "summary": "本窗口=Alembic（主体仓 ~/Documents/AlembicWorkspace/Alembic，main 直提）。先读父 CLAUDE.md + 本仓 CLAUDE.md + 状态根 + 需求设计，声明窗口/仓库身份，仅领 AP-7。\n\n上游已落（控制器已核）：AP-3 per-run 通道 = AlembicAgent `AgentRunExecutionOptions.groundingEnforcement?:'off'|'guard'`（AgentRunContracts.ts:177、dist .d.ts:162，经 @alembic/agent/service symlink 可达；AP-5/AP-6 已验收）。**默认 off=observe-only 已是全局默认**；本任务只为质量运行 opt-in 开 guard。\n\n任务=主体为 **PCVM/Test 质量运行** per-run 显式开 guard（FC4 注入点）：\n1. 在主体构建 dimension AgentRunInput.execution 处传 `groundingEnforcement:'guard'`——注入点候选 `lib/workflows/ai-execution/AgentRunInputBuilders.ts:141` execution 块（`execution?: AgentRunExecutionOptions` 入参，:198/:254 合并）+ `DimensionRuntimeBuilder.ts` 构建链。\n2. **确定质量运行 opt-in 触发判定**（哪些运行是 PCVM/Test「质量运行」需开 guard——读本仓 dimension/质量门/PCVM-Test 配置上下文裁定，须是真实 opt-in、非空开关）。\n3. **端到端回路验证**：证明质量运行真实开启 guard 并恢复 grounding 约束（CP1 政策文本注入 + CP4 invalid-no-evidence 阻断），非质量运行仍 observe-only。\n\n**必做并发核查**（控制器标记）：AP-3 per-run 经 AgentRuntime 实例字段 `#groundingEnforcement` 桥接到 LoopContext（AgentRuntime.ts:259，与 startTime/tokenUsage 同 per-execute 实例状态模式→既有契约=一实例一次 execute）。**须验证主体 AiDimensionPipeline 并发维度运行是否用独立 AgentService/AgentRuntime 实例**——若并发共享单实例，per-run guard（及既有 startTime/tokenUsage 等）会串值，属影响全部 per-run 状态的既有问题，**须暴露并回填**（不静默依赖；若确为独立实例则记录证据）。\n\n边界（PD6）：**仅加 opt-in wiring**、不改方法包本体；不碰 AlembicAgent（生产者完成）；不必要不动 AP-5/AP-6 文件（PcvNodeEvidence.ts 消费方）；不改四工具/LLM 对外语义；非质量运行默认 observe-only 不变。\n\n验证（**Node>=22**，nvm use 22）：build:check + lint:*-boundary + test:unit；**端到端 guard 回路证据**（质量运行 guard 真开、约束恢复）；并发模型核查证据。\n完成自检：真实 opt-in 非空开关、端到端回路通、非质量运行 observe-only、并发安全已核、契约/对外语义不破。\n回填 TargetResultEnvelope：commit hash + 改动文件 + 质量运行触发判定依据 + 端到端 guard 回路证据 + 并发模型结论 + 门禁输出。returnRoute=controller 回 AlembicWorkspace。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T15:05:46.890Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-ap7r-main-guard-optin-a__Alembic__AP-7",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap7r-main-guard-optin-a__Alembic__AP-7.json",
+        "deliveryRunId": "run-delivery-ap7r-main-guard-optin-a__Alembic__AP-7",
+        "dispatchGroup": "ap7r-main-guard-optin-a",
+        "sentAt": "2026-06-20T15:42:32.991Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-AP-7-20260620161114"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicAgent",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "ap-0-pcv-baseline-characterization-factchecks",
+        "ap-1-extract-provider-toolchoice-policy",
+        "ap-2-extract-analyze-grounding-guard",
+        "ap-3-grounding-enforcement-default-off",
+        "ap-4-evidence-purify-enforcement-marker",
+        "ap-5-agent-five-scenario-acceptance"
+      ],
+      "targetTaskIds": [
+        "AP-0",
+        "AP-1",
+        "AP-2",
+        "AP-3",
+        "AP-4",
+        "AP-5"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "ap-6-main-consumer-audit-semantics",
+        "ap-7-quality-run-guard-optin-wiring"
+      ],
+      "targetTaskIds": [
+        "AP-6",
+        "AP-7"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-AP-7-20260620161114"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-20T16:36:54.286Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-ap7r-main-guard-optin-a__Alembic__AP-7",
+    "lastDeliveryRunId": "run-delivery-ap7r-main-guard-optin-a__Alembic__AP-7",
+    "lastDispatchGroup": "ap7r-main-guard-optin-a",
+    "lastTargetTaskId": "AP-7",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-20T15:42:33.016Z"
+  }
+}

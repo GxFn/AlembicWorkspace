@@ -157,7 +157,7 @@ cd AlembicAgent && git diff --check
 发送给：`AlembicAgent`
 
 ```text
-先读取 AGENTS.md、codex-control-workspace/.workspace-active/workspace/index.md、codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6b-agent-stage-node-identity-2026-05-29.md，以及你所在窗口/目标仓库的 AGENTS.md。
+先读取 AGENTS.md、codex-control-workspace/.wakeflow-active/index.md、codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-6b-agent-stage-node-identity-2026-05-29.md，以及你所在窗口/目标仓库的 AGENTS.md。
 
 先明确声明当前窗口定位和本轮仓库职责。
 
@@ -211,7 +211,7 @@ cd AlembicAgent && git diff --check
   "indexRows": [
     {
       "type": "PCVM Wave 6B Agent stage node identity",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6b-agent-stage-node-identity-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6b-agent-stage-node-identity-2026-05-29.md",
       "status": "Wave 6B 总控验收通过 / Wave 6C 已裁决",
       "description": "AlembicAgent 已支持 canonical stage node identity passthrough；下一步派 Alembic 注入 bootstrap map。"
     }
@@ -219,7 +219,7 @@ cd AlembicAgent && git diff --check
   "currentIndexRows": [
     {
       "type": "PCVM Wave 6B Agent stage node identity",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6b-agent-stage-node-identity-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6b-agent-stage-node-identity-2026-05-29.md",
       "description": "Agent stage node identity passthrough，补齐每轮 burn 的 canonical evidence identity。"
     }
   ]

@@ -20,9 +20,9 @@
 
 ## 本轮状态根
 
-- State root：`codex-control-workspace/.workspace-active/workspace/current/afapi-11-dashboard-runtime-diagnostics-ui-closed-loop-validation-2026-06-06/`
+- State root：`codex-control-workspace/.wakeflow-active/current/afapi-11-dashboard-runtime-diagnostics-ui-closed-loop-validation-2026-06-06/`
 - Developer progress：`developer-progress.md`
-- Local automation state：`codex-control-workspace/.workspace-local/codex-automation-loop-afapi11-closed-loop-validation-2026-06-06/`
+- Local automation state：`codex-control-workspace/.wakeflow-local/codex-automation-loop-afapi11-closed-loop-validation-2026-06-06/`
 - Task package：`CSMR-AFAPI11-DASHBOARD-CLOSED-LOOP-P1`
 - Target task：`CSMR-AFAPI11-DASHBOARD-EVIDENCE-T1`
 - Dispatch group：`CSMR-AFAPI11-DASHBOARD-CLOSED-LOOP-GROUP-20260606`
@@ -48,7 +48,7 @@
 ## 原始证据
 
 - AFAPI 11 独立需求文档：`workspace-ledger/requirement-designs/plugin-agent-facing-public-api-redesign/afapi-11-dashboard-runtime-diagnostics-ui-landing-2026-06-05.md`
-- AFAPI 当前计划 Stage 5B 验收记录：`codex-control-workspace/.workspace-active/workspace/current/plugin-agent-facing-public-api-redesign-workspace-plan-2026-06-05.md`
+- AFAPI 当前计划 Stage 5B 验收记录：`codex-control-workspace/.wakeflow-active/current/plugin-agent-facing-public-api-redesign-workspace-plan-2026-06-05.md`
 - Dashboard commit：`47b7555bcf2abc9fc79249d7e6937c9b14bc3479`
 - Dashboard worktree：clean；commit 已在 `origin/main`。
 - 代码事实复核：`sourceOfTruth`、`diagnostics`、`stateCleanup`、`RuntimeSourceOfTruthPanel` 和 contract test 均存在。

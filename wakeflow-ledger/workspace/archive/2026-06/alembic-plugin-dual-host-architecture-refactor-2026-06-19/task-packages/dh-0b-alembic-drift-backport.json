@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "dh-0b-alembic-drift-backport",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "summary": "DH-0B Alembic 侧共享资产漂移回填（跨仓前置；DH-1 硬前置）。把 3 项漂移共享资产从 AlembicPlugin 回填到 Alembic main，漂移门禁转绿。仅动这 3 项；真 host-divergent 工具名行保留为 wakeflow-host:main 不覆盖；无法作为 shared 对齐的段 flag 给 DH-4。完成=check-shared-asset-drift.mjs GREEN + commit hash。",
+  "status": "pending",
+  "sourceRef": "wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md (item ①) + Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md",
+  "createdAt": "2026-06-19T14:23:23.646Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-0B",
+      "taskPackageId": "dh-0b-alembic-drift-backport",
+      "targetWindow": "Alembic",
+      "summary": "DH-0B Alembic 侧共享资产漂移回填（跨仓前置，DH-1 硬前置）。本窗口=Alembic（仓库 `~/Documents/AlembicWorkspace/Alembic`，基线 HEAD cf3b171 clean）。**直提 main，不开分支。**\n\n**背景（来自 DH-0 精查，已控制器验收）**：共享资产漂移门禁当前 RED（3 项），方向=**Alembic main 回填 AlembicPlugin 内容**（plugin 是目标态/领先，反映合并后工具面：`alembic_search` operation=search/get/expand + mode=auto/keyword/semantic、`alembic_code_guard`、`alembic_project_matrix`/`alembic_graph`、无 `alembic_knowledge confirm_usage`；Alembic main 仍是旧 `alembic_knowledge` list/get/confirm_usage、`alembic_guard`、`alembic_structure` targets/files/metadata 陈旧面）。符合设计「RC5=目标→main 追平」+ manifest「backported from plugin (RC5 p1)」既定模式。\n\n**任务（仅这 3 项共享资产，逐项对齐到 `../AlembicPlugin/{skills,templates}/...`）**：\n1. `skills/alembic-recipes/SKILL.md` — 共享段 `intro-and-overview` + `use-context-tail`\n2. `skills/alembic-structure/SKILL.md` — 共享段 `title-intro` + `tools-and-graph`\n3. `templates/recipes-setup/README.md` — 工具面相关行\n\n源真相=对应 `../AlembicPlugin/skills/alembic-recipes/SKILL.md`、`../AlembicPlugin/skills/alembic-structure/SKILL.md`、`../AlembicPlugin/templates/recipes-setup/README.md`。权威（见 `config/shared-asset-manifest.json`）：shared 段=main；templates-recipes-setup=main（directory-exact，含已声明 `_template.md` `v3-fields-heading` 变体）。\n\n**关键 CAVEAT（与 DH-4 纠缠）**：部分漂移行是**真 host-divergent 工具名**（main CLI `alembic_knowledge`/`alembic_guard` vs plugin MCP `alembic_search`/`alembic_code_guard`）。回填时**真 host-specific 工具名行保留为 `wakeflow-host:main` 段、不要用 plugin 工具名覆盖**。DH-0B 只把**共享段内容**对齐到绿；干净长期模型是 DH-4 per-host 分叉。**若某段不强行写错内容就无法作为「shared」对齐 → 不要硬改，blocked/flag 回控制器**（即确认该段属 DH-4 per-host 分叉范围）。\n\n**完成定义**：重跑 `scripts/check-shared-asset-drift.mjs` → **GREEN（0 drift）**；回填证据=门禁 before（RED/3 drift）→ after（GREEN）原始输出 + 每项 diff + Alembic main commit hash（直提 main）。\n\n**边界/不变量**：仅动这 3 项漂移共享资产；不动 Alembic 其它代码/测试；不改四工具对外 MCP 语义；不动 AlembicPlugin；不动 Core。**不进入任何 DH-1 plugin 重构。**\n\n**回 TargetResultEnvelope**：门禁 before/after 原始输出、每项 diff、Alembic main commit hash、任何无法作为 shared 对齐而 flag 给 DH-4 的段、所有 needs-controller/blocked。",
+      "status": "pending",
+      "createdAt": "2026-06-19T14:23:23.646Z"
+    }
+  ]
+}

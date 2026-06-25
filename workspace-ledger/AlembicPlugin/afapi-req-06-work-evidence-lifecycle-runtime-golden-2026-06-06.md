@@ -7,7 +7,7 @@ Generated: 2026-06-06
 - Current window: AlembicPlugin execution window.
 - Task id: AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-RUNTIME-GOLDEN-T2.
 - Dispatch group: AFAPI-REQ-06-WORK-EVIDENCE-LIFECYCLE-RUNTIME-GOLDEN-GROUP.
-- State root: `.workspace-active/workspace/current/afapi-req-06-work-evidence-lifecycle`.
+- State root: `.wakeflow-active/current/afapi-req-06-work-evidence-lifecycle`.
 - Scope: AlembicPlugin Codex MCP public `alembic_work_start` / `alembic_work_finish`, active public tool surface, embedded runtime artifact, installed-cache readback, and Codex host adaptation.
 - Explicit non-scope: no durable work ledger/store was implemented, no cross-repo migration was made, and no Alembic / AlembicCore / AlembicAgent / AlembicDashboard / AlembicDesign / AlembicTest responsibility was claimed.
 

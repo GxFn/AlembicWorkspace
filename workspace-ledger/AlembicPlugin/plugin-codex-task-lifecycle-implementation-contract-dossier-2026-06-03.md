@@ -18,11 +18,11 @@ Dashboard / Test repository, or real project source was modified for Stage 0.
 ## Inputs Read
 
 - `AGENTS.md`
-- `codex-control-workspace/.workspace-active/workspace/index.md`
-- `codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md`
-- `codex-control-workspace/.workspace-active/workspace/current/plugin-codex-task-lifecycle-redesign-workspace-plan-2026-06-03.md`
+- `codex-control-workspace/.wakeflow-active/index.md`
+- `codex-control-workspace/.wakeflow-active/current/workspace-current-status.md`
+- `codex-control-workspace/.wakeflow-active/current/plugin-codex-task-lifecycle-redesign-workspace-plan-2026-06-03.md`
 - `codex-control-workspace/skills/dev/codex-automation-target/SKILL.md`
-- `codex-control-workspace/.workspace-local/codex-automation-loop/dispatch-packets/PCTL-STAGE0-PLUGIN-FACTS-20260603__AlembicPlugin__PCTL-STAGE0-PLUGIN-P0.json`
+- `codex-control-workspace/.wakeflow-local/codex-automation-loop/dispatch-packets/PCTL-STAGE0-PLUGIN-FACTS-20260603__AlembicPlugin__PCTL-STAGE0-PLUGIN-P0.json`
 - `AlembicPlugin/AGENTS.md`
 - `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-original-plan-2026-06-03.md`
 - `AlembicDesign/docs/current/plugin-codex-task-lifecycle-redesign-requirement-design-2026-06-03.md`

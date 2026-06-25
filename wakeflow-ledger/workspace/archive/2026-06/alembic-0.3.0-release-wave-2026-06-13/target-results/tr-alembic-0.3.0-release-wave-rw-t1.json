@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-alembic-0.3.0-release-wave-rw-t1",
+  "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+  "taskPackageId": "alembic-0.3.0-release-wave-p1",
+  "dispatchGroup": "rw1",
+  "stateRoot": ".wakeflow-active/current/alembic-0.3.0-release-wave",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "alembic-0.3.0-release-wave-rw-t1",
+  "status": "completed",
+  "summary": "RW0+RW1+RW2 executed and PUSHED: 2 single-purpose commits 2823939..fd940f2 on origin/main (RW1 re-point 7777dcb, RW2 deletion fd940f2), tree clean, NO version bump (stays 0.2.0 — publish/bump held per C1), zero behavior change. RW0 FRESH RE-SCAN (evidence rw0-rescan-2026-06-13.json; 4 repos at CURRENT HEADs Alembic fca6e6a/Agent 9c2a4b3/Plugin 1256b1d/Dashboard 18837ef, mocks included, Node-style most-specific export-key resolution): all 67 staged wildcard keys STILL serve ZERO consumer references (candidateLiveOrMissing=[]), zero unresolved references, keep-alive confirmed — ONLY ./infrastructure/database/drizzle exact survives with 5 live refs (Plugin x4 + Alembic x1). Totals drifted from staging (Alembic 541->544, Plugin 552->550) but no candidate gained a consumer, so no key was held back. RW1 (B2=re-point): added applyOutputBudget/CORE_TOOL_OUTPUT_BUDGETS/CORE_CONTENT_SLICE_BUDGETS/assertDestructiveResetHasArchive + PersistenceError/DivergenceError to the ROOT facade @alembic/core (verified all four resolve from dist/index.js post-build) so deleting ./shared/* strands no import path; chose ROOT not ./shared because ./shared is a provisional facade frozen at its CO1 189-symbol narrowness budget while root '.' carries no narrowness baseline (additive-only). Re-pointed the in-code adoption docs (OutputBudget.ts header, shared/index.ts errors comment) + the facadeReadiness replacement-route map to root. RW2 (C3=delete): removed the 67 keys from package.json exports (126->59 = 52 exact + 7 wildcard, all 7 survivors are must-keep-transitional), folded the boundary policy to the new truth — transitionalInternalExports 37->24 (dropped the 13 deleted exacts; the 24 must-keep/keep-provisional survivors stay classified), expectedCounts.transitional-internal 98->31, closeout.maxCounts 98/61->31/7 (shrink-only), shrink-only trend entry appended for 2026-06-13, the 67 phase-1 deprecation marks emptied and moved into closeout.removedExports (14->81; resurrection guard + RC4-style scan-proof, replacementFacade=root), 54 stale facade-readiness routes for the deleted wildcards pruned. DRIFT FIX: a CoreContractSpine D9 drift gate (test/CoreContractSpine.test.ts) caught two convergence candidates referencing deleted keys — updated D9-C01.requiredExportPaths (dropped the 6 deleted core/daemon wildcards, kept the surviving canonical facades + the consumer-backed ./core/ast/*) and D9-C04.requiredExportPaths (['./search'] only), data-only, statuses/IDs untouched. AMBIGUITY RESOLVED (recorded): the staging JSON's keepAliveRows array overlapped the 67 delete-list on 13 exact keys; I derived delete/keep from the authoritative closeout manualCategories (keep-provisional 18 + must-keep-transitional 13 + drizzle) rather than the ambiguous array names, confirming all 67 are zero-consumer and outside every keep category. Staging's '37->1' was an over-statement of the eventual end-state; the gate-consistent truth this packet lands is 37->24 (survivors must stay classified). PROOF: full npm run check exit 0 at TRUE baselines (108 files/1193 tests, h1 baseline held); boundary gate 59 keys green; smoke imported 52 exact entrypoints; 3-consumer import gate OK; closeout report no-consumer-deprecate-candidate=0 AND consumer-replace-first=0; DOWNSTREAM builds green vs new Core HEAD (AlembicAgent tsc --noEmit exit 0, Alembic build:check exit 0, AlembicPlugin build:check exit 0 with worktree CLEAN — hands-off honored, read-only build only); mechanical diff = export-map deletion + policy sync + contract-data drift only (version 0.2.0 unchanged). SCOPE: RW3 (SN4 src renames) NOT done — still parked behind this deletion (separate later package); RW4/RW5 are other windows; publish remains HELD for the user trigger.",
+  "evidenceRefs": [
+    "evidence/raw/rw-t1-rw1-rw2-evidence.md",
+    "evidence/raw/rw0-rescan-2026-06-13.json",
+    "evidence/raw/rw0-rescan-script-2026-06-13.mjs"
+  ],
+  "verification": [
+    "RW0 fresh re-scan -> 67/67 still zero-consumer, 0 unresolved, keep-alive=drizzle(5) only (rw0-rescan-2026-06-13.json)",
+    "npm run check -> exit 0 (108 files/1193 tests; boundary 59 keys, smoke 52 entrypoints, 3-consumer gate OK, doctrine/naming/space green)",
+    "node scripts/report-public-api-closeout.mjs -> no-consumer-deprecate-candidate=0, consumer-replace-first=0",
+    "root facade resolves applyOutputBudget/CORE_TOOL_OUTPUT_BUDGETS/PersistenceError/DivergenceError (dist/index.js import probe)",
+    "downstream: AlembicAgent tsc --noEmit exit 0; Alembic build:check exit 0; AlembicPlugin build:check exit 0 (worktree clean)",
+    "git push origin main -> 2823939..fd940f2; version unchanged 0.2.0"
+  ],
+  "risks": [
+    "RW3 (SN4 Core source-naming wave) stays parked behind this deletion; the naming-lint src scope un-parks now that the src-covering wildcards are gone — separate later package per the requirement design",
+    "Plugin vendor copy of Core still predates this deletion until the next standing SD-5 vendor refresh (not this packet); Plugin builds green against the live file: link today",
+    "Staging keepAliveRows array semantics were ambiguous (13 keys in both lists); resolved via authoritative manualCategories — recorded so any future SD-5 step uses the same derivation, not the array names"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rw1__AlembicCore__alembic-0.3.0-release-wave-rw-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw1__AlembicCore__alembic-0.3.0-release-wave-rw-t1.json",
+    "deliveryRunId": "run-delivery-rw1__AlembicCore__alembic-0.3.0-release-wave-rw-t1",
+    "dispatchGroup": "rw1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rw1__AlembicCore__alembic-0.3.0-release-wave-rw-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-0.3.0-release-wave",
+    "stateRevision": 5,
+    "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+    "taskPackageId": "alembic-0.3.0-release-wave-p1",
+    "targetTaskId": "alembic-0.3.0-release-wave-rw-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "rw1",
+    "resultId": "tr-alembic-0.3.0-release-wave-rw-t1",
+    "createdAt": "2026-06-13T06:30:44.965Z"
+  },
+  "createdAt": "2026-06-13T06:30:44.965Z",
+  "stateRevisionObserved": 5,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

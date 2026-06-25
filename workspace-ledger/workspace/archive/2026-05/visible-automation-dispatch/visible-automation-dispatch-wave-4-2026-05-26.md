@@ -44,7 +44,7 @@
   - [alembic-test-exchange.md](../../../current/alembic-test-exchange.md)
   - `scripts/visible-dispatch.mjs`
   - `scripts/visible-dispatch.test.mjs`
-  - `.workspace-local/visible-dispatch/`
+  - `.wakeflow-local/visible-dispatch/`
 - producer / consumer 依赖：
   - Producer：Wave 3 已完成 `record-arm`、`armed` 状态和外部 automation id 落账；总控 5 分钟 controller heartbeat 已按用户确认撤销，不再作为正式路线。
   - Consumer：`AlembicTest` 作为单窗口可见目标，验证 heartbeat 触发后的 claim / complete / backfill。
@@ -194,7 +194,7 @@ node scripts/verify-control-center.mjs --require-todo --require-task-packages --
 - 2026-05-26 00:24 CST：`AlembicTest` 回填阻塞。`queued -> armed`、真实 heartbeat 创建、`record-arm`、暂停和删除均有证据；automation id `vad-p4-alembictest-heartbeat`。heartbeat 在 3 分钟以上观察窗口内未投递到当前可见线程执行 `claim`，任务未进入 `claimed` / `completed`。报告：[../../../AlembicTest/docs/vad-single-window-visible-heartbeat-validation-2026-05-26.md](../../../../../AlembicTest/docs/vad-single-window-visible-heartbeat-validation-2026-05-26.md)。
 - 2026-05-26 00:30 CST：总控验收 Test-12 证据有效，结论保持阻塞：问题不归咎于 `AlembicTest` 未执行，而是目标可见 heartbeat 投递 / 当前活跃线程调度模型未打通。按用户确认，`visible-automation-dispatch-controller` 已删除，5 分钟总控 heartbeat 不再作为正式路线。总控已补 `scripts/visible-dispatch.mjs record-stop`，并对 `vad-p4-alembictest-heartbeat` 记录 stopped，`cleanup` 后不再误报 active automation run。
 - 2026-05-26 00:35 CST：总控继续处理自动化失败，将 `visible-automation-dispatch-wave-4-2026-05-26__AlembicTest` 从 `armed` 转为 `blocked`，原因 `Test-2026-05-26-12-heartbeat-did-not-claim-visible-thread`；后续 tick 不再把该任务当成等待中的 automation，而是明确要求总控解决触发模型阻塞。
-- 2026-05-26 00:40 CST：总控按用户要求直接自跑最小闭环，使用独立 ignored stateDir `.workspace-local/vad-self-loop-test/state` 和临时 fixture plan `.workspace-local/vad-self-loop-test/plan.md`，完成 `mode-enable -> register -> enqueue -> tick-ready -> claim -> complete -> tick-review -> accept -> tick-done -> mode-disable -> cleanup`。结果：task `plan__AlembicTest` 依次进入 `queued`、`claimed`、`completed`、`accepted`；`tick-review` 为 `topAction=review / nextAction=acceptanceReview`；最终 `cleanup` 为 `staleTasks=0`、`activeAutomationRuns=0`。结论：本地 state machine 与总控自驱闭环已通过，剩余阻塞收窄为真实目标 thread heartbeat 投递 / 触发模型。
+- 2026-05-26 00:40 CST：总控按用户要求直接自跑最小闭环，使用独立 ignored stateDir `.wakeflow-local/vad-self-loop-test/state` 和临时 fixture plan `.wakeflow-local/vad-self-loop-test/plan.md`，完成 `mode-enable -> register -> enqueue -> tick-ready -> claim -> complete -> tick-review -> accept -> tick-done -> mode-disable -> cleanup`。结果：task `plan__AlembicTest` 依次进入 `queued`、`claimed`、`completed`、`accepted`；`tick-review` 为 `topAction=review / nextAction=acceptanceReview`；最终 `cleanup` 为 `staleTasks=0`、`activeAutomationRuns=0`。结论：本地 state machine 与总控自驱闭环已通过，剩余阻塞收窄为真实目标 thread heartbeat 投递 / 触发模型。
 
 <!-- workspace-sync
 {

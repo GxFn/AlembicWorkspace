@@ -469,7 +469,7 @@ consumer impact and replacement behavior.
   `Design/docs/design-window-operating-policy.md`, and
   `Design/docs/workspace-alignment-checklist.md`.
 - Current controller status read for orientation only:
-  `.workspace-active/workspace/current/workspace-current-status.md`.
+  `.wakeflow-active/current/workspace-current-status.md`.
 - Raw code references reviewed: `Alembic/config/constitution.yaml`,
   `Alembic/lib/Bootstrap.ts`, `Alembic/lib/governance/**`,
   `Alembic/lib/http/**`, `Alembic/lib/cli/SetupService.ts`,

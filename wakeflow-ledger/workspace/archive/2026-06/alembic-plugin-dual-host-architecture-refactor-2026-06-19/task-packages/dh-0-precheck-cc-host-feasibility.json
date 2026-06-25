@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "dh-0-precheck-cc-host-feasibility",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "summary": "DH-0 盘点+前置（硬前置，不重构）：① pre-existing 漂移门禁 RED 同步绿诊断（alembic-recipes/structure shared + recipes-setup/README；精确 diff + 正确同步方向 + Plugin 侧做 / Alembic 侧 apply 清单标 needs-controller）；② cc-host hooks 8 簇可行性研究（open question，缺口大 STOP+回报）；③ CC3 文案划界；④ 跨仓协调点清单；⑤ 基线 + 92 Codex* surface 分类复核（40 host-specific→L3 / 52 误命名→L1/L2）。不进 DH-1。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md",
+  "createdAt": "2026-06-19T10:21:04.329Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-0",
+      "taskPackageId": "dh-0-precheck-cc-host-feasibility",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-0 盘点 + 前置（硬前置；**不重构、不改业务行为**；产出证据 + 决策喂 DH-1~6）。本窗口=AlembicPlugin（基线 HEAD afbf25e = daemon-removal + MC-3p 后；纯 MCP 非强进程）。逐项给 file:line / grep / 命令输出 / 跨仓证据。\n\n**① pre-existing 漂移门禁 RED 同步绿（硬前置，最高优先）**：现 `alembic-recipes`/`alembic-structure` shared 段 + `recipes-setup/README` 漂移（plugin RC5 改了、Alembic main 未同步）。诊断：跑 Alembic 侧 `scripts/check-shared-asset-drift.mjs`（治理权威）确认当前 RED + 精确 diff；判定正确同步方向（RC5 改动若是目标态→同步 Alembic main 追平 plugin，或反向）；**本窗口同步 Plugin 侧可做的部分**；**Alembic 侧需 apply 的精确改动（manifest / shared 资产）列清单 + 标 needs-controller**（跨仓，由控制器派 Alembic 窗口在进 DH-1 前 apply）。目标：漂移门禁转绿再进 DH-1。\n\n**② cc-host hooks 可行性研究（open question，决定 cc adapter 8 簇形态）**：研究 Claude Code 是否暴露与 codex 等价的 host hooks，覆盖 8 簇——transport / 项目根发现 / init profile / env / tier / diagnostics / JobStore / execution context。每簇结论：cc 有等价 / 部分 / 无（缺口）。**若缺口大（多簇无等价）→ STOP + 回报 needs-user-decision**（cc adapter 形态须调整、可能回用户）。证据：可查 Claude Code 官方插件/MCP/hooks 文档（用 claude-code-guide 子代理或 WebFetch 官方源）+ 本仓 cc manifest/.claude-plugin 线索 + Core host-agent 契约。\n\n**③ CC3 文案划界确认**：确认 DH-4 = 结构 per-host 分叉（目录/标记/manifest/门禁），CC3 = 文案统一（删 \"Codex\" 术语，PLUGIN-SOURCE.json hostWordingDebt）——互不阻塞、本需求不含 CC3 文案统一。给边界线（哪些归 DH-4 / 哪些归 CC3）。\n\n**④ 跨仓协调点清单**：列 Alembic 侧需配合点（共享资产漂移门禁 manifest 单 path→per-host path、check-shared-asset-drift.mjs per-host 比较 + 可选 cross-host coherence）——供 DH-4 跨仓派发。\n\n**⑤ 基线 + 92 Codex* surface 复核**：build/test + drift-gate 现状基线；复核 requirement design 的 92 个 Codex* surface 分类（~40 真 host-specific→抽 L3 / ~52 误命名 host-agnostic→去前缀归 L1/L2，如 resolveCodexServiceRequestBoundary / CODEX_*_TOOL_NAMES / buildCodexProjectRuntimeContext）——给文件:行抽样核实，尤其 52 误命名判定准确性。\n\n**边界/不变量**：DH-0 不重构、不改四工具对外 MCP 语义、不建 L3、不动 per-host 分叉（除 ① 的漂移同步）；保持纯 MCP 非强进程不变量（不重建常驻）；不下沉 Core；AlembicCore 不改。回 TargetResultEnvelope：每项结论 + 证据 + **cc-host hooks 8 簇可行性矩阵** + 漂移同步状态（已绿 / 需 Alembic apply 清单）+ 所有 needs-controller / needs-user-decision（尤其 cc-host 缺口、漂移跨仓 apply、CC3 边界）。**不进入 DH-1**。",
+      "status": "pending",
+      "createdAt": "2026-06-19T10:21:04.329Z"
+    }
+  ]
+}

@@ -30,7 +30,7 @@ renaming, or downgrading anything.
 - Requirement design:
   [alembic-responsibility-governance-cleanup-requirement-design-2026-06-13.md](alembic-responsibility-governance-cleanup-requirement-design-2026-06-13.md)
 - Current runtime state root:
-  `.workspace-active/workspace/current/alembic-responsibility-governance-cleanup`
+  `.wakeflow-active/current/alembic-responsibility-governance-cleanup`
 
 ## Candidate Demand Order
 

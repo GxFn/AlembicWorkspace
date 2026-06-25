@@ -1,0 +1,621 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "title": "AlembicPlugin Dual-Host (Codex + Claude Code) Architecture Refactor And Layering",
+  "interfaceLanguage": "zh",
+  "controllerHost": "claude-code",
+  "state": "archived",
+  "stateReason": "需求 alembic-plugin-dual-host-architecture-refactor-2026-06-19 已完成（rev 74 state=completed；DH-0~DH-7 全验收，RC-1~8 闭合，cc workspace 内真实验收 PASS，F1 收尾）；用户授权归档至 ledger。dry-run 核：redactNeeded=false / findingCount=0（state root 无 real-id），danglingRefs 为 .wakeflow-local delivery 传输件（符合预期，不入归档）。",
+  "revision": 75,
+  "activeStageId": null,
+  "updatedAt": "2026-06-20T11:04:07.900Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "dh-0-precheck-cc-host-feasibility",
+      "summary": "DH-0 盘点+前置（硬前置，不重构）：① pre-existing 漂移门禁 RED 同步绿诊断（alembic-recipes/structure shared + recipes-setup/README；精确 diff + 正确同步方向 + Plugin 侧做 / Alembic 侧 apply 清单标 needs-controller）；② cc-host hooks 8 簇可行性研究（open question，缺口大 STOP+回报）；③ CC3 文案划界；④ 跨仓协调点清单；⑤ 基线 + 92 Codex* surface 分类复核（40 host-specific→L3 / 52 误命名→L1/L2）。不进 DH-1。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md",
+      "createdAt": "2026-06-19T10:21:04.329Z"
+    },
+    {
+      "taskPackageId": "dh-0b-alembic-drift-backport",
+      "summary": "DH-0B Alembic 侧共享资产漂移回填（跨仓前置；DH-1 硬前置）。把 3 项漂移共享资产从 AlembicPlugin 回填到 Alembic main，漂移门禁转绿。仅动这 3 项；真 host-divergent 工具名行保留为 wakeflow-host:main 不覆盖；无法作为 shared 对齐的段 flag 给 DH-4。完成=check-shared-asset-drift.mjs GREEN + commit hash。",
+      "status": "accepted",
+      "sourceRef": "wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md (item ①) + Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md",
+      "createdAt": "2026-06-19T14:23:23.646Z"
+    },
+    {
+      "taskPackageId": "dh-1-host-abstraction-unify-delete-generic",
+      "summary": "DH-1 host 抽象统一（RC-1）+ 删 generic-host-agent（RC-5）。AlembicPlugin 基线 afbf25e，直提 main。host identity 由 hostShape 派生（去 RuntimeContext.ts:45 codex 硬默认、:62 expectedPluginHost 派生、加 CLAUDE_CODE_PLUGIN_HOST 常量）；cc manifest:32/33 + bootstrap:100 声明 claude-code；Diagnostics.ts:542 比较走 expectedPluginHost；AGENT_HOSTS 去 generic（6 文件 contract.ts:11/mcp-tools.ts:103/KnowledgeContextStatus.ts:29-36/cross-host-readiness.ts:55-59 + 2 测试）。不建 L3、不做 de-Codex 改名、不动 per-host 产物（DH-2/3/4）。漂移门禁 RED 已解耦（归 DH-4）。完成=identity 派生正确 + generic 删净 + tsc 绿 + 受影响测试绿 + 非强进程不变量 + commit hash。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (### DH-1 精确改点 + 已决 1/2/4) + wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md (⑤ true L3≈5 files, ~221 surface) + 控制器决策 evt-20260619155155-0009 (drift→DH-4 解耦)",
+      "createdAt": "2026-06-19T15:55:30.365Z"
+    },
+    {
+      "taskPackageId": "dh-2-l3-hostadapter-interface-codex-migration",
+      "summary": "DH-2 建 L3 HostAdapter 接口 + codex 实现迁入（RC-2，行为不变）。AlembicPlugin 基线 6cd4c88，直提 main。抽 HostAdapter 接口（项目根/workspace init/runtime env/execution/MCP server 生命周期/diagnostics 方法集）+ 现有 codex 真 host-specific 逻辑迁入 CodexHostAdapter 并经其走（codex 单实现、逐行等价、非死代码）。DH-2→3 硬序：不建 cc adapter、不做 host-aware 选择/L2 host 分派、不做 52 de-Codex 改名、不动 per-host 产物/cc 子模块（DH-3/DH-4）。完成=接口被 codex 真实消费 + 行为逐行等价 + tsc 绿 + 受影响测试绿 + 失败集 vs 基线 IDENTICAL + 非强进程不变量 + commit hash。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (RC-2 + ### L3 HostAdapter 接口建议方法集 + ### DH 可执行细化 真 host-specific ~40→L3) + wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md (⑤ true L3≈5 files) + DH-1 验收 evt-20260620033355-0013",
+      "createdAt": "2026-06-20T03:36:02.954Z"
+    },
+    {
+      "taskPackageId": "dh-3-claude-code-adapter-l2-rewire-decodex",
+      "summary": "DH-3 双宿主对等执行（RC-2/3/3b）。AlembicPlugin 基线 348bea2，直提 main，大重构分步增量绿。① 新建 ClaudeCodeHostAdapter + host-aware resolveHostAdapter 选择（cc 项目根加 CLAUDE_PROJECT_DIR 可信，DH-0 #1；codex 不变）；② L2 全面改调 L3（~102 Codex* 直依赖，L2 去 host 分支）；③ 52 误命名 de-Codex 去前缀归 L1/L2 + 物理迁入 codex 函数体。host-name 分支只在 L3。不动 per-host 产物/cc 子模块（DH-4）。可在 ① 绿后 flag 余项给 DH-3b。完成=cc 选中+行为正确 + codex 不回归 + L2 无 host 分支 + de-Codex 清零误命名 + tsc/测试绿 + 非强进程不变量 + commit hash。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (RC-2/3/3b + DH-3 + ② cc-host 8 簇矩阵 #1 project-root 修复 + ⑤ 52 误命名 de-Codex) + wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md + DH-2 验收 evt-20260620040917-0017 (HostAdapter 接口/CodexHostAdapter 已建)",
+      "createdAt": "2026-06-20T04:11:35.876Z"
+    },
+    {
+      "taskPackageId": "dh-3b-l2-rewire-decodex-migration",
+      "summary": "DH-3b（DH-3 余项 ②③）双宿主对等执行收尾。AlembicPlugin 基线 651f96a，直提 main，分步增量绿。② L2 全面改调 L3（~102 Codex* 直依赖经 resolveHostAdapter 取 HostAdapter 走）+ 收口残留 host 分支（PluginRegistry:64/89 形态检测/manifest 选择、Diagnostics:583 asset-skip）到 L3，使 L2/非-L3 层无 host 分支；③ 52 误命名 de-Codex 去前缀归 L1/L2 + 真 host-specific codex 函数体物理迁入 CodexHostAdapter（去委托外观）。先替代/对等、不裸断。可在 ② 绿后 flag ③ 给 DH-3c。完成=L2 无 host 分支 + de-Codex 清零误命名 + codex 等价/cc 经 adapter + tsc/测试绿 + 非强进程不变量 + commit hash。不动 per-host 产物/cc 子模块（DH-4）。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (RC-3/3b + DH-3 ②③ + ⑤ 52 误命名) + DH-3.1 验收 evt-20260620043040-0021 (cc adapter + 工厂已建; 残 host 分支 PluginRegistry/Diagnostics 待收口)",
+      "createdAt": "2026-06-20T04:31:27.475Z"
+    },
+    {
+      "taskPackageId": "dh-3c-decodex-rename-routing-migration",
+      "summary": "DH-3c（DH-3 收尾 ③+routing）de-Codex 改名 + 物理迁入 + host-operation routing。AlembicPlugin 基线 ea22f92，直提 main，一次聚焦 pass 增量绿。A：~19 host-operation call site 经 resolveHostAdapter 的 HostAdapter 走 + ~52 误命名 Codex*/CODEX_*（65 引用）去前缀归 L1/L2（同批避免双重 churn）；B：真 host-specific codex 函数体物理迁入 CodexHostAdapter（去委托外观，保 F-V2-2 wire-byte 安全）。行为等价。完成=de-Codex 清零误命名（残留仅真 host-specific 在 L3）+ routing 经 adapter + 委托外观清除 + codex 等价(含 .mcp.json wire-byte)/cc 经 adapter + tsc/测试绿 + 非强进程不变量 + commit hash。不动 per-host 产物/cc 子模块（DH-4）。可在 A 绿后 flag B 给 DH-3d。此步完成即 DH-3 阶段收尾。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (RC-3b + DH-3 ③ + ⑤ 52 误命名) + DH-3b 验收 evt-20260620045431-0025 (③+~19 routing flag 给 DH-3c)",
+      "createdAt": "2026-06-20T04:55:27.834Z"
+    },
+    {
+      "taskPackageId": "dh-3d-decodex-rename-migration-finale",
+      "summary": "DH-3d（DH-3 收尾大头）de-Codex 改名 + 物理迁入 + 余 routing。AlembicPlugin 基线 f38e268，直提 main，分批增量绿（建议 Explore 子代理先测绘 65 引用再分组改名）。批1：~52 误命名 Codex*/CODEX_*（65 引用：CODEX_*_TOOL_NAMES/resolveCodexServiceRequestBoundary/buildCodexProjectRuntimeContext 等）去前缀归 L1/L2 + 裁决 isTrustedProjectRoot/resolveEffectiveTier（host-agnostic，推荐去前缀归 L1/L2）；批2：余 host-operation routing（Preflight/StatusService/host-agent-workflows 含 buildHostProjectAlignment）经 adapter；批3：真 host-specific 函数体物理迁入 CodexHostAdapter（去委托外观，保 wire-byte）。完成即 DH-3 阶段 DONE。可 flag DH-3e 但优先完成。不动 per-host 产物/cc 子模块（DH-4）。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (RC-3b + DH-3 ③ + ⑤ 52 误命名) + DH-3c 验收 evt-20260620050809-0029 (余项 flag DH-3d + isTrustedProjectRoot/resolveEffectiveTier host-agnostic 发现)",
+      "createdAt": "2026-06-20T05:09:29.688Z"
+    },
+    {
+      "taskPackageId": "dh-3e-decodex-full-rename-finale",
+      "summary": "DH-3e（DH-3 de-Codex 全量收尾，用户决策 A=做透）多批 de-Codex + collision + 余 routing + 物理迁入。AlembicPlugin 基线 ca1f9ab，直提 main。用已产出的完整 symbol→新名→refs 测绘清单直接执行，本步尽量多推进、每批 tsc 绿即 commit，确需跨上下文再 flag DH-3f（每批独立绿）。含 collision 定名（CODEX_AGENT_PUBLIC_TOOL_NAMES 撞 contract.ts）+ isTrustedProjectRoot/resolveEffectiveTier 去前缀裁决 + 余 host-operation routing（Preflight/StatusService/host-agent-workflows 含 buildHostProjectAlignment）+ 真 host-specific 函数体物理迁入 CodexHostAdapter（保 wire-byte）。完成即 DH-3 DONE。不动 per-host 产物/cc 子模块（DH-4）。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md (RC-3b 已决⑥ 全量做透) + DH-3d 验收 evt-20260620052848-0033 (SCOPE FINDING ~150 符号) + 用户决策 A(本会话: 全量 de-Codex 后再 DH-4)",
+      "createdAt": "2026-06-20T05:35:42.940Z"
+    },
+    {
+      "taskPackageId": "dh-3f-decodex-bulk-complete",
+      "summary": "DH-3f（DH-3 de-Codex 全量收尾，本 pass 力求完成）。AlembicPlugin 基线 ebb960f，直提 main。用已产出测绘清单 + 子代理并行，一个 dispatch 内按模块逐个改名（每模块 tsc 绿即 commit），覆盖残留 ~140 误命名 host-agnostic Codex*/CODEX_*（ToolPolicy CODEX_*_TOOL_NAMES 族/ProjectRuntimeContext/KnowledgeState/EnhancementRoute/Diagnostics/Preflight/StatusService/ProjectSkillDelivery/SourceBoundary 等）+ 2 collision 定名 + isTrustedProjectRoot/resolveEffectiveTier 接口移除归 L1/L2 + 余 host-operation routing + 物理迁入（保 wire-byte）。完成即 DH-3 DONE；仅真阻塞才 flag DH-3g。不动 per-host 产物/cc 子模块（DH-4）。",
+      "status": "accepted",
+      "sourceRef": "用户决策 A(全量 de-Codex) + DH-3e 验收 evt-20260620054644-0037 (残留 ~140 符号 + 2 collision + 完整测绘清单已产出) + Design RC-3b/⑤",
+      "createdAt": "2026-06-20T05:47:41.781Z"
+    },
+    {
+      "taskPackageId": "dh-3g-design-shared-workspace-io-structure",
+      "summary": "DH-3g-design（Design 结构裁决请求，option-planning）：cc/codex 共享 workspace-identity I/O 在 5 层架构 L3 的组织结构。Design 只出选项对比+推荐+风险，不改产品代码/不派发/不改控制器状态。候选：(i)保持共享 L1+两 adapter 委托(现状) /(ii)shared-base 基类 /(iii)cc 委托 codex 单例 /(iv)各自复制。约束：保 F-V2-2 wire-byte、行为不变、host 分支仅 L3、cc+codex 确共享、不碰 per-host 产物/cc 子模块(DH-4)。产出推荐+理由+每候选风险+控制器执行要点，供据此派 DH-3g 执行。",
+      "status": "accepted",
+      "sourceRef": "用户决策 B(本会话: 路由 Design 定结构) + DH-3f 验收 evt-20260620063852-0041 (物理迁入=cc/codex 共享 workspace I/O 真架构问题) + Design RC-2/3 物理迁入项",
+      "createdAt": "2026-06-20T06:46:42.292Z"
+    },
+    {
+      "taskPackageId": "dh-3g-decodex-shared-workspace-cluster",
+      "summary": "DH-3g（执行：共享簇 de-Codex 收尾，DH-3 最后一步）。AlembicPlugin 基线 a297e9d，直提 main。控制器裁断（基于 Design 裁决）：否决物理迁入（共享簇是 host-agnostic、委托=合法分层），改做共享 workspace-identity 簇剥 Codex 前缀 + L1 归位、两 adapter 委托新名。必读 Design doc §6（符号清单 + KEEP 边界）。严守 §6.B KEEP（落盘文件名/profile 值/CODEX env 值/MCP error codes/CODEX_PLUGIN_HOST label/isCodexPluginCachePath/resolveCodexPluginRoot 回退 不动）。完成=误命名清零(残留仅 KEEP) + 两 adapter 委托新名 + codex 逐行不变(wire-byte/落盘/profile 不变) + tsc/测试绿 + 失败集 vs a297e9d IDENTICAL = DH-3 DONE。不动 per-host 产物/cc 子模块(DH-4)。",
+      "status": "accepted",
+      "sourceRef": "Design 裁决 tr-DH-3g-design + Design/docs/current/alembic-plugin-dual-host-shared-workspace-io-structure-option-planning-2026-06-20.md §6 + 控制器裁断 evt-20260620070055-0045 (否决物理迁入、派 RC-3b de-Codex pass)",
+      "createdAt": "2026-06-20T07:01:57.115Z"
+    },
+    {
+      "taskPackageId": "dh-4a-plugin-per-host-products-cc-shell-gitlink",
+      "summary": "DH-4a（AlembicPlugin 侧 per-host 产物 + cc 壳 + gitlink + manifest-seam de-Codex；产出 Alembic 门禁 per-host 规格）。基线 0221525，直提 main。用户已授权 cc 子模块提交 + 父仓 gitlink bump。做：① skills/templates/constitution per-host 分叉（codex/cc 各承载本host工具名；DH-0B 3 项 host-divergent 资产出 per-host 变体）；② cc 子模块 manifest identity(删 ALEMBIC_CHANNEL_ID=codex+ALEMBIC_PLUGIN_HOST→claude-code)+cc bootstrap per-host+cc setupProfile，子模块 main 提交+父仓 gitlink bump；③ manifest-seam de-Codex(PluginRegistry 5 符号 host-agnostic 去前缀，wire-byte 保全)；④ 产出 Alembic 漂移门禁 per-host 规格(manifest 单path→per-host、check-shared-asset-drift per-host 比较、3 资产转绿预期)供 DH-4b。不改 Alembic/Core。可 subagent+增量绿+flag。完成=AlembicPlugin per-host 就位+cc 壳+gitlink+manifest-seam+Alembic 规格+tsc/测试绿。",
+      "status": "accepted",
+      "sourceRef": "Design RC-4 + DH-4 精确改点(per-host 产物/漂移门禁 per-host/CC3 划界) + 已决⑤⑦ + DH-0 ④跨仓协调 + DH-0B(3 项 host-divergent→per-host) + 用户决策 A(本会话: 全量 DH-4 含 gitlink bump) + DH-3g 折入 manifest-seam de-Codex",
+      "createdAt": "2026-06-20T07:43:07.720Z"
+    },
+    {
+      "taskPackageId": "dh-4b-alembic-shared-asset-drift-per-host",
+      "summary": "DH-4b（Alembic 侧 shared-asset-drift 门禁 per-host + 3 资产转绿）。本窗口=Alembic（治理权威），基线 cf3b171，直提 main。据 DH-4a 规格 §C：把 3 项资产(alembic-recipes/structure shared 段 + recipes-setup/README)的真 host-divergent 工具名行提升为 wakeflow-host:<host> 段(codex=alembic_knowledge/guard, claude-code=alembic_search/code_guard)；check-shared-asset-drift.mjs 加 per-host 比较 + 可选 cross-host coherence；重跑门禁 RED→GREEN(0 drift)。Plugin self-check 脚本同步 diff 标 needs-controller(不改 Plugin)。Node≥22 跑门禁。完成=门禁绿 + 每项 diff + commit hash。不改四工具语义(main 真实工具名保留在 codex 段)、AlembicCore 不动。",
+      "status": "accepted",
+      "sourceRef": "DH-4a 规格 wakeflow-ledger/AlembicPlugin/dh-4a-per-host-drift-gate-spec-2026-06-20.md §C + DH-0 §DH-4 line 47 + DH-0B(3 资产 host-divergent) + Design RC-4 + 控制器 line-39 裁断(per-host overlay 放行)",
+      "createdAt": "2026-06-20T08:11:09.907Z"
+    },
+    {
+      "taskPackageId": "dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap",
+      "summary": "DH-4c（DH-4 Plugin 侧收尾，完成即 DH-4 DONE）。AlembicPlugin 基线 53f9258，直提 main。① self-check 同步：Plugin config/shared-asset-manifest.json + scripts/check-shared-asset-drift.mjs 同步到 Alembic 88a2abf 版（应用 dh-4b patch，仅这 2 文件、不改 plugin 资产）→ shared-asset-drift 0 drift GREEN(Node≥22)；② cross-shell-drift 门禁 per-host 重塑(§D.1)：byte-identical→section/per-host-aware，line-39 overlay 放行→GREEN；③ cc bootstrap fork(bin:100→claude-code)，子模块提交+gitlink bump(用户授权)；④ cc setupProfile per-host(谨慎保 persistence，高风险可 flag DH-5)。完成=两门禁绿+cc bootstrap+setupProfile(或 flag)+tsc/测试绿。不改 Alembic/Core；CC3 不在本需求。",
+      "status": "accepted",
+      "sourceRef": "DH-4a 规格 §D + DH-4b 同步包 wakeflow-ledger/Alembic/dh-4b-plugin-self-check-sync-2026-06-20.patch + 控制器 line-39 裁断(overlay 放行) + 用户决策 A(全量含 gitlink bump)",
+      "createdAt": "2026-06-20T08:46:10.388Z"
+    },
+    {
+      "taskPackageId": "dh-5-cleanup-test-parity-rc678",
+      "summary": "DH-5（最终清理收口 + 测试对等 RC-6/7/8 + DH-4 结转项；完成即 RC-1~8 全部 DONE，仅余 DH-6 验收）。AlembicPlugin 基线 1b53b5d 直提 main。RC-7 主交付=补 cc 路径 runtime 测试 ~10-15 用例 + cross-host parity（现 cc 覆盖仅 ~5%）；RC-6=固化 layer-contract（mcp→service/workflows 26 处已干净单向 L2→L1、无 backslip，加 lint:layer-boundary 起步绿 或文档化+flag）；RC-8=兼容残留决策（HostDeclaredIntentInput LIVE 保留、file-monitor 纯诊断保留、intent 删除已归 PDR-1 不返工、保 4-tool 语义）；DH-4 结转=AGENTS.md 差异声明表同步 + structure 0-coherence 取舍 note + cc setupProfile 归 CC3 记录。完成=cc runtime 测试绿(failed 不增于基线 39)+RC-6 固化+RC-8 决策+DH-4 结转+tsc 绿+两漂移门禁仍绿(Node≥22)。不改 Alembic(88a2abf)/Core；CC3 文案不在本需求；四工具语义/落盘名/'codex-plugin'/frozen strings 不动；纯 MCP 非强进程。",
+      "status": "accepted",
+      "sourceRef": "需求设计 RC-6/7/8 + DH-5 阶段定义(Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md:79-118) + 控制器 DH-5 取证(Explore 子代理: cc 覆盖~5%/mcp→L1 26 干净单向 seam/HostDeclaredIntentInput LIVE/file-monitor 纯诊断/intent 删除已归 daemon-removal PDR-1) + DH-4b/4c 结转项 + 用户决策 A(全量 RC-1~8 一次做透)",
+      "createdAt": "2026-06-20T09:15:46.573Z"
+    },
+    {
+      "taskPackageId": "dh-6-cc-real-acceptance",
+      "summary": "DH-6 cc 在 workspace 内真实验收（Test）= 本需求最后验收的 cc 半边（codex 半边由用户在 codex host 外部验收，已决#9，不在本卡）。真实 cc host 加载 alembic-claude-code 插件(gitlink 15fce77, manifest ALEMBIC_PLUGIN_HOST=claude-code) + init/status/四工具真 MCP 调用 + 纯 MCP 非强进程验证 + 与 codex 语义对等。控制器已自验单测/门禁/tsc 全绿（tsc、14 cc runtime 单测、shared-asset-drift 权威方向 0 drift、cross-shell-drift、lint:layer-boundary/repo-boundary、全量 vitest 39-failed sandbox 基线无回归），故 Test 只做单测证明不了的真实 cc 运行验收。ALEMBIC_HOME sandbox 隔离保护真实 ~/.asd；安装(runtime 本地 build + 离线 mcp add)受阻则回精确 blocker、勿反复试。不改产品代码（缺陷回 AlembicPlugin）。",
+      "status": "accepted",
+      "sourceRef": "需求设计 DH-6 定义(Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md:118) + 已决#9(cc 在 workspace 内真实验收 / codex 路径用户外部不含本需求) + 控制器 DH-5 验收(RC-1~8 实现 DONE，tsc/14 cc 单测/两漂移门禁/layer-boundary 全绿，39-failed sandbox 基线无回归) + cc 安装方式(runtime 本地 build + 离线 claude mcp add, ALEMBIC_HOME sandbox 隔离)",
+      "createdAt": "2026-06-20T09:49:47.446Z"
+    },
+    {
+      "taskPackageId": "dh-7-agenthost-default-from-pluginhost",
+      "summary": "DH-7（F1 修复，用户选「现修」）= 收尾 RC-1 消除硬编码最后一处。AlembicPlugin 基线 532a7d1 直提 main。把 agentHost 省略时的默认从硬编码 'codex' 改为「取 runtime 已解析 pluginHost」：codex runtime → 仍默认 codex（不变）；cc runtime → 默认 claude-code。改点 mcp-tools.ts:128（AgentHostSchema.default('codex')）+ agent-public-tools.ts:905/925（args.agentHost ?? 'codex'）；默认值取 RuntimeContext/L3 已解析的 pluginHost（与 status.runtimeIdentity.pluginHost 同源），**不在 L2 handler 引入 host-name 字面分支**（读已解析值）。加回归测试（cc 省略→claude-code、codex 省略→codex、显式 agentHost 保留）。约束：wire-safe（codex 行为不变）、显式 agentHost 仍接受、AGENT_HOSTS 校验不变、output/contract 仍始终携带已解析 agentHost、四工具对外 MCP 语义不变。验证 tsc + 新测试 + 全量 unit 失败集不增于 39 基线 + 两漂移门禁 + lint:layer-boundary/repo-boundary 绿（Node≥22）。若 schema-default 移除波及 contract/output/测试超出小修预期，评估后回报。",
+      "status": "accepted",
+      "sourceRef": "DH-6 cc 真实验收 finding F1（Test 报告 + 控制器代码核实 mcp-tools.ts:128 / agent-public-tools.ts:905/925）+ RC-1「消除硬编码 codex / 让 pluginHost 真正驱动派发」+ 用户决策「现修」(2026-06-20)",
+      "createdAt": "2026-06-20T10:32:01.772Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-0",
+      "taskPackageId": "dh-0-precheck-cc-host-feasibility",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-0 盘点 + 前置（硬前置；**不重构、不改业务行为**；产出证据 + 决策喂 DH-1~6）。本窗口=AlembicPlugin（基线 HEAD afbf25e = daemon-removal + MC-3p 后；纯 MCP 非强进程）。逐项给 file:line / grep / 命令输出 / 跨仓证据。\n\n**① pre-existing 漂移门禁 RED 同步绿（硬前置，最高优先）**：现 `alembic-recipes`/`alembic-structure` shared 段 + `recipes-setup/README` 漂移（plugin RC5 改了、Alembic main 未同步）。诊断：跑 Alembic 侧 `scripts/check-shared-asset-drift.mjs`（治理权威）确认当前 RED + 精确 diff；判定正确同步方向（RC5 改动若是目标态→同步 Alembic main 追平 plugin，或反向）；**本窗口同步 Plugin 侧可做的部分**；**Alembic 侧需 apply 的精确改动（manifest / shared 资产）列清单 + 标 needs-controller**（跨仓，由控制器派 Alembic 窗口在进 DH-1 前 apply）。目标：漂移门禁转绿再进 DH-1。\n\n**② cc-host hooks 可行性研究（open question，决定 cc adapter 8 簇形态）**：研究 Claude Code 是否暴露与 codex 等价的 host hooks，覆盖 8 簇——transport / 项目根发现 / init profile / env / tier / diagnostics / JobStore / execution context。每簇结论：cc 有等价 / 部分 / 无（缺口）。**若缺口大（多簇无等价）→ STOP + 回报 needs-user-decision**（cc adapter 形态须调整、可能回用户）。证据：可查 Claude Code 官方插件/MCP/hooks 文档（用 claude-code-guide 子代理或 WebFetch 官方源）+ 本仓 cc manifest/.claude-plugin 线索 + Core host-agent 契约。\n\n**③ CC3 文案划界确认**：确认 DH-4 = 结构 per-host 分叉（目录/标记/manifest/门禁），CC3 = 文案统一（删 \"Codex\" 术语，PLUGIN-SOURCE.json hostWordingDebt）——互不阻塞、本需求不含 CC3 文案统一。给边界线（哪些归 DH-4 / 哪些归 CC3）。\n\n**④ 跨仓协调点清单**：列 Alembic 侧需配合点（共享资产漂移门禁 manifest 单 path→per-host path、check-shared-asset-drift.mjs per-host 比较 + 可选 cross-host coherence）——供 DH-4 跨仓派发。\n\n**⑤ 基线 + 92 Codex* surface 复核**：build/test + drift-gate 现状基线；复核 requirement design 的 92 个 Codex* surface 分类（~40 真 host-specific→抽 L3 / ~52 误命名 host-agnostic→去前缀归 L1/L2，如 resolveCodexServiceRequestBoundary / CODEX_*_TOOL_NAMES / buildCodexProjectRuntimeContext）——给文件:行抽样核实，尤其 52 误命名判定准确性。\n\n**边界/不变量**：DH-0 不重构、不改四工具对外 MCP 语义、不建 L3、不动 per-host 分叉（除 ① 的漂移同步）；保持纯 MCP 非强进程不变量（不重建常驻）；不下沉 Core；AlembicCore 不改。回 TargetResultEnvelope：每项结论 + 证据 + **cc-host hooks 8 簇可行性矩阵** + 漂移同步状态（已绿 / 需 Alembic apply 清单）+ 所有 needs-controller / needs-user-decision（尤其 cc-host 缺口、漂移跨仓 apply、CC3 边界）。**不进入 DH-1**。",
+      "status": "accepted",
+      "createdAt": "2026-06-19T10:21:04.329Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh0-plugin-precheck__AlembicPlugin__DH-0",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh0-plugin-precheck__AlembicPlugin__DH-0.json",
+        "deliveryRunId": "run-delivery-dh0-plugin-precheck__AlembicPlugin__DH-0",
+        "dispatchGroup": "dh0-plugin-precheck",
+        "sentAt": "2026-06-19T10:22:19.495Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-0"
+    },
+    {
+      "targetTaskId": "DH-0B",
+      "taskPackageId": "dh-0b-alembic-drift-backport",
+      "targetWindow": "Alembic",
+      "summary": "DH-0B Alembic 侧共享资产漂移回填（跨仓前置，DH-1 硬前置）。本窗口=Alembic（仓库 `~/Documents/AlembicWorkspace/Alembic`，基线 HEAD cf3b171 clean）。**直提 main，不开分支。**\n\n**背景（来自 DH-0 精查，已控制器验收）**：共享资产漂移门禁当前 RED（3 项），方向=**Alembic main 回填 AlembicPlugin 内容**（plugin 是目标态/领先，反映合并后工具面：`alembic_search` operation=search/get/expand + mode=auto/keyword/semantic、`alembic_code_guard`、`alembic_project_matrix`/`alembic_graph`、无 `alembic_knowledge confirm_usage`；Alembic main 仍是旧 `alembic_knowledge` list/get/confirm_usage、`alembic_guard`、`alembic_structure` targets/files/metadata 陈旧面）。符合设计「RC5=目标→main 追平」+ manifest「backported from plugin (RC5 p1)」既定模式。\n\n**任务（仅这 3 项共享资产，逐项对齐到 `../AlembicPlugin/{skills,templates}/...`）**：\n1. `skills/alembic-recipes/SKILL.md` — 共享段 `intro-and-overview` + `use-context-tail`\n2. `skills/alembic-structure/SKILL.md` — 共享段 `title-intro` + `tools-and-graph`\n3. `templates/recipes-setup/README.md` — 工具面相关行\n\n源真相=对应 `../AlembicPlugin/skills/alembic-recipes/SKILL.md`、`../AlembicPlugin/skills/alembic-structure/SKILL.md`、`../AlembicPlugin/templates/recipes-setup/README.md`。权威（见 `config/shared-asset-manifest.json`）：shared 段=main；templates-recipes-setup=main（directory-exact，含已声明 `_template.md` `v3-fields-heading` 变体）。\n\n**关键 CAVEAT（与 DH-4 纠缠）**：部分漂移行是**真 host-divergent 工具名**（main CLI `alembic_knowledge`/`alembic_guard` vs plugin MCP `alembic_search`/`alembic_code_guard`）。回填时**真 host-specific 工具名行保留为 `wakeflow-host:main` 段、不要用 plugin 工具名覆盖**。DH-0B 只把**共享段内容**对齐到绿；干净长期模型是 DH-4 per-host 分叉。**若某段不强行写错内容就无法作为「shared」对齐 → 不要硬改，blocked/flag 回控制器**（即确认该段属 DH-4 per-host 分叉范围）。\n\n**完成定义**：重跑 `scripts/check-shared-asset-drift.mjs` → **GREEN（0 drift）**；回填证据=门禁 before（RED/3 drift）→ after（GREEN）原始输出 + 每项 diff + Alembic main commit hash（直提 main）。\n\n**边界/不变量**：仅动这 3 项漂移共享资产；不动 Alembic 其它代码/测试；不改四工具对外 MCP 语义；不动 AlembicPlugin；不动 Core。**不进入任何 DH-1 plugin 重构。**\n\n**回 TargetResultEnvelope**：门禁 before/after 原始输出、每项 diff、Alembic main commit hash、任何无法作为 shared 对齐而 flag 给 DH-4 的段、所有 needs-controller/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-19T14:23:23.646Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh0b-alembic-drift__Alembic__DH-0B",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh0b-alembic-drift__Alembic__DH-0B.json",
+        "deliveryRunId": "run-delivery-dh0b-alembic-drift__Alembic__DH-0B",
+        "dispatchGroup": "dh0b-alembic-drift",
+        "sentAt": "2026-06-19T14:25:26.757Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-0B"
+    },
+    {
+      "targetTaskId": "DH-1",
+      "taskPackageId": "dh-1-host-abstraction-unify-delete-generic",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-1 host 抽象统一 + 删 generic-host-agent（RC-1 + RC-5）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `afbf25e` clean = daemon-removal + MC-3p 后，纯 MCP 非强进程）。**直提 main，不开分支。**\n\n**前置已澄清（控制器本会话决策，重要）**：DH-0B 已核实 alembic-recipes/structure + recipes-setup/README 漂移门禁 RED 是**真 host-divergent 工具面**（main `alembic_knowledge/confirm_usage/alembic_guard` ↔ plugin `alembic_search/alembic_code_guard/alembic_project_matrix`），无法在不改 main 四工具对外 MCP 语义下转绿。用户决策 B：该漂移**解耦于 DH-1**（归 DH-4 per-host 门禁模型正确转绿），**DH-1 不依赖漂移门禁绿、也不得去碰那 3 项 skill/template 漂移资产**。DH-1 改点（运行时 host 抽象代码）与漂移资产不相交，照常推进。\n\n**范围（仅 RC-1 host 抽象统一 + RC-5 删 generic；不建 L3、不做 de-Codex 改名、不动 per-host 产物分叉——那些分别是 DH-2/DH-3/DH-4）**：\n\n1. **host 身份（RC-1，由 hostShape 派生、消除硬编码 codex）**：\n   - `runtime/RuntimeContext.ts:45` 去 'codex' 硬默认；`:62` `expectedPluginHost` 由 `hostShape` 派生（非恒 codex）。\n   - `PluginRegistry.ts` hostShape(:59-78,:85) 检测已正确 → 把它喂给 `RuntimeContext` 派生 identity，让 `pluginHost` 可用于 per-host 身份。**本阶段只统一 identity 来源，不改四工具行为派发（行为下沉是 DH-2/3）。**\n   - 加 `CLAUDE_CODE_PLUGIN_HOST` 常量（对称现有 `CODEX_PLUGIN_HOST` RuntimeContext.ts:16）+ per-host `expectedPluginHost`。\n2. **manifest（RC-1）**：cc `.claude-plugin/plugin.json:32` 删 `ALEMBIC_CHANNEL_ID=codex`、`:33` `ALEMBIC_PLUGIN_HOST` 改 `claude-code`；**codex `.mcp.json:8` 不变**。\n3. **bootstrap（RC-1）**：cc `bin/alembic-start.mjs:100` 默认改 `claude-code`（现两脚本相同；**codex 脚本不变**）。\n4. **诊断（RC-1）**：`diagnostics/Diagnostics.ts:542` 比较改 `=== expectedPluginHost`（非恒 `CODEX_PLUGIN_HOST`），使 cc 运行时不再自认 codex。\n5. **删 generic-host-agent（RC-5，6 文件，AGENT_HOSTS 收敛 codex+claude-code）**：\n   - `public-tools/contract.ts:11`（`AGENT_HOSTS` 去 `generic-host-agent`）；\n   - `mcp-tools.ts:103`（去 + 合并到 contract import）；\n   - `KnowledgeContextStatus.ts:29-36`（去 generic + 其他未实现 future-host stub）；\n   - `cross-host-readiness.ts:55-59`（随 contract 自动）；\n   - 2 测试 `CrossHostReadiness:35`、`KnowledgeContextContracts:26`（期望改为 codex+claude-code 双宿主）。\n\n**完成定义**：host identity 由 hostShape 派生（cc→claude-code、codex→codex），无硬编码 codex 默认；generic-host-agent 删净（AGENT_HOSTS=codex+claude-code）；cc manifest/bootstrap 声明 claude-code；Diagnostics 比较走 expectedPluginHost；`tsc --noEmit` exit 0；受影响测试（含上述 2 个）绿；**pre-existing 39 vitest 沙箱失败文件是 DH-0 已记基线、非 DH-1 回归**（须明确区分、不得扩面去修）；纯 MCP 非强进程不变量不回退/不引入常驻；四工具对外 MCP 语义不变；未建 L3、未做 de-Codex 改名、未动 per-host 产物分叉、AlembicCore 不动。\n\n**边界/不变量**：只动上述 RC-1/RC-5 文件；不进 DH-2（建 L3）/DH-3（cc adapter + 52 de-Codex 改名）/DH-4（per-host 产物 + 漂移门禁模型）；不改 codex 侧 manifest/.mcp.json:8 与 codex bootstrap；不改四工具语义；不下沉 Core；不依赖/不强改漂移门禁绿，也不碰 3 项漂移 skill/template 资产（漂移归 DH-4）。先读本仓 `CLAUDE.md`/`AGENTS.md` 并遵循更严规则；用本仓既有 stack/scripts/Node 版本。\n\n**回 TargetResultEnvelope**：每改点 file:line + diff；`tsc --noEmit` 与受影响测试原始输出（明确区分 pre-existing 39 沙箱基线 vs DH-1 新增）；AlembicPlugin main commit hash（直提 main）；hostShape→identity 派生验证证据（cc 运行时自认 claude-code，如 RuntimeContext/Diagnostics 单测或探针输出）；任何 needs-controller/needs-user-decision/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-19T15:55:30.365Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh1-plugin-host-abstraction__AlembicPlugin__DH-1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh1-plugin-host-abstraction__AlembicPlugin__DH-1.json",
+        "deliveryRunId": "run-delivery-dh1-plugin-host-abstraction__AlembicPlugin__DH-1",
+        "dispatchGroup": "dh1-plugin-host-abstraction",
+        "sentAt": "2026-06-19T15:58:39.997Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-1"
+    },
+    {
+      "targetTaskId": "DH-2",
+      "taskPackageId": "dh-2-l3-hostadapter-interface-codex-migration",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-2 建 L3 HostAdapter 接口 + codex 实现迁入（RC-2，先对齐现状、**不改行为**）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `6cd4c88` = DH-1 后；纯 MCP 非强进程）。**直提 main，不开分支。**\n\n**前置（DH-1 已验收）**：host identity 已由物理 shell 形态派生（`detectPluginHostShape`/`derivePluginHostFromShape`/`CLAUDE_CODE_PLUGIN_HOST`，RuntimeContext 为单一来源）；generic-host-agent 已删（AGENT_HOSTS=codex+claude-code）。DH-2 在此之上建 L3 适配层骨架。\n\n**DH-2→DH-3 硬序（关键边界）**：DH-2 **只**「建接口 + codex 实现迁入、行为逐行等价」。**不**建 cc adapter、**不**做 host-aware 选择（codex/cc 二选一）/L2 host 分派、**不**做 52 个误命名 de-Codex 改名、**不**动 per-host 产物 / cc 子模块 alembic-claude-code（分属 DH-3/DH-4）。先替代/对等、不裸断、每步门禁绿。\n\n**范围（RC-2）**：\n1. **抽 `HostAdapter` 接口**（host-agnostic 契约，方法集按需求设计）：项目根 `resolveProjectRoot/validate/save/loadSaved`；workspace init `initializeWorkspace/record+readInitMarker`；runtime env `ensureRuntimeEnvironment/resolveHostRuntimeContext/resolveEffectiveTier`；execution `buildToolExecutionContext`；MCP server 生命周期 `start/shutdown/handleToolCall`；diagnostics `buildPluginDiagnostics/probeRuntimeBinary`。\n2. **codex 实现迁入 `CodexHostAdapter`（实现该接口，逐行行为等价）**。真 host-specific 源（DH-0 测绘，~40 surface 集中 ~5 文件）：`ProjectRootResolver.ts`(:75-241)、`HostMcpServer.ts`(workspace init :425-499 + start/shutdown/handleToolCall)、`RuntimeContext.ts`(:43-87 runtime env，DH-1 已部分)、tool execution context、`HostProjectAlignment.ts`(:88-428)、`diagnostics/Diagnostics.ts`(:195-1103)、`StatusService.ts`(:128-851)、`ProjectSkillDelivery.ts`(:16-141)、SetupService/`CODEX_SETUP_PROFILE`。\n3. **接入（避免空壳/死代码）**：把现有 codex 调用点改为经 `CodexHostAdapter` 走（codex 单实现、行为不变），使接口被真实消费——不建无人调的接口。**仅 codex 路径**；host-aware 选择与 cc adapter 留 DH-3。若「建接口+codex 迁入」与 DH-3「L2 host 分派」的切线需要具体取舍，按你的判断切在「codex 行为逐行等价」处并 flag 回控制器（像 DH-1 那样诚实标注），不要越界进 DH-3/DH-4。\n\n**完成定义**：`HostAdapter` 接口存在且被 codex 路径**真实消费**（非死代码/空壳）；codex 行为**逐行等价**（四工具对外 MCP 语义不变、init/status/项目根/diagnostics 输出不变、tier/env/job 行为不变）；`tsc --noEmit` exit 0；受影响测试绿 + 全量 unit 失败集与基线（pre-existing 39 沙箱/MTC-7）逐文件 IDENTICAL（无 DH-2 回归，须明确区分、不扩面修 MTC-7）；纯 MCP 非强进程不变量不回退（L3 不引入常驻进程）；未建 cc adapter / 未做 host-aware 选择 / 未做 de-Codex 改名 / 未动 per-host 产物 / 未碰 3 项漂移 skill/template 资产 / 未动 cc 子模块 / AlembicCore 不动 / 不改 codex .mcp.json:8。先读本仓 `CLAUDE.md`/`AGENTS.md` 遵循更严规则；用本仓既有 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：`HostAdapter` 接口定义 file:line + `CodexHostAdapter` 迁入清单（每源 file:line→adapter 方法）+ 接入点（哪些 call site 改走 adapter）；行为逐行等价证据（diff 等价说明 / 关键路径单测）；`tsc --noEmit` + 受影响测试 + 全量 unit 失败集 vs 基线对比原始输出；AlembicPlugin main commit hash；DH-2/DH-3 切线的任何取舍/flag；所有 needs-controller/needs-user-decision/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T03:36:02.954Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh2-plugin-l3-codex-adapter__AlembicPlugin__DH-2",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh2-plugin-l3-codex-adapter__AlembicPlugin__DH-2.json",
+        "deliveryRunId": "run-delivery-dh2-plugin-l3-codex-adapter__AlembicPlugin__DH-2",
+        "dispatchGroup": "dh2-plugin-l3-codex-adapter",
+        "sentAt": "2026-06-20T03:37:00.509Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-2"
+    },
+    {
+      "targetTaskId": "DH-3",
+      "taskPackageId": "dh-3-claude-code-adapter-l2-rewire-decodex",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-3 双宿主对等执行：新建 claude-code adapter + host-aware 选择 + L2 全面改调 L3 + 52 误命名 de-Codex 归 L1/L2（RC-2/3/3b）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `348bea2` = DH-2 后；纯 MCP 非强进程）。**直提 main，不开分支。**\n\n**前置（DH-1/DH-2 已验收）**：L3 `HostAdapter` 接口 + `CodexHostAdapter`（逐行委托）已建；`resolveHostAdapter()` DH-2 恒返 codex；HostMcpServer 已经 L3 消费身份簇；host identity 已由 `detectPluginHostShape` 派生。\n\n**这是大重构——必须分步、先替代/对等、不裸断、每步门禁绿、增量 commit（每子步一 commit）。** 顺序：\n\n**子步 ① cc adapter + host-aware 选择（補能力核心，最高价值绿检查点）**：\n- 新建 `ClaudeCodeHostAdapter implements HostAdapter`：cc 行为覆盖身份簇。关键（DH-0 ② 矩阵 + #1 修复）：`resolveProjectRoot` 把 cc 工作区 env（`CLAUDE_PROJECT_DIR` 等）加入 `ProjectRootResolver` 可信候选（codex 仅信 explicit/ALEMBIC_PROJECT_DIR/CODEX_WORKSPACE_*，cc cwd 现 fail-closed）；`hostId=CLAUDE_CODE_PLUGIN_HOST`、cc setupProfile；env/init/tier/saved-root/init-marker 取 cc 适配（host-agnostic 文件 I/O 可复用，cc 特有处 cc 化）。cluster 5(静态 tool list)/6(无 host introspection→自生成)/8(无 turn-meta) 在 cc **优雅降级**——按 DH-0 矩阵实现，不强造 host 能力。\n- `resolveHostAdapter()` 改为按 `detectPluginHostShape` 选 codex/cc（host-aware；**host-name 分支只允许在 L3 此处**）。**codex 路径行为逐行不变**。\n- 证据：cc 单测（cc shell→选中 ClaudeCodeHostAdapter + cc 项目根/identity 行为；codex 不回归），类比 DH-1 CodexRuntimeContext.test.ts。\n- **若判断整 DH-3 太大、单次不安全：在此子步绿 + commit 后返回，flag 余下 ②③ 给 DH-3b**（控制器再派），不要硬塞一次。\n\n**子步 ② L2 全面改调 L3**：把其余 host-specific call site（StatusService / project-root-scope / ToolPolicy / host-agent-workflows 的 resolveProjectRoot/readInitMarker/resolveEffectiveTier/buildCodexHostProjectAlignment 等，DH-0 列 ~102 处 Codex* 直依赖）改经 `HostAdapter` 走，使 **L2 不再含 host-name 分支**。行为保持（codex 等价、cc 经 adapter）。增量绿。\n\n**子步 ③ 52 误命名 de-Codex 归 L1/L2 + 物理迁入 codex 函数体**：把 DH-0 ⑤ 认定的 ~52 个**误命名 host-agnostic** `Codex*`/`CODEX_*` surface 去 Codex 前缀、归 L1/L2（如 `resolveCodexServiceRequestBoundary`/全部 `CODEX_*_TOOL_NAMES`/`buildCodexProjectRuntimeContext` 等）；把**真 host-specific** 的 codex 函数体物理迁入 `CodexHostAdapter`（去掉 DH-2 委托外观）。纯改名/搬移、行为等价、先替代后删。\n\n**完成定义**：cc shell 选中 `ClaudeCodeHostAdapter` 且 cc 身份/项目根/identity 正确（cc 不再自认 codex、cc 工作区可信）；codex 行为逐行不变；**host-name 分支只在 L3**（L2 无 host 分支，grep/lint 证）；~52 误命名 Codex* 去前缀归 L1/L2（grep 证残留仅真 host-specific）；`tsc --noEmit` 绿；cc adapter 单测 + 受影响测试绿 + 全量 unit 失败集与基线（39 pre-existing 沙箱/MTC-7）对比（改名引起的测试 import/名变更须说明，**净失败集不增长**）；纯 MCP 非强进程不变量不回退（L3 不引入常驻）；四工具对外 MCP 语义不变。\n\n**边界/不变量（DH-4 仍排除）**：**不动 per-host 产物**（skills/templates/constitution per-host、manifest per-host、漂移门禁 per-host、cc 子模块 alembic-claude-code 提交/gitlink bump——全归 DH-4）；不碰 3 项漂移 skill/template 资产；AlembicCore 不动；codex `.mcp.json:8` 不变；CC3 文案统一不在本需求。真实 cc 端验收在 DH-6（Test，workspace 内）；DH-3 cc 证据=单测/targeted。先读本仓 `CLAUDE.md`/`AGENTS.md` 遵循更严规则；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：每子步 commit hash + diff 摘要；ClaudeCodeHostAdapter 实现 + host-aware 选择证据；L2 去 host 分支证据（grep/lint）；52 de-Codex 改名清单（surface→新名/新位置）+ 残留 Codex* 仅真 host-specific 证明；cc 单测 + tsc + 全量 unit 失败集 vs 基线；codex 行为等价/不回归证据；若 ① 后 flag 给 DH-3b 的余项；所有 needs-controller/needs-user-decision/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T04:11:35.876Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh3-plugin-cc-adapter-decodex__AlembicPlugin__DH-3",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3-plugin-cc-adapter-decodex__AlembicPlugin__DH-3.json",
+        "deliveryRunId": "run-delivery-dh3-plugin-cc-adapter-decodex__AlembicPlugin__DH-3",
+        "dispatchGroup": "dh3-plugin-cc-adapter-decodex",
+        "sentAt": "2026-06-20T04:12:17.302Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-3"
+    },
+    {
+      "targetTaskId": "DH-3b",
+      "taskPackageId": "dh-3b-l2-rewire-decodex-migration",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-3b（DH-3 余项 ②③）双宿主对等执行收尾：L2 全面改调 L3 + 收口残留 host 分支 + 52 误命名 de-Codex 归 L1/L2 + 物理迁入。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `651f96a` = DH-3.1 后；纯 MCP 非强进程）。**直提 main，不开分支。**\n\n**前置（DH-1/DH-2/DH-3.1 已验收）**：L3 `HostAdapter` 接口 + `CodexHostAdapter` + `ClaudeCodeHostAdapter` + `resolveHostAdapter()` 工厂（shell 形态选 codex/cc，**L3 唯一 adapter 选择分支**）已建；cc 项目根信任 `CLAUDE_PROJECT_DIR` 已加；HostMcpServer 已部分经 L3 消费。\n\n**大重构（宽面机械）——分步增量绿、先替代/对等、不裸断、增量 commit（每子步一 commit）。** 顺序：\n\n**子步 ② L2 全面改调 L3 + 收口残留 host 分支**：\n- 其余 host-specific call site（DH-0 列 ~102 处 Codex* 直依赖：StatusService / project-root-scope / ToolPolicy / host-agent-workflows 的 resolveProjectRoot/readInitMarker/resolveEffectiveTier/buildCodexHostProjectAlignment 等）改经 `resolveHostAdapter()` 取的 `HostAdapter` 走。\n- 收口仍散在非-L3 文件的 host-name/hostShape 分支到 L3：尤其 `PluginRegistry.ts`（hostShape 形态检测/manifest 选择 :64/:89）、`diagnostics/Diagnostics.ts`（hostShape asset-skip :583）——DH-0 认定的 true-L3 seam，DH-3.1 暂留原处，本步按架构归位（**host-name 分支只在 L3**：shape 检测 + adapter 选择 + adapter 实现内）。\n- 目标：**L2 及其它非-L3 层不含 host-name 分支**（grep/lint 证）。行为保持（codex 逐行等价、cc 经 adapter）。增量绿 + commit。\n\n**子步 ③ 52 误命名 de-Codex 归 L1/L2 + 物理迁入 codex 函数体**：\n- DH-0 ⑤ 认定的 ~52 个**误命名 host-agnostic** `Codex*`/`CODEX_*` surface 去 Codex 前缀、归 L1/L2（`resolveCodexServiceRequestBoundary` / 全部 `CODEX_*_TOOL_NAMES` / `buildCodexProjectRuntimeContext` 等）。\n- 真 host-specific 的 codex 函数体物理迁入 `CodexHostAdapter`（去掉 DH-2/DH-3.1 委托外观，函数体进 adapter；cc adapter 相应共享或 cc 化）。\n- 纯改名/搬移、行为等价、先替代后删。增量绿 + commit。\n- **若判断 ③ 太大/单次不安全：在 ② 绿+commit 后返回，flag ③ 给 DH-3c**（控制器再派），不要硬塞。\n\n**完成定义**：L2 及非-L3 层 host-name 分支清零（仅 L3：shape 检测/adapter 选择/adapter 实现内，grep/lint 证）；~52 误命名 Codex* 去前缀归 L1/L2（grep 证残留 Codex*/CODEX_* 仅真 host-specific 且在 L3）；codex 行为逐行不变 + cc 经 adapter；`tsc --noEmit` 绿；受影响测试 + cc 单测绿 + 全量 unit 失败集与基线（39 pre-existing 沙箱/MTC-7）对比（改名引起的 import/名变更须说明、**净失败集不增长**）；纯 MCP 非强进程不变量不回退（L3 不引入常驻）；四工具对外 MCP 语义不变。\n\n**边界/不变量（DH-4 排除）**：不动 per-host 产物（skills/templates/constitution per-host、manifest per-host、漂移门禁 per-host、cc 子模块 alembic-claude-code 提交/gitlink bump——全归 DH-4）；不碰 3 项漂移 skill/template 资产；AlembicCore 不动；codex `.mcp.json:8` 不变；CC3 文案不在本需求。cc cluster 5/6/8 簇级降级 + cc 专属 setupProfile 若涉 per-host 产物归 DH-4（本步仅 runtime 层 de-Codex/re-route，不做 per-host 产物分叉）。真实 cc 验收 DH-6。先读本仓 `CLAUDE.md`/`AGENTS.md` 遵循更严规则；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：每子步 commit hash + diff 摘要；L2/非-L3 host 分支清零证据（grep/lint：host-name 分支仅 L3）；52 de-Codex 清单（surface→新名/新位置）+ 残留 Codex* 仅真 host-specific 证明；物理迁入清单（函数体→adapter）；`tsc --noEmit` + 测试 + 全量 unit 失败集 vs 基线；codex 等价/cc 不回归证据；若 flag DH-3c 的余项；所有 needs-controller/needs-user-decision/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T04:31:27.475Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh3b-plugin-l2-rewire-decodex__AlembicPlugin__DH-3b",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3b-plugin-l2-rewire-decodex__AlembicPlugin__DH-3b.json",
+        "deliveryRunId": "run-delivery-dh3b-plugin-l2-rewire-decodex__AlembicPlugin__DH-3b",
+        "dispatchGroup": "dh3b-plugin-l2-rewire-decodex",
+        "sentAt": "2026-06-20T04:32:02.284Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-3b"
+    },
+    {
+      "targetTaskId": "DH-3c",
+      "taskPackageId": "dh-3c-decodex-rename-routing-migration",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-3c（DH-3 收尾 ③ + ~19 host-operation routing）de-Codex 改名 + 物理迁入。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `ea22f92` = DH-3b 后；纯 MCP 非强进程）。**直提 main，不开分支。**\n\n**前置（DH-1/2/3.1/3b 已验收）**：L3 `HostAdapter`/`CodexHostAdapter`/`ClaudeCodeHostAdapter`/`resolveHostAdapter`+`hostAdapterForShape` 已建；host-name 分支已清零 outside L3（仅 host-adapter + RuntimeContext shape 原语）；cc 项目根信任 `CLAUDE_PROJECT_DIR` 已加。**这是 DH-3 阶段的收尾。**\n\n**宽面机械收尾——一次聚焦 pass（routing + 改名 + 物理迁入捆一起，因都触同一批 Codex*-named 调用点），分步增量绿、行为等价、先替代后删、增量 commit。** 顺序：\n\n**子步 A（host-operation routing + de-Codex 改名，同批）**：\n- **~19 host-operation call site** 经 `resolveHostAdapter()` 的 `HostAdapter` 走：StatusService / project-root-scope / ToolPolicy / tool-visibility / Preflight / host-agent-workflows 的 `resolveProjectRoot`/`readInitMarker`/`resolveEffectiveTier`/`buildCodexHostProjectAlignment` 等。\n- **~52 误命名 host-agnostic `Codex*`/`CODEX_*`**（全仓 65 处引用：全部 `CODEX_*_TOOL_NAMES`、`resolveCodexServiceRequestBoundary`、`buildCodexProjectRuntimeContext` 等）去 Codex 前缀、归 L1/L2。\n- 纯改名 + routing、行为等价。增量绿 + commit。\n\n**子步 B（物理迁入）**：真 host-specific codex 函数体物理迁入 `CodexHostAdapter`（去掉 DH-2/DH-3.1 的委托外观，函数体进 adapter；cc adapter 相应共享或 cc 化）。**保 F-V2-2 类 wire-byte 安全**：codex `.mcp.json` 读取/arg 归一化字节不变（`readJsonObject` 等敏感点谨慎，必要处留原层）。增量绿 + commit。\n- **若判断 B 仍过大/单次不安全：在 A 绿+commit 后返回，flag B 给 DH-3d**。\n\n**完成定义（达成即 DH-3 阶段收尾）**：~52 误命名 Codex* 去前缀归 L1/L2（grep 证残留 `Codex*`/`CODEX_*` 仅**真 host-specific** 且在 L3/host-adapter 层）；~19 host-operation 经 adapter；真 host-specific 函数体在 `CodexHostAdapter`（DH-2/3.1 委托外观清除）；codex 行为**逐行不变**（含 `.mcp.json` wire-byte/arg 归一化）+ cc 经 adapter；`tsc --noEmit` 绿；受影响测试 + cc/registry 测试绿 + 全量 unit 失败集与基线（39 pre-existing 沙箱/MTC-7）对比（改名引起的 import/名变更须说明、**净失败集不增长**）；纯 MCP 非强进程不变量不回退；四工具对外 MCP 语义不变；host-name 分支仍仅 L3。\n\n**边界/不变量（DH-4 排除）**：不动 per-host 产物（skills/templates/constitution per-host、manifest per-host、漂移门禁 per-host、cc 子模块 alembic-claude-code 提交/gitlink bump）；不碰 3 项漂移资产；AlembicCore 不动；codex `.mcp.json:8` 不变；CC3 文案不在本需求；cc cluster 5/6/8 簇级降级 + cc 专属 setupProfile 若属 per-host 产物归 DH-4（本步仅 runtime 层 de-Codex/routing/迁入）。真实 cc 验收 DH-6。先读本仓 `CLAUDE.md`/`AGENTS.md` 遵循更严规则；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：每子步 commit hash + diff 摘要；de-Codex 清单（surface→新名/新位置）+ grep 证残留 Codex* 仅真 host-specific（在 L3）；~19 routing 清单；物理迁入清单（函数体→adapter）+ wire-byte 安全证据（.mcp.json/arg 归一化不变）；`tsc --noEmit` + 测试 + 全量 unit 失败集 vs 基线；codex 等价/cc 不回归证据；**DH-3 阶段完成确认**（或 flag DH-3d 余项）；所有 needs-controller/needs-user-decision/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T04:55:27.834Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh3c-plugin-decodex-migration__AlembicPlugin__DH-3c",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3c-plugin-decodex-migration__AlembicPlugin__DH-3c.json",
+        "deliveryRunId": "run-delivery-dh3c-plugin-decodex-migration__AlembicPlugin__DH-3c",
+        "dispatchGroup": "dh3c-plugin-decodex-migration",
+        "sentAt": "2026-06-20T04:56:05.188Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-3c"
+    },
+    {
+      "targetTaskId": "DH-3d",
+      "taskPackageId": "dh-3d-decodex-rename-migration-finale",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-3d（DH-3 阶段最终收尾）de-Codex 改名 + 物理迁入 + 余 host-operation routing。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `f38e268` = DH-3c 后；纯 MCP 非强进程）。**直提 main，不开分支。本步完成后 DH-3 阶段 DONE。**\n\n**前置（DH-1/2/3.1/3b/3c 已验收）**：L3 adapter 体系（`HostAdapter`/`CodexHostAdapter`/`ClaudeCodeHostAdapter`/`resolveHostAdapter`/`hostAdapterForShape`）建成；host-name 分支清零 outside L3；project-root host-operation 已经 adapter（project-root-scope/tool-visibility）。\n\n**宽面机械重构——分批增量绿、每批一 commit、先替代后删、不裸断。** 建议先用 Explore 子代理把 65 处 `Codex*`/`CODEX_*` 引用 + 余 host-operation routing call site 全量测绘，再分逻辑批改（每批 tsc 绿即 commit），降低单次 blast radius。建议顺序：\n\n**批 1（de-Codex 改名，分逻辑组）**：~52 误命名 host-agnostic `Codex*`/`CODEX_*`（65 引用）去 Codex 前缀、归 L1/L2：\n- 全部 `CODEX_*_TOOL_NAMES`（ToolPolicy，普适工具策略，非 host 专属）；\n- `resolveCodexServiceRequestBoundary`、`buildCodexProjectRuntimeContext` 等；\n- **架构裁决（DH-3c 发现）**：`isTrustedProjectRoot`/`resolveEffectiveTier` 实为 host-agnostic（DH-2 接口 over-include）——**推荐从 HostAdapter 接口移除、去前缀归 L1/L2 纯函数**（调用方直用 L1），除非你判定保 adapter 更一致（须说明理由）。\n- 按文件/模块分组，每组改完 `tsc --noEmit` 绿 + commit。\n\n**批 2（余 host-operation routing）**：余下 host-specific call site（Preflight / StatusService / host-agent-workflows，含需在 `HostAdapter` 加方法的 `buildHostProjectAlignment`）经 `resolveHostAdapter()` 的 adapter 走。增量绿 + commit。\n\n**批 3（物理迁入）**：真 host-specific codex 函数体物理迁入 `CodexHostAdapter`（去掉 DH-2/DH-3.1 委托外观）。**保 F-V2-2 wire-byte 安全**：codex `.mcp.json` 读取/arg 归一化字节不变（敏感点谨慎、必要处留原层）。增量绿 + commit。\n\n**完成定义（达成即 DH-3 阶段 DONE）**：grep `Codex*`/`CODEX_*` 在 lib（excl host-adapter）= 0 残留或仅**真 host-specific 且在 L3**；所有 host-operation 经 adapter（host-name 分支仅 L3）；真 host-specific 函数体在 `CodexHostAdapter`（委托外观清除）；codex 行为**逐行不变**（含 `.mcp.json` wire-byte/arg）+ cc 经 adapter；`tsc --noEmit` 绿；受影响测试 + cc/registry 测试绿 + 全量 unit 失败集与基线（39 pre-existing 沙箱/MTC-7）对比（改名 import/名变更须说明、**净失败集不增长**）；纯 MCP 非强进程不变量不回退；四工具对外 MCP 语义不变。\n\n**边界/不变量（DH-4 排除）**：不动 per-host 产物（skills/templates/constitution per-host、manifest per-host、漂移门禁、cc 子模块 alembic-claude-code 提交/gitlink bump）；不碰 3 项漂移资产；AlembicCore 不动；codex `.mcp.json:8` 不变；CC3 文案不在本需求；cc cluster 5/6/8 降级 + cc setupProfile 若属 per-host 产物归 DH-4。真实 cc 验收 DH-6。若某批后仍判断剩余过大可 flag DH-3e + 报已完成比例，但**优先在本步完成 DH-3 收尾**（你已在 compact 后的较新上下文）。先读本仓 `CLAUDE.md`/`AGENTS.md`；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：每批 commit hash + diff 摘要；de-Codex 最终清单（surface→新名/位置）+ grep 证残留=0/仅真 host-specific；routing 清单；物理迁入清单 + wire-byte 证据；isTrustedProjectRoot/resolveEffectiveTier 裁决结果；`tsc --noEmit` + 测试 + 全量 unit 失败集 vs 基线；codex 等价/cc 不回归证据；**DH-3 阶段完成确认**（或 flag DH-3e + 已完成比例）；所有 needs-controller/needs-user-decision/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T05:09:29.688Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh3d-plugin-decodex-finale__AlembicPlugin__DH-3d",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3d-plugin-decodex-finale__AlembicPlugin__DH-3d.json",
+        "deliveryRunId": "run-delivery-dh3d-plugin-decodex-finale__AlembicPlugin__DH-3d",
+        "dispatchGroup": "dh3d-plugin-decodex-finale",
+        "sentAt": "2026-06-20T05:10:06.619Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-3d"
+    },
+    {
+      "targetTaskId": "DH-3e",
+      "taskPackageId": "dh-3e-decodex-full-rename-finale",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-3e（DH-3 de-Codex 全量收尾）多批 de-Codex 改名 + collision + 余 host-operation routing + 物理迁入。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `ca1f9ab` = DH-3d 后；纯 MCP 非强进程）。**直提 main，不开分支。**\n\n**用户决策（本会话）= A 全量做透**：剩余 ~150 误命名 host-agnostic `Codex*`/`CODEX_*` **全部**去前缀归 L1/L2，多批完成。**本步尽量多推进**（每批 tsc 绿即 commit），单次安全上限内尽量多做；确需跨上下文，在某批绿+commit 后 flag DH-3f（每批独立绿、不裸断）。这是 DH-3 阶段的全量收尾。\n\n**前置**：服务边界面 de-Codex 首批已落（ca1f9ab）；本窗 **2 个 Explore 子代理已产出完整 symbol→新名→refs 测绘清单——直接用它执行、勿重新测绘**（省上下文）。host-name 分支已清零 outside L3；L3 adapter 体系建成。\n\n**执行（每批一 commit、tsc 绿、先替代后删、不裸断）**：\n1. **de-Codex 余 ~150 符号去前缀归 L1/L2**：全部 `CODEX_*_TOOL_NAMES`、`buildCodexProjectRuntimeContext` 及测绘清单其余误命名 host-agnostic。\n   - **collision 定名**：`CODEX_AGENT_PUBLIC_TOOL_NAMES` 去前缀撞 contract.ts 现有 `AGENT_PUBLIC_TOOL_NAMES` → 定不冲突 host-agnostic 名（如 `TOOL_POLICY_AGENT_PUBLIC_TOOL_NAMES` 或 `PUBLIC_AGENT_TOOL_NAMES`），说明选择；其余 collision 同理逐一定名。\n   - `isTrustedProjectRoot`/`resolveEffectiveTier`（DH-3c 发现 host-agnostic）裁决：**推荐从 HostAdapter 接口移除、去前缀归 L1/L2 纯函数**（调用方直用 L1），或说明保留理由。\n2. **余 host-operation routing**：Preflight/StatusService/host-agent-workflows（含需在 HostAdapter 加方法的 `buildHostProjectAlignment`）的**真 host-specific**调用经 `resolveHostAdapter()` 走。\n3. **物理迁入**：真 host-specific codex 函数体进 `CodexHostAdapter`（去 DH-2/3.1 委托外观），**保 F-V2-2 wire-byte**（codex `.mcp.json` 读取/arg 归一化字节不变）。\n4. cosmetic 文件名（如 `CodexServiceRequestBoundary.test.ts`）按清单一并归正。\n\n**完成定义（达成即 DH-3 阶段 DONE）**：grep `Codex*`/`CODEX_*` 在 lib（excl host-adapter）残留仅**真 host-specific 且在 L3**（误命名清零）；所有 collision 已定名；所有 host-operation 经 adapter（host-name 分支仅 L3）；真 host-specific 函数体在 `CodexHostAdapter`（委托外观清除）；codex 行为**逐行不变**（含 `.mcp.json` wire-byte/arg）+ cc 经 adapter；`tsc --noEmit` 绿；受影响测试 + cc/registry 测试绿 + 全量 unit 失败集与基线（39 pre-existing 沙箱/MTC-7）对比（改名 import/名变更说明、**净失败集不增长**）；纯 MCP 非强进程不变量；四工具对外 MCP 语义不变。\n\n**边界/不变量（DH-4 排除）**：不动 per-host 产物（skills/templates/constitution per-host、manifest per-host、漂移门禁、cc 子模块提交/gitlink bump）；不碰 3 漂移资产；AlembicCore 不动；codex `.mcp.json:8` 不变；CC3 文案不在本需求。真实 cc 验收 DH-6。先读本仓 `CLAUDE.md`/`AGENTS.md`；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：每批 commit hash + diff 摘要；de-Codex 进度（本批改了哪些符号/族 + 剩余符号数 + grep 残留 host-agnostic Codex* 计数）；collision 定名结果；isTrustedProjectRoot/resolveEffectiveTier 裁决；routing/物理迁入清单 + wire-byte 证据；`tsc --noEmit` + 测试 + 全量 unit 失败集 vs 基线；codex 等价/cc 不回归；**DH-3 阶段完成确认**或 **flag DH-3f + 剩余符号数/已完成比例**；needs-controller/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T05:35:42.940Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh3e-plugin-decodex-full__AlembicPlugin__DH-3e",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3e-plugin-decodex-full__AlembicPlugin__DH-3e.json",
+        "deliveryRunId": "run-delivery-dh3e-plugin-decodex-full__AlembicPlugin__DH-3e",
+        "dispatchGroup": "dh3e-plugin-decodex-full",
+        "sentAt": "2026-06-20T05:36:22.411Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-3e"
+    },
+    {
+      "targetTaskId": "DH-3f",
+      "taskPackageId": "dh-3f-decodex-bulk-complete",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-3f（DH-3 de-Codex 全量收尾——**本 pass 力求完成 DH-3**）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `ebb960f` = DH-3e 后；纯 MCP 非强进程）。**直提 main，不开分支。**\n\n用户决策 A=全量已确认。已去前缀 11 符号（DH-3d/3e），**残留 ~140 误命名 host-agnostic 符号**。本窗 2 Explore 子代理产出的**完整 symbol→新名→refs 测绘清单可直接用**（勿重测绘）。\n\n**本 pass 目标 = 尽量一次收尾 DH-3，不要只做一族就返回。** 做法：**用 Explore/general-purpose 子代理并行核对各模块引用**，然后**按模块逐个改名、每模块 tsc 绿即 commit（一个 dispatch 内连做多个模块）**。覆盖测绘清单全部 ~140 符号：ToolPolicy `CODEX_*_TOOL_NAMES` 族、`ProjectRuntimeContext`(`buildCodexProjectRuntimeContext` 等)、`KnowledgeState`、`EnhancementRoute`、`Diagnostics`(非 host-分支部分)、`Preflight`、`StatusService`、`ProjectSkillDelivery`、`SourceBoundary` 等。\n\n同 pass 处理：\n- **2 collision 定名**：① `CODEX_AGENT_PUBLIC_TOOL_NAMES` → 不冲突 host-agnostic 名（如 `TOOL_POLICY_AGENT_PUBLIC_TOOL_NAMES`）；② SourceBoundary `CODEX_HOST_AGENT_SOURCE` re-export → 调用方直 import core `HOST_AGENT_SOURCE`、去该 re-export。说明选择。\n- **isTrustedProjectRoot/resolveEffectiveTier 接口移除**（DH-3c 发现 host-agnostic）：从 `HostAdapter` 接口移除、去前缀归 L1/L2 纯函数，调用方直用 L1。\n- **余 host-operation routing**：Preflight/StatusService/host-agent-workflows（含需加接口方法 `buildHostProjectAlignment`）真 host-specific 调用经 `resolveHostAdapter()`。\n- **物理迁入**：真 host-specific codex 函数体进 `CodexHostAdapter`（去 DH-2/3.1 委托外观），**保 F-V2-2 wire-byte**（codex `.mcp.json` 读取/arg 字节不变）。\n\n**完成定义（达成即 DH-3 阶段 DONE）**：grep `Codex*`/`CODEX_*` 在 lib（excl host-adapter）残留仅**真 host-specific 且在 L3**（误命名清零）；2 collision 定名；所有 host-operation 经 adapter（host-name 分支仅 L3）；委托外观清除（真 host-specific 函数体在 CodexHostAdapter）；codex 行为**逐行不变**（含 `.mcp.json` wire-byte）+ cc 经 adapter；`tsc --noEmit` 绿；受影响测试 + cc/registry 测试绿 + 全量 unit 失败集与基线（39 pre-existing）对比（改名说明、**净失败集不增长**）；纯 MCP 非强进程不变量；四工具对外 MCP 语义不变。\n\n**收尾纪律**：本 pass **优先完成 DH-3**；**仅当确有真阻塞**（某改名 tsc 无法解、collision 需用户裁、context 实在不足以安全继续）才在**已绿 commit 后** flag DH-3g + 剩余清单，不要无故只做一小批就返回。边界：DH-4 排除（per-host 产物/cc 子模块/漂移门禁/cc setupProfile）；不碰 3 漂移资产；AlembicCore 不动；codex `.mcp.json:8` 不变；CC3 文案不在本需求。先读本仓 `CLAUDE.md`/`AGENTS.md`；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：各模块 commit hash + 最终 grep 残留计数（误命名应=0）；collision 定名结果；接口移除/routing/物理迁入清单 + wire-byte 证据；`tsc` + 测试 + 全量 unit 失败集 vs 基线；**DH-3 阶段完成确认**或（真阻塞时）flag DH-3g + 剩余清单/已完成比例；needs-controller/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T05:47:41.781Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh3f-plugin-decodex-bulk__AlembicPlugin__DH-3f",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3f-plugin-decodex-bulk__AlembicPlugin__DH-3f.json",
+        "deliveryRunId": "run-delivery-dh3f-plugin-decodex-bulk__AlembicPlugin__DH-3f",
+        "dispatchGroup": "dh3f-plugin-decodex-bulk",
+        "sentAt": "2026-06-20T05:48:55.734Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-dh-3f"
+    },
+    {
+      "targetTaskId": "DH-3g-design",
+      "taskPackageId": "dh-3g-design-shared-workspace-io-structure",
+      "targetWindow": "Design",
+      "summary": "DH-3g-design —— **Design 结构裁决请求（option-planning / 架构推荐，不改产品代码）**。本窗口=Design（仓库内置 Design 面）。**职责边界：只出选项对比、推荐、风险、给控制器的执行要点；不编辑产品代码、不派发实现、不改 Wakeflow 控制器状态。** 读父 `CLAUDE.md`、本需求状态根、`Design/docs/current/alembic-plugin-dual-host-architecture-refactor-2026-06-19.md`，声明窗口身份。\n\n**背景**：AlembicPlugin dual-host 重构 DH-1~DH-3f 已完成——功能性双宿主（L3 `HostAdapter` 接口 + `CodexHostAdapter` + `ClaudeCodeHostAdapter` + `resolveHostAdapter`/`hostAdapterForShape` 选择器；host-name 分支仅 L3）+ de-Codex 误命名清零 + 接口收口 + 全 host-operation routing。**唯一剩余 = 物理迁入**（把 host-specific 函数体搬进 `CodexHostAdapter`、去 DH-2/3.1 的委托外观），但 AlembicPlugin 窗口揭示**真架构问题**需 Design 裁决。\n\n**问题**：cc 与 codex **共享同一组 workspace-identity I/O 函数**——`resolveCodexProjectRoot`（DH-3.1 后已同时信任 codex 的 ALEMBIC_PROJECT_DIR/CODEX_WORKSPACE_* 与 cc 的 CLAUDE_PROJECT_DIR）、init-marker/saved-root I/O、`ensureCodexRuntimeEnvironment`（shape 派生 host）、清单读取。两 adapter（Codex/ClaudeCode）现都**委托同一批函数**。把这些函数体物理迁入 `CodexHostAdapter`（codex 专属）会**破坏 cc 共享**。当前委托设计有效、行为不变。\n\n**请 Design 出结构裁决（option-planning）**，候选至少：\n- (i) **保持现状**：共享函数留 L1（host-agnostic），两 adapter 委托——「委托外观」实为正确分层（L3=host 契约，共享逻辑在低层），不做物理迁入。\n- (ii) **shared-base 基类**：抽 `BaseHostAdapter` 持共享 I/O，Codex/ClaudeCode 继承 + 各自覆盖真 host-specific 点。\n- (iii) **cc 委托 codex 单例**：保留 codex 为主实现，cc adapter 显式委托。\n- (iv) **各自复制**：每 adapter 复制一份（弃 DRY）。\n\n**约束/不变量**：保 F-V2-2 wire-byte（codex `.mcp.json` 读取/arg 字节不变）；行为逐行不变；host-name 分支仅 L3；cc+codex 确实共享这组 I/O（DH-0/DH-1 已证）；纯 MCP 非强进程；不改四工具对外 MCP 语义。**判据**：分层正确性、DRY、cc/codex 对等、与 DH-4 per-host 产物分叉的兼容、迁移/wire-byte 风险、是否值得（当前委托已有效）。\n\n**产出（回 TargetResultEnvelope 或 Design handoff）**：推荐结构 + 理由；每候选风险/代价；给控制器的**执行要点**（哪些函数去哪层/哪类、调用方如何改、wire-byte 注意点、是否需要 + 收益），供控制器据此派 DH-3g 执行 pass（或裁定保持现状=DH-3 DONE）。**不改任何代码；不碰 per-host 产物/cc 子模块（DH-4 领地）；不改控制器状态。**",
+      "status": "accepted",
+      "createdAt": "2026-06-20T06:46:42.292Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh3g-design-structure__Design__DH-3g-design",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3g-design-structure__Design__DH-3g-design.json",
+        "deliveryRunId": "run-delivery-dh3g-design-structure__Design__DH-3g-design",
+        "dispatchGroup": "dh3g-design-structure",
+        "sentAt": "2026-06-20T06:47:20.106Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-3g-design"
+    },
+    {
+      "targetTaskId": "DH-3g",
+      "taskPackageId": "dh-3g-decodex-shared-workspace-cluster",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-3g（执行：cc/codex 共享 workspace-identity 簇 de-Codex 收尾——**DH-3 阶段最后一步**）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，基线 HEAD `a297e9d` = DH-3f 后；纯 MCP 非强进程）。**直提 main，不开分支。完成即 DH-3 DONE。**\n\n**控制器裁断（基于 Design DH-3g-design 一手核读裁决，用户决策 B 路径）——重要**：**否决「物理迁入 CodexHostAdapter」**。Design 证：cc/codex 共享的 workspace-identity I/O 簇是 **host-agnostic shape-aware 共享实现**（`resolveCodexProjectRoot` 统一读全 host env 家族、函数体零 host-name 分支；env 由 `detectPluginHostShape` 派生）；「委托外观」是**合法 L3→L1 分层、非待清 facade**；物理迁入会破 cc 共享 + 错层。**改做**：对该共享簇**剥 cosmetic Codex 前缀（de-Codex）+ 确认 L1 归位**，两 adapter 委托新名。属 RC-3b/已决⑥ 原始范围、低风险（同 DH-3f 已验证改名类）。\n\n**必读**：`Design/docs/current/alembic-plugin-dual-host-shared-workspace-io-structure-option-planning-2026-06-20.md` **§6**（A=de-Codex 符号清单[ProjectRootResolver/RuntimeContext 等]；B=KEEP 边界；C=wire-byte 正交说明；D=验证口径）。按 §6.A 清单执行。\n\n**做**：按 §6.A 对真 host-agnostic 共享成员去 Codex 前缀（如 `resolveCodexProjectRoot`→`resolveProjectRoot` 等，**以 §6.A 清单为准**），两 adapter（Codex/ClaudeCode）委托新名，确认 host-agnostic 逻辑 L1 归位（adapter 委托低层）。可用 Explore/general-purpose 子代理并行核对引用；分模块每批 `tsc --noEmit` 绿即 commit。\n\n**严守 §6.B KEEP 边界（绝不可动，动则破 wire/persistence 兼容）**：落盘文件名 `codex-init.json`/`codex-project-root.json`；profile 值 `'codex-plugin'`；含 CODEX 的 env 值；MCP error codes（wire/persistence-frozen，作 error.code 返回）；`CODEX_PLUGIN_HOST` host-label；`alembic-codex` shell 产物标识；`isCodexPluginCachePath`、`resolveCodexPluginRoot` 回退（真 host/L4-specific）。用户可见 \"Codex\" 文案=CC3 不在本需求（只改符号不改用户串）。`isCodexPluginCachePath` 的 cc-无等价保护缺口=归 DH-5/6、**不在本 pass**。**若执行中发现某成员实为 host-name 字面分支或 host 专属落盘格式（Design 核读未见）→ 保留不 de-Codex 并 flag。**\n\n**完成定义（达成即 DH-3 阶段 DONE）**：共享簇真 host-agnostic 成员 Codex 误命名清零（grep 证 lib 残留 Codex*/CODEX_* 仅 §6.B KEEP 项）；两 adapter 委托新名、L1 归位确认；codex 行为**逐行不变**（含 `.mcp.json` wire-byte、落盘文件名、profile 值不变）+ cc 经 adapter；`tsc --noEmit` 绿；受影响测试 + cc/registry 测试绿 + 全量 unit 失败集与基线 `a297e9d` **IDENTICAL**（改名 import/名变更说明、净失败集不增长）；纯 MCP 非强进程不变量；四工具对外 MCP 语义不变；host-name 分支仅 L3。\n\n**边界（DH-4 排除）**：不动 per-host 产物（skills/templates/constitution per-host、manifest per-host、漂移门禁、cc 子模块 alembic-claude-code 提交/gitlink bump）；不碰 3 漂移资产；AlembicCore 不动；codex `.mcp.json:8` 不变；CC3 文案不在本需求。先读本仓 `CLAUDE.md`/`AGENTS.md`；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：commit hash + de-Codex 清单（共享簇符号→新名）+ grep 证残留仅 §6.B KEEP；两 adapter 委托新名证据；L1 归位说明；`tsc` + 测试 + 全量 unit 失败集 vs `a297e9d`；codex 逐行不变（wire-byte/落盘/profile）证据；**DH-3 阶段完成确认**；任何发现的真 host-specific 保留项 / needs-controller/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T07:01:57.115Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh3g-exec-decodex-shared__AlembicPlugin__DH-3g",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh3g-exec-decodex-shared__AlembicPlugin__DH-3g.json",
+        "deliveryRunId": "run-delivery-dh3g-exec-decodex-shared__AlembicPlugin__DH-3g",
+        "dispatchGroup": "dh3g-exec-decodex-shared",
+        "sentAt": "2026-06-20T07:02:37.968Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-dh-3g"
+    },
+    {
+      "targetTaskId": "DH-4a",
+      "taskPackageId": "dh-4a-plugin-per-host-products-cc-shell-gitlink",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-4a（AlembicPlugin 侧：per-host 产物对等 + cc 壳 + gitlink + manifest-seam de-Codex；并产出 Alembic 漂移门禁 per-host 规格）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin` 含 cc 子模块 `plugins/alembic-claude-code`；基线 HEAD `0221525` = DH-3 后；纯 MCP 非强进程）。**直提 main，不开分支。用户已授权 cc 子模块提交 + 父仓 gitlink bump。**\n\n**前置**：DH-3 DONE（功能双宿主 + de-Codex）。DH-0B 已证 3 项共享资产漂移是**真 host-divergent 工具面**（codex `alembic_knowledge/guard` ↔ cc `alembic_search/code_guard` 等）——单 path「shared」模型无法转绿，**本阶段改 per-host 模型解决**。这是跨仓最复杂阶段，**可用 Explore/general-purpose 子代理、分模块增量绿 commit、确需可在某子步绿后 flag 续作**。\n\n**做（AlembicPlugin 侧）**：\n1. **per-host 产物对等**：skills/templates/constitution 从「codex/cc 两壳字节相同」改为 **per-host 分叉**——codex 壳承载 codex 工具名指导、cc 壳承载 cc 工具名指导。DH-0B 的 3 项 host-divergent 资产（`alembic-recipes`/`alembic-structure` shared 段 + `recipes-setup/README`）各出 codex/cc 变体。结构按需求设计（目录/标记/manifest per-host，或 wakeflow-host 段 per-host）。\n2. **cc 壳（alembic-claude-code 子模块）**：落 DH-1/DH-3.1 推迟项——manifest identity（删 `ALEMBIC_CHANNEL_ID=codex` + `ALEMBIC_PLUGIN_HOST→claude-code`，即 DH-1 当时未提交的那处）；cc bootstrap per-host（`bin/alembic-start.mjs:100` 默认 `claude-code`，**现可分叉**因 cross-shell-drift 门禁本阶段改 per-host）；cc 专属 setupProfile（若 init-marker profile 字段类型/SetupService 需配套，**谨慎保 wire/persistence**）。**在子模块 main 提交 + bump 父仓 gitlink（用户已授权 release-sensitive）。**\n3. **manifest-seam de-Codex（DH-3g 折入项）**：PluginRegistry 5 符号（`CodexPluginHostShape`/`CodexPluginMcpDeclaration`/`CodexPluginRegistry`/`loadCodexPluginRegistry`/`readCodexPluginMcpDeclaration`）——host-agnostic 部分去前缀（如 `CodexPluginHostShape→PluginHostShape`），**严守 wire-byte**（codex `.mcp.json` 读路/字节不变）；真 host-specific（读 codex 专属 .mcp.json 的部分）保留或 per-host 化，按代码实判。\n4. **产出 Alembic 漂移门禁 per-host 规格（供 DH-4b，本窗不改 Alembic）**：`shared-asset-manifest.json` 单 path→per-host path 精确改法（哪些 skill/template 声明 codex+cc 变体、权威侧）；`check-shared-asset-drift.mjs` per-host 比较 + 可选 cross-host coherence 设计；3 项资产在 per-host 模型下转绿的预期。Alembic 是治理权威，DH-4b 实施。\n\n**完成定义（DH-4a）**：AlembicPlugin per-host 产物分叉就位；cc 壳 manifest/bootstrap/setupProfile per-host 落地 + 子模块提交 hash + 父仓 gitlink bump hash；manifest-seam de-Codex（wire-byte 保全证据）；`tsc --noEmit` 绿 + 受影响测试 + 全量 unit 失败集 vs 基线（per-host 分叉会改 cross-shell-drift 期望——须说明哪些测试/门禁期望随 per-host 模型更新、净失败集不因回归增长）；纯 MCP 非强进程不变量；四工具对外 MCP 语义不变；**Alembic 门禁 per-host 规格清单**产出。\n\n**边界/不变量**：本窗只动 AlembicPlugin（含其 cc 子模块）；**不改 Alembic**（DH-4b 实施门禁）；AlembicCore 不动；codex 侧 `.mcp.json:8` 工具行为/落盘文件名/profile 值/MCP error codes 等 wire/persistence-frozen 不动；**CC3 文案统一不在本需求**（只结构 per-host 分叉，不改用户可见 \"Codex\" 文案）。先读本仓 `CLAUDE.md`/`AGENTS.md` + 子模块约定；用本仓 stack/scripts/Node。\n\n**回 TargetResultEnvelope**：per-host 分叉清单 + 结构说明；cc 子模块 commit hash + 父仓 gitlink bump commit hash；manifest-seam de-Codex 清单 + wire-byte 证据；`tsc`/测试/全量 unit 失败集 vs 基线（+ cross-shell-drift 期望更新说明）；**Alembic 漂移门禁 per-host 规格**（manifest+脚本精确改法 + 3 资产转绿预期，供控制器派 DH-4b）；任何 needs-controller/needs-user-decision/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T07:43:07.720Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh4a-plugin-per-host-cc-shell__AlembicPlugin__DH-4a",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4a-plugin-per-host-cc-shell__AlembicPlugin__DH-4a.json",
+        "deliveryRunId": "run-delivery-dh4a-plugin-per-host-cc-shell__AlembicPlugin__DH-4a",
+        "dispatchGroup": "dh4a-plugin-per-host-cc-shell",
+        "sentAt": "2026-06-20T07:43:48.817Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-dh-4a"
+    },
+    {
+      "targetTaskId": "DH-4b",
+      "taskPackageId": "dh-4b-alembic-shared-asset-drift-per-host",
+      "targetWindow": "Alembic",
+      "summary": "DH-4b（Alembic 侧：shared-asset-drift 门禁 per-host 化 + 3 项资产转绿）。本窗口=**Alembic**（仓库 `~/Documents/AlembicWorkspace/Alembic`，共享资产漂移门禁**治理权威**；基线 HEAD `cf3b171` clean）。**直提 main，不开分支。**\n\n**前置**：AlembicPlugin 侧 dual-host DH-0..DH-3 已完成。DH-0B 已证 3 项共享资产（`skill-alembic-recipes` shared 段 + `skill-alembic-structure` shared 段 + `templates-recipes-setup/README`）漂移是**真 host-divergent 工具面**——main/codex 面 `alembic_knowledge`/`alembic_guard`/`alembic_structure(targets/files/metadata)` ↔ plugin/cc 面 `alembic_search`/`alembic_code_guard`/`alembic_project_matrix` 等；单 path「shared」模型**无法转绿**（强行对齐会改 main 四工具对外语义）。**本任务按 per-host 模型正确转绿。**\n\n**必读规格**：`wakeflow-ledger/AlembicPlugin/dh-4a-per-host-drift-gate-spec-2026-06-20.md` **§C**（AlembicPlugin DH-4a 产出的 Alembic 门禁 per-host 权威规格）+ DH-0 报告 `wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md` §DH-4。\n\n**做（Alembic 侧）**：\n1. **门禁 per-host 化**（§C.1/§C.2，低 churn 推荐法）：保留现 `skill-shared-sections` 模型，把 3 项资产里**真 host-divergent 的工具名行提升为 `wakeflow-host:<host>` 段**——`codex` 段承载 main/codex 工具名（`alembic_knowledge`/`alembic_guard` 等，**main 真实面保留不改**），`claude-code` 段承载 cc 工具名（`alembic_search`/`alembic_code_guard` 等）。`config/shared-asset-manifest.json` 按需声明 per-host；`scripts/check-shared-asset-drift.mjs` 加 per-host 比较（每 host 段对其 per-host 权威）+ 可选 cross-host coherence（非 host 的 shared 段仍须 codex/cc 一致）。\n2. **3 资产转绿**：host-divergent 行入 wakeflow-host 段后 shared-section 比较绿；重跑 `node scripts/check-shared-asset-drift.mjs` → **GREEN（0 drift）**。\n3. **Plugin self-check 同步**：Plugin 侧 `scripts/check-shared-asset-drift.mjs` 是 self-check 资产须与 Alembic 字节一致——**你不改 Plugin**；若你改了脚本，**给出 Plugin 需同步的精确 diff/新脚本内容，标 needs-controller**，由控制器派 Plugin 窗口同步。\n\n**完成定义**：`check-shared-asset-drift.mjs` before（RED/3 drift）→ after（**GREEN/0 drift**）原始输出 + 每项 diff；3 资产 host-divergent 行入 `wakeflow-host` 段（main 真实工具名保留在 codex 段，不改四工具对外语义）；**Node≥22 跑门禁**（本仓 .nvmrc=22；Node18 会假红 ERR_INVALID_ARG_TYPE，须 nvm use 22 再判）；Alembic main commit hash（直提 main）；Plugin self-check 脚本同步 diff（若脚本改）标 needs-controller。\n\n**边界/不变量**：只动 Alembic 的共享资产漂移门禁相关（`config/shared-asset-manifest.json` + `scripts/check-shared-asset-drift.mjs` + 3 资产的 wakeflow-host 段）；不动 Alembic 其它代码/测试；**不动 AlembicPlugin**（self-check 同步由控制器派）；**不改 main 四工具对外 MCP 语义**（main CLI 工具名是 main 真实面，保留在 codex/main 段）；AlembicCore 不动。先读本仓 `CLAUDE.md`/`AGENTS.md`（含 Node≥22 门禁约定）；用本仓 stack/scripts。\n\n**回 TargetResultEnvelope**：门禁 before/after 原始输出（RED→GREEN）+ 每项 diff；wakeflow-host 段提升清单（哪些行→哪个 host 段）；Alembic main commit hash；Plugin self-check 脚本同步 diff + needs-controller（若有）；任何 needs-controller/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T08:11:09.907Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh4b-alembic-drift-gate-per-host__Alembic__DH-4b",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4b-alembic-drift-gate-per-host__Alembic__DH-4b.json",
+        "deliveryRunId": "run-delivery-dh4b-alembic-drift-gate-per-host__Alembic__DH-4b",
+        "dispatchGroup": "dh4b-alembic-drift-gate-per-host",
+        "sentAt": "2026-06-20T08:11:55.689Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-4b"
+    },
+    {
+      "targetTaskId": "DH-4c",
+      "taskPackageId": "dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-4c（DH-4 Plugin 侧收尾：self-check 同步 + cross-shell 门禁 per-host + cc bootstrap/setupProfile）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin` 含 cc 子模块；基线 HEAD `53f9258` = DH-4a 后；纯 MCP 非强进程）。**直提 main，不开分支。完成即 DH-4 阶段 DONE。**\n\n**前置**：DH-4a（cc 身份/gitlink/manifest-seam）+ DH-4b（Alembic shared-asset 门禁 per-host，main `88a2abf`，3 资产已绿）均已控制器验收。当前 shared-asset-drift 仅余 2 self-check drift（Plugin manifest+script 副本待同步）；cross-shell-drift 门禁仍 byte-identical（line-39 RED）。控制器已裁 line-39（alembic-recipes codex semantic/cc auto）= **per-host overlay 放行**（intentional，行为不变）。可 subagent、分步增量绿 commit。\n\n**做**：\n1. **self-check 同步（DH-4b needs-controller）**：把 Plugin 的 `config/shared-asset-manifest.json` + `scripts/check-shared-asset-drift.mjs` 同步到 Alembic main `88a2abf` 版——应用 `wakeflow-ledger/Alembic/dh-4b-plugin-self-check-sync-2026-06-20.patch`（Plugin 当前 self-check 副本==Alembic cf3b171，故 diff=cf3b171→88a2abf）。**仅同步这 2 个 self-check 文件、不改任何 plugin skill/template 资产**（DH-4b mirror-proof：同步后 0 drift）。重跑 `node scripts/check-shared-asset-drift.mjs`（**Node≥22**，.nvmrc=22；Node18 假红）→ **GREEN（0 drift）**。\n2. **cross-shell-drift 门禁 per-host 重塑（DH-4a 规格 §D.1）**：`scripts/check-cross-shell-drift.mjs` 从 byte-identical `['bin','skills','LICENSE']` 改 section/per-host-aware——skills/ 只比 wakeflow-shared 标记段跨壳一致、**放行 host overlay**（line-39 codex semantic/cc auto 放行）；LICENSE 保字节一致；bin/ 允许 host-default 行差异（或移出 cross-shell 靠 shared-asset/self-check）。更新门禁失败信息/期望。重跑 → **GREEN**（记录 RED→GREEN-under-per-host 期望翻转）。\n3. **cc bootstrap fork（§D.2）**：`plugins/alembic-claude-code/bin/alembic-start.mjs:100` cc 默认改 `|| 'claude-code'`（manifest 已设 host，此为 defense-in-depth；需 §D.1 门禁先放行 bin/ per-host）。**在 cc 子模块提交 + bump 父仓 gitlink（用户已授权 release-sensitive）。**\n4. **cc setupProfile per-host（§D.3）**：cc 现复用 `CODEX_SETUP_PROFILE='codex-plugin'`（**持久化冻结** init-marker profile 值，CodexInitMarker.profile 类型锁定 + SetupService keyed off it）。引入独立 cc profile 须协调 init-marker profile 类型 + SetupService 且**保现存落盘 marker 兼容**；**若风险高/牵涉大→在此项 flag 留 DH-5 并说明理由**（其余 1-3 完成即 DH-4 主体 DONE，setupProfile 可作 DH-5 收尾）。\n\n**完成定义（达成即 DH-4 DONE）**：shared-asset-drift **0 drift/GREEN**（self-check 同步后，Node≥22）；cross-shell-drift **GREEN**（per-host 重塑后，line-39 overlay 放行）；cc bootstrap per-host（+ 子模块提交 + gitlink bump 若动 cc 壳）；cc setupProfile per-host **或** flag DH-5（带理由）；`tsc --noEmit` 绿 + 受影响测试 + 全量 unit 失败集 vs 基线（门禁期望翻转须说明、净失败集不增长）；纯 MCP 非强进程不变量；四工具对外 MCP 语义不变；host-name 分支仅 L3。\n\n**边界/不变量**：本窗只动 AlembicPlugin（含 cc 子模块）；**不改 Alembic**（DH-4b 已落 88a2abf）；AlembicCore 不动；CC3 文案不在本需求；落盘文件名/`'codex-plugin'` profile 值/MCP error codes wire/persistence-frozen（cc setupProfile 若引入须保现存 marker 兼容，否则 flag DH-5）。先读本仓 `CLAUDE.md`/`AGENTS.md` + DH-4a 规格 §D + DH-4b 同步包。\n\n**回 TargetResultEnvelope**：self-check 同步 commit + shared-asset-drift 0-drift 原始输出；cross-shell-drift per-host 重塑 + GREEN 原始输出 + 期望翻转说明；cc bootstrap commit（+ 子模块/gitlink hash 若动）；cc setupProfile 结果或 DH-5 flag（带理由）；`tsc`/测试/全量 unit 失败集 vs 基线；**DH-4 阶段完成确认**；任何 needs-controller/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T08:46:10.388Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh4c-plugin-cross-shell-selfcheck__AlembicPlugin__DH-4c",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4c-plugin-cross-shell-selfcheck__AlembicPlugin__DH-4c.json",
+        "deliveryRunId": "run-delivery-dh4c-plugin-cross-shell-selfcheck__AlembicPlugin__DH-4c",
+        "dispatchGroup": "dh4c-plugin-cross-shell-selfcheck",
+        "sentAt": "2026-06-20T08:47:01.462Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-dh-4c"
+    },
+    {
+      "targetTaskId": "DH-5",
+      "taskPackageId": "dh-5-cleanup-test-parity-rc678",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-5（最终清理收口 + 测试对等 RC-6/7/8 + DH-4 结转项；完成即本需求实现全部 DONE，仅余 DH-6 验收）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`，含 cc 子模块；基线 HEAD `1b53b5d` = DH-4c 后；纯 MCP 非强进程）。**直提 main，不开分支。** 测试量大时按 memory context-saturation 模式用 subagent offload、分步增量绿 commit。\n\n**前置（已控制器验收）**：DH-0~DH-4 全部 DONE。两漂移门禁权威方向均 GREEN（shared-asset-drift 从 Alembic `--sibling=plugin` 11 checks/0 drift；cross-shell-drift PASS）。host-name 分支仅 L3。de-Codex 误命名清零。daemon-removal PDR-1 已完成 intent paradigm 删除（2026-06-18）。\n\n**控制器已取证的剩余范围（直接据此做，不必重新盘点）**：\n\n**① RC-7 测试对等（主交付，直接支撑 DH-6 cc 验收）**：\n- 现状：154 测试文件；codex 路径充分（`test/.../HostMcpServer.test.ts` 1808 行覆盖 init/dispatch/shutdown/tool-exec）；**cc 路径覆盖仅 ~5%**——仅 `ClaudeCodeHostAdapter.test.ts`（~89 行，schematic：host selection/identity/project-root/manifest/arg-normalize，**无运行时 dispatch**）+ `AgentPublicToolsCrossHostReadiness.test.ts`（仅 schema 跨壳一致，无执行）。\n- 做：补 cc 路径 **runtime（非 schema）** 测试 ~10-15 用例：cc `buildToolExecutionContext()` 流；cc 项目根发现（`CLAUDE_PROJECT_DIR` 信任路径，参 ProjectRootResolver）；cc MCP dispatch 经 L3 adapter 交接；cc status 视图 per-host 投影；**cross-host parity**：codex+cc 同工具同输入→输出对等（如 alembic_prime/alembic_search），并覆盖 cc 特有差异（manifest/env/bootstrap default/arg `${CLAUDE_PLUGIN_ROOT}`→'.'）。新增用例须**全绿**；全量 unit 失败集相对基线（39 failed | 87 passed）**failed 不增**（新 cc 用例计入 passed）。\n\n**② RC-6 layer-contract 收口**：\n- 现状：代码**已结构性收敛**——mcp→service/workflows 是 **26 处干净单向 L2→L1 引用**（16 文件，如 `lib/runtime/mcp/handlers/agent-public-tools.ts`、`search.ts`、`structure.ts`、`host-agent-workflows/dimension-completion.ts`）；**service/workflows 无反向 backslip**；`governance/` 层已被 PDR-3 删（不存在）；已有 `lint:repo-boundary`（DB 层）绿。\n- 做：固化 layer-contract——**优先**加 `lint:layer-boundary` 门禁：allowlist 这些已记录的 L2→L1 seam + **禁 L1（service/workflows）import L2（runtime/mcp）backslip**，门禁须**起步即 GREEN**（代码已干净）。**若加门禁有假红风险/牵涉大→改为文档化 layer-contract（doc/config）+ flag 门禁为后续**，不强行引入会红的门禁。\n\n**③ RC-8 兼容残留决策（无 intent 返工）**：\n- `HostDeclaredIntentInput`（`lib/service/task/host-turn-meta.ts:9-23` 定义，5 真实消费者）= **LIVE**（PDR-1 后保留的可选语义元数据载体，已约束 optional/size-limit）→ **保留**，记录决策。\n- file-monitor（`lib/runtime/EnhancementRoute.ts` 4 处）= **纯诊断测量**（读 daemon fileMonitor 状态，无行为分支；FileChangeHandler/GitDiffCheckpointService 已被 PDR-1 删）→ **保留**（无害、保 status 形状），除非确证 trivially dead；**不删用户可见 status 字段**。\n- **intent paradigm 删除已归 daemon-removal PDR-1 并完成**——DH-5 **不重新拥有**，仅**保 4-tool MCP 语义**。记录跨需求边界。\n\n**④ DH-4 结转项**：\n- `AGENTS.md` 差异声明表（skill-alembic-recipes/structure 现写\"仅比较 wakeflow-shared 标记段\"）→ **同步更新**：现也适用 `perHostSections`（DH-4b 落地）。\n- structure skill 现 **0 跨壳 coherence 段**（两段都 host-divergent→都 per-host）→ 记录为**已接受取舍**（plugin 资产不可改前提下的诚实结果；未来双侧重构可恢复 host-agnostic 散文 coherence）。\n- cc setupProfile：控制器已裁 **归 CC3/不在本需求**（profile='codex-plugin' 持久化冻结 + cc 复用功能正确，独立 cc profile 仅命名实益=CC3）→ **本阶段不改代码**，仅记录裁断。\n\n**完成定义（达成即 RC-1~8 全部 DONE，需求进入 DH-6 验收）**：cc 路径 runtime 测试补齐且全绿（failed 不增于基线 39）；RC-6 layer-contract 固化（门禁 GREEN 或文档化+flag 带理由）；RC-8 决策记录（HostDeclaredIntentInput 留、file-monitor 留/note、无 intent 返工）；DH-4 结转项（AGENTS.md 文档同步、structure 取舍 note）；`tsc --noEmit` 绿；**两漂移门禁仍 GREEN**（Node≥22）。\n\n**边界/不变量**：本窗只动 AlembicPlugin；**不改 Alembic（88a2abf 已落）/AlembicCore**；CC3 文案不在本需求；四工具对外 MCP 语义不变；落盘文件名/`'codex-plugin'` profile 值/MCP error codes/KEEP frozen strings 不动；纯 MCP 非强进程不回退；host-name 分支仅 L3；Node≥22 跑门禁。先读本仓 `CLAUDE.md`/`AGENTS.md`。\n\n**回 TargetResultEnvelope**：cc runtime 测试新增用例清单 + 运行结果（新用例绿 + 全量 unit 失败集 vs 基线 39 failed）；RC-6 门禁/文档结果（门禁起步 GREEN 原始输出，或文档化+flag 理由）；RC-8 三项决策记录（含跨需求边界）；DH-4 结转项 commit；`tsc`/两漂移门禁 GREEN 原始输出；**RC-1~8 全量完成确认（需求进入 DH-6）**；任何 needs-controller/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T09:15:46.573Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh5-plugin-cleanup-test-parity__AlembicPlugin__DH-5",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh5-plugin-cleanup-test-parity__AlembicPlugin__DH-5.json",
+        "deliveryRunId": "run-delivery-dh5-plugin-cleanup-test-parity__AlembicPlugin__DH-5",
+        "dispatchGroup": "dh5-plugin-cleanup-test-parity",
+        "sentAt": "2026-06-20T09:16:43.763Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-dh-5"
+    },
+    {
+      "targetTaskId": "DH-6",
+      "taskPackageId": "dh-6-cc-real-acceptance",
+      "targetWindow": "Test",
+      "summary": "DH-6（cc 在 workspace 内真实验收 = 本需求最后验收的 cc 半边；codex 半边由用户在 codex host 外部验收，已决#9，**不在本卡**）。本窗口=Test（workspace 内真实场景验收窗口）。**只做真实 cc 运行验收，不改产品代码**（发现产品缺陷回 AlembicPlugin 窗口修，不在 Test 改）。先读本仓 Test `CLAUDE.md` + 父 `CLAUDE.md`，声明窗口/角色身份。\n\n**前置（控制器已自验绿，勿把重跑单测/门禁当本验收交付）**：dual-host 实现 RC-1~8 全 DONE，控制器已亲验——tsc --noEmit GREEN；test/unit/ClaudeCodeHostRuntime.test.ts 14 cc runtime 单测全绿；shared-asset-drift（从 Alembic `--sibling=plugin` 权威方向 11 checks/0 drift）+ cross-shell-drift（从 plugin）+ lint:layer-boundary + lint:repo-boundary 全 PASS；全量 vitest 39 failed files=长期 sandbox 基线、无回归。**这些是单测/静态层、已绿。DH-6 要的是单测证明不了的「真实 cc host 加载插件 + 真 MCP 工具调用 + 真项目」运行行为。Node≥22 跑任何门禁（.nvmrc=22）。**\n\n**精确问题**：alembic-claude-code 插件在真实 Claude Code（cc）host 加载后，init/status/四个 MCP 工具的运行行为是否正确（cc host 身份=claude-code、与 codex 语义真对等、纯 MCP 非强进程不变量持）？\n\n**对象边界**：cc 插件产物 `AlembicPlugin/plugins/alembic-claude-code`（gitlink 15fce77；manifest 已 ALEMBIC_PLUGIN_HOST=claude-code，DH-4a 修）+ 其 runtime。**不含 codex（用户外部，已决#9）**；不动 Alembic/Core。\n\n**做（真实 cc 运行验收）**：\n1. **装**：cc runtime（`@gxfn/alembic-runtime` 不在 npm）本地 build + 离线 `claude mcp add` 进一个 cc 会话。**用 `ALEMBIC_HOME` sandbox 隔离**（保护真实 `~/.asd`）；无 AI 凭证也应能 boot 基本 MCP。\n2. **init**：对一个真实/沙箱项目跑 alembic_init → 核 init marker 正确：host 身份=claude-code、profile 持久化、route、dataRoot；落盘文件名 `codex-init.json`/`codex-project-root.json`（frozen，不因 cc 改名）round-trip 读回正确。\n3. **status**：alembic_status → cc 正确自认 claude-code（非 codex）、bootstrapState/toolCapabilities 合理。\n4. **四工具**：从 cc manifest/alembic_status 读出真实工具名（cc 侧 alembic_search/alembic_code_guard/alembic_project_matrix + prime 类）逐个对真项目调用 → 返回正确、与 codex 语义对等（同输入对等输出，仅 host 标识/工具名属 per-host 差异，外部 MCP 语义不变）。\n5. **非强进程不变量**：调用期间确认无 daemon/常驻进程被拉起（纯 MCP 非强进程）——ps/进程检查取证。\n\n**成功含义**：cc 插件在 cc host 成功加载；init marker host=claude-code 且持久化正确；status 正确；四工具对真项目返回正确且 codex 语义对等；零常驻进程。\n**失败含义**：插件加载失败 / host 身份错（自认 codex）/ marker 畸形 / 工具报错 / 出现常驻进程（违反不变量）/ 非 per-host 的语义分叉。\n**无效结论**：不得据此判 codex 坏（不在范围）；不重打单测/门禁基线当验收；安装机制摩擦先隔离、勿当产品缺陷。\n**停止条件**：若 runtime build / 离线 mcp add 在本环境无法完成 → **停并回精确 blocker**（写清卡在哪步、缺什么），勿反复试、勿动产品代码。\n\n**回 TargetResultEnvelope（原始证据）**：安装步骤+结果；alembic_status 原始输出（host 身份/capabilities）；init marker 文件原始内容；各工具调用原始输入/输出 + 对等性判断；非强进程检查证据（进程列表）；DH-6 cc 验收结论（通过/blocker/产品缺陷→回 AlembicPlugin）。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T09:49:47.446Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh6-test-cc-acceptance__Test__DH-6",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh6-test-cc-acceptance__Test__DH-6.json",
+        "deliveryRunId": "run-delivery-dh6-test-cc-acceptance__Test__DH-6",
+        "dispatchGroup": "dh6-test-cc-acceptance",
+        "sentAt": "2026-06-20T09:50:24.628Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-DH-6"
+    },
+    {
+      "targetTaskId": "DH-7",
+      "taskPackageId": "dh-7-agenthost-default-from-pluginhost",
+      "targetWindow": "AlembicPlugin",
+      "summary": "DH-7（F1 修复 = 收尾 RC-1「消除硬编码 codex」最后一处；用户已决「现修」）。本窗口=AlembicPlugin（仓库 `~/Documents/AlembicWorkspace/AlembicPlugin`；基线 HEAD `532a7d1` = DH-5 后；纯 MCP 非强进程）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md`，声明窗口/仓库身份。\n\n**背景（DH-6 cc 真实验收 finding F1，控制器已代码核实）**：tool 调用省略 `agentHost` 字段时默认硬编码 `'codex'`，cc runtime 下把省略 agentHost 的 cc 调用误标为 codex。agentHost 是「calling host agent family」结构化字段，贯穿 intake→output echo + cross-host-readiness，**无 `if(agentHost===...)` 行为分支**（runtime host 身份本身已正确=claude-code）。这是 RC-1「消除硬编码 / 让 pluginHost 真正驱动派发」意图内、但 DH-1 枚举改点漏掉的最后一处硬编码 codex。\n\n**精确改点**：\n1. `lib/shared/schemas/mcp-tools.ts:128` `agentHost: AgentHostSchema.default('codex')` —— 移除 schema 级硬编码默认（改 `.optional()`，保留 `.describe`），使省略时 args.agentHost=undefined 交由 handler 按 runtime host 解析（否则 schema 在 parse 阶段就填了 'codex'，handler 的 `??` 成死码）。\n2. `lib/runtime/mcp/handlers/agent-public-tools.ts:905 & :925` `agentHost: args.agentHost ?? ('codex' as const)` —— 改为 `args.agentHost ?? <runtime 已解析 pluginHost>`：默认值取 **RuntimeContext / L3 host adapter 已解析的 pluginHost**（与 `status.runtimeIdentity.pluginHost` 同源，'codex'|'claude-code'）。把该 pluginHost 顺调用链传入 buildAgentToolContext/buildPrimeToolContext（找现成 RuntimeContext/host 注入点）。\n\n**架构约束**：\n- **host-name 分支仍仅 L3**：handler（L2）只**读已解析的 pluginHost 值**，不得在 L2 写 `=== 'codex'`/`'claude-code'` 字面分支。\n- **wire-safe / codex 行为不变**：codex runtime 下省略 agentHost 仍解析为 'codex'（与现状一致）；仅 cc runtime 下从 'codex' 纠正为 'claude-code'。\n- 显式传 agentHost 仍被接受并原样记录；AGENT_HOSTS 校验不变；output/contract（output.ts:150 / contract.ts requiredFields）仍**始终携带已解析 agentHost**（handler 解析后非空）——若移除 schema default 影响 contract requiredFields/输出 schema 的「必填」语义，相应调整使「省略可、解析后必有值」成立，勿破坏既有 contract/output 测试。\n- 四工具对外 MCP 语义不变；落盘名/'codex-plugin'/MCP error codes/KEEP frozen strings 不动；纯 MCP 非强进程。\n\n**回归测试**（锁定修复，建议落 `test/unit/ClaudeCodeHostRuntime.test.ts` 或就近）：cc runtime + 省略 agentHost → 解析 claude-code；codex runtime + 省略 → 解析 codex；显式 agentHost（任一 host）→ 原样保留。\n\n**完成定义**：上述改点落地 + 回归测试绿；`tsc --noEmit` 绿；biome lint 0；全量 unit 失败集**不增于基线 39 failed**（新测试计入 passed）；`lint:layer-boundary` + `lint:repo-boundary` + 两漂移门禁仍 GREEN（Node≥22，.nvmrc=22）；codex 行为不变（codex 省略仍 codex）。\n\n**边界**：本窗只动 AlembicPlugin lib/test；不改 Alembic/AlembicCore；CC3 文案不在本需求；若 schema-default 移除波及面超出小修（contract/output/大量测试），**评估后回报**而非强推。\n\n**回 TargetResultEnvelope**：改点 diff + commit hash；回归测试新增用例 + 运行结果；tsc/lint/两漂移门禁/layer-boundary 原始输出；全量 unit 失败集 vs 基线 39；codex 行为不变佐证；F1 闭合确认（RC-1 消除硬编码 100% 完成）；任何超预期波及/blocked。",
+      "status": "accepted",
+      "createdAt": "2026-06-20T10:32:01.772Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7.json",
+        "deliveryRunId": "run-delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7",
+        "dispatchGroup": "dh7-plugin-agenthost-default",
+        "sentAt": "2026-06-20T10:32:37.571Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-dh-7"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "dh-0-precheck-cc-host-feasibility",
+        "dh-1-host-abstraction-unify-delete-generic",
+        "dh-2-l3-hostadapter-interface-codex-migration",
+        "dh-3-claude-code-adapter-l2-rewire-decodex",
+        "dh-3b-l2-rewire-decodex-migration",
+        "dh-3c-decodex-rename-routing-migration",
+        "dh-3d-decodex-rename-migration-finale",
+        "dh-3e-decodex-full-rename-finale",
+        "dh-3f-decodex-bulk-complete",
+        "dh-3g-decodex-shared-workspace-cluster",
+        "dh-4a-plugin-per-host-products-cc-shell-gitlink",
+        "dh-4c-plugin-cross-shell-gate-selfcheck-cc-bootstrap",
+        "dh-5-cleanup-test-parity-rc678",
+        "dh-7-agenthost-default-from-pluginhost"
+      ],
+      "targetTaskIds": [
+        "DH-0",
+        "DH-1",
+        "DH-2",
+        "DH-3",
+        "DH-3b",
+        "DH-3c",
+        "DH-3d",
+        "DH-3e",
+        "DH-3f",
+        "DH-3g",
+        "DH-4a",
+        "DH-4c",
+        "DH-5",
+        "DH-7"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "dh-0b-alembic-drift-backport",
+        "dh-4b-alembic-shared-asset-drift-per-host"
+      ],
+      "targetTaskIds": [
+        "DH-0B",
+        "DH-4b"
+      ]
+    },
+    {
+      "windowName": "Design",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "dh-3g-design-shared-workspace-io-structure"
+      ],
+      "targetTaskIds": [
+        "DH-3g-design"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "dh-6-cc-real-acceptance"
+      ],
+      "targetTaskIds": [
+        "DH-6"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-dh-7"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-20T10:58:25.604Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7",
+    "lastDeliveryRunId": "run-delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7",
+    "lastDispatchGroup": "dh7-plugin-agenthost-default",
+    "lastTargetTaskId": "DH-7",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-20T10:32:37.574Z"
+  }
+}

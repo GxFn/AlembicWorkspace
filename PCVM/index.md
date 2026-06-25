@@ -50,7 +50,7 @@ LLM token efficiency run:
 ## Source
 
 - Canonical PCV source: `../progressive-chain-validation/progressive-chain-validation/`
-- Workspace control: `../codex-control-workspace/.workspace-active/workspace/current/`
+- Workspace control: `../codex-control-workspace/.wakeflow-active/current/`
 
 ## Fixed Route
 

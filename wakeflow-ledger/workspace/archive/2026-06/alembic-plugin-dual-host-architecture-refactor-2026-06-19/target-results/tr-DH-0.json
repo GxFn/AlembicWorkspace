@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-0",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-0-precheck-cc-host-feasibility",
+  "dispatchGroup": "dh0-plugin-precheck",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-0",
+  "status": "completed",
+  "summary": "DH-0 precheck done (NO refactor, NO code change; Plugin tree clean at afbf25e, AlembicCore clean f0bf896; did NOT enter DH-1). Full report: wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md. ① DRIFT GATE RED (3 drifts: skill-alembic-recipes [intro-and-overview/use-context-tail], skill-alembic-structure [title-intro/tools-and-graph], templates-recipes-setup [README.md]). Diff finding: PLUGIN is ahead (current merged-tool surface: alembic_search op=search/get/expand + mode auto/keyword/semantic, alembic_code_guard, alembic_project_matrix/alembic_graph, no confirm_usage); Alembic main STALE (old alembic_knowledge/alembic_guard/alembic_structure/confirm_usage). DIRECTION = Alembic main backports plugin content (matches design 'RC5=target' + manifest 'backported from plugin' pattern). Plugin side: nothing to sync (already target). NEEDS-CONTROLLER: dispatch Alembic window to backport the 3 assets (precise list in report) before DH-1, then gate green — CAVEAT: keep genuinely host-divergent tool-name lines as wakeflow-host:main (don't overwrite; that's DH-4 fork territory). ② CC-HOST 8-CLUSTER: cc adapter FEASIBLE, NO needs-user-decision. claude-code-guide's '3 NONE' (tool-tiering/diagnostics/turn-metadata) map exactly to NICETY clusters that degrade gracefully (verified file:line); only CORE coupling = project-root (cc cwd→fallback→tools fail-closed, mitigated by built-in per-call projectRoot + add a cc workspace env to ProjectRootResolver trusted list = #1 DH-1/DH-3 fix); transport/init/env work; L3 seam already partially exists (PluginRegistry CodexPluginHostShape='codex'|'claude-code', Diagnostics special-cases claude-code). ③ CC3 BOUNDARY: DH-4 = structural per-host fork (dirs/markers/manifest/gate, IN demand); CC3 = wording unification (NOT in demand); de-Codex code symbols = DH-3/RC-3b (distinct from CC3 prose). ④ CROSS-REPO: now=Alembic backports 3 drift assets; DH-4=shared-asset-manifest single-path→per-host-path + check-shared-asset-drift.mjs per-host compare (authority Alembic). ⑤ 92 SURFACES: actually ~221 distinct Codex*/CODEX_* (1118 occ/58 files; 92 undercounts ~2.4x). ~40 host-specific OVER-counts — true L3 seam ≈ 5 files (ProjectRootResolver/RuntimeContext/PluginRegistry/Diagnostics/SetupService-profile); ~80% are cosmetic-prefix host-agnostic→de-prefix L1/L2. 3 named mis-named examples confirmed host-agnostic; 1 MISCLASSIFICATION (buildCodexMcpInitializeInstructions is host-agnostic, design L3 list wrong).",
+  "evidenceRefs": [
+    "wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md (full DH-0 report: 8-cluster matrix, drift diffs+direction, surface restatement, CC3 boundary, cross-repo list)",
+    "Alembic/scripts/check-shared-asset-drift.mjs (RED: skill-alembic-recipes/structure + templates-recipes-setup)",
+    "AlembicPlugin/lib/runtime/ProjectRootResolver.ts:280-285 (project-root trusted candidates = #1 cc coupling)",
+    "AlembicPlugin/lib/runtime/PluginRegistry.ts:22,60-77 (CodexPluginHostShape codex|claude-code = existing L3 seam)",
+    "Alembic/config/shared-asset-manifest.json (drift authority model: shared sections=main; templates=main)"
+  ],
+  "verification": [
+    "No code change (precheck): AlembicPlugin tree clean at afbf25e; AlembicCore clean at f0bf896; tsc --noEmit exit 0; biome 0err/16warn (baseline)",
+    "① drift confirmed RED via Alembic/scripts/check-shared-asset-drift.mjs (governance authority): 11 checks, 3 drift; exact diffs captured (Alembic vs Plugin) for all 3 assets — plugin ahead, main stale; direction = main backports plugin",
+    "② 8-cluster matrix = claude-code-guide CC-capability research + repo-side criticality (verified first-hand: ProjectRootResolver.ts:280-285 trusted candidates + fallback trust; PluginRegistry CodexPluginHostShape dual-host scaffolding; buildCodexMcpInitializeInstructions host-agnostic). cc feasible; only project-root is CORE+mitigated",
+    "⑤ surface count via grep = ~221 distinct / 1118 occ / 58 files (not ~92); sampled ~13 symbols classified with file:line; 3 design mis-named examples confirmed host-agnostic; buildCodexMcpInitializeInstructions misclassification verified host-agnostic",
+    "Boundaries: no refactor, no L3 built, no per-host fork, no four-tool MCP semantic change, pure-MCP non-resident invariant intact, no Core sink; did NOT enter DH-1"
+  ],
+  "risks": [
+    "needs-controller (HARD prereq for DH-1): Alembic-side drift backport of the 3 shared assets (precise list in report) — cross-repo, controller dispatches Alembic window before DH-1; gate goes green only after that apply. CAVEAT: host-divergent tool-name lines stay wakeflow-host:main (entangled with DH-4 per-host fork — if unreconcilable as 'shared', confirms DH-4 fork)",
+    "② cc adapter is narrower in 3 nicety clusters (static tool list / no host-introspection / no turn-metadata) — accepted asymmetry the L3 design accommodates; DH-2/DH-3 must add a cc workspace env to ProjectRootResolver trusted candidates (else cc tools fail-closed without per-call projectRoot)",
+    "⑤ design figures need restatement before DH-1: surface ~221 not ~92; ~40 host-specific over-counts (true L3 ≈ 5 files); buildCodexMcpInitializeInstructions misclassified — controller/Design should adjust DH-2/DH-3 scope estimates",
+    "cc real-host acceptance (8-cluster behavior on actual Claude Code) -> Test/DH-6; DH-0 verified by static research + repo trace + drift-gate run only"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh0-plugin-precheck__AlembicPlugin__DH-0",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh0-plugin-precheck__AlembicPlugin__DH-0.json",
+    "deliveryRunId": "run-delivery-dh0-plugin-precheck__AlembicPlugin__DH-0",
+    "dispatchGroup": "dh0-plugin-precheck",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh0-plugin-precheck__AlembicPlugin__DH-0.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 3,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-0-precheck-cc-host-feasibility",
+    "targetTaskId": "DH-0",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh0-plugin-precheck",
+    "resultId": "tr-DH-0",
+    "createdAt": "2026-06-19T10:44:09.787Z"
+  },
+  "createdAt": "2026-06-19T10:44:09.787Z",
+  "stateRevisionObserved": 3,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

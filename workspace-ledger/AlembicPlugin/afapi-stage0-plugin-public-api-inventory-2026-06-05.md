@@ -4,7 +4,7 @@
 - Dispatch group: `AFAPI-STAGE0-INVENTORY-20260605`
 - Window: `AlembicPlugin`
 - Target repo: `/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin`
-- Control plan: `codex-control-workspace/.workspace-active/workspace/current/plugin-agent-facing-public-api-redesign-workspace-plan-2026-06-05.md`
+- Control plan: `codex-control-workspace/.wakeflow-active/current/plugin-agent-facing-public-api-redesign-workspace-plan-2026-06-05.md`
 - Scope: read-only inventory of Plugin agent-facing public API, active skill/tool descriptions, runtime package surface, local-dev verification surface, legacy `alembic_task` / `alembic_guard` surface and tests.
 - Not done: no product source changes, no old tool or skill deletion, no runtime bundle refresh, no service startup, no real Codex smoke, no cross-repo responsibility.
 
@@ -15,9 +15,9 @@ I am the AlembicPlugin execution window. This task only covers AlembicPlugin-own
 ## Documents Read
 
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/AGENTS.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/index.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/workspace-current-status.md`
-- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.workspace-active/workspace/current/plugin-agent-facing-public-api-redesign-workspace-plan-2026-06-05.md`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/index.md`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/workspace-current-status.md`
+- `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/.wakeflow-active/current/plugin-agent-facing-public-api-redesign-workspace-plan-2026-06-05.md`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/AGENTS.md`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicDesign/docs/current/plugin-agent-facing-public-api-redesign-workspace-handoff-2026-06-04.md`
 - `/Users/gaoxuefeng/Documents/AlembicWorkspace/codex-control-workspace/skills/dev/codex-automation-target/SKILL.md`

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-DH-4b",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-4b-alembic-shared-asset-drift-per-host",
+  "dispatchGroup": "dh4b-alembic-drift-gate-per-host",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "Alembic",
+  "targetTaskId": "DH-4b",
+  "status": "needs-review",
+  "summary": "DH-4b（Alembic 侧 shared-asset-drift 门禁 per-host 化 + 3 资产转绿）。基线 cf3b171 → main 提交 88a2abf（直提 main，仅改 2 文件 +51/-10）。门禁 RED(3 drift)→3 目标资产 GREEN；完全 0-drift 经镜像证明（仅需控制器派 Plugin 同步 2 个 self-check 文件，无需改 plugin 任何资产）。\n\n【设计】采 §C.1 primary 的 manifest 级 per-host 模型（recipes/structure 是多行多处工具面分叉，不适合单行 wakeflow-host:<host> 段提升；且不可改 plugin 资产）：\n- scripts/check-shared-asset-drift.mjs：checkSkillSharedSections 加可选 perHostSections——声明段承载真 host-divergent 工具面（codex/main alembic_knowledge/alembic_guard/alembic_structure ↔ cc/plugin alembic_search/alembic_code_guard/alembic_project_matrix），从 cross-host coherence 排除（每侧即该 host per-host 权威，互不比较，保各宿主四工具对外 MCP 语义），其余 shared 段仍须 codex/cc 一致；并校验声明段存在于 main 权威侧。无 perHostSections 的资产行为不变。\n- config/shared-asset-manifest.json：recipes perHostSections=[intro-and-overview,use-context-tail]；structure perHostSections=[title-intro,tools-and-graph]；templates-recipes-setup 加 README.md fileVariants（3 个 host-divergent 工具表行，复用既有 directory-exact 变体机制）。\n\n【门禁 before→after（Node v22.22.1）】before(cf3b171)：11 checks/3 drift（recipes intro-and-overview·use-context-tail 段；structure title-intro·tools-and-graph 段；recipes-setup README.md）。after(88a2abf) vs 真实 plugin：3 目标资产全 [ok]（recipes 3 shared+2 per-host skipped；structure 0 shared+2 per-host skipped；recipes-setup 6 files in sync），仅剩 2 self-check drift（manifest+script，plugin 副本未同步）。镜像（plugin 资产原样、仅同步 2 self-check 文件）：11 checks/0 drift/PASS。\n\n【per-host 提升清单】host-divergent 行未逐行入文件级 wakeflow-host:<host> 段（多行多处分叉 + 不可改 plugin 资产边界），改为 manifest 级 per-host 声明（§C.1 primary codex/cc variant）：recipes 的 Context index/搜索表格/MCP 列表/confirm_usage/semantic 行落在 intro-and-overview·use-context-tail（声明 per-host）；structure 的 alembic_structure(targets|files|metadata)↔alembic_project_matrix + 知识图谱↔项目图谱行落在 title-intro·tools-and-graph（声明 per-host）；README 3 行入 fileVariants。\n\n【needs-controller】Plugin self-check 2 文件字节同步：派 AlembicPlugin 窗口用 main 88a2abf 版覆盖 config/shared-asset-manifest.json + scripts/check-shared-asset-drift.mjs（精确 diff/指引见 wakeflow-ledger/Alembic/dh-4b-plugin-self-check-sync-2026-06-20.patch + .md）。同步后整门禁 0 drift；无需改 plugin 任何资产。\n\n【边界】只改 Alembic 2 个门禁文件；不动 plugin；四工具对外 MCP 语义不变（main 工具名保留在 codex 侧）；AlembicCore 未动；Node≥22 跑门禁。",
+  "evidenceRefs": [
+    "Alembic main commit 88a2abf feat(drift-gate): DH-4b per-host shared-asset-drift — recipes/structure perHostSections + recipes-setup README fileVariants (baseline cf3b171; 2 files, +51/-10; tree clean)",
+    "gate BEFORE (cf3b171, Node v22.22.1): 11 checks, 3 drift — skill-alembic-recipes / skill-alembic-structure / templates-recipes-setup(README.md)",
+    "gate AFTER (88a2abf) vs real plugin: 3 target assets [ok] (recipes 3 shared+2 per-host skipped; structure 0 shared+2 per-host skipped; recipes-setup 6 files in sync); only 2 self-check drift (manifest+script, plugin not yet synced)",
+    "mirror proof (plugin assets untouched + 2 self-check files synced to main 88a2abf): 11 checks, 0 drift, PASS (EXIT 0)",
+    "Plugin self-check sync package: wakeflow-ledger/Alembic/dh-4b-plugin-self-check-sync-2026-06-20.patch + dh-4b-plugin-self-check-sync-2026-06-20.md",
+    "plugin current self-check copies == Alembic cf3b171 (verified) → sync diff == commit cf3b171→88a2abf"
+  ],
+  "verification": [
+    "Node v22.22.1 used for the gate (.nvmrc=22); Node 18 false-reds with ERR_INVALID_ARG_TYPE per task note",
+    "node scripts/check-shared-asset-drift.mjs — before: 3 drift (RED, EXIT 1); after vs real plugin: 3 target assets green + 2 self-check residual (EXIT 1, self-check only)",
+    "node scripts/check-shared-asset-drift.mjs --sibling <synced-mirror>: 11 checks, 0 drift, PASS, EXIT 0 (full-green proof; plugin assets untouched)",
+    "npx biome check scripts/check-shared-asset-drift.mjs config/shared-asset-manifest.json: Checked 2 files, no fixes (clean); pre-commit lint-staged biome check/format also ran clean",
+    "git diff --check: no whitespace errors; git diff --stat: only 2 files changed (+51/-10); scratch/ gitignored (not committed)"
+  ],
+  "risks": [
+    "WHOLE-GATE 0-drift requires controller to dispatch AlembicPlugin to byte-sync the 2 self-check files (manifest+script) per ledger package; until then npm run check / drift gate stays RED on self-check ONLY (3 target assets already green). No plugin asset edits needed (mirror-proven).",
+    "structure skill now has 0 cross-host coherence-checked shared sections (both sections are host-divergent → both per-host) — honest tradeoff given plugin assets can't be edited; a future two-sided restructure could reintroduce coherence on host-agnostic prose.",
+    "DESIGN INTERPRETATION to confirm: host-divergent lines declared per-host at the MANIFEST level (§C.1 primary codex/cc variant), NOT lifted into file-level wakeflow-host:<host> begin/end sections inside the SKILL.md — chosen because divergence is multi-line/multi-location and the boundary forbids editing plugin assets (literal file-level two-sided markers would need a coordinated plugin asset restructure, a bigger needs-controller scope). Flag if controller wants the literal marker form.",
+    "AGENTS.md '差异声明表' for skill-alembic-recipes/structure still says '仅比较 wakeflow-shared 标记段' — minor doc staleness now that perHostSections also applies; not edited (outside the task's stated 2-file boundary)."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh4b-alembic-drift-gate-per-host__Alembic__DH-4b",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4b-alembic-drift-gate-per-host__Alembic__DH-4b.json",
+    "deliveryRunId": "run-delivery-dh4b-alembic-drift-gate-per-host__Alembic__DH-4b",
+    "dispatchGroup": "dh4b-alembic-drift-gate-per-host",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh4b-alembic-drift-gate-per-host__Alembic__DH-4b.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 55,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-4b-alembic-shared-asset-drift-per-host",
+    "targetTaskId": "DH-4b",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dh4b-alembic-drift-gate-per-host",
+    "resultId": "tr-DH-4b",
+    "createdAt": "2026-06-20T08:40:49.152Z"
+  },
+  "createdAt": "2026-06-20T08:40:49.152Z",
+  "stateRevisionObserved": 55,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

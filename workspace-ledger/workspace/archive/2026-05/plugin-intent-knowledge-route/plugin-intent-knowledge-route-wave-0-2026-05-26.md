@@ -45,7 +45,7 @@
   - `AlembicCore`：ProjectScope、knowledge / Recipe / source refs、可能的 shared contract 边界。
 - producer / consumer 依赖：Stage 1-2 的 producer 是 `AlembicPlugin` 的 `RecognizedIntentDraft` / `IntentEpisode`；Stage 3-5 的 consumer 是 Plugin -> Alembic / Core 知识检索与 prime 注入；下游不得早于上游 contract 和 evidence 稳定前实现。
 - 不可提前消费的上游：没有 `RecognizedIntentDraft` / `IntentEpisode` 事实前，不启动 `IntentSearchPlan` / vector / `PrimeInjectionPackage` 实现。
-- 不允许触碰的目录 / 仓库：不改产品源码、不改真实测试项目、不写 raw thread id 到 tracked 文档、不把 `.workspace-local/visible-dispatch/` 提交。
+- 不允许触碰的目录 / 仓库：不改产品源码、不改真实测试项目、不写 raw thread id 到 tracked 文档、不把 `.wakeflow-local/visible-dispatch/` 提交。
 - 真实测试项目是否涉及：本轮不涉及。后续 Stage 6 才按真实项目、多会话和 prime 注入价值创建 `AlembicTest` 测试单。
 
 ## 阶段顺序
@@ -308,7 +308,7 @@ node scripts/visible-dispatch.mjs claim --window <你的窗口名> --write --jso
   - 不能推出的结论：不能推出 037 功能已实现，也不能推出真实 prime 注入有效。
   - 停止或不开始条件：current plan 未切到本文、sendEligible 不是 037、queue 仍有旧 active / review 任务、registry 缺少目标窗口、mode 已启但任务不匹配。
 - 测试单：无。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：本轮不使用真实测试项目。
 
 ## 回填区

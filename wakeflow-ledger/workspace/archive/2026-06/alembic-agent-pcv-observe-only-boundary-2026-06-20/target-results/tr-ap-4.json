@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-ap-4",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "taskPackageId": "ap-4-evidence-purify-enforcement-marker",
+  "dispatchGroup": "ap4-agent-evidence-marker",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "AP-4",
+  "status": "completed",
+  "summary": "AP-4 完成（证据层纯化收口 + additive enforcement-mode 标记；生产者侧，主体消费是 AP-6）。AlembicAgent main dd1bf0c→8118dbe（仅 AlembicAgent，2 文件 +39，纯增量）。\n\n做了：\n1. 纯观察确认：PcvNodeEvidence 已纯观察、无残留控流——record 函数（recordPcvLlmOutput:1064 / recordPcvToolRoundOutcome:1481）仅 mutate evidence 对象、返回值在调用点被忽略；唯一的「证据派生信号驱动控流」读取点 getLatestPcvBurnGrounding 已在 AP-3 被 CP4 调用点 guard 门控（off 不读）。AP-4 标记是纯数据、不新增任何控流。\n2. additive enforcement-mode 标记：PcvNodeEvidenceSummary 新增 `groundingEnforcement: 'off' | 'guard'`（按字母序置于 findingRefs 与 groundingLedger 之间）。createPcvNodeEvidence 从 ctx.groundingEnforcement（AP-3 已解析并挂 LoopContext 的本次运行 effective 值）填充；质量门 fallback 证据标 'off'（非 guard 运行）。**纯 additive**：不改名/不删既有字段、schemaVersion 保持 1、cloneEvidence 的 {...evidence} spread 自动保留——老跨仓消费者（主体/PCVM）忽略新字段不受影响（R3 不断链）。标记区分 off/guard 语义（AP-3 carry），供 AP-6 主体把 grounding ledger 解读为审计而非质量判定、observe-only 下增多的 invalid-no-evidence 不误判回归（R6）。\n3. 「关 metadata 仅缺 trace、主流程不变」核实：新增测试断言 off 模式下 invalid-no-evidence classification 仍被记录为审计材料，但主循环控制（终结/阻断/回退）完全不受影响（loop 照常以首轮文本终结、chatWithTools 1 次、无 rollbackTick）——证 PCV 纯观察、无残留控流耦合。\n\n测试（表征文件 11→14 例，+3 AP-4）：① 默认 off→summary.groundingEnforcement='off' + additive 不破既有字段/schemaVersion；② guard override→标记='guard'（区分两模式）；③ 纯观察/关 metadata 主流程不变。typecheck 确认无其它 PcvNodeEvidenceSummary 字面量需改（fixture 松类型 + toMatchObject 不破）。\n\n不变量：仅 AlembicAgent（生产者）；additive 不改既有字段；**不改主体/PCVM/Test**（AP-6/AP-7 领地）；PcvNodeEvidence 纯观察；deepseekV4ToolChoiceMode 等 enforcement-derived 字段仍由 PCV 观察产出；四工具/LLM 对外语义不变；Node 22。\n\n结论：AP-4 完成定义全部满足；纯观察确认 + 标记落地 + 关 metadata 对照通过。无 blocker、无需用户决策。AP-4 完成解锁 AP-5∥AP-6∥AP-7 并行（AP-6 依赖本标记、AP-7 依赖 AP-3 per-run）。建议控制器审阅后调度后续三路。",
+  "evidenceRefs": [
+    "AlembicAgent commit 8118dbe on main (baseline dd1bf0c=AP-3; AlembicAgent-only, 2 files +39, additive-only)",
+    "src/agent/runtime/PcvNodeEvidence.ts: PcvNodeEvidenceSummary + groundingEnforcement:'off'|'guard' (additive, between findingRefs and groundingLedger); schemaVersion stays 1; existing fields/order unchanged",
+    "createPcvNodeEvidence populates groundingEnforcement: ctx.groundingEnforcement (AP-3 LoopContext effective value); createFallbackQualityGateEvidence marks 'off'",
+    "Pure-observe proof: recordPcvLlmOutput (AgentRuntime.ts:1064) + recordPcvToolRoundOutcome (:1481) are statement calls (return ignored); sole control read getLatestPcvBurnGrounding stays guard-gated (AP-3 CP4); marker is data-only",
+    "Backward-compat: cloneEvidence {...evidence} spread preserves new field; typecheck clean (no other typed PcvNodeEvidenceSummary literal needs the field; evidence-recording-phase-chain.test.ts fixture is loose + toMatchObject)",
+    "test/pcv-observe-only-baseline.characterization.test.ts +3 AP-4 cases (marker off/guard, additive-non-break, metadata-recorded-but-main-flow-unaffected); 11->14"
+  ],
+  "verification": [
+    "npm run build (tsc emit): pass, exit 0",
+    "npm run build:check (typecheck noEmit): exit 0",
+    "npm run lint (biome src scripts test): exit 0, 4 warnings (= AP-0..AP-3 baseline, 0 new; all pre-existing in scripts/, none in AP-4 files)",
+    "npm run lint:core-import-boundary: OK, scanned 260 files / 46 @alembic/core imports (= AP-2/AP-3; no new files)",
+    "npm test (full vitest): 35 files / 259 tests passed, 0 failed (AP-3 was 256; +3 = AP-4 marker tests; 0 failed preserved)",
+    "characterization file isolated run: 14/14 pass",
+    "Node 22 (nvm v22.22.1)"
+  ],
+  "risks": [
+    "additive 标记 schemaVersion 保持 1（非 bump）以最大化向后兼容：跨仓消费者若硬检 schemaVersion===1 仍可用、忽略新字段。若 AP-6 需要显式版本信号区分新旧产出，需单独决策是否 bump（本阶段按 additive 不变）",
+    "标记仅落在 PcvNodeEvidenceSummary（result.pcvNodeEvidence，主体 AP-6 经 agentService.run 返回消费，FC4 通道）；PcvNodeEvidenceProcessMetadata（进度事件投影）未加标记。若某消费者从 progress-event metadata 读取而非 summary，AP-6 需确认通道后决定是否补齐（同为 additive）",
+    "wouldBlockButAllowed 计数（可选）未实现：需要在 off 路径观察 gate 决策或复制 guard 阻断准则，会耦合证据与 guard 逻辑；且 invalid-no-evidence 计数消费方可从 groundingLedger 自行派生。标记 groundingEnforcement 已充分服务 R6（consumer 知模式即可判读），故按任务「可选」缓延",
+    "主体 AP-6 跨仓消费未在本窗口验证（只读跨仓为 AP-6 领地）；本窗只产出标记、不改主体"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-ap4-agent-evidence-marker__AlembicAgent__AP-4",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap4-agent-evidence-marker__AlembicAgent__AP-4.json",
+    "deliveryRunId": "run-delivery-ap4-agent-evidence-marker__AlembicAgent__AP-4",
+    "dispatchGroup": "ap4-agent-evidence-marker",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap4-agent-evidence-marker__AlembicAgent__AP-4.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 19,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "taskPackageId": "ap-4-evidence-purify-enforcement-marker",
+    "targetTaskId": "AP-4",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "ap4-agent-evidence-marker",
+    "resultId": "tr-ap-4",
+    "createdAt": "2026-06-20T14:23:00.605Z"
+  },
+  "createdAt": "2026-06-20T14:23:00.605Z",
+  "stateRevisionObserved": 19,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

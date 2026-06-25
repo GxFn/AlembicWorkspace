@@ -22,7 +22,7 @@
 - 已核对证据：Wave 8 已实现 `FREQ=MINUTELY;INTERVAL=1` heartbeat payload、target finish-chain、mode disabled 断链门禁；Wave 9 完成后发现 `AlembicTest` registry 使用了 `current-codex-thread` 占位符，已通过 `unregister --window AlembicTest --write` 清理，当前 registry 只保留 5 个真实登记窗口；脚本已新增 placeholder thread id 拒绝门禁。
 - 是否需要先验证 / 重新计划 / 用户确认：需要先完成本计划、队列和校验准备；不启动真实 heartbeat，直到用户明确说开启。
 - 本次允许更新：当前 Wave 9 计划、总控索引 / 状态同步、全局 TODO 的 VAD 行、`check-test-boundary` 非测试型 VAD smoke 例外、脚本索引说明、本地 ignored VAD queue。
-- 本次不得更新：不得改 Alembic 系列产品源码；不得把 fake TODO 结论写成真实产品能力结论；不得自动开启 mode 或创建 heartbeat；不得把 `AlembicTest` 当测试验证窗口；不得提交 `.workspace-local`。
+- 本次不得更新：不得改 Alembic 系列产品源码；不得把 fake TODO 结论写成真实产品能力结论；不得自动开启 mode 或创建 heartbeat；不得把 `AlembicTest` 当测试验证窗口；不得提交 `.wakeflow-local`。
 
 ## Design / 需求来源
 
@@ -42,16 +42,16 @@
 - 相关仓库：`AlembicWorkspace`。
 - 关键入口：
   - `scripts/visible-dispatch.mjs`
-  - `.workspace-local/visible-dispatch/state.json`
-  - `.workspace-local/visible-dispatch/window-registry.json`
-  - `.workspace-local/visible-dispatch/dispatch-queue.json`
-  - `.workspace-local/visible-dispatch/automation-runs.json`
+  - `.wakeflow-local/visible-dispatch/state.json`
+  - `.wakeflow-local/visible-dispatch/window-registry.json`
+  - `.wakeflow-local/visible-dispatch/dispatch-queue.json`
+  - `.wakeflow-local/visible-dispatch/automation-runs.json`
 - producer / consumer 依赖：
   - Producer：总控 `mode --enable`、`enqueue --from-plan`、`arm --task`、Codex automation 创建 heartbeat、`record-arm`。
   - Consumer：目标窗口 heartbeat 醒来后 `claim`、执行只读 fake TODO、`finish --chain-next`、仅在 finish JSON 明确允许 target-courier 时按 `chain.payload` 创建下一跳、`record-arm`、`record-stop`；`AlembicTest` 下一跳默认由总控创建。
   - Acceptance：总控读取 queue / runs / backfill，逐项 `accept` 或裁决失败层。
 - 不可提前消费的上游：用户未明确开启前不得 enable mode 或创建 heartbeat；若任一窗口无法唤醒或无法 record-arm，必须暂停链路并归因，不得继续空转。
-- 不允许触碰的目录 / 仓库：不写 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 产品源码；不写真实测试项目业务代码；不提交 `.workspace-local`。
+- 不允许触碰的目录 / 仓库：不写 `Alembic`、`AlembicCore`、`AlembicAgent`、`AlembicDashboard`、`AlembicPlugin` 产品源码；不写真实测试项目业务代码；不提交 `.wakeflow-local`。
 - 真实测试项目是否涉及：不涉及；`AlembicTest` 本轮只作为非测试型可见窗口参与 VAD heartbeat smoke，不运行真实项目测试。
 
 ## 阶段顺序
@@ -223,7 +223,7 @@ node scripts/visible-dispatch.mjs record-stop --automation-id <当前 automation
 - 需要真实场景的理由：需要真实 Codex thread / heartbeat 才能验证唤醒和 finish-chain；但不需要真实产品仓库修改、cold-start、rescan、Dashboard 手动观察或真实测试项目。
 - 测试前边界与多条件判断：
   - 测试要回答的问题：真实 heartbeat 是否能按已登记 thread id 唤醒窗口，并由窗口完成 claim / finish / chain-next / record-arm / record-stop。
-  - 测试对象 / 目标窗口 / 线程 / 项目边界：`.workspace-local/visible-dispatch` runtime、Alembic 系列可见 Codex 窗口；`AlembicTest` 必须使用真实 thread id 登记，placeholder 不算可投递窗口；不触碰产品源码和真实测试项目。
+  - 测试对象 / 目标窗口 / 线程 / 项目边界：`.wakeflow-local/visible-dispatch` runtime、Alembic 系列可见 Codex 窗口；`AlembicTest` 必须使用真实 thread id 登记，placeholder 不算可投递窗口；不触碰产品源码和真实测试项目。
   - 成功能推出的结论：VAD 真实多窗口 fake TODO 自动化链路可工作，后续可以用低风险 workspace-only 真实任务继续验证。
   - 失败能推出的结论：失败归因在 automation 投递、thread registry、窗口操作、脚本状态机或总控计划边界之一；不能直接归因到产品仓库。
   - 不能推出的结论：不能证明 PCVM、Plugin intent、file monitor 或真实产品任务已可无人值守完成。

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "tc-20260620140931-0016",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "fromRevision": 16,
+  "candidateState": "accepting",
+  "reason": "All target results are present; total-control acceptance/rework decision is required.",
+  "reviewStatus": "ready-for-controller-review",
+  "readyResultIds": [
+    "tr-ap-3"
+  ],
+  "blockedResultIds": [],
+  "missingResultIds": [],
+  "reviewScope": "open-controller-review-targets",
+  "targetTaskIds": [
+    "AP-3"
+  ],
+  "excludedTargetTaskIds": [
+    "AP-0",
+    "AP-1",
+    "AP-2"
+  ],
+  "allowedDecisions": [
+    "accept",
+    "rework",
+    "blocked"
+  ],
+  "evidenceRefs": [
+    "AlembicAgent commit dd1bf0c on main (baseline c206e7a=AP-2; AlembicAgent-only, 8 files +260/-116)",
+    "src/agent/runtime/AgentRuntimeTypes.ts: new `export type GroundingEnforcement='off'|'guard'`; RuntimeConfig.groundingEnforcement (global default) + ReactLoopOpts.groundingEnforcement (per-call)",
+    "src/agent/service/AgentRunContracts.ts: AgentRunExecutionOptions.groundingEnforcement + AgentRuntimeRunOptions.groundingEnforcement; AgentService.ts buildRuntimeOptions maps input.execution?.groundingEnforcement (mirrors toolChoiceOverride, PD7)",
+    "src/agent/runtime/AgentRuntime.ts: ctor #groundingEnforcementDefault=config??off; execute() resolves per-run effective onto #groundingEnforcement (instance bridge; PipelineStrategy does not forward opts); #initLoop override ?? effective -> LoopContext",
+    "src/agent/runtime/LoopContext.ts: carries groundingEnforcement:'off'|'guard' (default off) — shared read point for CP1+CP4",
+    "CP1 src/agent/runtime/LLMInputAssembly.ts:528 policy gated by ctx.groundingEnforcement==='guard' && stage==='analyze' (all analyze paths); PD5 ref-list injection :433-439 unchanged",
+    "CP4 src/agent/runtime/AgentRuntime.ts:1612 call-site short-circuit; AnalyzeGroundingGuard.ts UNCHANGED (not in diff) — guard internals intact",
+    "PD1 proof: ProviderToolChoicePolicy untouched; CP2 guard-mode characterization test asserts identical provider toolChoice (none->auto, schema visible) in both modes",
+    "test/pcv-observe-only-baseline.characterization.test.ts rewritten two-mode (7->11 cases); test/AgentRuntime.test.ts block test opts into groundingEnforcement='guard'",
+    "target-results/tr-ap-3.json"
+  ],
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "transition-candidate",
+    "source": "wakeflow-state",
+    "command": "reduce-results",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 16,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "candidateId": "tc-20260620140931-0016",
+    "createdAt": "2026-06-20T14:09:31.075Z"
+  },
+  "forbiddenConclusions": [
+    "transition-candidate-is-acceptance",
+    "reducer-decision-closes-task-package",
+    "reducer-decision-creates-next-dispatch"
+  ]
+}

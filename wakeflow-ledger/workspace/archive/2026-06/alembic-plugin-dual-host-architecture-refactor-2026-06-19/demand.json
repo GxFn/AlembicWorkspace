@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "title": "AlembicPlugin Dual-Host (Codex + Claude Code) Architecture Refactor And Layering",
+  "interfaceLanguage": "zh",
+  "goal": "把 AlembicPlugin（daemon-removal 后纯 MCP 非强进程，基线 HEAD afbf25e）真正做成 Codex + Claude Code 双宿主插件：5 层架构（L4 per-host shell / L3 host adapter[新建,对称 codex+claude-code] / L2 两 MCP 表面 / L1 host-agnostic 内核 / L0 Core 消费；单向依赖 L4→L3→L2→L1→L0；host-name 分支只允许在 L3）+ host 抽象统一 + 执行层去 Codex-only。性质=补能力非收拾（深挖确认现态 Codex 100% / cc ~5% 图式占位 / generic 0%）。9 项已决：① 全量 RC-1~8；② 删 generic-host-agent（AGENT_HOSTS 收敛 codex+claude-code）；③ L3 留 Plugin 不下沉 Core；④ 真双 identity（env 由 hostShape 派生、删 ALEMBIC_PLUGIN_HOST=codex 硬编码 + 加 CLAUDE_CODE_PLUGIN_HOST + per-host expectedPluginHost）；⑤ per-host 产物对等（skills/templates/constitution 分叉）；⑥ de-Codex 52 误命名 host-agnostic Codex* 去前缀归 L1/L2（RC-3b，区别于 ~40 真 host-specific 抽 L3）；⑦ 跨仓 Plugin+Alembic（共享资产漂移门禁单 path→per-host path + check-shared-asset-drift.mjs，治理权威在 Alembic 侧）；⑧ pre-existing 漂移 RED 纳入（DH-0 先同步绿）；⑨ 验收 cc 在 workspace 内由 Test、codex 由用户在 codex host 外部验收。不变量：保持纯 MCP 非强进程不回退、L3 不引入常驻进程；不改四工具对外 MCP 语义/业务行为；不下沉 L3 到 Core；CC3 文案统一不在本需求（DH-4 只做结构 per-host 分叉）。跨仓覆盖：AlembicPlugin=全部 DH（host 抽象/L3 adapter/de-Codex/per-host 产物/清理/测试）；Alembic=共享资产漂移门禁 per-host + 同步 pre-existing 漂移（治理权威）；AlembicCore=observing（连接层 host-blind、无 Core 改、仅复核消费门禁）；Test=cc 端真实验收。",
+  "completionDefinition": "DH-6（claude-code 在 workspace 内真实验收）：cc 端 init/status/工具行为与 codex 真对等；保持 daemon-removal 纯 MCP 非强进程不变量（无常驻进程、不回退已删能力）；四工具对外 MCP 语义不变；共享资产漂移门禁绿（per-host 模型）；build/test 绿；de-Codex 后 `Codex*` 误命名清零、层级单向依赖（host-name 分支只在 L3）；generic-host-agent 已删（AGENT_HOSTS=codex+claude-code）。codex 路径由用户在 codex host 外部真实验收（workspace 外，不含于本需求 DH-6 实跑）。",
+  "createdAt": "2026-06-19T10:19:38.399Z",
+  "source": {
+    "kind": "wakeflow-state-init",
+    "trackedTemplates": "templates/wakeflow-state-machine",
+    "generatedStateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor"
+  }
+}

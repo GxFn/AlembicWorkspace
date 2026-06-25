@@ -160,7 +160,7 @@ cd Alembic && git diff --check
 发送给：无
 
 ```text
-先读取 AGENTS.md、codex-control-workspace/.workspace-active/workspace/index.md、codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6c-alembic-stage-node-map-injection-2026-05-29.md，以及你所在窗口/目标仓库的 AGENTS.md。
+先读取 AGENTS.md、codex-control-workspace/.wakeflow-active/index.md、codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-6c-alembic-stage-node-map-injection-2026-05-29.md，以及你所在窗口/目标仓库的 AGENTS.md。
 
 先明确声明当前窗口定位和本轮仓库职责。
 
@@ -217,7 +217,7 @@ cd Alembic && git diff --check
   "indexRows": [
     {
       "type": "PCVM Wave 6C Alembic stage node map injection",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6c-alembic-stage-node-map-injection-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6c-alembic-stage-node-map-injection-2026-05-29.md",
       "status": "Wave 6C 总控验收通过",
       "description": "Alembic commit acd273e 已在 bootstrap dimension input 注入 canonical stage node map，并通过 targeted tests 与总控复核。"
     }
@@ -225,7 +225,7 @@ cd Alembic && git diff --check
   "currentIndexRows": [
     {
       "type": "PCVM Wave 6C Alembic stage node map injection",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6c-alembic-stage-node-map-injection-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6c-alembic-stage-node-map-injection-2026-05-29.md",
       "description": "Bootstrap stage node map injection，补齐真实 cold-start producer 入口。"
     }
   ]

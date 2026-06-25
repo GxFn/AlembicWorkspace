@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rg10-core-bootstrap-session-source-ref-repair-t1-evidence-repair-1",
+  "demandKey": "alembic-recipe-evolution-optimization-2026-06-21",
+  "taskPackageId": "rg10-core-bootstrap-session-source-ref-repair-p1",
+  "dispatchGroup": "rg10-cross-repo-test-blocker-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-evolution-optimization-2026-06-21",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "rg10-core-bootstrap-session-source-ref-repair-t1",
+  "status": "completed",
+  "summary": "Evidence repair for AlembicCore RG10 result: same completed Core repair as commit b18754d1ff238613af8619c294787f6a4ca6d4d8, with workspace-relative source/test evidence refs so controller review can resolve changed files. Behavior remains: completed bootstrap sessions no longer block same-project follow-on sessions, sourceRef line-range paths resolve to existing files, and ProjectScope single-folder relative refs are allowed while multi-folder refs remain qualified-only.",
+  "evidenceRefs": [
+    "commit:AlembicCore:b18754d1ff238613af8619c294787f6a4ca6d4d8",
+    "AlembicCore/src/workflows/capabilities/host-agent/BootstrapSession.ts",
+    "AlembicCore/src/service/knowledge/SourceRefReconciler.ts",
+    "AlembicCore/src/shared/ProjectScope.ts",
+    "AlembicCore/test/BootstrapSessionManager.test.ts",
+    "AlembicCore/test/RecipeFreshnessService.test.ts",
+    "AlembicCore/test/ProjectScopeContracts.test.ts"
+  ],
+  "verification": [
+    "npx vitest run test/BootstrapSessionManager.test.ts test/RecipeFreshnessService.test.ts test/ProjectScopeContracts.test.ts -> passed (3 files, 20 tests)",
+    "npm run build:check -> passed",
+    "npm run lint -> passed",
+    "git diff --check -> passed",
+    "npm run test -> passed (135 files, 1375 tests)",
+    "npm run check -> blocked at pre-existing lint:naming violations in src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts after earlier gates passed",
+    "alembic_code_guard -> attempted twice; MCP returned internal schema error before producing guard findings"
+  ],
+  "risks": [
+    "Focused Plugin PLAN_PROJECT_CONTEXT_STALE blocker is outside AlembicCore scope and was not changed.",
+    "npm run check remains blocked by existing naming gate files unrelated to this RG10 edit.",
+    "Alembic Guard MCP surface did not produce a usable review result due internal schema error; repository build/lint/tests were used as primary validation."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rg10-cross-repo-test-blocker-repair-p1__AlembicCore__rg10-core-bootstrap-session-source-ref-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rg10-cross-repo-test-blocker-repair-p1__AlembicCore__rg10-core-bootstrap-session-source-ref-repair-t1.json",
+    "deliveryRunId": "run-delivery-rg10-cross-repo-test-blocker-repair-p1__AlembicCore__rg10-core-bootstrap-session-source-ref-repair-t1",
+    "dispatchGroup": "rg10-cross-repo-test-blocker-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rg10-cross-repo-test-blocker-repair-p1__AlembicCore__rg10-core-bootstrap-session-source-ref-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-evolution-optimization-2026-06-21",
+    "stateRevision": 76,
+    "demandKey": "alembic-recipe-evolution-optimization-2026-06-21",
+    "taskPackageId": "rg10-core-bootstrap-session-source-ref-repair-p1",
+    "targetTaskId": "rg10-core-bootstrap-session-source-ref-repair-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "rg10-cross-repo-test-blocker-repair-p1",
+    "resultId": "tr-rg10-core-bootstrap-session-source-ref-repair-t1-evidence-repair-1",
+    "createdAt": "2026-06-22T04:46:50.992Z"
+  },
+  "createdAt": "2026-06-22T04:46:50.992Z",
+  "stateRevisionObserved": 76,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

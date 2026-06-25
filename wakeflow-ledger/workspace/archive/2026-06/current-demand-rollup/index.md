@@ -6,12 +6,12 @@ Maintained Entry: [workspace-record-map.md](../../../workspace-record-map.md)
 
 ## Summary
 
-Current AlembicWorkspace demand state compacted after the 2026-06-13 R-group
-closeout. The rollup separates completed requirement families from the remaining
-user-gated release, real-data-root cleanup, and future-wave TODO boundaries.
+Current demand-state rollup after the 2026-06-13 R-group closeout.
+
+This file summarizes the archive folder and map. Historical body files remain evidence snapshots; active docs should link to the record map or archive directory instead of scattering direct historical file links.
 
 ## Map
 
 | File | Type | Notes |
 | --- | --- | --- |
-| [current-demand-rollup-2026-06-13.md](current-demand-rollup-2026-06-13.md) | demand rollup archive | Completed, superseded, held, and active TODO boundaries as of 2026-06-13. |
+| [current-demand-rollup-2026-06-13.md](current-demand-rollup-2026-06-13.md) | archive document | current demand rollup |

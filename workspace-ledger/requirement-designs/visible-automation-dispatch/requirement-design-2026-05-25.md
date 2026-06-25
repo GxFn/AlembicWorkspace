@@ -114,7 +114,7 @@
   4. Pull 执行：目标 thread 醒来后读取 queue、claim、执行、回填。
   5. 清理：目标 thread 删除 automation；总控回收 stale claim / stale automation。
 - 共享状态 / 持久化位置：
-  - 第一版运行态建议放在 `.workspace-local/visible-dispatch/`，包括 `state.json`、`window-registry.json`、`dispatch-queue.json` 和 `automation-runs.json`。
+  - 第一版运行态建议放在 `.wakeflow-local/visible-dispatch/`，包括 `state.json`、`window-registry.json`、`dispatch-queue.json` 和 `automation-runs.json`。
   - 长期文档只记录 schema、计划和验收证据，不提交本机 threadId / registry。
   - 测试临时文件可放 `/private/tmp`。
 - producer / consumer 硬依赖：

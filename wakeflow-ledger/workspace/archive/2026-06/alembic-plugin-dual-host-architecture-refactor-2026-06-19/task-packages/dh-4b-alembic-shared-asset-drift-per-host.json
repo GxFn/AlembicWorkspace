@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "dh-4b-alembic-shared-asset-drift-per-host",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "summary": "DH-4b（Alembic 侧 shared-asset-drift 门禁 per-host + 3 资产转绿）。本窗口=Alembic（治理权威），基线 cf3b171，直提 main。据 DH-4a 规格 §C：把 3 项资产(alembic-recipes/structure shared 段 + recipes-setup/README)的真 host-divergent 工具名行提升为 wakeflow-host:<host> 段(codex=alembic_knowledge/guard, claude-code=alembic_search/code_guard)；check-shared-asset-drift.mjs 加 per-host 比较 + 可选 cross-host coherence；重跑门禁 RED→GREEN(0 drift)。Plugin self-check 脚本同步 diff 标 needs-controller(不改 Plugin)。Node≥22 跑门禁。完成=门禁绿 + 每项 diff + commit hash。不改四工具语义(main 真实工具名保留在 codex 段)、AlembicCore 不动。",
+  "status": "pending",
+  "sourceRef": "DH-4a 规格 wakeflow-ledger/AlembicPlugin/dh-4a-per-host-drift-gate-spec-2026-06-20.md §C + DH-0 §DH-4 line 47 + DH-0B(3 资产 host-divergent) + Design RC-4 + 控制器 line-39 裁断(per-host overlay 放行)",
+  "createdAt": "2026-06-20T08:11:09.907Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "DH-4b",
+      "taskPackageId": "dh-4b-alembic-shared-asset-drift-per-host",
+      "targetWindow": "Alembic",
+      "summary": "DH-4b（Alembic 侧：shared-asset-drift 门禁 per-host 化 + 3 项资产转绿）。本窗口=**Alembic**（仓库 `~/Documents/AlembicWorkspace/Alembic`，共享资产漂移门禁**治理权威**；基线 HEAD `cf3b171` clean）。**直提 main，不开分支。**\n\n**前置**：AlembicPlugin 侧 dual-host DH-0..DH-3 已完成。DH-0B 已证 3 项共享资产（`skill-alembic-recipes` shared 段 + `skill-alembic-structure` shared 段 + `templates-recipes-setup/README`）漂移是**真 host-divergent 工具面**——main/codex 面 `alembic_knowledge`/`alembic_guard`/`alembic_structure(targets/files/metadata)` ↔ plugin/cc 面 `alembic_search`/`alembic_code_guard`/`alembic_project_matrix` 等；单 path「shared」模型**无法转绿**（强行对齐会改 main 四工具对外语义）。**本任务按 per-host 模型正确转绿。**\n\n**必读规格**：`wakeflow-ledger/AlembicPlugin/dh-4a-per-host-drift-gate-spec-2026-06-20.md` **§C**（AlembicPlugin DH-4a 产出的 Alembic 门禁 per-host 权威规格）+ DH-0 报告 `wakeflow-ledger/AlembicPlugin/dh-0-dual-host-precheck-2026-06-19.md` §DH-4。\n\n**做（Alembic 侧）**：\n1. **门禁 per-host 化**（§C.1/§C.2，低 churn 推荐法）：保留现 `skill-shared-sections` 模型，把 3 项资产里**真 host-divergent 的工具名行提升为 `wakeflow-host:<host>` 段**——`codex` 段承载 main/codex 工具名（`alembic_knowledge`/`alembic_guard` 等，**main 真实面保留不改**），`claude-code` 段承载 cc 工具名（`alembic_search`/`alembic_code_guard` 等）。`config/shared-asset-manifest.json` 按需声明 per-host；`scripts/check-shared-asset-drift.mjs` 加 per-host 比较（每 host 段对其 per-host 权威）+ 可选 cross-host coherence（非 host 的 shared 段仍须 codex/cc 一致）。\n2. **3 资产转绿**：host-divergent 行入 wakeflow-host 段后 shared-section 比较绿；重跑 `node scripts/check-shared-asset-drift.mjs` → **GREEN（0 drift）**。\n3. **Plugin self-check 同步**：Plugin 侧 `scripts/check-shared-asset-drift.mjs` 是 self-check 资产须与 Alembic 字节一致——**你不改 Plugin**；若你改了脚本，**给出 Plugin 需同步的精确 diff/新脚本内容，标 needs-controller**，由控制器派 Plugin 窗口同步。\n\n**完成定义**：`check-shared-asset-drift.mjs` before（RED/3 drift）→ after（**GREEN/0 drift**）原始输出 + 每项 diff；3 资产 host-divergent 行入 `wakeflow-host` 段（main 真实工具名保留在 codex 段，不改四工具对外语义）；**Node≥22 跑门禁**（本仓 .nvmrc=22；Node18 会假红 ERR_INVALID_ARG_TYPE，须 nvm use 22 再判）；Alembic main commit hash（直提 main）；Plugin self-check 脚本同步 diff（若脚本改）标 needs-controller。\n\n**边界/不变量**：只动 Alembic 的共享资产漂移门禁相关（`config/shared-asset-manifest.json` + `scripts/check-shared-asset-drift.mjs` + 3 资产的 wakeflow-host 段）；不动 Alembic 其它代码/测试；**不动 AlembicPlugin**（self-check 同步由控制器派）；**不改 main 四工具对外 MCP 语义**（main CLI 工具名是 main 真实面，保留在 codex/main 段）；AlembicCore 不动。先读本仓 `CLAUDE.md`/`AGENTS.md`（含 Node≥22 门禁约定）；用本仓 stack/scripts。\n\n**回 TargetResultEnvelope**：门禁 before/after 原始输出（RED→GREEN）+ 每项 diff；wakeflow-host 段提升清单（哪些行→哪个 host 段）；Alembic main commit hash；Plugin self-check 脚本同步 diff + needs-controller（若有）；任何 needs-controller/blocked。",
+      "status": "pending",
+      "createdAt": "2026-06-20T08:11:09.907Z"
+    }
+  ]
+}

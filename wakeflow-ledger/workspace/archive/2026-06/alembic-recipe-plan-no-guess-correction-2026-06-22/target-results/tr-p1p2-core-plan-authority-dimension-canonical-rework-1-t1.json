@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+  "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+  "status": "completed",
+  "summary": "AlembicCore rework completed in commit e1de391993a3d8205ed2654412726d00a8ac4d95 (Remove plan recommendation facts leak). The Plan facts path no longer exposes recommendation/top/order/subset semantics from Core dimension planning: DimensionPlanningAidReport now carries factual selection, informationGatheringSteps, crossDimensionConstraints, lowConfidenceSignals, and unavailableSignals only; recommendedDimensions, dimensionOrder, maxRecommendedDimensions, subsetHints, scaleDecision/maxDimensionsPerDraft, and recommended constraint severity were removed or neutralized. Information-gathering steps are derived from all active dimension facts and matching dynamic signals without top-N slicing or order-as-decision. Cross-dimension non-required relationships use related/required severity, and PlanLedger draft sourceReports may still include planningAids because the report is now fact-only. Prior good CO/P1P2 behavior from fe563ee was preserved: no draftPackage.intent, confirm requires full Agent PlanIntent and rationale, stop-write planning_brief_json handling, read-time generation state projection, and resolvePlanDimensionDefinitions API remain outside this rework change.",
+  "evidenceRefs": [
+    "commit:e1de391993a3d8205ed2654412726d00a8ac4d95 Remove plan recommendation facts leak",
+    "changed:src/service/project-context/dimensionPlanning/contracts.ts",
+    "changed:src/service/project-context/dimensionPlanning/dimensionPlanning.ts",
+    "changed:src/service/planLedger/planLedger.ts",
+    "changed:test/DimensionPlanningDynamicSignals.test.ts",
+    "changed:test/PlanLedgerProjection.test.ts",
+    "rg-no-match: rg -n \"recommendedDimensions|dimensionOrder|maxRecommendedDimensions|maxDimensionsPerDraft|subsetHints|defaultOrder|severity: 'recommended'|'recommended'|\\btop\\b|top-N|topN\" src/service/project-context/dimensionPlanning src/service/planLedger src/project-context-capabilities.ts src/dimensions.ts",
+    "git-status: AlembicCore main ahead 2 with clean worktree"
+  ],
+  "verification": [
+    "PASS npm run build:check",
+    "PASS npm run lint",
+    "PASS npx vitest run test/PlanLedgerProjection.test.ts test/DimensionPlanningDynamicSignals.test.ts",
+    "PASS git diff --check",
+    "PASS npm run test",
+    "PASS npm run build",
+    "PASS plan-path rg leak scan returned no matches for recommendedDimensions/dimensionOrder/maxRecommendedDimensions/maxDimensionsPerDraft/subsetHints/defaultOrder/recommended/top tokens in Core Plan path",
+    "PARTIAL npm run check: passed build:check, lint:public-api-boundary, lint:layer-contract, lint:consumer-core-imports, smoke:public-api, check:output-budgets, check:space-edges, lint:doctrine; failed at pre-existing lint:naming in src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts (files not modified by this rework)",
+    "BLOCKED Alembic code guard tool returned internal schema/CODEX_MCP_ERROR, so no guardRef was produced"
+  ],
+  "risks": [
+    "Downstream AlembicPlugin/Alembic consumers must treat DimensionPlanningAidReport as fact-only and must not expect removed recommendation/order/subset fields.",
+    "Existing npm run check lint:naming blocker remains outside this rework scope and should be handled by its owning follow-up.",
+    "Alembic guard MCP internal schema failure prevented guardRef evidence; repository validation above is the available execution evidence."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1p2-core-plan-authority-dimension-canonical-rework-1-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-rework-1-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-1-t1.json",
+    "deliveryRunId": "run-delivery-p1p2-core-plan-authority-dimension-canonical-rework-1-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+    "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1p2-core-plan-authority-dimension-canonical-rework-1-p1__AlembicCore__p1p2-core-plan-authority-dimension-canonical-rework-1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "stateRevision": 7,
+    "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+    "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+    "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+    "resultId": "tr-p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+    "createdAt": "2026-06-22T12:29:55.660Z"
+  },
+  "createdAt": "2026-06-22T12:29:55.660Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

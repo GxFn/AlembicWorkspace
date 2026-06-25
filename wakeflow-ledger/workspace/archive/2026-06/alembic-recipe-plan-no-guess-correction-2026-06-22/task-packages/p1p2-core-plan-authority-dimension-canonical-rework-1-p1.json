@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+  "demandKey": "alembic-recipe-plan-no-guess-correction-2026-06-22",
+  "summary": "Rework P1/P2 Core producer after controller review evt-20260622121836-0005. The previous commit fe563ee correctly removed draftPackage.intent and added complete-confirm validation, but it still leaves recommendation/top/order semantics in the Core Plan facts path: DimensionPlanningAidReport still defines/builds recommendedDimensions, dimensionOrder, maxRecommendedDimensions, subsetHints, and recommended constraint severity, and buildPlanDraftInformationPackage exposes the entire planningAids object through sourceReports. This conflicts with Design/docs/current/alembic-recipe-plan-no-guess-correction-2026-06-22.md lines 28-37 and group A lines 43-56: Plan facts are confirmed facts, not recommendations/top-N/order; Plugin/Core must not recommend, rank, top-slice, or curate dimensions for the authoritative Plan. Scope: remove or neutralize these Core public/report fields from the Plan path; expose only factual dimension signal/selection/evidence reports for the Agent; information-gathering steps must be derived without top-N slicing/order-as-decision; tests must assert no recommended/top/order/subset/default-order leak from the draft information package or Plan-path report. If a non-Plan legacy consumer truly still needs old fields, keep it out of the Plan path with an explicit consumer/migration note rather than exposing it to sourceReports. Preserve the good work from fe563ee: no draft intent, confirm requires complete Agent PlanIntent+rationale, stop-write planning_brief_json, read-time generation-state projection, and resolvePlanDimensionDefinitions canonical confirmed-id API. Do not edit AlembicPlugin/Alembic/Dashboard in this package; do not add compatibility/fallback/renamed recommendation semantics. Return TargetResultEnvelope with commit, changed files, exact tests, and rg evidence for recommendedDimensions/dimensionOrder/maxRecommendedDimensions/subsetHints/top in Core Plan path.",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22/target-results/tr-p1p2-core-plan-authority-dimension-canonical-t1.json",
+  "createdAt": "2026-06-22T12:19:08.226Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p1p2-core-plan-authority-dimension-canonical-rework-1-t1",
+      "taskPackageId": "p1p2-core-plan-authority-dimension-canonical-rework-1-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Current window: AlembicCore. Claim only rework task p1p2-core-plan-authority-dimension-canonical-rework-1-t1 under stateRoot .wakeflow-active/current/alembic-recipe-plan-no-guess-correction-2026-06-22. Read parent AGENTS.md, AlembicCore/AGENTS.md, requirement design, P0 evidence, previous target result, and controller rework decision evt-20260622121836-0005 before editing. Fix only the Core P1/P2 recommendation/top/order leak in the Plan facts path; preserve complete confirm validation and canonical confirmed Plan ID resolution; backfill commit/tests/rg evidence.",
+      "status": "pending",
+      "createdAt": "2026-06-22T12:19:08.226Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-core-plan-persistence-dist-residue-repair-t1",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "taskPackageId": "p5-core-plan-persistence-dist-residue-repair-p1",
+  "dispatchGroup": "p5-core-plan-persistence-dist-residue-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p5-core-plan-persistence-dist-residue-repair-t1",
+  "status": "completed",
+  "summary": "AlembicCore P5 dist residue repair completed. Commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93 adds scripts/clean-dist.mjs and changes npm run build to clean dist before tsc, preventing deleted source artifacts such as 012_plans and PlanRepository from remaining in runtime distribution output. Rebuilt dist locally (not committed per AlembicCore AGENTS) and verified src/dist no longer contain production 012_plans/PlanRepository/plans-table artifacts. Fresh DB-open check from rebuilt dist reports plansTableExists=false and plansMigrationApplied=false.",
+  "evidenceRefs": [
+    "AlembicCore commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93",
+    "AlembicCore/package.json",
+    "AlembicCore/scripts/clean-dist.mjs",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/task-packages/p5-core-plan-persistence-dist-residue-repair-p1.json",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p5-test-bilidili-stateless-plan-e2e-controller-review.json"
+  ],
+  "verification": [
+    "npm run build passed: node scripts/clean-dist.mjs && tsc -p tsconfig.json",
+    "rg -n \"012_plans|PlanRepository|planRepository|getActiveConfirmed|CREATE TABLE IF NOT EXISTS plans|sqliteTable\\\\('plans'|sqliteTable\\\\(\\\\\\\"plans\\\\\\\"\" src dist scripts package.json produced no matches",
+    "rg --files dist src | rg \"(^|/)(012_plans|PlanRepository)\\\\.(js|d\\\\.ts|ts)$|(^|/)plan(/|$)\" produced no matches",
+    "fresh DB-open check via node --input-type=module importing ./dist/database.js and ./dist/io.js returned plansTableExists=false, plansMigrationApplied=false, migrationCount=10, tableCount=21",
+    "npm run build:check passed",
+    "npm run lint passed: 616 files checked",
+    "npm run test -- DatabaseRepository.test.ts MigrationsRerunIdempotency.test.ts PublicDatabaseRepositoryEntrypoints.test.ts GitDiffCheckpointRepository.test.ts PublicEvolutionEntrypoints.test.ts passed: 5 files, 22 tests",
+    "npm run test passed: 126 files, 1308 tests",
+    "npm run smoke:public-api passed: Imported 54 exact public API entrypoints",
+    "npm run lint:public-api-boundary passed: 61 package exports classified",
+    "git diff --check passed",
+    "npm run check progressed through build:check, public-api-boundary, layer-contract, consumer-core-imports, public-api smoke, output budgets, space edges, doctrine; failed only at pre-existing lint:naming for src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts"
+  ],
+  "risks": [
+    "dist is ignored and was rebuilt locally but not committed, per AlembicCore AGENTS. Downstream/runtime packaging must run npm run build after taking commit 9fa3b0f025dd063d59d757b1eac0e6f73cfbff93 so the cleaned dist is materialized.",
+    "Alembic Guard could not produce a verdict: alembic_status for AlembicCore is degraded/not_initialized with host project mismatch; alembic_code_guard failed with the same internal schema validation error seen in prior Core tasks. Repository-local build/lint/test/DB evidence passed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p5-core-plan-persistence-dist-residue-repair-p1__AlembicCore__p5-core-plan-persistence-dist-residue-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-core-plan-persistence-dist-residue-repair-p1__AlembicCore__p5-core-plan-persistence-dist-residue-repair-t1.json",
+    "deliveryRunId": "run-delivery-p5-core-plan-persistence-dist-residue-repair-p1__AlembicCore__p5-core-plan-persistence-dist-residue-repair-t1",
+    "dispatchGroup": "p5-core-plan-persistence-dist-residue-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-core-plan-persistence-dist-residue-repair-p1__AlembicCore__p5-core-plan-persistence-dist-residue-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24",
+    "stateRevision": 40,
+    "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+    "taskPackageId": "p5-core-plan-persistence-dist-residue-repair-p1",
+    "targetTaskId": "p5-core-plan-persistence-dist-residue-repair-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p5-core-plan-persistence-dist-residue-repair-p1",
+    "resultId": "tr-p5-core-plan-persistence-dist-residue-repair-t1",
+    "createdAt": "2026-06-24T01:50:23.971Z"
+  },
+  "createdAt": "2026-06-24T01:50:23.971Z",
+  "stateRevisionObserved": 40,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

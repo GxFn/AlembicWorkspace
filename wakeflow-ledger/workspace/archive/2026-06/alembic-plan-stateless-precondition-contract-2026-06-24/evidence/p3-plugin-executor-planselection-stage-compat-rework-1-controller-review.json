@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "kind": "ControllerRawEvidenceReview",
+  "demandKey": "alembic-plan-stateless-precondition-contract-2026-06-24",
+  "dispatchGroup": "p3-plugin-executor-planselection-stage-compat-rework-1-p1",
+  "targetTaskId": "p3-plugin-executor-planselection-stage-compat-rework-1-t1",
+  "targetWindow": "AlembicPlugin",
+  "decision": "accept-target-result",
+  "reviewedAt": "2026-06-24T01:00:00+08:00",
+  "scope": {
+    "acceptedOriginalP3Commit": "be2120510a5d0a4eb9d258c3b553ebe1ef40e5ba",
+    "reworkCommit": "f8d5fd196e6f64fafc5adc5503574c09a8f6aff1",
+    "requiredRepair": [
+      "bootstrap rejects non-coldStart planSelection",
+      "rescan rejects coldStart planSelection",
+      "rescan allows deepMining and moduleMining planSelection",
+      "resolvePlanGenerationGate compares planSelection.generationStage with the executor/requested/default stage instead of allowing planSelection to override the executor stage"
+    ],
+    "outOfScopeConfirmed": [
+      "P4 checkpoint HEAD/SOP/missionBriefing derivation",
+      "P5 BiliDili e2e acceptance"
+    ]
+  },
+  "rawEvidenceReviewed": [
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/task-packages/p3-plugin-executor-planselection-stage-compat-rework-1-p1.json",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/target-results/tr-p3-plugin-executor-planselection-stage-compat-rework-1-t1.json",
+    ".wakeflow-active/current/alembic-plan-stateless-precondition-contract-2026-06-24/evidence/p3-plugin-executor-planselection-stage-compat-rework-1-t1.md",
+    "AlembicPlugin/AGENTS.md",
+    "AlembicPlugin commit f8d5fd196e6f64fafc5adc5503574c09a8f6aff1",
+    "AlembicPlugin/lib/recipe-generation/plan-generation-gate.ts",
+    "AlembicPlugin/lib/shared/schemas/mcp-tools.ts",
+    "AlembicPlugin/test/unit/PlanSelectionGateStateless.test.ts"
+  ],
+  "implementationReality": {
+    "changedFiles": [
+      "AlembicPlugin/lib/recipe-generation/plan-generation-gate.ts",
+      "AlembicPlugin/lib/shared/schemas/mcp-tools.ts",
+      "AlembicPlugin/test/unit/PlanSelectionGateStateless.test.ts"
+    ],
+    "gateBehavior": [
+      "resolveExecutorGenerationStage resolves the executor/requested/default generationStage before validatePlanSelection.",
+      "alembic_bootstrap hard-binds generationStage to coldStart and rejects non-coldStart requested stages.",
+      "alembic_rescan rejects coldStart and accepts explicit deepMining or moduleMining.",
+      "validatePlanSelection rejects selection stage mismatches against the already-resolved executor stage."
+    ],
+    "schemaBehavior": [
+      "BootstrapInput uses ColdStartPlanSelectionInput.",
+      "RescanInput uses RescanPlanSelectionInput for deepMining/moduleMining."
+    ],
+    "scopeContainment": "git show for f8d5fd1 shows only plan-generation-gate.ts, mcp-tools.ts, and PlanSelectionGateStateless.test.ts changed."
+  },
+  "controllerVerification": [
+    {
+      "command": "npm exec -- vitest run test/unit/PlanSelectionGateStateless.test.ts test/unit/HostMcpServerPlanSelectionJobForwarding.test.ts",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "2 files passed, 8 tests passed"
+    },
+    {
+      "command": "npm run build:check",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "Core build used ../AlembicCore @ 38d074fa64a014ef458044cac7881e092c0c6b8d; tsc --noEmit passed"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "Core build plus clean-dist plus tsc plus postbuild passed"
+    },
+    {
+      "command": "dist black-box probe for schema/gate stage mismatch",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "bootstrapDeepSchema=false, bootstrapGateOk=false, bootstrapGateStage=coldStart; rescanColdSchema=false, rescanGateOk=false, rescanGateStage=deepMining; moduleSchema=true, moduleGateOk=true, moduleGateStage=moduleMining"
+    },
+    {
+      "command": "npm run lint:repo-boundary",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "repository boundary check passed"
+    },
+    {
+      "command": "npm run lint:layer-boundary",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "layer-boundary PASS"
+    },
+    {
+      "command": "npm run smoke:codex-plugin",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "runtimePackageBoundary, startupRuntime, install, shellBootstrap, stdio all passed"
+    },
+    {
+      "command": "npm run verify:codex-plugin",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "Codex plugin verification passed"
+    },
+    {
+      "command": "npm run verify:plugin-distribution",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "Plugin distribution verification passed"
+    },
+    {
+      "command": "npm run check",
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "summary": "typecheck, lint, core-import-boundary, layer-boundary, shared-asset-drift, cross-shell-drift, doctrine, naming passed; Biome reported 17 existing warnings"
+    },
+    {
+      "command": "rg -n \"routePlanTool|PlanRepository|planRepository|getActiveConfirmed|readConfirmed|active confirmed plan|active confirmed Plan|confirmed Plan|confirmed plan\" AlembicPlugin/lib/recipe-generation/plan-generation-gate.ts",
+      "cwd": "AlembicWorkspace",
+      "exitCode": 1,
+      "summary": "no storage/active confirmed plan residue in plan-generation-gate.ts"
+    },
+    {
+      "command": "git -C AlembicPlugin diff --check && git -C AlembicPlugin diff --cached --check",
+      "cwd": "AlembicWorkspace",
+      "exitCode": 0,
+      "summary": "diff whitespace checks passed"
+    },
+    {
+      "command": "git -C AlembicPlugin status --short --branch",
+      "cwd": "AlembicWorkspace",
+      "exitCode": 0,
+      "summary": "main is ahead of origin/main by 8 commits; no uncommitted changes"
+    }
+  ],
+  "distProbeOutput": {
+    "bootstrapDeepSchema": false,
+    "bootstrapGateOk": false,
+    "bootstrapGateReason": "planSelection.generationStage deepMining does not match requested coldStart.",
+    "bootstrapGateStage": "coldStart",
+    "rescanColdSchema": false,
+    "rescanGateOk": false,
+    "rescanGateReason": "planSelection.generationStage coldStart does not match requested deepMining.",
+    "rescanGateStage": "deepMining",
+    "moduleSchema": true,
+    "moduleGateOk": true,
+    "moduleGateStage": "moduleMining"
+  },
+  "blockers": [],
+  "missingEvidence": [],
+  "residualRisks": [
+    "P4 checkpoint HEAD/SOP/missionBriefing derivation remains future scope.",
+    "P5 BiliDili e2e remains future scope."
+  ],
+  "todoBacklogRollup": {
+    "closedByThisReview": [
+      "P3 rework stage compatibility gap"
+    ],
+    "keptForFutureAuthorizedPhases": [
+      "P4 checkpoint/current HEAD/SOP/missionBriefing derivation",
+      "P5 BiliDili e2e"
+    ],
+    "newItems": []
+  }
+}

@@ -32,7 +32,7 @@
   - [requirement design](../../../../../AlembicDesign/docs/current/ai-mock-removal-requirement-design-2026-05-28.md)
 - 用户确认状态：已确认 Design 推荐方向；本文件记录 Stage 0 后的总控阶段判断。
 - 总控接收结论：接收为 P0 当前主线，先于 037 收敛、038、039；同时阻断 PCVM 后续真实 runtime baseline。
-- 是否需要目标阶段确认：需要，见 [goal stage confirmation](../../../../../codex-control-workspace/.workspace-active/workspace/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md)。
+- 是否需要目标阶段确认：需要，见 [goal stage confirmation](../../../../../codex-control-workspace/.wakeflow-active/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md)。
 - 是否需要代码实现依赖调研：需要，本文件即 Stage 0 事实基线。
 
 ## 代码事实与边界
@@ -282,7 +282,7 @@ git diff --check
   - 不能推出的结论：不能证明 N0-N14 全部 PCV 节点已经可度量。
   - 停止或不开始条件：Stage 1/2 未完成、测试配置仍要求 `ALEMBIC_AI_PROVIDER=mock`、或真实 project config 不可用。
 - 测试单：待 Stage 1/2 通过后创建。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：BiliDili 只作为受保护测试目标，不改业务源码。
 
 ## 回填区
@@ -300,13 +300,13 @@ git diff --check
   "indexRows": [
     {
       "type": "AI-MOCK 目标阶段确认",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md",
       "status": "Stage 0 已完成 / Wave 1 待确认",
       "description": "用户已确认 Design 推荐方向；总控记录删除产品 runtime AI mock 的完成定义、阶段顺序和第一波候选。"
     },
     {
       "type": "PCVM Wave 4A cold-start baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
       "status": "暂停",
       "description": "PCVM 暂停到 AI-MOCK 删除产品 mock runtime 后恢复；Wave 4D 已证明 mock path 不能代表真实 N8 / N11 / N12 evidence。"
     }
@@ -314,12 +314,12 @@ git diff --check
   "currentIndexRows": [
     {
       "type": "AI-MOCK 目标阶段确认",
-      "doc": ".workspace-active/workspace/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md",
+      "doc": ".wakeflow-active/current/ai-mock-removal-goal-stage-confirmation-2026-05-28.md",
       "description": "产品 runtime AI mock 删除的完成定义、阶段顺序和 Deletion Wave 1 候选。"
     },
     {
       "type": "PCVM Wave 4A cold-start baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-4a-cold-start-baseline-2026-05-28.md",
       "description": "暂停到 AI-MOCK 删除后恢复；保留 PCVM 当前事实和后续入口。"
     }
   ]

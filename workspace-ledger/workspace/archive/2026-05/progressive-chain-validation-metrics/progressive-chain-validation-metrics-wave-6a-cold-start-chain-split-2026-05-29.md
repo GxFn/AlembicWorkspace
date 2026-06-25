@@ -27,7 +27,7 @@
 ## Design / 需求来源
 
 - 来源类型：用户直接需求 + PCVM 当前主线延续。
-- 来源文档：当前计划承接 [Wave 5A analyze evidence-through](../../../../../codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-5a-analyze-evidence-through-2026-05-29.md)；方法参考 `progressive-chain-validation/progressive-chain-validation/SKILL.md`。
+- 来源文档：当前计划承接 [Wave 5A analyze evidence-through](../../../../../codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-5a-analyze-evidence-through-2026-05-29.md)；方法参考 `progressive-chain-validation/progressive-chain-validation/SKILL.md`。
 - 用户确认状态：已确认。
 - 总控接收结论：接收为 PCVM Wave 6A 当前主线，范围是 cold-start chain split baseline。
 - 是否需要目标阶段确认：不需要；属于 `GTODO-2026-05-25-003` 后续阶段内的明确推进。
@@ -226,7 +226,7 @@ cd AlembicAgent && git diff --check
 发送给：`Alembic`、`AlembicAgent`
 
 ```text
-先读取 AGENTS.md、codex-control-workspace/.workspace-active/workspace/index.md、codex-control-workspace/.workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6a-cold-start-chain-split-2026-05-29.md，以及你所在窗口/目标仓库的 AGENTS.md。
+先读取 AGENTS.md、codex-control-workspace/.wakeflow-active/index.md、codex-control-workspace/.wakeflow-active/current/progressive-chain-validation-metrics-wave-6a-cold-start-chain-split-2026-05-29.md，以及你所在窗口/目标仓库的 AGENTS.md。
 
 先明确声明当前窗口定位和本轮仓库职责。
 
@@ -250,7 +250,7 @@ cd AlembicAgent && git diff --check
   - 不能推出的结论：不能推出 full cold-start 已优化、真实项目通过、Dashboard 可视化完成或 N0-N14 全部可测。
   - 停止或不开始条件：若需要修改产品代码、跑真实项目、执行 full cold-start 或改变用户目标，必须停止并回到总控裁决。
 - 测试单：无。
-- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md)
+- 测试交流入口：[test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md)
 - 真实项目保护说明：本轮不触碰真实项目。
 
 ## 回填区
@@ -271,7 +271,7 @@ cd AlembicAgent && git diff --check
   "indexRows": [
     {
       "type": "PCVM Wave 6A cold-start chain split baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6a-cold-start-chain-split-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6a-cold-start-chain-split-2026-05-29.md",
       "status": "Wave 6A 已启动 / 发送给 Alembic、AlembicAgent",
       "description": "使用 PCVM 对 cold-start 链路做源码事实节点拆分，等待 Alembic / AlembicAgent 回填。"
     }
@@ -279,7 +279,7 @@ cd AlembicAgent && git diff --check
   "currentIndexRows": [
     {
       "type": "PCVM Wave 6A cold-start chain split baseline",
-      "doc": ".workspace-active/workspace/current/progressive-chain-validation-metrics-wave-6a-cold-start-chain-split-2026-05-29.md",
+      "doc": ".wakeflow-active/current/progressive-chain-validation-metrics-wave-6a-cold-start-chain-split-2026-05-29.md",
       "description": "Cold-start 节点地图、证据面、指标缺口和第一优化候选。"
     }
   ]

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-AP-7-20260620161114",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "taskPackageId": "ap-7-quality-run-guard-optin-wiring",
+  "dispatchGroup": "ap7r-main-guard-optin-a",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+  "targetWindow": "Alembic",
+  "targetTaskId": "AP-7",
+  "status": "completed",
+  "summary": "AP-7（rework·方向 A：显式 per-invocation guard opt-in，用户拍板）完成。基线 016f6bb → main 提交 b14f37a（直提 main，4 文件 +78/-1，tree clean）。为 grounding enforcement 回路提供**真实、范围明确的 opt-in 消费者**，默认零行为变更。\n\n【实现（仅 opt-in wiring）】\n- resolveBootstrapGroundingEnforcement(env)（AiDimensionSessionRunner.ts，镜像 resolveAiDimensionConcurrency）读 ALEMBIC_GROUNDING_ENFORCEMENT → 'guard'|'off'|undefined。\n- runAiDimensionSession 解析后传 buildBootstrapSessionExecutionInput；SessionExecutionBuilder **仅当设置时**把 groundingEnforcement 加入 session execution 块（未设则块与改前字节一致=零行为变更，保 abortSignal/shouldAbort）。\n- Agent coordinator 把 session execution 原样拷给每子维度（AgentRunCoordinator execution:input.execution）→ 各子 runtime.execute → #groundingEnforcement → LoopContext → analyze grounding guard（CP1 政策注入 + CP4 阻断/nudge）仅 'guard' 时触发。\n\n【非空开关 + 默认零变更】设 ALEMBIC_GROUNDING_ENFORCEMENT=guard → 质量运行真开 guard；未设 → undefined → 普通 bootstrap/rescan/增量回退默认 observe-only（PD6 仅质量运行 + PD7 per-invocation）。\n\n【并发 SAFE（保留·自验）】每子维度各自独立 AgentRuntime（per-child agentService.run → runtimeBuilder.build），#groundingEnforcement 隔离不串值。\n\n【端到端 guard 回路】主体 wiring（env→session execution.groundingEnforcement='guard'）单测验证；下游 guard 真实激活（session execution→#groundingEnforcement→guard 阻断/nudge）= AP-3 seam，AP-5（AlembicAgent 五场景 off/guard）已端到端证。\n\n【验证 Node v22.22.1】build:check exit 0；test:unit 977 passed|4 skipped（含新 resolver + session-execution wiring 测试，零回归）；biome clean；lint:repo-boundary/core-import/consumer-core/agent-extraction pass。触发契约文档：wakeflow-ledger/Alembic/ap-7-grounding-enforcement-optin-contract-2026-06-21.md（供 PCVM/Test skill 引用）。\n\n【完成自检】真实 opt-in 非空开关 ✓ / 未设 observe-only ✓ / 并发安全 ✓ / 契约不破（additive 可选）✓ / 端到端回路（wiring 单测 + AP-5 下游证）✓。\n【边界】仅 opt-in wiring（PD6 方法包本体不改）；未碰 AlembicAgent/AP-5/AP-6 文件；四工具对外语义不变；AlembicCore 不动。",
+  "evidenceRefs": [
+    "Alembic main commit b14f37a feat(pcv): AP-7 per-invocation grounding-guard opt-in for quality runs (PCVM/Test) (baseline 016f6bb; 4 files +78/-1; tree clean)",
+    "wiring: AiDimensionSessionRunner.ts resolveBootstrapGroundingEnforcement(env) reads ALEMBIC_GROUNDING_ENFORCEMENT; runAiDimensionSession resolves + passes to buildBootstrapSessionExecutionInput; SessionExecutionBuilder.ts adds groundingEnforcement to session execution block only when set (unset=byte-identical, zero behavior change)",
+    "propagation+concurrency (AlembicAgent read-only, self-verified): AgentRunCoordinator execution:input.execution copies session execution to each child; per-child agentService.run -> runtimeBuilder.build (own AgentRuntime) -> execute -> #groundingEnforcement -> LoopContext -> analyze grounding guard; per-run state isolated (no race)",
+    "tests: test/unit/AiDimensionSessionRunner.test.ts (resolver guard/off/unset/invalid) + test/unit/BootstrapSessionExecutionBuilder.test.ts (session execution carries 'guard' only when set; default undefined; shouldAbort preserved)",
+    "downstream guard activation = AP-3 per-run seam, proven end-to-end by AP-5 (AlembicAgent five-scenario acceptance, off vs guard)",
+    "trigger contract doc: wakeflow-ledger/Alembic/ap-7-grounding-enforcement-optin-contract-2026-06-21.md (ALEMBIC_GROUNDING_ENFORCEMENT=guard for PCVM/Test markdown skills)"
+  ],
+  "verification": [
+    "Node v22.22.1 (.nvmrc=22) for all gates",
+    "npm run build:check: exit 0 (Core build + main tsc --noEmit; no TS errors)",
+    "npm run test:unit: 977 passed | 4 skipped, exit 0 (full suite incl. new AP-7 resolver + wiring tests; re-verified affected files on committed bytes = 11 passed)",
+    "npm run lint:repo-boundary / lint:core-import-boundary / lint:consumer-core-imports / lint:agent-extraction-boundary: all exit 0; npx biome check (4 changed files): clean",
+    "git: only the 4 intended files changed (+78/-1); git diff --check clean; tree clean post-commit"
+  ],
+  "risks": [
+    "PRE-EXISTING (not AP-7): npm run lint:layer-contract exits 1 with 6 violations in unrelated files (none in SessionExecutionBuilder/AiDimensionSessionRunner) — identical count/files with/without this change; out of scope (flagged for separate cleanup).",
+    "Downstream guard activation (session execution -> #groundingEnforcement -> guard block/nudge) is the AP-3 cross-repo seam; NOT re-run from main this turn (AlembicAgent not touched) — it was proven end-to-end by AP-5 (controller-accepted commit 8c9fd62). The main-repo wiring (env -> session execution.groundingEnforcement) is unit-tested + type-checked.",
+    "Opt-in granularity is process/env-level (PD7 per-invocation): PCVM/Test set ALEMBIC_GROUNDING_ENFORCEMENT=guard for the process that launches the quality-validation bootstrap. If a single long-lived process ever needs to mix guard and non-guard sessions, a per-call override channel would be needed (out of AP-7 scope; env fits the documented PCVM/Test process-launch model).",
+    "Contract doc dated 2026-06-21 (creation/commit date) while the demand/design stream is 2026-06-20 — same AP-7 rework stream, cross-referenced in the doc."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-ap7r-main-guard-optin-a__Alembic__AP-7",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap7r-main-guard-optin-a__Alembic__AP-7.json",
+    "deliveryRunId": "run-delivery-ap7r-main-guard-optin-a__Alembic__AP-7",
+    "dispatchGroup": "ap7r-main-guard-optin-a",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-ap7r-main-guard-optin-a__Alembic__AP-7.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-pcv-observe-only-boundary",
+    "stateRevision": 33,
+    "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+    "taskPackageId": "ap-7-quality-run-guard-optin-wiring",
+    "targetTaskId": "AP-7",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "ap7r-main-guard-optin-a",
+    "resultId": "tr-AP-7-20260620161114",
+    "createdAt": "2026-06-20T16:11:14.391Z"
+  },
+  "createdAt": "2026-06-20T16:11:14.391Z",
+  "stateRevisionObserved": 33,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

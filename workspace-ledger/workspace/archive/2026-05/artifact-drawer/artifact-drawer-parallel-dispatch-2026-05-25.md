@@ -45,7 +45,7 @@
 
 当前完成定义：
 
-- LLM Wave 6B：`AlembicTest` 已按 [test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md) 回填 `Test-2026-05-25-09 / LLMI-P11-Package-Runtime-Integration` 证据，并通过总控验收。
+- LLM Wave 6B：`AlembicTest` 已按 [test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md) 回填 `Test-2026-05-25-09 / LLMI-P11-Package-Runtime-Integration` 证据，并通过总控验收。
 - Artifact Drawer：`AlembicDashboard` 已完成 Timeline artifact detail 双层抽屉体验；总控复核确认宽屏上下文并排、窄屏第二层覆盖第一层、第二层返回按钮、Escape 优先关闭第二层，以及 artifact / metrics / trace / metadata 现有内容和失败状态均保留。
 
 ## Design 接收结论
@@ -54,7 +54,7 @@
 
 - [Timeline Artifact Recipe Drawer Optimization 原始计划](../../../../requirement-designs/timeline-artifact-recipe-drawer-optimization/timeline-artifact-recipe-drawer-optimization-original-plan-2026-05-25.md)
 - [Timeline Artifact Recipe Drawer Optimization 需求设计](../../../../requirement-designs/timeline-artifact-recipe-drawer-optimization/timeline-artifact-recipe-drawer-optimization-requirement-design-2026-05-25.md)
-- [Design Handoff Inbox](../../../../../codex-control-workspace/.workspace-active/workspace/current/design-handoff-inbox.md)
+- [Design Handoff Inbox](../../../../../codex-control-workspace/.wakeflow-active/current/design-handoff-inbox.md)
 
 总控接收结论：
 
@@ -109,7 +109,7 @@
 主线动作：
 
 - 先读取本 workspace `AGENTS.md`、`docs/workspace/index.md`、本文档、`docs/workspace/current/test-exchange.md` 和 `AlembicTest/AGENTS.md`，并声明当前窗口定位和本轮仓库职责。
-- 按 [test-exchange.md](../../../../../codex-control-workspace/.workspace-active/workspace/current/test-exchange.md) 中 `Test-2026-05-25-09 / LLMI-P11-Package-Runtime-Integration` 执行。
+- 按 [test-exchange.md](../../../../../codex-control-workspace/.wakeflow-active/current/test-exchange.md) 中 `Test-2026-05-25-09 / LLMI-P11-Package-Runtime-Integration` 执行。
 - 只验证 package/runtime 或小 cold-start 消费链路；不修改真实测试项目源码。
 
 合并 TODO：

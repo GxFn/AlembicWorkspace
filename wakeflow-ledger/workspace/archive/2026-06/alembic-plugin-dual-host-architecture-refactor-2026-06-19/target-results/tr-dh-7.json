@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-dh-7",
+  "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+  "taskPackageId": "dh-7-agenthost-default-from-pluginhost",
+  "dispatchGroup": "dh7-plugin-agenthost-default",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "DH-7",
+  "status": "completed",
+  "summary": "DH-7（F1 修复 = RC-1「消除硬编码 codex」最后一处收尾）。基线 6d8bc2f → 父 HEAD 6f48c81，1 commit 直提 main。**F1 闭合，agentHost 省略默认改由 runtime 已解析 pluginHost 驱动，codex 行为不变。**\n\n【背景】DH-6 cc 真实验收 finding F1：tool 调用省略 agentHost 字段时默认硬编码 'codex'，cc runtime 下把省略 agentHost 的 cc 调用误标 codex。agentHost 是「calling host agent family」结构化字段（贯穿 intake→output echo + cross-host-readiness），无 if(agentHost===) 行为分支——这是 RC-1 意图内、DH-1 枚举漏掉的最后一处硬编码。\n\n【精确改点（2 lib 文件）】\n1. lib/shared/schemas/mcp-tools.ts: AgentPublicToolBaseInput.agentHost `.default('codex')` → `.optional()`（保 .describe）——使省略时 parse 得 undefined 而非 parse 阶段填 'codex'（否则 handler 的 ?? 成死码）。\n2. lib/runtime/mcp/handlers/agent-public-tools.ts: buildAgentToolContext/buildPrimeToolContext 两处 `?? ('codex' as const)` → `?? resolveDefaultAgentHost()`，helper = `resolveHostRuntimeContext().pluginHost as AgentHost`（与 status.runtimeIdentity.pluginHost 同源）——codex runtime→'codex'，cc runtime→'claude-code'。\n\n【架构约束守住】handler(L2) 只**读已解析的 pluginHost 值**（host 选择仍仅 L3，无 ===codex/claude-code 字面分支；pluginHost 恒为 AGENT_HOSTS 之一，故 cast 安全）；wire-safe（codex 省略仍 codex）；显式 agentHost 仍接受并原样记录；AGENT_HOSTS 校验不变；output/contract 仍始终携带已解析 agentHost（handler 解析后非空，输入 default 移除不破输出 required 语义）；四工具对外 MCP 语义不变；lint:layer-boundary 仍绿（handler→RuntimeContext 是 L2→L1 合法方向）。\n\n【回归测试（ClaudeCodeHostRuntime.test.ts，5 个）】schema：alembic_prime 省略 agentHost→undefined（原 default codex）/ 显式接受 + 非 host 标签拒；handler：cc runtime+省略→claude-code、codex runtime+省略→codex、显式 agentHost 跨 host 原样保留。全绿。\n\n【验证】tsc 绿；biome lint 0；lint:layer-boundary + lint:repo-boundary GREEN；两漂移门禁 GREEN（Node 22）；全量 unit 失败集与基线 IDENTICAL（39 failed | 88 passed (127)；+5 计入 passed 1119→1124，零回归；stash-diff 证 2 个 pre-existing-failing 文件 5/25 失败集不变=非本改引入）；codex 行为不变（codex 省略仍 codex）。**F1 闭合 → RC-1 消除硬编码 codex 100% 完成。** 需求维持 DH-6 验收态（仅 F1 修复，无新 flag）。",
+  "evidenceRefs": [
+    "parent commit 6f48c81 fix(mcp): DH-7 default agentHost from resolved pluginHost (F1; RC-1 hardcoded-codex closure)",
+    "lib/shared/schemas/mcp-tools.ts:128 .default('codex')→.optional()",
+    "lib/runtime/mcp/handlers/agent-public-tools.ts resolveDefaultAgentHost() + 2 sites",
+    "test/unit/ClaudeCodeHostRuntime.test.ts +5 DH-7 regression tests",
+    "baseline 6d8bc2f → parent HEAD 6f48c81"
+  ],
+  "verification": [
+    "tsc --noEmit 绿；biome lint 0 error",
+    "lint:layer-boundary PASS（handler→RuntimeContext = L2→L1 合法）；lint:repo-boundary PASS",
+    "两漂移门禁 GREEN（Node 22：shared-asset-drift 0 drift、cross-shell-drift per-host）",
+    "全量 unit 失败集与基线 IDENTICAL：39 failed | 88 passed (127)；+5 DH-7 计入 passed 1119→1124，零回归",
+    "stash-diff 证：AgentPublicToolsActive/CrossHostReadiness（基线 39 内）本改前后 5 failed/25 passed 不变=失败为 pre-existing sandbox、非本改引入",
+    "5 个回归测试全绿：schema 可省/显式接受+非host拒、cc 省→claude-code、codex 省→codex、显式保留",
+    "codex 行为不变（codex runtime 省略 agentHost 仍解析 codex）；wire-safe",
+    "host-name 分支仅 L3；四工具语义/AGENT_HOSTS 校验/输出 contract 不变；只动 AlembicPlugin lib/test、不改 Alembic/Core"
+  ],
+  "risks": [
+    "agentHost 默认变更（cc 省略从 codex→claude-code）是修复 F1 误标，理论上改变 cc 省略调用的回显 agentHost 值；但无行为分支消费该值（runtime host 身份本已正确），codex 不受影响",
+    "resolveDefaultAgentHost 在 ?? 右侧仅省略时求值（短路）；每次调用 resolveHostRuntimeContext()（读 env + shape 检测）微开销，与 status 同源一致",
+    "pluginHost as AgentHost 为 cast：pluginHost 恒为 'codex'|'claude-code'(=AGENT_HOSTS)、derivePluginHostFromShape 保证；若未来 pluginHost 取值集变需同步 AGENT_HOSTS enum",
+    "未在真实 cc shell 运行复验（DH-6 领地）；本修经 schema+handler 回归测试 + tsc/门禁等价证"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7.json",
+    "deliveryRunId": "run-delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7",
+    "dispatchGroup": "dh7-plugin-agenthost-default",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dh7-plugin-agenthost-default__AlembicPlugin__DH-7.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-dual-host-architecture-refactor",
+    "stateRevision": 71,
+    "demandKey": "alembic-plugin-dual-host-architecture-refactor-2026-06-19",
+    "taskPackageId": "dh-7-agenthost-default-from-pluginhost",
+    "targetTaskId": "DH-7",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dh7-plugin-agenthost-default",
+    "resultId": "tr-dh-7",
+    "createdAt": "2026-06-20T10:50:53.242Z"
+  },
+  "createdAt": "2026-06-20T10:50:53.242Z",
+  "stateRevisionObserved": 71,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

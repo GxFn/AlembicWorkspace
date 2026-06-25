@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "ap-2-extract-analyze-grounding-guard",
+  "demandKey": "alembic-agent-pcv-observe-only-boundary-2026-06-20",
+  "summary": "AP-2（抽 AnalyzeGroundingGuard：迁 analyze 阻断+nudge+rollback(CP4 AgentRuntime:1576-1605/1707-1732) + grounding-policy 指令文本注入(CP1 LLMInputAssembly:440-442/523-534)；**PD5 边界=证据 ref 列表注入(:432-438)不入 guard、保留默认 analyze 上下文**；输入=PCV grounding classification 只读消费，输出=block/nudge）。AlembicAgent 基线 ad6f74c 直提 main。**行为对等、暂仍开启**（默认 off 是 AP-3、不本阶段）。命名不带 Pcv 前缀。AP-1 结转：isDeepSeekV4AnalyzeFirstBurn(provider 导出，CP4 gate:1722 复用)→AP-2 裁定归属、**避免 guard↔provider 循环**（provider 不得依赖 guard；guard 单向读 provider 谓词可接受）。完成=AnalyzeGroundingGuard 建立+CP1/CP4 迁入+ref 列表不入 guard+AP-0 CP1/CP4 表征仍绿(行为对等)+无循环依赖+tsc/lint/core-import-boundary/全量 vitest=基线(252 passed 0 failed)+默认仍开。Node 22。",
+  "status": "pending",
+  "sourceRef": "需求设计 Implementation Decisions 模块拆分#2(AnalyzeGroundingGuard) + PD5(ref 列表保留默认不入 guard) + AP-0 CP1/CP4 表征基线 + AP-1 结转(isDeepSeekV4AnalyzeFirstBurn 现 provider 导出被 CP4 gate 复用→裁归属避循环)",
+  "createdAt": "2026-06-20T13:10:51.231Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "AP-2",
+      "taskPackageId": "ap-2-extract-analyze-grounding-guard",
+      "targetWindow": "AlembicAgent",
+      "summary": "AP-2（抽取 `AnalyzeGroundingGuard`，PCV observe-only 边界收敛第 3 步）。本窗口=AlembicAgent（仓库 `~/Documents/AlembicWorkspace/AlembicAgent`，基线 HEAD `ad6f74c`=AP-1 后）。**直提 main，不开分支。** 先读本仓 `CLAUDE.md`/`AGENTS.md` + 需求设计（Implementation Decisions 模块拆分#2 + PD5）。\n\n**目标（行为对等抽取，不切默认）**：把 analyze grounding **enforcement**（阻断/nudge/政策文本注入）收敛进新模块 `AnalyzeGroundingGuard`（runtime 质量门层）。**本阶段行为对等、暂仍开启**——不引 groundingEnforcement 开关（AP-3）、不动 provider policy（AP-1 已抽）。\n\n**做（迁入 AnalyzeGroundingGuard，质量门层，命名不带 Pcv 前缀）**：\n1. **CP4** analyze grounding 阻断 + nudge + rollback tick：AgentRuntime.ts:1576-1605，gate :1707-1732（读 `burn.classification==='invalid-no-evidence'`，经 getLatestPcvBurnGrounding:1722）。\n2. **CP1** grounding-policy **指令文本**注入：LLMInputAssembly.ts:440-442 + `buildAnalyzeGroundingPolicy`:523-534（analyze always-on 静态文本）。\n3. 输入=PCV grounding `classification`（**只读消费**，不反写证据）；输出=block/nudge 决策。\n\n**PD5 硬边界**：guard **仅含**「政策文本 + nudge + 阻断」；**证据 ref 列表注入 deterministicEvidenceRefs/evidenceStarterRefs（LLMInputAssembly.ts:432-438）不入 guard、保留为默认 analyze 上下文**（有用 grounding 材料、非强制控制）。表征测试勿把 ref 列表当 grounding-policy。\n\n**AP-1 结转裁断（避免循环依赖）**：`isDeepSeekV4AnalyzeFirstBurn` 现由 ProviderToolChoicePolicy 导出、被 CP4 gate(AgentRuntime:1722)复用。AP-2 把 CP4 迁入 guard 时须裁定该首轮判定归属：**guard 单向读 provider 谓词可接受（guard→provider 下行依赖），但 provider 不得依赖 guard（无反向/循环）**。如更清晰可设为中性共享 util；自行裁定并在回填说明，保 import 边界绿。\n\n**完成定义**：`AnalyzeGroundingGuard` 模块建立、CP1+CP4 逻辑迁入、ref 列表注入**留在默认 analyze 上下文不入 guard**；AP-0 CP1/CP4 表征测试**仍绿**（行为对等，guard 暂仍开启）；无 guard↔provider 循环依赖；`npm run build`/`build:check`/`lint`/`lint:core-import-boundary`/`npm test`（Node 22）全绿，**全量 vitest 失败集不增于基线（0 failed）**；默认 grounding enforcement 仍开（本阶段不切）。\n\n**边界/不变量**：仅 AlembicAgent；行为对等（不切默认、不引 groundingEnforcement）；PD5 ref 列表不入 guard；guard 只读消费 classification 不反写证据；PcvNodeEvidence 保持纯观察；命名不带 Pcv 前缀；不删证据/不改四工具/LLM 对外语义；Node 22。\n\n**回 TargetResultEnvelope**：AnalyzeGroundingGuard 模块 + 迁移 diff + commit hash；CP1/CP4 表征测试绿（行为对等）；PD5 ref 列表仍默认注入佐证（不入 guard）；isDeepSeekV4AnalyzeFirstBurn 归属裁断 + 无循环依赖佐证（import 边界绿）；build/build:check/lint/core-import-boundary/全量 vitest vs 基线；AP-2 完成确认 + 任何 blocker。",
+      "status": "pending",
+      "createdAt": "2026-06-20T13:10:51.231Z"
+    }
+  ]
+}

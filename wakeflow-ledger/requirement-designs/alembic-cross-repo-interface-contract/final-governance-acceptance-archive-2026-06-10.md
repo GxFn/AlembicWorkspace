@@ -16,15 +16,15 @@ current consumer, owner, cleanup trigger, and validation path.
 ## Evidence Pointers
 
 - D32 state root:
-  `.workspace-active/workspace/current/alembic-interface-contract-d32-final-governance-acceptance-archive`
+  `.wakeflow-active/current/alembic-interface-contract-d32-final-governance-acceptance-archive`
 - D32 final evidence:
-  `.workspace-active/workspace/current/alembic-interface-contract-d32-final-governance-acceptance-archive/evidence/d32-final-governance-acceptance-archive-2026-06-10.md`
+  `.wakeflow-active/current/alembic-interface-contract-d32-final-governance-acceptance-archive/evidence/d32-final-governance-acceptance-archive-2026-06-10.md`
 - D31 runtime evidence:
-  `.workspace-active/workspace/current/alembic-interface-contract-d31-runtime-dashboard-scenario-validation/evidence/d31-runtime-dashboard-scenario-validation-2026-06-10.md`
+  `.wakeflow-active/current/alembic-interface-contract-d31-runtime-dashboard-scenario-validation/evidence/d31-runtime-dashboard-scenario-validation-2026-06-10.md`
 - D30 drift gate:
-  `.workspace-active/workspace/current/alembic-interface-contract-d30-generated-contract-drift-gates/evidence/d30-generated-contract-drift-gates-2026-06-10.md`
+  `.wakeflow-active/current/alembic-interface-contract-d30-generated-contract-drift-gates/evidence/d30-generated-contract-drift-gates-2026-06-10.md`
 - D29 deletion wave:
-  `.workspace-active/workspace/current/alembic-interface-contract-d29-compatibility-deletion-wave/evidence/d29-compatibility-deletion-wave-2026-06-10.md`
+  `.wakeflow-active/current/alembic-interface-contract-d29-compatibility-deletion-wave/evidence/d29-compatibility-deletion-wave-2026-06-10.md`
 
 ## Accepted Product Heads
 

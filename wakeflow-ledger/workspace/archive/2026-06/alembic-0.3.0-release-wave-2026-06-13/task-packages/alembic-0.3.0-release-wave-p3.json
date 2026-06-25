@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "alembic-0.3.0-release-wave-p3",
+  "demandKey": "alembic-0.3.0-release-wave-2026-06-13",
+  "summary": "Release p3 (RW3 SN4): AlembicCore src/ source-naming wave, now UN-PARKED by the SD-5 deletion. Renames-only, export specifiers stay stable, naming-lint src scope flipped active, downstream builds green.",
+  "status": "pending",
+  "sourceRef": "SN0 convention + SN6 SN4 resumption pointer + release-wave RW3 (un-parked by rw-t1 SD-5 acceptance)",
+  "createdAt": "2026-06-13T06:34:14.981Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "alembic-0.3.0-release-wave-rw-t3",
+      "taskPackageId": "alembic-0.3.0-release-wave-p3",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore SN4 source-naming wave — the parked Core src/ normalization, UN-PARKED now that rw-t1 (accepted) deleted the src-covering wildcard exports. RENAMES/MOVES ONLY, zero behavior change, git-recoverable. REQUIRED READS: SN0 artifact sn0-convention-and-constraints-2026-06-13.md (§1 convention, §2 Core stragglers ~44 kebab+27 camel, §4 gate-config protocol, §6 commit protocol) + SN6 terminal review SN4 resumption pointer + release-wave RW3. CRITICAL CURRENT-STATE: SD-5 just landed (package.json exports 126→59 = 52 exact + 7 wildcard) — the export-map shield now applies to the CURRENT 59-key map; renaming an exported source FILE must keep its export KEY/PATH specifier byte-stable (rename the file, keep the path consumers import) and update only the internal target — do NOT reintroduce a deleted key, do NOT change any export path a consumer uses. LEGS: (1) confirm/refresh Core's own NodeNext codemod scripts/codemod-rename.mjs (a43519e-restored lineage; add the SN5 mkdirSync dir-precreate if a cross-dir move needs it) — own commit if changed. (2) Census Core src/ class-position stragglers by SN0 §1 export-shape rule (classes/services/contracts/presenters→PascalCase; functions/utils/middleware→camelCase; drizzle migrations NNN_snake EXEMPT — never rename); reviewed rename map + per-file rationale saved to evidence BEFORE --apply; readdirSync case validation; MANDATORY post-apply stale-name negative grep. (3) ONE batch rename commit carrying ALL affected gate-config rows IN-COMMIT per SN0 §4: the 59-key exports targets for any renamed exported file (KEYS stable), blessed-singletons + lintExemptions, layer-contract stems + regenerate the as-is report, side-effect-doctrine paths, wire-manifest/api-types constants if any. (4) FLIP the naming-lint src parkedScope to ACTIVE: move config/naming-lint.json parkedScopes(src) rules into the active rules array UNCHANGED — the migrations NNN_snake exempt family stays FIRST (first-match-wins) per the recorded SN4a note; naming lint now scans src/ and is GREEN with the renames. (5) .git-blame-ignore-revs append. (6) PROOF: full Core check green at TRUE baselines (108/1193); naming lint src-active + green; DOWNSTREAM Agent+Alembic+Plugin builds green against the renamed Core HEAD (hands-off, read-only) — exported renames keep specifiers stable so consumers are unaffected; mechanical-diff audit = renames + internal specifier rewrites + gate-config only. STOP CONDITIONS: any rename would change an export PATH/specifier a consumer imports (rename file, keep path; if impossible, STOP+backfill — that's a public-API change beyond scope); behavior change; a migration renamed; downstream build breaks. Single-purpose commits, push. Backfill TargetResultEnvelope: census+rename map, dry-run plan, stale-grep, exports-target updates (keys stable), lint-scope-flip evidence, downstream build outputs, commit hashes.",
+      "status": "pending",
+      "createdAt": "2026-06-13T06:34:14.981Z"
+    }
+  ]
+}
