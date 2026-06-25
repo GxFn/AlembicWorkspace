@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p6-core-productization-lifecycle-deadline-repair-t1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "taskPackageId": "p6-core-productization-lifecycle-deadline-repair-p1",
+  "dispatchGroup": "p6-core-productization-lifecycle-deadline-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p6-core-productization-lifecycle-deadline-repair-t1",
+  "status": "completed",
+  "summary": "AlembicCore P6 lifecycle deadline repair completed on main at commit 9db27ba4201b8be53ea629e79c8edb0cf91e9597. Root cause: KnowledgeService creation could write stagingDeadline to DB, but file-first persistence omitted stagingDeadline from KnowledgeEntry wire/frontmatter and KnowledgeSyncService upsert omitted the staging_deadline DB column, so later file sync could clear deadlines for auto-approvable staging Recipes. Fixed Core persistence/sync contract so stagingDeadline is serialized, parsed, and upserted to knowledge_entries.staging_deadline. Added real SQLite integration coverage proving host-agent high-confidence Recipe creation writes non-empty staging_deadline, KnowledgeSyncService preserves it, and due staging entries promote to active through StagingManager/LifecycleStateMachine with lifecycle_transition_events recorded.",
+  "evidenceRefs": [
+    "commit:9db27ba4201b8be53ea629e79c8edb0cf91e9597",
+    "AlembicCore/src/types/KnowledgeWire.ts",
+    "AlembicCore/src/domain/knowledge/KnowledgeEntry.ts",
+    "AlembicCore/src/service/knowledge/KnowledgeFileWriter.ts",
+    "AlembicCore/src/service/knowledge/KnowledgeSyncService.ts",
+    "AlembicCore/test/KnowledgeFileWriter.test.ts",
+    "AlembicCore/test/KnowledgeProductizationLifecycle.test.ts",
+    "pre-fix-real-db-readonly: sqlite3 /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db => lifecycle deprecated=6 staging=40; lifecycle_transition_events=0; auto-approvable staging rows without deadline=40; new recipe ids <redacted>,<redacted>,<redacted> lifecycle=staging autoApprovable=1 staging_deadline empty",
+    "raw-sqlite-probe-after-fix: initial {lifecycle=staging, autoApprovable=1, staging_deadline=1782479092997}; syncReport {synced=1, updated=1, violations=[]}; afterSync retained same staging_deadline; after due deadline StagingManager promoted id <redacted> to active with staging_deadline=null,publishedBy=StagingManager; lifecycle_transition_events row from_state=staging,to_state=active,trigger=grace-period-expire,operator_id=StagingManager",
+    "git status --short after commit: clean"
+  ],
+  "verification": [
+    "npx vitest run test/KnowledgeProductizationLifecycle.test.ts test/KnowledgeFileWriter.test.ts test/StagingManager.test.ts: passed (3 files, 36 tests)",
+    "npm run build:check: passed",
+    "npx biome check src/types/KnowledgeWire.ts src/domain/knowledge/KnowledgeEntry.ts src/service/knowledge/KnowledgeFileWriter.ts src/service/knowledge/KnowledgeSyncService.ts test/KnowledgeFileWriter.test.ts test/KnowledgeProductizationLifecycle.test.ts test/StagingManager.test.ts: passed",
+    "npm run test -- test/KnowledgeProductizationLifecycle.test.ts test/KnowledgeFileWriter.test.ts test/StagingManager.test.ts: passed (3 files, 36 tests)",
+    "npm run build: passed",
+    "git diff --check: passed",
+    "node --input-type=module raw SQLite probe against dist: passed; printed create/sync/promote/event evidence",
+    "npm run test: passed (129 files, 1317 tests)",
+    "npm run lint: passed (620 files)",
+    "npm run check: failed at existing lint:naming baseline after build:check, public-api-boundary, layer-contract, consumer-core-imports, smoke:public-api, output-budgets, space-edges, and doctrine passed; failing files are pre-existing src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts",
+    "alembic_status /Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore: degraded/not_initialized with host project mismatch selected=/Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili",
+    "alembic_code_guard explicit changed files: failed with CODEX_MCP_ERROR internal schema validation error unrecognized key \"data\"; no code findings produced"
+  ],
+  "risks": [
+    "Existing BiliDili DB rows observed before the fix still have empty staging_deadline; this Core task did not mutate the live BiliDili data root. A fresh submit/rescan/Test rerun should exercise the repaired creation/sync route.",
+    "Aggregate npm run check remains blocked by the known naming baseline unrelated to this task, though full test/lint and all check steps before lint:naming passed.",
+    "Alembic Guard/status tool surface is degraded for this Core checkout due not_initialized/project-selection mismatch and CODEX_MCP_ERROR schema failure; repository validation and raw SQLite evidence were used as acceptance evidence."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p6-core-productization-lifecycle-deadline-repair-p1__AlembicCore__p6-core-productization-lifecycle-deadline-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-core-productization-lifecycle-deadline-repair-p1__AlembicCore__p6-core-productization-lifecycle-deadline-repair-t1.json",
+    "deliveryRunId": "run-delivery-p6-core-productization-lifecycle-deadline-repair-p1__AlembicCore__p6-core-productization-lifecycle-deadline-repair-t1",
+    "dispatchGroup": "p6-core-productization-lifecycle-deadline-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-core-productization-lifecycle-deadline-repair-p1__AlembicCore__p6-core-productization-lifecycle-deadline-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+    "stateRevision": 41,
+    "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+    "taskPackageId": "p6-core-productization-lifecycle-deadline-repair-p1",
+    "targetTaskId": "p6-core-productization-lifecycle-deadline-repair-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p6-core-productization-lifecycle-deadline-repair-p1",
+    "resultId": "tr-p6-core-productization-lifecycle-deadline-repair-t1",
+    "createdAt": "2026-06-25T13:07:31.512Z"
+  },
+  "createdAt": "2026-06-25T13:07:31.512Z",
+  "stateRevisionObserved": 41,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

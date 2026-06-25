@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-plugin-recipe-content-quality-polish-t1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "taskPackageId": "p5-plugin-recipe-content-quality-polish-p1",
+  "dispatchGroup": "p5-plugin-recipe-content-quality-polish-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p5-plugin-recipe-content-quality-polish-t1",
+  "status": "completed",
+  "summary": "P5 AlembicPlugin recipe content quality polish completed. Added a Plugin-owned pre-Core submit quality gate for alembic_submit_knowledge that rejects new Recipe submissions whose doClause/dontClause are missing, non-English, or non-imperative, and rejects content.markdown without a ✅/❌ project contrast. Exposed the same constraints through MCP schema/tool text, hostAgentContract field floors, and compact current-dimension submissionSpec preSubmitChecklist while preserving inline budget. Old data is not migrated or destructively rewritten.",
+  "evidenceRefs": [
+    "commit:ed556c3",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/runtime/mcp/handlers/recipe-content-quality-gate.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/runtime/mcp/handlers/tool-router.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/shared/schemas/mcp-tools.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/runtime/mcp/tools.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/runtime/status/OnboardingContract.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/host-agent-workflows/cold-start.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/SubmitKnowledgeRouter.test.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/HostMcpServer.test.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/CodexStatusService.test.ts",
+    "git status --short: clean"
+  ],
+  "verification": [
+    "npx biome check lib/runtime/mcp/handlers/recipe-content-quality-gate.ts lib/runtime/mcp/handlers/tool-router.ts lib/shared/schemas/mcp-tools.ts lib/runtime/mcp/tools.ts lib/runtime/status/OnboardingContract.ts lib/recipe-generation/host-agent-workflows/cold-start.ts test/unit/SubmitKnowledgeRouter.test.ts test/unit/HostMcpServer.test.ts test/unit/CodexStatusService.test.ts -> passed; Checked 9 files; no fixes applied.",
+    "npx vitest run test/unit/SubmitKnowledgeRouter.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts -> passed; 2 files, 24 tests.",
+    "npx vitest run test/unit/HostMcpServer.test.ts -t \"Codex host-agent bootstrap runs in the Plugin without the daemon MCP bridge\" -> passed; inline structuredContent budget remains <=20KB and P5 preSubmitChecklist/contract assertions pass.",
+    "npx vitest run test/unit/CodexStatusService.test.ts -t \"reports initialized empty knowledge\" -> passed; status onboarding exposes P5 submitKnowledgeContract field floors.",
+    "npm run build:check -> passed; Core build used ../AlembicCore @ b950785405faa0e6ce05057a79ff981beedf9013; tsc --noEmit passed.",
+    "git diff --check -> passed with no output.",
+    "git diff -- lib/recipe-generation/plan-tool.ts lib/recipe-generation/vector/LocalEmbedding.ts lib/injection/modules/VectorModule.ts lib/runtime/mcp/host/staging-access-sweep.ts lib/recipe-generation/host-agent-workflows/dimension-completion.ts -> no output, proving no P1/P2/P4/plan/embedding contract drift.",
+    "git -C ../AlembicCore status --short -> no output; Core was not modified.",
+    "alembic_code_guard attempted twice on scoped files -> tool failed before analysis with CODEX_MCP_ERROR: unrecognized key \"data\"; treated as Guard tool-surface blocker, not product evidence."
+  ],
+  "risks": [
+    "alembic_code_guard did not produce a usable guard result because the tool surface returned CODEX_MCP_ERROR/unrecognized key data; local scoped Biome, tests, build:check, diff checks, and clean-output contract passed.",
+    "Existing old Chinese doClause/dontClause rows are intentionally not migrated or destructively rewritten; they remain non-blocking and should be corrected by future rescan/evolution as required by the task package.",
+    "Compact bootstrap briefing budget was preserved by removing redundant per-dimension fullGuideRef/fullSubmissionSpecRef pointers; the top-level meta.fullBriefingRef still points to the complete briefing file."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p5-plugin-recipe-content-quality-polish-p1__AlembicPlugin__p5-plugin-recipe-content-quality-polish-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-recipe-content-quality-polish-p1__AlembicPlugin__p5-plugin-recipe-content-quality-polish-t1.json",
+    "deliveryRunId": "run-delivery-p5-plugin-recipe-content-quality-polish-p1__AlembicPlugin__p5-plugin-recipe-content-quality-polish-t1",
+    "dispatchGroup": "p5-plugin-recipe-content-quality-polish-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-recipe-content-quality-polish-p1__AlembicPlugin__p5-plugin-recipe-content-quality-polish-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+    "stateRevision": 32,
+    "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+    "taskPackageId": "p5-plugin-recipe-content-quality-polish-p1",
+    "targetTaskId": "p5-plugin-recipe-content-quality-polish-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p5-plugin-recipe-content-quality-polish-p1",
+    "resultId": "tr-p5-plugin-recipe-content-quality-polish-t1",
+    "createdAt": "2026-06-25T12:27:06.299Z"
+  },
+  "createdAt": "2026-06-25T12:27:06.299Z",
+  "stateRevisionObserved": 32,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

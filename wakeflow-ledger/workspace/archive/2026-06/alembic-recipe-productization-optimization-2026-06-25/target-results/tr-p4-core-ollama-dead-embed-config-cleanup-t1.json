@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-core-ollama-dead-embed-config-cleanup-t1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "taskPackageId": "p4-core-ollama-dead-embed-config-cleanup-p1",
+  "dispatchGroup": "p4-core-ollama-dead-embed-config-cleanup-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p4-core-ollama-dead-embed-config-cleanup-t1",
+  "status": "completed",
+  "summary": "AlembicCore P4 cleanup completed in commit b950785405faa0e6ce05057a79ff981beedf9013. Removed the dead ALEMBIC_EMBED_* WorkspaceSettingsStore surface from Core AI env collection, non-secret settings mapping, secret key handling, read/apply paths, and write persistence. Added regression coverage proving legacy embed settings/secrets/process env are not collected, applied, or written while normal AI provider settings and provider keys still work. Preserved OllamaEmbedProvider/vector public exports and did not change Plugin setup/runtime wiring or add a new provider; downstream local embedding remains Plugin-owned through ALEMBIC_LOCAL_EMBEDDING_* and vector.localEmbedding.",
+  "evidenceRefs": [
+    "commit:b950785405faa0e6ce05057a79ff981beedf9013",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/src/shared/WorkspaceSettingsStore.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/test/WorkspaceSettingsStore.test.ts",
+    "git status --short: clean"
+  ],
+  "verification": [
+    "npx biome check src/shared/WorkspaceSettingsStore.ts test/WorkspaceSettingsStore.test.ts -> passed; Checked 2 files; no fixes applied.",
+    "npx vitest run test/WorkspaceSettingsStore.test.ts -> passed; 1 file, 5 tests.",
+    "npm run build:check -> passed; tsc -p tsconfig.json --noEmit.",
+    "rg -n \"ALEMBIC_EMBED_\" src -> no matches (exit 1), proving the legacy env surface is gone from Core source.",
+    "npm run build -> passed; clean-dist + tsc.",
+    "npm run lint -> passed; Biome checked 619 files.",
+    "npm run test -> passed; 128 files, 1315 tests.",
+    "git diff --check -> passed.",
+    "npm run check -> failed only at existing lint:naming baseline after build:check, public-api-boundary, layer-contract, consumer-core-imports, smoke:public-api, output-budgets, space-edges, and doctrine all passed; failing legacy files: src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts.",
+    "alembic_status(projectRoot=AlembicCore) -> degraded/not_initialized; daemon removed expected, knowledge not initialized.",
+    "alembic_code_guard(files=2) -> failed with Alembic MCP internal schema error: unrecognized key data."
+  ],
+  "risks": [
+    "Aggregate npm run check remains blocked by pre-existing lint:naming baseline in three unrelated legacy src files; targeted build, lint, build, and full test suite passed after this change.",
+    "Alembic Guard could not provide a semantic verdict because the plugin returned an internal schema validation error; repository validations passed and the guard failure should be treated as tool-surface residual.",
+    "This Core half intentionally does not enable local embedding by itself; Plugin setup/runtime/docs still own user-facing Ollama enablement through ALEMBIC_LOCAL_EMBEDDING_ENABLED, ALEMBIC_OLLAMA_ENDPOINT, ALEMBIC_OLLAMA_EMBED_MODEL, and vector.localEmbedding."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-core-ollama-dead-embed-config-cleanup-p1__AlembicCore__p4-core-ollama-dead-embed-config-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-ollama-dead-embed-config-cleanup-p1__AlembicCore__p4-core-ollama-dead-embed-config-cleanup-t1.json",
+    "deliveryRunId": "run-delivery-p4-core-ollama-dead-embed-config-cleanup-p1__AlembicCore__p4-core-ollama-dead-embed-config-cleanup-t1",
+    "dispatchGroup": "p4-core-ollama-dead-embed-config-cleanup-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-ollama-dead-embed-config-cleanup-p1__AlembicCore__p4-core-ollama-dead-embed-config-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+    "stateRevision": 24,
+    "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+    "taskPackageId": "p4-core-ollama-dead-embed-config-cleanup-p1",
+    "targetTaskId": "p4-core-ollama-dead-embed-config-cleanup-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p4-core-ollama-dead-embed-config-cleanup-p1",
+    "resultId": "tr-p4-core-ollama-dead-embed-config-cleanup-t1",
+    "createdAt": "2026-06-25T11:44:23.095Z"
+  },
+  "createdAt": "2026-06-25T11:44:23.095Z",
+  "stateRevisionObserved": 24,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

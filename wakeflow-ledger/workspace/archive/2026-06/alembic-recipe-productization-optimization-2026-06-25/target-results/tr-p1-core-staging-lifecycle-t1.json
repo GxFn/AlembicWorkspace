@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-core-staging-lifecycle-t1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "taskPackageId": "p1-core-staging-lifecycle-p1",
+  "dispatchGroup": "p1-core-staging-lifecycle-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1-core-staging-lifecycle-t1",
+  "status": "completed",
+  "summary": "AlembicCore P1 staging lifecycle primitive completed on main at commit 777c5b795784aa41bb80845dee3f9cd9ef9c60c1. StagingManager.checkAndPromote now promotes only due auto-approvable staging Recipes through LifecycleStateMachine.transition({targetState:'active', trigger:'grace-period-expire', operatorId:'StagingManager'}), preserves no-daemon/no-plugin boundary, and finalizes publishedAt/publishedBy/stagingDeadline metadata after the legal transition. KnowledgeRepositoryImpl now persists stagingDeadline through the Drizzle property so staging deadlines can be read/cleared reliably. Added real SQLite/Drizzle integration test covering due auto promotion, non-due waiting, non-auto waiting, and lifecycle_transition_events persistence.",
+  "evidenceRefs": [
+    "commit:777c5b795784aa41bb80845dee3f9cd9ef9c60c1",
+    "AlembicCore/src/service/evolution/StagingManager.ts",
+    "AlembicCore/src/repository/knowledge/KnowledgeRepositoryImpl.ts",
+    "AlembicCore/test/StagingManager.test.ts",
+    "raw-db-probe: promoted=[probe-due-auto], waiting=[probe-due-manual,probe-future-auto], knowledge_entries probe-due-auto lifecycle=active autoApprovable=1 staging_deadline=null publishedBy=StagingManager; probe-due-manual and probe-future-auto remain lifecycle=staging; lifecycle_transition_events has one row recipe_id=<redacted> from_state=staging to_state=active trigger=grace-period-expire operator_id=StagingManager evidence_json={\"reason\":\"staging deadline expired and recipe is auto-approvable\"}",
+    "git status --short: clean"
+  ],
+  "verification": [
+    "npm run build:check: passed",
+    "npx vitest run test/StagingManager.test.ts: passed (1 file, 1 test)",
+    "npm run test -- test/Lifecycle.test.ts test/DatabaseRepository.test.ts test/StagingManager.test.ts: passed (3 files, 37 tests)",
+    "npm run build: passed",
+    "npx biome check src/service/evolution/StagingManager.ts src/repository/knowledge/KnowledgeRepositoryImpl.ts test/StagingManager.test.ts: passed",
+    "git diff --check: passed",
+    "npm run test: passed (127 files, 1310 tests)",
+    "npm run lint: passed (617 files)",
+    "npm run check: failed at existing lint:naming baseline after preceding gates passed; failing files are src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts",
+    "alembic_status: degraded/not_initialized for AlembicCore with host project mismatch selected=/Users/gaoxuefeng/Documents/AlembicWorkspace; daemon removed PDR-3",
+    "alembic_code_guard: failed with Alembic MCP internal schema validation error, no guard result produced"
+  ],
+  "risks": [
+    "AlembicPlugin tick-on-access remains intentionally untouched and must inject the LifecycleStateMachine into StagingManager before promotion can run from Plugin access paths.",
+    "Existing npm run check naming baseline is outside this task and still blocks the aggregate script before its built-in test/lint tail, though full test and lint were run separately and passed.",
+    "Alembic Guard could not complete due MCP internal schema failure and project-selection mismatch; repository validation and raw SQLite evidence were used as acceptance evidence."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-core-staging-lifecycle-p1__AlembicCore__p1-core-staging-lifecycle-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-staging-lifecycle-p1__AlembicCore__p1-core-staging-lifecycle-t1.json",
+    "deliveryRunId": "run-delivery-p1-core-staging-lifecycle-p1__AlembicCore__p1-core-staging-lifecycle-t1",
+    "dispatchGroup": "p1-core-staging-lifecycle-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-staging-lifecycle-p1__AlembicCore__p1-core-staging-lifecycle-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+    "stateRevision": 4,
+    "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+    "taskPackageId": "p1-core-staging-lifecycle-p1",
+    "targetTaskId": "p1-core-staging-lifecycle-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1-core-staging-lifecycle-p1",
+    "resultId": "tr-p1-core-staging-lifecycle-t1",
+    "createdAt": "2026-06-25T10:10:44.477Z"
+  },
+  "createdAt": "2026-06-25T10:10:44.477Z",
+  "stateRevisionObserved": 4,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

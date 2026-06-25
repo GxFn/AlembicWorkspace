@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-core-ollama-dead-embed-config-cleanup-p1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "summary": "P4 Core cleanup: delete the misleading write-only ALEMBIC_EMBED_* configuration surface from @alembic/core WorkspaceSettingsStore. Keep existing AI provider env/settings behavior, keep OllamaEmbedProvider/vector public exports, do not add any new provider, and do not touch Plugin setup/runtime wiring. This is the Core upstream half of the confirmed Ollama-only P4 decision: real embedding enablement goes through ALEMBIC_LOCAL_EMBEDDING_* and vector.localEmbedding, not ALEMBIC_EMBED_*. Validate with Node22 build:check, targeted WorkspaceSettingsStore tests or new regression coverage proving ALEMBIC_EMBED_* is no longer collected/written/applied while normal AI env still works, grep showing no ALEMBIC_EMBED_* remains in Core source, and repository status clean. Commit locally to main and backfill commit hash, changed files, validation output, and downstream Plugin impact notes.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md#P4",
+  "createdAt": "2026-06-25T11:38:49.088Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-core-ollama-dead-embed-config-cleanup-t1",
+      "taskPackageId": "p4-core-ollama-dead-embed-config-cleanup-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, AlembicCore/AGENTS.md, this state root, and strict requirement design P4/R3. Declare AlembicCore identity. Implement only Core deletion of WorkspaceSettingsStore ALEMBIC_EMBED_* dead config surface (write-only/no consumer). Preserve normal AI provider env/settings, provider key secrets, OllamaEmbedProvider/vector exports, and all embedding runtime semantics. Do not add DashScope/OpenAI-compatible embedding provider, do not edit Plugin, and do not modify P1/P2/P3/P5 behavior. Commit to main locally and backfill commit hash, changed files, Node22 build:check/test/lint/grep outputs, and evidence that ALEMBIC_EMBED_* is gone from Core source while ALEMBIC_LOCAL_EMBEDDING_* remains Plugin-owned.",
+      "status": "pending",
+      "createdAt": "2026-06-25T11:38:49.088Z"
+    }
+  ]
+}

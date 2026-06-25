@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p6-plugin-productization-vector-runtime-repair-t1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "taskPackageId": "p6-plugin-productization-vector-runtime-repair-p1",
+  "dispatchGroup": "p6-plugin-productization-vector-runtime-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p6-plugin-productization-vector-runtime-repair-t1",
+  "status": "completed",
+  "summary": "Fixed Plugin vector runtime path so BiliDili ghost workspace vector.localEmbedding config reaches ServiceContainer/VectorService; rebuilt recipe source-ref/semantic-region indexes through the real local derived-index rebuild entrypoint; updated alembic_search semantic mode to consume local recipe-region vectors when resident semantic evidence is unavailable. BiliDili validation now reports 335 recipe-region vector ids, 161 active source refs, HostMcpServer local Ollama lane selected, alembic_search semantic ready with 5 local vector matches, and status/prime/search probes ready.",
+  "evidenceRefs": [
+    "AlembicPlugin:lib/injection/ServiceContainer.ts",
+    "AlembicPlugin:lib/runtime/mcp/handlers/search.ts",
+    "AlembicPlugin:scripts/rebuild-local-knowledge-indexes.mjs",
+    "AlembicPlugin:test/unit/ServiceContainerRuntimeConfig.test.ts",
+    "AlembicPlugin:test/unit/SearchHandlerResidentSearch.test.ts",
+    "command:npx biome check lib/runtime/mcp/handlers/search.ts test/unit/SearchHandlerResidentSearch.test.ts scripts/rebuild-local-knowledge-indexes.mjs lib/injection/ServiceContainer.ts test/unit/ServiceContainerRuntimeConfig.test.ts => passed",
+    "command:npx vitest run test/unit/ServiceContainerRuntimeConfig.test.ts test/unit/LocalEmbedding.test.ts test/unit/RecipeRegionVectorAvailability.test.ts test/unit/SearchHandlerResidentSearch.test.ts => 50 tests passed",
+    "command:npx vitest run test/unit/StagingAccessSweep.test.ts test/unit/SubmitKnowledgeRouter.test.ts test/unit/SetupServiceVectorAvailability.test.ts => 19 tests passed",
+    "command:npm run build:check => passed, Core ../AlembicCore @ 9db27ba4201b8be53ea629e79c8edb0cf91e9597",
+    "command:npm run build => passed, dist rebuilt",
+    "command:node scripts/rebuild-local-knowledge-indexes.mjs --project-root /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili --enable-local-embedding --ollama-model qwen3-embedding:0.6b --ollama-endpoint http://127.0.0.1:11434 --timeout-ms 180000 --json => ok true, sourceRefs.active=161, vectorIndex.recipeRegionIds=335, recipeRegionRecipeIds=40, dimension=1024",
+    "command:HostMcpServer alembic_search mode=semantic query='Swift package module startup AOXFoundationKit repository data flow' => status ready, actualMode semantic, local-recipe-region-vector source, returned 5 semantic matches, vector available/used true",
+    "command:node scripts/verify-codex-plugin-tools-local.mjs --project-root /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili --graph-file Package.swift --case host/prime --case host/search --case host/status --case host/status-knowledge --case host/status-runtime --skip-handler-fixture --timeout-ms 60000 --allow-knowledge-skip --json => ok true",
+    "command:rg -n \"ALEMBIC_EMBED_\" lib scripts test plugins skills package.json docs || true => no matches",
+    "command:git diff --check => passed"
+  ],
+  "verification": [
+    "BiliDili ghost config path used: /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/config.json with vector.localEmbedding enabled endpoint http://127.0.0.1:11434 model qwen3-embedding:0.6b laneOrder local-first.",
+    "ServiceContainer runtime config unit proves workspace vector.localEmbedding is merged into DI plain config and preserves default database object.",
+    "SearchHandler resident/local unit proves semantic mode does not fall back to keyword search, but does accept local recipe-region vector evidence when available.",
+    "Live Ollama/network validation must run outside Codex sandbox; sandboxed Node fetch reports unavailable while unrestricted local Node selects Ollama lane."
+  ],
+  "risks": [
+    "alembic_code_guard MCP surface failed with internal schema error `unrecognized_keys: data` even for a single file; no guard conclusion was available. Covered with biome, focused unit tests, build:check/build, and live BiliDili probes.",
+    "SQLite semantic_memories remains 0; current repaired vector runtime writes recipe semantic-region vectors to .asd/context/index/vector_index.asvec, not semantic_memories. Treat the old semantic_memories acceptance probe as stale/misaligned unless product decides to add a separate memory-table writer.",
+    "Latest rebuild attempt kept index usable but batch embed hit one Ollama 30s timeout; existing vector index still had 335 vectors and semantic search query succeeded. This is local Ollama latency risk, not a missing provider/runtime-config failure."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1.json",
+    "deliveryRunId": "run-delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1",
+    "dispatchGroup": "p6-plugin-productization-vector-runtime-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+    "stateRevision": 43,
+    "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+    "taskPackageId": "p6-plugin-productization-vector-runtime-repair-p1",
+    "targetTaskId": "p6-plugin-productization-vector-runtime-repair-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p6-plugin-productization-vector-runtime-repair-p1",
+    "resultId": "tr-p6-plugin-productization-vector-runtime-repair-t1",
+    "createdAt": "2026-06-25T13:45:53.584Z"
+  },
+  "createdAt": "2026-06-25T13:45:53.584Z",
+  "stateRevisionObserved": 43,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

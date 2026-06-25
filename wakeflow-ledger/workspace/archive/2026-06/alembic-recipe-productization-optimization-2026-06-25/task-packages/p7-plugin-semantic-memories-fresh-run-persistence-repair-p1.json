@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p7-plugin-semantic-memories-fresh-run-persistence-repair-p1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "summary": "修复 BiliDili fresh-run productization e2e 暴露的 P4 硬缺口：本地 Ollama/recipe-region vector semantic search 已可用，但原需求要求 semantic_memories 有条目，fresh cleared 数据根实测 semantic_memories=0。AlembicPlugin 需让正常 host-agent submit/dimension_complete/status/search 链路在 embedding 可用时写入 semantic_memories，同时保持现有 local recipe-region vector 搜索路径、P5 质量门、staging lifecycle 与 skill 生成不回退。",
+  "status": "pending",
+  "sourceRef": null,
+  "createdAt": "2026-06-25T14:36:22.776Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p7-plugin-semantic-memories-fresh-run-persistence-repair-t1",
+      "taskPackageId": "p7-plugin-semantic-memories-fresh-run-persistence-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "读取父 AGENTS.md、AlembicPlugin/AGENTS.md、本 state root、原需求 Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md、Test 证据 Test/tmp/test-bilidili-recipe-productization-e2e-after-p6-repairs-evidence.md。声明 AlembicPlugin 仓库身份。修复 fresh-run 生成后 semantic_memories=0：定位当前 recipe submit/dimension_complete/index/sync 路径为何只生成 /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/context/index/vector_index.asvec 和 local-recipe-region-vector 语义检索，却没有把 accepted recipes 写入 semantic_memories。要求：1) 不放松 evidence/floor/P5 门禁；2) 不新增 provider、不回滚 Ollama、本地 vector route 保留；3) 不用语义检索可用替代 semantic_memories 条目；4) 正常链路自动/幂等写入 semantic_memories，清空数据根 fresh run 后也成立；5) 本地单测/集成验证 + build:check/node22 证据；6) 回填 commit hash、改动文件、命令输出、DB 查询证明 semantic_memories>0，以及 alembic_search 仍走 local-recipe-region-vector/semanticUsed=true 的 JSON 证据。",
+      "status": "pending",
+      "createdAt": "2026-06-25T14:36:22.776Z"
+    }
+  ]
+}

@@ -1,0 +1,493 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "title": "冷启动产出的高质量 Recipe 自动产物化为可消费知识:staging→active 自动晋级(daemon-less tick-on-access)、合成维度 Skill、覆盖推向 target+未覆盖 pattern critic、接通本地千问 embedding、质量打磨。生成质量已达标(grade A),补\"生成之后\"整段",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Demand completed after controller-accepted final BiliDili recipe productization e2e. Archive completed state root with redaction guard.",
+  "revision": 59,
+  "activeStageId": null,
+  "updatedAt": "2026-06-25T15:11:47.301Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p1-core-staging-lifecycle-p1",
+      "summary": "P1 Core upstream: repair daemon-less Recipe staging promotion primitives so grade-A staging Recipes can be promoted by bounded tick-on-access callers without reintroducing daemon. Strictly implement requirement design P1/R1a: StagingManager.checkAndPromote remains the public promotion executor, but private promotion must go through LifecycleStateMachine.transition() for legal staging->active migration and lifecycle_transition_events persistence; preserve generation quality floor and no daemon. Validate with Node22 build/check and targeted lifecycle/staging tests proving due autoApprovable staging Recipes promote active, non-due/non-auto rows do not, and lifecycle_transition_events records transitions.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md#P1",
+      "createdAt": "2026-06-25T10:00:04.004Z"
+    },
+    {
+      "taskPackageId": "p1-plugin-tick-on-access-staging-sweep-p1",
+      "summary": "P1 Plugin consumer: wire daemon-less Recipe staging promotion into existing tool access paths after accepted Core commit 777c5b795784aa41bb80845dee3f9cd9ef9c60c1. Implement bounded, idempotent, throttled tick-on-access staging sweep for alembic_submit_knowledge, alembic_dimension_complete, alembic_status, and alembic_rescan paths; inject LifecycleStateMachine into StagingManager so checkAndPromote can perform legal staging->active transitions and lifecycle_transition_events persistence. Do not reintroduce daemon, relax evidence gates, move P2/P3/P4/P5 scope, or alter alembic_plan contracts. Validate with Node22 build/check and targeted tests proving due autoApprovable staging entries are promoted on allowed tool access, sweep is throttled/bounded/nonblocking, non-due/non-auto entries remain staging, and no daemon/runtime loop is introduced.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md#P1",
+      "createdAt": "2026-06-25T10:14:44.794Z"
+    },
+    {
+      "taskPackageId": "p2-plugin-dimension-complete-skill-flow-p1",
+      "summary": "P2 Plugin: make Skill synthesis a required cold-start completion flow. Per requirement R1b/P2, host-agent cold-start must make alembic_dimension_complete an explicit per-dimension required closing step after submit, expose remaining unfinished dimensions, and verify the existing dimension_complete -> ProjectSkillService chain writes Alembic/skills/<dimension>/SKILL.md when recipes are skill-worthy. Keep staging lifecycle independent: staging Recipes may still synthesize skills; do not make skill synthesis wait for active lifecycle. Do not implement P3 coverage critic, P4 embeddings, P5 quality grammar, or any daemon. Validate with Node22 build/check and targeted tests proving workflow guidance requires dimension_complete, remaining dimensions are visible/actionable, skill synthesis writes non-empty SKILL.md, and skillCount reflects real SKILL.md files.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md#P2",
+      "createdAt": "2026-06-25T10:37:42.307Z"
+    },
+    {
+      "taskPackageId": "p3-core-completeness-critic-primitives-p1",
+      "summary": "P3 Core producer: build the shared completeness critic primitive for coverage-depth guidance without creating a hard target-5 gate. Per requirement R2/P3, the critic must identify high-value patterns/files/symbol areas not yet covered by submitted Recipe sourceRefs, using real projectInfoTree/project facts plus dimension miningGuidance and submitted sourceRefs. It must sort miningGuidance/coverage hints by importance, push toward targetPerDimension=5 while preserving floor=3 and noPadding, and allow an explicit exhausted/no-more-core-patterns result with reason. Do not relax recipe-evidence-gate floor, invent uncovered patterns, reintroduce daemon/AI provider, or touch P1/P2/P4/P5 scope. Validate with Node22 build/check and targeted tests proving missing core patterns are grounded in supplied projectInfoTree/source evidence, already-covered refs are not repeated, exhausted path is supported with reason, and no hard target gate is introduced.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md#P3",
+      "createdAt": "2026-06-25T11:00:18.281Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-completeness-critic-consumer-p1",
+      "summary": "P3 Plugin consumer: wire the accepted Core completeness critic primitive (AlembicCore commit 946df285ecbfb777dffc1fc4dccc1aed6118adfd) into Codex-facing cold-start/dimension-complete guidance so targetPerDimension=5 becomes executable grounded coverage guidance, not a hard gate. Use @alembic/core public host-agent facade; do not copy Core logic or import Core source paths. Feed real projectInfoTree/project facts, dimension miningGuidance, submitted Recipe/sourceRefs, target/floor counts, noPadding/exhausted reason into buildCompletenessCritic. Surface uncoveredPattern hints with sourceRefs in currentDimensionGuidance and/or alembic_dimension_complete response before/at dimension close. Preserve floor=3 evidence gate and existing subpackageCoverageWarning as legacy advisory only; do not invent patterns, do not hard-block completion at target 5, and allow explicit exhausted/no more core patterns reason. Validate with Node22 build/check and tests proving grounded missing pattern hints appear, covered refs are not repeated, noPadding exhausted path passes, target remains advisory, and existing dimension_complete skill synthesis from P2 still writes SKILL.md.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md#P3",
+      "createdAt": "2026-06-25T11:17:14.348Z"
+    },
+    {
+      "taskPackageId": "p4-core-ollama-dead-embed-config-cleanup-p1",
+      "summary": "P4 Core cleanup: delete the misleading write-only ALEMBIC_EMBED_* configuration surface from @alembic/core WorkspaceSettingsStore. Keep existing AI provider env/settings behavior, keep OllamaEmbedProvider/vector public exports, do not add any new provider, and do not touch Plugin setup/runtime wiring. This is the Core upstream half of the confirmed Ollama-only P4 decision: real embedding enablement goes through ALEMBIC_LOCAL_EMBEDDING_* and vector.localEmbedding, not ALEMBIC_EMBED_*. Validate with Node22 build:check, targeted WorkspaceSettingsStore tests or new regression coverage proving ALEMBIC_EMBED_* is no longer collected/written/applied while normal AI env still works, grep showing no ALEMBIC_EMBED_* remains in Core source, and repository status clean. Commit locally to main and backfill commit hash, changed files, validation output, and downstream Plugin impact notes.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md#P4",
+      "createdAt": "2026-06-25T11:38:49.088Z"
+    },
+    {
+      "taskPackageId": "p4-plugin-ollama-local-embedding-enablement-p1",
+      "summary": "P4 Plugin consumer: complete the confirmed Ollama-only local embedding enablement path after accepted Core cleanup b950785405faa0e6ce05057a79ff981beedf9013. Runtime already owns Ollama via @alembic/core/vector and Plugin LocalEmbedding; this package must make the existing path user-visible and operational without adding providers: setup/status/docs or MCP output must clearly guide/present `ollama pull qwen3-embedding` plus `ALEMBIC_LOCAL_EMBEDDING_ENABLED=1` or `.asd/config.json vector.localEmbedding.enabled=true`, preserve `ALEMBIC_OLLAMA_ENDPOINT`/`ALEMBIC_OLLAMA_EMBED_MODEL`, optionally auto-enable only when an actual Ollama probe proves availability, and ensure enabled local embedding yields `embed-provider-ready`/semantic indexing instead of `embed-provider-missing`. Delete/avoid any live user-facing `ALEMBIC_EMBED_*` surface. Do not add DashScope/OpenAI-compatible provider, do not reintroduce daemon, do not edit Core, and do not touch P5 content quality rules.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md#P4",
+      "createdAt": "2026-06-25T11:48:46.921Z"
+    },
+    {
+      "taskPackageId": "p5-plugin-recipe-content-quality-polish-p1",
+      "summary": "P5 AlembicPlugin quality polish. Implement only the requirement-design P5 scope: submit validation/SOP must constrain recipe doClause and dontClause to English imperative verb-leading clauses, and project close-up content/submissionSpec preSubmitChecklist must require consistent ✅/❌ contrast. Preserve existing evidence gates and floor=3 quality threshold; do not touch P1 lifecycle, P2 dimension_complete skill flow, P3 completeness critic, P4 embedding/Ollama routes, Core code, alembic_plan contracts, or Test e2e. Old Chinese do/dont rows are non-blocking and should be corrected gradually by rescan/evolution, not by destructive migration.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md:88",
+      "createdAt": "2026-06-25T12:07:01.699Z"
+    },
+    {
+      "taskPackageId": "test-bilidili-recipe-productization-e2e-p1",
+      "summary": "Final Test e2e for alembic-recipe-productization-optimization-2026-06-25. After controller acceptance of P1-P5 product phases, verify on the real BiliDili project that host-agent cold-start output becomes consumable knowledge: active lifecycle promotion with events, generated dimension Skills, grounded coverage/completeness critic, live Ollama semantic memory/search when enabled, and P5 English imperative do/dont plus ✅/❌ recipe content quality. Test only; do not edit product code.",
+      "status": "accepted",
+      "sourceRef": "test-cards/test-bilidili-recipe-productization-e2e.json",
+      "createdAt": "2026-06-25T12:32:42.029Z"
+    },
+    {
+      "taskPackageId": "p6-core-productization-lifecycle-deadline-repair-p1",
+      "summary": "Repair the final BiliDili e2e P1 lifecycle blocker exposed by accepted Test evidence. Read parent AGENTS.md, AlembicCore/AGENTS.md, this state root, original productization design P1, accepted P1 Core/Plugin evidence, and Test evidence file. Declare AlembicCore identity. Scope: fix Core lifecycle/staging primitives so newly created auto-approvable staging KnowledgeEntry records always receive a non-empty staging_deadline through the authoritative route and are promotable only through LifecycleStateMachine, with lifecycle_transition_events recorded. Raw blocker: /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db has new BiliDili recipes d8a8b5ed-daca-4227-ac4e-e6baa81cd79f, 510c3d5c-b3f0-4e50-96e0-4c2badf20a4c, d5b60432-4956-4548-a36f-b5bfa87c0562 as lifecycle=staging, autoApprovable=1, empty staging_deadline; lifecycle_transition_events=0. Inspect KnowledgeService confidence route / StagingManager boundaries instead of adding bypass promotion. Do not reintroduce daemon, relax quality/evidence gates, touch Plugin, P2/P3/P4/P5, alembic_plan, or fake immediate active states. Commit to main locally and backfill commit hash, changed files, Node22 build:check and targeted tests, plus raw sqlite evidence that an auto-approvable new entry gets staging_deadline, due entry promotes to active through LifecycleStateMachine, and lifecycle_transition_events is written.",
+      "status": "accepted",
+      "sourceRef": "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/test-bilidili-recipe-productization-e2e-evidence.md",
+      "createdAt": "2026-06-25T12:54:54.608Z"
+    },
+    {
+      "taskPackageId": "p6-plugin-productization-vector-runtime-repair-p1",
+      "summary": "Repair the final BiliDili e2e P4 vector/semantic runtime blocker and verify P1 tick-on-access integration against accepted Test evidence. Read parent AGENTS.md, AlembicPlugin/AGENTS.md, this state root, original productization design P1/P4, accepted P4 Plugin evidence, and Test evidence. Declare AlembicPlugin identity. Raw blocker: BiliDili ghost config has vector.localEmbedding.enabled=true endpoint=http://127.0.0.1:11434 model=qwen3-embedding:0.6b; Ollama /api/tags lists the model; daemon search still reports embed_provider_unavailable, VectorService resident stats show embedProviderAvailable=false/indexSize=0, submit degraded with embed-provider-missing, and semantic_memories=0. Scope: fix Plugin runtime/DI/config ordering so enabled localEmbedding reaches the real VectorService used by submit/search/status in daemon + host MCP paths, and semantic indexing writes semantic_memories when Ollama is reachable; ensure current CodeX plugin cache/reload path reflects the fix. Also re-check P1 tick-on-access staging sweep entrypoints after Core deadline repair is available, but do not invent bypass promotion. Do not add a new provider, reintroduce daemon, relax fallback behavior, change alembic_plan, P2 skill synthesis, P3 critic, P5 content quality, or Core source. Commit to main locally and backfill commit hash, changed files, Node22 build:check/lint/relevant tests, grep no live ALEMBIC_EMBED_* user-facing config, raw availability/status JSON proving embed-provider-ready or equivalent, sqlite evidence semantic_memories > 0 after submit, and search evidence for BiliDili recipe title/source query returning useful results.",
+      "status": "accepted",
+      "sourceRef": "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/test-bilidili-recipe-productization-e2e-evidence.md",
+      "createdAt": "2026-06-25T12:55:08.307Z"
+    },
+    {
+      "taskPackageId": "test-bilidili-recipe-productization-e2e-after-p6-repairs-p1",
+      "summary": "Final Test rerun after accepted P6 Core+Plugin repairs. Verify the original alembic-recipe-productization completion definition on real BiliDili, not a new scope: generated Recipes no longer remain all staging, grade-A/auto-approvable entries receive staging_deadline and promote to active through LifecycleStateMachine with lifecycle_transition_events; each completed dimension writes Alembic/skills/<dim>/SKILL.md and status skillCount>0; completeness critic guides toward uncovered important real patterns without hard target-5 padding; local Ollama vector path writes semantic_memories and alembic_search semantic uses local recipe-region-vector; new Recipe do/dont clauses are English imperative and ✅/❌ content is consistent. Use current accepted AlembicCore commit 9db27ba4201b8be53ea629e79c8edb0cf91e9597 and AlembicPlugin commit 4d3b97a12c594f7c01ae25cb5bcb923dc67d41f4. If the installed host MCP needs reload, use the user-authorized temporary Test window callback route, or report a precise host-cache/reload blocker. Do not edit product code, relax gates, reintroduce daemon, add providers, change alembic_plan, push/tag/release, or write real thread ids to tracked files.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md + accepted P6 Core/Plugin controller review event evt-20260625141538-0045",
+      "createdAt": "2026-06-25T14:15:58.010Z"
+    },
+    {
+      "taskPackageId": "p7-plugin-semantic-memories-fresh-run-persistence-repair-p1",
+      "summary": "修复 BiliDili fresh-run productization e2e 暴露的 P4 硬缺口：本地 Ollama/recipe-region vector semantic search 已可用，但原需求要求 semantic_memories 有条目，fresh cleared 数据根实测 semantic_memories=0。AlembicPlugin 需让正常 host-agent submit/dimension_complete/status/search 链路在 embedding 可用时写入 semantic_memories，同时保持现有 local recipe-region vector 搜索路径、P5 质量门、staging lifecycle 与 skill 生成不回退。",
+      "status": "accepted",
+      "sourceRef": null,
+      "createdAt": "2026-06-25T14:36:22.776Z"
+    },
+    {
+      "taskPackageId": "test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1",
+      "summary": "P7 AlembicPlugin 修复已接受，需 Test 重新跑 BiliDili productization e2e，验证原需求最终完成定义，尤其是 fresh-run 正常宿主链路下 semantic_memories>0 与 alembic_search 语义检索同时成立。",
+      "status": "accepted",
+      "sourceRef": null,
+      "createdAt": "2026-06-25T14:55:36.002Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p1-core-staging-lifecycle-t1",
+      "taskPackageId": "p1-core-staging-lifecycle-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, AlembicCore/AGENTS.md, state root, and Design docs. Declare AlembicCore identity. Implement only P1 Core upstream from design file lines R1a/P1: StagingManager.checkAndPromote + LifecycleStateMachine legal transition/events. Do not reintroduce daemon, relax evidence gates, or touch Plugin tick-on-access. Commit to main locally and backfill commit hash, changed files, Node22 build:check/test outputs, and raw DB/event evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T10:00:04.004Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-core-staging-lifecycle-p1__AlembicCore__p1-core-staging-lifecycle-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-staging-lifecycle-p1__AlembicCore__p1-core-staging-lifecycle-t1.json",
+        "deliveryRunId": "run-delivery-p1-core-staging-lifecycle-p1__AlembicCore__p1-core-staging-lifecycle-t1",
+        "dispatchGroup": "p1-core-staging-lifecycle-p1",
+        "sentAt": "2026-06-25T10:01:21.442Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-core-staging-lifecycle-t1"
+    },
+    {
+      "targetTaskId": "p1-plugin-tick-on-access-staging-sweep-t1",
+      "taskPackageId": "p1-plugin-tick-on-access-staging-sweep-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, AlembicPlugin/AGENTS.md, this state root, and the strict requirement design. Declare AlembicPlugin identity. Implement only P1 Plugin tick-on-access consumer: connect StagingManager.checkAndPromote from submit_knowledge/dimension_complete/status/rescan entrypoints with bounded idempotent throttled sweep, and update DI to pass LifecycleStateMachine accepted by Core commit 777c5b7. Do not touch P2 skill completion, P3 coverage critic, P4 embeddings, P5 quality, or any daemon. Commit to main locally and backfill commit hash, changed files, Node22 build:check/lint/test outputs, and raw evidence that a due autoApprovable staging recipe becomes active with lifecycle_transition_events after a tool call while non-due/non-auto rows stay staging.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T10:14:44.794Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-plugin-tick-on-access-staging-sweep-p1__AlembicPlugin__p1-plugin-tick-on-access-staging-sweep-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-tick-on-access-staging-sweep-p1__AlembicPlugin__p1-plugin-tick-on-access-staging-sweep-t1.json",
+        "deliveryRunId": "run-delivery-p1-plugin-tick-on-access-staging-sweep-p1__AlembicPlugin__p1-plugin-tick-on-access-staging-sweep-t1",
+        "dispatchGroup": "p1-plugin-tick-on-access-staging-sweep-p1",
+        "sentAt": "2026-06-25T10:15:13.218Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-plugin-tick-on-access-staging-sweep-t1"
+    },
+    {
+      "targetTaskId": "p2-plugin-dimension-complete-skill-flow-t1",
+      "taskPackageId": "p2-plugin-dimension-complete-skill-flow-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, AlembicPlugin/AGENTS.md, this state root, and strict requirement design P2/R1b. Declare AlembicPlugin identity. Implement only P2 Skill synthesis flow: cold-start guidance/execution plan says submit is not complete until alembic_dimension_complete runs per dimension; remaining dimensions are visible; dimension_complete skill synthesis chain writes Alembic/skills/<dim>/SKILL.md and skillCount scans real files. Do not alter lifecycle promotion/P1, P3 coverage critic, P4 embedding, P5 content quality, or alembic_plan contract. Commit to main locally and backfill commit hash, changed files, Node22 build:check/test/lint outputs, and raw filesystem evidence for SKILL.md creation + skillCount >0.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T10:37:42.307Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-plugin-dimension-complete-skill-flow-p1__AlembicPlugin__p2-plugin-dimension-complete-skill-flow-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-dimension-complete-skill-flow-p1__AlembicPlugin__p2-plugin-dimension-complete-skill-flow-t1.json",
+        "deliveryRunId": "run-delivery-p2-plugin-dimension-complete-skill-flow-p1__AlembicPlugin__p2-plugin-dimension-complete-skill-flow-t1",
+        "dispatchGroup": "p2-plugin-dimension-complete-skill-flow-p1",
+        "sentAt": "2026-06-25T10:39:07.522Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-plugin-dimension-complete-skill-flow-t1"
+    },
+    {
+      "targetTaskId": "p3-core-completeness-critic-primitives-t1",
+      "taskPackageId": "p3-core-completeness-critic-primitives-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, AlembicCore/AGENTS.md, this state root, and strict requirement design P3/R2. Declare AlembicCore identity. Implement only Core-side completeness critic primitives, likely near host-agent MissionBriefing/DimensionCompletion coverage helpers or a new small exported capability, so Plugin can consume it in the next P3 package. Inputs must include dimensionId, miningGuidance, projectInfoTree/project facts, submittedRecipe/sourceRefs, targetPerDimension, and noPadding/exhausted reason; outputs must include grounded uncoveredPattern hints with source refs or exhausted reason. Preserve existing subpackageCoverageWarning as legacy advisory if still needed, but do not treat it as the P3 critic. Commit to main locally and backfill commit hash, changed files, Node22 build:check/test outputs, and raw test evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T11:00:18.281Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-core-completeness-critic-primitives-p1__AlembicCore__p3-core-completeness-critic-primitives-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-completeness-critic-primitives-p1__AlembicCore__p3-core-completeness-critic-primitives-t1.json",
+        "deliveryRunId": "run-delivery-p3-core-completeness-critic-primitives-p1__AlembicCore__p3-core-completeness-critic-primitives-t1",
+        "dispatchGroup": "p3-core-completeness-critic-primitives-p1",
+        "sentAt": "2026-06-25T11:03:02.644Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-core-completeness-critic-primitives-t1"
+    },
+    {
+      "targetTaskId": "p3-plugin-completeness-critic-consumer-t1",
+      "taskPackageId": "p3-plugin-completeness-critic-consumer-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, AlembicPlugin/AGENTS.md, this state root, strict requirement design P3/R2, and accepted Core producer evidence. Declare AlembicPlugin identity. Implement only P3 Plugin consumer wiring: import buildCompletenessCritic from @alembic/core public host-agent facade, map plan/projectInfoTree/miningGuidance/submitted source refs into it, and expose grounded completeness hints to host-agent currentDimensionGuidance and/or dimension_complete output. Do not modify P1 lifecycle sweep, P2 completion gate semantics, P4 embedding, P5 content quality, alembic_plan contract, or Core source. Commit to main locally and backfill commit hash, changed files, Node22 build:check/lint/test outputs, and raw JSON/test evidence showing hints are grounded in source refs, already-covered refs are excluded, exhausted/noPadding is supported, and targetPerDimension remains advisory with no hard target-5 block.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T11:17:14.348Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-completeness-critic-consumer-p1__AlembicPlugin__p3-plugin-completeness-critic-consumer-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-completeness-critic-consumer-p1__AlembicPlugin__p3-plugin-completeness-critic-consumer-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-completeness-critic-consumer-p1__AlembicPlugin__p3-plugin-completeness-critic-consumer-t1",
+        "dispatchGroup": "p3-plugin-completeness-critic-consumer-p1",
+        "sentAt": "2026-06-25T11:17:48.991Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-completeness-critic-consumer-t1"
+    },
+    {
+      "targetTaskId": "p4-core-ollama-dead-embed-config-cleanup-t1",
+      "taskPackageId": "p4-core-ollama-dead-embed-config-cleanup-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, AlembicCore/AGENTS.md, this state root, and strict requirement design P4/R3. Declare AlembicCore identity. Implement only Core deletion of WorkspaceSettingsStore ALEMBIC_EMBED_* dead config surface (write-only/no consumer). Preserve normal AI provider env/settings, provider key secrets, OllamaEmbedProvider/vector exports, and all embedding runtime semantics. Do not add DashScope/OpenAI-compatible embedding provider, do not edit Plugin, and do not modify P1/P2/P3/P5 behavior. Commit to main locally and backfill commit hash, changed files, Node22 build:check/test/lint/grep outputs, and evidence that ALEMBIC_EMBED_* is gone from Core source while ALEMBIC_LOCAL_EMBEDDING_* remains Plugin-owned.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T11:38:49.088Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-core-ollama-dead-embed-config-cleanup-p1__AlembicCore__p4-core-ollama-dead-embed-config-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-ollama-dead-embed-config-cleanup-p1__AlembicCore__p4-core-ollama-dead-embed-config-cleanup-t1.json",
+        "deliveryRunId": "run-delivery-p4-core-ollama-dead-embed-config-cleanup-p1__AlembicCore__p4-core-ollama-dead-embed-config-cleanup-t1",
+        "dispatchGroup": "p4-core-ollama-dead-embed-config-cleanup-p1",
+        "sentAt": "2026-06-25T11:39:19.763Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-core-ollama-dead-embed-config-cleanup-t1"
+    },
+    {
+      "targetTaskId": "p4-plugin-ollama-local-embedding-enablement-t1",
+      "taskPackageId": "p4-plugin-ollama-local-embedding-enablement-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, AlembicPlugin/AGENTS.md, this state root, accepted P4 Core evidence, and strict requirement design P4/R3. Declare AlembicPlugin identity. Implement only Plugin P4: expose and/or wire the existing Ollama localEmbedding setup path so users can enable local semantic embeddings through `vector.localEmbedding` or `ALEMBIC_LOCAL_EMBEDDING_ENABLED`, with defaults `http://127.0.0.1:11434` and `qwen3-embedding`; if choosing auto-enable, it must be probe-backed and safe when Ollama is absent. Keep clean keyword fallback when disabled/unavailable, but when enabled and provider is available, `VectorService.getAvailability()` and submit/search indexing paths must surface `embed-provider-ready` and write semantic_memories. Remove or avoid any live `ALEMBIC_EMBED_*` config/docs/user-facing output; test-only negative assertions are acceptable only to prove the dead surface is ignored. Do not modify Core, P1 lifecycle sweep, P2 skill synthesis, P3 completeness critic, P5 recipe text validation, or alembic_plan contracts. Commit to main locally and backfill commit hash, changed files, Node22 build:check/lint/relevant tests, grep evidence for no live `ALEMBIC_EMBED_*`, and a fake or real Ollama availability/submit semantic indexing proof.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T11:48:46.921Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-plugin-ollama-local-embedding-enablement-p1__AlembicPlugin__p4-plugin-ollama-local-embedding-enablement-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-ollama-local-embedding-enablement-p1__AlembicPlugin__p4-plugin-ollama-local-embedding-enablement-t1.json",
+        "deliveryRunId": "run-delivery-p4-plugin-ollama-local-embedding-enablement-p1__AlembicPlugin__p4-plugin-ollama-local-embedding-enablement-t1",
+        "dispatchGroup": "p4-plugin-ollama-local-embedding-enablement-p1",
+        "sentAt": "2026-06-25T11:49:21.686Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-plugin-ollama-local-embedding-enablement-t1"
+    },
+    {
+      "targetTaskId": "p5-plugin-recipe-content-quality-polish-t1",
+      "taskPackageId": "p5-plugin-recipe-content-quality-polish-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, AlembicPlugin AGENTS.md, this state root, and requirement design P5. Declare AlembicPlugin window/repository identity. Implement P5 only: add/rewire submit validation and/or SOP/preSubmitChecklist so new recipe submissions require doClause/dontClause to be English imperative verb-leading clauses and require content/project-specific contrast to include consistent ✅ and ❌ examples. Add focused tests/fixtures proving invalid non-English/non-imperative do/dont and missing/inconsistent ✅/❌ are rejected or surfaced before acceptance, while valid project-specific English imperative clauses pass. Validate with Node 22: build:check, scoped biome/lint for changed files, relevant submit/recipe quality tests, and grep/evidence showing no P1-P4/Core/plan/embedding contract drift. Commit to main and backfill commit hash, changed files, command outputs, residual risks, and any old-data non-blocking note.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T12:07:01.699Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-plugin-recipe-content-quality-polish-p1__AlembicPlugin__p5-plugin-recipe-content-quality-polish-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-recipe-content-quality-polish-p1__AlembicPlugin__p5-plugin-recipe-content-quality-polish-t1.json",
+        "deliveryRunId": "run-delivery-p5-plugin-recipe-content-quality-polish-p1__AlembicPlugin__p5-plugin-recipe-content-quality-polish-t1",
+        "dispatchGroup": "p5-plugin-recipe-content-quality-polish-p1",
+        "sentAt": "2026-06-25T12:07:59.135Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-plugin-recipe-content-quality-polish-t1"
+    },
+    {
+      "targetTaskId": "test-bilidili-recipe-productization-e2e-t1",
+      "taskPackageId": "test-bilidili-recipe-productization-e2e-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, Test AGENTS.md, this state root, requirement design, and test card test-bilidili-recipe-productization-e2e.json. Declare Test window identity. Run a real BiliDili host-agent cold-start e2e with current accepted AlembicCore/AlembicPlugin main commits: alembic_plan draft+confirm -> alembic_bootstrap -> per-dimension alembic_submit_knowledge -> alembic_dimension_complete -> status/search/DB/file checks. Use test-safe data root or backup existing data before destructive rebuild. Evidence must cover lifecycle staging->active + lifecycle_transition_events, Skill files + skillCount, coverage/completeness critic behavior, Ollama semantic memory/search if enabled, and P5 quality on new Recipes. If host MCP cache/reload or Ollama availability blocks verification, stop with precise runtime/config evidence. Do not edit product code, push, tag, relax gates, reintroduce daemon, add providers, alter alembic_plan, or write real thread ids to tracked evidence. Backfill TargetResultEnvelope with raw transcripts/JSON paths, DB/file evidence, sampled Recipe source-ref verification, verdict per criterion, blockers/risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T12:32:42.029Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-test-bilidili-recipe-productization-e2e-p1__Test__test-bilidili-recipe-productization-e2e-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-bilidili-recipe-productization-e2e-p1__Test__test-bilidili-recipe-productization-e2e-t1.json",
+        "deliveryRunId": "run-delivery-test-bilidili-recipe-productization-e2e-p1__Test__test-bilidili-recipe-productization-e2e-t1",
+        "dispatchGroup": "test-bilidili-recipe-productization-e2e-p1",
+        "sentAt": "2026-06-25T12:33:34.377Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-test-bilidili-recipe-productization-e2e-t1"
+    },
+    {
+      "targetTaskId": "p6-core-productization-lifecycle-deadline-repair-t1",
+      "taskPackageId": "p6-core-productization-lifecycle-deadline-repair-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Fix Core P1 lifecycle deadline/transition blocker from final Test e2e: autoApprovable staging entries must get staging_deadline and promote via LifecycleStateMachine with transition events.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T12:54:54.608Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-core-productization-lifecycle-deadline-repair-p1__AlembicCore__p6-core-productization-lifecycle-deadline-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-core-productization-lifecycle-deadline-repair-p1__AlembicCore__p6-core-productization-lifecycle-deadline-repair-t1.json",
+        "deliveryRunId": "run-delivery-p6-core-productization-lifecycle-deadline-repair-p1__AlembicCore__p6-core-productization-lifecycle-deadline-repair-t1",
+        "dispatchGroup": "p6-core-productization-lifecycle-deadline-repair-p1",
+        "sentAt": "2026-06-25T12:55:50.790Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p6-core-productization-lifecycle-deadline-repair-t1-evidence-ref-repair"
+    },
+    {
+      "targetTaskId": "p6-plugin-productization-vector-runtime-repair-t1",
+      "taskPackageId": "p6-plugin-productization-vector-runtime-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Fix Plugin P4 local Ollama/vector runtime connection from final Test e2e, and verify tick-on-access sweep stays wired; enabled localEmbedding must reach submit/search/status and write semantic_memories.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T12:55:08.307Z",
+      "resultId": "tr-p6-plugin-productization-vector-runtime-repair-t1-evidence-ref-repair",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1.json",
+        "deliveryRunId": "run-delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1",
+        "dispatchGroup": "p6-plugin-productization-vector-runtime-repair-p1",
+        "sentAt": "2026-06-25T13:10:22.958Z",
+        "readbackOk": true
+      }
+    },
+    {
+      "targetTaskId": "test-bilidili-recipe-productization-e2e-after-p6-repairs-t1",
+      "taskPackageId": "test-bilidili-recipe-productization-e2e-after-p6-repairs-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, Test AGENTS.md, this state root, requirement design, accepted P6 Core/Plugin evidence, and prior blocked Test result. Declare Test window identity. Run a fresh BiliDili host-agent productization e2e after P6 repairs: refresh/rebuild local AlembicPlugin if needed with Node22, clear/backup old BiliDili test data as Test rules allow, then run plan/bootstrap/submit/dimension_complete/status/search/DB/file checks. Backfill TargetResultEnvelope with raw transcript/JSON paths, DB counts/queries, skill file evidence, lifecycle/event evidence, semantic search evidence, sampled Recipe source-ref verification, verdict per criterion, and blockers/risks. This is final acceptance evidence, not product implementation.",
+      "status": "accepted",
+      "createdAt": "2026-06-25T14:15:58.010Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-test-bilidili-recipe-productization-e2e-after-p6-repairs-p1__Test__test-bilidili-recipe-productization-e2e-after-p6-repairs-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-bilidili-recipe-productization-e2e-after-p6-repairs-p1__Test__test-bilidili-recipe-productization-e2e-after-p6-repairs-t1.json",
+        "deliveryRunId": "run-delivery-test-bilidili-recipe-productization-e2e-after-p6-repairs-p1__Test__test-bilidili-recipe-productization-e2e-after-p6-repairs-t1",
+        "dispatchGroup": "test-bilidili-recipe-productization-e2e-after-p6-repairs-p1",
+        "sentAt": "2026-06-25T14:16:29.552Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-test-bilidili-recipe-productization-e2e-after-p6-repairs-t1"
+    },
+    {
+      "targetTaskId": "p7-plugin-semantic-memories-fresh-run-persistence-repair-t1",
+      "taskPackageId": "p7-plugin-semantic-memories-fresh-run-persistence-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "读取父 AGENTS.md、AlembicPlugin/AGENTS.md、本 state root、原需求 Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md、Test 证据 Test/tmp/test-bilidili-recipe-productization-e2e-after-p6-repairs-evidence.md。声明 AlembicPlugin 仓库身份。修复 fresh-run 生成后 semantic_memories=0：定位当前 recipe submit/dimension_complete/index/sync 路径为何只生成 /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/context/index/vector_index.asvec 和 local-recipe-region-vector 语义检索，却没有把 accepted recipes 写入 semantic_memories。要求：1) 不放松 evidence/floor/P5 门禁；2) 不新增 provider、不回滚 Ollama、本地 vector route 保留；3) 不用语义检索可用替代 semantic_memories 条目；4) 正常链路自动/幂等写入 semantic_memories，清空数据根 fresh run 后也成立；5) 本地单测/集成验证 + build:check/node22 证据；6) 回填 commit hash、改动文件、命令输出、DB 查询证明 semantic_memories>0，以及 alembic_search 仍走 local-recipe-region-vector/semanticUsed=true 的 JSON 证据。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T14:36:22.776Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p7-plugin-semantic-memories-fresh-run-persistence-repair-p1__AlembicPlugin__p7-plugin-semantic-memories-fresh-run-persistence-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-plugin-semantic-memories-fresh-run-persistence-repair-p1__AlembicPlugin__p7-plugin-semantic-memories-fresh-run-persistence-repair-t1.json",
+        "deliveryRunId": "run-delivery-p7-plugin-semantic-memories-fresh-run-persistence-repair-p1__AlembicPlugin__p7-plugin-semantic-memories-fresh-run-persistence-repair-t1",
+        "dispatchGroup": "p7-plugin-semantic-memories-fresh-run-persistence-repair-p1",
+        "sentAt": "2026-06-25T14:36:48.422Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p7-plugin-semantic-memories-fresh-run-persistence-repair-t1"
+    },
+    {
+      "targetTaskId": "test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1",
+      "taskPackageId": "test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1",
+      "targetWindow": "Test",
+      "summary": "读取父 AGENTS.md、Test/AGENTS.md、本 state root、Design/docs/current/alembic-recipe-productization-optimization-2026-06-25.md、上次 Test 证据 Test/tmp/test-bilidili-recipe-productization-e2e-after-p6-repairs-evidence.md、P7 Plugin result .wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25/target-results/tr-p7-plugin-semantic-memories-fresh-run-persistence-repair-t1.json。声明 Test 窗口身份。使用 /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili 真实项目，清理/隔离旧生成数据后重新执行 productization e2e：plan→bootstrap→submit quality-gated recipes→dimension_complete→status/search/get。必须验证并回填原始证据：1) grade-A recipes 不停留全 staging，deadline/tick 后 active，lifecycle_transition_events 有记录；2) dimension_complete 生成 Alembic/skills/<dim>/SKILL.md 且 skillCount>0；3) sourceRefs/graphRefs 与 snippets 真实，P5 do/dont 英文祈使句与 ✅/❌ 一致；4) 本地 Ollama/qwen embedding 启用后 submit 不再 embed-provider-missing；5) sqlite semantic_memories > 0，且 source/type 包含 recipe-region-vector/recipe；6) alembic_search actualMode=semantic、route=local-recipe-region-vector、semanticUsed=true、vectorUsed=true；7) DB recipeCount/sourceRefs/skillCount 与状态输出一致。若当前 Codex MCP 会话缓存 stale，可用 fresh HostMcpServer 子进程或临时 Test 窗口执行并回调总控；不得把会话缓存问题误判为产品通过或失败。回填命令、JSON、DB 查询、报告路径、风险与是否满足最终归档条件。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T14:55:36.002Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1__Test__test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1__Test__test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1.json",
+        "deliveryRunId": "run-delivery-test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1__Test__test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1",
+        "dispatchGroup": "test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1",
+        "sentAt": "2026-06-25T14:55:58.258Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-core-staging-lifecycle-p1",
+        "p3-core-completeness-critic-primitives-p1",
+        "p4-core-ollama-dead-embed-config-cleanup-p1",
+        "p6-core-productization-lifecycle-deadline-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p1-core-staging-lifecycle-t1",
+        "p3-core-completeness-critic-primitives-t1",
+        "p4-core-ollama-dead-embed-config-cleanup-t1",
+        "p6-core-productization-lifecycle-deadline-repair-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-plugin-tick-on-access-staging-sweep-p1",
+        "p2-plugin-dimension-complete-skill-flow-p1",
+        "p3-plugin-completeness-critic-consumer-p1",
+        "p4-plugin-ollama-local-embedding-enablement-p1",
+        "p5-plugin-recipe-content-quality-polish-p1",
+        "p6-plugin-productization-vector-runtime-repair-p1",
+        "p7-plugin-semantic-memories-fresh-run-persistence-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p1-plugin-tick-on-access-staging-sweep-t1",
+        "p2-plugin-dimension-complete-skill-flow-t1",
+        "p3-plugin-completeness-critic-consumer-t1",
+        "p4-plugin-ollama-local-embedding-enablement-t1",
+        "p5-plugin-recipe-content-quality-polish-t1",
+        "p6-plugin-productization-vector-runtime-repair-t1",
+        "p7-plugin-semantic-memories-fresh-run-persistence-repair-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "test-bilidili-recipe-productization-e2e-p1",
+        "test-bilidili-recipe-productization-e2e-after-p6-repairs-p1",
+        "test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1"
+      ],
+      "targetTaskIds": [
+        "test-bilidili-recipe-productization-e2e-t1",
+        "test-bilidili-recipe-productization-e2e-after-p6-repairs-t1",
+        "test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-25T12:32:48.553Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1__Test__test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1",
+    "lastDeliveryRunId": "run-delivery-test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1__Test__test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1",
+    "lastDispatchGroup": "test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-p1",
+    "lastTargetTaskId": "test-bilidili-recipe-productization-e2e-after-p7-semantic-memory-repair-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-25T14:55:58.261Z"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-plugin-ollama-local-embedding-enablement-t1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "taskPackageId": "p4-plugin-ollama-local-embedding-enablement-p1",
+  "dispatchGroup": "p4-plugin-ollama-local-embedding-enablement-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p4-plugin-ollama-local-embedding-enablement-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin P4 consumer completed in commit 3ed999f. The Plugin now exposes the Ollama-only local embedding setup path through alembic_status.localEmbedding and setup/vector-index degradation hints, preserving ALEMBIC_LOCAL_EMBEDDING_ENABLED plus ALEMBIC_OLLAMA_ENDPOINT/ALEMBIC_OLLAMA_EMBED_MODEL and vector.localEmbedding. The production path still defaults disabled with keyword fallback; when enabled and a mocked pulled qwen3-embedding model is available, VectorModule injects the Core Ollama provider and VectorService.getAvailability() reports embed-provider-ready. Submit freshness output now has regression coverage proving ready semantic indexing surfaces without embed-provider-missing vector degradation. No Core changes and no non-Ollama provider were introduced.",
+  "evidenceRefs": [
+    "commit:3ed999f",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/vector/LocalEmbedding.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/injection/modules/VectorModule.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/runtime/status/StatusService.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/cli/SetupService.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/HostMcpServer.test.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/SubmitKnowledgeRouter.test.ts",
+    "git status --short: clean"
+  ],
+  "verification": [
+    "npx biome check lib/recipe-generation/vector/LocalEmbedding.ts lib/injection/modules/VectorModule.ts lib/runtime/status/StatusService.ts lib/cli/SetupService.ts test/unit/LocalEmbedding.test.ts test/unit/HostMcpServer.test.ts test/unit/SubmitKnowledgeRouter.test.ts -> passed; Checked 7 files; no fixes applied.",
+    "npx vitest run test/unit/LocalEmbedding.test.ts test/unit/SetupServiceVectorAvailability.test.ts test/unit/RecipeRegionVectorAvailability.test.ts test/unit/SubmitKnowledgeRouter.test.ts -> passed; 4 files, 32 tests.",
+    "npx vitest run test/unit/HostMcpServer.test.ts -t \"status inspects workspace and daemon state without ensuring daemon startup\" -> passed; status output includes localEmbedding default endpoint/model, ollama pull qwen3-embedding, ALEMBIC_LOCAL_EMBEDDING_ENABLED=1, and vector.localEmbedding.enabled=true.",
+    "npm run build:check -> passed; Core build used ../AlembicCore @ b950785405faa0e6ce05057a79ff981beedf9013; tsc --noEmit passed.",
+    "rg -n \"ALEMBIC_EMBED_\" lib docs plugins skills package.json -> no matches (exit 1), proving no live Plugin user-facing legacy embed env surface.",
+    "rg -n \"Claude Code|ALEMBIC_EMBED_\" changed P4 files -> no matches after removing stale localEmbedding comment/user path.",
+    "git diff --check -> passed with no output.",
+    "npm run lint -> failed on existing repo-wide Biome baseline unrelated to this P4 patch: scripts console warnings/errors, ClaudeCodeHostAdapter literal placeholder warning, plan-tool/tool-router/recipe-map/project-source-facts formatting/import-order issues. Changed files pass scoped Biome."
+  ],
+  "risks": [
+    "Full npm run lint remains blocked by pre-existing repository-wide Biome baseline outside the P4 changed files; scoped changed-file Biome, relevant tests, build:check, dead-env scan, and diff check passed.",
+    "No real local Ollama daemon was used in this target window; operational proof is offline/fake transport: mocked /api/tags with qwen3-embedding produces provider injection and embed-provider-ready availability, plus submit freshness semantic-indexing output without embed-provider-missing. A real Ollama/BiliDili smoke remains suitable for Test or user runtime verification.",
+    "Status localEmbedding does not auto-enable embedding; it reports config/env-derived state and setup commands. This preserves the requirement boundary that auto-enable is optional and must be probe-backed if implemented later."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-plugin-ollama-local-embedding-enablement-p1__AlembicPlugin__p4-plugin-ollama-local-embedding-enablement-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-ollama-local-embedding-enablement-p1__AlembicPlugin__p4-plugin-ollama-local-embedding-enablement-t1.json",
+    "deliveryRunId": "run-delivery-p4-plugin-ollama-local-embedding-enablement-p1__AlembicPlugin__p4-plugin-ollama-local-embedding-enablement-t1",
+    "dispatchGroup": "p4-plugin-ollama-local-embedding-enablement-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-ollama-local-embedding-enablement-p1__AlembicPlugin__p4-plugin-ollama-local-embedding-enablement-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+    "stateRevision": 28,
+    "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+    "taskPackageId": "p4-plugin-ollama-local-embedding-enablement-p1",
+    "targetTaskId": "p4-plugin-ollama-local-embedding-enablement-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p4-plugin-ollama-local-embedding-enablement-p1",
+    "resultId": "tr-p4-plugin-ollama-local-embedding-enablement-t1",
+    "createdAt": "2026-06-25T12:00:06.518Z"
+  },
+  "createdAt": "2026-06-25T12:00:06.518Z",
+  "stateRevisionObserved": 28,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

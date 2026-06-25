@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-plugin-tick-on-access-staging-sweep-t1",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "taskPackageId": "p1-plugin-tick-on-access-staging-sweep-p1",
+  "dispatchGroup": "p1-plugin-tick-on-access-staging-sweep-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p1-plugin-tick-on-access-staging-sweep-t1",
+  "status": "completed",
+  "summary": "Implemented daemon-less tick-on-access staging sweep in AlembicPlugin. The Host MCP route now triggers a throttled, non-throwing StagingManager.checkAndPromote sweep for submit_knowledge, dimension_complete, default status, and rescan after initialized-workspace preflight; runtime status diagnostics remain read-only. StagingManager DI now receives LifecycleStateMachine, and tests prove due auto-approvable staging Recipes promote to active with lifecycle_transition_events persistence.",
+  "evidenceRefs": [
+    "AlembicPlugin commit 0bea3c0",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/.wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25/target-results/p1-plugin-tick-on-access-staging-sweep-t1-evidence.md"
+  ],
+  "verification": [
+    "npx biome check lib/runtime/mcp/host/staging-access-sweep.ts lib/runtime/mcp/HostMcpServer.ts lib/runtime/mcp/host/embedded-executor.ts lib/injection/modules/KnowledgeModule.ts test/unit/HostMcpServer.test.ts test/unit/StagingAccessSweep.test.ts => passed",
+    "npm run build:check => passed; Core build used ../AlembicCore @ 777c5b795784aa41bb80845dee3f9cd9ef9c60c1",
+    "git diff --check => passed",
+    "npx vitest run --config vitest.unit.config.ts test/unit/StagingAccessSweep.test.ts test/unit/HostMcpServer.test.ts -t \"StagingAccessSweep|status access runs daemon-less staging sweep|Codex host-agent bootstrap runs in the Plugin without the daemon MCP bridge|Codex bootstrap job runs in-process via local JobStore without the daemon|status recommends bootstrap after initialization|status inspects workspace and daemon state without ensuring daemon startup|Codex job status reads local JobStore without starting daemon\" => passed (8 tests)"
+  ],
+  "risks": [
+    "alembic_code_guard surface failed twice with CODEX_MCP_ERROR/unrecognized key \"data\"; no code findings were produced.",
+    "Full HostMcpServer suite still has unrelated current expectation drift (alembic_plan tool visibility, ProjectScope prime validation, runtime-control/sourceOfTruth, search structuredContent/project, resident job-status expectations). Focused P1 coverage and build are green."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-plugin-tick-on-access-staging-sweep-p1__AlembicPlugin__p1-plugin-tick-on-access-staging-sweep-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-tick-on-access-staging-sweep-p1__AlembicPlugin__p1-plugin-tick-on-access-staging-sweep-t1.json",
+    "deliveryRunId": "run-delivery-p1-plugin-tick-on-access-staging-sweep-p1__AlembicPlugin__p1-plugin-tick-on-access-staging-sweep-t1",
+    "dispatchGroup": "p1-plugin-tick-on-access-staging-sweep-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-tick-on-access-staging-sweep-p1__AlembicPlugin__p1-plugin-tick-on-access-staging-sweep-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+    "stateRevision": 8,
+    "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+    "taskPackageId": "p1-plugin-tick-on-access-staging-sweep-p1",
+    "targetTaskId": "p1-plugin-tick-on-access-staging-sweep-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p1-plugin-tick-on-access-staging-sweep-p1",
+    "resultId": "tr-p1-plugin-tick-on-access-staging-sweep-t1",
+    "createdAt": "2026-06-25T10:34:58.985Z"
+  },
+  "createdAt": "2026-06-25T10:34:58.985Z",
+  "stateRevisionObserved": 8,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

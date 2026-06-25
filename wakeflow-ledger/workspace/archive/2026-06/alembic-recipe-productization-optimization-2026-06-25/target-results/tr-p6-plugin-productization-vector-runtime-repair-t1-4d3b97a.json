@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p6-plugin-productization-vector-runtime-repair-t1-4d3b97a",
+  "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+  "taskPackageId": "p6-plugin-productization-vector-runtime-repair-p1",
+  "dispatchGroup": "p6-plugin-productization-vector-runtime-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p6-plugin-productization-vector-runtime-repair-t1",
+  "status": "completed",
+  "summary": "Supplemental final closeout for AlembicPlugin P6 after local commit. Commit 4d3b97a12c594f7c01ae25cb5bcb923dc67d41f4 fixes the vector runtime/config path, batches Recipe semantic-region vector sync, writes recipe semantic_memories, and validates BiliDili semantic search through HostMcpServer.",
+  "evidenceRefs": [
+    "AlembicPlugin commit 4d3b97a12c594f7c01ae25cb5bcb923dc67d41f4",
+    "Changed files: lib/injection/ServiceContainer.ts; lib/recipe-generation/host-agent-workflows/recipe-region-vector.ts; lib/runtime/mcp/handlers/search.ts; scripts/rebuild-local-knowledge-indexes.mjs; test/unit/ServiceContainerRuntimeConfig.test.ts; test/unit/RecipeRegionVectorAvailability.test.ts; test/unit/SearchHandlerResidentSearch.test.ts",
+    "BiliDili rebuild probe: ok=true; vectorAvailability.reason=embed-provider-ready; syncResult.status=completed; embedded=335; upserted=335; semanticMemories.total=40; sourceRefs.active=161; vectorIndex.recipeRegionIds=335",
+    "sqlite evidence: /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db has semantic_memories=40 and recipe-region-vector|recipe=40",
+    "HostMcpServer alembic_search semantic probe: ok=true status=ready actualMode=semantic route=local-recipe-region-vector semanticUsed=true vectorUsed=true returnedCount=5; item summary includes BiliDili source refs under Packages/AOXFoundationKit/...",
+    "Public tools probe: scripts/verify-codex-plugin-tools-local.mjs ok=true for host/status, host/status-knowledge, host/status-runtime, host/prime, host/search"
+  ],
+  "verification": [
+    "npx biome check changed TS/MJS/test files -> passed",
+    "npx vitest run ServiceContainerRuntimeConfig, LocalEmbedding, RecipeRegionVectorAvailability, SearchHandlerResidentSearch, StagingAccessSweep, SubmitKnowledgeRouter, SetupServiceVectorAvailability -> 7 files, 69 tests passed",
+    "npm run build:check -> passed using ../AlembicCore @ 9db27ba4201b8be53ea629e79c8edb0cf91e9597",
+    "npm run build -> passed and refreshed dist",
+    "node scripts/rebuild-local-knowledge-indexes.mjs --project-root /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili --enable-local-embedding --ollama-model qwen3-embedding:0.6b --ollama-endpoint http://127.0.0.1:11434 --timeout-ms 180000 --json -> ok=true; syncResult.status=completed; embedded/upserted=335; semanticMemories.total=40",
+    "node scripts/verify-codex-plugin-tools-local.mjs --project-root /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili --graph-file Package.swift --case host/prime --case host/search --case host/status --case host/status-knowledge --case host/status-runtime --skip-handler-fixture --timeout-ms 60000 --allow-knowledge-skip --json -> ok=true",
+    "HostMcpServer.handleToolCall('alembic_search', {mode:'semantic'}) with local Ollama -> ok=true, actualMode=semantic, route=local-recipe-region-vector, vectorUsed=true, returned useful Recipe items",
+    "rg -n \"ALEMBIC_EMBED_\" lib scripts test plugins skills package.json docs -> no matches",
+    "git diff --check -> passed before commit; git status --short -> clean after commit",
+    "alembic_code_guard attempted on changed files -> failed with tool internal schema error unrecognized_keys:data, no guard conclusion produced"
+  ],
+  "risks": [
+    "Primary residual: alembic_code_guard is blocked by Alembic MCP internal schema error unrecognized_keys:data; it is recorded as failed, not passed.",
+    "Host MCP semantic probes need unsandboxed/local network access to Ollama at 127.0.0.1:11434; sandboxed Node reports local embedding unavailable.",
+    "Search source refs are currently in item summary/region evidence rather than top-level sourceRefs; the actual returned summary includes BiliDili file refs and line ranges."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1.json",
+    "deliveryRunId": "run-delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1",
+    "dispatchGroup": "p6-plugin-productization-vector-runtime-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-plugin-productization-vector-runtime-repair-p1__AlembicPlugin__p6-plugin-productization-vector-runtime-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-productization-optimization-2026-06-25",
+    "stateRevision": 43,
+    "demandKey": "alembic-recipe-productization-optimization-2026-06-25",
+    "taskPackageId": "p6-plugin-productization-vector-runtime-repair-p1",
+    "targetTaskId": "p6-plugin-productization-vector-runtime-repair-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p6-plugin-productization-vector-runtime-repair-p1",
+    "resultId": "tr-p6-plugin-productization-vector-runtime-repair-t1-4d3b97a",
+    "createdAt": "2026-06-25T14:07:27.518Z"
+  },
+  "createdAt": "2026-06-25T14:07:27.518Z",
+  "stateRevisionObserved": 43,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}
