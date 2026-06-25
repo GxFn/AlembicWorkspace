@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-core-proposal-reentrancy-fix",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "summary": "P3-Core-Fix（F-A，用户裁断 Option A）：修 ProposalExecutor dual-track re-entrancy——#executeUpdate 的 active→evolving transition 发信号被 init subscribeToSignals 订阅者 re-enter 同一 still-observing proposal→二次 active→evolving→'evolving→evolving' invalid→误标 rejected（Test 真实运行时 + 控制器源码确认 + 单 proposal 隔离复现）。改法=re-entrancy 安全(推荐 #inFlight Set 守卫：执行前加 id、finally 移除，#onSignal/#evaluateOnSignal/checkAndExecute 跳过 in-flight)。不变量：合法信号驱动仍生效(只挡已在执行中的二次进入)、首次执行照常跑门禁+transition 到正确终态、判定门禁/transition Guard/cap 有界/subscribeToSignals 幂等零改、不重引 daemon。验收 Node22 build:check+re-entrancy 回归(UPDATE 终态 executed 非误标 rejected/只执行一次/合法信号仍驱动)+门禁保留回归+全量无回归+npm run build emit dist，提交 main，path-like evidenceRefs。完成后控制器重跑 Test e2e 重验 ④。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25/task-packages/p3-core-proposal-reentrancy-fix.md",
+  "createdAt": "2026-06-25T18:51:26.284Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-core-proposal-reentrancy-fix",
+      "taskPackageId": "p3-core-proposal-reentrancy-fix",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore F-A 修复：ProposalExecutor re-entrancy 安全(#inFlight 守卫)，UPDATE proposal 不再被自身信号二次执行误标 rejected、真正 executed；判定门禁/transition/cap/幂等零改；Node22 build:check+re-entrancy 回归+全量无回归+emit dist，提交 main。",
+      "status": "pending",
+      "createdAt": "2026-06-25T18:51:26.284Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

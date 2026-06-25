@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p2-core-checktimeouts-cap",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "summary": "P2-Core checkTimeouts 有界化（producer）：LifecycleStateMachine.checkTimeouts(cap?) 加可选 cap，cap 时走带 limit 查询(复用 P1 findAllByLifecycles limit)、推荐跨状态共享 remaining 预算使单 tick 扫描+迁移 ≤cap、最旧优先、跨 tick 排空；未给 cap 仍无界。硬不变量：checkTimeouts 绝不碰 staging(仅 evolving→active/pending·decaying→deprecated)、迁移仍经 transition(Guard+lifecycle_transition_events)、阈值/目标态/判定零改、不重引 daemon、不接线 sweep 驱动(P2-Plugin)/不动 proposal(P3)。验收 Node22 build:check+新单测(evolving 恢复记事件/pending·decaying GC/staging 不碰/cap 生效带 LIMIT/无 cap 无界)+npm run build emit dist+全量无回归，提交 main，path-like evidenceRefs。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25/task-packages/p2-core-checktimeouts-cap.md",
+  "createdAt": "2026-06-25T16:37:18.439Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p2-core-checktimeouts",
+      "taskPackageId": "p2-core-checktimeouts-cap",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore P2：checkTimeouts(cap?) 有界(带 limit 查询/最旧优先/≤cap-per-tick/跨 tick 排空)、staging 不碰、迁移经 transition 记事件、无 cap 无界；Node22 验收+npm run build emit dist，提交 main。",
+      "status": "pending",
+      "createdAt": "2026-06-25T16:37:18.439Z"
+    }
+  ]
+}

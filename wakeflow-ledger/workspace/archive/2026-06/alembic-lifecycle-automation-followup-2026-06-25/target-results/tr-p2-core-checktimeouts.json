@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-core-checktimeouts",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "taskPackageId": "p2-core-checktimeouts-cap",
+  "dispatchGroup": "p2-core-checktimeouts",
+  "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p2-core-checktimeouts",
+  "status": "completed",
+  "summary": "P2-Core checkTimeouts 有界化完成（纯 additive，producer 侧）。checkTimeouts(cap?) 用「跨 timeout 状态共享 remaining 预算」：cap 给定时 remaining=cap，按 TIMEOUT_MS 顺序(evolving→decaying→pending)每 state 走 findAllByLifecycles([state], remaining)（复用 P1 最旧优先 createdAt 升序 + LIMIT），按实际扫描行数递减 remaining、<=0 即停 → 单 tick 扫描行数+迁移数 ≤cap、最旧/最积压优先、跨多次 tick 排空；选 total-budget(跨状态共享)语义而非 per-state cap。cap===undefined → remaining 保持 undefined、每 state 透传 undefined limit = 现行无界全表(字节一致契约)。硬不变量守住：staging 仍因不在 TIMEOUT_TARGET 被跳过且从不被查询(与 checkAndPromote 不相交)；迁移全部经 transition()(Guard + lifecycle_transition_events)；TIMEOUT_MS/TIMEOUT_TARGET 阈值/目标态/evidence/trigger 零改(只加有界、不改「何时迁移」)；未重引 daemon/scheduler、未接线 sweep 驱动(P2-Plugin)、未动 proposal 执行(P3)。cap 默认值不在 Core 设(P2-Plugin 用 P1 的 resolveStagingAccessSweepCap 共享 cap)。已 npm run build 重生 dist 供 P2-Plugin 消费(dist gitignored、未提交)；commit 仅含 src+test，落 main。",
+  "evidenceRefs": [
+    "AlembicCore/src/service/evolution/LifecycleStateMachine.ts",
+    "AlembicCore/test/LifecycleStateMachineTimeouts.test.ts"
+  ],
+  "verification": [
+    "node -v: v22.22.1 (.nvmrc=22)",
+    "npm run build:check: green (tsc --noEmit, 无错误输出)",
+    "npm run build: green (node scripts/clean-dist.mjs && tsc -p tsconfig.json 重生 dist；dist gitignored 未提交)",
+    "npx vitest run test/LifecycleStateMachineTimeouts.test.ts: 1 file / 5 tests passed",
+    "npm run test 全量: 130 files / 1329 tests passed，failed-set 为空（无回归；对 P1 基线 129/1324 为 +1 file/+5 tests）",
+    "npm run lint (Biome): Checked 621 files, no fixes — clean",
+    "git diff --check: 无空白错误",
+    "commit b557b1088d59f779715f5e28c0fdb91103e65819 (main)；改动文件: src/service/evolution/LifecycleStateMachine.ts, test/LifecycleStateMachineTimeouts.test.ts (2 files +230/-3)"
+  ],
+  "risks": [
+    "checkTimeouts 的「卡死时长」判定沿用现状链路：enteredAt(stats.evolvingStartedAt 等 meta 键)因 Stats 值对象固定 schema、toJSON 不保留临时键而恒不持久化 → 实际恒回退到 #getRecipeAge = now(ms) - updatedAt。这是 P2 之前的现状行为；P2 仅加 cap 有界、未改判定/迁移语义，未修该 enteredAt/units 现状（属另需求、需 Design 确认，不在本次擅自扩大）。",
+    "cap 为 total-budget 跨状态共享：靠前状态(evolving)积压多时先吃预算，靠后状态(pending/decaying)本 tick 可能 0 处理；但 createdAt 最旧优先 + 跨 tick 仍保证最终排空、不饿死。若 P2-Plugin 期望 per-state 公平配额，须经 Design 明确后另调整。",
+    "下游接入：P2-Plugin 经 @alembic/core(file:../AlembicCore live symlink，已 npm run build 重生 dist) 消费 checkTimeouts(cap?)，在 sweep 接线驱动并用 P1 的 resolveStagingAccessSweepCap 共享 cap；Core 侧不设 cap 默认(cap===undefined 视为无界)。",
+    "本提交仅 P2-Core producer；P2-Plugin(sweep 接线)/P3(孤儿 proposal 执行驱动)/P4(vendor 快照)未触，按顺序硬性 P1✅→P2→P3→P4 由控制器后续派发。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-core-checktimeouts__AlembicCore__p2-core-checktimeouts",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-checktimeouts__AlembicCore__p2-core-checktimeouts.json",
+    "deliveryRunId": "run-delivery-p2-core-checktimeouts__AlembicCore__p2-core-checktimeouts",
+    "dispatchGroup": "p2-core-checktimeouts",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-checktimeouts__AlembicCore__p2-core-checktimeouts.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+    "stateRevision": 12,
+    "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+    "taskPackageId": "p2-core-checktimeouts-cap",
+    "targetTaskId": "p2-core-checktimeouts",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p2-core-checktimeouts",
+    "resultId": "tr-p2-core-checktimeouts",
+    "createdAt": "2026-06-25T16:48:25.646Z"
+  },
+  "createdAt": "2026-06-25T16:48:25.646Z",
+  "stateRevisionObserved": 12,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

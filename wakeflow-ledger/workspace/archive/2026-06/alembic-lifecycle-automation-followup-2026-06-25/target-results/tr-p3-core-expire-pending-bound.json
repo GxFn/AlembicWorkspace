@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-core-expire-pending-bound",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "taskPackageId": "p3-core-expire-pending-bound",
+  "dispatchGroup": "p3-core-expire-pending-bound",
+  "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p3-core-expire-pending-bound",
+  "status": "completed",
+  "summary": "P3-Core-2（Option A）完成：界定 #expireOldPending 的 pending GC，使整个 capped checkAndExecute tick 严格有界（提交 main 62f0b4b）。实现：checkAndExecute(cap) 跨 observing + pending GC 共享单一 remaining 预算（与 P2-Core checkTimeouts 的 total-budget 一致）——remaining=cap，observing 查询限 remaining（最旧优先 oldestFirst+LIMIT）、处理后按实际扫描行数递减 remaining；#expireOldPending(result, remaining) 收剩余预算作 limit：limit 给定→find({status:'pending', limit, oldestFirst:true})，limit===undefined→find({status:'pending'})。故单 capped tick 跨 observing+pending 总扫描+写 ≤cap、最旧优先、跨 tick 排空不饿死；cap===undefined 两查询均维持无界+默认 desc（字节一致契约）。硬不变量守住：limit 只限「扫描多少条」绝不改过期判定——EvolutionPolicy.shouldExpirePending/markExpired/observing 侧 evaluateUpdate·evaluateDeprecate·§9.1·transition Guard 全保留（有单测证明未到期 pending 在 cap 下仍不被 markExpired）；未重引 daemon、未接线 sweep/init 驱动（P3-Plugin）、未改 observing 侧 P3-Core 既有 cap 行为。已 npm run build 重生 dist 供 P3-Plugin 消费（dist gitignored、未提交）；commit 仅含 src+test。本任务源于 P3-Core 回填中我标注的 #expireOldPending 无界风险，经控制器 intake + 用户裁断 Option A 授权。",
+  "evidenceRefs": [
+    "AlembicCore/src/service/evolution/ProposalExecutor.ts",
+    "AlembicCore/test/ProposalExecutorBounding.test.ts"
+  ],
+  "verification": [
+    "node -v: v22.22.1 (.nvmrc=22)",
+    "npm run build:check: green (tsc --noEmit, 无错误输出)",
+    "npm run build: green (node scripts/clean-dist.mjs && tsc -p tsconfig.json 重生 dist；dist gitignored 未提交)",
+    "npx vitest run test/ProposalExecutorBounding.test.ts: 1 file / 10 tests passed（原 P3 5 用例 + 新增 P3-Core-2 5 用例）",
+    "npm run test 全量: 131 files / 1340 tests passed，failed-set 为空（无回归；对 P3-Core 基线 131/1335 为 +5 tests）",
+    "npm run lint (Biome): Checked 622 files, no fixes — clean",
+    "git diff --check: 无空白错误",
+    "commit 62f0b4b392ada66e8678d5eeb8a3e3b4c10c2c9d (main)；改动文件: src/service/evolution/ProposalExecutor.ts, test/ProposalExecutorBounding.test.ts (2 files +124/-6)"
+  ],
+  "risks": [
+    "选用 shared-remaining（跨 observing+pending 单一预算）语义，达成完成定义「整 capped checkAndExecute 单 tick 总扫描≤cap」最严格解读：靠前的 observing 积压多时先吃预算，pending GC 本 tick 可能 0 处理；createdAt/proposedAt 最旧优先 + 跨 tick 仍保证最终排空不饿死。若 P3-Plugin 期望 observing与pending 各自独立≤cap配额，需 Design 明确后另调整。",
+    "remaining 恢减按 observing 查询实际返回(扫描)行数，非逐个 SQL 写次；单条 observing update 可能触发多次 transition 写。「≤cap」指单 tick 扫描/处理的 proposal 条数≤cap（与 P2-Core checkTimeouts 一致），非底层 DB 写次数。",
+    "下游接入：P3-Plugin 经 @alembic/core(file:../AlembicCore live symlink，已 npm run build 重生 dist) 消费已完全有界的 checkAndExecute(cap?)，在 init 一次性 subscribeToSignals + sweep 兽底调 checkAndExecute(cap)、用共享 cap；Core 侧不设 cap 默认(cap===undefined 视为无界)。",
+    "本提交为 P3-Core producer 追加（Option A）；至此 P3-Core 侧 checkAndExecute 已整 tick 有界。P3-Plugin(subscribe+sweep 兽底)/P4(vendor 快照) 未触，由控制器后续派发。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-core-expire-pending-bound__AlembicCore__p3-core-expire-pending-bound",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-expire-pending-bound__AlembicCore__p3-core-expire-pending-bound.json",
+    "deliveryRunId": "run-delivery-p3-core-expire-pending-bound__AlembicCore__p3-core-expire-pending-bound",
+    "dispatchGroup": "p3-core-expire-pending-bound",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-expire-pending-bound__AlembicCore__p3-core-expire-pending-bound.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+    "stateRevision": 24,
+    "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+    "taskPackageId": "p3-core-expire-pending-bound",
+    "targetTaskId": "p3-core-expire-pending-bound",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p3-core-expire-pending-bound",
+    "resultId": "tr-p3-core-expire-pending-bound",
+    "createdAt": "2026-06-25T17:39:54.449Z"
+  },
+  "createdAt": "2026-06-25T17:39:54.449Z",
+  "stateRevisionObserved": 24,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

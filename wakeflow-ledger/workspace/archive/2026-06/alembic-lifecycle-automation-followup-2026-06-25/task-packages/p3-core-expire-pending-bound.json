@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-core-expire-pending-bound",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "summary": "P3-Core-2 界定 #expireOldPending（用户裁断 Option A，producer，P3-Plugin 前置）：让 capped checkAndExecute 把有界传导到 #expireOldPending 的 pending GC 查询(find({status:'pending'})→limit+oldestFirst:true 复用 P3-Core)。推荐跨 observing+pending 共享单一 remaining 预算(同 P2-Core checkTimeouts total-budget)使整个 capped checkAndExecute 单 tick ≤cap；cap===undefined 两查询均维持无界字节一致。硬不变量：判定门禁完全不动(shouldExpirePending/markExpired/evaluateUpdate/evaluateDeprecate/§9.1/transition 全保留，cap 只限处理多少)、不重引 daemon、不接线 sweep/init(P3-Plugin)。验收 Node22 build:check+新单测(pending ≤budget 最旧优先排空/带 LIMIT/总≤cap/无 cap 无界/门禁仍拦)+npm run build emit dist+全量无回归，提交 main，path-like evidenceRefs。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25/task-packages/p3-core-expire-pending-bound.md",
+  "createdAt": "2026-06-25T17:33:04.777Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-core-expire-pending-bound",
+      "taskPackageId": "p3-core-expire-pending-bound",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore P3-Core-2：capped checkAndExecute 的 pending GC 亦有界(limit+最旧优先、推荐共享 remaining 使总≤cap)、cap undefined 无界字节一致、门禁不动；Node22 验收+npm run build emit dist，提交 main。",
+      "status": "pending",
+      "createdAt": "2026-06-25T17:33:04.777Z"
+    }
+  ]
+}

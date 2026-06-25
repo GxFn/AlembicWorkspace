@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-core-checkandexecute-cap",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "summary": "P3-Core checkAndExecute 有界化（producer，最后 Core 变更）：ProposalExecutor.checkAndExecute(cap?) 加可选 cap，cap 时走带 limit 查询(复用 P1 ProposalRepository.find limit)+最旧优先(防饿死，推荐给 find 加 additive oldestFirst/order 选项、默认仍 desc)、单 tick≤cap、跨 tick 排空；未给 cap 无界。subscribeToSignals(:85)已幂等无需改。硬不变量：判定门禁完全不动(evaluateUpdate 需 usage/evaluateDeprecate recovered→reject/§9.1/transition Guard 全保留，cap 只限处理多少不改是否通过，须测试证不合格仍 reject)、proposal 执行不绕 transition Guard、不重引 daemon、不接线 sweep/init 驱动(P3-Plugin)。验收 Node22 build:check+新单测(≤cap 最旧优先排空/带 LIMIT/门禁仍拦/update·deprecate 真实流转记事件边/无 cap 无界)+npm run build emit dist+全量无回归，提交 main，path-like evidenceRefs。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25/task-packages/p3-core-checkandexecute-cap.md",
+  "createdAt": "2026-06-25T17:08:51.561Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-core-checkandexecute",
+      "taskPackageId": "p3-core-checkandexecute-cap",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore P3：checkAndExecute(cap?) 有界(带 limit+最旧优先/≤cap/跨 tick 排空)、门禁全保留(不合格仍 reject)、流转经 transition、无 cap 无界、subscribeToSignals 不改；Node22 验收+npm run build emit dist，提交 main。",
+      "status": "pending",
+      "createdAt": "2026-06-25T17:08:51.561Z"
+    }
+  ]
+}

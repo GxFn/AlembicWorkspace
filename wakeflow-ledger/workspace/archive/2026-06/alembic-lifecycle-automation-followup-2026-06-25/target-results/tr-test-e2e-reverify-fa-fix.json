@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-test-e2e-reverify-fa-fix",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "taskPackageId": "test-e2e-reverify-fa-fix",
+  "dispatchGroup": "test-e2e-reverify-fa-fix",
+  "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+  "targetWindow": "Test",
+  "targetTaskId": "test-e2e-reverify-fa-fix",
+  "status": "completed",
+  "summary": "Re-verify (rework round 2) of F-A fix on real runtime. Fix under test: AlembicCore d49fc05 (ProposalExecutor #inFlight Set + #runWithReentrancyGuard wrapping #executeUpdate/#executeDeprecate in BOTH the sweep path #processExpiredProposal and the signal path #evaluateOnSignal; #onSignal filter + checkAndExecute loop skip in-flight ids) on top of accepted 62f0b4b; AlembicPlugin unchanged 799ceac consumes it via live symlink. Confirmed the fix is in the dist the runtime loads (cache @alembic/core->d49fc05, ProposalExecutor.js has inFlight x6). Method identical to round 1 (real cc bootstrap->stdio MCP, ALEMBIC_HOME sandbox, raw backdated seed, real alembic_status tick fires staging-access-sweep, shared cap=3, 6 ticks + isolated clean-update). VERDICT: PASS. (4) F-A FIXED: qualified UPDATE proposals now reach status=executed with a single clean active->evolving->active cycle and resolution 'patch skipped, reverted to active' — prop-up-ok (main seed) AND prop-up-clean (the exact isolated single-proposal scenario that was 100% reproducibly broken in round 1) both -> executed; ZERO proposals carry an 'evolving -> evolving' resolution (round 1 had it). observing->executed flow correct, still bounded (tick1 processed 3 observing -> 1 executed + 2 rejected). (1)(2)(3)(5)(6) NO REGRESSION: per-tick staging/timeout transitions byte-identical to round 1 (promote 3/3/1 stg-01..07 oldest-first; evo-01/02 recovery trigger=timeout-recovery; dec-01/pnd-01/pnd-02 GC->deprecated; pnd-fresh stays pending; cap bounded; gates: no-usage reject, FP reject, deprecate gate-reject, prop-pend-fresh stays pending while prop-pend-old expired). F-B (deprecate execute reachability / deprecated_by edge, edges=0) confirmed OUT-OF-SCOPE per user ruling A->Design; deprecate gate-reject of an un-decayed recipe is correct, not a failure. Invariants: non-resident (no leaked sandbox process, clean exit, no daemon); isolation (sandbox workspace 2b74bdf3 absent from real ~/.asd, 4 real projects untouched); Test changed NO product code (AlembicCore d49fc05 / AlembicPlugin 799ceac clean). Completion definition met: (4) update->executed + (1)(2)(3)(5)(6) no regression. With F-B deferred to Design, the daemon-less lifecycle/proposal automation is e2e-verified.",
+  "evidenceRefs": [
+    "tmp/lifecycle-e2e/evidence-r2/REVERIFY-FA-FIX-REPORT.md",
+    "tmp/lifecycle-e2e/evidence-r2/ANALYSIS.txt",
+    "tmp/lifecycle-e2e/evidence-r2/snap-00-pre.json",
+    "tmp/lifecycle-e2e/evidence-r2/snap-1.json",
+    "tmp/lifecycle-e2e/evidence-r2/snap-clean.json",
+    "tmp/lifecycle-e2e/evidence-r2/tick-clean-raw.json",
+    "tmp/lifecycle-e2e/run-e2e-r2.sh"
+  ],
+  "verification": [
+    "④ F-A FIX — PASS: prop-up-ok [update] -> executed ('patch skipped, reverted to active'), A_up_ok active->evolving(proposal-attach)->active(content-patch-complete) once, ends active; prop-up-clean (isolated single-proposal F-A scenario) -> executed; mis-rejected 'evolving -> evolving' count = 0 (round 1 = 1). (evidence-r2/ANALYSIS.txt, snap-clean.json, tick-clean-raw.json)",
+    "① staging — PASS no regression: promote 3/3/1 over 3 ticks [stg-01..07] createdAt-oldest-first; stg-noauto(autoApprovable=0)+stg-future(deadline future) never promoted; checkTimeouts produced no staging transition (evidence-r2/ANALYSIS.txt)",
+    "② evolving recovery — PASS no regression: evo-01,evo-02 (>7d) -> active tick1, trigger=timeout-recovery",
+    "③ pending/decaying GC — PASS no regression: dec-01(decaying),pnd-01,pnd-02 (>30d) -> deprecated; pnd-fresh(5d) stayed pending",
+    "⑤ per-sweep cap — PASS no regression: promote<=3/tick, checkTimeouts shared-budget<=3 scanned (tick1 2evolving+1decaying, tick2 pending), observing<=3/tick; multi-tick drain",
+    "⑥ gates — PASS no regression: prop-up-bad rejected 'no usage during observation'; prop-up-fp rejected 'FP rate too high: 50%'; prop-dep-ok/rec rejected 'decay slowed' (gate refused); prop-pend-fresh(5d<14d) stayed pending, prop-pend-old(20d>14d) expired",
+    "F-B out-of-scope (user ruling A): deprecate gate-rejects on decayScore=50 default (not seedable via stats), deprecated_by edges=0 — acceptable, not a failure; reachability -> Design",
+    "Invariants — non-resident (no leaked sandbox runtime process post-run, clean exit); isolation (sandbox 2b74bdf3 absent from real ~/.asd, 4 real projects untouched); Test changed no product code (AlembicCore d49fc05 / AlembicPlugin 799ceac clean)"
+  ],
+  "risks": [
+    "F-B remains deferred to Design (user ruling A): deprecate-proposal execution + deprecated_by edge are not reachable from seeded state because decayScore isn't preserved through KnowledgeEntry stats canonicalization; confirmed out-of-scope for this requirement, gate-reject is correct behavior.",
+    "deprecated_by edge path (knowledge_edges) therefore remains unexercised by e2e; if a future requirement needs it proven, a heavier run with a real DecayDetector pass is required.",
+    "Fix scope is re-entrancy-only (no gate/transition-Guard/state-semantics change), verified by no-regression on the 5 other checks; broader concurrency (multiple distinct proposals on one entry) not specifically stressed beyond the seeded set."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-test-e2e-reverify-fa-fix__Test__test-e2e-reverify-fa-fix",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-e2e-reverify-fa-fix__Test__test-e2e-reverify-fa-fix.json",
+    "deliveryRunId": "run-delivery-test-e2e-reverify-fa-fix__Test__test-e2e-reverify-fa-fix",
+    "dispatchGroup": "test-e2e-reverify-fa-fix",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-e2e-reverify-fa-fix__Test__test-e2e-reverify-fa-fix.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+    "stateRevision": 40,
+    "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+    "taskPackageId": "test-e2e-reverify-fa-fix",
+    "targetTaskId": "test-e2e-reverify-fa-fix",
+    "targetWindow": "Test",
+    "dispatchGroup": "test-e2e-reverify-fa-fix",
+    "resultId": "tr-test-e2e-reverify-fa-fix",
+    "createdAt": "2026-06-25T19:18:38.958Z"
+  },
+  "createdAt": "2026-06-25T19:18:38.958Z",
+  "stateRevisionObserved": 40,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

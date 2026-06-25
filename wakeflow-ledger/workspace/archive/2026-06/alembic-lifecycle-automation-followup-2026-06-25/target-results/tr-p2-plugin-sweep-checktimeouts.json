@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-sweep-checktimeouts",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "taskPackageId": "p2-plugin-sweep-checktimeouts",
+  "dispatchGroup": "p2-plugin-sweep-checktimeouts",
+  "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-sweep-checktimeouts",
+  "status": "completed",
+  "summary": "P2-Plugin sweep 接线 checkTimeouts 完成（consumer 侧，提交 main 2748968）。lib/runtime/mcp/host/staging-access-sweep.ts 的 runSweep 在 checkAndPromote(cap) 之后、同一 tick / 同一 try-catch + inFlight/throttle/2s-timeout 信封内，用同一共享 cap（resolveStagingAccessSweepCap，P1 已导出）调 container.get('lifecycleStateMachine').checkTimeouts(cap)，驱动 lifecycle 超时迁移（evolving→active / pending·decaying→deprecated）tick-on-access、单 tick 有界。新增本地 LifecycleStateMachineLike ducktype 接口，对齐 Core b557b10 的 checkTimeouts(cap?: number): Promise<TimeoutCheckResult{ timedOut, checked }>。StagingAccessSweepResult 仅 additive 加 checkedTimeouts/timedOutCount 两个可观测计数（与既有 timedOut 布尔=2s 信封超时标志语义不同，注释标注、勿混用）+ logSweepResult meta 记录。各驱动各自 ≤cap、单 tick 总量 ≤ 驱动数×cap 仍有界。硬不变量守住：checkTimeouts 抛错则整 sweep 走既有 try/catch skipped 兜底（信封不变）；与 checkAndPromote 不相交（Core 侧 staging 不在 TIMEOUT_TARGET、从不被 checkTimeouts 查询）；未接线 P3（checkAndExecute/subscribeToSignals）；未重引 daemon/scheduler；未放松门禁；未改 checkAndPromote 既有 cap 行为与 StagingAccessSweepResult 既有字段语义。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/runtime/mcp/host/staging-access-sweep.ts",
+    "AlembicPlugin/test/unit/StagingAccessSweep.test.ts"
+  ],
+  "verification": [
+    "node -v: v22.22.1 (.nvm v22.22.1)",
+    "npm run build:check: green（build:core 用 ../AlembicCore @ b557b1088d59f779715f5e28c0fdb91103e65819 = 已验收 P2-Core commit；tsc --noEmit 无错误，消费 Core checkTimeouts(cap?) 新签名）",
+    "npx vitest run test/unit/StagingAccessSweep.test.ts (vitest 4.0.18): 1 file / 7 tests passed（原 2 + P1 3 cap + P2 新增 2：checkTimeouts 以共享 cap 在 checkAndPromote 之后调用+计数 / 抛错→skipped 兑底）",
+    "全量单测 npm run test:unit (vitest.unit.config.ts, Node22): 534 suites / 1594 tests = 46 failed | 1548 passed；failed-set=12 文件与改前基线(干净树 HEAD 5f56539) stash diff IDENTICAL，passed 1546→1548(+2 新 P2 测试)，零回归",
+    "门禁(Node22): lint:core-import-boundary / lint:layer-boundary(无 L1→L2 backslip) / lint:repo-boundary / lint:naming / check:cross-shell-drift / check:shared-asset-drift(11 checks,0 drift) 全 PASS；biome check 改动 2 文件 clean(No fixes applied)",
+    "commit 2748968 (main, baseline 5f56539 → HEAD 2748968, 2 files +142/-21): lib/runtime/mcp/host/staging-access-sweep.ts, test/unit/StagingAccessSweep.test.ts"
+  ],
+  "risks": [
+    "pre-existing(非本次引入): lint:doctrine 对 staging-access-sweep.ts 既有 module-scope Map 'sweepStateByProjectRoot'(tick-on-access 状态,前序 commit 引入)报 1 violation（行号因本次在其上方加接口+字段而 57→72，count 恒为 1、无新增）；P1 已 stash 证实干净树同样 1 violation。需 managed-lifecycle/exemption row 是 tick-on-access commit 既有合规缺口，超出 P2-Plugin 范围——记为观察项未擅自修。同理 biome 全仓 4 errors/17 warnings 亦 pre-existing、均在他人文件。",
+    "cap total-budget 语义(承自 P2-Core risk): checkTimeouts(cap) 跨超时状态共享 remaining 预算(靠前状态 evolving 积压多时先吃预算，pending/decaying 本 tick 可能 0 处理)；createdAt 最旧优先+跨 tick 仍保证最终排空不饥死。若期望 per-state 公平配额须经 Design——本次 plugin 侧仅透传共享 cap、未改 Core 预算语义。P2-Core 另一 risk：enteredAt 恒不持久化→checkTimeouts 卡死时长实按 updatedAt 算，属 P2 之前现状、需另 Design，不在本任务。",
+    "P3 未接线(按硬性 P1✅→P2→P3→P4 顺序由控制器后续派发): 本次仅在 sweep 接线 checkTimeouts 驱动；P3 孤儿 proposal 执行(checkAndExecute/subscribeToSignals)、P4 vendor 快照不在本任务。",
+    "本次纯 lib L2(mcp/host)+单测改动；未涉 cc 子模块/相邻仓库/Core 源码/marketplace/skills/manifests/bin。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-sweep-checktimeouts__AlembicPlugin__p2-plugin-sweep-checktimeouts",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-sweep-checktimeouts__AlembicPlugin__p2-plugin-sweep-checktimeouts.json",
+    "deliveryRunId": "run-delivery-p2-plugin-sweep-checktimeouts__AlembicPlugin__p2-plugin-sweep-checktimeouts",
+    "dispatchGroup": "p2-plugin-sweep-checktimeouts",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-sweep-checktimeouts__AlembicPlugin__p2-plugin-sweep-checktimeouts.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+    "stateRevision": 16,
+    "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+    "taskPackageId": "p2-plugin-sweep-checktimeouts",
+    "targetTaskId": "p2-plugin-sweep-checktimeouts",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-sweep-checktimeouts",
+    "resultId": "tr-p2-plugin-sweep-checktimeouts",
+    "createdAt": "2026-06-25T17:05:28.164Z"
+  },
+  "createdAt": "2026-06-25T17:05:28.164Z",
+  "stateRevisionObserved": 16,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

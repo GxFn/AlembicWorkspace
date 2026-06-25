@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-plugin-proposal-driver",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "summary": "P3-Plugin 双轨驱动 proposal 执行（consumer，最后代码变更）：轨①KnowledgeModule.initializeKnowledgeServices best-effort 取 proposalExecutor+signalBus 调 subscribeToSignals(signalBus) 幂等只订阅一次(Core 已 if(#unsubscribe)return)；轨②runSweep 在 checkTimeouts(cap) 后加 checkAndExecute(cap) 复用共享 cap、同信封、抛错走 skipped 兜底。可选 additive 执行计数。硬不变量：subscribeToSignals 幂等一次、checkAndExecute 共享 cap 有界、判定门禁完全不动(在 Core 侧)、proposal 不绕 transition Guard、不重引 daemon、不改既有字段。前置 P3-Core+P3-Core-2 已验收(checkAndExecute 整 tick 有界、dist 重生)。验收 Node22 build:check+双轨单测(init subscribe 恰一次/sweep checkAndExecute 以共享 cap)+全量无回归，提交 main，path-like evidenceRefs。完成即 P3 闭环(proposal 执行链活)。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25/task-packages/p3-plugin-proposal-driver.md",
+  "createdAt": "2026-06-25T17:43:06.362Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-plugin-proposal-driver",
+      "taskPackageId": "p3-plugin-proposal-driver",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin P3：双轨——init 一次性幂等 subscribeToSignals(signalBus) + sweep 兜底 checkAndExecute(cap) 共享 cap；判定门禁不动、不重引 daemon；Node22 验收提交 main，evidenceRefs 纯路径。",
+      "status": "pending",
+      "createdAt": "2026-06-25T17:43:06.362Z"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-plugin-proposal-driver",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "taskPackageId": "p3-plugin-proposal-driver",
+  "dispatchGroup": "p3-plugin-proposal-driver",
+  "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p3-plugin-proposal-driver",
+  "status": "completed",
+  "summary": "P3-Plugin 双轨驱动 orphan proposal 执行完成（consumer 侧，提交 main 799ceac），P3 阶段闭环、proposal 执行链活。消费 Core 439c960/62f0b4b 的 checkAndExecute(cap?)+幂等 subscribeToSignals。轨①（init 即时信号驱动）：KnowledgeModule.initializeKnowledgeServices 在 eventBus 早 return 之前 best-effort 取 proposalExecutor+signalBus 并 subscribeToSignals(signalBus)——truthiness 守卫+try/catch 非致命（不可取则跳过，同既有 wiring 风格）；Core subscribeToSignals 已幂等(if(#unsubscribe)return)，重复 init 不放大订阅；接通后真实信号(FileChangeHandler quality/source_modified)即时驱动 observing proposal。轨②（sweep 有界兜底）：staging-access-sweep.ts runSweep 在 checkTimeouts(cap) 之后、同一 tick/同一 try-catch+inFlight/throttle/2s 信封内、以同一共享 cap 调 container.get('proposalExecutor').checkAndExecute(cap)（ProposalExecutorLike ducktype），处理信号错过的到期 observing proposal；抛错则整 sweep 走既有 skipped 兜底。轨③（additive）：StagingAccessSweepResult 加可选 executedCount/rejectedCount/expiredCount + logSweepResult meta。硬不变量守住：判定门禁完全不动（evaluateUpdate/evaluateDeprecate/§9.1/transition/shouldExpirePending 全在 Core，plugin 仅接线驱动、不碰判定、不绕 transition Guard）；未重引 daemon/scheduler；未改 checkAndPromote/checkTimeouts 既有行为与 StagingAccessSweepResult 既有字段语义；未触 P4(vendor)。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/injection/modules/KnowledgeModule.ts",
+    "AlembicPlugin/lib/runtime/mcp/host/staging-access-sweep.ts",
+    "AlembicPlugin/test/unit/StagingAccessSweep.test.ts",
+    "AlembicPlugin/test/unit/KnowledgeModuleProposalSignal.test.ts"
+  ],
+  "verification": [
+    "node -v: v22.22.1 (.nvm v22.22.1)",
+    "npm run build:check: green（build:core 用 ../AlembicCore @ 62f0b4b392ada66e8678d5eeb8a3e3b4c10c2c9d = 已验收 P3-Core-2；tsc --noEmit 无错误，消费 Core checkAndExecute(cap?)+subscribeToSignals 新签名）",
+    "定向测试 npx vitest run StagingAccessSweep + KnowledgeModuleProposalSignal + KnowledgeModuleFreshness: 3 files / 12 passed（sweep 7→9: 新增 checkAndExecute 在 checkTimeouts 后以共享 cap 调用+计数 / 抛错→skipped；KnowledgeModuleProposalSignal 新 2: init 以 signalBus 调 subscribeToSignals 恰一次 / executor 不可取 best-effort 跳过；KnowledgeModuleFreshness 1 无回归）",
+    "全量单测 npm run test:unit (Node22): 真·clean-2748968 基线(stash 3 tracked + 移走 untracked、grep 验证 reverted) = 534 suites / 1594 tests = 46 failed | 1548 passed；after(+P3) = 536 suites / 1598 tests = 46 failed | 1552 passed；failed-set 12 文件 IDENTICAL、+4 测试全 passed、零回归。另交叉验证：P3-after failed-set 与原始 P1 干净基线(HEAD 42647e8)12 文件逐字 IDENTICAL（均 pre-existing sandbox 失败，StagingAccessSweep/KnowledgeModule* 不在其中）",
+    "门禁(Node22): lint:core-import-boundary(423 files,418 imports OK) / lint:layer-boundary(无 L1→L2 backslip) / lint:repo-boundary / lint:naming / check:cross-shell-drift / check:shared-asset-drift(11 checks,0 drift) 全 PASS；biome check 改动 4 文件 clean(No fixes applied)",
+    "commit 799ceac (main, baseline 2748968 → HEAD 799ceac, 4 files +182/-3，含新增 test/unit/KnowledgeModuleProposalSignal.test.ts): KnowledgeModule.ts, staging-access-sweep.ts, StagingAccessSweep.test.ts, KnowledgeModuleProposalSignal.test.ts"
+  ],
+  "risks": [
+    "pre-existing(非本次引入): lint:doctrine 对 staging-access-sweep.ts 既有 module-scope Map 'sweepStateByProjectRoot'(tick-on-access 状态,前序 commit 引入)报 1 violation（行号因本次在其上方加 ProposalExecutorLike+字段而 72→88，count 恒 1、无新增）；P1 已 stash 证实干净树同样。同理 biome 全仓 4 errors/17 warnings 亦 pre-existing、均在他人文件。超出 P3-Plugin 范围，记为观察项未擅自修。",
+    "init 现会实例化 proposalExecutor（原为 orphan、从未 .get）并 subscribeToSignals——这是 P3 设计意图(让孤儿 executor 活)，非副作用风险；best-effort try/catch 保证极小容器/缺依赖时不致命。幂等依赖 Core subscribeToSignals 的 if(#unsubscribe)return；init 仅被 ServiceContainer:257 调一次。",
+    "cap 语义(承自 P3-Core risk): checkAndExecute(cap) 仅限 observing 查询(最旧优先 oldestFirst+LIMIT、跨 tick 排空)；其内部 #expireOldPending(独立 pending GC)按 P3-Core 任务范围保持无界。若需单 tick 总扫描严格≤cap(含 pending GC)须经 Design——本次 plugin 侧仅透传共享 cap、未改 Core 语义。",
+    "P4 vendor 快照(发布期 gitlink bump=用户门)为本需求最后一环、不在本任务；按硬性 P1✅→P2✅→P3(本次闭环)→P4 顺序由控制器后续决。本次纯 lib(injection wiring + mcp/host)+单测改动；未涉 cc 子模块/相邻仓库/Core 源码/marketplace/skills/manifests/bin。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-plugin-proposal-driver__AlembicPlugin__p3-plugin-proposal-driver",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-proposal-driver__AlembicPlugin__p3-plugin-proposal-driver.json",
+    "deliveryRunId": "run-delivery-p3-plugin-proposal-driver__AlembicPlugin__p3-plugin-proposal-driver",
+    "dispatchGroup": "p3-plugin-proposal-driver",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-proposal-driver__AlembicPlugin__p3-plugin-proposal-driver.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+    "stateRevision": 28,
+    "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+    "taskPackageId": "p3-plugin-proposal-driver",
+    "targetTaskId": "p3-plugin-proposal-driver",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p3-plugin-proposal-driver",
+    "resultId": "tr-p3-plugin-proposal-driver",
+    "createdAt": "2026-06-25T17:57:33.909Z"
+  },
+  "createdAt": "2026-06-25T17:57:33.909Z",
+  "stateRevisionObserved": 28,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

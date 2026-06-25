@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-core-checkandexecute",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "taskPackageId": "p3-core-checkandexecute-cap",
+  "dispatchGroup": "p3-core-checkandexecute",
+  "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p3-core-checkandexecute",
+  "status": "completed",
+  "summary": "P3-Core checkAndExecute 有界化完成（纯 additive，producer 侧，最后一个 Core 变更；提交 main 439c960）。两处 additive 改动：(1) ProposalRepository.find 增可选 ProposalFilter.oldestFirst：true→asc(proposedAt)（最旧优先），默认/false→现行 desc(proposedAt)（其他调用方排序字节不变）。(2) ProposalExecutor.checkAndExecute(cap?)：cap 给定时查 find({status:'observing', limit:cap, oldestFirst:true})——单 tick 处理 ≤cap 条 observing proposal、最旧优先、跨 tick 排空不饿死（之所以需要 oldestFirst：P1 的 find 默认 desc，capped 取最新 N 会饿死最久未处理者）；cap===undefined 维持 find({status:'observing'}) 无界+默认 desc（字节一致契约）。硬不变量守住：cap 只限「处理多少条」绝不改判定门禁——evaluateUpdate/evaluateDeprecate/§9.1 active-modification guard/transition Guard 全保留（有单测证明 cap 模式下无 usage 的 update 仍被 reject、未绕过）；proposal 执行仍全经 transition()（evolving→staging/active、deprecate→deprecated、记 lifecycle_transition_events/deprecated_by 边）；subscribeToSignals 未改（已幂等）；未重引 daemon、未接线 sweep/init 驱动（P3-Plugin）。cap 默认值不在 Core 设。范围说明：#expireOldPending（独立 pending GC）按任务范围保持无界。已 npm run build 重生 dist 供 P3-Plugin 消费（dist gitignored、未提交）；commit 仅含 src+test。",
+  "evidenceRefs": [
+    "AlembicCore/src/repository/evolution/ProposalRepository.ts",
+    "AlembicCore/src/service/evolution/ProposalExecutor.ts",
+    "AlembicCore/test/ProposalRepository.test.ts",
+    "AlembicCore/test/ProposalExecutorBounding.test.ts"
+  ],
+  "verification": [
+    "node -v: v22.22.1 (.nvmrc=22)",
+    "npm run build:check: green (tsc --noEmit, 无错误输出)",
+    "npm run build: green (node scripts/clean-dist.mjs && tsc -p tsconfig.json 重生 dist；dist gitignored 未提交)",
+    "npx vitest run test/ProposalExecutorBounding.test.ts test/ProposalRepository.test.ts: 2 files / 38 tests passed（含新增 ProposalExecutor 5 用例 + find oldestFirst 1 用例）",
+    "npm run test 全量: 131 files / 1335 tests passed，failed-set 为空（无回归；对 P2 基线 130/1329 为 +1 file/+6 tests）",
+    "npm run lint (Biome): Checked 622 files, no fixes — clean（新增代码已按 Biome 格式化）",
+    "git diff --check: 无空白错误",
+    "commit 439c960b1d758c57fc2d04ebf782a63d38a3aa91 (main)；改动文件: src/repository/evolution/ProposalRepository.ts, src/service/evolution/ProposalExecutor.ts, test/ProposalRepository.test.ts, test/ProposalExecutorBounding.test.ts (4 files +293/-10)"
+  ],
+  "risks": [
+    "#expireOldPending（checkAndExecute 内部的独立 pending GC，查 find({status:'pending'})）按任务范围保持无界（本次 cap 仅限定 observing 查询）。若 P3-Plugin 希望单 tick 总扫描严格≤cap（含 pending GC），需 Design 明确后另行扩展，不在本次擅自扩大。",
+    "ProposalRepository.find 默认排序仍 desc(proposedAt)；oldestFirst 仅在显式传 true 时生效（capped checkAndExecute 传入）；现有 find 调用方（ProposalExecutor:471 等）排序与返回集完全不变。",
+    "下游接入：P3-Plugin 经 @alembic/core(file:../AlembicCore live symlink，已 npm run build 重生 dist) 消费 checkAndExecute(cap?) + ProposalFilter.oldestFirst，在 init 一次性 subscribeToSignals + sweep 兽底调 checkAndExecute(cap)、用共享 cap；Core 侧不设 cap 默认(cap===undefined 视为无界)。",
+    "本提交为最后一个 P3-Core producer；P3-Plugin(subscribe+sweep 兽底)/P4(vendor 快照) 未触，按顺序硬性 P1✅→P2✅→P3→P4 由控制器后续派发。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-core-checkandexecute__AlembicCore__p3-core-checkandexecute",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-checkandexecute__AlembicCore__p3-core-checkandexecute.json",
+    "deliveryRunId": "run-delivery-p3-core-checkandexecute__AlembicCore__p3-core-checkandexecute",
+    "dispatchGroup": "p3-core-checkandexecute",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-checkandexecute__AlembicCore__p3-core-checkandexecute.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+    "stateRevision": 20,
+    "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+    "taskPackageId": "p3-core-checkandexecute-cap",
+    "targetTaskId": "p3-core-checkandexecute",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p3-core-checkandexecute",
+    "resultId": "tr-p3-core-checkandexecute",
+    "createdAt": "2026-06-25T17:24:33.781Z"
+  },
+  "createdAt": "2026-06-25T17:24:33.781Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

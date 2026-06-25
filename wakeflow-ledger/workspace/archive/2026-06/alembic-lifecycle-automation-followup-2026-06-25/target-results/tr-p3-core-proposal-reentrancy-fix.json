@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-core-proposal-reentrancy-fix",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "taskPackageId": "p3-core-proposal-reentrancy-fix",
+  "dispatchGroup": "p3-core-proposal-reentrancy-fix",
+  "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p3-core-proposal-reentrancy-fix",
+  "status": "completed",
+  "summary": "P3-Core-Fix（F-A dual-track re-entrancy）修复完成（提交 main d49fc05）。根因：#executeUpdate 先 transition(→evolving)（发 lifecycle 信号）、markExecuted 在方法最末，故执行进行中 proposal 仍 status==='observing'；init 注册的 subscribeToSignals 订阅者据该信号 re-enter（#onSignal→#evaluateOnSignal→#executeUpdate）对同一 still-observing proposal 再执行 → 第二次 active→evolving 撞 'evolving→evolving' invalid → 被误标 rejected（单 proposal 隔离即复现；unit 分别 mock 两轨故未暴露，仅真实运行时双轨同活触发，Test e2e 实证）。修复（仅 re-entrancy 安全，零改判定门禁/transition Guard/proposal 状态语义）：ProposalExecutor 持 #inFlight Set<proposalId>；新增 #runWithReentrancyGuard 包裹 #processExpiredProposal 与 #evaluateOnSignal 两轨的 #executeUpdate/#executeDeprecate 调用（入口 add、finally delete）；#onSignal 的 observing 过滤与 checkAndExecute 处理循环并列跳过 #inFlight 中的 proposal，使「proposal 自身执行触发的信号」不再 re-enter 二次执行；not-in-flight proposal 的合法信号驱动不受影响。未改 evaluateUpdate/evaluateDeprecate/§9.1/transition Guard、checkAndExecute cap 有界（P3-Core/-2 已验收）、subscribeToSignals 幂等；未重引 daemon；deprecate 数据流不动（F-B 另议）。已 npm run build 重生 dist 供 Plugin 消费 + Test e2e 重跑；commit 仅含 src+test。",
+  "evidenceRefs": [
+    "AlembicCore/src/service/evolution/ProposalExecutor.ts",
+    "AlembicCore/test/ProposalExecutorBounding.test.ts"
+  ],
+  "verification": [
+    "node -v: v22.22.1 (.nvmrc=22)",
+    "npm run build:check: green (tsc --noEmit, 无错误输出)",
+    "npm run build: green (node scripts/clean-dist.mjs && tsc -p tsconfig.json 重生 dist；dist gitignored 未提交)",
+    "复现验证：临时禁用 #onSignal 的 in-flight 跳过后，re-entrancy 回归测试 FAIL——`expected 'rejected' to be 'executed'`（精确复现 F-A）；恢复 in-flight 跳过后通过",
+    "npx vitest run test/ProposalExecutorBounding.test.ts: 1 file / 12 tests passed（含新增 2 条 re-entrancy 回归：合格 UPDATE 终态 executed 且从未 markRejected；合法 usage 信号仍驱动 not-in-flight 合格 update 执行）",
+    "npm run test 全量: 131 files / 1342 tests passed，failed-set 为空（无回归；对基线 131/1340 为 +2 tests）",
+    "npm run lint (Biome): Checked 622 files, no fixes — clean",
+    "git diff --check: 无空白错误",
+    "commit d49fc058d6a81725ed1060d63cd04c6c5e1bfbe1 (main)；改动文件: src/service/evolution/ProposalExecutor.ts, test/ProposalExecutorBounding.test.ts (2 files +96/-6)"
+  ],
+  "risks": [
+    "选用 in-flight Set 守卫（最小、无 schema 变更）：仅挡「已在执行中的同一 proposal 的二次进入」，不挡 not-in-flight proposal 的首次信号驱动。#runWithReentrancyGuard 以 finally 移除 id，异常路径也不会泄漏。",
+    "deprecate 数据流本次不改（F-B 另议）；但 deprecate 执行（#executeDeprecate）同样经 #runWithReentrancyGuard 包裹，获得同等 re-entrancy 保护（仅再入安全，未改判定/迁移逻辑）。",
+    "SignalBus 同步分发 + 订阅回调 void #onSignal（异步）：修复后 re-entry 在 #onSignal 同步过滤阶段被跳过（sweep 轨同步阻断）；信号驱动轨的执行仍在 void 微任务链，测试以 setTimeout(0) 宏任务排空后断言。",
+    "下游：dist 已重生，Plugin 不改；待控制器重跑 Test e2e 重验 ④（update 活起 = 合格 update 真正到达 executed）。本提交仅 P3-Core producer 侧修复；P4(vendor 快照) 未触。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-core-proposal-reentrancy-fix__AlembicCore__p3-core-proposal-reentrancy-fix",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-proposal-reentrancy-fix__AlembicCore__p3-core-proposal-reentrancy-fix.json",
+    "deliveryRunId": "run-delivery-p3-core-proposal-reentrancy-fix__AlembicCore__p3-core-proposal-reentrancy-fix",
+    "dispatchGroup": "p3-core-proposal-reentrancy-fix",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-proposal-reentrancy-fix__AlembicCore__p3-core-proposal-reentrancy-fix.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+    "stateRevision": 36,
+    "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+    "taskPackageId": "p3-core-proposal-reentrancy-fix",
+    "targetTaskId": "p3-core-proposal-reentrancy-fix",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p3-core-proposal-reentrancy-fix",
+    "resultId": "tr-p3-core-proposal-reentrancy-fix",
+    "createdAt": "2026-06-25T19:03:34.775Z"
+  },
+  "createdAt": "2026-06-25T19:03:34.775Z",
+  "stateRevisionObserved": 36,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

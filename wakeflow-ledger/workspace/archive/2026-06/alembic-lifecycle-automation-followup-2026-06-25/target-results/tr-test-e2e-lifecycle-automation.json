@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-test-e2e-lifecycle-automation",
+  "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+  "taskPackageId": "test-e2e-lifecycle-automation",
+  "dispatchGroup": "test-e2e-lifecycle-automation",
+  "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+  "targetWindow": "Test",
+  "targetTaskId": "test-e2e-lifecycle-automation",
+  "status": "needs-review",
+  "summary": "Real-runtime e2e of daemon-less lifecycle/proposal automation (AlembicPlugin runtime, build:core live ../AlembicCore @62f0b4b, ALEMBIC_HOME sandbox, real cc bootstrap->stdio MCP, tick = real alembic_status firing staging-access-sweep, shared cap=3). Seeded real DB (raw better-sqlite3, backdated) + drove 6 ticks, snapshotting DB each tick. VERDICT: 5/6 PASS, check ④ FAIL with one reproducible product defect (F-A) to route. (1)PASS staging: checkAndPromote ONLY promotes staging, cap-bounded oldest-first (promote 3/3/1 over 3 ticks, stg-01..07 by createdAt), non-autoApprovable + future-deadline staging stayed waiting, checkTimeouts never touched staging. (2)PASS evolving>7d->active w/ lifecycle_transition_events trigger=timeout-recovery. (3)PASS pending/decaying>30d->deprecated; pnd-fresh(5d) stayed pending. (5)PASS per-sweep cap bound (promote<=3, checkTimeouts shared-budget<=3 scanned, observing<=3), backlog drained across multiple ticks not one cold scan. (6)PASS gates held: no-usage update rejected 'no usage during observation', FP update rejected, deprecate-without-decay rejected, unexpired pending proposal stayed pending while >14d expired. (4)FAIL positive execution: all 5 observing proposals were sweep-driven to terminal state (observing->rejected, bounded) proving checkAndExecute is live, BUT none reached 'executed' and 0 deprecated_by edges. F-A (defect, reproducible even with a single isolated proposal): every UPDATE proposal self-races to rejected 'Invalid transition: evolving -> evolving' — the sweep's own active->evolving transition emits a lifecycle signal that the init-registered subscribeToSignals subscriber (KnowledgeModule.ts:406) re-enters on the still-observing proposal, so the entry completes active->evolving->active once but the proposal is mislabeled rejected instead of executed. Unit tests mock the two tracks separately, so only real-runtime e2e exposes it. F-B (observation): deprecate proposals rejected 'decay slowed: decayScore=50' because decayScore isn't preserved through KnowledgeEntry stats canonicalization (#collectRecipeMetrics reads ??50 default), so deprecate-execute isn't reachable from seeded state (gate correctly refused). Non-resident invariant held (sandbox tree = bootstrap+host-mcp only, clean exit, no daemon). Isolation held (sandbox workspace 2b74bdf3 absent from real ~/.asd). Test changed NO product code (AlembicPlugin 799ceac / AlembicCore 62f0b4b clean). Controller action: route F-A to owning repo (AlembicCore ProposalExecutor + AlembicPlugin dual-track wiring); Design/Core to rule F-B scope. Test does not fix product code.",
+  "evidenceRefs": [
+    "tmp/lifecycle-e2e/evidence/LIFECYCLE-E2E-REPORT.md",
+    "tmp/lifecycle-e2e/evidence/ANALYSIS.txt",
+    "tmp/lifecycle-e2e/evidence/snap-00-pre.json",
+    "tmp/lifecycle-e2e/evidence/snap-1.json",
+    "tmp/lifecycle-e2e/evidence/snap-2.json",
+    "tmp/lifecycle-e2e/evidence/snap-6.json",
+    "tmp/lifecycle-e2e/evidence/tick-clean-raw.json",
+    "tmp/lifecycle-e2e/seed.cjs",
+    "tmp/lifecycle-e2e/run-e2e.sh",
+    "tmp/lifecycle-e2e/snapshot.cjs"
+  ],
+  "verification": [
+    "① staging promote bounded/oldest-first/disjoint — PASS: events stg-01,02,03(tick1) stg-04,05,06(tick2) stg-07(tick3) trigger grace-period-expire in createdAt order; promote/tick=3,3,1<=cap3; stg-noauto(autoApprovable=0)+stg-future(deadline future) never promoted; zero staging rows in any timeout-recovery event (evidence/ANALYSIS.txt, snap-1..3.json)",
+    "② evolving stuck recovery — PASS: evo-01,evo-02 (evolvingStartedAt 8/9d>7d) -> active tick1, lifecycle_transition_events trigger=timeout-recovery (evidence/snap-1.json events)",
+    "③ pending/decaying GC — PASS: dec-01(decaying 31d), pnd-01(31d), pnd-02(32d) -> deprecated; pnd-fresh(5d<30d) stayed pending (evidence/ANALYSIS.txt)",
+    "④ observing proposal execution — FAIL(positive): 5 observing -> rejected, bounded (processed 3 then 2), 0 executed, 0 edges. UPDATE self-race F-A reproduced in isolation: prop-up-clean alone -> active->evolving->active events but status rejected 'Invalid transition: evolving -> evolving' (evidence/tick-clean-raw.json). DEPRECATE rejected decayScore=50 default F-B",
+    "⑤ per-sweep cap bound — PASS: promote<=3/tick; checkTimeouts shared budget tick1=2evolving+1decaying=3 (pending skipped, budget exhausted) tick2=pending; observing<=3/tick; multi-tick drain not cold full scan; source-confirmed cap->LIMIT + shared remaining (evidence/ANALYSIS.txt)",
+    "⑥ gates not bypassed — PASS: prop-up-bad rejected 'no usage during observation'; prop-up-fp rejected 'FP rate too high: 50%'; prop-dep-ok/rec rejected (gate refused deprecate); prop-pend-fresh(5d<14d) stayed pending, prop-pend-old(20d>14d) expired (final ledger evidence/ANALYSIS.txt)",
+    "Non-resident/daemon-less — PASS: tick process tree = {alembic-start.mjs PID93631 -> host-mcp.js 93632} only, exit 0, absent post-run; no daemon spawned (evidence/tick-clean-raw.json processSnapshots)",
+    "Isolation — PASS: sandbox workspace 2b74bdf3 absent from real ~/.asd/projects.json (4 real projects untouched)",
+    "No product code changed — AlembicPlugin HEAD 799ceac clean, AlembicCore HEAD 62f0b4b clean (only gitignored .tmp/dist from build)"
+  ],
+  "risks": [
+    "F-A (route to owning repo): UPDATE proposal execution mislabeled executed->rejected under dual-track (init-signal subscriber + bounded sweep) re-entrancy; entry state stays consistent but proposal accounting is wrong and the requirement goal 'updates 活起来' is unmet. Mechanism: ProposalExecutor.subscribeToSignals:85 / #onSignal:118 (status still 'observing' mid-flight) / #executeUpdate:335 (transition emits signal at :353, markExecuted only at :399) + LifecycleStateMachine.transition guard :128; wired in AlembicPlugin KnowledgeModule.ts:406. Reproducible with a single isolated proposal.",
+    "F-B (needs Design/Core decision): decayScore not preserved through KnowledgeEntry stats canonicalization -> ProposalExecutor.#collectRecipeMetrics reads ??50 default, so deprecate dead/severe execution path not reachable from seeded entry state (may not fire in normal op without a DecayDetector pass). deprecated_by edge path therefore not exercised.",
+    "Heavier deprecate-execute + edge e2e (run real decay scoring first) would be needed to prove the deprecated_by edge if controller rules it in-scope."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-test-e2e-lifecycle-automation__Test__test-e2e-lifecycle-automation",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-e2e-lifecycle-automation__Test__test-e2e-lifecycle-automation.json",
+    "deliveryRunId": "run-delivery-test-e2e-lifecycle-automation__Test__test-e2e-lifecycle-automation",
+    "dispatchGroup": "test-e2e-lifecycle-automation",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-e2e-lifecycle-automation__Test__test-e2e-lifecycle-automation.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-lifecycle-automation-followup-2026-06-25",
+    "stateRevision": 32,
+    "demandKey": "alembic-lifecycle-automation-followup-2026-06-25",
+    "taskPackageId": "test-e2e-lifecycle-automation",
+    "targetTaskId": "test-e2e-lifecycle-automation",
+    "targetWindow": "Test",
+    "dispatchGroup": "test-e2e-lifecycle-automation",
+    "resultId": "tr-test-e2e-lifecycle-automation",
+    "createdAt": "2026-06-25T18:39:00.433Z"
+  },
+  "createdAt": "2026-06-25T18:39:00.433Z",
+  "stateRevisionObserved": 32,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}
