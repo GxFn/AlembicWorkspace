@@ -1,0 +1,94 @@
+{
+  "kind": "TestBoundaryCard",
+  "schemaVersion": 1,
+  "testId": "p6-bilidili-deep-mining-realtest-rerun-after-full-reset-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "status": "draft",
+  "createdAt": "2026-06-27T23:16:30.817Z",
+  "stateRevisionObserved": 37,
+  "sourceRef": "Alembic repair accepted at commit 9d703a3; controller review evidence .wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p6-full-reset-coverage-ledger-cleanup-repair-controller-review.md; prior blocker tr-p6-bilidili-deep-mining-realtest-t1.",
+  "boundaryGate": {
+    "question": "After Alembic commit 9d703a3, does the documented real BiliDili bootstrap reset clear stale Core deepMining measured state so the following in-process deepMining run opens/closes a fresh round and satisfies the P6/G4 gate?",
+    "objectBoundary": "Real BiliDili workspace P6 deepMining reset-and-rerun only. Validate Alembic fullReset behavior plus subsequent in-process deepMining round advancement/coverage evidence. Do not test unrelated P7+ phases or change product code.",
+    "controllerSelfChecks": [
+      "Controller accepted Alembic repair commit 9d703a3 after reviewing source/test diff and rerunning CleanupService unit test, build:check, repo-boundary lint, and diff whitespace.",
+      "Previous Test blocker proved stale coverage_ledger/deep_mining_rounds survived bootstrap reset before repair and caused stopReason=diminishing-returns before a fresh round opened.",
+      "Controller review evidence is in evidence/p6-full-reset-coverage-ledger-cleanup-repair-controller-review.md."
+    ],
+    "realScenarioConditions": [
+      "Use the real BiliDili workspace directly, not a sandbox copy.",
+      "Use the configured generation/embedding stack: DeepSeek for generation and local Qwen embedding; do not swap providers.",
+      "Start from accepted Alembic commit 9d703a3fa8a6f7cbabb1d02ec5d968e2c399a3d1 and record all repository HEADs used.",
+      "Before any destructive reset, re-check the R-2 source triad/root guard so only the intended BiliDili workspace/data root is touched.",
+      "Use alembic_bootstrap with rebuild:true between attempts; recipe delete/rebuild is authorized for BiliDili only.",
+      "Do not manually repair the database with ad hoc SQL to force success; SQL queries are allowed only for observation/evidence."
+    ],
+    "successMeans": [
+      "Post-repair bootstrap rebuild clears stale measured state for the BiliDili project root; after reset, coverage_ledger and deep_mining_rounds no longer contain the pre-repair stale round/coverage rows for that root.",
+      "The following in-process deepMining run opens and closes a fresh round; deep_mining_rounds advances from the post-reset baseline and records daemon-job-runner/in-process execution evidence.",
+      "The P6/G4 evidence is fresh: coverage evidence after the deepMining run is attributable to the rerun, not carried over from old rows, and the gate is non-empty where required.",
+      "Advisor termination is recorded and acceptable for P6, without stopping before the fresh round opens.",
+      "Host vs in-process parity predicate for this P6 chain has no unexpected diff, or any diff is precisely attributed and non-blocking by the original P6 acceptance rules."
+    ],
+    "failureMeans": [
+      "Bootstrap rebuild still leaves stale coverage_ledger or deep_mining_rounds rows for the BiliDili root.",
+      "The post-reset deepMining run completes without opening/closing a fresh round, or max round/round count does not advance from the reset baseline.",
+      "Coverage evidence remains stale or empty in a way that fails G4/P6.",
+      "The run touches the wrong root, wrong provider stack, sandbox copy, unrelated workspace, or manually forces database success.",
+      "A product/runtime error prevents a real P6 conclusion and must be returned with raw logs and exact failure stage."
+    ],
+    "cannotConclude": [
+      "Do not conclude P7+ or whole demand completion from this rerun.",
+      "Do not conclude coldStart writes measured coverage; the confirmed decision is still that coldStart does not write measured coverage.",
+      "Do not treat manual SQL cleanup as proof of product behavior.",
+      "Do not treat provider fallback, mocked AI, or sandbox-copy results as equivalent to the required real BiliDili run.",
+      "Do not accept a non-empty coverage table unless the evidence distinguishes fresh post-run rows from stale pre-reset rows."
+    ],
+    "stopConditions": [
+      "R-2/root guard cannot prove the intended BiliDili data root before destructive reset.",
+      "Configured DeepSeek/Qwen provider stack is unavailable or would be swapped.",
+      "Bootstrap rebuild or deepMining fails before producing reviewable logs/DB evidence.",
+      "The run would touch the real ~/.asd outside the authorized BiliDili workspace/data root boundary.",
+      "Any evidence suggests the wrong repository commit or state root is being tested."
+    ]
+  },
+  "evidenceRequired": [
+    "Repository HEADs and provider configuration used for the run.",
+    "Pre-reset, post-bootstrap-reset, and post-deepMining DB summaries for coverage_ledger/deep_mining_rounds scoped to BiliDili project root.",
+    "Job ids, run JSON, logs, and stopReason for bootstrap and deepMining.",
+    "Explicit round advancement proof: baseline round state after reset versus post-run state.",
+    "Coverage freshness proof showing post-run non-empty evidence is not stale carryover.",
+    "R-2/root guard notes and any host/in-process parity diff report."
+  ],
+  "allowedOperations": [
+    "Run real BiliDili bootstrap rebuild and deepMining in the authorized workspace.",
+    "Delete/rebuild BiliDili recipe artifacts as required by documented bootstrap rebuild.",
+    "Query SQLite/logs for evidence only.",
+    "Capture reports under Test/tmp and state-root evidence."
+  ],
+  "forbiddenOperations": [
+    "Do not edit Alembic, AlembicCore, AlembicPlugin, AlembicAgent, or BiliDili product code.",
+    "Do not push, release, version bump, or change vendor pointers.",
+    "Do not manually mutate the database to force passing rows.",
+    "Do not touch unrelated ~/.asd workspaces or sandbox copies."
+  ],
+  "suggestedTaskPackage": {
+    "targetWindow": "Test",
+    "targetTaskId": "p6-bilidili-deep-mining-realtest-rerun-after-full-reset-repair-t1",
+    "summary": "After Alembic commit 9d703a3, does the documented real BiliDili bootstrap reset clear stale Core deepMining measured state so the following in-process deepMining run opens/closes a fresh round and satisfies the P6/G4 gate?",
+    "sourceRef": "test-cards/p6-bilidili-deep-mining-realtest-rerun-after-full-reset-repair-t1.json"
+  },
+  "allowedNextActions": [
+    "total-control-review-test-boundary",
+    "wakeflow-state add-task-package",
+    "wakeflow-delivery prepare-dispatch-from-state"
+  ],
+  "forbiddenConclusions": [
+    "test-card-is-dispatch",
+    "test-card-is-test-result",
+    "test-card-is-controller-acceptance",
+    "test-card-updates-wakeflow-state",
+    "test-result-closes-demand-without-controller-review"
+  ]
+}

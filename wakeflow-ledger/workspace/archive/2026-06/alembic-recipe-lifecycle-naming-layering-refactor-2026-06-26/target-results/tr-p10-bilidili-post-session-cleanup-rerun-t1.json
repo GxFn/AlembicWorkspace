@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p10-bilidili-post-session-cleanup-rerun-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p10-bilidili-post-session-cleanup-rerun-p1",
+  "dispatchGroup": "p10-bilidili-post-session-cleanup-rerun-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "p10-bilidili-post-session-cleanup-rerun-t1",
+  "status": "blocked",
+  "summary": "Real BiliDili no-preclean rerun verified the repaired cold-start retry can start after the prior stale session and releases on clean completion, but P10 parity remains blocked: MCP rescan surface was Transport closed, daemon rescan wrote only one empty target-scoped coverage row with no coverageLedgerSeed, timed out running, and public cancellation left one active BiliDili session plus one open deep_mining_rounds row. In-process parity was skipped to avoid 0-vs-0 or stale-state comparison.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-post-session-cleanup-rerun-t1-report.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-post-session-cleanup-rerun-t1-summary.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/baseline-before-restart.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/restart-no-preclean.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/host-retry-after-restart-summary.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/daemon-rescan-after-host-bootstrap.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/cancel-daemon-rescan-after-timeout.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/final-after-cancel-wait10-snapshot.json"
+  ],
+  "verification": [
+    "Alembic dist rebuilt before restart; source/dist cancellation classifier present in baseline evidence.",
+    "Restart used documented BiliDili route with --no-preclean; restart output has preclean.skipped=true and devLink.skipped=true.",
+    "verify-test-environment after restart reported ready, BiliDili projectRoot/dataRoot, and architecture-only test mode.",
+    "Cold-start job bootstrap_mqxke6ju_8031efab completed and log recorded Workflow session lease released.",
+    "Daemon rescan job rescan_mqxkqs00_b2cd8bf8 remained running past bounded wrapper, then cancel API marked it cancelled, but delayed snapshot still had one active BiliDili session and one open round."
+  ],
+  "risks": [
+    "Current BiliDili data root is left with one active session and one open deep_mining_rounds row from the cancelled daemon rescan; Test did not manually edit or clean it.",
+    "Host coverage is not usable for parity: one target-scoped row exists but measuredRows=0 and coverageLedgerSeed is absent.",
+    "Alembic MCP status returned Transport closed; Test did not repair or reload the MCP surface per card."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p10-bilidili-post-session-cleanup-rerun-p1__Test__p10-bilidili-post-session-cleanup-rerun-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-bilidili-post-session-cleanup-rerun-p1__Test__p10-bilidili-post-session-cleanup-rerun-t1.json",
+    "deliveryRunId": "run-delivery-p10-bilidili-post-session-cleanup-rerun-p1__Test__p10-bilidili-post-session-cleanup-rerun-t1",
+    "dispatchGroup": "p10-bilidili-post-session-cleanup-rerun-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-bilidili-post-session-cleanup-rerun-p1__Test__p10-bilidili-post-session-cleanup-rerun-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 143,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p10-bilidili-post-session-cleanup-rerun-p1",
+    "targetTaskId": "p10-bilidili-post-session-cleanup-rerun-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "p10-bilidili-post-session-cleanup-rerun-p1",
+    "resultId": "tr-p10-bilidili-post-session-cleanup-rerun-t1",
+    "createdAt": "2026-06-28T09:23:31.294Z"
+  },
+  "createdAt": "2026-06-28T09:23:31.294Z",
+  "stateRevisionObserved": 143,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

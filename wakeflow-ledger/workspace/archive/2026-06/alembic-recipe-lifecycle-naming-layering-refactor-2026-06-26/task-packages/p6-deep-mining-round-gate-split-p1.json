@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p6-deep-mining-round-gate-split-p1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "summary": "P6/HOT Alembic DaemonJobRunner god-file split: extract the in-process deepMining round-loop and adjacent gates into focused Alembic modules without changing behavior. This is the code phase before the P6 REAL-TEST; Test will be dispatched by the controller after code acceptance.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26.md §12.2 P6 + §12.4 invariants + P5 accepted state rev 25",
+  "createdAt": "2026-06-27T22:12:33.849Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p6-deep-mining-round-gate-split-t1",
+      "taskPackageId": "p6-deep-mining-round-gate-split-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read Alembic/AGENTS.md, parent AGENTS.md, active index/status, state root, task package, design §12.2 P6, §12.3 gate order, and §12.4 hard invariants. P6 scope is Alembic-local code refactor only: split DaemonJobRunner god-file slices into focused modules such as lib/daemon/DeepMiningRoundGate.ts, PlanSelectionGate.ts, and ModuleMiningWorkflow.ts (or equivalent names if existing code shape demands), moving behavior rather than rewriting it. Required slices include runDeepMiningRounds, runPlanSelectionGate, buildDeepMiningRoundPlanContext, ensureCoverageLedgerCells, latestDeepMiningRound, extractNewRecipesThisRound, runBootstrapPlanGate/runModuleMiningWorkflow, selectModuleMiningModules, readModuleMiningPersistenceSnapshot, and readModuleMiningPersistedOutputDelta as applicable to current live code. Keep executeApiAiWorkflow dispatch connected to the new modules. Preserve Core advisor contracts (adviseCoverageLedger, upsertRound, ensureCoverageLedgerCells repository semantics), while(true)/shouldStop loop semantics, serial owner behavior, runAsyncFillInline:true thread, job kind/source, PlanStageId strings, response.tool, lifecycle values, coverage_ledger/deep_mining_rounds schema, R-2 cleanup.projectRoot behavior, and all public CLI/HTTP behavior. No Core changes, no vendor/AlembicCore re-pin, no P7/P8/P9/P10 collapse, no runProjectIndexWorkflow unification, no BiliDili direct REAL-TEST in this code package. Add/adjust focused characterization tests so seeded deepMining pre/post preserves deep_mining_rounds open/close order and newRecipesThisRound, and proves inline-fill coverage write is observed before round close where this can be tested inside Alembic. Run npm run build:check, npm run lint:repo-boundary, relevant focused tests (or justify if exact seam is not unit-testable), npm run build or justified build-equivalent, and git diff --check. Commit locally on main; do not push. Return TargetResultEnvelope with Alembic commit hash, changed files, validation summaries, characterization proof, frozen-token/R-2 preservation notes, and explicit recommendation that controller dispatch P6 Test REAL-TEST next if code is accepted.",
+      "status": "pending",
+      "createdAt": "2026-06-27T22:12:33.849Z"
+    }
+  ]
+}

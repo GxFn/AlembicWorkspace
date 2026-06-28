@@ -1,0 +1,104 @@
+{
+  "taskId": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1",
+  "dispatchGroup": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-p1",
+  "targetWindow": "Test",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "status": "blocked",
+  "completedAt": "2026-06-28T05:05:00Z",
+  "result": {
+    "hostNoPaddingSessionCleanupPassed": true,
+    "hostCoverageLedgerSeedReached": true,
+    "hostCoverageLedgerNonEmpty": true,
+    "hostNoOpenRoundsAfterTerminalCleanup": true,
+    "inprocessBootstrapCompleted": true,
+    "inprocessModuleScopeKeptNestedTargets": true,
+    "inprocessCoverageLedgerNonEmpty": true,
+    "inprocessNoOpenRoundsAfterCompletion": true,
+    "parityComparable": true,
+    "parityDiffEmpty": false,
+    "doNotClaimLaterPhaseCompletion": true
+  },
+  "pins": {
+    "alembic": "bf328ea81a809bb8f761c0a0d81162703b1cb70d",
+    "alembicPlugin": "9eaf89ad99ce87779c050487d22f98e281f5e1ff",
+    "alembicCore": "99a7cf10d82056cd860eb0a1d9544662e3735b08",
+    "bilidili": "6f1bf34cf1b6daca4e08895db211939115dac868"
+  },
+  "providerEvidence": {
+    "generationProvider": "deepseek",
+    "generationModel": "deepseek-v4-pro",
+    "embeddingProvider": "local-ollama",
+    "embeddingModel": "qwen3-embedding:0.6b",
+    "embeddingLaneOrder": "local-first"
+  },
+  "counts": {
+    "afterNoPaddingCleanup": {
+      "activeSessionCount": 0,
+      "matchingProjectCount": 0,
+      "coverageLedgerRows": 6,
+      "deepMiningRoundRows": 0,
+      "openRoundRows": 0
+    },
+    "afterHostRescanNoPadding": {
+      "activeSessionCount": 0,
+      "matchingProjectCount": 0,
+      "coverageLedgerRows": 8,
+      "deepMiningRoundRows": 1,
+      "openRoundRows": 0
+    },
+    "finalAfterInprocess": {
+      "activeSessionCount": 0,
+      "matchingProjectCount": 0,
+      "coverageLedgerRows": 15,
+      "deepMiningRoundRows": 1,
+      "openRoundRows": 0
+    },
+    "parity": {
+      "hostRowCount": 8,
+      "inprocessRowCount": 15,
+      "onlyHostCount": 8,
+      "onlyInprocessCount": 15
+    }
+  },
+  "findings": [
+    {
+      "stage": "host-noPadding-cleanup",
+      "status": "passed",
+      "summary": "The terminal candidate-insufficient noPadding path with submittedRecipeIds released the file-backed host-agent session and left no open host-agent-rescan round.",
+      "evidence": "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/after-nopadding-cleanup-with-recipe-snapshot.json"
+    },
+    {
+      "stage": "host-bootstrap-rescan",
+      "status": "passed-partial-chain",
+      "summary": "Host bootstrap completed, host rescan reached coverageLedgerSeed, and terminal cleanup left session/open-round counts at zero with a non-empty coverage ledger.",
+      "evidence": "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/after-host-rescan-nopadding-with-recipe-snapshot.json"
+    },
+    {
+      "stage": "inprocess-bootstrap-rescan",
+      "status": "passed-partial-chain",
+      "summary": "In-process moduleScope [\"BiliDili\"] no longer removed all targets; the run completed with nested target rows, non-empty coverage ledger, no active session, and no open rounds.",
+      "evidence": "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/final-snapshot.json"
+    },
+    {
+      "stage": "parity",
+      "status": "failed",
+      "summary": "Parity is comparable and not 0-vs-0, but diffEmpty=false: host produced 8 normalized rows and in-process produced 15 normalized rows with no identical row set.",
+      "evidence": "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/parity-diff.json"
+    }
+  ],
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1-report.md",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/restart.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/environment-after-restart.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/before-host-snapshot.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/after-nopadding-cleanup-with-recipe-snapshot.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/after-host-rescan-nopadding-with-recipe-snapshot.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/final-snapshot.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-combined-source-repairs-t1/parity-diff.json"
+  ],
+  "residualRisks": [
+    "The final P10 hard gate remains blocked because normalized host vs in-process coverage-ledger parity is non-empty.",
+    "The remaining mismatch appears to be module-axis/seed-shape normalization between host canonical aggregate rows and in-process target-scoped rows.",
+    "This result must not be generalized to P11, P12, P13, G4, or whole-demand completion."
+  ]
+}

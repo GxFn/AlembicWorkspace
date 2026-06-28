@@ -1,0 +1,92 @@
+{
+  "kind": "TestBoundaryCard",
+  "schemaVersion": 1,
+  "testId": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-data-root-sqlite-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "status": "draft",
+  "createdAt": "2026-06-28T08:01:49Z",
+  "stateRevisionObserved": 130,
+  "sourceRef": "evidence/p10-bilidili-data-root-sqlite-corruption-repair-controller-action.md",
+  "boundaryGate": {
+    "question": "After controller quarantined the malformed BiliDili data-root SQLite DB and reinitialized the Ghost workspace, does the real BiliDili P10 project-index workflow-unify route rebuild cleanly and produce non-empty target-scoped host/in-process parity?",
+    "objectBoundary": "Real BiliDili workspace only, using configured local Alembic/AlembicPlugin/AlembicCore/BiliDili sources and existing DeepSeek generation plus local Qwen embedding provider setup.",
+    "controllerSelfChecks": [
+      "Controller reviewed Test fail-closed evidence for Alembic af4d976 and accepted it as valid blocked evidence only.",
+      "Controller stopped Alembic processes holding the corrupt DB, quarantined DB/wal/shm under the BiliDili data root, and ran Alembic Ghost init.",
+      "Controller confirmed the old corrupt DB is no longer in the runtime path and the current runtime DB integrity check returns ok."
+    ],
+    "realScenarioConditions": [
+      "Use direct real BiliDili workspace; no sandbox copy.",
+      "Confirm R-2 cleanup.projectRoot/dataRoot ternary before destructive reset.",
+      "Confirm source pins and provider setup before running.",
+      "Confirm runtime DB is not the quarantined corrupt DB and PRAGMA integrity_check is ok.",
+      "Use official Alembic rebuild/reset path; do not manually edit DB rows or sessions."
+    ],
+    "successMeans": [
+      "Official rebuild completes without corrupt DB failure, BOOTSTRAP_IN_PROGRESS, or fullReset complete(errors>0).",
+      "Stale DB rows, aggregate/root coverage rows, old bootstrap sessions, and open rounds are cleared or replaced through the source path.",
+      "Host and in-process coverage ledgers/cells are non-empty and target scoped.",
+      "coverageLedgerSeed is present.",
+      "Host vs in-process parity diff is empty and the pass is not 0-vs-0 empty parity."
+    ],
+    "failureMeans": [
+      "Source/provider/R-2 mismatch invalidates the run.",
+      "Bootstrap hits BOOTSTRAP_IN_PROGRESS before or after reset.",
+      "DB corruption recurs or official rebuild fails to create usable tables.",
+      "fullReset fails or logs complete(errors>0).",
+      "Coverage is empty, includes aggregate/root module ids, or lacks coverageLedgerSeed.",
+      "Host/in-process parity diff remains non-empty."
+    ],
+    "cannotConclude": [
+      "Cannot conclude P10 complete from DB quarantine or Ghost init alone.",
+      "Cannot conclude G4/G6 or final demand completion unless all corresponding gates are explicitly evidenced.",
+      "Cannot treat empty host/in-process outputs as parity success.",
+      "Cannot repair source code or provider configuration from Test."
+    ],
+    "stopConditions": [
+      "R-2 root/dataRoot proof fails or source/provider pins mismatch.",
+      "Any additional manual state mutation would be required to continue.",
+      "Real run threatens paths outside the BiliDili data root.",
+      "Official rebuild blocks on stale session, DB corruption, missing schema, or reset errors."
+    ]
+  },
+  "evidenceRequired": [
+    "Source pin summary for Alembic af4d976 or later accepted commit, AlembicPlugin aee228b or later accepted commit, AlembicCore 99a7cf1 or later accepted commit, and BiliDili workspace commit/state.",
+    "R-2 proof before destructive reset.",
+    "Runtime DB integrity/schema summary before official rebuild.",
+    "Bootstrap/rebuild runtime JSON and logs, including fullReset/session evidence.",
+    "DB/coverage ledger summaries showing target scope and non-empty cells.",
+    "Host vs in-process parity diff artifact and statement that it is not 0-vs-0.",
+    "TargetResultEnvelope with commands, outputs, risks, and next recommendation."
+  ],
+  "allowedOperations": [
+    "Read BiliDili/Alembic runtime files and logs needed for evidence.",
+    "Run BiliDili real workspace bootstrap/rescan verification commands through the configured local Alembic route.",
+    "Collect runtime JSON, log excerpts, DB/ledger summaries, parity diff, and source pin evidence."
+  ],
+  "forbiddenOperations": [
+    "Do not sandbox-copy BiliDili.",
+    "Do not manually edit DB rows, session files, provider config, package versions, or source to create a pass.",
+    "Do not touch ~/.asd outside the BiliDili data root.",
+    "Do not change product code in Test.",
+    "Do not accept 0-vs-0 parity."
+  ],
+  "suggestedTaskPackage": {
+    "targetWindow": "Test",
+    "targetTaskId": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-data-root-sqlite-repair-t1",
+    "summary": "After controller repaired the BiliDili data-root SQLite corruption, verify official rebuild and real P10 host/in-process parity from the repaired data-root state.",
+    "sourceRef": "test-cards/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-data-root-sqlite-repair-t1.json"
+  },
+  "allowedNextActions": [
+    "total-control-review-test-boundary",
+    "wakeflow-delivery prepare-dispatch-from-state"
+  ],
+  "forbiddenConclusions": [
+    "test-card-is-dispatch",
+    "test-card-is-test-result",
+    "test-card-is-controller-acceptance",
+    "db-quarantine-is-p10-pass",
+    "empty-parity-is-success"
+  ]
+}

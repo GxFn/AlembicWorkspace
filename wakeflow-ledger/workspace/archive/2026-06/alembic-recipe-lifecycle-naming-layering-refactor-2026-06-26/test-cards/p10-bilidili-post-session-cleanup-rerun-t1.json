@@ -1,0 +1,104 @@
+{
+  "kind": "TestBoundaryCard",
+  "schemaVersion": 1,
+  "testId": "p10-bilidili-post-session-cleanup-rerun-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "status": "draft",
+  "createdAt": "2026-06-28T08:56:34.878Z",
+  "stateRevisionObserved": 141,
+  "sourceRef": "evidence/p10-alembic-host-cold-start-session-completion-repair-controller-review.md",
+  "boundaryGate": {
+    "question": "After accepted Alembic commit 01e70642260e61fca2174a87106b22ad21b6ad81 releases cancelled ProjectContext workflow sessions, can the real BiliDili no-preclean P10 host route retry without stale active-session blockage and reach a valid non-empty host/in-process parity result?",
+    "objectBoundary": "Real BiliDili workspace and its Alembic data root for the P10 project-index workflow-unify route only. This card verifies Test evidence after the Alembic session-cancellation repair; it does not authorize source edits, provider changes, manual DB/session row edits, non-BiliDili ~/.asd cleanup, or final acceptance of P10/G4/G6.",
+    "controllerSelfChecks": [
+      "Controller accepted Alembic commit 01e70642260e61fca2174a87106b22ad21b6ad81 as a narrow cancellation/session lease cleanup repair.",
+      "Controller reran `npm test -- --run test/unit/ProjectContextWorkflowFacts.test.ts` in Alembic and it passed 14 tests.",
+      "Controller reran `npm run build:check` in Alembic and it passed.",
+      "Prior Test blocker showed the daemon job cancellation path cancelled the job but left the ProjectContext workflow active session incomplete, blocking retry."
+    ],
+    "realScenarioConditions": [
+      "Use the real BiliDili workspace directly; do not create a sandbox copy.",
+      "Preserve configured providers: DeepSeek for generation and local Qwen/Ollama for embeddings.",
+      "Prefer the already-running BiliDili daemon only if the Test environment verifier reports ready and points to the BiliDili data root.",
+      "If daemon restart is required, use the documented BiliDili no-preclean route and prove preclean is skipped.",
+      "Before any rebuild/destructive operation, prove the R-2 root/dataRoot route so cleanup cannot touch a non-BiliDili root.",
+      "Do not manually edit or delete active session files, DB rows, coverage ledgers, WAL/SHM files, source files, package versions, provider config, or unrelated ~/.asd data."
+    ],
+    "successMeans": [
+      "The repaired host route is not blocked by the stale active ProjectContext workflow session from the prior cancellation.",
+      "If a bounded cancellation is used, cancellation releases or replaces the workflow lease so a retry can start without manual cleanup.",
+      "Host route reaches usable completion with `coverageLedgerSeed` metadata and non-empty target-scoped coverage.",
+      "In-process route produces non-empty target-scoped coverage for the same normalized scope.",
+      "Normalized host-vs-in-process parity diff is empty, excluding only documented volatile runtime fields.",
+      "No stale active sessions or open rounds remain after completion/cleanup."
+    ],
+    "failureMeans": [
+      "Stale ProjectContext active session or open round still blocks retry after cancellation/completion.",
+      "The no-preclean route would touch a non-BiliDili root or cannot prove R-2 projectRoot/dataRoot safety.",
+      "Daemon/MCP/provider/environment setup prevents a valid real BiliDili route and no safe controller-authorized workaround exists.",
+      "Host coverage remains empty, aggregate/root-scoped only, lacks `coverageLedgerSeed`, or parity is 0-vs-0.",
+      "Host vs in-process normalized diff remains non-empty.",
+      "DB corruption, rebuild/reset failure, or fullReset fail-closed diagnostics prevent parity from running."
+    ],
+    "cannotConclude": [
+      "Cannot conclude P10/G4/G6/final demand completion from session cleanup alone.",
+      "Cannot conclude source correctness from a successful job cancellation without retry evidence.",
+      "Cannot conclude parity from empty ledgers, aggregate/root module ids, or 0-vs-0 comparison.",
+      "Cannot conclude Test may repair source/provider/MCP/DB/session state; such blockers return to controller with evidence.",
+      "Cannot conclude non-BiliDili roots are safe without explicit R-2 proof."
+    ],
+    "stopConditions": [
+      "R-2 root/dataRoot proof fails or points outside real BiliDili boundaries.",
+      "Any needed operation would clean or mutate unrelated ~/.asd roots.",
+      "The route requires manual DB/session/coverage edits to proceed.",
+      "Provider config is missing or mismatched and cannot be verified as DeepSeek generation plus local Qwen embedding.",
+      "Alembic MCP transport repair/reload would be required from Test.",
+      "A bounded cancellation leaves a stale session and retry remains blocked after the accepted Alembic repair."
+    ]
+  },
+  "evidenceRequired": [
+    "`Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/` with raw JSON/log/report artifacts.",
+    "Environment and source-pin JSON, including Alembic commit 01e70642260e61fca2174a87106b22ad21b6ad81 or a clearly justified newer accepted pin from this state root.",
+    "R-2 projectRoot/dataRoot proof before any destructive/reset operation.",
+    "Daemon health/test-mode and no-preclean proof if restart is needed.",
+    "DB schema and `PRAGMA integrity_check` evidence before the run and after any rebuild/reset.",
+    "Active ProjectContext workflow session and open deep-mining round snapshots before host, after cancellation/completion, and after retry/completion.",
+    "Host route output proving `coverageLedgerSeed` metadata when the route reaches usable completion.",
+    "Non-empty target-scoped host coverage ledger/cell evidence, with aggregate/root module ids excluded.",
+    "Non-empty target-scoped in-process coverage ledger/cell evidence, with moduleScope behavior recorded.",
+    "Normalized host-vs-in-process parity artifact; success requires diff == empty and not 0-vs-0."
+  ],
+  "allowedOperations": [
+    "Read Test AGENTS, state root, this test card, prior Test blocker evidence, and the Alembic controller review.",
+    "Record source pins, provider config, daemon health, DB/schema/integrity, active-session/open-round snapshots, command lines, runtime JSON, logs, and parity artifacts under the Test tmp directory for this task.",
+    "Run the official real BiliDili no-preclean host route after the Alembic repair.",
+    "If the host route times out or is cancelled by the bounded test, capture cancellation/job/session cleanup evidence and then verify whether a subsequent retry is unblocked.",
+    "Run the in-process/moduleScope parity route only after the host route has produced usable non-empty target-scoped coverage evidence."
+  ],
+  "forbiddenOperations": [
+    "Do not repair or reload the Alembic MCP surface from Test if it reports Transport closed; use the Dashboard/daemon route or block with evidence.",
+    "Do not use default preclean, do not clean logs or data outside the BiliDili data root, and do not touch unrelated ~/.asd roots.",
+    "Do not manually fix DB/session/coverage rows to make parity pass.",
+    "Do not accept 0-vs-0 parity or aggregate/root module coverage as success.",
+    "Do not edit Alembic, AlembicPlugin, AlembicCore, BiliDili source, provider config, versions, release assets, frozen names, or dispatch onward."
+  ],
+  "suggestedTaskPackage": {
+    "targetWindow": "Test",
+    "targetTaskId": "p10-bilidili-post-session-cleanup-rerun-t1",
+    "summary": "After accepted Alembic commit 01e70642260e61fca2174a87106b22ad21b6ad81 releases cancelled ProjectContext workflow sessions, can the real BiliDili no-preclean P10 host route retry without stale active-session blockage and reach a valid non-empty host/in-process parity result?",
+    "sourceRef": "test-cards/p10-bilidili-post-session-cleanup-rerun-t1.json"
+  },
+  "allowedNextActions": [
+    "total-control-review-test-boundary",
+    "wakeflow-state add-task-package",
+    "wakeflow-delivery prepare-dispatch-from-state"
+  ],
+  "forbiddenConclusions": [
+    "test-card-is-dispatch",
+    "test-card-is-test-result",
+    "test-card-is-controller-acceptance",
+    "test-card-updates-wakeflow-state",
+    "test-result-closes-demand-without-controller-review"
+  ]
+}

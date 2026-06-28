@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p10-alembic-full-reset-corrupt-db-live-route-repair-p1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "summary": "P10 Alembic main live-route repair after Test blocked fullReset corrupt-DB rerun. The real BiliDili host cold-start route consumes Alembic/lib/workflows/cold-start/ColdStartWorkflow.ts and Alembic/lib/service/cleanup/CleanupService.ts, not the repaired AlembicPlugin cleanup path. Repair Alembic main so destructive rebuild/fullReset cannot continue after critical DB clear failures and so a successful rebuild:true route can start a fresh bootstrap session without Test-side manual session edits. Scope is Alembic source only; do not edit BiliDili, Test evidence, providers, versions, AlembicPlugin, or AlembicCore unless you return blocked with exact Core/API need.",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-controller-review.md",
+  "createdAt": "2026-06-28T07:16:42.824Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p10-alembic-full-reset-corrupt-db-live-route-repair-t1",
+      "taskPackageId": "p10-alembic-full-reset-corrupt-db-live-route-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "In Alembic, align CleanupService.fullReset fail-closed behavior with Plugin commit aee228be0082e8ddb1d4494df07e0ffedc6ea292: non-'no such table' DB clear errors and missing DB reference must throw before Recipe generation/fullReset-complete success logs, with a diagnostic equivalent to resetMode=fail-closed. Preserve existing P10 table coverage and include task-table errors where relevant. Also repair the rebuild:true cold-start/session path so stale active bootstrap leases in dataRoot/.asd/bootstrap-sessions/active-sessions.json cannot block a clean destructive rebuild after fullReset succeeds, using an existing safe replace/clear route if available. If that second fix requires a Core API change, stop and return blocked with the exact required Core interface instead of editing Core. Add/adjust focused tests for malformed knowledge_entries fail-closed and rebuild stale-session handling; run Alembic build/check and relevant unit tests. Commit locally on main and backfill commit hash, diff summary, commands, and residual risks.",
+      "status": "pending",
+      "createdAt": "2026-06-28T07:16:42.824Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

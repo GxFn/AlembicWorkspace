@@ -1,0 +1,98 @@
+{
+  "kind": "TestBoundaryCard",
+  "schemaVersion": 1,
+  "testId": "p10-bilidili-project-index-workflow-unify-realtest-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "status": "draft",
+  "createdAt": "2026-06-28T01:58:52.825Z",
+  "stateRevisionObserved": 63,
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26.md §12.2 P10, §12.3 G2/G4/G6; evidence/p10-project-index-workflow-unify-controller-review.md",
+  "boundaryGate": {
+    "question": "Does the accepted P10 per-host runProjectIndexWorkflow(mode) refactor preserve real BiliDili behavior for both in-process Alembic and host-agent AlembicPlugin flows, including full/incremental mode routing, R-2 cleanup roots, session release, coverage/deepMining progress, host response tool stability, and normalized incremental parity?",
+    "objectBoundary": "Real BiliDili workspace only. Code points: Alembic aa7aeb9605f7b3f9a5a0584d1a40b06d095c1813, AlembicPlugin 95bf4578ec3e2b9d19db8c548b8bfd6a98814b8e, AlembicCore 99a7cf10d82056cd860eb0a1d9544662e3735b08 via local source/vendor pins. Test collects runtime evidence only and must not edit product code or provider configuration.",
+    "controllerSelfChecks": [
+      "Controller accepted P10 code phase at state revision 63 after reviewing raw target results and source files.",
+      "Alembic validation rerun by controller: npm run build:check, npm run lint:repo-boundary, targeted Vitest 5 files / 39 tests, git diff --check HEAD~1 HEAD.",
+      "AlembicPlugin validation rerun by controller: npm run build:check, npm run lint:repo-boundary, targeted Vitest 3 files / 8 tests, Biome changed-file check, git diff --check HEAD~1 HEAD.",
+      "Controller verified old wrapper names, CLI/daemon consumers, Plugin MCP handler names, frozen strings, and R-2 plan-builder cleanup root anchors in code."
+    ],
+    "realScenarioConditions": [
+      "Use the real BiliDili workspace directly; do not create a sandbox copy.",
+      "Before any destructive reset, prove the R-2 root guard/characterization so BiliDili projectRoot and Alembic dataRoot cannot be confused.",
+      "Keep configured providers unchanged: DeepSeek for generation and local Qwen/Qianwen for embeddings.",
+      "Between runs, use the authorized Alembic bootstrap rebuild/reset for the BiliDili workspace only.",
+      "Capture raw command/log/database/JSON evidence under Test-owned evidence paths."
+    ],
+    "successMeans": [
+      "In-process full path: daemon/job or CLI evidence shows bootstrap mode via runProjectIndexWorkflow(mode='full'), job kind/source remain bootstrap/in-process, coverage_ledger cells become non-empty, and full-reset cleanup is under projectRoot.",
+      "In-process incremental/deepMining path: rescan/deepMining mode via runProjectIndexWorkflow(mode='incremental') advances deep_mining_rounds and writes non-empty coverage_ledger cells; DeepMiningRoundGate remains caller and terminates via advisor stopReason.",
+      "In-process session-release assertion: bootstrap workflow session is released after onBootstrapComplete; evidence can be session registry post-run empty or explicit release log.",
+      "Host-agent full path: alembic_bootstrap reaches planGate.status='ready', response.tool remains alembic_bootstrap, and cleanup/reset evidence shows host-agent destructive cleanup under dataRoot, not projectRoot.",
+      "Host-agent incremental path: alembic_rescan reaches planGate.status='ready', response.tool remains alembic_rescan, meta.coverageLedgerSeed remains present, and coverage/deepMining evidence is non-empty where applicable.",
+      "Parity: one incremental in-process run and one host-agent run over the same BiliDili module/dimension set produce normalized coverage_ledger diff == empty, with documented exclusions only for allowed volatile round-driving fields."
+    ],
+    "failureMeans": [
+      "A blocked result must name the exact failing stage: root safety, provider/runtime, in-process full, in-process incremental/deepMining, session-release, host full, host incremental, parity, or evidence export.",
+      "If R-2 proof fails or root identity is ambiguous, the result is blocked and no destructive reset may run.",
+      "If providers are missing/misconfigured, classify as environment/provider blocker and include raw config/log evidence without changing configuration.",
+      "If code behavior fails after root/provider safety, classify owning repository and include raw logs, command output, DB rows, and reproduction commands."
+    ],
+    "cannotConclude": [
+      "Do not conclude the whole demand is complete from P10 REAL-TEST; later P11-P15 gates remain.",
+      "Do not claim P11 moduleMining binding-rich selector behavior, P12 FileChangeHandler rename, or P13 HostAgent facade rename is validated by this test.",
+      "Do not accept code or create next dispatch from Test; return TargetResultEnvelope only.",
+      "Do not treat a single host pass as parity success.",
+      "Do not infer success from command exit alone without DB/log/output evidence."
+    ],
+    "stopConditions": [
+      "Root identity or R-2 guard cannot be proven before destructive operations.",
+      "The operation would touch non-BiliDili project/data roots or unrelated real ~/.asd data.",
+      "Provider configuration differs from required DeepSeek/local Qwen setup and cannot be verified read-only.",
+      "BiliDili workspace is unavailable or dirty in a way that makes evidence unsafe.",
+      "A command would require changing product code, package versions, release state, or frozen values.",
+      "Evidence cannot be captured in reviewable files/logs/JSON."
+    ]
+  },
+  "evidenceRequired": [
+    "R-2 root guard evidence before reset.",
+    "Command/log evidence for in-process full and incremental/deepMining paths.",
+    "Command/log evidence for host-agent alembic_bootstrap and alembic_rescan paths.",
+    "DB/exported JSON evidence for coverage_ledger and deep_mining_rounds before/after where relevant.",
+    "Session-release evidence after bootstrap completion.",
+    "Normalized parity JSON or equivalent diff proof showing diff == empty.",
+    "Provider/config evidence showing DeepSeek generation and local Qwen/Qianwen embedding were preserved."
+  ],
+  "allowedOperations": [
+    "Run Alembic/AlembicPlugin commands or MCP flows against the real BiliDili workspace.",
+    "Restart or use the local Alembic runtime only as needed for this BiliDili test.",
+    "Use authorized rebuild/reset on the BiliDili workspace after R-2 proof.",
+    "Inspect and export BiliDili Alembic DB rows/logs for coverage_ledger, deep_mining_rounds, job/source/tool/session evidence.",
+    "Create Test evidence files under Test/tmp or the state-root evidence area."
+  ],
+  "forbiddenOperations": [
+    "Do not edit Alembic, AlembicPlugin, AlembicCore, BiliDili product source, provider config, package versions, release assets, or git history.",
+    "Do not push, publish, tag, bump versions, or change frozen strings.",
+    "Do not touch unrelated real ~/.asd data or any non-BiliDili workspace data.",
+    "Do not write real thread ids into tracked docs, backfill, or GitHub.",
+    "Do not perform P11 selector changes, P12 FileChangeHandler rename, or P13 HostAgent facade work."
+  ],
+  "suggestedTaskPackage": {
+    "targetWindow": "Test",
+    "targetTaskId": "p10-bilidili-project-index-workflow-unify-realtest-t1",
+    "summary": "Does the accepted P10 per-host runProjectIndexWorkflow(mode) refactor preserve real BiliDili behavior for both in-process Alembic and host-agent AlembicPlugin flows, including full/incremental mode routing, R-2 cleanup roots, session release, coverage/deepMining progress, host response tool stability, and normalized incremental parity?",
+    "sourceRef": "test-cards/p10-bilidili-project-index-workflow-unify-realtest-t1.json"
+  },
+  "allowedNextActions": [
+    "total-control-review-test-boundary",
+    "wakeflow-state add-task-package",
+    "wakeflow-delivery prepare-dispatch-from-state"
+  ],
+  "forbiddenConclusions": [
+    "test-card-is-dispatch",
+    "test-card-is-test-result",
+    "test-card-is-controller-acceptance",
+    "test-card-updates-wakeflow-state",
+    "test-result-closes-demand-without-controller-review"
+  ]
+}

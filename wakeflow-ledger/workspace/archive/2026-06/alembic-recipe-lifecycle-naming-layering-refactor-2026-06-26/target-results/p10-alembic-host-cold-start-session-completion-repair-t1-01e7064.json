@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "p10-alembic-host-cold-start-session-completion-repair-t1-01e7064",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p10-alembic-host-cold-start-session-completion-repair-p1",
+  "dispatchGroup": "p10-alembic-host-cold-start-session-completion-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p10-alembic-host-cold-start-session-completion-repair-t1",
+  "status": "completed",
+  "summary": "Alembic source repair completed in commit 01e70642260e61fca2174a87106b22ad21b6ad81. ProjectContextWorkflowFacts now classifies bootstrap completion events so clean completed sessions still release, partial failed/degraded sessions remain retained as evidence, and cancelled/aborted/user-cancelled sessions release the file-backed ProjectContext workflow lease with a cancellation-specific diagnostic. This repairs the no-preclean BiliDili host cold-start cancellation blocker where the daemon job cancelled but an incomplete active bootstrap-session file record kept blocking retries. No Test/BiliDili/provider/DB state was edited and no final parity rerun was performed from Alembic.",
+  "evidenceRefs": [
+    "Alembic commit 01e70642260e61fca2174a87106b22ad21b6ad81",
+    "evidence/p10-alembic-host-cold-start-session-completion-repair-t1-report.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/task-packages/p10-alembic-host-cold-start-session-completion-repair-p1.json",
+    "evidence/p10-bilidili-no-preclean-parity-rerun-controller-review.md",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/cancel-host-probe-job.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-cold-start-process-timeline.json"
+  ],
+  "verification": [
+    "npm test -- --run test/unit/ProjectContextWorkflowFacts.test.ts => passed (14 tests)",
+    "npm test -- --run test/unit/DaemonJobRunner.test.ts test/unit/JobsRoute.test.ts test/unit/ProjectIndexWorkflow.test.ts => passed (38 tests)",
+    "npx biome check lib/workflows/project-context/ProjectContextWorkflowFacts.ts test/unit/ProjectContextWorkflowFacts.test.ts => passed",
+    "npm run build:check => passed",
+    "npm run lint:repo-boundary => passed",
+    "git diff --check => passed before commit",
+    "npm run lint => exit 0 with 5 pre-existing unrelated noExplicitAny warnings outside this change set",
+    "post-commit git status clean on main ahead 13"
+  ],
+  "risks": [
+    "alembic_code_guard was attempted on the changed files but failed with internal MCP schema error: unrecognized key \"data\"; Guard did not provide usable pass/fail evidence.",
+    "This target did not rerun the real BiliDili no-preclean parity scenario; controller/Test should rerun after review to prove non-empty target-scoped coverage, coverageLedgerSeed, no stale active session/open round, and real host-vs-in-process parity.",
+    "The fix intentionally does not change the AI pipeline runtime or shorten long-running architecture analysis; it makes cancellation deterministic and retry-safe while preserving partial failed-session evidence."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p10-alembic-host-cold-start-session-completion-repair-p1__Alembic__p10-alembic-host-cold-start-session-completion-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-host-cold-start-session-completion-repair-p1__Alembic__p10-alembic-host-cold-start-session-completion-repair-t1.json",
+    "deliveryRunId": "run-delivery-p10-alembic-host-cold-start-session-completion-repair-p1__Alembic__p10-alembic-host-cold-start-session-completion-repair-t1",
+    "dispatchGroup": "p10-alembic-host-cold-start-session-completion-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-host-cold-start-session-completion-repair-p1__Alembic__p10-alembic-host-cold-start-session-completion-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 139,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p10-alembic-host-cold-start-session-completion-repair-p1",
+    "targetTaskId": "p10-alembic-host-cold-start-session-completion-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p10-alembic-host-cold-start-session-completion-repair-p1",
+    "resultId": "p10-alembic-host-cold-start-session-completion-repair-t1-01e7064",
+    "createdAt": "2026-06-28T08:49:23.506Z"
+  },
+  "createdAt": "2026-06-28T08:49:23.506Z",
+  "stateRevisionObserved": 139,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

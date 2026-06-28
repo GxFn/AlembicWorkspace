@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-appruntime-rename-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p3-appruntime-rename-p1",
+  "dispatchGroup": "p3-appruntime-rename-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p3-appruntime-rename-t1",
+  "status": "completed",
+  "summary": "Alembic P3 completed: renamed the app-boot class in lib/Bootstrap.ts from Bootstrap to AppRuntime, updated Alembic app-runtime consumers/tests to use AppRuntime, retained export { AppRuntime as Bootstrap } compatibility, kept lib/Bootstrap.ts/package main path stable, and left frozen bootstrap/job/tool/stage/domain literals untouched. Local commit: d1a5bc6ddd6f (refactor: rename app runtime bootstrap class). Changed files: bin/api-server.ts, bin/cli.ts, bin/daemon-server.ts, lib/Bootstrap.ts, lib/cli/SetupService.ts, test/fixtures/factory.ts, test/integration/BootstrapLifecycle.test.ts, test/integration/FullFlow.test.ts, test/integration/HttpApi.test.ts, test/integration/TaskGuardApi.test.ts.",
+  "evidenceRefs": [
+    "Alembic commit d1a5bc6ddd6f",
+    "git status --short --branch => main...origin/main [ahead 1]",
+    "lib/Bootstrap.ts exports AppRuntime default and export { AppRuntime as Bootstrap } compatibility alias",
+    "rg proof: direct app-runtime imports/new/static calls now use AppRuntime; remaining Bootstrap class hits are BootstrapTaskManager/EventEmitter/session/dedup/analyze domain symbols outside P3",
+    "git show --format= --unified=0 HEAD -- bin lib test | rg exact frozen tokens => no output"
+  ],
+  "verification": [
+    "npm run build:check => PASS (uses local ../AlembicCore)",
+    "npm run lint:repo-boundary => PASS; @escape-hatch count 1/75",
+    "npx vitest run test/integration/BootstrapLifecycle.test.ts => PASS, 8 tests / 1 file",
+    "git diff --check => PASS before commit; post-commit working tree has no unstaged diff",
+    "npm run lint => exit 0; Biome reported 5 pre-existing noExplicitAny warnings outside changed files",
+    "alembic_code_guard attempted twice and failed with internal schema error: unrecognized key \"data\"; no guard findings were produced"
+  ],
+  "risks": [
+    "No push performed per task boundary; Alembic main is ahead 1 locally.",
+    "File path remains lib/Bootstrap.ts and package.json main remains dist/lib/Bootstrap.js intentionally to avoid package entrypoint churn.",
+    "Bootstrap named export compatibility alias is retained for external importers; future phases may decide whether to rename file/path/docs.",
+    "No AlembicCore, AlembicPlugin, AlembicAgent, AlembicDashboard, BiliDili, vendor, version, release asset, or thread-id changes were made."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-appruntime-rename-p1__Alembic__p3-appruntime-rename-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-appruntime-rename-p1__Alembic__p3-appruntime-rename-t1.json",
+    "deliveryRunId": "run-delivery-p3-appruntime-rename-p1__Alembic__p3-appruntime-rename-t1",
+    "dispatchGroup": "p3-appruntime-rename-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-appruntime-rename-p1__Alembic__p3-appruntime-rename-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 15,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p3-appruntime-rename-p1",
+    "targetTaskId": "p3-appruntime-rename-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p3-appruntime-rename-p1",
+    "resultId": "tr-p3-appruntime-rename-t1",
+    "createdAt": "2026-06-27T21:27:03.957Z"
+  },
+  "createdAt": "2026-06-27T21:27:03.957Z",
+  "stateRevisionObserved": 15,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

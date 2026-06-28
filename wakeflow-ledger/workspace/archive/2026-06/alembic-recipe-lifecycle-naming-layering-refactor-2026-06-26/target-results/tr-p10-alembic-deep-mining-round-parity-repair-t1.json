@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p10-alembic-deep-mining-round-parity-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p10-alembic-deep-mining-round-parity-repair-p1",
+  "dispatchGroup": "p10-alembic-deep-mining-round-parity-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p10-alembic-deep-mining-round-parity-repair-t1",
+  "status": "completed",
+  "summary": "Alembic repair completed in commit 1a07b0f89044855913ac4cb4fb5d9172915990b4. DeepMiningRoundGate now fail-closes an opened deep_mining_rounds row with completedAt/newRecipesThisRound=0 and a process event when the incremental project-index workflow throws. PlanSelectionGate now applies explicit deepMining request seed constraints (dimensions/moduleScope/scaleCap/maxFiles/contentMaxLines and missing plan maxRounds/minNewRecipes) to the daemon plan projection/rescan args so P10 in-process reruns can avoid broad module/dimension drift. Only Alembic files were changed; AlembicPlugin, AlembicCore, BiliDili, provider config, frozen tool/job/table strings, and release assets were not edited.",
+  "evidenceRefs": [
+    "Alembic/lib/daemon/DeepMiningRoundGate.ts",
+    "Alembic/lib/daemon/PlanSelectionGate.ts",
+    "Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/task-packages/p10-alembic-deep-mining-round-parity-repair-p1.json",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-project-index-workflow-unify-realtest-controller-review.md",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/failed-rescan-status.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/db-after-inprocess-rescan.json"
+  ],
+  "verification": [
+    "commit=1a07b0f89044855913ac4cb4fb5d9172915990b4",
+    "git status --short --branch => ## main...origin/main [ahead 9] (clean)",
+    "npx vitest run test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/DaemonJobRunner.test.ts test/unit/ProjectIndexWorkflow.test.ts => 3 files passed, 37 tests passed",
+    "npm run build:check => passed, using local AlembicCore source ../AlembicCore",
+    "npm run lint:repo-boundary => passed, @escape-hatch count 1 / 75",
+    "npx biome check lib/daemon/PlanSelectionGate.ts lib/daemon/DeepMiningRoundGate.ts test/unit/DaemonJobRunnerPlanGate.test.ts => passed",
+    "git diff --check HEAD~1 HEAD => passed",
+    "alembic_status => ready, knowledge initialized_empty; active/selected project mismatch noted as existing host-project selection issue",
+    "alembic_prime => degraded/knowledge-empty; used only as context, not as trusted project Recipe guidance",
+    "alembic_code_guard => failed with existing MCP schema error: unrecognized key \"data\""
+  ],
+  "risks": [
+    "P10 REAL-TEST parity is not re-accepted here; rerun Test after the sibling AlembicPlugin coverageLedgerSeed output repair lands.",
+    "This target did not edit AlembicPlugin, AlembicCore, BiliDili DB/provider config, versions, or release assets by design.",
+    "alembic_code_guard remains unavailable due an MCP internal schema error, so repository build/lint/test/diff evidence is the executable validation for this target.",
+    "The in-process explicit seed alignment is covered by unit tests; final host/in-process normalized coverage_ledger parity still requires the real BiliDili retest."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p10-alembic-deep-mining-round-parity-repair-p1__Alembic__p10-alembic-deep-mining-round-parity-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-deep-mining-round-parity-repair-p1__Alembic__p10-alembic-deep-mining-round-parity-repair-t1.json",
+    "deliveryRunId": "run-delivery-p10-alembic-deep-mining-round-parity-repair-p1__Alembic__p10-alembic-deep-mining-round-parity-repair-t1",
+    "dispatchGroup": "p10-alembic-deep-mining-round-parity-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-deep-mining-round-parity-repair-p1__Alembic__p10-alembic-deep-mining-round-parity-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 71,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p10-alembic-deep-mining-round-parity-repair-p1",
+    "targetTaskId": "p10-alembic-deep-mining-round-parity-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p10-alembic-deep-mining-round-parity-repair-p1",
+    "resultId": "tr-p10-alembic-deep-mining-round-parity-repair-t1",
+    "createdAt": "2026-06-28T02:50:18.225Z"
+  },
+  "createdAt": "2026-06-28T02:50:18.225Z",
+  "stateRevisionObserved": 71,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

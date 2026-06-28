@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "resultId": "target-result-p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1",
+  "dispatchGroup": "p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1",
+  "status": "blocked",
+  "summary": "Blocked at reset/session boundary. Loaded accepted Plugin commit 773dd9563d1282ede4fc5397137e98a173186ef2; authorized host MCP alembic_bootstrap rebuild:true cleaned old persisted aggregate/root rows and open rounds (17 coverage rows -> 0 after reset, open rounds 2 -> 0, SQLite integrity ok) with repos clean and expected DeepSeek generation plus local Ollama/Qwen embeddings. However the rebuild left an active BiliDili host MCP bootstrap session; the assigned host alembic_rescan after reset failed with BOOTSTRAP_IN_PROGRESS / 409. Public noPadding dimension_complete was blocked with DIMENSION_RECIPE_ID_NOT_BOUND and did not release the session; Dashboard bootstrap cancel reported no active bootstrap session and also did not release the host MCP session. After the failed host attempt SQLite contained 15 target-scoped coverage rows, no aggregate/root rows, and 0 open rounds, but the host route failed and the active session remained, so no valid host-vs-in-process parity can be claimed. No manual SQLite/session/round edits were performed; no product source/provider changes were made.",
+  "evidenceRefs": [
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/environment-ready-before-reset.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/baseline-before-authorized-bootstrap-rebuild.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/bootstrap-rebuild-evidence.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/bootstrap-rebuild-parsed-response.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/bootstrap-rebuild-full-briefing.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/host-rescan-evidence.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/host-rescan-parsed-response.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/dimension-complete-nopadding-evidence.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/dimension-complete-nopadding-parsed-response.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/bootstrap-cancel-response.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/after-dashboard-bootstrap-cancel-attempt.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/blocked-summary.json",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p15-plugin-host-rescan-terminal-cleanup-seed-consistency-repair-controller-review.md"
+  ],
+  "verification": [
+    "node Test/scripts/verify-test-environment.mjs --project BiliDili --json",
+    "node --check Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode snapshot --url http://127.0.0.1:60474 --label baseline-before-authorized-bootstrap-rebuild --output Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/baseline-before-authorized-bootstrap-rebuild.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1 P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode bootstrap-rebuild --url http://127.0.0.1:60474 --output Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/bootstrap-rebuild-evidence.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1 P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode run-host --url http://127.0.0.1:60474 --output Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/host-rescan-evidence.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1 P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode dimension-complete-nopadding --url http://127.0.0.1:60474 --output Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/dimension-complete-nopadding-evidence.json",
+    "curl -sS --max-time 20 -X POST -H 'content-type: application/json' --data '{\"reason\":\"P15 Test reset boundary cleanup after authorized host MCP alembic_bootstrap rebuild:true left an active bootstrap session that blocks alembic_rescan; using public runtime cancel endpoint, not manual session file edits.\"}' http://127.0.0.1:60474/api/v1/modules/bootstrap/cancel > Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/bootstrap-cancel-response.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode snapshot --url http://127.0.0.1:60474 --label after-dashboard-bootstrap-cancel-attempt --output Test/tmp/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1/after-dashboard-bootstrap-cancel-attempt.json",
+    "for d in AlembicPlugin Alembic AlembicCore BiliDili; do git -C \"$d\" status --short; done"
+  ],
+  "risks": [
+    "Manual deletion or editing of host MCP session, SQLite, or round files would invalidate this Test card and was not performed.",
+    "The authorized reset route alembic_bootstrap rebuild:true cleaned persisted rows and rounds but left a host MCP bootstrap session that the public daemon cancel endpoint did not see, suggesting a host MCP/Core session lifecycle disconnect.",
+    "The failed host alembic_rescan side effect created 15 target-scoped rows with no aggregate/root rows, but because the route failed with BOOTSTRAP_IN_PROGRESS and the active session remained, these rows cannot be used to claim parity."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1__Test__p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1__Test__p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1.json",
+    "deliveryRunId": "run-delivery-p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1__Test__p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1",
+    "dispatchGroup": "p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1__Test__p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 235,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1",
+    "targetTaskId": "p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-p1",
+    "resultId": "target-result-p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-t1",
+    "createdAt": "2026-06-28T18:01:34.501Z"
+  },
+  "createdAt": "2026-06-28T18:01:34.501Z",
+  "stateRevisionObserved": 235,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

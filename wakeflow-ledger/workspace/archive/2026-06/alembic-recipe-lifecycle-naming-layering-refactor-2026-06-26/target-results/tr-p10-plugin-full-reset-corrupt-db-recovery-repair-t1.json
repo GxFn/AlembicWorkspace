@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p10-plugin-full-reset-corrupt-db-recovery-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p10-plugin-full-reset-corrupt-db-recovery-repair-p1",
+  "dispatchGroup": "p10-plugin-full-reset-corrupt-db-recovery-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p10-plugin-full-reset-corrupt-db-recovery-repair-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin source repair completed in commit aee228be0082e8ddb1d4494df07e0ffedc6ea292. CleanupService.fullReset now includes current project-index/deep-mining/ProjectContext reset tables such as source_graph_*, git_diff_checkpoints, coverage_ledger, deep_mining_rounds, project_context_file_snapshots, recipe_warnings, and token_usage. fullReset also fails closed on any non-missing-table DB clear error (including malformed database failures) or missing DB reference, throwing an explicit diagnostic before host Recipe generation can continue with stale knowledge_entries or coverage ledger rows. Added focused CleanupService unit coverage for the expanded reset table list and non-no-such-table clear failure behavior.",
+  "evidenceRefs": [
+    "AlembicPlugin commit aee228be0082e8ddb1d4494df07e0ffedc6ea292",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/service/cleanup/CleanupService.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/CleanupService.test.ts"
+  ],
+  "verification": [
+    "npm run test:unit -- test/unit/CleanupService.test.ts (passed: 1 file, 6 tests)",
+    "npm run test:unit -- test/unit/CleanupService.test.ts test/unit/McpEntrypointEffects.test.ts test/unit/PlanDrivenGenerationGate.test.ts test/unit/KnowledgeRescanPlan.test.ts test/unit/HostAgentDimensionCompletionWorkflow.test.ts test/unit/HostAgentSessionLease.test.ts test/unit/CoverageLedgerTargetAxis.test.ts test/unit/RescanCoverageModuleAxis.test.ts (passed: 8 files, 54 tests)",
+    "npm run build:check (passed; Core build used ../AlembicCore @ 99a7cf10d82056cd860eb0a1d9544662e3735b08)",
+    "npx biome check lib/service/cleanup/CleanupService.ts test/unit/CleanupService.test.ts (passed)",
+    "npm run lint (exit 0; existing warnings in unrelated files: lib/runtime/host-adapter/ClaudeCodeHostAdapter.ts and scripts/*.mjs)",
+    "npm run lint:repo-boundary (passed)",
+    "npm run lint:core-import-boundary (passed; scanned 439 files and 445 @alembic/core imports)",
+    "npm run lint:layer-boundary (passed)",
+    "npm run lint:naming (passed)",
+    "npm run lint:doctrine (passed)",
+    "git diff --check (passed)",
+    "alembic_code_guard attempted twice and failed due MCP internal schema error: unrecognized key \"data\""
+  ],
+  "risks": [
+    "No real BiliDili/Test rerun was performed by this target window; controller/Test must rerun to prove rebuild:true now fails closed or resets cleanly on the live corrupt-DB scenario and that P10 parity can proceed.",
+    "A broader targeted run including test/unit/DataLossWorkflowGates.test.ts still has one unrelated pre-existing/schema failure: BootstrapInput.parse({}) now rejects missing planSelection; CleanupService tests and host workflow tests passed.",
+    "Alembic MCP code_guard remains unavailable due internal response schema error (`unrecognized key \"data\"`); repository tests/build/lints passed.",
+    "The repair chooses fail-closed behavior rather than DB reindex/recreate recovery; malformed DBs will stop before generation with a diagnostic instead of attempting automatic salvage."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p10-plugin-full-reset-corrupt-db-recovery-repair-p1__AlembicPlugin__p10-plugin-full-reset-corrupt-db-recovery-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-plugin-full-reset-corrupt-db-recovery-repair-p1__AlembicPlugin__p10-plugin-full-reset-corrupt-db-recovery-repair-t1.json",
+    "deliveryRunId": "run-delivery-p10-plugin-full-reset-corrupt-db-recovery-repair-p1__AlembicPlugin__p10-plugin-full-reset-corrupt-db-recovery-repair-t1",
+    "dispatchGroup": "p10-plugin-full-reset-corrupt-db-recovery-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-plugin-full-reset-corrupt-db-recovery-repair-p1__AlembicPlugin__p10-plugin-full-reset-corrupt-db-recovery-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 115,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p10-plugin-full-reset-corrupt-db-recovery-repair-p1",
+    "targetTaskId": "p10-plugin-full-reset-corrupt-db-recovery-repair-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p10-plugin-full-reset-corrupt-db-recovery-repair-p1",
+    "resultId": "tr-p10-plugin-full-reset-corrupt-db-recovery-repair-t1",
+    "createdAt": "2026-06-28T06:52:23.815Z"
+  },
+  "createdAt": "2026-06-28T06:52:23.815Z",
+  "stateRevisionObserved": 115,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

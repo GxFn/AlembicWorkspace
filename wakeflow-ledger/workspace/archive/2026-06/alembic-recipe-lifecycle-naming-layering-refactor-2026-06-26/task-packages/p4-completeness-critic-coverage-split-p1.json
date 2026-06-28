@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-completeness-critic-coverage-split-p1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "summary": "P4/COLD Core exception: behavior-neutral split of CompletenessCritic coverage ledger aggregation into coverage/CoverageLedgerBuilder.ts, with Core commit, build, tests, and Alembic/AlembicPlugin vendor/AlembicCore re-pin plus consumer build checks inside the phase.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26.md §12.2 P4 + §11.A/§11.C + wakeflow-ledger/AlembicWorkspace/recipe-lifecycle-freeze-register-2026-06-28.md",
+  "createdAt": "2026-06-27T21:34:19.887Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-completeness-critic-coverage-split-t1",
+      "taskPackageId": "p4-completeness-critic-coverage-split-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read AlembicCore/AGENTS.md, parent AGENTS.md, active index/status, state root, design §12.2 P4 and §11.A/§11.C, and the P2 freeze register. In AlembicCore only, perform scan-first split of src/workflows/capabilities/host-agent/CompletenessCritic.ts: move buildCoverageLedger plus CoverageLedgerCandidate, CoverageLedgerModuleAxis, ExhaustedDeclaration, CoverageLedgerCell, BuildCoverageLedgerInput and any private helpers used only by that aggregation into src/workflows/capabilities/coverage/CoverageLedgerBuilder.ts. If scan finds shared private helpers/types also used by buildCompletenessCritic, extract only genuinely shared neutral helpers under coverage/shared/ or keep them in place; do not change scoring semantics. Update Core barrels so @alembic/core/host-agent-workflows continues exporting the same symbols and CoverageLedgerWrite imports from the new module. Do not rename public symbols, frozen literals, job/tool/source/stage values, cleanup.projectRoot ternary, cold-start coverage behavior, package export paths, versions, release assets, thread ids, BiliDili, or non-P4 files. Because this is a Core-touch phase, after Core commit/build, re-pin Alembic/vendor/AlembicCore and AlembicPlugin/vendor/AlembicCore to the new Core commit in the same logical phase, then run consumer build:check. Required validation/evidence: scan evidence for shared-private-symbol decision; fixed-input characterization proving buildCoverageLedger output before/after is byte-equivalent or an equivalent focused unit/snapshot test; Core npm run build:check, npm run test (or focused test plus stated reason if full test is infeasible), npm run build; git diff --check; grep/import proof that buildCoverageLedger and CoverageLedgerCell still resolve from @alembic/core/host-agent-workflows; Alembic and AlembicPlugin vendor gitlink hashes re-pinned to the new Core commit; Alembic npm run build:check; AlembicPlugin npm run build:check. Commit locally on main in Core and in each consumer repo for vendor re-pin if changed; do not push. Return TargetResultEnvelope with commit hashes, changed files, validation summaries, characterization evidence refs, vendor pin evidence, remaining risks, and note no REAL-TEST is required for P4 because it is documented pure relocation.",
+      "status": "pending",
+      "createdAt": "2026-06-27T21:34:19.887Z"
+    }
+  ]
+}

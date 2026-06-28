@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "resultId": "target-result-p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1",
+  "dispatchGroup": "p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1",
+  "status": "blocked",
+  "summary": "Blocked after real BiliDili P15 rerun following accepted AlembicPlugin commit 0d1c257a632186b72fea820b81ca9a467156d03d. Positive evidence: Plugin source/dist repair markers loaded; authorized host MCP alembic_bootstrap rebuild:true succeeded, kept SQLite integrity ok, reset coverage rows 15 -> 0, aggregate/root ids absent, open rounds 0 -> 0; the subsequent host alembic_rescan no longer failed BOOTSTRAP_IN_PROGRESS and replaced the fresh empty rebuild session. Host and in-process routes both produced 15 target-scoped persisted coverage rows, no aggregate/root rows, seed output was consistent with SQLite, normalized parity diff was comparable and empty, providers remained DeepSeek generation plus local Ollama/Qwen embedding, and Alembic/AlembicCore/AlembicPlugin/BiliDili repos were clean at the required heads. Blocking evidence: host alembic_rescan returned success/ready with coverageAdvisory.shouldStop=false and 15 high-value blank target-scoped gaps but no submitted Recipe evidence, then left one active BiliDili host-agent session and one open host-agent-rescan/deepMining round; in-process completed with the same target-scoped parity state but sessions/rounds remained open. G4 remains unproven because coverageLedgerSeed/measuredCells is 0 on both host and in-process routes. No manual SQLite/session/round edits, no sandbox copy, no provider changes, and no product source edits were performed.",
+  "evidenceRefs": [
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/environment-ready-before-reset.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/baseline-before-authorized-bootstrap-rebuild.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/bootstrap-rebuild-evidence.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/bootstrap-rebuild-parsed-response.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/bootstrap-rebuild-full-briefing.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/host-rescan-evidence.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/host-rescan-parsed-response.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/host-rescan-full-briefing.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/inprocess-rescan-evidence.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/inprocess-rescan-status.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/inprocess-rescan-events.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/parity-diff.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/final-summary.json",
+    "Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/blocked-summary.json",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p15-plugin-host-bootstrap-rebuild-session-release-repair-controller-review.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-controller-review.md"
+  ],
+  "verification": [
+    "node --check Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs",
+    "node Test/scripts/verify-test-environment.mjs --project BiliDili --json",
+    "rg -n \"allowFreshEmpty|rescan-route-replaces-empty-bootstrap-session|fresh empty bootstrap rebuild-boundary session|Released stale empty host-agent lease\" AlembicPlugin/lib AlembicPlugin/dist AlembicPlugin/test",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode snapshot --url http://127.0.0.1:60474 --label baseline-before-authorized-bootstrap-rebuild --output Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/baseline-before-authorized-bootstrap-rebuild.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1 P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode bootstrap-rebuild --url http://127.0.0.1:60474 --output Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/bootstrap-rebuild-evidence.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1 P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode run-host --url http://127.0.0.1:60474 --output Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/host-rescan-evidence.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1 P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode run-inprocess --url http://127.0.0.1:60474 --output Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/inprocess-rescan-evidence.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode parity --host Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/host-rescan-evidence.json --inprocess Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/inprocess-rescan-evidence.json --output Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/parity-diff.json",
+    "P15_TASK_ID=p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode final-summary --url http://127.0.0.1:60474 --host Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/host-rescan-evidence.json --inprocess Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/inprocess-rescan-evidence.json --parity Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/parity-diff.json --output Test/tmp/p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1/final-summary.json",
+    "for d in AlembicPlugin Alembic AlembicCore BiliDili; do git -C \"$d\" status --short; done"
+  ],
+  "risks": [
+    "The prior BOOTSTRAP_IN_PROGRESS blocker appears fixed, but P15 still cannot pass because terminal lifecycle gates fail: an active BiliDili host-agent session and one open host-agent-rescan/deepMining round remain after the successful host route.",
+    "Do not accept the empty normalized parity diff as success; both sides match on target-scoped rows, but measuredCells is 0 and terminal sessions/rounds are not closed.",
+    "The host route reports coverageAdvisory.shouldStop=false with 15 high-value blank gaps and no submitted Recipe evidence; Test did not invoke noPadding cleanup with synthetic recipe ids because that would hide an actionable-output/G4 failure.",
+    "No manual cleanup was performed, so the data root remains with the observed active session/open round for controller/source-owner review."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1__Test__p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1__Test__p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1.json",
+    "deliveryRunId": "run-delivery-p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1__Test__p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1",
+    "dispatchGroup": "p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1__Test__p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 243,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1",
+    "targetTaskId": "p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-p1",
+    "resultId": "target-result-p15-bilidili-final-parity-rerun-after-bootstrap-session-release-repair-t1",
+    "createdAt": "2026-06-28T18:28:10.843Z"
+  },
+  "createdAt": "2026-06-28T18:28:10.843Z",
+  "stateRevisionObserved": 243,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

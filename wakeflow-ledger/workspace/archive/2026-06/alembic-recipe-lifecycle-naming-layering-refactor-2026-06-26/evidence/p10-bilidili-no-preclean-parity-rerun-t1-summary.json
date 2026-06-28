@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "taskId": "p10-bilidili-no-preclean-parity-rerun-t1",
+  "dispatchGroup": "p10-bilidili-no-preclean-parity-rerun-p1",
+  "window": "Test",
+  "status": "blocked",
+  "createdAt": "2026-06-28T08:34:08Z",
+  "classification": "host-route-did-not-produce-usable-coverage",
+  "route": {
+    "project": "BiliDili",
+    "dashboardUrl": "http://127.0.0.1:63477",
+    "dataRoot": "/Users/gaoxuefeng/.asd/workspaces/02a25032",
+    "usedExistingDaemon": true,
+    "restartAttempted": false,
+    "precleanInvoked": false,
+    "mcpStatus": "Transport closed",
+    "mcpRepairAttempted": false
+  },
+  "sourcePins": {
+    "Alembic": "af4d976c29fee58a93f05de8bfc334073575b46d",
+    "AlembicPlugin": "aee228be0082e8ddb1d4494df07e0ffedc6ea292",
+    "AlembicCore": "99a7cf10d82056cd860eb0a1d9544662e3735b08",
+    "BiliDili": "6f1bf34cf1b6daca4e08895db211939115dac868"
+  },
+  "gitStatusClean": {
+    "Alembic": true,
+    "AlembicPlugin": true,
+    "AlembicCore": true,
+    "BiliDili": true
+  },
+  "provider": {
+    "generation": "deepseek/deepseek-v4-pro",
+    "embedding": "local-ollama/qwen3-embedding:0.6b",
+    "embeddingLaneOrder": "local-first",
+    "secretsPresent": true
+  },
+  "baseline": {
+    "verifyReady": true,
+    "pointsToBiliDiliProject": true,
+    "pointsToBiliDiliDataRoot": true,
+    "dbIntegrity": "ok",
+    "coverageLedgerRows": 0,
+    "deepMiningRoundRows": 0,
+    "openRounds": 0,
+    "activeBiliDiliSessions": 1
+  },
+  "hostProbe": {
+    "command": "node Test/scripts/probe-cold-start-process-timeline.mjs --project BiliDili --url http://127.0.0.1:63477 --data-root /Users/gaoxuefeng/.asd/workspaces/02a25032 --max-files 4 --content-max-lines 40 --skip-guard --timeout-ms 180000 --poll-ms 2500 --output Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-cold-start-process-timeline.json",
+    "jobId": "bootstrap_mqxiy51y_b669e32c",
+    "probeDurationMs": 180481,
+    "probeClassification": "producer-gap",
+    "jobStatusAtProbeEnd": "running",
+    "coverageLedgerRowsAfterProbe": 0,
+    "targetScopedRowsAfterProbe": 0,
+    "coverageLedgerSeedPresent": false,
+    "cancelledAfterBoundedWindow": true,
+    "cancelStatus": "cancelled",
+    "coverageLedgerRowsAfterCancel": 0,
+    "openRoundsAfterCancel": 0,
+    "activeBiliDiliSessionsAfterCancel": 1
+  },
+  "didNotRun": [
+    "in-process moduleScope parity route",
+    "host-vs-in-process parity diff"
+  ],
+  "blockingReasons": [
+    "Host Dashboard/daemon probe did not reach terminal success within its bounded 180000 ms window.",
+    "Host route produced zero coverage_ledger rows and zero target-scoped rows.",
+    "coverageLedgerSeed evidence was not present.",
+    "A matching unfinished BiliDili active session remained after cancellation."
+  ],
+  "evidenceRefs": [
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/baseline.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-cold-start-command.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-cold-start-process-timeline.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/after-host-probe-readback.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-probe-monitor-1.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-probe-monitor-2.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/cancel-host-probe-job.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/p10-no-preclean-evidence.mjs"
+  ],
+  "forbiddenConclusions": [
+    "Do not accept P10 parity.",
+    "Do not accept G4, G6, or whole-demand completion.",
+    "Do not claim empty 0-vs-0 parity.",
+    "Do not treat daemon health or DB integrity as P10 success."
+  ],
+  "recommendation": "Return to controller as blocked. The next repair should address the host route/session completion path or provide a controller-authorized cleanup/retry strategy; Test should not manually edit DB/session/provider/source state."
+}

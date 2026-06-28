@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p10-plugin-full-reset-corrupt-db-recovery-repair-p1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "summary": "Repair P10 host rebuild reset blocker found by real BiliDili Test target-axis-hardening rerun. Test proved AlembicPlugin host fullReset logged database disk image is malformed while clearing knowledge_entries, then continued, leaving stale staging knowledge_entries and mixed aggregate/root coverage_ledger rows. Scope is AlembicPlugin only; do not edit BiliDili real DB/source/provider/session files. Fix Plugin CleanupService/fullReset so rebuild:true cannot proceed to recipe submission with uncleared critical tables, and align fullReset data-table coverage with current P10 project-index/deep-mining tables (including coverage_ledger/deep_mining_rounds/project_context_file_snapshots and other Alembic parity tables as applicable). Implement safe corrupted-DB handling for destructive rebuild reset: either recover/reindex/recreate and then clear, or fail closed before generation with an explicit diagnostic; success must mean stale knowledge_entries and aggregate/root coverage rows cannot survive reset. Add focused unit coverage for added reset table list and non-no-such-table clear failure behavior. Validate with AlembicPlugin targeted CleanupService tests plus relevant coverage/host workflow tests, npm run build:check, biome on touched files, and git diff --check. Backfill commit hash, diff summary, exact commands, and any residual risk; no Test rerun from AlembicPlugin.",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-target-axis-hardening-controller-review.md",
+  "createdAt": "2026-06-28T06:43:50.453Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p10-plugin-full-reset-corrupt-db-recovery-repair-t1",
+      "taskPackageId": "p10-plugin-full-reset-corrupt-db-recovery-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "In AlembicPlugin, repair CleanupService/fullReset for P10: include current project-index/deep-mining tables in destructive reset and make/reset critical DB clear failures fail closed or recover safely so rebuild:true cannot continue with stale knowledge_entries or aggregate/root coverage_ledger rows. Do not touch real BiliDili DB/source/provider/session files. Provide source diff, tests/build evidence, commit hash, and residual risk.",
+      "status": "pending",
+      "createdAt": "2026-06-28T06:43:50.453Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "taskId": "p10-bilidili-project-index-workflow-unify-realtest-t1",
+  "window": "Test",
+  "status": "blocked",
+  "completedAt": "2026-06-28T10:29:54+08:00",
+  "projectRoot": "/Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili",
+  "dataRoot": "/Users/gaoxuefeng/.asd/workspaces/02a25032",
+  "codePoints": {
+    "Alembic": "aa7aeb9605f7b3f9a5a0584d1a40b06d095c1813",
+    "AlembicPlugin": "95bf4578ec3e2b9d19db8c548b8bfd6a98814b8e",
+    "AlembicCore": "99a7cf10d82056cd860eb0a1d9544662e3735b08"
+  },
+  "verified": {
+    "builds": {
+      "Alembic": "npm run build succeeded",
+      "AlembicPlugin": "npm run build succeeded"
+    },
+    "rootSafety": {
+      "projectIndexPlanR2Checked": true,
+      "hostFullCleanupRoot": "input.dataRoot",
+      "inProcessFullCleanupRoot": "input.projectRoot",
+      "incrementalCleanupRoot": "input.dataRoot"
+    },
+    "providersPreserved": {
+      "generation": "deepseek/deepseek-v4-pro",
+      "embedding": "ollama/qwen3-embedding:0.6b via http://127.0.0.1:11434/v1"
+    },
+    "hostFull": {
+      "planGateStatus": "ready",
+      "toolName": "alembic_bootstrap",
+      "cleanupPolicy": "full-reset",
+      "sessionComplete": true,
+      "recipesBound": 3,
+      "recipeIds": [
+        "<redacted>",
+        "<redacted>",
+        "<redacted>"
+      ]
+    },
+    "hostIncremental": {
+      "planGateStatus": "ready",
+      "toolName": "alembic_rescan",
+      "cleanupPolicy": "rescan-clean",
+      "coverageLedgerSeedVisible": false
+    },
+    "inProcessFull": {
+      "jobId": "bootstrap_mqx5jfor_86020719",
+      "status": "completed"
+    },
+    "inProcessIncrementalRecovery": {
+      "failedJobId": "rescan_mqx5pnr4_658ab696",
+      "failedReason": "Bootstrap already in progress for project with session bs-<redacted>.",
+      "cancelledBootstrapJobId": "bootstrap_mqx5khm6_39598191",
+      "rerunJobId": "rescan_mqx66280_bc324a79",
+      "rerunStatus": "completed",
+      "advisorStopReason": "diminishing-returns",
+      "rounds": []
+    }
+  },
+  "failedStages": [
+    {
+      "stage": "host-incremental-meta",
+      "reason": "alembic_rescan clean output and full briefing did not expose meta.coverageLedgerSeed, although planGate.status was ready."
+    },
+    {
+      "stage": "in-process-deep-mining-rounds",
+      "reason": "Fresh completed daemon rescan returned deepMining.rounds=[] and DB deep_mining_rounds still contained the earlier failed row with completed_at=null."
+    },
+    {
+      "stage": "parity",
+      "reason": "DB snapshot after host rescan had 8 coverage rows; after in-process rerun had 20 rows, so normalized host vs in-process parity diff cannot be claimed empty."
+    }
+  ],
+  "dbSnapshots": {
+    "afterHostRescan": {
+      "coverageRows": 8,
+      "deepRoundRows": 1,
+      "deepRoundOpenRows": 1
+    },
+    "afterInProcessRescan": {
+      "coverageRows": 20,
+      "deepRoundRows": 1,
+      "deepRoundOpenRows": 1
+    }
+  },
+  "rawEvidence": [
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/completed-inprocess-bootstrap-status.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/failed-rescan-status.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/cancelled-bootstrap-status.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/completed-inprocess-rescan-full.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/db-after-host-rescan.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/db-after-inprocess-rescan.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/inprocess-rescan-after-host-release.json"
+  ],
+  "recommendation": "Return to controller as blocked for source repair. Candidate repair areas: expose host rescan coverageLedgerSeed in the response contract, close/record deep_mining_rounds for no-action or diminishing-returns rescan paths, and define/restore a comparable normalized parity seed between host and in-process incremental workflows."
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p10-alembic-deep-mining-round-parity-repair-p1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "summary": "P10 REAL-TEST rework: Alembic in-process deepMining/rescan path left a deep_mining_rounds row open after workflow failure, reran with rounds=[], and could not provide comparable host/in-process coverage parity. Repair round lifecycle and P10 parity prerequisites in Alembic without changing frozen contract values.",
+  "status": "pending",
+  "sourceRef": "evidence/p10-bilidili-project-index-workflow-unify-realtest-controller-review.md; target-results/tr-p10-bilidili-project-index-workflow-unify-realtest-t1.json; Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/failed-rescan-status.json; Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-t1/db-after-inprocess-rescan.json",
+  "createdAt": "2026-06-28T02:37:32.508Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p10-alembic-deep-mining-round-parity-repair-t1",
+      "taskPackageId": "p10-alembic-deep-mining-round-parity-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read AGENTS.md, active index/status, this state root, evidence/p10-bilidili-project-index-workflow-unify-realtest-controller-review.md, the Test report/summary, and the P10 code-phase review. Confirm Alembic window/repository identity and execute only this repair. Raw Test evidence: initial in-process deepMining rescan opened rescan_mqx5pnr4_658ab696:deepMining:1 then threw BootstrapSessionLeaseError; DB left completed_at=null. After Test cancelled the stale bootstrap and reran, job completed with advisor stopReason=diminishing-returns but deepMining.rounds=[], and coverage_ledger was 20 rows vs host 8 rows, so P10 parity could not be claimed. Source review points to Alembic/lib/daemon/DeepMiningRoundGate.ts opening a round before runProjectIndexWorkflow(mode='incremental') with no failure close/mark path. Repair the in-process daemon deepMining lifecycle so opened rows close/fail closed on workflow errors and cannot poison later runs. Also align or expose the P10 in-process incremental scope/plan evidence so a rerun can compare the same explicit module/dimension/scale seed as host; preserve DeepMiningRoundGate as caller, R-2 cleanup root semantics, old wrappers, CLI/daemon consumers, job kind/source strings, plan stage ids, response.tool values, and coverage_ledger/deep_mining_rounds table names. Add focused tests for thrown incremental workflow round closure and for explicit plan/module/dimension propagation or documented parity evidence. Run Alembic build:check, repo-boundary lint, targeted Vitest, and git diff --check. Do not edit AlembicPlugin, AlembicCore source, BiliDili, provider config, versions, release assets, thread IDs, or frozen strings. Return TargetResultEnvelope with commit hash, changed files, tests, raw evidence, risks, and explicit recommendation for P10 retest after Plugin repair also lands.",
+      "status": "pending",
+      "createdAt": "2026-06-28T02:37:32.508Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

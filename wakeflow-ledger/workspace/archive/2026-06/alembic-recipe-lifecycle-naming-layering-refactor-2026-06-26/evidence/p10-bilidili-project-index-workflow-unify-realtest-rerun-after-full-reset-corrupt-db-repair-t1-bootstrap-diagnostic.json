@@ -1,0 +1,83 @@
+{
+  "targetWindow": "Test",
+  "taskId": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-t1",
+  "dispatchGroup": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-p1",
+  "operation": "alembic_bootstrap",
+  "arguments": {
+    "projectRoot": "/Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili",
+    "generationStage": "coldStart",
+    "rebuild": true,
+    "planSelection": {
+      "generationStage": "coldStart",
+      "dimensions": [
+        "architecture"
+      ],
+      "scale": {
+        "totalRecipeBudget": 3,
+        "maxFiles": 4,
+        "contentMaxLines": 40,
+        "depthLevels": [
+          "L0",
+          "L1"
+        ]
+      },
+      "moduleBindings": [
+        {
+          "modulePath": ".",
+          "moduleId": "root",
+          "dimensions": [
+            "architecture"
+          ],
+          "targetRecipes": 3,
+          "priority": 1
+        }
+      ]
+    }
+  },
+  "result": {
+    "ok": false,
+    "status": "failed",
+    "summary": "Bootstrap already in progress for project \"/Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili\" with session \"bs-<redacted>\".",
+    "error": {
+      "code": "BOOTSTRAP_IN_PROGRESS",
+      "mcpStatus": "conflict",
+      "canonicalHttpStatus": 409,
+      "problemClass": "state-conflict",
+      "reasonCode": "conflict",
+      "retryable": true,
+      "message": "Bootstrap already in progress for project \"/Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili\" with session \"bs-<redacted>\".",
+      "details": {
+        "state": "bootstrap_in_progress",
+        "reason": "bootstrap_in_progress",
+        "activeSessionId": "bs-<redacted>",
+        "activeProjectRoot": "/Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili",
+        "expiresAt": 1782635162340,
+        "expiresAtUtc": "2026-06-28T08:26:02.340Z"
+      }
+    }
+  },
+  "observedLogSignalsDuringCall": [
+    {
+      "timestamp": "2026-06-28T07:08:30.184Z",
+      "message": "[CleanupService] Starting fullReset (trash-bin mode)..."
+    },
+    {
+      "timestamp": "2026-06-28T07:08:30.187Z",
+      "message": "[CleanupService] DB snapshot: 14 rows -> db-snapshot.jsonl"
+    },
+    {
+      "timestamp": "2026-06-28T07:08:30.187Z",
+      "message": "[CleanupService] Failed to clear knowledge_entries: database disk image is malformed"
+    },
+    {
+      "timestamp": "2026-06-28T07:08:30.187Z",
+      "message": "[CleanupService] fullReset complete (trash-bin mode)",
+      "dbSnapshotRows": 14,
+      "errors": 1,
+      "movedItems": 0,
+      "tables": 11,
+      "trashFolder": "2026-06-28T07-08-30-184Z"
+    }
+  ],
+  "interpretation": "The real route did not produce an acceptable post-repair bootstrap result. The MCP call returned BOOTSTRAP_IN_PROGRESS before a valid new host bootstrap session could proceed. Log signals at the same time show the corrupt DB clear failure still occurred, but the route did not return a fail-closed fullReset diagnostic that could be treated as the intended repair behavior. Test did not manually edit sessions or DB state."
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p10-alembic-rescan-cancellation-cleanup-repair-p1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "summary": "P10 Alembic source repair after Test proved cold-start retry cleanup is fixed but daemon rescan cancellation still leaves one active ProjectContext workflow session and one open deep_mining_rounds row, with no usable coverageLedgerSeed. Repair Alembic main daemon/rescan cancellation cleanup so cancelled/aborted rescan releases the workflow session and closes/fail-closes deep-mining rounds with diagnostics.",
+  "status": "pending",
+  "sourceRef": "evidence/p10-bilidili-post-session-cleanup-rerun-controller-review.md",
+  "createdAt": "2026-06-28T09:27:06.854Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p10-alembic-rescan-cancellation-cleanup-repair-t1",
+      "taskPackageId": "p10-alembic-rescan-cancellation-cleanup-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, Alembic/AGENTS.md, active index/status, this state root, evidence/p10-bilidili-post-session-cleanup-rerun-controller-review.md, the Test report/summary, and raw Test evidence under Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/ before editing. Confirm identity as Alembic and execute only this package. Source pins from Test: Alembic 01e70642260e61fca2174a87106b22ad21b6ad81, AlembicCore 99a7cf10d82056cd860eb0a1d9544662e3735b08, AlembicPlugin aee228be0082e8ddb1d4494df07e0ffedc6ea292, BiliDili 6f1bf34cf1b6daca4e08895db211939115dac868. Scope is Alembic main only: diagnose and repair why daemon rescan job rescan_mqxkqs00_b2cd8bf8, after public cancel marked job status cancelled, still left a BiliDili ProjectContext workflow active session bs-<redacted> and open deep_mining_rounds row rescan_mqxkqs00_b2cd8bf8:deepMining:1 with completed_at=null. The prior cold-start clean completion path must stay fixed; do not regress cold-start session release. Expected repair: cancelled/aborted rescan/deepMining route releases or replaces the ProjectContext workflow session and closes/fail-closes any opened deep_mining_rounds row with clear diagnostics, without manually mutating BiliDili data as evidence. Preserve R-2 cleanup root behavior, provider config, corrupt-DB fail-closed behavior, no-cross-root/no-preclean Test boundary, freeze strings, public CLI/HTTP/API semantics, job kind/source values, PlanStageId/response.tool/lifecycle values, and coverage_ledger/deep_mining_rounds schema names. Do not edit AlembicCore, AlembicPlugin, Test, BiliDili source, provider config, versions, release assets, vendor pins, or thread ids unless you return blocked with the exact external interface need. Add focused tests around rescan/deepMining cancellation cleanup, including ProjectContext workflow session release for cancelled rescan and deep_mining_rounds open-row closure/fail-close on cancellation or workflow abort; include regression evidence that clean cold-start completion still releases and partial failed/degraded evidence is not silently deleted. Run targeted Vitest, npm run build:check, npm run lint:repo-boundary, git diff --check, and any narrower lint/format checks required by changed files. Commit locally on main if source changes pass; do not push. Return TargetResultEnvelope with commit hash, changed files, validation output, raw evidence refs, risks, and explicit recommendation for a fresh Test no-preclean BiliDili rerun after controller acceptance.",
+      "status": "pending",
+      "createdAt": "2026-06-28T09:27:06.854Z"
+    }
+  ]
+}

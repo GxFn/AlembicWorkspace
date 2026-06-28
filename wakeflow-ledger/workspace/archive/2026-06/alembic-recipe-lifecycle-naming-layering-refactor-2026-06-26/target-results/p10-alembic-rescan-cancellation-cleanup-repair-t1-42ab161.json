@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "p10-alembic-rescan-cancellation-cleanup-repair-t1-42ab161",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p10-alembic-rescan-cancellation-cleanup-repair-p1",
+  "dispatchGroup": "p10-alembic-rescan-cancellation-cleanup-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p10-alembic-rescan-cancellation-cleanup-repair-t1",
+  "status": "completed",
+  "summary": "Alembic main repair completed at commit 42ab1613692fda5f7efb20de9d00cd35ebde796a. Public rescan job cancellation now runs best-effort cleanup that releases the ProjectContext workflow lease for the resolved project root and closes matching open deepMining rounds for the cancelled job while keeping the job status cancelled and public route semantics unchanged. Cold-start completion and cancelled cold-start session release remain covered; partial/degraded non-clean completion retention remains unchanged. Next recommendation: controller should dispatch a fresh real BiliDili no-preclean rerun after acceptance; do not accept P10 parity from this source repair alone.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-alembic-rescan-cancellation-cleanup-repair-t1-report.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-post-session-cleanup-rerun-controller-review.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-post-session-cleanup-rerun-t1-report.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-post-session-cleanup-rerun-t1-summary.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/daemon-rescan-after-host-bootstrap.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/cancel-daemon-rescan-after-timeout.json",
+    "Test/tmp/p10-bilidili-post-session-cleanup-rerun-t1/final-after-cancel-wait10-snapshot.json"
+  ],
+  "verification": [
+    "npm test -- --run test/unit/ProjectContextWorkflowFacts.test.ts => passed (15 tests)",
+    "npm test -- --run test/unit/DaemonJobRunner.test.ts => passed (17 tests)",
+    "npm test -- --run test/unit/DaemonJobRunnerPlanGate.test.ts => passed (21 tests)",
+    "npx biome check lib/workflows/project-context/ProjectContextWorkflowFacts.ts lib/daemon/DaemonJobRunner.ts test/unit/ProjectContextWorkflowFacts.test.ts test/unit/DaemonJobRunner.test.ts => passed",
+    "git diff --check => passed",
+    "npm run lint:repo-boundary => passed",
+    "npm run build:check => passed",
+    "npm run lint => exit 0 with 5 pre-existing unrelated noExplicitAny warnings",
+    "alembic_code_guard retry => failed due internal MCP schema error: unrecognized key \"data\"",
+    "alembic_work phase=start => failed due internal MCP schema error: unrecognized key \"data\""
+  ],
+  "risks": [
+    "Cancellation still does not interrupt an already-running async workflow; this patch cleans durable session/round evidence immediately on public cancel without changing the broader execution model.",
+    "Rescan cancellation release is keyed by resolved project root because rescan jobs do not persist the workflow session id; this matches the single active ProjectContext lease invariant and the Test failure evidence.",
+    "Alembic Guard/work lifecycle MCP surface failed with internal schema error, so no Guard/workRef evidence was produced."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p10-alembic-rescan-cancellation-cleanup-repair-p1__Alembic__p10-alembic-rescan-cancellation-cleanup-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-rescan-cancellation-cleanup-repair-p1__Alembic__p10-alembic-rescan-cancellation-cleanup-repair-t1.json",
+    "deliveryRunId": "run-delivery-p10-alembic-rescan-cancellation-cleanup-repair-p1__Alembic__p10-alembic-rescan-cancellation-cleanup-repair-t1",
+    "dispatchGroup": "p10-alembic-rescan-cancellation-cleanup-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-rescan-cancellation-cleanup-repair-p1__Alembic__p10-alembic-rescan-cancellation-cleanup-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 147,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p10-alembic-rescan-cancellation-cleanup-repair-p1",
+    "targetTaskId": "p10-alembic-rescan-cancellation-cleanup-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p10-alembic-rescan-cancellation-cleanup-repair-p1",
+    "resultId": "p10-alembic-rescan-cancellation-cleanup-repair-t1-42ab161",
+    "createdAt": "2026-06-28T09:39:08.130Z"
+  },
+  "createdAt": "2026-06-28T09:39:08.130Z",
+  "stateRevisionObserved": 147,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

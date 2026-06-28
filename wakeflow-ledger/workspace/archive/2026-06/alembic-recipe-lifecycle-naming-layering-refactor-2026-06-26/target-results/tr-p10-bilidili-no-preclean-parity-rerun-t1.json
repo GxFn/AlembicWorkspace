@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p10-bilidili-no-preclean-parity-rerun-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p10-bilidili-no-preclean-parity-rerun-p1",
+  "dispatchGroup": "p10-bilidili-no-preclean-parity-rerun-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "p10-bilidili-no-preclean-parity-rerun-t1",
+  "status": "blocked",
+  "summary": "No-preclean/no-cross-root rerun reused the ready BiliDili daemon at http://127.0.0.1:63477 and did not invoke restart/preclean. Current Alembic MCP status remained Transport closed, so Test used the Dashboard/daemon route. The bounded host probe job bootstrap_mqxiy51y_b669e32c timed out with status running, was cancelled, and never produced non-empty target-scoped coverage or coverageLedgerSeed; coverage_ledger stayed 0 and active BiliDili session count stayed 1. In-process/parity was not run to avoid 0-vs-0 parity.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-no-preclean-parity-rerun-t1-report.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-no-preclean-parity-rerun-t1-summary.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/baseline.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-cold-start-command.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-cold-start-process-timeline.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/after-host-probe-readback.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-probe-monitor-1.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/host-probe-monitor-2.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/cancel-host-probe-job.json",
+    "Test/tmp/p10-bilidili-no-preclean-parity-rerun-t1/p10-no-preclean-evidence.mjs"
+  ],
+  "verification": [
+    "verify-test-environment --url http://127.0.0.1:63477 returned ok=true/verdict=ready and BiliDili dataRoot.",
+    "MCP alembic_status(projectRoot=BiliDili) returned Transport closed; no repair/reload attempted.",
+    "probe-cold-start-process-timeline ran bounded host route with --max-files 4 --content-max-lines 40 --skip-guard --timeout-ms 180000.",
+    "Cancel evidence shows only bootstrap_mqxiy51y_b669e32c was cancelled after bounded timeout; daemon health remained healthy and DB integrity remained ok."
+  ],
+  "risks": [
+    "A matching unfinished BiliDili active session remains after cancellation; Test did not manually edit session state.",
+    "Host route produced zero coverage_ledger rows and no coverageLedgerSeed, so P10 parity, G4, G6, and final demand completion remain unproven.",
+    "Current Codex Alembic MCP surface is still unusable in this Test thread."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p10-bilidili-no-preclean-parity-rerun-p1__Test__p10-bilidili-no-preclean-parity-rerun-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-bilidili-no-preclean-parity-rerun-p1__Test__p10-bilidili-no-preclean-parity-rerun-t1.json",
+    "deliveryRunId": "run-delivery-p10-bilidili-no-preclean-parity-rerun-p1__Test__p10-bilidili-no-preclean-parity-rerun-t1",
+    "dispatchGroup": "p10-bilidili-no-preclean-parity-rerun-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-bilidili-no-preclean-parity-rerun-p1__Test__p10-bilidili-no-preclean-parity-rerun-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 135,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p10-bilidili-no-preclean-parity-rerun-p1",
+    "targetTaskId": "p10-bilidili-no-preclean-parity-rerun-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "p10-bilidili-no-preclean-parity-rerun-p1",
+    "resultId": "tr-p10-bilidili-no-preclean-parity-rerun-t1",
+    "createdAt": "2026-06-28T08:35:36.019Z"
+  },
+  "createdAt": "2026-06-28T08:35:36.019Z",
+  "stateRevisionObserved": 135,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

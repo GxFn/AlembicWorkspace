@@ -1,0 +1,119 @@
+{
+  "targetWindow": "Test",
+  "taskId": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-target-axis-hardening-t1",
+  "dispatchGroup": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-target-axis-hardening-p1",
+  "status": "blocked",
+  "blockedAt": "host-bootstrap-dimension-submit",
+  "firstBlocker": "BiliDili rebuild:true fullReset did not clear stale knowledge_entries and left mixed aggregate/root coverage_ledger rows; corrected current-session recipe submissions were rejected as duplicate old staging recipes, so no session-bound recipe ids were available for dimension completion or cleanup.",
+  "pins": {
+    "AlembicPlugin": "bdd0b62fb80082c032f299d3393eacb5bfd78eeb",
+    "AlembicCore": "99a7cf10d82056cd860eb0a1d9544662e3735b08",
+    "Alembic": "bf328ea81a809bb8f761c0a0d81162703b1cb70d",
+    "BiliDili": "6f1bf34cf1b6daca4e08895db211939115dac868"
+  },
+  "preconditions": {
+    "gitStatusClean": true,
+    "alembicPluginBuild": "passed",
+    "alembicBuild": "passed",
+    "testEnvironment": "ready",
+    "dashboardUrl": "http://127.0.0.1:58762",
+    "provider": {
+      "aiProvider": "deepseek",
+      "aiModel": "deepseek-v4-pro",
+      "embedProvider": "local-ollama",
+      "embedModel": "qwen3-embedding:0.6b",
+      "embedLaneOrder": "local-first"
+    },
+    "r2Proof": {
+      "fullHostUsesDataRoot": true,
+      "fullInProcessUsesProjectRoot": true,
+      "incrementalUsesDataRoot": true
+    },
+    "targetAxisSourceProof": {
+      "targetAxisHelperPresent": true,
+      "dimensionCompletionFiltersMixedAxis": true,
+      "rescanSeedFiltersTargetAxis": true,
+      "coverageAdvisoryFiltersTargetAxis": true,
+      "moduleServicePrefersTargetCanonicalModules": true
+    }
+  },
+  "hostRoute": {
+    "bootstrapRebuild": "started",
+    "fullResetLog": {
+      "timestamp": "2026-06-28T06:26:01Z",
+      "dbSnapshotRows": 29,
+      "movedItems": 2,
+      "errors": 1,
+      "trashFolder": "2026-06-28T06-26-01-867Z",
+      "warning": "[CleanupService] Failed to clear knowledge_entries: database disk image is malformed"
+    },
+    "duplicateRecipes": [
+      {
+        "title": "协调器装配",
+        "id": "<redacted>",
+        "source": "host-agent",
+        "lifecycle": "staging",
+        "createdAt": 1782625097,
+        "createdAtUtc": "2026-06-28T05:38:17Z"
+      },
+      {
+        "title": "模块生命周期",
+        "id": "<redacted>",
+        "source": "host-agent",
+        "lifecycle": "staging",
+        "createdAt": 1782625097,
+        "createdAtUtc": "2026-06-28T05:38:17Z"
+      },
+      {
+        "title": "二级路由表",
+        "id": "<redacted>",
+        "source": "host-agent",
+        "lifecycle": "staging",
+        "createdAt": 1782625097,
+        "createdAtUtc": "2026-06-28T05:38:17Z"
+      }
+    ],
+    "dbAfterRebuild": {
+      "knowledgeEntries": 18,
+      "coverageLedger": 23,
+      "targetCoverageRows": 15,
+      "aggregateCoverageRows": 8,
+      "targetScopedOnly": false,
+      "aggregateModuleIds": [
+        "BiliDili",
+        "Packages/AOXFoundationKit",
+        "Packages/AOXNetworkKit",
+        "Packages/AOXPlayer",
+        "Packages/AOXUIKit",
+        "Sources",
+        "module:root:BiliDili:BiliDili",
+        "root"
+      ]
+    }
+  },
+  "cleanupAttempt": {
+    "tool": "alembic_dimension_complete",
+    "mode": "noPadding cleanup-only",
+    "submittedRecipeIds": [],
+    "status": "blocked",
+    "errorCode": "DIMENSION_RECIPE_ID_NOT_BOUND",
+    "activeMatchingBiliDiliSessionsAfterAttempt": 1
+  },
+  "notRun": [
+    "host rescan",
+    "successful noPadding cleanup verification",
+    "in-process route with moduleScope=[\"BiliDili\"]",
+    "host-vs-in-process parity diff"
+  ],
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-target-axis-hardening-t1-report.md",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-target-axis-hardening-t1/before-host-snapshot.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-target-axis-hardening-t1/after-host-bootstrap-submit-duplicate-blocker-snapshot.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-target-axis-hardening-t1/after-cleanup-attempt-blocked-snapshot.json"
+  ],
+  "risks": [
+    "One matching BiliDili bootstrap session remains open because cleanup-only dimension completion was rejected without session-bound recipe ids.",
+    "The real BiliDili dataRoot still contains stale knowledge_entries and aggregate/root coverage_ledger rows after rebuild:true.",
+    "No valid parity conclusion can be drawn because the host route did not reach a clean target-only post-bootstrap state."
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p9-core-project-index-collapse-coverage-unify-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p9-core-project-index-collapse-coverage-unify-p1",
+  "dispatchGroup": "p9-core-project-index-collapse-coverage-unify-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p9-core-project-index-collapse-coverage-unify-t1",
+  "status": "completed",
+  "summary": "P9 completed. AlembicCore collapsed cold-start/knowledge-rescan Core workflow implementation into src/workflows/project-index with old cold-start/knowledge-rescan file and barrel shims preserved, added ProjectIndex aliases on project-index/workflows/host-agent-workflows/plans barrels, relocated CoverageLedgerAdvisor/Write real implementations into capabilities/coverage with host-agent shims, added buildCoverageLedgerModuleAxisFromSummaries for shared module-summary-to-axis mapping, and updated Alembic/AlembicPlugin adapters to feed that Core builder. Core committed at 99a7cf10d82056cd860eb0a1d9544662e3735b08; Alembic vendor/AlembicCore re-pinned and committed at 65c244d8092a70656cd2d5f3f16883f6a053b326; AlembicPlugin vendor/AlembicCore re-pinned and committed at 69c80dfc86bc1ea587058567f0016e48bb8dfec2. No push performed. Recommend controller dispatch P9 REAL-TEST parity next if accepted.",
+  "evidenceRefs": [
+    "AlembicCore commit 99a7cf10d82056cd860eb0a1d9544662e3735b08 (Collapse project index workflow seams): 31 files changed; project-index implementation added; cold-start/knowledge-rescan shims retained; coverage Advisor/Write moved to capabilities/coverage; module-axis builder added; ProjectIndexWorkflowPlan and BuildCoverageLedger characterization tests added.",
+    "Alembic commit 65c244d8092a70656cd2d5f3f16883f6a053b326 (Use core coverage module axis builder): lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts now delegates in-process coverage module axis mapping to Core builder while preserving old moduleId+path filter; vendor/AlembicCore pinned to 99a7cf10d82056cd860eb0a1d9544662e3735b08.",
+    "AlembicPlugin commit 69c80dfc86bc1ea587058567f0016e48bb8dfec2 (Use core coverage module axis builder): dimension-completion and host-agent rescan coverage modules now delegate summary-to-axis mapping to Core builder; vendor/AlembicCore pinned to 99a7cf10d82056cd860eb0a1d9544662e3735b08.",
+    "Import proof from AlembicCore dist: oldCold/oldRescan functions resolve; host-agent-workflows aliases buildProjectIndexFullPlan and buildProjectIndexIncrementalPlan are identical to old builders; plans facade aliases identical; old workflows/cold-start and workflows/knowledge-rescan subpaths resolve; workflows/project-index aggregate ProjectIndex aliases resolve; coverage barrel buildCoverageLedgerModuleAxisFromSummaries is identical to host-agent-workflows export.",
+    "Frozen/R-2 proof: grep confirmed PlanStageId coldStart/deepMining/moduleMining unchanged in src/service/planIntent/contracts.ts and planIntent.ts; response.tool values alembic_bootstrap/alembic_rescan and alembic_dimension_complete remain in moved project-index presenters/plans and host-agent support; coverage_ledger/deep_mining_rounds schema/migrations unchanged; ProjectIndexPlan.ts preserves full-mode cleanup.projectRoot ternary intent.executor === 'host-agent' ? dataRoot : projectRoot and incremental cleanup projectRoot=dataRoot.",
+    "Clean state proof after commits: AlembicCore main ahead 3 clean at 99a7cf10d82056cd860eb0a1d9544662e3735b08; Alembic main ahead 7 clean at 65c244d8092a70656cd2d5f3f16883f6a053b326 with vendor/AlembicCore 99a7cf10d82056cd860eb0a1d9544662e3735b08; AlembicPlugin main ahead 5 clean at 69c80dfc86bc1ea587058567f0016e48bb8dfec2 with vendor/AlembicCore 99a7cf10d82056cd860eb0a1d9544662e3735b08."
+  ],
+  "verification": [
+    "AlembicCore npm run build:check: passed after final changes.",
+    "AlembicCore npm run build: passed after final changes.",
+    "AlembicCore npm run test: passed, 145 test files / 1418 tests.",
+    "AlembicCore npm run lint: passed, Biome checked 655 files.",
+    "AlembicCore npm run lint:public-api-boundary: passed, 61 package exports classified, stable=24 provisional=8 transitional=29, no-growth checks passed.",
+    "AlembicCore npm run lint:consumer-core-imports: passed, AlembicAgent/Alembic/AlembicPlugin issues=0.",
+    "AlembicCore npm run lint:layer-contract: passed, 404 allowed cross-area runtime imports and 253 type-only bridges.",
+    "AlembicCore targeted characterization: npx vitest run test/ProjectIndexWorkflowPlan.test.ts test/PublicHostAgentWorkflowEntrypoints.test.ts test/unit/BuildCoverageLedger.test.ts passed, 3 files / 15 tests after final barrel alias update.",
+    "AlembicCore git diff --check and git diff --check HEAD~1 HEAD: passed.",
+    "Alembic npx vitest run test/unit/KnowledgeRescanCoverageLedgerWrite.test.ts test/unit/DaemonJobRunnerPlanGate.test.ts: passed, 2 files / 20 tests.",
+    "Alembic npm run build:check: passed using local AlembicCore source.",
+    "Alembic git diff --check and git diff --check HEAD~1 HEAD: passed.",
+    "AlembicPlugin npx vitest run test/unit/CoverageLedgerWiring.test.ts test/unit/HostAgentDimensionCompletionWorkflow.test.ts: passed, 2 files / 28 tests.",
+    "AlembicPlugin npm run build:check: passed; build-core reported ../AlembicCore @ 99a7cf10d82056cd860eb0a1d9544662e3735b08.",
+    "AlembicPlugin git diff --check and git diff --check HEAD~1 HEAD: passed.",
+    "alembic_code_guard attempted on explicit Core P9 files and failed with existing MCP internal schema error unrecognized_keys:data; no code findings returned."
+  ],
+  "risks": [
+    "P9 REAL-TEST dual-host parity was not run in this AlembicCore target package; packet asks to recommend controller dispatch P9 REAL-TEST parity next if code is accepted.",
+    "Alembic Guard remains unavailable due MCP internal error unrecognized_keys:data, same class observed in prior phases; repository validations passed instead.",
+    "Core public package export list was intentionally not expanded; project-index is exposed through existing workflows aggregate/source barrels and stable host-agent-workflows/plans aliases while old public package subpaths remain stable.",
+    "No push performed; commits are local on main in the three repositories."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p9-core-project-index-collapse-coverage-unify-p1__AlembicCore__p9-core-project-index-collapse-coverage-unify-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-core-project-index-collapse-coverage-unify-p1__AlembicCore__p9-core-project-index-collapse-coverage-unify-t1.json",
+    "deliveryRunId": "run-delivery-p9-core-project-index-collapse-coverage-unify-p1__AlembicCore__p9-core-project-index-collapse-coverage-unify-t1",
+    "dispatchGroup": "p9-core-project-index-collapse-coverage-unify-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-core-project-index-collapse-coverage-unify-p1__AlembicCore__p9-core-project-index-collapse-coverage-unify-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 51,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p9-core-project-index-collapse-coverage-unify-p1",
+    "targetTaskId": "p9-core-project-index-collapse-coverage-unify-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p9-core-project-index-collapse-coverage-unify-p1",
+    "resultId": "tr-p9-core-project-index-collapse-coverage-unify-t1",
+    "createdAt": "2026-06-28T01:02:38.452Z"
+  },
+  "createdAt": "2026-06-28T01:02:38.452Z",
+  "stateRevisionObserved": 51,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

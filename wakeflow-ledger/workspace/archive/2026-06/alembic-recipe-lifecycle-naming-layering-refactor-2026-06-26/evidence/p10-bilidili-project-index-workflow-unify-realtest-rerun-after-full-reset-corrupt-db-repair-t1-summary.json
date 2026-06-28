@@ -1,0 +1,105 @@
+{
+  "targetWindow": "Test",
+  "taskId": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-t1",
+  "dispatchGroup": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-p1",
+  "status": "blocked",
+  "blockedAt": "host-bootstrap-rebuild",
+  "firstBlocker": "alembic_bootstrap({rebuild:true}) returned BOOTSTRAP_IN_PROGRESS for a stale active BiliDili bootstrap session before a valid post-repair host bootstrap could proceed.",
+  "pins": {
+    "AlembicPlugin": "aee228be0082e8ddb1d4494df07e0ffedc6ea292",
+    "AlembicCore": "99a7cf10d82056cd860eb0a1d9544662e3735b08",
+    "Alembic": "bf328ea81a809bb8f761c0a0d81162703b1cb70d",
+    "BiliDili": "6f1bf34cf1b6daca4e08895db211939115dac868"
+  },
+  "preconditions": {
+    "gitStatusClean": true,
+    "alembicPluginBuild": "passed",
+    "alembicBuild": "passed",
+    "testEnvironment": "ready",
+    "dashboardUrl": "http://127.0.0.1:58762",
+    "provider": {
+      "aiProvider": "deepseek",
+      "aiModel": "deepseek-v4-pro",
+      "embedProvider": "local-ollama",
+      "embedModel": "qwen3-embedding:0.6b",
+      "embedLaneOrder": "local-first"
+    },
+    "r2Proof": {
+      "fullHostUsesDataRoot": true,
+      "fullInProcessUsesProjectRoot": true,
+      "incrementalUsesDataRoot": true
+    },
+    "sourceRepairProof": {
+      "pluginHeadMatchesRepair": true,
+      "resetDeletesCoverageLedger": true,
+      "resetDeletesDeepMiningRounds": true,
+      "resetDeletesSourceGraph": true,
+      "resetDeletesProjectContextSnapshots": true,
+      "criticalDbFailureFailsClosed": true,
+      "malformedKnowledgeEntriesTested": true
+    }
+  },
+  "preRunDbState": {
+    "integrityCheck": "corrupt: Tree 4 page 4 cell 0 Rowid out of order; knowledge_entries index counts wrong/missing rows",
+    "knowledgeEntries": 18,
+    "coverageLedger": 23,
+    "deepMiningRounds": 2,
+    "targetCoverageRows": 15,
+    "aggregateCoverageRows": 8,
+    "targetScopedOnly": false,
+    "aggregateModuleIds": [
+      "BiliDili",
+      "Packages/AOXFoundationKit",
+      "Packages/AOXNetworkKit",
+      "Packages/AOXPlayer",
+      "Packages/AOXUIKit",
+      "Sources",
+      "module:root:BiliDili:BiliDili",
+      "root"
+    ],
+    "staleRecipeTitles": [
+      "协调器装配",
+      "模块生命周期",
+      "二级路由表"
+    ],
+    "activeSession": {
+      "id": "bs-<redacted>",
+      "projectRoot": "/Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili",
+      "dimension": "architecture",
+      "completedDimensions": []
+    }
+  },
+  "bootstrapAttempt": {
+    "status": "failed",
+    "errorCode": "BOOTSTRAP_IN_PROGRESS",
+    "httpStatus": 409,
+    "activeSessionId": "bs-<redacted>",
+    "activeSessionExpiresAtUtc": "2026-06-28T08:26:02.340Z",
+    "observedCleanupLog": {
+      "timestamp": "2026-06-28T07:08:30.187Z",
+      "message": "[CleanupService] Failed to clear knowledge_entries: database disk image is malformed",
+      "followedBy": "[CleanupService] fullReset complete (trash-bin mode)",
+      "errors": 1
+    }
+  },
+  "notRun": [
+    "recipe submission",
+    "dimension completion",
+    "host rescan",
+    "successful noPadding cleanup verification",
+    "in-process route with moduleScope=[\"BiliDili\"]",
+    "host-vs-in-process parity diff"
+  ],
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-t1-report.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-t1-bootstrap-diagnostic.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-t1/before-host-snapshot.json",
+    "Test/tmp/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-t1/after-bootstrap-conflict-snapshot.json"
+  ],
+  "risks": [
+    "The stale BiliDili bootstrap session remains active because Test did not manually edit session state.",
+    "The real BiliDili dataRoot remains corrupt and still contains stale knowledge_entries plus aggregate/root coverage_ledger rows.",
+    "The live route did not produce a controller-reviewable fail-closed bootstrap diagnostic proving the accepted source repair is active in the current execution path.",
+    "No valid parity conclusion can be drawn because the host route did not reach a clean target-only post-bootstrap state."
+  ]
+}

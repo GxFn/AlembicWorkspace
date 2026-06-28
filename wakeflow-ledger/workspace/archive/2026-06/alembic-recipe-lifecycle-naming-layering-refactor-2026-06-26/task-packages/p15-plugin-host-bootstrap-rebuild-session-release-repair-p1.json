@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p15-plugin-host-bootstrap-rebuild-session-release-repair-p1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "summary": "P15 repair package for AlembicPlugin: accepted Test evidence shows authorized BiliDili host MCP alembic_bootstrap rebuild:true cleaned SQLite coverage rows, aggregate/root ids, and open rounds with integrity ok, but the successful bootstrap rebuild left a durable host-agent bootstrap session. The following host alembic_rescan failed BOOTSTRAP_IN_PROGRESS/409, public dimension_complete no-padding failed DIMENSION_RECIPE_ID_NOT_BOUND, and dashboard cancel reported idle while the durable session remained. Repair Plugin host bootstrap/project-index session lifecycle before any further Test rerun.",
+  "status": "pending",
+  "sourceRef": "evidence/p15-bilidili-final-parity-rerun-after-terminal-cleanup-seed-consistency-repair-controller-review.md",
+  "createdAt": "2026-06-28T18:07:30.925Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p15-plugin-host-bootstrap-rebuild-session-release-repair-t1",
+      "taskPackageId": "p15-plugin-host-bootstrap-rebuild-session-release-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, the active state root, this task package, and controller review evidence. Confirm window/repository identity as AlembicPlugin. Scope is narrow: investigate and fix the Plugin host MCP bootstrap/project-index route so a successful authorized alembic_bootstrap rebuild:true/full-reset run does not leave a stale durable host-agent bootstrap session that blocks the next alembic_rescan for the same project. Relevant starting points from controller source scan: lib/runtime/mcp/HostMcpServer.ts normalizes alembic_bootstrap/alembic_rescan; lib/recipe-generation/host-agent-workflows/project-index.ts dispatches full/incremental modes; lib/recipe-generation/host-agent-workflows/cold-start.ts creates the host-agent session; lib/recipe-generation/host-agent-workflows/project-context-analysis.ts has session release helpers; AlembicCore BootstrapSessionManager already has clearSession/releaseProjectLease APIs. Preserve productive in-progress bootstrap work: do not broadly clear active sessions. Add focused tests proving the successful rebuild/full-reset terminal path releases or safely completes only the intended empty/terminal project session, and proving subsequent rescan is not blocked by BOOTSTRAP_IN_PROGRESS. If a safe fix requires an AlembicCore API change, stop and backfill the exact API gap with evidence instead of editing BiliDili data or Test. Do not run BiliDili REAL-TEST, do not manually edit SQLite/session files, do not change frozen public tool names/response tool values/lifecycle/coverage ledger schema/export paths, do not push/version/release. Build dist if Plugin runtime requires it, run focused unit tests plus build/check and repo/layer/core boundary checks used by this repo, include source and dist repair-marker proof, commit locally on main if repository rules require target commits, and return a TargetResultEnvelope with raw command evidence, commit hash, risks, and whether Test can rerun.",
+      "status": "pending",
+      "createdAt": "2026-06-28T18:07:30.925Z"
+    }
+  ]
+}

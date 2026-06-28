@@ -1,0 +1,47 @@
+{
+  "taskId": "p10-bilidili-project-index-workflow-unify-realtest-rerun-after-data-root-sqlite-repair-t1",
+  "targetWindow": "Test",
+  "status": "blocked",
+  "classification": "execution-boundary-blocked-before-official-rebuild",
+  "sourcePins": {
+    "alembic": "af4d976c29fee58a93f05de8bfc334073575b46d",
+    "alembicPlugin": "aee228be0082e8ddb1d4494df07e0ffedc6ea292",
+    "alembicCore": "99a7cf10d82056cd860eb0a1d9544662e3735b08",
+    "bilidili": "6f1bf34cf1b6daca4e08895db211939115dac868"
+  },
+  "preconditions": {
+    "gitStatusClean": true,
+    "providerConfigUnchanged": true,
+    "dbIntegrityBeforeRestart": "ok",
+    "dbTablesBeforeRestart": [],
+    "quarantinePresent": true
+  },
+  "blockers": [
+    {
+      "kind": "host-mcp",
+      "summary": "Alembic MCP returned Transport closed for alembic_status; Test did not repair current host MCP."
+    },
+    {
+      "kind": "test-boundary",
+      "summary": "restart-alembic.mjs default preclean cleaned logs under non-BiliDili Ghost roots, violating the test card boundary."
+    }
+  ],
+  "postStopReadOnlyEvidence": {
+    "dashboardUrl": "http://127.0.0.1:63477",
+    "health": "healthy",
+    "testModeEnabled": true,
+    "runtimeDbIntegrity": "ok",
+    "schemaInitializedAfterDaemonStart": true,
+    "staleSessionStillPresent": true,
+    "daemonPid": 12245
+  },
+  "notRun": [
+    "alembic_bootstrap({rebuild:true})",
+    "host dimension_complete/noPadding",
+    "host rescan",
+    "in-process moduleScope=[\"BiliDili\"] route",
+    "host-vs-in-process parity"
+  ],
+  "report": "evidence/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-data-root-sqlite-repair-t1-report.md",
+  "recommendedNextAction": "Controller should treat this Test target as blocked, repair or refresh the current Alembic MCP host surface through the owning path if host MCP is required, and rerun Test with a no-preclean/no-cross-root restart route before official rebuild/parity."
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-appruntime-rename-p1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "summary": "P3/COLD: Alembic main app-boot class rename Bootstrap -> AppRuntime after P2 freeze acceptance. This is Alembic-local and must not rename bootstrap job/tool/signal/log literals.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26.md §12.2 P3 + wakeflow-ledger/AlembicWorkspace/recipe-lifecycle-freeze-register-2026-06-28.md",
+  "createdAt": "2026-06-27T21:18:06.031Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-appruntime-rename-t1",
+      "taskPackageId": "p3-appruntime-rename-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read Alembic/AGENTS.md, parent AGENTS.md, active index/status, state root, design §12.2 P3, and P2 freeze register. In Alembic only, rename the app-boot class `Bootstrap` in `lib/Bootstrap.ts` to `AppRuntime`. First grep `Bootstrap` and classify hits: change only class/type/constructor/import/export references needed for app runtime; do not change workflow/domain symbols, `bootstrap` job kind/source, `alembic_bootstrap` tool, `createInternalColdStartIntent`, `BootstrapTaskManager`, `BootstrapEventEmitter`, signalBus/logPrefix literal `Bootstrap`, or other frozen/lifecycle/domain strings. If external importers require compatibility, keep a local shim/export alias such as `export { AppRuntime as Bootstrap }` while moving consumers to `AppRuntime` where safe. Include `package.json` main path handling if the filename changes; do not rename the file unless all runtime/package import paths and build entrypoints are updated safely. Do not edit AlembicCore, AlembicPlugin, AlembicAgent, AlembicDashboard, BiliDili, vendor/AlembicCore, versions, release assets, or thread ids. Validation required: `npm run build:check`, `npm run lint:repo-boundary`, targeted app-boot test(s) covering Bootstrap/AppRuntime initialization (`createTestBootstrap`/ServiceContainer/FullPipeline or more focused equivalent), `git diff --check`, grep proof that frozen tokens did not drift (`bootstrap`, `alembic_bootstrap`, `alembic_rescan`, `alembic_dimension_complete`, `coldStart`, `deepMining`, `moduleMining`, `bootstrap-session:`, `coverage_ledger`, `deep_mining_rounds`) and that app runtime imports resolve. Commit locally on main if source changes; do not push. Return TargetResultEnvelope with commit hash or no-commit rationale, changed files, validation summaries, grep classification, frozen-token proof, and risks.",
+      "status": "pending",
+      "createdAt": "2026-06-27T21:18:06.031Z"
+    }
+  ]
+}

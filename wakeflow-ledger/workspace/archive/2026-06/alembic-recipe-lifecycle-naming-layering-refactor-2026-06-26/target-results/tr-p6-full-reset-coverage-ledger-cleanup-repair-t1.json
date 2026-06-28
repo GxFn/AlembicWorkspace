@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p6-full-reset-coverage-ledger-cleanup-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p6-full-reset-coverage-ledger-cleanup-repair-p1",
+  "dispatchGroup": "p6-full-reset-coverage-ledger-cleanup-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p6-full-reset-coverage-ledger-cleanup-repair-t1",
+  "status": "completed",
+  "summary": "Alembic fullReset cleanup repaired for P6 blocker. CleanupService.fullReset now clears Core deepMining measured-state tables coverage_ledger and deep_mining_rounds, plus same full-reset-contract omitted data/cache tables found in current schema scan, while leaving rescanClean/forceRescanClean and coldStart measured-coverage behavior unchanged. Commit 9d703a3 fixes the table-list seam and adds focused CleanupService regression coverage. Exact next recommendation: controller should rerun the P6 BiliDili real-test against Alembic commit 9d703a3 to prove documented bootstrap reset now clears stale coverage/round state and allows a fresh deepMining round open/close.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p6-full-reset-coverage-ledger-cleanup-repair-t1-report.md",
+    "Alembic/lib/service/cleanup/CleanupService.ts",
+    "Alembic/test/unit/CleanupService.test.ts"
+  ],
+  "verification": [
+    "Commit: 9d703a3 fix: clear coverage ledger on full reset.",
+    "npx vitest run test/unit/CleanupService.test.ts: passed, 3 tests.",
+    "npm run build:check: passed with local ../AlembicCore source and tsc --noEmit.",
+    "npm run lint:repo-boundary: passed; @escape-hatch 1/75.",
+    "npm run lint: exit 0 with 5 pre-existing noExplicitAny warnings outside changed files.",
+    "npm run build: passed.",
+    "git diff --check: passed; git diff --check HEAD~1 HEAD: passed.",
+    "Schema scan listed current non-schema data/cache tables from Core migrations and Alembic SqliteDatabaseAccess; fullReset now covers the same-contract omitted tables while task tables remain covered by the existing task-table loop.",
+    "alembic_code_guard attempted on changed files; failed with internal MCP schema error unrecognized key data, not a code finding."
+  ],
+  "risks": [
+    "P6 real BiliDili scenario was not rerun in this Alembic target; controller should dispatch the Test rerun next.",
+    "The repair intentionally does not change advisor thresholds, coldStart measured-coverage behavior, R-2 cleanup.projectRoot routing, or deepMining round-loop semantics.",
+    "alembic_code_guard unavailable due internal schema error unrecognized key data."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p6-full-reset-coverage-ledger-cleanup-repair-p1__Alembic__p6-full-reset-coverage-ledger-cleanup-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-full-reset-coverage-ledger-cleanup-repair-p1__Alembic__p6-full-reset-coverage-ledger-cleanup-repair-t1.json",
+    "deliveryRunId": "run-delivery-p6-full-reset-coverage-ledger-cleanup-repair-p1__Alembic__p6-full-reset-coverage-ledger-cleanup-repair-t1",
+    "dispatchGroup": "p6-full-reset-coverage-ledger-cleanup-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-full-reset-coverage-ledger-cleanup-repair-p1__Alembic__p6-full-reset-coverage-ledger-cleanup-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 35,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p6-full-reset-coverage-ledger-cleanup-repair-p1",
+    "targetTaskId": "p6-full-reset-coverage-ledger-cleanup-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p6-full-reset-coverage-ledger-cleanup-repair-p1",
+    "resultId": "tr-p6-full-reset-coverage-ledger-cleanup-repair-t1",
+    "createdAt": "2026-06-27T23:12:35.827Z"
+  },
+  "createdAt": "2026-06-27T23:12:35.827Z",
+  "stateRevisionObserved": 35,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

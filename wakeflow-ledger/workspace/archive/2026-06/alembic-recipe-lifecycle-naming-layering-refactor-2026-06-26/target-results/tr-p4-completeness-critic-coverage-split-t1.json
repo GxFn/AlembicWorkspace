@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-completeness-critic-coverage-split-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p4-completeness-critic-coverage-split-p1",
+  "dispatchGroup": "p4-completeness-critic-coverage-split-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p4-completeness-critic-coverage-split-t1",
+  "status": "completed",
+  "summary": "Completed P4 behavior-neutral Core split. AlembicCore commit 4695c929d70701cf0025d176e7ca51b42e800073 moves buildCoverageLedger and coverage ledger types to src/workflows/capabilities/coverage/CoverageLedgerBuilder.ts, extracts only shared neutral path/sort helpers to coverage/shared/coveragePathMatching.ts, keeps buildCompletenessCritic in CompletenessCritic.ts, updates CoverageLedgerWrite to import the new builder, and keeps @alembic/core/host-agent-workflows exporting buildCoverageLedger/CoverageLedgerCell through the host-agent barrel. Alembic parent commit 1196353f83b876dcc6503c5e37af9d6a3ebbd34b and AlembicPlugin parent commit b9be06285dc77c027687c7d086eaf62ee90523a3 re-pin vendor/AlembicCore to 4695c929d70701cf0025d176e7ca51b42e800073. No push performed. No REAL-TEST required because P4 is documented pure relocation/characterization coverage.",
+  "evidenceRefs": [
+    "AlembicCore@4695c929d70701cf0025d176e7ca51b42e800073",
+    "Alembic@1196353f83b876dcc6503c5e37af9d6a3ebbd34b",
+    "AlembicPlugin@b9be06285dc77c027687c7d086eaf62ee90523a3",
+    "AlembicCore/src/workflows/capabilities/coverage/CoverageLedgerBuilder.ts",
+    "AlembicCore/src/workflows/capabilities/coverage/shared/coveragePathMatching.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/CompletenessCritic.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/CoverageLedgerWrite.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/index.ts",
+    "AlembicCore/test/unit/BuildCoverageLedger.test.ts",
+    "Alembic/vendor/AlembicCore -> 4695c929d70701cf0025d176e7ca51b42e800073",
+    "AlembicPlugin/vendor/AlembicCore -> 4695c929d70701cf0025d176e7ca51b42e800073"
+  ],
+  "verification": [
+    "Scan evidence: rg shows buildCoverageLedger/CoverageLedgerCell now only in CoverageLedgerBuilder, CoverageLedgerWrite imports the new builder, and CompletenessCritic only shares neutral comparablePaths/refsOverlap/pathsOverlap/normalizePath/sortUnique via coverage/shared/coveragePathMatching.ts.",
+    "Pre-change focused baseline: npm run test -- test/unit/BuildCoverageLedger.test.ts -> 1 file passed, 5 tests passed.",
+    "Post-change focused characterization: npm run test -- test/unit/BuildCoverageLedger.test.ts -> 1 file passed, 6 tests passed, including exact fixed-output public facade test.",
+    "Core npm run build:check -> pass.",
+    "Core npm run lint -> pass.",
+    "Core npm run build -> pass.",
+    "Core npm run test -> pass, 144 files / 1413 tests.",
+    "Core git diff --check -> pass.",
+    "Public export proof: node import('@alembic/core/host-agent-workflows').buildCoverageLedger -> function; tsc temp consumer importing buildCoverageLedger and type CoverageLedgerCell from @alembic/core/host-agent-workflows -> pass; dist d.ts re-export chain includes CoverageLedgerBuilder.",
+    "Alembic npm run build:check -> pass.",
+    "AlembicPlugin npm run build:check -> pass; output confirmed Core build used ../AlembicCore @ 4695c929d70701cf0025d176e7ca51b42e800073.",
+    "Alembic git ls-files -s vendor/AlembicCore -> 160000 4695c929d70701cf0025d176e7ca51b42e800073.",
+    "AlembicPlugin git ls-files -s vendor/AlembicCore -> 160000 4695c929d70701cf0025d176e7ca51b42e800073.",
+    "Alembic Guard attempted twice and failed with tool internal schema error unrecognized_keys:data; repository validations above are green."
+  ],
+  "risks": [
+    "Alembic vendor moved from old detached e809140 line to the new Core source commit as required by P4; this intentionally replaces the previous gitlink with the canonical Core source commit 4695c929.",
+    "No REAL-TEST was run because P4 scope is behavior-neutral relocation and design §12.2 explicitly says no REAL-TEST for P4.",
+    "No push performed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-completeness-critic-coverage-split-p1__AlembicCore__p4-completeness-critic-coverage-split-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-completeness-critic-coverage-split-p1__AlembicCore__p4-completeness-critic-coverage-split-t1.json",
+    "deliveryRunId": "run-delivery-p4-completeness-critic-coverage-split-p1__AlembicCore__p4-completeness-critic-coverage-split-t1",
+    "dispatchGroup": "p4-completeness-critic-coverage-split-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-completeness-critic-coverage-split-p1__AlembicCore__p4-completeness-critic-coverage-split-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 19,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p4-completeness-critic-coverage-split-p1",
+    "targetTaskId": "p4-completeness-critic-coverage-split-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p4-completeness-critic-coverage-split-p1",
+    "resultId": "tr-p4-completeness-critic-coverage-split-t1",
+    "createdAt": "2026-06-27T21:49:51.470Z"
+  },
+  "createdAt": "2026-06-27T21:49:51.470Z",
+  "stateRevisionObserved": 19,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

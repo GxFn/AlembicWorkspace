@@ -1,0 +1,92 @@
+{
+  "kind": "TestBoundaryCard",
+  "schemaVersion": 1,
+  "testId": "p11-bilidili-module-mining-binding-rich-realtest-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "status": "draft",
+  "createdAt": "2026-06-28T11:01:53.869Z",
+  "stateRevisionObserved": 165,
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/evidence/p11-alembic-module-mining-binding-rich-selector-controller-review.md",
+  "boundaryGate": {
+    "question": "Does the real BiliDili moduleMining flow prove the P11 binding-rich selector behavior change end to end, especially Entry B planned per-module dimensions instead of scope-only/all-dimension behavior?",
+    "objectBoundary": "Real BiliDili workspace/data-root using the current Alembic source with commit 25a86eed857294d63ee671203d3634859a6709fa loaded. Cover both in-process moduleMining entries: Entry A daemon ModuleMiningWorkflow and Entry B KnowledgeRescanWorkflow Step 7 moduleMining/per-module route. Do not test Plugin host-agent moduleMining as P11 source scope.",
+    "controllerSelfChecks": [
+      "Controller reviewed Alembic commit 25a86eed857294d63ee671203d3634859a6709fa, the shared selector source, Entry B wiring, and AlembicAgent compatibility source.",
+      "Controller reran Alembic focused tests, Alembic build:check, Alembic boundary checks, AlembicAgent moduleMining test, and AlembicAgent core-import boundary check.",
+      "Controller accepted the Alembic source task only; no AlembicAgent source follow-up is currently authorized."
+    ],
+    "realScenarioConditions": [
+      "Run directly against the real BiliDili workspace/data root authorized by the state root; no sandbox copy.",
+      "Preserve configured providers: DeepSeek for generation and local Qwen/Ollama for embeddings.",
+      "Use rebuild/reset between major runs when needed through the authorized BiliDili flow, and do not manually edit SQLite/source/provider state to create a pass.",
+      "Record loaded repo pins for Alembic, AlembicCore, AlembicAgent, AlembicPlugin, BiliDili, and Test."
+    ],
+    "successMeans": [
+      "Entry A and Entry B both run through real moduleMining against BiliDili and expose selected module payloads containing planned per-module dimensions.",
+      "Entry B proves the behavior change: selected modules only mine their planned dimensions, not every execution dimension.",
+      "For each selected module, recipe_source_refs shows at least one source_path-backed recipe or an equivalent persisted source-ref-backed recipe evidence record.",
+      "coverage_ledger advances for module x dimension cells targeted by the run.",
+      "deep_mining_rounds does not advance for moduleMining because the stage guard excludes moduleMining from deepMining round accounting.",
+      "Agent fan-out child count equals selectedModules capped by the configured concurrency/scale cap, with the default concurrency behavior accounted for.",
+      "SQLite integrity remains ok, no stale active ProjectContext session/open round remains, and provider route remains DeepSeek plus local Qwen/Ollama."
+    ],
+    "failureMeans": [
+      "Entry B has no plannedDimensions evidence, still mines all execution dimensions for a scoped module, or cannot be triggered through a real route.",
+      "Recipe/source-ref persistence does not materialize for selected modules.",
+      "coverage_ledger does not move for targeted module x dimension cells.",
+      "deep_mining_rounds advances for moduleMining, implying the stage guard regressed.",
+      "Agent fan-out does not respect selected module count/cap or fails to consume dimensions/dimensionIds.",
+      "SQLite corruption, stale session/open round, wrong provider route, or wrong root."
+    ],
+    "cannotConclude": [
+      "Do not conclude P11 is accepted, G4/G6 passed, P12 ready, or the whole demand is complete solely from this Test card.",
+      "Do not use a successful Entry A alone to prove Entry B behavior change.",
+      "Do not treat empty source refs, 0-vs-0 coverage, or aggregate/root-only rows as success.",
+      "Do not diagnose or modify Alembic/AlembicAgent source from the Test window; block with evidence if a product defect is found."
+    ],
+    "stopConditions": [
+      "Wrong project root/data root/provider route.",
+      "SQLite integrity failure.",
+      "Missing loaded Alembic commit 25a86ee or equivalent source proof.",
+      "Entry B cannot be triggered or lacks plannedDimensions evidence.",
+      "Any operation would require manual data mutation or product source edits from Test."
+    ]
+  },
+  "evidenceRequired": [
+    "A Test report and summary JSON under the state root.",
+    "Raw tmp JSON/log artifacts for Entry A and Entry B showing request, selected modules, dimensions/plannedDimensions, fan-out, job/result status, source refs, coverage ledger, rounds, sessions, provider config, and SQLite integrity.",
+    "Exact repo pins and command outputs.",
+    "Explicit PASS/BLOCKED verdict with residual risks and next recommendation."
+  ],
+  "allowedOperations": [
+    "Restart/rebuild the BiliDili Alembic test environment as needed through existing Test harnesses.",
+    "Run public/daemon or in-process moduleMining routes needed to exercise Entry A and Entry B.",
+    "Capture logs, job results, developer events, SQLite snapshots, provider config, session/round snapshots, and source-ref/coverage evidence.",
+    "Use read-only source inspection to verify loaded commit and route shape."
+  ],
+  "forbiddenOperations": [
+    "Do not edit product source in Test.",
+    "Do not manually edit SQLite, sessions, coverage rows, source refs, provider config, or BiliDili source to manufacture a pass.",
+    "Do not run destructive preclean outside the authorized BiliDili data-root flow.",
+    "Do not write thread ids to tracked docs or backfill."
+  ],
+  "suggestedTaskPackage": {
+    "targetWindow": "Test",
+    "targetTaskId": "p11-bilidili-module-mining-binding-rich-realtest-t1",
+    "summary": "Does the real BiliDili moduleMining flow prove the P11 binding-rich selector behavior change end to end, especially Entry B planned per-module dimensions instead of scope-only/all-dimension behavior?",
+    "sourceRef": "test-cards/p11-bilidili-module-mining-binding-rich-realtest-t1.json"
+  },
+  "allowedNextActions": [
+    "total-control-review-test-boundary",
+    "wakeflow-state add-task-package",
+    "wakeflow-delivery prepare-dispatch-from-state"
+  ],
+  "forbiddenConclusions": [
+    "test-card-is-dispatch",
+    "test-card-is-test-result",
+    "test-card-is-controller-acceptance",
+    "test-card-updates-wakeflow-state",
+    "test-result-closes-demand-without-controller-review"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "p10-alembic-full-reset-corrupt-db-live-route-repair-t1-af4d976",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p10-alembic-full-reset-corrupt-db-live-route-repair-p1",
+  "dispatchGroup": "p10-alembic-full-reset-corrupt-db-live-route-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p10-alembic-full-reset-corrupt-db-live-route-repair-t1",
+  "status": "completed",
+  "summary": "Alembic source repair completed in commit af4d976c29fee58a93f05de8bfc334073575b46d. CleanupService.fullReset now fail-closes on non-'no such table' data/task table clear errors and missing DB references before fullReset-complete success logs or Recipe generation can continue, with resetMode=fail-closed diagnostics. ColdStartWorkflow now uses explicit replaceExisting session creation after successful fullReset so destructive rebuild can replace stale ProjectContext/bootstrap workflow leases instead of returning BOOTSTRAP_IN_PROGRESS from active-sessions.json.",
+  "evidenceRefs": [
+    "Alembic commit af4d976c29fee58a93f05de8bfc334073575b46d",
+    "evidence/p10-alembic-full-reset-corrupt-db-live-route-repair-t1-report.md",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26/task-packages/p10-alembic-full-reset-corrupt-db-live-route-repair-p1.json",
+    "evidence/p10-bilidili-project-index-workflow-unify-realtest-rerun-after-full-reset-corrupt-db-repair-controller-review.md"
+  ],
+  "verification": [
+    "npm test -- --run test/unit/CleanupService.test.ts test/unit/ProjectContextWorkflowFacts.test.ts test/unit/ProjectIndexWorkflow.test.ts => passed (22 tests)",
+    "npx biome check lib/service/cleanup/CleanupService.ts lib/workflows/cold-start/ColdStartWorkflow.ts lib/workflows/project-context/ProjectContextWorkflowFacts.ts test/unit/CleanupService.test.ts test/unit/ProjectContextWorkflowFacts.test.ts test/unit/ProjectIndexWorkflow.test.ts => passed",
+    "npm run build:check => passed",
+    "npm run lint:repo-boundary => passed",
+    "git diff --check => passed before commit",
+    "npm run lint => exit 0 with 5 pre-existing unrelated noExplicitAny warnings outside this change set",
+    "post-commit git status clean on main ahead 12"
+  ],
+  "risks": [
+    "Alembic code guard MCP was attempted but failed with internal schema error: unrecognized key \"data\"; Guard did not produce usable pass/fail evidence.",
+    "Did not rerun the full BiliDili live host/Test-window workflow in this Alembic target task; controller/Test should rerun the real route with this Alembic commit after other active P10 repairs are in place.",
+    "Alembic MCP status reported empty local Recipe knowledge and selected-project alignment mismatch; this task therefore used raw source reads and repository validation as proof, not Recipe guidance."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p10-alembic-full-reset-corrupt-db-live-route-repair-p1__Alembic__p10-alembic-full-reset-corrupt-db-live-route-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-full-reset-corrupt-db-live-route-repair-p1__Alembic__p10-alembic-full-reset-corrupt-db-live-route-repair-t1.json",
+    "deliveryRunId": "run-delivery-p10-alembic-full-reset-corrupt-db-live-route-repair-p1__Alembic__p10-alembic-full-reset-corrupt-db-live-route-repair-t1",
+    "dispatchGroup": "p10-alembic-full-reset-corrupt-db-live-route-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-full-reset-corrupt-db-live-route-repair-p1__Alembic__p10-alembic-full-reset-corrupt-db-live-route-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 123,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p10-alembic-full-reset-corrupt-db-live-route-repair-p1",
+    "targetTaskId": "p10-alembic-full-reset-corrupt-db-live-route-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p10-alembic-full-reset-corrupt-db-live-route-repair-p1",
+    "resultId": "p10-alembic-full-reset-corrupt-db-live-route-repair-t1-af4d976",
+    "createdAt": "2026-06-28T07:28:30.989Z"
+  },
+  "createdAt": "2026-06-28T07:28:30.989Z",
+  "stateRevisionObserved": 123,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

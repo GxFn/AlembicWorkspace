@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p15-bilidili-session-bound-recipe-evidence-realtest-t1",
+  "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "taskPackageId": "p15-bilidili-session-bound-recipe-evidence-realtest-p1",
+  "dispatchGroup": "p15-bilidili-session-bound-recipe-evidence-realtest-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "p15-bilidili-session-bound-recipe-evidence-realtest-t1",
+  "status": "needs-review",
+  "summary": "Test executed BiliDili session-bound Recipe evidence route. Public host MCP submit_knowledge produced three session-bound architecture Recipes with six active source refs; alembic_dimension_complete succeeded with recipesBound=3, qualityFeedback.pass=true, and persisted SQLite coverage became non-zero (measuredCells=1, coveredPathCount=138, targetScopedCells=16). Final host and in-process normalized coverage rows are comparable and diffEmpty=true with aggregate/root absent. Strict final success is not met because final host rescan opened a new active BiliDili host-agent session and one open host-agent-rescan round, host route coverageLedgerSeed remained inconsistent versus SQLite, and in-process route seed output still diverged from SQLite (aggregateOrRootModuleIds target:Account:. and measuredCells=0 in route result while SQLite has aggregate/root absent and measuredCells=1).",
+  "evidenceRefs": [
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/completed-summary.json",
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/session-bound-recipe-evidence.json",
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/submit-knowledge-parsed-response.json",
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/dimension-complete-parsed-response.json",
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-host-rescan-evidence.json",
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-inprocess-rescan-evidence.json",
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-parity.json",
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-helper-summary.json",
+    "Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/environment-ready.json"
+  ],
+  "verification": [
+    "node --check Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/session-bound-recipe-evidence.mjs",
+    "node Test/scripts/verify-test-environment.mjs --project BiliDili --json",
+    "P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/session-bound-recipe-evidence.mjs --mode run --output Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/session-bound-recipe-evidence.json",
+    "P15_TASK_ID=p15-bilidili-session-bound-recipe-evidence-realtest-t1 P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode run-host --url http://127.0.0.1:60474 --output Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-host-rescan-evidence.json",
+    "P15_TASK_ID=p15-bilidili-session-bound-recipe-evidence-realtest-t1 P15_TIMEOUT_MS=300000 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode run-inprocess --url http://127.0.0.1:60474 --output Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-inprocess-rescan-evidence.json",
+    "P15_TASK_ID=p15-bilidili-session-bound-recipe-evidence-realtest-t1 node Test/tmp/p15-bilidili-final-project-index-parity-gap-rerun-t1/p15-final-parity-evidence.mjs --mode parity --host Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-host-rescan-evidence.json --inprocess Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-inprocess-rescan-evidence.json --output Test/tmp/p15-bilidili-session-bound-recipe-evidence-realtest-t1/final-parity.json",
+    "git -C Alembic status --short -- . ; git -C AlembicCore status --short -- . ; git -C AlembicPlugin status --short -- . ; git -C BiliDili status --short -- ."
+  ],
+  "risks": [
+    "Final host-agent runtime is not terminal-clean after the final host rescan: one BiliDili active session and one open host-agent-rescan round remain.",
+    "Route coverageLedgerSeed projections still diverge from persisted SQLite coverage despite normalized SQLite row parity being diffEmpty=true.",
+    "Do not claim full P15 final parity success until source owner repairs host-agent rescan lifecycle/session release and route seed projection consistency, then Test reruns without manual DB/session cleanup."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p15-bilidili-session-bound-recipe-evidence-realtest-p1__Test__p15-bilidili-session-bound-recipe-evidence-realtest-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p15-bilidili-session-bound-recipe-evidence-realtest-p1__Test__p15-bilidili-session-bound-recipe-evidence-realtest-t1.json",
+    "deliveryRunId": "run-delivery-p15-bilidili-session-bound-recipe-evidence-realtest-p1__Test__p15-bilidili-session-bound-recipe-evidence-realtest-t1",
+    "dispatchGroup": "p15-bilidili-session-bound-recipe-evidence-realtest-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p15-bilidili-session-bound-recipe-evidence-realtest-p1__Test__p15-bilidili-session-bound-recipe-evidence-realtest-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "stateRevision": 255,
+    "demandKey": "alembic-recipe-lifecycle-naming-layering-refactor-2026-06-26",
+    "taskPackageId": "p15-bilidili-session-bound-recipe-evidence-realtest-p1",
+    "targetTaskId": "p15-bilidili-session-bound-recipe-evidence-realtest-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "p15-bilidili-session-bound-recipe-evidence-realtest-p1",
+    "resultId": "tr-p15-bilidili-session-bound-recipe-evidence-realtest-t1",
+    "createdAt": "2026-06-28T19:27:04.134Z"
+  },
+  "createdAt": "2026-06-28T19:27:04.134Z",
+  "stateRevisionObserved": 255,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}
