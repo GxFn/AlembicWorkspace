@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28",
+  "title": "母重构 naming-layering-refactor COMPLETE+ARCHIVED(rev 272)+pushed 后 3-agent post-completion 审计的残留修复矫正。**核心高度成功**(全 frozen 决策+6 不变量在 P1-P15 repair churn 中干净存活·BiliDili parity 真过·已 push)但残留：**R-1[HIGH 载重] 双宿主覆盖 module-id 派生未真统一**(in-process plain module.id[ProjectMapModules.ts:17] vs host target:name:path[knowledge-rescan.ts:781];BiliDili 空-ProjectMap 才相等·非空-map JS/TS 项目重新分歧 seed≠writeback key;+dimension-completion.ts:663 第二未 parity 测 writer)+**R-2[HIGH] code_guard public MCP schema drift OPEN**(data.unifiedEvolution.evidenceGate.verdict 经公共工具不可读·P12/P13 记但从未修·public-tools/contract.ts vs PluginOpportunisticEvolution.ts:36)；MED R-3 §10.2 docs 陈旧(Plugin CLAUDE.md/AGENTS.md 列不存在目录+死#codex/* 别名·Core glossary 过时;任务似被丢)/R-4 host coverageLedgerSeed 与 SQLite 不独立(68d1e39 降级 inconsistent→info 掩盖)；LOW R-5 plan-tool 1589L god-file 续拆/R-6 别名重复/R-7 R-2 ternary 主体 inert/R-8 lint:naming/R-9 ledger stale。**CG 全决**:CG-1=target:name:path 全统一/CG-2=文档化 dataRoot-only+订正 plan ternary 契约(不 honor projectRoot,主体删 dataRoot 安全)/CG-3=R-5 纳入+R-8 豁免登记。**验收**:R-1 三 adapter module-id 收口单 canonical+**非空-ProjectMap 项目重跑 host/in-process parity 真集合相等(diff=[])**+BiliDili 不回归;R-2 public 响应过 output-contract schema+verdict 可读+契约测。直接真测真 BiliDili(DeepSeek+Qwen,rebuild 授权)。不重做成功主体·不改 freeze·R-2 语义不动·门禁不放松。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Residual followup completed: R-1 through R-4 accepted by controller raw-evidence review; optional R-5 through R-9 remain non-blocking cleanup observations.",
+  "revision": 30,
+  "activeStageId": null,
+  "updatedAt": "2026-06-28T23:10:11.961Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "r1-core-coverage-module-axis-canonical-p1",
+      "summary": "R-1 HIGH / Core producer: establish the shared canonical coverage module-id contract for ProjectMap-backed coverage axes. Add/export a Core helper whose canonical form is exactly `target:{moduleName}:{modulePath}` when a module has usable name+path data, preserve already target-scoped ids, keep explicit fallback behavior for modules without usable paths, and avoid aggregate/root pollution. Apply the helper in Core coverage-axis construction so callers passing plain `module.id` plus `moduleName`/`modulePath` receive target-scoped ids. Add targeted tests for non-empty ProjectMap-like modules, already-target scoped ids, missing-path fallback, and aggregate/root handling. Do not change freeze literal values, R-2 ternary cleanup semantics, plugin/runtime host behavior, vendor snapshots, release metadata, or outer repos. Validate with Core targeted coverage tests plus `npm run build:check` (and broader `npm run check` if touched surface warrants it). Commit locally on main and backfill commit hash, commands, outputs, touched exports, compatibility/fallback notes, and downstream Alembic/AlembicPlugin consumption guidance.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28.md §2 R-1 / §4 CG-1",
+      "createdAt": "2026-06-28T21:38:40.777Z"
+    },
+    {
+      "taskPackageId": "r2-plugin-code-guard-public-schema-p1",
+      "summary": "R-2 HIGH / Plugin public schema drift: fix public `alembic_code_guard` output-contract drift so the public MCP response accepts and preserves `data.unifiedEvolution.evidenceGate.verdict` from `PluginOpportunisticEvolution`. Inspect `lib/runtime/mcp/public-tools/contract.ts`, `lib/runtime/mcp/public-tools/output.ts`, the public presenter/projector path, and `lib/recipe-generation/evolution/PluginOpportunisticEvolution.ts`. Update the public schema/contract shape without weakening clean-output guarantees or hiding unexpected keys; verdict must be readable from the public response and schema validation must no longer fail with an unrecognized `data` key. Add/adjust contract tests that fail before and pass after, preferably around `AgentCodeGuardOutputSchema` or the public tool clean-output contract plus opportunistic evolution presenter data. Do not change freeze literal values, tool names, R-2 destructive cleanup ternary semantics, Core source, vendor snapshots, release metadata, or marketplace packaging. Validate with targeted MCP/public-output/evolution tests plus `npm run build:check` (and broader plugin checks if touched surface warrants it). Commit locally on main and backfill commit hash, commands, outputs, exact schema path, public response shape, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28.md §2 R-2",
+      "createdAt": "2026-06-28T21:38:52.684Z"
+    },
+    {
+      "taskPackageId": "r1-alembic-inprocess-module-axis-canonical-p1",
+      "summary": "R-1 HIGH / Alembic in-process consumer: consume the accepted Core canonical coverage module-id helper from AlembicCore commit cf5317efbef3f9e80cd3bd4c516272acdcf9923a and remove the in-process plain module.id divergence. Update the in-process ProjectMap-backed module axis path so `ProjectMapModules.ts` / `ProjectContextWorkflowFacts.ts` / downstream coverage ledger construction derive module ids as exactly `target:{moduleName}:{modulePath}` whenever ProjectMap modules have usable name+path data, while preserving explicit fallback behavior for no-path modules and filtering aggregate/root axes consistently with Core. Do not change R-2 cleanup ternary semantics, freeze literal values, vendor snapshots, release metadata, Plugin/Core source, or real BiliDili data. Add/adjust focused tests proving non-empty ProjectMap modules no longer emit plain `module.id`, target-scoped ids remain stable, and fallback behavior stays explicit. Validate with Alembic targeted tests plus `npm run build:check` and any boundary checks touched by imports. Commit locally on main and backfill commit hash, commands, outputs, files changed, consumer import path, residual risks, and Test/parity handoff guidance.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28.md §2 R-1 / §4 CG-1; accepted Core producer cf5317efbef3f9e80cd3bd4c516272acdcf9923a",
+      "createdAt": "2026-06-28T22:00:11.991Z"
+    },
+    {
+      "taskPackageId": "r1-plugin-host-dimension-module-axis-canonical-p1",
+      "summary": "R-1 HIGH / AlembicPlugin host consumer: consume the accepted Core canonical coverage module-id helper from AlembicCore commit cf5317efbef3f9e80cd3bd4c516272acdcf9923a and remove Plugin's private host module-axis divergence in both writers. Replace or wrap `knowledge-rescan.ts` `normalizeTargetScopedCoverageModuleId` and the dimension-completion `listCanonicalModules` coverage-axis writer so host rescan and dimension-completion both produce the same `target:{moduleName}:{modulePath}` ids as Core/Alembic in-process whenever name+path data exists; preserve already target-scoped ids, explicit no-path fallback, and aggregate/root filtering. Prefer importing from `@alembic/core/host-agent-workflows` or an existing Core public subpath rather than copying logic; keep any local wrapper only for Plugin-specific normalization diagnostics. Preserve the accepted R-2 code_guard schema fix, tool names, freeze literal values, vendor snapshots, release metadata, marketplace assets, and real BiliDili data. Add focused tests covering host rescan and dimension-completion second writer, including non-empty module path/name canonicalization and strict target-scoped counting. Validate with targeted Plugin tests plus `npm run build:check`, and broader boundary checks if imports move. Commit locally on main and backfill commit hash, commands, outputs, files changed, Core helper import path, residual risks, and Test/parity handoff guidance.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28.md §2 R-1 / §4 CG-1; accepted Core producer cf5317efbef3f9e80cd3bd4c516272acdcf9923a; accepted R-2 Plugin bb2d192b892a80fe334912fff98f0a32b7740930",
+      "createdAt": "2026-06-28T22:00:27.791Z"
+    },
+    {
+      "taskPackageId": "r1-final-nonempty-projectmap-parity-realtest-p1",
+      "summary": "R-1 final validation after accepted producers/consumers: Core cf5317efbef3f9e80cd3bd4c516272acdcf9923a, Alembic 6db9b0274f79cb4a73f4e4cc6e55baaa648f6ba0, and AlembicPlugin 4a47538229bef7d93bac31256ae7ce32bc5b5b77 are accepted by controller for their implementation scope. Run Test-owned real validation for the R-1 acceptance gate only: (1) on a non-empty ProjectMap project, execute the real host and in-process coverage module-axis paths and prove true-set equality with diff=[] for canonical module ids target:{moduleName}:{modulePath}; BiliDili alone is insufficient because it is Swift/empty-ProjectMap for this gate. (2) Run BiliDili no-regression coverage parity/smoke needed by the residual requirement, preserving configured DeepSeek generation and local Qwen embedding and not touching real ~/.asd outside the authorized test workspace. Do not relax gates, do not exclude mismatches by downgrade, do not modify product source, do not push/release/bump. If destructive reset is needed for BiliDili, first run the required R-2 destructive characterization and use alembic_bootstrap rebuild:true per established Test protocol. Backfill raw evidence paths, commands, project paths, before/after module-id sets, host/in-process diff, BiliDili no-regression result, blockers, and exact residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28.md §2 R-1 / §3 acceptance; controller accepted Core cf5317e, Alembic 6db9b02, AlembicPlugin 4a47538",
+      "createdAt": "2026-06-28T22:22:11.434Z"
+    },
+    {
+      "taskPackageId": "r4-plugin-coverage-ledger-seed-projection-consistency-p1",
+      "summary": "R-4: fix host-route coverageLedgerSeed projection so the host rescan output independently matches SQLite persisted coverage_ledger cell counts; do not rely on downgraded mismatch/info semantics.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28.md#r-4",
+      "createdAt": "2026-06-28T22:41:21.954Z"
+    },
+    {
+      "taskPackageId": "r3-core-semantic-glossary-doc-sync-p1",
+      "summary": "R-3/Core: update AlembicCore semantic glossary header/body to reflect shipped AppRuntime and HostAgent naming, removing stale 2026-06-12 / NOT-renamed language.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28.md#r-3",
+      "createdAt": "2026-06-28T22:41:31.712Z"
+    },
+    {
+      "taskPackageId": "r3-plugin-doc-map-shared-asset-sync-p1",
+      "summary": "R-3 residual Plugin docs: repair stale AlembicPlugin CLAUDE.md/AGENTS.md file map and dead path alias documentation, following shared-asset authority/sync rules, docs-only local commit, no runtime behavior or freeze literal changes.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-refactor-residual-followup-2026-06-28/index.md R-3 docs residual",
+      "createdAt": "2026-06-28T22:57:23.520Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "r1-core-coverage-module-axis-canonical-t1",
+      "taskPackageId": "r1-core-coverage-module-axis-canonical-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Implement Core canonical coverage module-id helper/contract for `target:{moduleName}:{modulePath}` and make Core coverage-axis construction use it with tests and local commit.",
+      "status": "accepted",
+      "createdAt": "2026-06-28T21:38:40.777Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-r1-core-coverage-module-axis-canonical-p1__AlembicCore__r1-core-coverage-module-axis-canonical-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-r1-core-coverage-module-axis-canonical-p1__AlembicCore__r1-core-coverage-module-axis-canonical-t1.json",
+        "deliveryRunId": "run-delivery-r1-core-coverage-module-axis-canonical-p1__AlembicCore__r1-core-coverage-module-axis-canonical-t1",
+        "dispatchGroup": "r1-core-coverage-module-axis-canonical-p1",
+        "sentAt": "2026-06-28T21:40:19.691Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-r1-core-coverage-module-axis-canonical-t1"
+    },
+    {
+      "targetTaskId": "r2-plugin-code-guard-public-schema-t1",
+      "taskPackageId": "r2-plugin-code-guard-public-schema-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Fix Plugin public `alembic_code_guard` output schema so `data.unifiedEvolution.evidenceGate.verdict` is schema-valid and readable, with contract tests and local commit.",
+      "status": "accepted",
+      "createdAt": "2026-06-28T21:38:52.684Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-r2-plugin-code-guard-public-schema-p1__AlembicPlugin__r2-plugin-code-guard-public-schema-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-r2-plugin-code-guard-public-schema-p1__AlembicPlugin__r2-plugin-code-guard-public-schema-t1.json",
+        "deliveryRunId": "run-delivery-r2-plugin-code-guard-public-schema-p1__AlembicPlugin__r2-plugin-code-guard-public-schema-t1",
+        "dispatchGroup": "r2-plugin-code-guard-public-schema-p1",
+        "sentAt": "2026-06-28T21:40:31.353Z",
+        "readbackOk": true
+      },
+      "resultId": "target-result-r2-plugin-code-guard-public-schema-t1"
+    },
+    {
+      "targetTaskId": "r1-alembic-inprocess-module-axis-canonical-t1",
+      "taskPackageId": "r1-alembic-inprocess-module-axis-canonical-p1",
+      "targetWindow": "Alembic",
+      "summary": "Wire Alembic in-process ProjectMap coverage module axes to Core canonical `target:{moduleName}:{modulePath}` helper, with tests and local commit.",
+      "status": "accepted",
+      "createdAt": "2026-06-28T22:00:11.991Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-r1-alembic-inprocess-module-axis-canonical-p1__Alembic__r1-alembic-inprocess-module-axis-canonical-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-r1-alembic-inprocess-module-axis-canonical-p1__Alembic__r1-alembic-inprocess-module-axis-canonical-t1.json",
+        "deliveryRunId": "run-delivery-r1-alembic-inprocess-module-axis-canonical-p1__Alembic__r1-alembic-inprocess-module-axis-canonical-t1",
+        "dispatchGroup": "r1-alembic-inprocess-module-axis-canonical-p1",
+        "sentAt": "2026-06-28T22:03:04.052Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-r1-alembic-inprocess-module-axis-canonical-t1"
+    },
+    {
+      "targetTaskId": "r1-plugin-host-dimension-module-axis-canonical-t1",
+      "taskPackageId": "r1-plugin-host-dimension-module-axis-canonical-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Wire AlembicPlugin host rescan and dimension-completion coverage writers to Core canonical `target:{moduleName}:{modulePath}` helper, with tests and local commit.",
+      "status": "accepted",
+      "createdAt": "2026-06-28T22:00:27.791Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-r1-plugin-host-dimension-module-axis-canonical-p1__AlembicPlugin__r1-plugin-host-dimension-module-axis-canonical-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-r1-plugin-host-dimension-module-axis-canonical-p1__AlembicPlugin__r1-plugin-host-dimension-module-axis-canonical-t1.json",
+        "deliveryRunId": "run-delivery-r1-plugin-host-dimension-module-axis-canonical-p1__AlembicPlugin__r1-plugin-host-dimension-module-axis-canonical-t1",
+        "dispatchGroup": "r1-plugin-host-dimension-module-axis-canonical-p1",
+        "sentAt": "2026-06-28T22:03:12.416Z",
+        "readbackOk": true
+      },
+      "resultId": "target-result-r1-plugin-host-dimension-module-axis-canonical-t1"
+    },
+    {
+      "targetTaskId": "r1-final-nonempty-projectmap-parity-realtest-t1",
+      "taskPackageId": "r1-final-nonempty-projectmap-parity-realtest-p1",
+      "targetWindow": "Test",
+      "summary": "Test R-1 final gate: non-empty ProjectMap host-vs-in-process canonical coverage module-id parity diff=[] plus BiliDili no-regression evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-28T22:22:11.434Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-r1-final-nonempty-projectmap-parity-realtest-p1__Test__r1-final-nonempty-projectmap-parity-realtest-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-r1-final-nonempty-projectmap-parity-realtest-p1__Test__r1-final-nonempty-projectmap-parity-realtest-t1.json",
+        "deliveryRunId": "run-delivery-r1-final-nonempty-projectmap-parity-realtest-p1__Test__r1-final-nonempty-projectmap-parity-realtest-t1",
+        "dispatchGroup": "r1-final-nonempty-projectmap-parity-realtest-p1",
+        "sentAt": "2026-06-28T22:22:57.887Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-r1-final-nonempty-projectmap-parity-realtest-t1"
+    },
+    {
+      "targetTaskId": "r4-plugin-coverage-ledger-seed-projection-consistency-t1",
+      "taskPackageId": "r4-plugin-coverage-ledger-seed-projection-consistency-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "In AlembicPlugin, inspect and repair host rescan coverageLedgerSeed projection/reconciliation, especially knowledge-rescan coverage seed output around the prior mismatch downgrade. Completion requires source tests proving projection written/measured/target-scoped counts match persisted SQLite rows independently, no gate relaxation, no freeze literal changes, local commit only, and evidence/backfill with commit, tests, and remaining risk.",
+      "status": "accepted",
+      "createdAt": "2026-06-28T22:41:21.954Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-r4-plugin-coverage-ledger-seed-projection-consistency-p1__AlembicPlugin__r4-plugin-coverage-ledger-seed-projection-consistency-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-r4-plugin-coverage-ledger-seed-projection-consistency-p1__AlembicPlugin__r4-plugin-coverage-ledger-seed-projection-consistency-t1.json",
+        "deliveryRunId": "run-delivery-r4-plugin-coverage-ledger-seed-projection-consistency-p1__AlembicPlugin__r4-plugin-coverage-ledger-seed-projection-consistency-t1",
+        "dispatchGroup": "r4-plugin-coverage-ledger-seed-projection-consistency-p1",
+        "sentAt": "2026-06-28T22:42:34.183Z",
+        "readbackOk": true
+      },
+      "resultId": "target-result-r4-plugin-coverage-ledger-seed-projection-consistency-t1"
+    },
+    {
+      "targetTaskId": "r3-core-semantic-glossary-doc-sync-t1",
+      "taskPackageId": "r3-core-semantic-glossary-doc-sync-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "In AlembicCore, update docs/semantic-glossary.md lines 1-6 and any directly adjacent stale wording so it matches current shipped AppRuntime and HostAgent naming. Treat as docs-only shared-asset-drift correction: no freeze value changes, no code behavior changes, local commit only, validate with git diff --check and any repo doc/lint check that applies, then backfill evidence with commit and exact changed lines.",
+      "status": "accepted",
+      "createdAt": "2026-06-28T22:41:31.712Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-r3-core-semantic-glossary-doc-sync-p1__AlembicCore__r3-core-semantic-glossary-doc-sync-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-r3-core-semantic-glossary-doc-sync-p1__AlembicCore__r3-core-semantic-glossary-doc-sync-t1.json",
+        "deliveryRunId": "run-delivery-r3-core-semantic-glossary-doc-sync-p1__AlembicCore__r3-core-semantic-glossary-doc-sync-t1",
+        "dispatchGroup": "r3-core-semantic-glossary-doc-sync-p1",
+        "sentAt": "2026-06-28T22:42:47.150Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-r3-core-semantic-glossary-doc-sync-t1"
+    },
+    {
+      "targetTaskId": "r3-plugin-doc-map-shared-asset-sync-t1",
+      "taskPackageId": "r3-plugin-doc-map-shared-asset-sync-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, AlembicPlugin AGENTS.md/CLAUDE.md, and this state root. This is the R-3 Plugin half that was omitted while Core semantic-glossary was already accepted. Update AlembicPlugin/AGENTS.md and AlembicPlugin/CLAUDE.md file map around the current source layering and path aliases so they no longer list nonexistent directories or dead #codex/* aliases. Treat shared assets as edit-in-authority-then-sync: keep the two files byte/meaning aligned where they intentionally mirror each other, and do not change runtime behavior, freeze literals, package metadata, vendor snapshots, marketplace assets, release files, or thread ids. Validate with git diff --check, any docs/shared-asset drift check that applies, and a focused grep proving no stale #codex/* alias/doc-map text remains unless it is genuinely current. Commit locally on main, no push. Backfill TargetResultEnvelope with commit hash, changed lines/files, validation commands, residual risks, and whether any follow-up is in-scope.",
+      "status": "accepted",
+      "createdAt": "2026-06-28T22:57:23.520Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-r3-plugin-doc-map-shared-asset-sync-p1__AlembicPlugin__r3-plugin-doc-map-shared-asset-sync-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-r3-plugin-doc-map-shared-asset-sync-p1__AlembicPlugin__r3-plugin-doc-map-shared-asset-sync-t1.json",
+        "deliveryRunId": "run-delivery-r3-plugin-doc-map-shared-asset-sync-p1__AlembicPlugin__r3-plugin-doc-map-shared-asset-sync-t1",
+        "dispatchGroup": "r3-plugin-doc-map-shared-asset-sync-p1",
+        "sentAt": "2026-06-28T22:58:18.289Z",
+        "readbackOk": true
+      },
+      "resultId": "target-result-r3-plugin-doc-map-shared-asset-sync-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "r1-core-coverage-module-axis-canonical-p1",
+        "r3-core-semantic-glossary-doc-sync-p1"
+      ],
+      "targetTaskIds": [
+        "r1-core-coverage-module-axis-canonical-t1",
+        "r3-core-semantic-glossary-doc-sync-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "r2-plugin-code-guard-public-schema-p1",
+        "r1-plugin-host-dimension-module-axis-canonical-p1",
+        "r4-plugin-coverage-ledger-seed-projection-consistency-p1",
+        "r3-plugin-doc-map-shared-asset-sync-p1"
+      ],
+      "targetTaskIds": [
+        "r2-plugin-code-guard-public-schema-t1",
+        "r1-plugin-host-dimension-module-axis-canonical-t1",
+        "r4-plugin-coverage-ledger-seed-projection-consistency-t1",
+        "r3-plugin-doc-map-shared-asset-sync-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "r1-alembic-inprocess-module-axis-canonical-p1"
+      ],
+      "targetTaskIds": [
+        "r1-alembic-inprocess-module-axis-canonical-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "r1-final-nonempty-projectmap-parity-realtest-p1"
+      ],
+      "targetTaskIds": [
+        "r1-final-nonempty-projectmap-parity-realtest-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "target-result-r3-plugin-doc-map-shared-asset-sync-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-28T23:09:53.588Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-r3-plugin-doc-map-shared-asset-sync-p1__AlembicPlugin__r3-plugin-doc-map-shared-asset-sync-t1",
+    "lastDeliveryRunId": "run-delivery-r3-plugin-doc-map-shared-asset-sync-p1__AlembicPlugin__r3-plugin-doc-map-shared-asset-sync-t1",
+    "lastDispatchGroup": "r3-plugin-doc-map-shared-asset-sync-p1",
+    "lastTargetTaskId": "r3-plugin-doc-map-shared-asset-sync-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-28T22:58:18.292Z"
+  }
+}
