@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-agent-memory-staleness-20260630220430",
+  "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+  "taskPackageId": "p2-memory-staleness",
+  "dispatchGroup": "p2-memory-staleness",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p2-agent-memory-staleness",
+  "status": "completed",
+  "summary": "Phase 2 (A-2) recall-memory staleness annotation — controller-reviewed, independently verified. MemoryRetriever.ts adds STALE_MEMORY_DAYS=7 + STALE_MEMORY_PREFIX='⏳[可能陈旧] ' + private static #stalenessPrefix(m, now) reading CAMELCASE m.updatedAt (fallback lastAccessedAt) with Number.isNaN guard (unknown-age → no annotation), and the toPromptSection builder inserts the prefix between badge and [type] (fresh memories byte-identical). render-only; boundary held (0b1c029 on AlembicAgent main, 2 files; MemoryStore/insightAnalyst/Core schema/raw-SQL ZERO change). CG-1 full-source proven (bootstrap + user via real MemoryCoordinator.buildStaticMemoryPrompt both annotated). Evidence-ref repair: cleaned the design sourceRef suffix.",
+  "evidenceRefs": [
+    "0b1c029",
+    "AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+    "AlembicAgent/test/memory-context.test.ts",
+    "AlembicAgent/test/recipe-authoring-inprocess-parity.test.ts",
+    "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md"
+  ],
+  "verification": [
+    "Controller re-ran vitest test/memory-context.test.ts + test/recipe-authoring-inprocess-parity.test.ts on Node 22.22.1: 2 files / 16 passed / 0 failed (4 new A-2 cases + parity tripwire 3/3)",
+    "Controller ran npm run build:check (tsc): exit 0 — proves the camelCase pinning compiles; using snake_case m.updated_at would fail the type gate (DeserializedMemory has no snake keys)",
+    "Controller read MemoryRetriever.ts diff: constants + builder insertion (fresh memory stale='' => line byte-identical to before) + #stalenessPrefix camelCase m.updatedAt/lastAccessedAt + Number.isNaN guard (return '' for unknown-age, no throw), pure render-only; git stat = 2 files only",
+    "Controller read test diff: fixtures built via REAL store.add -> deserialize path (NOT hand-built camelCase literals) with raw-row UPDATE to age them => casing-drift sentinel; 4 cases cover >7d annotated / <=7d not / null->NaN-guard not-annotated / updatedAt-empty->lastAccessedAt fallback via real deserialize",
+    "LOAD-BEARING floor parity: full-source Recipe corpus verdict byte-empty diff (target sha a0965a6b baseline==after) despite A-2 model-visible prompt-text change; parity test green on controller re-run + gate code (Core) untouched => floor judgment stable",
+    "git: 0b1c029 on main (HEAD, after 9bfa1dc), develop-on-main, boundary held"
+  ],
+  "risks": [
+    "Real-machine bootstrap+user prompt dump (target-reported grep '⏳[可能陈旧]'=1 each, STALE marked / FRESH unmarked, updatedAt 30d/45d>7 vs 1d/2d<=7) NOT independently re-run by controller — the deterministic unit tests (incl real-deserialize casing-drift sentinels + NaN guard + lastAccessedAt fallback) are conclusive proof of the annotation behavior",
+    "A-2 changes model-visible prompt text (the memory-recall section), so it could influence generated recipe content on a live run — accepted per CG-1; the floor-parity gate proves the gate JUDGMENT does not drift (= the '门禁字节级不变' guarantee), which is what was required"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness.json",
+    "deliveryRunId": "run-delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness",
+    "dispatchGroup": "p2-memory-staleness",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+    "stateRevision": 8,
+    "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+    "taskPackageId": "p2-memory-staleness",
+    "targetTaskId": "p2-agent-memory-staleness",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p2-memory-staleness",
+    "resultId": "tr-p2-agent-memory-staleness-20260630220430",
+    "createdAt": "2026-06-30T22:04:30.229Z"
+  },
+  "createdAt": "2026-06-30T22:04:30.229Z",
+  "stateRevisionObserved": 8,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

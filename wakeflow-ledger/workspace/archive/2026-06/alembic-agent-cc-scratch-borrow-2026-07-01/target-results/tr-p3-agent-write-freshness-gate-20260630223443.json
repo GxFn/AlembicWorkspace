@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-agent-write-freshness-gate-20260630223443",
+  "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+  "taskPackageId": "p3-write-freshness-gate",
+  "dispatchGroup": "p3-write-freshness-gate",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p3-agent-write-freshness-gate",
+  "status": "completed",
+  "summary": "Phase 3 (B-1) write-before-freshness gate — controller-reviewed COMPLETED; the target's needs-review HARD-GATE open item is CLOSED by the controller's independent static proof of the production host wiring. code.ts handleWrite gates via checkWriteFreshness (four states, disk-existence precedence over cache-membership) reusing ctx.deltaCache md5 (CG-4, no registry field), CG-3 hard-reject + REREAD_GUIDANCE, set() baseline update after write; boundary held (ab3f2c0 on AlembicAgent main, 2 files +266/-0 additive; registry.ts/ToolContext/envelope untouched). SHARED-CTX HARD GATE closed: production ToolContextFactory (Alembic/lib) holds ONE long-lifecycle DeltaCache injected into every per-call context, so read and write share it at run scope and B-1 threads read→write in the real in-process AI path.",
+  "evidenceRefs": [
+    "ab3f2c0",
+    "AlembicAgent/src/tools/runtime/handlers/code.ts",
+    "AlembicAgent/test/tool-v2-contract.test.ts",
+    "AlembicAgent/test/recipe-authoring-inprocess-parity.test.ts",
+    "Alembic/lib/tools/v2/ToolContextFactory.ts",
+    "Alembic/lib/injection/modules/AgentModule.ts",
+    "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md"
+  ],
+  "verification": [
+    "SHARED-CTX HARD GATE CLOSED by controller static proof of production host wiring: Alembic/lib/tools/v2/ToolContextFactory.ts:123/131 holds a SINGLE #deltaCache=new DeltaCache(200) created once in the ctor; create() :142-167 injects deltaCache:this.#deltaCache (:158) into EVERY per-call ToolContext; AgentModule.ts:31 documents it as a long-lifecycle singleton and :45 builds the ToolRouterAdapter with it -> read (readSingleFile:459 deltaCache.check populates) and write (checkWriteFreshness deltaCache.get reads) observe the SAME instance at run scope -> B-1 active+correct in the production in-process AI path. The target's needs-review was a directory miss: it grepped Alembic/src, but the main-body host lives in Alembic/lib.",
+    "Controller re-ran vitest test/tool-v2-contract.test.ts + test/recipe-authoring-inprocess-parity.test.ts on Node 22.22.1: 2 files / 23 passed / 0 failed (7 new B-1 cases via real router.execute + parity tripwire 3/3)",
+    "Controller ran npm run build:check (tsc) exit 0 + lint:core-import-boundary exit 0 (250 files/50 @alembic/core imports; node:crypto is a Node builtin)",
+    "Controller read code.ts diff: import createHash; freshnessFingerprint=md5 ALIGNED with DeltaCache.ts:108 createHash('md5'); stable REREAD_GUIDANCE; handleWrite calls checkWriteFreshness after PROTECTED_PATHS / before fs.writeFile and ctx.deltaCache?.set after success; checkWriteFreshness four states with DISK-EXISTENCE PRECEDENCE (fs.readFile ENOENT->new-file allow; disk-exists+no-cache->state1 reject, NOT waved through as new); keyed on relPath; registry.ts ZERO field (CG-4); ToolResult/{tool,action}/code.write spec/ok()/fail() untouched; no new LLM tool/round-trip",
+    "PRE-CHECK independently consistent: WriteZone grep lastRead|mtime|hash|freshness|external = 0 hits (Core has no read-before-write primitive -> B-1 correctly at Agent layer)",
+    "production-floor parity byte-empty (B-1 changes no prompt text / no gate); git: ab3f2c0 on main HEAD, develop-on-main, boundary held"
+  ],
+  "risks": [
+    "DeltaCache(200) is a 200-entry LRU: if a single run reads >200 distinct files before writing an earlier one, that file's read fingerprint may be evicted -> checkWriteFreshness hits state 1 ('exists but was not read') and asks for a re-read. This is a SAFE-DIRECTION failure (conservative over-rejection / ask-to-re-read), never a silent overwrite or false-accept; inherent to the CG-4 decision to reuse deltaCache. Capacity is generous for typical dimension runs.",
+    "freshnessFingerprint=md5 is locked to DeltaCache.ts:108 createHash('md5'); a future DeltaCache hash-algorithm change must sync this helper (commented in code).",
+    "B-1 is the LAST phase: with this closure all four sub-phases (A-1 9bfa1dc / A-1b / A-2 0b1c029 / B-1 ab3f2c0) of the demand are complete. Commits are LOCAL only (no push/tag/bump) pending user-gated deployment."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate.json",
+    "deliveryRunId": "run-delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate",
+    "dispatchGroup": "p3-write-freshness-gate",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+    "stateRevision": 12,
+    "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+    "taskPackageId": "p3-write-freshness-gate",
+    "targetTaskId": "p3-agent-write-freshness-gate",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p3-write-freshness-gate",
+    "resultId": "tr-p3-agent-write-freshness-gate-20260630223443",
+    "createdAt": "2026-06-30T22:34:43.327Z"
+  },
+  "createdAt": "2026-06-30T22:34:43.327Z",
+  "stateRevisionObserved": 12,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

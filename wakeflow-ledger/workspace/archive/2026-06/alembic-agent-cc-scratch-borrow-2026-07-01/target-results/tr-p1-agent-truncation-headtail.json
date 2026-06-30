@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-agent-truncation-headtail",
+  "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+  "taskPackageId": "p1-truncation-headtail",
+  "dispatchGroup": "p1-truncation-headtail",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p1-agent-truncation-headtail",
+  "status": "completed",
+  "summary": "P1 (work-group A, truncation head+tail) COMPLETE on AlembicAgent main, LOCAL commit 9bfa1dc (baseline f8ddddd; no push/tag/version bump). Authority: Design §8 Phase 1 + Phase 1b (CG-2 80%/15%, markers decided). Scope = ONLY src/agent/context/ContextWindow.ts + test/ContextWindow.test.ts (git diff --stat: 2 files, +181/-13); no Core/Plugin/other-repo edit.\n\nA-1 (#compactL1 :583): added shared file-local snipHeadTail(text,budget,tag) + constants L1_SNIP_MARKER_TAG='compaction snip' / LIMIT_SNIP_MARKER_TAG='tool-result snip' (overflow shrinks safeTail then keepHead so keepHead+marker.length+safeTail <= budget at ANY budget; short-string passthrough). Replaced head-only substring(0,TRUNCATE_TO) with snipHeadTail(msg.content, TRUNCATE_TO=500, L1_SNIP_MARKER_TAG); rest of #compactL1 (constants/loop i=1/log/return) byte-unchanged; messages[0] pin + atomic tool-pairing intact. Idempotent by construction (~500 < THRESHOLD 2000 -> cycle-2 guard skips).\n\nA-1b: limitToolResult 4 non-knowledge sites (:1054 V2 search / :1072 V1 batch / :1080 file-content batch / :1088 generic) + limitFileContent string branch (:1187) and line-level content branch -> snipHeadTail(...,LIMIT_SNIP_MARKER_TAG) (file-content branch keeps whole-line boundaries, same tag). knowledge branch (:1046) STAYS head-only WITH explanatory comment. limitSearchResult/limitSearchResultObj UNCHANGED. limitToolResult signature+return unchanged (AgentRuntime.ts/MessageAdapter.ts consumers untouched). Markers 3-way distinct (compaction snip != tool-result snip != read-entry 'batch read budget').\n\nFaithful-equivalent deviation (noted in code + commit): snipHeadTail keepTail uses const not the spec's let — repo biome useConst=error and keepTail is never reassigned (only keepHead/safeTail/overflow are); behavior byte-identical to spec.\n\nINDEPENDENT ACCEPTANCE (design rule 'L1 done != limit done', proven separately):\n- A-1 unit (+4): old oversized tool result keeps head AND tail; contains 'compaction snip' and NOT 'batch read budget'; idempotent across >=3 cycles (afterThird===afterFirst byte-identical, length <=500, tail fragment survives); message count unchanged + messages[0]=original prompt.\n- A-1b unit (+3): generic oversized string / code batch (asserts TAIL VALUE fragment 'c49' survives, not a key) / file content (last lines survive) each keep tail with marker 'tool-result snip' != 'compaction snip' != 'batch read budget'.\n\nREAL-CODE-PATH DUMP (offline, NO real key per CLAUDE.md — realistic scan-shaped data driven through the REAL compactForProviderInputBudget->#compactL1 and the exported limitToolResult, i.e. real truncation code, not a mock of it):\n- A-1: grep -c 'compaction snip'=6 (>=1) on the L1-processed window; grep -c 'batch read budget'=0; >=2-cycle byte-identical (diff pass1 vs pass3 EMPTY); pass1 = head 'src/module0/Entry.ts:1 — entry symbol mapped...' + '... [compaction snip: 12288 of 12763 chars omitted] ...' + tail '...showing 240 of 871 ---' (head signal AND scan match-count tail BOTH survive; old head-only dropped the tail); JS-char length 500 <= 500 (wc -c shows 502 bytes = em-dash UTF-8 expansion, not a bound violation).\n- A-1b: grep -c 'tool-result snip'=3; grep -c 'batch read budget'=0; grep -c 'compaction snip'=0 (3 layers distinct); generic tail 'errors=5 matched=21' + file 'ENTRY_FOOTER' survive.\n\nCROSS-PHASE HARD GATES (all PASS, node 22.22.1):\n- Offline vitest (mock provider, NO real key): 43 files / 318 passed / 0 failed (+7 new).\n- production-floor verdict baseline capture-then-diff on the parity-test full-source corpus (runInProcessRecipeAuthoringGate -> Core validateAgainst, opportunistic + cold-start, FIXED root): baseline sha a0965a6b... == after sha a0965a6b... -> BYTE-EMPTY diff (floor verdict not drifted; A-1/A-1b touch no prompt text / no gate).\n- host-vs-in-process parity standing tripwire (recipe-authoring-inprocess-parity.test.ts): 3/3 green.\n- npm run check exit 0: build:check; biome lint (250 files, 4 PRE-EXISTING scripts warnings, 0 error, my 2 files clean); agent/public-api/core-import/space/layer/doctrine/naming boundary lints; smoke:public-signatures (12 exports / 435 bindings); verify:validation-floor (43 files / 318 cases / 12 stable exports); test.\n\nFORBIDDEN respected: no production-floor/submit-gate relaxation; ToolResult{ok,data,error,_meta} + {tool,action} + ok()/fail() untouched; no new LLM-callable tool or model round-trip; compaction pairing atomicity + messages[0] pin intact; limitSearchResult* unmodified.\n\nTemp capture/dump harnesses ran from test/ then DELETED; git status = exactly the 2 committed files, zero residue.\n\nNEXT STEP: Phase 2 (A-2 memory staleness annotation) and Phase 3 (B-1 write-freshness gate) are SEPARATE task packages (not this dispatch); not started here.",
+  "evidenceRefs": [
+    "9bfa1dc",
+    "AlembicAgent/src/agent/context/ContextWindow.ts",
+    "AlembicAgent/test/ContextWindow.test.ts",
+    "production-floor baseline==after sha a0965a6bc6e71d6a3bb842d3fd54eef7bfeb88bc4e94ae349c2109787a6185ea (byte-empty diff)",
+    "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 1 + Phase 1b",
+    "test/recipe-authoring-inprocess-parity.test.ts (host-vs-in-process tripwire, 3/3)"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm test -> 43 files / 318 passed / 0 failed (offline mock provider, no real key); +7 new cases (4 A-1, 3 A-1b)",
+    "production-floor baseline capture-then-diff -> BYTE-EMPTY (sha a0965a6b... baseline==after; runInProcessRecipeAuthoringGate->Core validateAgainst over parity full-source corpus, opportunistic + cold-start)",
+    "recipe-authoring-inprocess-parity.test.ts -> 3/3 green (host-vs-in-process standing tripwire)",
+    "npm run check -> exit 0 (build:check; biome lint 250 files / 4 pre-existing scripts warnings / 0 error; agent+public-api+core-import+space+layer+doctrine+naming boundary lints; smoke:public-signatures 12 exports/435 bindings; verify:validation-floor 43 files/318 cases/12 stable exports; test)",
+    "real-code-path dump (offline): A-1 grep -c 'compaction snip'=6, 'batch read budget'=0, pass1==pass3 byte-identical, head 'Entry.ts:1' + tail 'showing 240 of 871 ---' both survive; A-1b 'tool-result snip'=3, 'batch read budget'=0, 'compaction snip'=0, generic+file tails survive",
+    "git diff --stat 9bfa1dc -> 2 files only (src/agent/context/ContextWindow.ts, test/ContextWindow.test.ts); no Core/Plugin/other-repo edit"
+  ],
+  "risks": [
+    "Real LIVE-API bootstrap dump deferred per CLAUDE.md (must not depend on a real key); offline evidence drives realistic scan-shaped data through the REAL compactForProviderInputBudget->#compactL1 + exported limitToolResult (not a mocked truncation) plus deterministic units + floor-diff, fully covering the head+tail behavior.",
+    "snipHeadTail keepTail uses const (spec example wrote let); repo biome useConst=error and keepTail is never reassigned -> behaviorally identical to spec; documented in code comment + commit body.",
+    "snipHeadTail length bound is in JS chars (unit asserts <=500); a multibyte head char (em-dash U+2014) makes wc -c report 502 bytes for 500 chars — byte expansion, not a bound violation.",
+    "Commit 9bfa1dc is LOCAL only (no push/tag/bump), per main-only discipline; controller verification is local.",
+    "Phase 2 (A-2) and Phase 3 (B-1) are OUT of this task package's scope (separate dispatch); intentionally not started."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail.json",
+    "deliveryRunId": "run-delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail",
+    "dispatchGroup": "p1-truncation-headtail",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+    "stateRevision": 4,
+    "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+    "taskPackageId": "p1-truncation-headtail",
+    "targetTaskId": "p1-agent-truncation-headtail",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p1-truncation-headtail",
+    "resultId": "tr-p1-agent-truncation-headtail",
+    "createdAt": "2026-06-30T21:38:24.754Z"
+  },
+  "createdAt": "2026-06-30T21:38:24.754Z",
+  "stateRevisionObserved": 4,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

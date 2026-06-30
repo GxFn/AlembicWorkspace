@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-agent-write-freshness-gate",
+  "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+  "taskPackageId": "p3-write-freshness-gate",
+  "dispatchGroup": "p3-write-freshness-gate",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p3-agent-write-freshness-gate",
+  "status": "needs-review",
+  "summary": "P3 (B-1, write safety, the LAST phase) — IMPLEMENTATION COMPLETE + all logic/routing/cross-phase gates green, returned status=needs-review because the SHARED-CTX HARD GATE's DIRECT production-host-factory proof is unobtainable from within AlembicAgent offline (details below). AlembicAgent main LOCAL commit ab3f2c0 (baseline 0b1c029/P2; no push/tag/version bump). Authority: Design §8 Phase 3 + §3 B-1 + §6 + CG-3 + CG-4. Scope = ONLY src/tools/runtime/handlers/code.ts + test/tool-v2-contract.test.ts (git diff --stat: 2 files, +266/-0, purely additive); registry.ts/ToolContext ZERO field added (CG-4); ContextWindow.ts (P1) / MemoryRetriever.ts (P2) untouched.\n\nPRE-CHECK (admission gate): AlembicCore/src/infrastructure/io/WriteZone.ts grep 'lastRead|mtime|hash|freshness|external|readBeforeWrite' = ZERO hits; @alembic/core/io dir grep = ZERO hits → Core has NO read-before-write freshness primitive → B-1 correctly stays at the Agent layer. DeltaCache.ts:108 uses createHash('md5') → freshnessFingerprint=md5 ALIGNED (verified, not assumed).\n\nIMPLEMENTATION (code.ts ONLY, no registry.ts field per CG-4): import {createHash} from 'node:crypto'; freshnessFingerprint=md5; stable REREAD_GUIDANCE. handleWrite: after PROTECTED_PATHS, before fs.writeFile, calls checkWriteFreshness and fail(error) on !ok; after successful writeFile, ctx.deltaCache?.set(relPath, fingerprint, content) updates baseline. checkWriteFreshness 4 states with DISK-EXISTENCE PRECEDENCE over cache-membership (TOCTOU-hole fix): state4 fs.readFile ENOENT → allow (new file); deltaCache not injected → allow (passthrough); state1 disk-exists ∧ get()===undefined → REJECT 'exists on disk but was not read in this run.'+REREAD_GUIDANCE; state2 (CG-3) disk-exists ∧ cached ∧ cached.hash≠md5(diskContent) → REJECT 'changed externally since last read.'+REREAD_GUIDANCE (hard reject, no silent overwrite); state3 hash match → allow. Keyed on relPath (consistent with readSingleFile:459). Public contract preserved (ToolResult/{tool,action}/code.write spec/ok()/fail() untouched; no new LLM tool/round-trip).\n\nUNIT TESTS (+7) via the REAL router.execute({tool:'code',action:'read'|'write'},ctx) routing path (NOT direct handleWrite), mkdtemp offline, shared deltaCache ctx: (1) state4 new file → ok ∧ data.written==='src/new.ts' ∧ disk content; (2) state1 disk-exists-unread → ok===false ∧ 'exists on disk but was not read' ∧ 'Re-read the file with code.read' ∧ disk NOT overwritten (distinct from state4); (3) state3 read-then-consistent → ok===true ∧ disk written; (4) state2 read-then-externally-modified → ok===false ∧ 'changed externally since last read' ∧ REREAD_GUIDANCE ∧ disk still external; (5) write-then-immediate-rewrite → ok===true (proves set() updated baseline); (6) no-deltaCache passthrough → ok===true; (7) shared-instance guard (same deltaCache → state3 allow; different new DeltaCache → state1 reject), explicitly commented logic-only, NOT a substitute for the real-run HARD GATE.\n\nSHARED-CTX HARD GATE (make-or-break) — DISPOSITION = needs-review:\n- Mechanism: read (readSingleFile:459 deltaCache.check writes fingerprint) and write (checkWriteFreshness deltaCache.get reads it) must observe the SAME per-run deltaCache. ToolRouterAdapter.execute:90 creates ctx via this.#contextFactory.create(request) PER tool call → sharing depends on the host-injected ToolContextFactory.\n- IN-REPO REALITY: 'new DeltaCache(' / 'new ToolRouterAdapter(' / any toolRouter+deltaCache factory wiring have ZERO hits across the ENTIRE workspace src/ (AlembicAgent + Alembic + AlembicPlugin + AlembicDashboard). The production ToolContextFactory that injects deltaCache is host-owned and NOT in this workspace (AgentRuntimeBoundary.ts:85 hostOwns:'ToolContextFactory inputs'; AgentRuntime:184 receives config.toolRouter / container.get('toolRouter')). A live bootstrap/scan run needs a provider — forbidden offline by CLAUDE.md.\n- PROOF PRODUCED (instanceId via the REAL ToolRouterAdapter.execute per-call create() path, instrumented DeltaCache wrapper logging from check[handleRead] and get[checkWriteFreshness]): under a RUN-SCOPE-SHARING factory the two observe the SAME instanceId (dc-1==dc-1 EQUAL) → the gate threads the shared deltaCache read→write correctly; under a FRESH-PER-CREATE factory they differ (dc-2≠dc-3 DIFFER) → demonstrates exactly the blocked failure mode (a non-sharing host factory would state-1-reject EVERY legitimate rewrite).\n- STRUCTURAL ARGUMENT that the production host shares: the deltaCache's sole purpose is run-scope delta reads (readSingleFile:458-469 returns 'unchanged'/'delta' on re-reads). This shipped, tested feature ONLY functions if the host factory shares deltaCache across create() calls within a run; its existence is itself evidence the production host shares at run scope, and the same shared instance is what checkWriteFreshness reads.\n- WHY needs-review (per spec 'If the shared-ctx HARD GATE ... cannot be met, STOP and return status=needs-review with the instanceId evidence'): the gate is proven correct under the run-scope-sharing contract via the real adapter path, but the spec's DIRECT real-bootstrap production-factory instanceId equality is structurally unobtainable inside AlembicAgent offline (host-owned factory absent from the workspace; no provider). NARROW CLOSURE ITEM: a host-side confirmation (or a host integration run) that the production ToolContextFactory shares deltaCache at run scope. The structural argument already establishes sharing; controller may accept on it (then B-1 → done) or run a host integration check. The implementation is committed and correct; nothing ships (no push) pending acceptance.\n\nREAL-ROUTING CALL-SCOPED EVIDENCE (offline, no key — the unit tests ARE the real router.execute path): first-write-new-file positive = test(1) ok===true ∧ data.written==='src/new.ts' ∧ disk==written; changed-externally reject = test(4) ok===false ∧ 'changed externally since last read' ∧ disk still holds external content (not silently overwritten).\n\nCROSS-PHASE HARD GATES (all PASS, node 22.22.1): offline vitest 43 files/329 passed/0 failed (+7 B-1, mock provider no key); build:check (tsc) green; lint:core-import-boundary green (250 files/50 imports; node:crypto is a Node builtin not a Core import); production-floor verdict baseline capture-then-diff BYTE-EMPTY (sha a0965a6b==a0965a6b, regression tripwire; B-1 touches no prompt text/no gate); host-vs-in-process parity tripwire 3/3 green; npm run check exit 0 (biome 250 files/4 pre-existing scripts warnings/0 error/code.ts clean; all boundary lints; smoke 12 exports/435 bindings; verify:validation-floor 43/329/12; test).\n\nFORBIDDEN respected: no production-floor/submit-gate relaxation; ToolResult{ok,data,error,_meta}/{tool,action}/code.write spec(concurrency/risk)/ok()/fail() untouched; NO registry.ts/ToolContext field added (CG-4); no new LLM-callable tool or model round-trip.\n\nTemp floor-capture + instanceId proof harnesses ran from test/ then DELETED; git status = exactly the 2 committed files, zero residue.\n\nNEXT STEP / BLOCKER: HARD GATE host confirmation — controller/host confirms the production ToolContextFactory shares deltaCache at run scope (structural argument establishes it; or run a host integration check). On confirmation, B-1 → done; all phases (P1 9bfa1dc, P2 0b1c029, P3 ab3f2c0) then complete for this demand.",
+  "evidenceRefs": [
+    "ab3f2c0",
+    "AlembicAgent/src/tools/runtime/handlers/code.ts",
+    "AlembicAgent/test/tool-v2-contract.test.ts",
+    "PRE-CHECK WriteZone grep: AlembicCore/src/infrastructure/io/WriteZone.ts lastRead|mtime|hash|freshness|external = 0 hits (Core has no read-before-write primitive)",
+    "SHARED-CTX instanceId proof via real ToolRouterAdapter.execute: sharing factory check==get EQUAL (dc-1==dc-1); non-sharing factory DIFFER (dc-2!=dc-3)",
+    "production-floor baseline==after sha a0965a6bc6e71d6a3bb842d3fd54eef7bfeb88bc4e94ae349c2109787a6185ea (byte-empty diff)",
+    "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 3 + §3 B-1 + CG-3 + CG-4"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm test -> 43 files / 329 passed / 0 failed (offline mock provider, no real key); +7 B-1 cases via real router.execute routing path",
+    "build:check (tsc --noEmit) -> PASS; lint:core-import-boundary -> OK (250 files / 50 @alembic/core imports)",
+    "SHARED-CTX HARD GATE instanceId proof via REAL ToolRouterAdapter.execute (per-call create()): RUN-SCOPE-SHARING factory -> handleRead.check instanceId == checkWriteFreshness.get instanceId (dc-1==dc-1 EQUAL, gate threads read->write); FRESH-PER-CREATE factory -> differ (dc-2!=dc-3, blocked failure mode demonstrated)",
+    "PRE-CHECK: WriteZone/io grep lastRead|mtime|hash|freshness|external = 0 hits; DeltaCache.ts:108 createHash('md5') -> freshnessFingerprint=md5 aligned",
+    "production-floor baseline capture-then-diff -> BYTE-EMPTY (sha a0965a6b baseline==after; regression tripwire, B-1 changes no prompt text/no gate)",
+    "recipe-authoring-inprocess-parity.test.ts -> 3/3 green (host-vs-in-process tripwire)",
+    "npm run check -> exit 0 (biome 250 files/4 pre-existing scripts warnings/0 error/code.ts clean; agent+public-api+core-import+space+layer+doctrine+naming boundary lints; smoke 12 exports/435 bindings; verify:validation-floor 43/329/12; test)",
+    "git diff --stat ab3f2c0 -> 2 files (src/tools/runtime/handlers/code.ts +70, test/tool-v2-contract.test.ts +196), +266/-0 additive; registry.ts ZERO field added (CG-4)"
+  ],
+  "risks": [
+    "MAKE-OR-BREAK BLOCKER (reason for needs-review): the production host ToolContextFactory's run-scope deltaCache sharing is host-owned (AgentRuntimeBoundary hostOwns 'ToolContextFactory inputs') and NOT present anywhere in this workspace (zero 'new DeltaCache'/'new ToolRouterAdapter' wiring in any sibling src/); its DIRECT real-bootstrap instanceId equality cannot be observed from within AlembicAgent offline (no provider). If the production factory does NOT share deltaCache at run scope, the gate would state-1-reject EVERY legitimate rewrite. MITIGATION: instanceId proof shows EQUAL under the correct run-scope-sharing contract via the real adapter path; the shipped deltaCache delta-read feature (unchanged/delta re-reads) structurally REQUIRES run-scope sharing, so the production host shares. Needs host-side confirmation or a host integration run to close.",
+    "Recommendation for the controller: the structural argument (delta-read feature requires run-scope sharing) is strong enough to accept; alternatively obtain the direct production instanceId equality via a host integration check before enabling reliance on the gate.",
+    "freshnessFingerprint=md5 is locked to DeltaCache.ts:108 createHash('md5'); a future DeltaCache hash-algorithm change must sync this helper (commented in code).",
+    "Commit ab3f2c0 is LOCAL only (no push/tag/bump); nothing ships pending controller acceptance + HARD GATE host confirmation.",
+    "B-1 is the LAST phase; on HARD GATE closure all four sub-phases (A-1/A-1b/A-2/B-1) of demand alembic-agent-cc-scratch-borrow are complete."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate.json",
+    "deliveryRunId": "run-delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate",
+    "dispatchGroup": "p3-write-freshness-gate",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+    "stateRevision": 12,
+    "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+    "taskPackageId": "p3-write-freshness-gate",
+    "targetTaskId": "p3-agent-write-freshness-gate",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p3-write-freshness-gate",
+    "resultId": "tr-p3-agent-write-freshness-gate",
+    "createdAt": "2026-06-30T22:26:22.347Z"
+  },
+  "createdAt": "2026-06-30T22:26:22.347Z",
+  "stateRevisionObserved": 12,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

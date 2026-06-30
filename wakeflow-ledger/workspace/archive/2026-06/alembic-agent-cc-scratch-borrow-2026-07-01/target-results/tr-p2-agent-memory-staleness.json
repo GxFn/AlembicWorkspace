@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-agent-memory-staleness",
+  "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+  "taskPackageId": "p2-memory-staleness",
+  "dispatchGroup": "p2-memory-staleness",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p2-agent-memory-staleness",
+  "status": "completed",
+  "summary": "P2 (work-group A, A-2 recall-memory staleness annotation) COMPLETE on AlembicAgent main, LOCAL commit 0b1c029 (baseline 9bfa1dc/P1; no push/tag/version bump). Authority: Design §8 Phase 2 + §3 A-2 + §6 + CG-1 (>7d, soft prefix, ALL source). Scope = ONLY src/agent/memory/MemoryRetriever.ts + test/memory-context.test.ts (git diff --stat: 2 files, +104/-2); MemoryStore.ts/insightAnalyst.ts/Core schema/raw-SQL adapter ZERO change; ContextWindow.ts (P1) untouched.\n\nIMPLEMENTATION (render-only): constants STALE_MEMORY_DAYS=7 + STALE_MEMORY_PREFIX='⏳[可能陈旧] ' (after SIMILARITY_UPDATE). private static #stalenessPrefix(m: DeserializedMemory, now): age from CAMELCASE m.updatedAt (fallback m.lastAccessedAt), explicit Number.isNaN guard → '' for invalid/missing timestamp (unknown-age NOT annotated, no throw); ageDays > 7 → STALE_MEMORY_PREFIX else ''. toPromptSection builder inserts prefix BETWEEN badge and [type]: `- ${badge} ${stale}[${m.type}] ${m.content}`; fresh memories (stale='') byte-identical to before; signature/return Promise<string> unchanged.\n\nCAMELCASE LOAD-BEARING TRAP FIX (design §3/§8): builder feeds DeserializedMemory (MemoryStore.deserialize → camelCase updatedAt/lastAccessedAt); raw-row snake_case m.updated_at would be new Date(undefined)=NaN → every memory silently un-annotated (phase ships as a no-op). #stalenessPrefix reads ONLY camelCase; DeserializedMemory has no snake keys so misuse fails build:check (verified exit 0 with camelCase). The 3 PRE-EXISTING snake_case sites in MemoryRetriever (:132/:255/:261) operate on raw MemoryRow and are NOT touched.\n\nCG-1 FULL SOURCE: builder change is source-agnostic (no branch on source), covering both bootstrap (insightAnalyst:391) and user (MemoryCoordinator:799) recall paths.\n\nUNIT TESTS (+4) — fixtures via the REAL store.add → getAllActive/deserialize path (NOT hand-built camelCase literals, so casing drift goes red), aged via raw-row UPDATE semantic_memories SET updated_at/last_accessed_at; MemoryRetriever imported via DIRECT path (not barrel — not exported from src/index.ts): (1) >7d (30d) → annotated (regex /⏳\\\\[可能陈旧\\\\] \\\\[.*\\\\] STALE_ITEM/); (2) ≤7d (1d) → NOT annotated; (3) missing/invalid timestamp (updated_at='' + last_accessed_at=null) → unknown-age NOT annotated (NaN guard); (4) updatedAt empty + lastAccessedAt set → falls back to lastAccessedAt via real deserialize → annotated.\n\nREAL-PATH DUMP (offline, NO real key per CLAUDE.md — real rendering code; query-less getAllActive→deserialize branch needs no embedding/provider): bootstrap source (insightAnalyst:391 same builder): rendered `## 项目记忆` = `- ⚠️ ⏳[可能陈旧] [fact] STALE_BOOT...` + `- 📌 [fact] FRESH_BOOT...`; grep -cF '⏳[可能陈旧]'=1 (= stale count), STALE marked / FRESH unmarked. user source via REAL MemoryCoordinator.buildStaticMemoryPrompt() → #buildPersistentMemorySection → toPromptSection({source:'user'}) (the :799 chain) AND a direct toPromptSection({source:'user'}) double-witness: both grep=1, STALE_USER marked / FRESH_USER unmarked → proves FULL-source coverage. updatedAt corroboration (now 2026-06-30T21:59Z): STALE_BOOT 2026-05-31 (30d), FRESH_BOOT 2026-06-29 (1d), STALE_USER 2026-05-16 (45d), FRESH_USER 2026-06-28 (2d) — age math consistent; deterministic grep + timestamps, not eyeball.\n\nCROSS-PHASE HARD GATES (all PASS, node 22.22.1):\n- Offline vitest (mock provider, NO real key): 43 files / 322 passed / 0 failed (+4 A-2).\n- LOAD-BEARING production-floor verdict baseline capture-then-diff on the FULL-source representative Recipe corpus (runInProcessRecipeAuthoringGate → Core validateAgainst, opportunistic + cold-start): baseline sha a0965a6b... == after sha a0965a6b... → BYTE-EMPTY diff. A-2 changes model-VISIBLE memory prompt text, but the gate verdict over the fixed Recipe submission corpus is byte-identical → floor NOT drifted (the gate validates Recipe content, not the memory section that informs the producer).\n- host-vs-in-process parity standing tripwire (recipe-authoring-inprocess-parity.test.ts): 3/3 green.\n- npm run check exit 0: build:check (tsc; camelCase passes, snake_case would fail the type gate); biome lint (250 files, 4 PRE-EXISTING scripts warnings, 0 error, MemoryRetriever clean); agent/public-api/core-import/space/layer/doctrine/naming boundary lints; smoke:public-signatures (12 exports / 435 bindings, unchanged); verify:validation-floor (43 files / 322 cases / 12 stable exports); test.\n\nFORBIDDEN respected: no production-floor/submit-gate relaxation; Core schema / semantic_memories / raw-SQL adapter / MemoryStore (SD-4 frozen) untouched; no new LLM-callable tool or model round-trip; annotation strictly render-only (constants + pure static fn + string interpolation, no DB write).\n\nTemp floor-capture + dump harnesses ran from test/ then DELETED; git status = exactly the 2 committed files, zero residue.\n\nNEXT STEP: Phase 3 (B-1 write-freshness gate, read-before-write TOCTOU) is the remaining SEPARATE task package for this demand; not started here.",
+  "evidenceRefs": [
+    "0b1c029",
+    "AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+    "AlembicAgent/test/memory-context.test.ts",
+    "FULL-source production-floor baseline==after sha a0965a6bc6e71d6a3bb842d3fd54eef7bfeb88bc4e94ae349c2109787a6185ea (byte-empty diff)",
+    "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 2 + §3 A-2 + CG-1"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm test -> 43 files / 322 passed / 0 failed (offline mock provider, no real key); +4 A-2 cases",
+    "LOAD-BEARING floor baseline capture-then-diff -> BYTE-EMPTY (sha a0965a6b baseline==after; runInProcessRecipeAuthoringGate->Core validateAgainst over FULL-source Recipe corpus, opportunistic+cold-start) despite A-2 model-visible prompt-text change",
+    "recipe-authoring-inprocess-parity.test.ts -> 3/3 green (host-vs-in-process standing tripwire)",
+    "npm run check -> exit 0 (build:check camelCase passes / snake_case would fail type gate; biome 250 files / 4 pre-existing scripts warnings / 0 error / MemoryRetriever clean; agent+public-api+core-import+space+layer+doctrine+naming boundary lints; smoke 12 exports/435 bindings; verify:validation-floor 43 files/322 cases/12 stable exports; test)",
+    "real-path dump (offline): bootstrap grep -cF '⏳[可能陈旧]'=1 (STALE_BOOT marked, FRESH_BOOT unmarked); user via real MemoryCoordinator.buildStaticMemoryPrompt() AND direct toPromptSection both =1 (STALE_USER marked, FRESH_USER unmarked); updatedAt corroboration STALE 30d/45d>7, FRESH 1d/2d<=7",
+    "git diff --stat 0b1c029 -> 2 files only (MemoryRetriever.ts, memory-context.test.ts); MemoryStore/insightAnalyst/Core schema/raw-SQL ZERO change"
+  ],
+  "risks": [
+    "A-2 changes model-visible memory prompt text, but the production-floor gate validates the SUBMITTED Recipe items, not the memory section that informs the producer; the fixed-corpus verdict is structurally independent of MemoryRetriever, hence the byte-empty floor diff. Live-run prompt text DOES change (stale lines gain the prefix) — intended behavior; a live stale-bearing corpus would show prompt diff while the floor verdict stays fixed.",
+    "Real LIVE-API bootstrap dump deferred per CLAUDE.md (no real-key dependence); offline evidence renders through the REAL toPromptSection builder + the real MemoryCoordinator.buildStaticMemoryPrompt() chain (query-less getAllActive branch needs no provider) + deterministic grep + updatedAt corroboration.",
+    "Commit 0b1c029 is LOCAL only (no push/tag/bump); controller verification is local.",
+    "Phase 3 (B-1 write-freshness gate) is OUT of this task package's scope (separate dispatch); not started."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness.json",
+    "deliveryRunId": "run-delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness",
+    "dispatchGroup": "p2-memory-staleness",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+    "stateRevision": 8,
+    "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+    "taskPackageId": "p2-memory-staleness",
+    "targetTaskId": "p2-agent-memory-staleness",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p2-memory-staleness",
+    "resultId": "tr-p2-agent-memory-staleness",
+    "createdAt": "2026-06-30T22:01:33.127Z"
+  },
+  "createdAt": "2026-06-30T22:01:33.127Z",
+  "stateRevisionObserved": 8,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

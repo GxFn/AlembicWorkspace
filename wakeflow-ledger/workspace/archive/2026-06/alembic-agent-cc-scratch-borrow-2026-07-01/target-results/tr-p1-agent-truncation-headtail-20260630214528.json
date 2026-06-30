@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-agent-truncation-headtail-20260630214528",
+  "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+  "taskPackageId": "p1-truncation-headtail",
+  "dispatchGroup": "p1-truncation-headtail",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p1-agent-truncation-headtail",
+  "status": "completed",
+  "summary": "Phase 1 (A-1) + Phase 1b (A-1b) truncation head+tail retention — controller-reviewed, independently verified. ContextWindow.ts #compactL1 and the 4 non-knowledge limitToolResult sites + limitFileContent now keep head+marker+tail via file-local snipHeadTail (L1_SNIP_MARKER_TAG='compaction snip', LIMIT_SNIP_MARKER_TAG='tool-result snip', both distinct from read-entry 'batch read budget'); knowledge branch deliberately kept head-only with comment; limitSearchResult* untouched. Idempotency invariant keepHead+marker+safeTail≤budget holds (overflow shrinks safeTail then keepHead). Commit 9bfa1dc on AlembicAgent main, 2 files only (no Core/Plugin). Evidence-ref repair: cleaned the design sourceRef and the repo-relative parity-test path that the resolver false-flagged.",
+  "evidenceRefs": [
+    "9bfa1dc",
+    "AlembicAgent/src/agent/context/ContextWindow.ts",
+    "AlembicAgent/test/ContextWindow.test.ts",
+    "AlembicAgent/test/recipe-authoring-inprocess-parity.test.ts",
+    "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md"
+  ],
+  "verification": [
+    "Controller re-ran vitest test/ContextWindow.test.ts + test/recipe-authoring-inprocess-parity.test.ts on Node 22.22.1: 2 files / 17 passed / 0 failed (includes the 7 new A-1/A-1b cases + parity tripwire 3/3)",
+    "Controller ran npm run build:check (tsc --noEmit): exit 0, type-clean",
+    "Controller read the full ContextWindow.ts diff: A-1 #compactL1 line + snipHeadTail helper (idempotency math verified: budget 500 -> 400+~55+45=500 <=500 <2000 -> 2nd pass skipped -> byte-identical), all 4 A-1b limitToolResult sites + limitFileContent string/line branches, knowledge head-only kept, limitSearchResult* untouched, ToolResult envelope/{tool,action}/signature untouched",
+    "Controller read the test diff: assertions are non-vacuous (tail-survival + distinct-marker + >=3-cycle byte-identical + message-count/messages[0] pin; A-1b generic/code-batch-c49-value/file-content footer), folded adversarial corrections present",
+    "git: 9bfa1dc on main (HEAD), 2 files only, develop-on-main, boundary held",
+    "Production-floor parity: gate code (Core) untouched + parity test green => floor verdict byte-empty diff structurally guaranteed (target sha a0965a6b baseline==after over full-source corpus)"
+  ],
+  "risks": [
+    "Real-machine bootstrap dump (target-reported: 'compaction snip'=6, 'tool-result snip'=3, 'batch read budget'=0, head 'Entry.ts:1' + tail 'showing 240 of 871 ---' survive, pass1==pass3 byte-identical) was NOT independently reproduced by the controller — the deterministic unit tests are the conclusive proof of the head+tail+idempotency behavior; the real-run dump is corroboration",
+    "Floor-parity is a regression tripwire here, not a behavioral signal (A-1/A-1b only change tool-result truncation in ContextWindow, which is upstream of and orthogonal to the recipe-authoring gate path)"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail.json",
+    "deliveryRunId": "run-delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail",
+    "dispatchGroup": "p1-truncation-headtail",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-cc-scratch-borrow-2026-07-01",
+    "stateRevision": 4,
+    "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+    "taskPackageId": "p1-truncation-headtail",
+    "targetTaskId": "p1-agent-truncation-headtail",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p1-truncation-headtail",
+    "resultId": "tr-p1-agent-truncation-headtail-20260630214528",
+    "createdAt": "2026-06-30T21:45:28.228Z"
+  },
+  "createdAt": "2026-06-30T21:45:28.228Z",
+  "stateRevisionObserved": 4,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

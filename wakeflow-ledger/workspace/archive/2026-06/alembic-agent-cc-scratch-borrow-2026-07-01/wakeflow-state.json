@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-agent-cc-scratch-borrow-2026-07-01",
+  "title": "把 claude-code-from-scratch 中真正适配 in-process Recipe 生成的 3 项保真增强借鉴进 AlembicAgent；全在 AlembicAgent 仓，不改 Core/Plugin；CG 已决、§8 代码级实现指导 + 每阶段确定性验收齐全。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "claude-code",
+  "state": "archived",
+  "stateReason": "Demand completed (rev 15): all 4 sub-phases A-1/A-1b/A-2/B-1 accepted with independent controller verification; B-1 HARD GATE closed via static host-wiring proof. Archiving to the committed ledger. Local ledger commit only; AlembicAgent product commits (9bfa1dc/0b1c029/ab3f2c0) remain local-unpushed (user-gated deployment).",
+  "revision": 16,
+  "activeStageId": null,
+  "updatedAt": "2026-06-30T22:37:30.550Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p1-truncation-headtail",
+      "summary": "Phase 1 + Phase 1b (work-group A, truncation head+tail). ALL in AlembicAgent repo; develop-on-main; LOCAL commit only, NO push. Authority = Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 1 + Phase 1b (code-level target code is given there), with §5/§6/§7. Read parent CLAUDE.md + this state root + AlembicAgent CLAUDE.md, declare window/repo identity, claim ONLY this task.\n\nPHASE 1 (A-1), file src/agent/context/ContextWindow.ts: add file-local helper snipHeadTail(text,budget,tag):string + constants L1_SNIP_MARKER_TAG='compaction snip' and LIMIT_SNIP_MARKER_TAG='tool-result snip' exactly per §8 target code (overflow shrinks safeTail first, then keepHead, so keepHead+marker.length+safeTail ≤ budget at ANY budget; short-string passthrough). Replace #compactL1 line ~583 substring(0,TRUNCATE_TO) with snipHeadTail(msg.content, TRUNCATE_TO, L1_SNIP_MARKER_TAG) (CG-2 = 80%/15% of TRUNCATE_TO=500); rest of #compactL1 (constants/loop/log/return) byte-unchanged; loop still starts i=1 (messages[0] pin).\n\nPHASE 1b (A-1b), same file: change the 4 NON-knowledge substring sites in limitToolResult (~:1054 search string, ~:1072 batch, ~:1080 file-content batch, ~:1088 generic) + limitFileContent string branch (~:1187) and the line-level content branch to use snipHeadTail(...,LIMIT_SNIP_MARKER_TAG) (file-content branch keeps whole-line boundaries but same marker tag). The knowledge branch (~:1046) STAYS head-only WITH an explanatory comment. limitSearchResult/limitSearchResultObj UNCHANGED. Verify limitToolResult signature+return type unchanged (consumers untouched).\n\nINDEPENDENT ACCEPTANCE (design rule: 'L1 done' must NOT count as 'limit done' — prove each separately):\n- A-1 unit (test/ContextWindow.test.ts): an old oversized tool result keeps head AND tail; output contains 'compaction snip' and NOT 'batch read budget'; idempotent across ≥3 compaction cycles (after 1st pass byte-identical on re-compaction, length ≤500, tail fragment survives); message count unchanged + messages[0] is the original prompt.\n- A-1b unit: generic oversized string / code batch (assert a TAIL VALUE fragment e.g. 'c49' survives, NOT a key name) / file content (last lines survive) each keep the tail with marker 'tool-result snip', and that marker ≠ 'compaction snip' ≠ 'batch read budget'.\n- Real bootstrap/scan dump: grep -c 'compaction snip' ≥1 on an L1-processed result + a result processed ≥2× has byte-identical 1st==2nd pass; on a limit* product grep 'tool-result snip' hits and grep -c 'batch read budget' = 0.\n\nCROSS-PHASE HARD GATES (all required): offline `npm test` / vitest green (mock provider, NO real key); production-floor verdict baseline capture-then-diff on the FULL-source representative Recipe corpus via test/recipe-authoring-inprocess-parity.test.ts (A-1/A-1b don't touch prompt text → expect byte-empty diff, but you MUST produce the captured baseline + the diff as evidence, not merely assert); host-vs-in-process parity standing tripwire green.\n\nFORBIDDEN: relaxing production floor / submit gate; touching ToolResult{ok,data,error,_meta} envelope, {tool,action} naming, or ok()/fail(); any new LLM-callable tool or model round-trip; breaking compaction pairing atomicity or messages[0] pin; modifying limitSearchResult*.\n\nBACKFILL the TargetResultEnvelope with: AlembicAgent commit hash (main), full vitest output, real-run dumps with the grep-assertion output, the ≥2-cycle byte-identical diff, the floor verdict baseline+diff JSON, residual risks, next step. If any hard gate cannot be met, STOP and return status=needs-review (NOT done) with the blocker.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 1 + Phase 1b (code-level target code), §5/§6/§7",
+      "createdAt": "2026-06-30T21:19:26.224Z"
+    },
+    {
+      "taskPackageId": "p2-memory-staleness",
+      "summary": "Phase 2 (A-2, work-group A memory fidelity). ALL in AlembicAgent repo; develop-on-main; LOCAL commit only, NO push. Authority = Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 2 (code-level target code given) + §3 A-2 + §6 + CG-1. Read parent CLAUDE.md + this state root + AlembicAgent CLAUDE.md, declare window/repo identity, claim ONLY this task. Phase 1+1b already accepted (commit 9bfa1dc) — do NOT touch ContextWindow.ts.\n\nWORK (file src/agent/memory/MemoryRetriever.ts, render-only): add constants STALE_MEMORY_DAYS=7 + STALE_MEMORY_PREFIX='⏳[可能陈旧] ' (after SIMILARITY_UPDATE ~:31). Add a private static helper #stalenessPrefix(m: DeserializedMemory, now): compute age from CAMELCASE m.updatedAt (fallback m.lastAccessedAt), with an explicit Number.isNaN guard → return '' for invalid/missing timestamp (unknown-age = NOT annotated, no throw); ageDays > STALE_MEMORY_DAYS → return STALE_MEMORY_PREFIX else ''. In the toPromptSection line-builder (real anchor ~:226-236, NOT the stale :194), insert the prefix BETWEEN badge and [type]: `- ${badge} ${stale}[${m.type}] ${m.content}` so fresh memories (stale='') are byte-identical to before. CG-1 = FULL source: the builder change must cover both bootstrap (insightAnalyst.ts:390) and user (MemoryCoordinator.ts:798) recall paths.\n\nCRITICAL TRAP (design §3/§8): builder input is the DESERIALIZED DeserializedMemory (camelCase updatedAt/lastAccessedAt from MemoryStore.deserialize ~:569-579); the raw rows at retrieve()/load() use snake_case (updated_at). Using snake_case m.updated_at → new Date(undefined) → NaN → age compare always false → EVERY memory silently un-annotated (phase ships as a no-op). Pin camelCase + Number.isNaN guard.\n\nBOUNDARY / render-only: do NOT touch Core-owned semantic_memories schema (@alembic/core/memory), the raw-SQL sync adapter, or MemoryStore (SD-4 frozen rule MemoryStore.ts:14-26). No DB write — only renderer constants + a pure static fn + string interpolation.\n\nACCEPTANCE (design §8 Phase 2):\n- git diff --stat = ONLY MemoryRetriever.ts + test/memory-context.test.ts; MemoryStore.ts/insightAnalyst.ts/Core schema/raw-SQL adapter ZERO change.\n- npm run build:check (tsc) passes — misusing snake_case m.updated_at must fail the type gate (DeserializedMemory has no snake keys).\n- 4 unit tests (test/memory-context.test.ts) GREEN, offline, fixtures built via the REAL store.add → deserialize path (NOT hand-built camelCase literals, so casing drift goes red), using a raw-row `UPDATE semantic_memories SET updated_at=?,last_accessed_at=? WHERE id=?` to age fixtures: (1) >7d → annotated; (2) ≤7d → NOT annotated; (3) missing/invalid timestamp → unknown-age NOT annotated (NaN guard); (4) updatedAt empty → falls back to lastAccessedAt via real deserialize. Note: MemoryRetriever is NOT exported from src/index.ts — import via '../src/agent/memory/MemoryRetriever.js' (grep-confirm first).\n- Real bootstrap §8 prompt dump: corpus with known >7d AND ≤7d memories — grep -F '⏳[可能陈旧]' hits ≥ the stale count, each fresh line lacks the marker; attach underlying updatedAt values corroborating the age math (deterministic grep, NOT eyeball).\n- FULL-source coverage: separately exercise the user-source recall path (MemoryCoordinator.ts:798) and grep the marker, proving the builder change covers ALL sources, not just bootstrap.\n\nCROSS-PHASE HARD GATES (all required): offline `npm test`/vitest green (mock provider, NO real key); **PRODUCTION-FLOOR VERDICT BASELINE CAPTURE-THEN-DIFF on the FULL-source representative Recipe corpus** via test/recipe-authoring-inprocess-parity.test.ts — A-2 changes model-VISIBLE prompt text so this is the LOAD-BEARING gate (capture verdict JSON before, diff after, PASS = byte-empty diff; if a stale-bearing corpus shows prompt-text diff, confirm the floor verdict still does not drift); host-vs-in-process parity standing tripwire green.\n\nFORBIDDEN: relaxing production floor / submit gate; touching Core schema / semantic_memories / raw-SQL adapter / MemoryStore (SD-4); any new LLM-callable tool or model round-trip; making the annotation anything other than render-only.\n\nBACKFILL the TargetResultEnvelope: AlembicAgent commit hash (main), full vitest output, the §8 bootstrap dump + user-path dump with grep output + updatedAt corroboration, the FULL-source floor verdict baseline+diff JSON (the key A-2 evidence — must be byte-empty), residual risks, next step. If any hard gate (especially floor parity) cannot be met, STOP and return status=needs-review (NOT done) with the blocker.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 2 (code-level target code), §3 A-2 / §6 / CG-1",
+      "createdAt": "2026-06-30T21:47:50.053Z"
+    },
+    {
+      "taskPackageId": "p3-write-freshness-gate",
+      "summary": "Phase 3 (B-1, work-group B write safety) — the LAST phase. ALL in AlembicAgent repo; develop-on-main; LOCAL commit only, NO push. Authority = Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 3 (code-level target code given) + §3 B-1 + §6 + CG-3 + CG-4. Read parent CLAUDE.md + this state root + AlembicAgent CLAUDE.md, declare window/repo identity, claim ONLY this task. Phase 1+1b (9bfa1dc) and Phase 2 (0b1c029) already accepted — do NOT touch ContextWindow.ts / MemoryRetriever.ts.\n\nPRE-CHECK (admission gate, design §3/§8): re-grep Core @alembic/core/io WriteZone for lastRead|mtime|hash|freshness|external — confirm Core provides NO read-before-write freshness primitive (design verified WriteZone is landing-point guard only). If Core DOES expose one, consume it instead of rebuilding and report. Provide the grep evidence in backfill.\n\nWORK (file src/tools/runtime/handlers/code.ts ONLY; do NOT add a registry.ts field — CG-4): add `import { createHash } from 'node:crypto'`; add file-private freshnessFingerprint(content)=createHash('md5').update(content).digest('hex') (MUST align with DeltaCache's content-hash algorithm so 'disk content' vs 'cached read fingerprint' compare correctly — verify DeltaCache uses md5; if not, match whatever it uses); add a stable REREAD_GUIDANCE const (exact grep string per §8). In handleWrite, AFTER the PROTECTED_PATHS loop and BEFORE fs.writeFile, call `await checkWriteFreshness(resolved.absPath, resolved.relPath, ctx)` and return fail(freshness.error) on !ok; after a successful fs.writeFile, call `ctx.deltaCache?.set(resolved.relPath, freshnessFingerprint(content), content)` to update the baseline. Implement checkWriteFreshness with FOUR states, and CRITICALLY disk-existence takes precedence over cache-membership:\n  state 4: fs.readFile(absPath) throws ENOENT → allow (new file);\n  (deltaCache not injected → allow passthrough, don't false-reject legitimate writes);\n  state 1: disk exists ∧ ctx.deltaCache.get(relPath) is undefined (not read this run) → REJECT 'code.write rejected: <relPath> exists on disk but was not read in this run. ' + REREAD_GUIDANCE;\n  state 2 (CG-3): disk exists ∧ cached ∧ cached.hash !== freshnessFingerprint(diskContent) → REJECT 'code.write rejected: <relPath> changed externally since last read. ' + REREAD_GUIDANCE (hard reject, NOT silent overwrite, NOT log-only);\n  state 3: disk exists ∧ cached ∧ hash matches → allow.\n  Key on relPath (consistent with readSingleFile :459). The new-file branch keys on DISK existence, NOT cache membership — a disk-existing-but-unread file must hit state 1, never be waved through as 'new'.\n\nSHARED-CTX HARD GATE (design §3/§8 — the make-or-break): read (handleRead/readSingleFile :458-459 writes the fingerprint via deltaCache.check) and write (checkWriteFreshness reads via deltaCache.get) MUST observe the SAME per-run ToolContext/deltaCache instance, which depends on the host's ToolContextFactory. This CANNOT be proven by a unit test hand-passing ctx. PROVE IT in a real run: instrument the factory-injected DeltaCache with a one-time #instanceId and log it from BOTH handleRead (after :459) and checkWriteFreshness (after get); dump the run, grep the two instanceId lines, assert EQUAL. If NOT equal (factory builds a fresh deltaCache per create()), B-1 is BLOCKED — return status=needs-review with the unequal-instanceId log and the message 'host factory does not share deltaCache at run scope'. Do NOT fake done; a non-shared ctx means the gate either false-rejects all legitimate rewrites or never fires.\n\nUNIT TESTS (test/tool-v2-contract.test.ts) via router.execute({tool:'code',action:'read'|'write'}, ctx) (REAL routing path, not direct handleWrite), mkdtemp offline, 7 deterministic cases: (1) state4 new file (disk-absent) → ok===true + file on disk; (2) state1 disk-exists-but-unread (pre-write via fs without code.read) → ok===false + error contains 'exists on disk but was not read' + 'Re-read the file with code.read' (distinct from state4); (3) state3 read-then-consistent → ok===true; (4) state2 read-then-externally-modified (out-of-band fs.writeFile) → ok===false + 'changed externally since last read' + REREAD_GUIDANCE; (5) write-then-baseline-update (immediate same-ctx re-write, no external change) → ok===true (proves set() updated the fingerprint, no false-reject); (6) deltaCache-not-injected → ok===true passthrough; (7) shared-instance contract guard (same deltaCache passed twice → read then write hits state3; a DIFFERENT new DeltaCache passed to write → state1 reject), explicitly commented as logic-only, NOT a substitute for the real-run HARD GATE.\n\nCROSS-PHASE HARD GATES: offline `npm test` / vitest green (mock provider, NO real key); Phase 3 ALSO build/typecheck + lint:core-import-boundary green; production-floor verdict baseline capture-then-diff (B-1 doesn't touch prompt text → expect byte-empty, but produce the diff as a regression tripwire); host-vs-in-process parity standing tripwire green.\n\nFORBIDDEN: relaxing production floor / submit gate; touching ToolResult{ok,data,error,_meta} envelope, {tool,action} naming, code.write spec (concurrency/risk), or ok()/fail(); adding a registry.ts/ToolContext field (CG-4 = reuse deltaCache); any new LLM-callable tool or model round-trip.\n\nBACKFILL the TargetResultEnvelope: AlembicAgent commit hash (main), WriteZone grep evidence, full vitest output, the SHARED-CTX instanceId real-run log (two equal lines — the HARD GATE evidence), the first-write-new-file positive call-scoped assertion (ok ∧ data.written ∧ disk==written), the changed-externally reject envelope dump (+ disk not overwritten), floor verdict baseline+diff JSON, residual risks, next step. If the shared-ctx HARD GATE fails OR any other hard gate cannot be met, STOP and return status=needs-review (NOT done / NOT a workaround) with the blocker + instanceId evidence.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-cc-scratch-borrow-2026-07-01.md §8 Phase 3 (code-level target code), §3 B-1 / §6 / CG-3 / CG-4",
+      "createdAt": "2026-06-30T22:06:47.158Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p1-agent-truncation-headtail",
+      "taskPackageId": "p1-truncation-headtail",
+      "targetWindow": "AlembicAgent",
+      "summary": "Phase 1 (A-1) + Phase 1b (A-1b): truncation head+tail retention in AlembicAgent src/agent/context/ContextWindow.ts, with INDEPENDENT per-sub-phase acceptance.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T21:19:26.224Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail.json",
+        "deliveryRunId": "run-delivery-p1-truncation-headtail__AlembicAgent__p1-agent-truncation-headtail",
+        "dispatchGroup": "p1-truncation-headtail",
+        "sentAt": "2026-06-30T21:20:16.782Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-agent-truncation-headtail-20260630214528"
+    },
+    {
+      "targetTaskId": "p2-agent-memory-staleness",
+      "taskPackageId": "p2-memory-staleness",
+      "targetWindow": "AlembicAgent",
+      "summary": "Phase 2 (A-2): recall-memory staleness annotation in AlembicAgent src/agent/memory/MemoryRetriever.ts (render-only), with the full-source production-floor parity gate.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T21:47:50.053Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness.json",
+        "deliveryRunId": "run-delivery-p2-memory-staleness__AlembicAgent__p2-agent-memory-staleness",
+        "dispatchGroup": "p2-memory-staleness",
+        "sentAt": "2026-06-30T21:48:18.560Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-agent-memory-staleness-20260630220430"
+    },
+    {
+      "targetTaskId": "p3-agent-write-freshness-gate",
+      "taskPackageId": "p3-write-freshness-gate",
+      "targetWindow": "AlembicAgent",
+      "summary": "Phase 3 (B-1): write-before-freshness gate (read-before-write / TOCTOU) in AlembicAgent src/tools/runtime/handlers/code.ts, reusing deltaCache content hash; with the shared-ctx instanceId HARD GATE.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T22:06:47.158Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate.json",
+        "deliveryRunId": "run-delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate",
+        "dispatchGroup": "p3-write-freshness-gate",
+        "sentAt": "2026-06-30T22:07:14.734Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-agent-write-freshness-gate-20260630223443"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicAgent",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-truncation-headtail",
+        "p2-memory-staleness",
+        "p3-write-freshness-gate"
+      ],
+      "targetTaskIds": [
+        "p1-agent-truncation-headtail",
+        "p2-agent-memory-staleness",
+        "p3-agent-write-freshness-gate"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p3-agent-write-freshness-gate-20260630223443"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-30T21:16:27.477Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate",
+    "lastDeliveryRunId": "run-delivery-p3-write-freshness-gate__AlembicAgent__p3-agent-write-freshness-gate",
+    "lastDispatchGroup": "p3-write-freshness-gate",
+    "lastTargetTaskId": "p3-agent-write-freshness-gate",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-30T22:07:14.737Z"
+  }
+}
