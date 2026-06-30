@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p0-recipe-authoring-spec-module",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "summary": "P0 wave-1 producer foundation: build the canonical RecipeAuthoringSpec module in AlembicCore at src/domain/knowledge/recipe-authoring-spec exposed via the existing knowledge facade, as the single source of truth for Recipe authoring (gate validation, guidance, examples). PURELY ADDITIVE this phase: no Plugin, Agent, or FieldSpec edits; lift the gate constants by moving function bodies for byte-identity; Plugin and Core gates keep their inline originals until P1, so all existing tests stay green. P0.0 is the HARD first step: build the enforcement-matrix fixture and a round-trip test grounded on the controller oracle evidence file; the rules are layered across stage 1 (Plugin verb and marker), stage 2 (Plugin cold-start-only evidence, snippet, graph) and stage 3 (Core all-paths field, floor, uniqueness); derive the verb count of 45 from the lifted Set, never hardcode the number. Apply the C.1 split: only pure-data predicates move into the domain gate-rules module, while fs and session checks stay Plugin-side behind typed sourceRefResolver and sessionScope ports defined in the types layer, and gate-rules must carry zero node-fs or host-agent-workflows imports so lint layer-contract stays green. The live stage-2 source file is lib/recipe-generation/host-agent-workflows/recipe-evidence-gate, NOT the dead lib/runtime/mcp duplicate which is out of scope and must not be touched. No confidence floor, per decision D-A. Acceptance on Node 22: build-check, the spec-shape test, the matrix test, lint layer-contract, the full Core check, and a cross-package facade resolve. Develop on main only; no push, tag, or version bump. The full code-level spec and every corrected line number live in the sourceRef design sections and the oracle evidence file. Backfill the Core commit hash, raw acceptance output, the matrix json content, and a grep proof that gate-rules has zero fs and workflows imports.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections A B-P0 and C (C overrides A and B) plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md (controller-verified enforcement matrix oracle)",
+  "createdAt": "2026-06-29T22:31:28.605Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p0-core-recipe-authoring-spec-module",
+      "taskPackageId": "p0-recipe-authoring-spec-module",
+      "targetWindow": "AlembicCore",
+      "summary": "Build the canonical RecipeAuthoringSpec module in Core domain knowledge, exposed via the knowledge facade. Do the P0.0 enforcement-matrix fixture and test first, grounded on the controller oracle. Lift gate constants byte-identical with the C.1 split (pure predicates into domain, fs and session behind injected typed ports, zero fs or workflows imports in gate-rules). Additive only: no Plugin or FieldSpec edits, all tests green. Accept with build-check, spec-shape test, matrix test, lint layer-contract, full Core check, and cross-package facade resolve on Node 22. Backfill the commit and raw acceptance output.",
+      "status": "pending",
+      "createdAt": "2026-06-29T22:31:28.605Z"
+    }
+  ]
+}

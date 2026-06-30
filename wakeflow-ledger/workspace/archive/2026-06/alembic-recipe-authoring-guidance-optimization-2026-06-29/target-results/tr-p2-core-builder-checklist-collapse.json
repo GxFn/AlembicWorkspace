@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-core-builder-checklist-collapse",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p2-core-builder-checklist-collapse",
+  "dispatchGroup": "p2-core-builder-checklist-collapse",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p2-core-builder-checklist-collapse",
+  "status": "needs-review",
+  "summary": "P2 Core guidance foundation — AlembicCore commit 4869db2 on main (no push/tag/version bump). Guidance-only change; gates byte-identical from P1.\n\nP2.1 (DELIVERED): the two parallel submissionSpec builders are collapsed onto ONE module-fed source. New exported DimensionCatalogPayload.buildDimensionSubmissionSpec(knowledgeTypes) reads the candidate floor (module buildSubmissionSpec('').minCandidates = 3), the imperative-verb allowlist (getImperativeVerbAllowlist), and the evidence floor (getEvidenceFloorPolicy) from @alembic/core/knowledge, so the rendered guidance states the ACTUAL gate rules (guidance==gate). BOTH DimensionCatalogPayload (was '可以提交 0 条') AND MissionBriefingBuilder (inline 8-field object, was '最少 3 条') now call it. Decision D-B applied: the 0-vs-3 candidate-count contradiction resolves to >=3 — the alembic_plan draft no longer says 0 candidates is OK (the one intentional visible-guidance change). A fresh-literal spread ({...spec}) bridges the strict DimensionSubmissionSpec to the loose, compaction-mutable DimensionTask.submissionSpec shape (CompressibleDimensionTask deletes preSubmitChecklist.FAIL_EXAMPLES under budget). plan-tool.ts (Plugin) consumes buildDimensionCatalogPayload but ignores submissionSpec, so it is unaffected.\n\nP2.4 (PARTIAL): SHARED_SUBMIT_CHECKLIST (private, sole consumer _sop Phase-4) had a third '提交 0 条' line — aligned to the D-B >=3 floor. PRE_SUBMIT_CHECKLIST kept its {MUST,SHOULD,FAIL_EXAMPLES} structure (see WHY needs-review).\n\nWHY needs-review (controller decision): the literal P2.4 — flatten BOTH checklists to the module's flat buildPreSubmitChecklist() string[] — is a CROSS-REPO breaking change out of this Core-only/guidance-only task. The consumer map proved PRE_SUBMIT_CHECKLIST.MUST is hard-read by the Plugin cold-start compactor (cold-start.ts:569: checklist.required ?? checklist.MUST) and asserted by DimensionCatalogPayload.test.ts:25 (.MUST.length) + HostMcpServer.test.ts:1892 (projected required). Flattening would require editing the Plugin compactor + Plugin test — outside Core. I therefore delivered the submissionSpec collapse + the D-B floor fix everywhere (incl. SHARED), and kept PRE_SUBMIT_CHECKLIST structured. Recommendation: route the PRE_SUBMIT_CHECKLIST flatten + FAIL_EXAMPLES single-sourcing (the delete-on-compaction-loss fix) as a separate cross-repo P2 wave that also updates the Plugin cold-start compactor + HostMcpServer test. Please confirm whether the conservative checklist handling is acceptable for this Core wave.\n\nACCEPTANCE (node 22.22.1) — all Core criteria met: build:check PASS; new test/DimensionSubmissionSpecCollapse.test.ts PASS (rendered submissionSpec states 最少 3 条 + no '0 条'; lists the live 45-verb allowlist with count derived from getImperativeVerbAllowlist, contains 'validate'; states ≥3 distinct-files floor; every catalog dimension uses the collapsed builder; preSubmitChecklist.MUST preserved); full Core suite 1482/1482 (155 files); biome 682 clean; lint:public-api-boundary OK (the new export did not trip it). Cross-repo: Plugin tsc --noEmit (incl plan-tool.ts) PASS against the rebuilt Core dist. The 16 failing Plugin RUNTIME tests are PRE-EXISTING (identical 16 fail at clean Core HEAD via stash probe; all ProjectContext/planning/cold-start/status env failures with 'expected 0 to be greater than 10' fact counts, none submissionSpec-related); the submissionSpec-shape-sensitive Plugin tests (required/P5, knowledgeTypes) are GREEN. npm run check red ONLY on the 3 pre-existing out-of-scope lint:naming files (carve-out; not touched).",
+  "evidenceRefs": [
+    "AlembicCore/src/domain/dimension/DimensionCatalogPayload.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/MissionBriefingBuilder.ts",
+    "AlembicCore/src/domain/dimension/DimensionSop.ts",
+    "AlembicCore/test/DimensionSubmissionSpecCollapse.test.ts"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm run build:check → PASS (tsc --noEmit clean)",
+    "npm run build → PASS (Core dist rebuilt for the cross-repo type-check)",
+    "vitest test/DimensionSubmissionSpecCollapse.test.ts → PASS (states 最少 3 条 / no 0 条; lists live 45-verb allowlist + ≥3 distinct-files floor; every catalog dim uses the collapsed builder; preSubmitChecklist.MUST preserved)",
+    "vitest test/DimensionCatalogPayload.test.ts → PASS (briefing/catalog shape unchanged, MUST.length>0)",
+    "npm run test → 1482/1482 PASS (155 files)",
+    "npm run lint (biome) → 682 files clean",
+    "npm run check → build:check/public-api-boundary/layer-contract/consumer-core-imports/scope-resolution/smoke/output-budgets/space-edges/doctrine PASS; lint:naming red ONLY on the 3 pre-existing files",
+    "CROSS-REPO: AlembicPlugin tsc --noEmit (typecheck, incl plan-tool.ts) → PASS against rebuilt Core dist",
+    "Plugin stash-probe: the 16 failing Plugin runtime tests fail IDENTICALLY at clean Core HEAD (16 failed|35 passed both with and without p2) → pre-existing, zero new failures from p2"
+  ],
+  "risks": [
+    "CONTROLLER DECISION (P2.4 scope): the literal 'both checklists call buildPreSubmitChecklist()' flatten of PRE_SUBMIT_CHECKLIST is deferred — it breaks the Plugin cold-start .MUST compactor + 2 cross-repo tests (out of this Core-only/guidance-only task). Delivered: submissionSpec collapse + D-B >=3 everywhere (incl SHARED). Recommend a separate cross-repo P2 wave (Plugin compactor + HostMcpServer test) for the PRE_SUBMIT flatten + FAIL_EXAMPLES single-sourcing. Confirm if conservative handling is OK for this wave.",
+    "Visible guidance change is intentional and bounded: D-B >=3 floor is the one alembic_plan draft change; the submissionSpec now also states the verb allowlist + evidence floor (the guidance==gate enrichment the task asked for). No Core/Plugin test asserted the old candidate-count wording, so this is safe.",
+    "16 Plugin RUNTIME tests fail but are PRE-EXISTING (identical at clean Core HEAD; ProjectContext/planning/cold-start env failures, not submissionSpec) — zero new failures from p2; out of this Core task's acceptance (which is Core test + plan-tool TYPE-check, both green).",
+    "buildDimensionSubmissionSpec is a NEW module-internal export from DimensionCatalogPayload.ts (consumed by MissionBriefingBuilder + the proof test); lint:public-api-boundary still OK (not a package-entry export).",
+    "Commit 4869db2 is local only (no push), per main-only/no-push; controller verification is local."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-core-builder-checklist-collapse__AlembicCore__p2-core-builder-checklist-collapse",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-builder-checklist-collapse__AlembicCore__p2-core-builder-checklist-collapse.json",
+    "deliveryRunId": "run-delivery-p2-core-builder-checklist-collapse__AlembicCore__p2-core-builder-checklist-collapse",
+    "dispatchGroup": "p2-core-builder-checklist-collapse",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-builder-checklist-collapse__AlembicCore__p2-core-builder-checklist-collapse.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 36,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p2-core-builder-checklist-collapse",
+    "targetTaskId": "p2-core-builder-checklist-collapse",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p2-core-builder-checklist-collapse",
+    "resultId": "tr-p2-core-builder-checklist-collapse",
+    "createdAt": "2026-06-30T02:44:45.687Z"
+  },
+  "createdAt": "2026-06-30T02:44:45.687Z",
+  "stateRevisionObserved": 36,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

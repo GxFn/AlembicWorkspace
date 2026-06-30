@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-agent-inprocess-flatten",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p1-agent-inprocess-flatten",
+  "dispatchGroup": "p1-agent-inprocess-flatten",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p1-agent-inprocess-flatten",
+  "status": "completed",
+  "summary": "P1.4b AlembicAgent in-process flatten complete — commit eab6c88 on main (baseline e26f044; no push/tag/version bump). Re-pointed the in-process knowledge.submit path to the authoritative @alembic/core/knowledge validateAgainst with the §12.3 profile axis, closing the CG-4 in-process parity gap. Consumes Core profile model 8771524 via @alembic/core/knowledge; host path (AlembicPlugin c1c3922) and Core (8771524) untouched.\n\nWHAT SHIPPED (AlembicAgent only, 6 files):\n- NEW src/tools/runtime/handlers/recipeAuthoringGate.ts: createInProcessSourceRefResolver (byte-faithful §C.11 mirror of the host createSourceRefResolver — identical SOURCE_REF_INVALID/NOT_FOUND/LINE_OUT_OF_RANGE branches+messages) + runInProcessRecipeAuthoringGate (resolveAuthoringProfile + validateAgainst stage:'all' path:'in-process', fs resolver injected, session-scope port NOT injected) + formatRecipeAuthoringViolations.\n- knowledge.ts handleSubmit: before gateway.create, runs the in-process gate; on violations returns the existing in-process fail() reject envelope. validateSubmitParams KEPT as the cheap presence/length fast-fail the authoritative gate supersedes (task-permitted option).\n- STEP 1 producer-prompt-first: insightProducer STYLE_GUIDE now = renderGuidance('in-process',undefined,'cold-start').text (same gateRules() table the gate reads); PRODUCER_SUBMIT_FIELD_CONTRACT re-sourced from describeSubmitToolFields (spec-sourced, zero hand-written drift). Producer now sees the 45/12 verb allowlist + ✅❌ contrast + cheap grounding + cold-start evidence floor BEFORE the gate enforces.\n\nPROFILE SEMANTICS: resolveAuthoringProfile(ctx) → opportunistic for runtime in-process AI (no session/dimension): all content gates + cheap fs grounding, NO 3-distinct-files floor, NO session-scope; → cold-start for dimension-bearing (bootstrap) submissions: full gate incl floor. session-scope not injected in-process (consistent with P1-Plugin 'session-scope stays host-side'; opportunistic has it off anyway → no conflict).\n\nSTEP 3 new-reject set (documented + asserted): bounded to content/cheap-grounding codes {DO_CLAUSE_NON_IMPERATIVE, DONT_CLAUSE_REQUIRED, CONTENT_CONTRAST_MISSING, SOURCE_REF_LINE_MISSING, SOURCE_REF_NOT_FOUND, STAGE3_*, ...}; opportunistic NEVER emits INSUFFICIENT_EVIDENCE (3-file floor) or SESSION_NOT_FOUND/WRONG_SCOPE — the tightening is bounded.\nSTEP 4 parity result: host-cold-start vs in-process validateAgainst verdicts byte-identical under BOTH profiles on a mixed corpus (clean + stage-1/2/3 violations + fs NOT_FOUND/OUT_OF_RANGE); profiles proven non-identical (cold-start adds the floor) so parity is non-trivial (§12.5 standing tripwire).\n\nDiscipline held: gate output bytes unchanged (only what the in-process agent sees changes); cold-start parity with the host path; opportunistic is the declared lighter bar, not a relaxation; AlembicAgent only; main, no push/tag/bump. P1.4c (main-body Alembic GatewayActionRegistry) is the SECOND in-process entry — separate downstream wave, NOT in this commit.",
+  "evidenceRefs": [
+    "AlembicAgent/src/tools/runtime/handlers/recipeAuthoringGate.ts",
+    "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+    "AlembicAgent/src/agent/prompts/insightProducer.ts",
+    "AlembicAgent/test/recipe-authoring-inprocess-flatten.test.ts",
+    "AlembicAgent/test/tool-v2-contract.test.ts",
+    "AlembicAgent/test/llm-input-layering.test.ts"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm run check → exit 0 (build:check + lint + agent-import-boundary + public-api-boundary + core-import-boundary[249 files/49 @alembic/core imports; knowledge facade stable] + space-edges + layer-contract[43 runtime edges; in-process fs resolver OK] + doctrine + naming + smoke:public-signatures[12 exports unchanged] + verify:validation-floor[42 files/308 cases] + test)",
+    "npm run test → 42 files / 308 tests PASS / 0 fail",
+    "vitest test/recipe-authoring-inprocess-flatten.test.ts → 12/12 PASS: producer-prompt-renders-from-module (rules byte-sourced from renderGuidance) / in-process gate re-point (content gates + fs NOT_FOUND/OUT_OF_RANGE fire; opportunistic drops floor, cold-start keeps it) / currently-passing-corpus regression (bounded new-reject set, no floor/session) / host-vs-in-process parity (byte-identical per profile)",
+    "biome check (6 changed files) → clean; only 4 pre-existing scripts/ warnings (codemod-rename, smoke-agent-public-signatures, verify-agent-validation-floor)",
+    "git: commit eab6c88 = exactly 6 files; pre-existing installer CLAUDE.md NOT staged; AlembicCore HEAD 8771524 + AlembicPlugin HEAD c1c3922 untouched"
+  ],
+  "risks": [
+    "Bootstrap cold-start in-process tightening: dimension-bearing in-process submissions (e.g. the bootstrap Producer) now resolve to cold-start and face the FULL gate incl the 3-distinct-files evidence floor + fs grounding — a real behavior change vs the prior length-only in-process bar. This is parity-closing (the host cold-start path already enforces it; CG-4 = flatten the two paths) and STEP 1 producer-prompt-first pre-warns the Producer with cold-start guidance. No recipe I believe should pass is wrongly rejected, so NOT returned as needs-review per §C.4; flagged for controller awareness.",
+    "validateSubmitParams kept as cheap presence/length fast-fail (task-permitted option) rather than removed/folded; strictly weaker than the authoritative gate and runs first, so it never overrides the new verdict — but its reject message shape differs. If the controller prefers full removal/fold into the spec content gate, that is a bounded follow-up.",
+    "In-process fs sourceRefResolver is a byte-faithful COPY of the host §C.11 resolver (AlembicAgent repo boundary forbids importing AlembicPlugin internals; Core intentionally ships no fs resolver — the port is the host's). Two copies now exist (host + in-process). The §12.5 parity test guarantees host-label vs in-process-label equality WITH THE SAME resolver (in-repo); true cross-repo host-vs-in-process byte-identity is asserted structurally (same messages/branches), not mechanically. A future Core-exported reference resolver could de-dup.",
+    "stage:'all' runs validateAgainst stage-3 in the pre-check AND Core stage-3 again inside gateway.create (UnifiedValidator, same spec source via P1.3 re-point) — benign double-eval, identical verdict, earlier short-circuit; follows the task's literal {stage:'all'}.",
+    "P1.4c (main-body Alembic GatewayActionRegistry, the 2nd in-process entry) and real-machine cold-start in-process e2e (bootstrap session + on-disk grounding) are separate downstream waves / Test scope — NOT in this commit."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-agent-inprocess-flatten__AlembicAgent__p1-agent-inprocess-flatten",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-agent-inprocess-flatten__AlembicAgent__p1-agent-inprocess-flatten.json",
+    "deliveryRunId": "run-delivery-p1-agent-inprocess-flatten__AlembicAgent__p1-agent-inprocess-flatten",
+    "dispatchGroup": "p1-agent-inprocess-flatten",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-agent-inprocess-flatten__AlembicAgent__p1-agent-inprocess-flatten.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 24,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p1-agent-inprocess-flatten",
+    "targetTaskId": "p1-agent-inprocess-flatten",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p1-agent-inprocess-flatten",
+    "resultId": "tr-p1-agent-inprocess-flatten",
+    "createdAt": "2026-06-30T01:30:17.171Z"
+  },
+  "createdAt": "2026-06-30T01:30:17.171Z",
+  "stateRevisionObserved": 24,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

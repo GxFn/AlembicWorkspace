@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p0b-core-module-build",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "summary": "P0 CONTINUATION on the controller-verified P0.0 foundation. The controller independently verified the P0.0 enforcement matrix (commit 92992a6, test/fixtures/recipe-gate-enforcement-matrix.json) correct against the oracle and re-ran its round-trip test five of five green on node 22; do NOT redo P0.0. Now build the rest of the RecipeAuthoringSpec module additively on top of it. Deliverables P0.1 to P0.6: create the module folder and barrel at src/domain/knowledge/recipe-authoring-spec; fields.ts re-exports V3_FIELD_SPEC and getters from ../FieldSpec.js AS-IS with no edit to FieldSpec; gate-rules.ts is the MAIN BODY and lifts pure constants and predicates byte-identical by moving function bodies not retyping them, from the live recipe-content-quality-gate.ts, the LIVE lib/recipe-generation/host-agent-workflows/recipe-evidence-gate.ts (NOT the dead lib/runtime/mcp copy), and UnifiedValidator.ts, applying the section C.1 split so only pure-data predicates live in the domain module while fs and session checks stay behind injected sourceRefResolver and sessionScope typed ports defined in the types layer, and gate-rules carries zero node:fs and zero host-agent-workflows imports; content-contract.ts moves PROJECT_SNAPSHOT_STYLE_GUIDE from StyleGuide.ts with StyleGuide re-importing it, and encodes the QualityScorer scoreContentDepth levers as explicit numeric docScoreTargets; failure-modes.ts maps each reject code to avoidance computed from gate-rules params; guidance-generator.ts and index.ts implement the section A.3 public API; the examples directory may stub to default this phase since the EXAMPLE_TEMPLATES down-move is P3. Wire RecipeAuthoringSpec into src/domain/knowledge/index.ts and the stable barrel src/knowledge.ts reusing the existing knowledge facade, and do not mint a recipe-spec subpath. Then run and backfill the six-command P0 acceptance on node 22: build:check, the new spec-shape test, the matrix test still green, lint:layer-contract proving the spec has zero fs and workflows imports, the full Core check, and a cross-package facade resolve that prints the validateAgainst and renderGuidance typeof plus the imperative verb count of 45. Additive only: Plugin gates and FieldSpec keep their inline originals so all existing tests stay green; gates are byte-identical and not relaxed; main only, no push or tag or version bump; the dead recipe-evidence-gate duplicate is out of scope. Backfill the Core commit hash, raw acceptance output for all six commands, and a grep proof that gate-rules has zero fs and host-agent-workflows imports.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections A B-P0 and C (C overrides) plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md (oracle) plus verified P0.0 commit AlembicCore 92992a6 (test/fixtures/recipe-gate-enforcement-matrix.json)",
+  "createdAt": "2026-06-29T22:54:00.404Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p0b-core-module-build",
+      "taskPackageId": "p0b-core-module-build",
+      "targetWindow": "AlembicCore",
+      "summary": "Continue P0 on the verified P0.0 matrix (do not redo P0.0). Build P0.1 to P0.6 of the RecipeAuthoringSpec module additively: folder and barrel, fields re-export as-is, gate-rules byte-identical lift with the C.1 split (pure into domain, fs and session behind injected typed ports, zero fs or workflows imports), content-contract with docScoreTargets, failure-modes, guidance-generator, index public API, examples stub. Wire the knowledge facade. Run and backfill the six-command P0 acceptance on node 22. Additive, gates byte-identical, main only, no push.",
+      "status": "pending",
+      "createdAt": "2026-06-29T22:54:00.404Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-plugin-drift-parity",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "summary": "P4 wave 2 (Plugin consumer drift plus host-path parity plus non-regression), consumes AlembicCore at commit 47391c6 via the at-alembic-core-knowledge facade. Extend the existing Plugin drift test recipe-gate-drift-tripwire.test.ts (today only snapshots the verb allowlist and the evidence floor plus the sessionScope port) into the full Plugin-consumer guidance-equals-gate drift suite per design A.6 and B-P4.1, every assertion reading the one Core gateRules table. ADD Plugin-consumer allowlist parity: the Plugin RENDERED guidance from OnboardingContract buildSubmitKnowledgeContract and buildRecipeGuidanceFloor and the cold-start front-load and the mcp-tools submit-knowledge describe strings list EXACTLY the verbs returned by getImperativeVerbAllowlist, never a hardcoded copy and never the vague verb-led, which also serves as the A.6 number-1 imports-allowlist guard proving the Plugin imports the allowlist from Core rather than re-declaring it. ADD evidence-floor and scope-escape parity: the rendered Plugin guidance states the ruleFiles 3 and factFiles 1 floor and surfaces the scope narrow or file-local escape that getEvidenceFloorPolicy exposes. ADD the Plugin half of Decision D-A confidence: the OnboardingContract confidence wording reads recommended at least 0.85 not enforced and never a hard floor (carried forward from P4-Core where the Core guidance simply omits confidence). ADD the host-path side of the section 12.5 parity tripwire: assert the Plugin host-path gate wrapper, that is the cold-start or tool-router stage-1 plus stage-2 invocation, produces a verdict byte-identical to a direct Core validateAgainst call with the same profile and path host-cold-start and the same injected ports on a fixture corpus, proving the Plugin wrapper does not mutate the verdict it gets from Core. Non-regression P4.2: re-run recipe-gate-golden-corpus.test.ts and assert byte-identical gate output, gates byte-identical meaning no recipe-content-quality-gate or recipe-evidence-gate file is touched, and the Plugin recipe test surface stays green. Hard discipline: gates not relaxed, additive tests plus only a tiny guidance wording fix if a parity assertion legitimately catches a Plugin guidance string that does not yet list the verbs or the escape or still claims a hard confidence floor, in which case fix the guidance to match the Core gate and never relax the gate, develop on main only, commit local do not push or tag or bump, Node 22 for build:check. Acceptance reference is the controller P0 oracle evidence/p0-gate-truth-matrix-2026-06-30.md with 45 positive and 12 negative verbs and no confidence floor plus design A.6 and B-P4 and section 12.5.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md",
+  "createdAt": "2026-06-30T04:13:44.917Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-plugin-drift-parity",
+      "taskPackageId": "p4-plugin-drift-parity",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Extend Plugin recipe-gate-drift-tripwire.test.ts to the full Plugin-consumer guidance-equals-gate drift suite (allowlist + scope-escape + Plugin-side D-A confidence wording + A.6 imports-allowlist guard) plus the host-path side of the section 12.5 parity tripwire (Plugin wrapper verdict equals direct Core validateAgainst); re-run the golden corpus byte-identical; gates byte-identical; fix guidance not gate on any mismatch.",
+      "status": "pending",
+      "createdAt": "2026-06-30T04:13:44.917Z"
+    }
+  ]
+}

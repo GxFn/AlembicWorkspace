@@ -1,0 +1,534 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "title": "把完整 Recipe 生成规则+契约+逐字段含义与生成规则+可过门富范例 汇总为独立解耦通用模块 RecipeAuthoringSpec（Core domain/knowledge，经 @alembic/core/knowledge，domain 层 lint 强制解耦无环）；两路(host-agent + in-process 主体 AI)全打平=统一 validateAgainst+renderGuidance，context-profile(cold-start严/opportunistic轻)+ports注入+fieldSuppliers；生成前 front-load 逐字段{含义、生成规则、示例值}全表+profile+gate-clean富范例+失败模式（gate退安全网/契约成指令路径，不靠打回）。门禁字节级不变(只改 agent 看到什么)。最危险纪律：§13.C.1 范例必须新写 gate-clean(旧 EXAMPLE_TEMPLATES 全过不了门)+stage-2 拆分(纯谓词进 Core/fs+session 经 port)+L4 内链加门排 L2 后。CG-1~4/D-A/D-B/严格度=profile/全打平 全决。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "claude-code",
+  "state": "archived",
+  "stateReason": "Demand completed (rev 60, all 15 P0–P5 task packages accepted; P5 real-machine cold-start acceptance verified). Archiving to clear current/ for next-demand intake. Local ledger commit only; product-repo commits remain local-unpushed (user-gated, out of scope).",
+  "revision": 61,
+  "activeStageId": null,
+  "updatedAt": "2026-06-30T21:14:58.944Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p0-recipe-authoring-spec-module",
+      "summary": "P0 wave-1 producer foundation: build the canonical RecipeAuthoringSpec module in AlembicCore at src/domain/knowledge/recipe-authoring-spec exposed via the existing knowledge facade, as the single source of truth for Recipe authoring (gate validation, guidance, examples). PURELY ADDITIVE this phase: no Plugin, Agent, or FieldSpec edits; lift the gate constants by moving function bodies for byte-identity; Plugin and Core gates keep their inline originals until P1, so all existing tests stay green. P0.0 is the HARD first step: build the enforcement-matrix fixture and a round-trip test grounded on the controller oracle evidence file; the rules are layered across stage 1 (Plugin verb and marker), stage 2 (Plugin cold-start-only evidence, snippet, graph) and stage 3 (Core all-paths field, floor, uniqueness); derive the verb count of 45 from the lifted Set, never hardcode the number. Apply the C.1 split: only pure-data predicates move into the domain gate-rules module, while fs and session checks stay Plugin-side behind typed sourceRefResolver and sessionScope ports defined in the types layer, and gate-rules must carry zero node-fs or host-agent-workflows imports so lint layer-contract stays green. The live stage-2 source file is lib/recipe-generation/host-agent-workflows/recipe-evidence-gate, NOT the dead lib/runtime/mcp duplicate which is out of scope and must not be touched. No confidence floor, per decision D-A. Acceptance on Node 22: build-check, the spec-shape test, the matrix test, lint layer-contract, the full Core check, and a cross-package facade resolve. Develop on main only; no push, tag, or version bump. The full code-level spec and every corrected line number live in the sourceRef design sections and the oracle evidence file. Backfill the Core commit hash, raw acceptance output, the matrix json content, and a grep proof that gate-rules has zero fs and workflows imports.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections A B-P0 and C (C overrides A and B) plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md (controller-verified enforcement matrix oracle)",
+      "createdAt": "2026-06-29T22:31:28.605Z"
+    },
+    {
+      "taskPackageId": "p0b-core-module-build",
+      "summary": "P0 CONTINUATION on the controller-verified P0.0 foundation. The controller independently verified the P0.0 enforcement matrix (commit 92992a6, test/fixtures/recipe-gate-enforcement-matrix.json) correct against the oracle and re-ran its round-trip test five of five green on node 22; do NOT redo P0.0. Now build the rest of the RecipeAuthoringSpec module additively on top of it. Deliverables P0.1 to P0.6: create the module folder and barrel at src/domain/knowledge/recipe-authoring-spec; fields.ts re-exports V3_FIELD_SPEC and getters from ../FieldSpec.js AS-IS with no edit to FieldSpec; gate-rules.ts is the MAIN BODY and lifts pure constants and predicates byte-identical by moving function bodies not retyping them, from the live recipe-content-quality-gate.ts, the LIVE lib/recipe-generation/host-agent-workflows/recipe-evidence-gate.ts (NOT the dead lib/runtime/mcp copy), and UnifiedValidator.ts, applying the section C.1 split so only pure-data predicates live in the domain module while fs and session checks stay behind injected sourceRefResolver and sessionScope typed ports defined in the types layer, and gate-rules carries zero node:fs and zero host-agent-workflows imports; content-contract.ts moves PROJECT_SNAPSHOT_STYLE_GUIDE from StyleGuide.ts with StyleGuide re-importing it, and encodes the QualityScorer scoreContentDepth levers as explicit numeric docScoreTargets; failure-modes.ts maps each reject code to avoidance computed from gate-rules params; guidance-generator.ts and index.ts implement the section A.3 public API; the examples directory may stub to default this phase since the EXAMPLE_TEMPLATES down-move is P3. Wire RecipeAuthoringSpec into src/domain/knowledge/index.ts and the stable barrel src/knowledge.ts reusing the existing knowledge facade, and do not mint a recipe-spec subpath. Then run and backfill the six-command P0 acceptance on node 22: build:check, the new spec-shape test, the matrix test still green, lint:layer-contract proving the spec has zero fs and workflows imports, the full Core check, and a cross-package facade resolve that prints the validateAgainst and renderGuidance typeof plus the imperative verb count of 45. Additive only: Plugin gates and FieldSpec keep their inline originals so all existing tests stay green; gates are byte-identical and not relaxed; main only, no push or tag or version bump; the dead recipe-evidence-gate duplicate is out of scope. Backfill the Core commit hash, raw acceptance output for all six commands, and a grep proof that gate-rules has zero fs and host-agent-workflows imports.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections A B-P0 and C (C overrides) plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md (oracle) plus verified P0.0 commit AlembicCore 92992a6 (test/fixtures/recipe-gate-enforcement-matrix.json)",
+      "createdAt": "2026-06-29T22:54:00.404Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p1-plugin-gate-repoint",
+      "summary": "P1 wave-2 consumer: re-point the AlembicPlugin recipe-submission gates to validate against the now-shipped @alembic/core/knowledge module (Core a2329ce, P0 accepted and controller-verified byte-identical), proving byte-identical behavior. This is the most dangerous discipline CG-3: gates are RE-SOURCED, not relaxed and not rewritten; if any baseline byte differs after re-pointing, STOP because a value was reinterpreted instead of moved. P1.0 FIRST: capture a golden-corpus behavior baseline BEFORE re-sourcing. Generate a corpus of submissions (one passing plus one failing per reject code) and snapshot every gate current violation output; if the existing handler tests are thin, add lib/runtime/mcp/handlers/recipe-gate-golden-corpus.test.ts on the OLD inline constants first to lock current behavior, then re-point; this baseline is the P1 and P4 oracle. P1.1 stage-1: in lib/runtime/mcp/handlers/recipe-content-quality-gate.ts delete the inline constant and predicate bodies (the verb Sets, regexes, hasMarkerExample, around lines 24-89 and 158-217) and add the file first upward import of validateAgainst from @alembic/core/knowledge, so validateSubmitKnowledgeContentQuality calls validateAgainst(items, stage 1, path host-cold-start) and returns the same violation shape; the tool-router.ts line 163 call site is unchanged; same Set same regex same predicate (the module copies are byte-identical to these originals, controller-verified in P0) means byte-identical output. P1.2 stage-2: in the LIVE lib/recipe-generation/host-agent-workflows/recipe-evidence-gate.ts (NOT the dead lib/runtime/mcp duplicate) delete the inline pure predicates that P0 already lifted into the module (floor table, snippet algo, source-ref format regex, placeholder blacklist, relationship keywords) and call validateAgainst(items, stage 2, path, sourceRefResolver); the Plugin injects the sourceRefResolver and sessionScope ports so the on-disk SOURCE_REF_NOT_FOUND and LINE_OUT_OF_RANGE checks (around lines 528-581) and the bootstrap-session scope stay Plugin-side; shouldRunRecipeEvidenceGate (around 88-110) and the tool-router.ts 172-180 wrapping are unchanged so stage 2 still fires only on cold-start. P1.5: add a per-rule drift tripwire snapshot test on the lifted constants so any future edit that would change gate behavior fails loudly. Acceptance on node 22: the golden-corpus test produces byte-identical violation arrays versus the P1.0 baseline (the discipline gate — any byte difference means STOP); the handler and evidence-gate test suites pass; Plugin build:check green; the drift snapshot green. Ensure the local Core build is current so @alembic/core/knowledge resolves validateAgainst (P0 already built Core dist; rebuild Core if your resolver needs it). Develop on main only, no push or tag or version bump; gates byte-identical and not relaxed; the dead recipe-evidence-gate duplicate is out of scope and must not be touched. Producer-consumer: you consume the shipped Core module; Core stage-3 re-point P1.3 and the in-process parity flatten P1.4 follow as separate waves. Backfill the Plugin commit hash, the golden-corpus byte-identical proof (baseline versus re-pointed), raw test and build:check output, and the delete-inline-plus-import diff. If any baseline byte differs, do NOT massage it green: stop and return needs-review with the diff so the controller can rule whether a value was reinterpreted.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections B-P1 (P1.0 P1.1 P1.2 P1.5) and 12 (flatten/profile context) and A.5 (byte-identical) plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md (oracle) plus the shipped Core module commit a2329ce (validateAgainst in @alembic/core/knowledge)",
+      "createdAt": "2026-06-29T23:40:42.054Z"
+    },
+    {
+      "taskPackageId": "p1-core-stage3-repoint",
+      "summary": "P1.3 Core stage-3 re-point — the next P1 piece after the accepted Plugin stage-1/2 re-point (P1-Plugin done, byte-identical proven). Re-point the Core UnifiedValidator stage-3 field gate to read its params from the RecipeAuthoringSpec gateRules table instead of inline literals, byte-identical. Per design B.P1.3 replace the inline markdown length floor 200, the code-block-or-file-ref regexes, the coreCode bracket predicate (close-brace close-paren close-bracket), the generic-title regex, and the code-fingerprint normalization (UnifiedValidator.ts around 185-240 and codeFingerprint) with reads from the module. Field-presence already reads V3_FIELD_SPEC and stays unchanged. IMPORTANT scope note: the module gateRules table currently exposes only 2 stage-3 entries (uniqueness plus one) plus the fingerprint helper and the generic-title regex; UnifiedValidator does NOT yet import the module. If any stage-3 param UnifiedValidator needs is not yet a clean module export, ADD it to the RecipeAuthoringSpec module first with the byte-identical value from UnifiedValidator current inline code (this completes the P0.3 stage-3 lift), then re-point. Behavior must stay byte-identical: capture a stage-3 behavior baseline first (a small corpus of submissions hitting each stage-3 error: missing required field, content not object, reasoning not object, kind invalid, markdown too short, markdown needs code or file ref, coreCode incomplete, title too generic, the three uniqueness duplicates) and assert the re-pointed UnifiedValidator produces the identical errors array; if any byte differs, STOP because a value was reinterpreted not moved, and return needs-review with the diff. This also enables the A.6 drift test number 4 (guidance 200 floor and required-field list equal the module markdown.lengthFloor and getAllRequiredFieldNames). Acceptance on node 22: Core build, build:check, and the UnifiedValidator/stage-3 test suite green with byte-identical output; the gate-constants drift snapshot green. Note the Core npm run check is red ONLY on the 3 pre-existing out-of-scope lint:naming files (project-context-capabilities.ts, recipe-context-capabilities.ts, test-fixtures.ts) — do NOT touch or rename those (out of scope, public exports); use build:check plus test plus drift as your green bar and note the carve-out in backfill. Gates byte-identical and not relaxed; main only, no push or tag or version bump; FieldSpec field-presence unchanged; the dead recipe-evidence-gate duplicate is out of scope. Producer-consumer: Core consumes its own module; this completes the gate-side re-point (stage-1/2 Plugin done, stage-3 Core here); the in-process parity flatten P1.4 follows as a separate wave. Backfill the Core commit hash, the stage-3 byte-identical proof, raw build:check and test output, and which stage-3 params you added to the module versus already present.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md section B-P1.3 and A.2/A.6 plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md (stage-3 oracle) plus the shipped module (gateRules table currently 4+5+2; complete the stage-3 entries)",
+      "createdAt": "2026-06-30T00:10:58.847Z"
+    },
+    {
+      "taskPackageId": "p1-core-profile-model",
+      "summary": "P1.4a Core profile model — the producer foundation for the in-process flatten (P1.4b follows). The module validateAgainst and renderGuidance currently take stage and path but NOT a profile axis; design section 12.3 requires a context-profile model so the in-process opportunistic path can run a lighter bar. Add the profile axis to the RecipeAuthoringSpec module: a profile parameter (cold-start or opportunistic) on ValidateAgainstOptions and on renderGuidance. The cold-start profile is the CURRENT full-gate behavior and MUST be byte-identical to today (all content gates, the full stage-2 evidence gate including the 3-distinct-files floor and snippet and sourceRef line-format and graph, plus the host-injected session-scope) and it is the DEFAULT, so the already-accepted and re-pointed Plugin stage-1/2 and Core stage-3 consumers that call validateAgainst without a profile are unaffected — re-run the P1 golden-corpus and the stage-3 byte-identical tests to prove zero change. The opportunistic profile (per 12.3) keeps ALL content gates (verb allowlist, the contrast markers with the 4-char rule, markdown floor 200 plus code-or-file-ref, fields and reasoning) AND keeps the cheap grounding (if a sourceRef is given it must carry a line number; if a snippet is given it must match its cited range) but does NOT enforce the 3-distinct-files evidence floor and does NOT run session-scope — this is the DECLARED lighter bar for opportunistic in-process authoring, explicitly NOT a relaxation of cold-start. Expose the profile-selection signal that reuses the existing shouldRunRecipeEvidenceGate logic (session or dimensionId present means cold-start, otherwise opportunistic) so the host can resolve and pass the profile. Acceptance on node 22: Core build and build:check green; a NEW profile test asserts cold-start equals the current full behavior on the byte-identical corpus (zero change) and opportunistic drops ONLY the 3-file floor and session-scope while keeping content and grounding; the existing P1 golden-corpus, stage-3 byte-identical, drift, and matrix tests stay green because cold-start is the default; full Core test green. The 3 pre-existing lint:naming files are the out-of-scope carve-out — do not touch or rename them; use build:check plus test plus drift as the green bar. Gates not relaxed (cold-start byte-identical; opportunistic is a declared profile not a backdoor); main only, no push or tag or version bump; FieldSpec unchanged; the dead recipe-evidence-gate duplicate is out of scope. Producer-consumer: this ships the profile axis on @alembic/core/knowledge for the P1.4b in-process re-point (AlembicAgent plus main-body GatewayActionRegistry) which follows as a separate wave with producer-prompt-first discipline. Backfill the Core commit, the cold-start-byte-identical proof (existing P1 tests still green), the opportunistic-profile test result, and raw build and test output.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md section 12 (12.3 context-profile model, 12.4 P1.4 full-flatten) plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md; the module currently has no profile axis (validateAgainst takes only stage+path)",
+      "createdAt": "2026-06-30T00:38:56.819Z"
+    },
+    {
+      "taskPackageId": "p1-agent-inprocess-flatten",
+      "summary": "P1.4b AlembicAgent in-process flatten — re-point the AlembicAgent in-process submit path to the canonical validateAgainst with the now-shipped profile axis, closing the CG-4 in-process parity gap. This is a SCOPED behavior change (a tightening), so follow the section C.4 discipline strictly. Today AlembicAgent src/tools/runtime/handlers/knowledge.ts handleSubmit runs the looser validateSubmitParams (length and presence only, around line 283, called near line 101) then gateway.create (around line 175) which only runs Core stage-3; stages 1 and 2 never run in-process. STEP 1 PRODUCER-PROMPT-FIRST (mandatory, do this before enabling the gate): upgrade the in-process producer prompt in src/agent/prompts/insightProducer.ts (around lines 133-142, buildProducerStyleGuide plus PRODUCER_SUBMIT_FIELD_CONTRACT) to render from renderGuidance('in-process', undefined, profile) so the producer KNOWS the new rules (the verb allowlist, the contrast markers, markdown floor plus code-or-file-ref, the cheap grounding) before any gate enforces them — this prevents the in-process agent from reverse-engineering the gate. STEP 2 enable the gate: before gateway.create, call validateAgainst([item], {stage:'all', path:'in-process', profile: resolveAuthoringProfile(context), sourceRefResolver: the in-process fs resolver, dimensionId: dimMeta id}) and on violations return the existing in-process reject envelope shape; the profile is resolved by resolveAuthoringProfile from context, so in-process AI dev without a cold-start session runs the OPPORTUNISTIC profile (all content gates plus cheap grounding, but NOT the 3-distinct-files floor and NOT session-scope) — the lighter bar that resolves the C.4 over-tightening concern. Wire the in-process fs sourceRefResolver so the kept grounding (SOURCE_REF_LINE_MISSING format, fs resolution SOURCE_REF_NOT_FOUND and LINE_OUT_OF_RANGE, SNIPPET_MISMATCH) actually runs; verify dimMeta id and any session plumbing exist (for opportunistic, session-scope is off, but the fs resolver is needed). Fold the validateSubmitParams length checks into the spec content gate and remove the now-redundant thin pre-check (or keep it only as a cheap fast-fail that the authoritative validateAgainst supersedes). STEP 3 regression (C.4): capture a corpus of in-process recipes that PASS today under the length-only bar, run them through the new opportunistic validateAgainst, and DOCUMENT exactly which now fail (expected: only content problems — missing verb, missing contrast markers, markdown too thin — far smaller than a cold-start tightening); this is the proof the tightening is bounded. STEP 4 parity test (section 12.5, new standing tripwire): for a fixture candidate corpus under the SAME profile, host-agent validateAgainst and in-process validateAgainst must return byte-identical verdicts (violations arrays equal). Acceptance on node 22: AlembicAgent build:check green; the producer-prompt-renders-from-module test; the in-process gate re-point test; the currently-passing-corpus regression with the documented new-reject set; the host-vs-in-process parity test; full AlembicAgent test green. Discipline: cold-start profile stays byte-identical (the host path is unaffected); opportunistic is the DECLARED lighter bar not a relaxation; gates not relaxed beyond the declared profile; main only, no push or tag or version bump. Producer-consumer: you consume the shipped Core profile model (8771524) via @alembic/core/knowledge; the main-body Alembic GatewayActionRegistry re-point (P1.4c) is the second in-process entry and follows as a separate wave. Reconcile with the P1-Plugin decision that session-scope stays a host-side precondition: in-process opportunistic has session-scope OFF so there is no conflict. Backfill the AlembicAgent commit, the producer-prompt proof, the in-process re-point diff, the currently-passing-corpus regression result (the new-reject set), the parity test result, and raw build and test output. If the tightening would reject a recipe you believe should pass, STOP and return needs-review with the case so the controller can rule.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections B-P1.4, 12.4, C.4 (tightening discipline), 12.5 (parity test), P2.6 (producer prompt) plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md (in-process bar) plus the shipped profile model (Core 8771524, @alembic/core/knowledge validateAgainst + resolveAuthoringProfile + RecipeAuthoringProfile)",
+      "createdAt": "2026-06-30T00:54:20.166Z"
+    },
+    {
+      "taskPackageId": "p1-mainbody-inprocess-repoint",
+      "summary": "P1.4c main-body in-process re-point — close CG-4 for the SECOND in-process submit entry. Per section C.7 and the controller-verified P0.0 oracle, the main-body Alembic lib/governance/gateway/GatewayActionRegistry.ts has two actions, candidate:create (around lines 24-29) and recipe:create (around lines 77-82), that both call knowledgeService.create(ctx.data) DIRECTLY — they do NOT route through the AlembicAgent handleSubmit that P1.4b just re-pointed, and they run only Core stage-3 (no stage-1/2). Re-point them: before knowledgeService.create, run the canonical authoring gate validateAgainst([item], {stage:'all', path:'in-process', profile: resolveAuthoringProfile(context), sourceRefResolver: an in-process fs resolver, dimensionId}) from @alembic/core/knowledge, and on violations reject with the existing main-body error shape. Profile semantics identical to P1.4b: runtime in-process AI without a cold-start session resolves to OPPORTUNISTIC (all content gates plus cheap grounding, NOT the 3-distinct-files floor, NOT session-scope); dimension-bearing bootstrap resolves to cold-start (full gate). REUSE if possible: if the main-body can import the AlembicAgent in-process gate (runInProcessRecipeAuthoringGate from @alembic/agent, since the main-body embeds the agent runtime), reuse it to avoid a third fs-resolver copy; otherwise supply the in-process gate plus a byte-faithful fs sourceRefResolver per the section C.11 port pattern (the same one AlembicAgent shipped). If the main-body has its OWN AI producer prompt that authors these recipes (distinct from the AlembicAgent insightProducer that P1.4b already upgraded), upgrade it producer-first via renderGuidance('in-process', profile) BEFORE enabling the gate, per the C.4 discipline; if the main-body recipes come from the embedded AlembicAgent producer, that is already covered and you only do the gate re-point. Acceptance on node 22: main-body build:check green; a re-point test proving both GatewayActionRegistry create actions now run validateAgainst before knowledgeService.create (content gates fire, opportunistic drops floor and session-scope); a currently-passing-corpus regression documenting the bounded new-reject set; if you added a producer prompt, a producer-renders-from-module test; full main-body test green. Discipline: this is the same SCOPED in-process tightening as P1.4b (opportunistic lighter bar, not a relaxation; cold-start full gate matches the host); gate output bytes unchanged; main only, no push or tag or version bump; do NOT touch AlembicCore, AlembicPlugin, AlembicAgent, FieldSpec, or the dead recipe-evidence-gate duplicate. Producer-consumer: you consume the shipped Core profile model and (optionally) the AlembicAgent in-process gate; this is the last in-process entry, completing CG-4 across all submission paths. Backfill the main-body commit, the re-point diff, the currently-passing-corpus new-reject set, whether you reused the AlembicAgent gate or supplied your own resolver, and raw build and test output. If the tightening would reject a recipe you believe should pass, STOP and return needs-review with the case.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections C.7 (second in-process entry), B-P1.4, 12.4 plus state-root evidence/p0-gate-truth-matrix-2026-06-30.md (the main-body GatewayActionRegistry entry) plus the accepted AlembicAgent in-process gate (eab6c88, runInProcessRecipeAuthoringGate) and the Core profile model (8771524, @alembic/core/knowledge)",
+      "createdAt": "2026-06-30T01:37:32.941Z"
+    },
+    {
+      "taskPackageId": "p1-mainbody-aiscan-gate",
+      "summary": "P1.4c CORRECTED (Option A, controller-confirmed) — your prior needs-review was correct: the named GatewayActionRegistry candidate:create/recipe:create are DEAD code (never dispatched), and the controller corrected the oracle. Now gate the REAL live main-body in-process AI create that you found: lib/cli/AiScanService.ts:159 knowledgeService.create(recipe, {userId:'ai-scan'}) — the alembic ai-scan CLI which authors recipes via runScanAgentTask then create+publish, today only Core stage-3. This is the genuine CG-4 in-process gap (section C.7 independent knowledgeService.create). Implement: before the AiScanService.ts:159 knowledgeService.create, run validateAgainst([recipe], {stage:'all', path:'in-process', profile: resolveAuthoringProfile(context), sourceRefResolver: your own in-process fs resolver, dimensionId}) from @alembic/core/knowledge; on violations, do NOT create/publish that recipe — surface the violations (skip-and-report per recipe, consistent with the ai-scan batch flow). Profile: ai-scan without a cold-start session resolves to OPPORTUNISTIC (all content gates plus cheap grounding, NOT the 3-distinct-files floor, NOT session-scope); if an ai-scan run carries dimension/session context it resolves to cold-start (full gate) — let resolveAuthoringProfile decide. PRODUCER-PROMPT (C.4): the ai-scan author is runScanAgentTask -> AgentService.run(scan-extract), the embedded AlembicAgent whose insightProducer was already upgraded to renderGuidance in P1.4b — so producer-prompt-first is most likely ALREADY satisfied; VERIFY the ai-scan extract uses that embedded AlembicAgent producer and note it; only if ai-scan has its OWN separate producer prompt do you upgrade it producer-first. FS RESOLVER: supply your own byte-faithful section C.11 fs sourceRefResolver (consume @alembic/core/knowledge validateAgainst/resolveAuthoringProfile types) — the AlembicAgent gate is not publicly re-exported so you cannot reuse it; this is the sanctioned fallback. Acceptance on node 22: main-body build:check green; a re-point test proving AiScanService now runs validateAgainst before knowledgeService.create (content gates fire; opportunistic drops the floor and session-scope; cold-start keeps them); a currently-passing-corpus regression documenting the bounded new-reject set for ai-scan recipes (expected: only content and cheap-grounding codes, never INSUFFICIENT_EVIDENCE or SESSION_NOT_FOUND under opportunistic); full main-body test green. Discipline: bounded SCOPED tightening (opportunistic lighter bar, not a relaxation; cold-start matches the host); main only, no push or tag or version bump; touch ONLY the main-body; do NOT touch AlembicCore, AlembicPlugin, AlembicAgent, FieldSpec; do NOT gate the dead Gateway actions (Option C skipped — zero live paths); do NOT touch the external HTTP POST /api/v1/knowledge route (Option B is a separate user decision, out of this demand's CG-4 scope). This completes CG-4 for the live in-process AI authoring paths (AlembicAgent done in P1.4b + AiScanService here). Backfill the main-body commit, the AiScanService re-point diff, the currently-passing-corpus new-reject set, the producer-prompt finding (already-covered vs upgraded), and raw build and test output. If the tightening would reject an ai-scan recipe you believe should pass, STOP and return needs-review with the case.",
+      "status": "accepted",
+      "sourceRef": "Controller rework decision (Option A) on tr-p1-mainbody-inprocess-repoint plus the corrected state-root evidence/p0-gate-truth-matrix-2026-06-30.md (main-body in-process entry corrected to AiScanService.ts:159) plus design sections C.7, B-P1.4, 12.3/12.4 plus the shipped Core profile model (8771524, @alembic/core/knowledge)",
+      "createdAt": "2026-06-30T01:59:02.122Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p2-core-builder-checklist-collapse",
+      "summary": "P2 (guidance render-from-module) Core foundation — collapse the duplicate Core guidance builders onto the canonical module generators (shipped in P0/P1.4a). This is the GUIDANCE side (what the authoring agent SEES) — the gates are already byte-identical from P1, so this changes only the rendered guidance, NOT gate behavior. P2.1 collapse the two parallel submissionSpec builders: MissionBriefingBuilder.ts (around lines 311-331, enrichDimensionTask.submissionSpec) AND DimensionCatalogPayload.ts (around lines 178-196, the second parallel buildSubmissionSpec) both call the module buildSubmissionSpec(dim) from @alembic/core/knowledge. This resolves the long-standing 0-vs-3 target-count contradiction (MissionBriefingBuilder 最少3条 vs DimensionCatalogPayload 可以提交0条) in one place. Per controller decision D-B: pick the evidence-consistent floor of >=3 for rule/pattern in the module (consistent with the host-agent path, single source of truth) — this is an INTENTIONAL visible-guidance change to alembic_plan (the draft no longer says 0 candidates is OK); verify plan-tool.ts (around line 417, the DimensionCatalogPayload consumer) still type-checks against the unified buildSubmissionSpec shape (the two old builders returned different field wording crossDimensionDedup/contentQuality — reconcile so the consumer compiles). P2.4 collapse the two checklists: DimensionSop.ts PRE_SUBMIT_CHECKLIST (around 1702-1739) AND SHARED_SUBMIT_CHECKLIST (around 53-59) both call the module buildPreSubmitChecklist() — one checklist, one FAIL_EXAMPLES set (stop the MissionBriefingSupport FAIL_EXAMPLES delete-on-compaction loss). Both generators read the same gateRules() table, so the rendered guidance now states the actual rules (the 45-verb allowlist, the contrast-marker rule, the >=3 distinct-files floor and its scope-escape, markdown floor) — guidance==gate by construction. Acceptance on node 22: Core build:check green; Core test green incl the briefing tests (both submissionSpec builders collapsed; checklists collapsed); a test or grep proof that the rendered submissionSpec now states >=3 and lists the real allowlisted verbs; plan-tool.ts type-checks. The 3 pre-existing lint:naming files are the out-of-scope carve-out — do not touch; use build:check + test as the green bar. Discipline: GUIDANCE-only change (gates untouched, byte-identical from P1); D-B is the one INTENTIONAL alembic_plan visible-guidance change (>=3 floor); main only, no push or tag or version bump; FieldSpec unchanged; do not relax any gate. Producer-consumer: Core consumes its own module generators; the Plugin cold-start render + example injection + OnboardingContract + the section 13.L front-load, and the main-body/Plugin tool-schema describe(), are the next P2 waves. Backfill the Core commit, the builder-and-checklist collapse diff, the plan-tool type-check result, and a proof that the rendered guidance now states the >=3 floor and the real verb allowlist (guidance==gate).",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections B-P2.1 and B-P2.4 plus C.6/decision D-B (submissionSpec floor) plus the shipped module guidance-generator (buildSubmissionSpec/buildPreSubmitChecklist in @alembic/core/knowledge, Core 8771524)",
+      "createdAt": "2026-06-30T02:19:25.375Z"
+    },
+    {
+      "taskPackageId": "p2-plugin-coldstart-frontload",
+      "summary": "P2 Plugin cold-start front-load — the demand's CORE FIX: make the host-agent cold-start authoring agent SEE the full per-field authoring contract plus a gate-passing worked example BEFORE it generates its first token, so it passes the gate on the first try and writes rich docs instead of reverse-engineering the gate and stopping at the floor. This is GUIDANCE only (the gates are byte-identical from P1); render everything from the shipped @alembic/core/knowledge module so guidance==gate. Deliverables: (P2.3, the #1 root cause) in lib/runtime/mcp/handlers/cold-start.ts, compactHostAgentContract reads the spec-generated contract, and critically summarizeSubmissionSchema (around lines 976-986) must CARRY the worked example instead of dropping it — exempt the example from the cold-start 18 KB inline-budget strip (COLD_START_BRIEFING_INLINE_BUDGET_BYTES) so the cold-start agent finally sees a complete worked example; if the briefing exceeds budget, trim other analysis fields first, the example is load-bearing for one-pass rate. (Section 13.L front-load) render the per-field {meaning | generation-rule | example-value} contract via renderGuidance('host-cold-start') into the cold-start briefing at the contract-presentation point (before authoring), so the agent sees every V3 field's rule + the active profile + the gate-clean example + the failure-mode catalog up front. (P2.2) OnboardingContract.ts buildSubmitKnowledgeContract/buildRecipeGuidanceFloor/fieldFloors call the module buildSubmitKnowledgeContract() + getEvidenceFloorPolicy() + getImperativeVerbAllowlist() — this fixes two real drifts: the guidance now lists the ACTUAL 45 allowlisted verbs (today it only says verb-led) and surfaces the scope:narrow|file-local evidence-floor escape the gate honors (today omitted). (P2.5) lib/shared/schemas/mcp-tools.ts .describe() strings generate from describeSubmitToolFields() so the tool-schema field descriptions are spec-derived. (Decision D-A) render confidence as recommended >=0.85, not enforced (correct the OnboardingContract/buildRecipeGuidanceFloor falsely-high floor; the gate does NOT enforce confidence). (Section C.3) the deepMining/moduleMining guidance is produced in the rescan briefing assembly (knowledge-rescan.ts around line 1278, parsing generationStage) — re-point it to render from the module too, OR grep-prove the mining path reuses buildProjectContextMissionBriefing so it is already covered; do not leave CG-4's deepMining/moduleMining coverage as an unproven assumption. (Folded from P2.4, cross-repo) flatten PRE_SUBMIT_CHECKLIST to the module buildPreSubmitChecklist() and single-source FAIL_EXAMPLES (the delete-on-compaction-loss fix), updating the Plugin cold-start compactor (cold-start.ts:569 reads checklist.required ?? checklist.MUST) and the HostMcpServer test that asserts the projected required shape. Acceptance on node 22: Plugin build:check green; the handler/cold-start/status test suites green; and the REAL-MACHINE check (section B-P2 acceptance) — render a cold-start briefing for one dimension and grep the emitted JSON for (a) the worked example object present and NOT stripped, (b) the literal allowlisted verbs in the doClause guidance, (c) the scope:narrow escape text; ALL THREE must appear. Discipline: guidance-only (gates untouched, byte-identical from P1; do not relax any gate); D-A confidence wording is the only floor correction; main only, no push or tag or version bump; consume the shipped Core module (rebuild Core dist if your resolver needs it); the dead recipe-evidence-gate duplicate is out of scope; ai-scan is carved out (do not touch). Producer-consumer: you consume the Core module generators (P2.1 + P1.4a); the example surfaced is the P0 stub (the real multi-language gate-clean examples are filled in P3). Backfill the Plugin commit, the diffs, the real-machine briefing grep proof (example + verbs + scope-escape all present), the C.3 mining finding (re-pointed vs proven-reused), and raw build and test output. If any cold-start guidance still omits a real gate rule or the example is still stripped, that is the failure mode to fix; if you hit a cross-repo blocker (e.g. the example needs a Core change), STOP and return needs-review.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections B-P2.2/P2.3/P2.5, Section 13 + 13.L (front-load the per-field contract), C.3 (mining briefing re-point), decision D-A (confidence), and B-P2.4 (deferred checklist flatten) plus the shipped module (renderGuidance/buildSubmitKnowledgeContract/describeSubmitToolFields/getEvidenceFloorPolicy/getImperativeVerbAllowlist/example in @alembic/core/knowledge, Core 4869db2)",
+      "createdAt": "2026-06-30T02:50:16.179Z"
+    },
+    {
+      "taskPackageId": "p3-core-examples",
+      "summary": "P3 examples — make the worked examples REAL gate-clean (today the surfaced example is the P0 stub; this fills the real multi-language examples so the cold-start front-load shows a genuine gate-passing one). P3.1 move EXAMPLE_TEMPLATES from MissionBriefingSupport.ts (around lines 106-213, single consumer MissionBriefingBuilder.ts:46) DOWN into the module recipe-authoring-spec/examples/; MissionBriefingSupport.ts re-imports them downward (workflows imports domain is legal). Per section C.9 the down-move is INTERNAL-only: MissionBriefingSupport must NOT re-export EXAMPLE_TEMPLATES (host-agent/index.ts:75 export-star would leak a domain symbol through the stable-public @alembic/core/host-agent-workflows facade) — consumers needing examples import example(lang) from @alembic/core/knowledge; re-run npm run check boundary and intentionally update the snapshot; grep-prove the EXAMPLE_TEMPLATES constant body does not depend on a workflows-layer import. CRITICAL FIX (section C.5): all four shipped examples FAIL the gate today — CONTENT_CONTRAST_MISSING (a marker line like // ✅ 正确 leaves only 2 trimmed chars after the marker, below the 4-char floor) and objectivec also fails DO_CLAUSE_NON_IMPERATIVE (Prefix is not in the allowlist). Rewrite every shipped example so it PASSES the full gate: each ✅ and ❌ marker line carries >=4 non-space chars after the marker (e.g. // ✅ correct: @interface BDVideoPlayer), and every doClause leads with an allowlisted imperative verb. P3.2 add the missing real languages (swift, kotlin, java, go, rust, csharp, javascript, and any other primary corpus languages) so unlisted languages no longer fall to the skeletal _default, and grow _default to gate-passing. P3.3 injection: Core MissionBriefingBuilder keeps its injection; the Plugin cold-start (P2.3) and the AlembicAgent bootstrap producer (P1.4b) already surface example() — note that; the in-process main-body ColdStartWorkflow/KnowledgeRescanWorkflow injection is a carry-item (ai-scan is carved out; if the bootstrap in-process path already renders example via the upgraded producer, grep-prove it, else record as follow-up). THE STANDING TRIPWIRE (section C.5): add test/recipe-authoring-spec/examples-gate-passing.test.ts that runs EVERY example(lang) through validateAgainst(candidate, {stage:'all'}) and asserts zero violations — this guarantees the shipped examples are gate-passing forever, the opposite of today's anti-examples. Acceptance on node 22: Core build:check green; the examples-gate-passing test green (every example, all languages incl _default, passes the full gate); the EXAMPLE_TEMPLATES move did not break MissionBriefingBuilder injection (briefing tests green); npm run check boundary green with the intentionally-updated snapshot (no facade leak); full Core test green. The 3 pre-existing lint:naming files are the out-of-scope carve-out. Discipline: the examples must genuinely PASS validateAgainst (do NOT relax the gate to make a bad example pass — fix the example); the down-move stays internal (no facade leak); main only, no push or tag or version bump; FieldSpec unchanged; do not touch the gates (byte-identical from P1) or the dead duplicates; ai-scan carved out. Producer-consumer: this fills example() so the already-wired cold-start front-load surfaces a real gate-clean example; P4 (drift + parity suite) and P5 (real-machine) follow. Backfill the Core commit, the examples-gate-passing proof (every example passes the full gate), the anti-example fixes (before/after marker lines + the objectivec verb fix), the languages added, the boundary snapshot update, and raw build and test output.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md sections B-P3 (P3.1/P3.2/P3.3), C.5 (anti-examples fail the gate + self-consistency tripwire), C.9 (down-move internal-only) plus the shipped module examples folder (P0 stub) + validateAgainst in @alembic/core/knowledge",
+      "createdAt": "2026-06-30T03:40:20.791Z"
+    },
+    {
+      "taskPackageId": "p4-core-drift-parity",
+      "summary": "P4 wave 1 (Core, producer-first) — extend the existing Core drift test RecipeAuthoringSpecDrift.test.ts (today only covers A.6 #4 markdown plus field snapshot and #6 constant snapshots) into the full guidance-equals-gate drift suite per design sections A.6 and B-P4.1, every assertion reading the one gateRules table so guidance and gate stay two projections of a single source. ADD these drift assertions. drift#1 allowlist parity: getImperativeVerbAllowlist positive byte-equals the stage-1 predicate Set AND the rendered doClause guidance string lists exactly those verbs (this catches the real drift where the guidance only said verb-led while the gate enforces a closed 45-verb set). drift#2 marker parity: the rendered guidance states the both-markers and at-least-4-non-space-chars-after-the-marker rule AND a property assertion feeds the guidance own worked-example markdown through validateAgainst stage 1 and asserts zero violations. drift#3 evidence-floor parity: getEvidenceFloorPolicy ruleFiles 3 factFiles 1 plus the scope-escape regex equals the evidence floor numbers and regex AND the rendered guidance includes the scope narrow or file-local escape the gate honors. drift#7 enforcement-matrix parity: assert the checked-in fixture recipe-gate-enforcement-matrix.json still lists exactly the reject codes found by grepping the three gate files so the layered-not-duplicated matrix can never silently reopen. Decision D-A confidence drift assertion: the rendered guidance confidence wording is recommended at least 0.85 not enforced AND gate-rules exposes no confidence floor predicate so guidance can never re-inflate a fake hard floor. KEEP drift#5 example self-consistency (already standing in RecipeAuthoringSpecExamplesGatePassing.test.ts) and drift#6 no-relaxation snapshot (already present) referenced as the standing tripwires. Also ADD the section 12.5 two-paths-tie parity tripwire as a Core test: for a small fixture candidate corpus, under a FIXED profile and FIXED ports, validateAgainst with path host-cold-start must produce byte-identical violation arrays to validateAgainst with path in-process, proving the path label itself does not change the verdict and the two real submission paths face the same bar at the Core API. Non-regression P4.2: npm run check on Node 22 green except the three pre-existing out-of-scope lint:naming files (carve-out, do not touch), full Core suite green, gates byte-identical meaning no gate-rules or UnifiedValidator or recipe-content-quality-gate or recipe-evidence-gate file is touched. Hard discipline: gates not relaxed (this is additive tests plus possibly a tiny guidance wording fix only if a drift assertion legitimately catches a guidance string that does not yet list the verbs or escape, never a gate change), additive tests, develop on main only, commit local do not push or tag or bump. Acceptance reference is the controller P0 oracle at evidence/p0-gate-truth-matrix-2026-06-30.md (verb count 45 positive 12 negative, marker threshold 4, no confidence floor) plus design sections A.6 and B-P4. If any drift assertion reveals a real guidance-versus-gate mismatch, FIX THE GUIDANCE to match the gate, never relax the gate.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md",
+      "createdAt": "2026-06-30T04:02:49.499Z"
+    },
+    {
+      "taskPackageId": "p4-plugin-drift-parity",
+      "summary": "P4 wave 2 (Plugin consumer drift plus host-path parity plus non-regression), consumes AlembicCore at commit 47391c6 via the at-alembic-core-knowledge facade. Extend the existing Plugin drift test recipe-gate-drift-tripwire.test.ts (today only snapshots the verb allowlist and the evidence floor plus the sessionScope port) into the full Plugin-consumer guidance-equals-gate drift suite per design A.6 and B-P4.1, every assertion reading the one Core gateRules table. ADD Plugin-consumer allowlist parity: the Plugin RENDERED guidance from OnboardingContract buildSubmitKnowledgeContract and buildRecipeGuidanceFloor and the cold-start front-load and the mcp-tools submit-knowledge describe strings list EXACTLY the verbs returned by getImperativeVerbAllowlist, never a hardcoded copy and never the vague verb-led, which also serves as the A.6 number-1 imports-allowlist guard proving the Plugin imports the allowlist from Core rather than re-declaring it. ADD evidence-floor and scope-escape parity: the rendered Plugin guidance states the ruleFiles 3 and factFiles 1 floor and surfaces the scope narrow or file-local escape that getEvidenceFloorPolicy exposes. ADD the Plugin half of Decision D-A confidence: the OnboardingContract confidence wording reads recommended at least 0.85 not enforced and never a hard floor (carried forward from P4-Core where the Core guidance simply omits confidence). ADD the host-path side of the section 12.5 parity tripwire: assert the Plugin host-path gate wrapper, that is the cold-start or tool-router stage-1 plus stage-2 invocation, produces a verdict byte-identical to a direct Core validateAgainst call with the same profile and path host-cold-start and the same injected ports on a fixture corpus, proving the Plugin wrapper does not mutate the verdict it gets from Core. Non-regression P4.2: re-run recipe-gate-golden-corpus.test.ts and assert byte-identical gate output, gates byte-identical meaning no recipe-content-quality-gate or recipe-evidence-gate file is touched, and the Plugin recipe test surface stays green. Hard discipline: gates not relaxed, additive tests plus only a tiny guidance wording fix if a parity assertion legitimately catches a Plugin guidance string that does not yet list the verbs or the escape or still claims a hard confidence floor, in which case fix the guidance to match the Core gate and never relax the gate, develop on main only, commit local do not push or tag or bump, Node 22 for build:check. Acceptance reference is the controller P0 oracle evidence/p0-gate-truth-matrix-2026-06-30.md with 45 positive and 12 negative verbs and no confidence floor plus design A.6 and B-P4 and section 12.5.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md",
+      "createdAt": "2026-06-30T04:13:44.917Z"
+    },
+    {
+      "taskPackageId": "p4-agent-inprocess-parity",
+      "summary": "P4 wave 2 (AlembicAgent in-process parity plus non-regression), consumes AlembicCore at commit 47391c6 via the at-alembic-core knowledge facade. Add the in-process side of the section 12.5 two-paths-tie parity tripwire: a new additive Agent test asserts that the in-process recipe authoring gate wrapper runInProcessRecipeAuthoringGate in src/tools/runtime/handlers/recipeAuthoringGate.ts produces a verdict byte-identical to a direct Core validateAgainst call with path in-process and the matching opportunistic profile and the same injected ports on a fixture candidate corpus, proving the AlembicAgent in-process submission wrapper faces the same Core bar as the host-agent path and does not mutate the verdict. Together with the Plugin host-path parity test this closes the host-versus-in-process tie transitively, since both wrappers equal the same Core validateAgainst. Non-regression: the Agent test suite stays green and the P1.4b in-process gate wrapper itself is unchanged, that is an additive test only with no wrapper edit. Hard discipline: gates not relaxed, additive test only, if the parity assertion reveals the wrapper diverges from Core validateAgainst then the fix is to make the wrapper call the unified Core validateAgainst rather than relax anything, develop on main only, commit local do not push or tag or bump. Acceptance reference is design section 12.5 and section 10 P1.4 plus the controller P0 oracle at evidence/p0-gate-truth-matrix-2026-06-30.md.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md",
+      "createdAt": "2026-06-30T04:13:58.348Z"
+    },
+    {
+      "taskPackageId": "p5-realmachine-coldstart-acceptance",
+      "summary": "P5 real-machine acceptance of the host-agent Recipe-production logic on the refreshed plugin build, run by the controller as self-validation per the user direction (test via refreshing the ClaudeCode plugin, subject is the host-agent Recipe logic, not DeepSeek generation quality). Built AlembicPlugin (Core at 47391c6 + Plugin at ea186ad) and drove the plugin own HostMcpServer runtime with the real alembic_init and alembic_submit_knowledge handlers in an ALEMBIC_HOME sandbox protecting the real home asd. No DeepSeek or Qwen used because the cold-start briefing front-load and the submit gate are deterministic and the host agent authored the recipe by hand following the front-loaded contract. Results all green. Subject A: the cold-start briefing front-loads the full contract plus a gate-clean worked example inline at submissionSchema.recipeAuthoringFrontLoad (15082 chars) with all fingerprints present (check and cross markers, validate verb, 45-verb count, scope narrow file-local escape, three-distinct-file floor, marker rule, per-field contract) and a language-matched typescript worked example. Subject B: a contract-following recipe with all required fields one-passed alembic_submit_knowledge on the first submit (success true, errorCode null, recipe id created). The live iteration loop was demonstrated because the first incomplete attempt was rejected with a precise per-field list and the second following that contract one-passed. Subject C: a contract-violating recipe was rejected QUALITY_GATE_FAILED with exactly DO_CLAUSE_NON_IMPERATIVE plus DONT_CLAUSE_REQUIRED plus CONTENT_CONTRAST_MISSING and the rejection message is the guidance itself (guidance equals gate live). Subject D: QualityScorer contentDepth doc-score on the one-passed recipe is 0.884 clearly above the 0.65 baseline (overall 0.814 grade B). Design P5 criteria all met (complete language-matched gate-passing worked example inline, contract-following submit one-passes, sampled doc-score above 0.65) plus the guidance-equals-gate rejection path and the live iteration loop. Gates not relaxed (the violating recipe is still rejected with the exact codes). Out of scope deployment follow-ups the user controls: making the refreshed plugin live in the daily ClaudeCode (reinstall plus restart) and push or release or version bump (all four repos local unpushed). Full evidence at evidence/p5-realmachine-coldstart-acceptance-2026-06-30.md.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29/evidence/p5-realmachine-coldstart-acceptance-2026-06-30.md",
+      "createdAt": "2026-06-30T04:48:47.445Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p0-core-recipe-authoring-spec-module",
+      "taskPackageId": "p0-recipe-authoring-spec-module",
+      "targetWindow": "AlembicCore",
+      "summary": "Build the canonical RecipeAuthoringSpec module in Core domain knowledge, exposed via the knowledge facade. Do the P0.0 enforcement-matrix fixture and test first, grounded on the controller oracle. Lift gate constants byte-identical with the C.1 split (pure predicates into domain, fs and session behind injected typed ports, zero fs or workflows imports in gate-rules). Additive only: no Plugin or FieldSpec edits, all tests green. Accept with build-check, spec-shape test, matrix test, lint layer-contract, full Core check, and cross-package facade resolve on Node 22. Backfill the commit and raw acceptance output.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T22:31:28.605Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0-recipe-authoring-spec-module__AlembicCore__p0-core-recipe-authoring-spec-module",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-recipe-authoring-spec-module__AlembicCore__p0-core-recipe-authoring-spec-module.json",
+        "deliveryRunId": "run-delivery-p0-recipe-authoring-spec-module__AlembicCore__p0-core-recipe-authoring-spec-module",
+        "dispatchGroup": "p0-recipe-authoring-spec-module",
+        "sentAt": "2026-06-29T22:33:46.468Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0-core-recipe-authoring-spec-module"
+    },
+    {
+      "targetTaskId": "p0b-core-module-build",
+      "taskPackageId": "p0b-core-module-build",
+      "targetWindow": "AlembicCore",
+      "summary": "Continue P0 on the verified P0.0 matrix (do not redo P0.0). Build P0.1 to P0.6 of the RecipeAuthoringSpec module additively: folder and barrel, fields re-export as-is, gate-rules byte-identical lift with the C.1 split (pure into domain, fs and session behind injected typed ports, zero fs or workflows imports), content-contract with docScoreTargets, failure-modes, guidance-generator, index public API, examples stub. Wire the knowledge facade. Run and backfill the six-command P0 acceptance on node 22. Additive, gates byte-identical, main only, no push.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T22:54:00.404Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0b-core-module-build__AlembicCore__p0b-core-module-build",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0b-core-module-build__AlembicCore__p0b-core-module-build.json",
+        "deliveryRunId": "run-delivery-p0b-core-module-build__AlembicCore__p0b-core-module-build",
+        "dispatchGroup": "p0b-core-module-build",
+        "sentAt": "2026-06-29T22:54:39.749Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0b-core-module-build"
+    },
+    {
+      "targetTaskId": "p1-plugin-gate-repoint",
+      "taskPackageId": "p1-plugin-gate-repoint",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Re-point the AlembicPlugin stage-1 (recipe-content-quality-gate.ts) and stage-2 (the LIVE lib/recipe-generation/host-agent-workflows/recipe-evidence-gate.ts) gates to call validateAgainst from @alembic/core/knowledge, deleting the inline constants P0 already lifted, injecting sourceRefResolver/sessionScope ports for the fs and session checks. P1.0 capture a golden-corpus baseline FIRST; the re-pointed gates must produce byte-identical violation arrays (discipline gate: any byte differs = STOP). Add the P1.5 drift snapshot. Accept on node 22 with the golden-corpus byte-identical proof + handler/evidence tests + build:check. Main only, no push, gates not relaxed, dead duplicate out of scope. Backfill commit + byte-identical proof + raw output.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T23:40:42.054Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-plugin-gate-repoint__AlembicPlugin__p1-plugin-gate-repoint",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-gate-repoint__AlembicPlugin__p1-plugin-gate-repoint.json",
+        "deliveryRunId": "run-delivery-p1-plugin-gate-repoint__AlembicPlugin__p1-plugin-gate-repoint",
+        "dispatchGroup": "p1-plugin-gate-repoint",
+        "sentAt": "2026-06-29T23:41:18.264Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-plugin-gate-repoint"
+    },
+    {
+      "targetTaskId": "p1-core-stage3-repoint",
+      "taskPackageId": "p1-core-stage3-repoint",
+      "targetWindow": "AlembicCore",
+      "summary": "Re-point Core UnifiedValidator stage-3 to read its params (markdown floor 200, code-or-file-ref regex, coreCode bracket, generic-title regex, fingerprint, uniqueness) from the RecipeAuthoringSpec module instead of inline literals, byte-identical. The module currently exposes only 2 stage-3 gateRule entries; complete the missing stage-3 entries from UnifiedValidator current values first, then re-point. Capture a stage-3 baseline and assert identical errors output (any byte differs = STOP). Accept on node 22 with Core build:check + UnifiedValidator tests + drift snapshot; the 3 pre-existing lint:naming files are out of scope. Main only, no push. Backfill commit + byte-identical proof + which params added.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T00:10:58.847Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-core-stage3-repoint__AlembicCore__p1-core-stage3-repoint",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-stage3-repoint__AlembicCore__p1-core-stage3-repoint.json",
+        "deliveryRunId": "run-delivery-p1-core-stage3-repoint__AlembicCore__p1-core-stage3-repoint",
+        "dispatchGroup": "p1-core-stage3-repoint",
+        "sentAt": "2026-06-30T00:11:23.480Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-core-stage3-repoint"
+    },
+    {
+      "targetTaskId": "p1-core-profile-model",
+      "taskPackageId": "p1-core-profile-model",
+      "targetWindow": "AlembicCore",
+      "summary": "Add a profile axis (cold-start or opportunistic) to the RecipeAuthoringSpec module validateAgainst and renderGuidance, per design 12.3. cold-start = current full-gate behavior, byte-identical, DEFAULT (so the accepted Plugin and Core gate consumers are unaffected — re-run the P1 golden-corpus and stage-3 byte-identical tests to prove zero change). opportunistic = all content gates plus cheap grounding but WITHOUT the 3-distinct-files evidence floor and WITHOUT session-scope (declared lighter bar, not a relaxation). Expose profile selection reusing shouldRunRecipeEvidenceGate. Accept on node 22 with Core build:check + a new profile test (cold-start zero-change, opportunistic drops only floor+session-scope) + existing P1 tests green. Main only, no push, gates not relaxed, the 3 lint:naming files out of scope. Backfill commit + cold-start byte-identical proof + opportunistic test.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T00:38:56.819Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-core-profile-model__AlembicCore__p1-core-profile-model",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-profile-model__AlembicCore__p1-core-profile-model.json",
+        "deliveryRunId": "run-delivery-p1-core-profile-model__AlembicCore__p1-core-profile-model",
+        "dispatchGroup": "p1-core-profile-model",
+        "sentAt": "2026-06-30T00:39:22.307Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-core-profile-model"
+    },
+    {
+      "targetTaskId": "p1-agent-inprocess-flatten",
+      "taskPackageId": "p1-agent-inprocess-flatten",
+      "targetWindow": "AlembicAgent",
+      "summary": "Re-point the AlembicAgent in-process submit (knowledge.ts handleSubmit) to validateAgainst with the profile axis, closing CG-4. Follow C.4: FIRST upgrade the insightProducer prompt to renderGuidance('in-process', profile) so the producer knows the rules; THEN add validateAgainst([item], {stage:'all', path:'in-process', profile: resolveAuthoringProfile(ctx), sourceRefResolver, dimensionId}) before gateway.create (opportunistic profile = content gates + cheap grounding, no 3-file floor, no session-scope). Wire the in-process fs resolver. Add a currently-passing-corpus regression documenting the bounded new-reject set, and the section 12.5 host-vs-in-process parity test. Accept on node 22 with build:check + producer-prompt test + re-point test + regression + parity + full test green. Main only, no push; cold-start byte-identical, opportunistic is the declared lighter bar. Backfill commit + producer proof + new-reject set + parity result. STOP and return needs-review if a recipe that should pass is rejected.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T00:54:20.166Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-agent-inprocess-flatten__AlembicAgent__p1-agent-inprocess-flatten",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-agent-inprocess-flatten__AlembicAgent__p1-agent-inprocess-flatten.json",
+        "deliveryRunId": "run-delivery-p1-agent-inprocess-flatten__AlembicAgent__p1-agent-inprocess-flatten",
+        "dispatchGroup": "p1-agent-inprocess-flatten",
+        "sentAt": "2026-06-30T00:54:45.708Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-agent-inprocess-flatten"
+    },
+    {
+      "targetTaskId": "p1-mainbody-inprocess-repoint",
+      "taskPackageId": "p1-mainbody-inprocess-repoint",
+      "targetWindow": "Alembic",
+      "summary": "Re-point the main-body Alembic GatewayActionRegistry candidate:create and recipe:create (the second in-process submit entry, around lines 24-29 and 77-82) to run validateAgainst([item], {stage:'all', path:'in-process', profile: resolveAuthoringProfile(ctx), sourceRefResolver, dimensionId}) from @alembic/core/knowledge BEFORE knowledgeService.create, completing CG-4. Reuse the AlembicAgent in-process gate (runInProcessRecipeAuthoringGate) if importable to avoid a third fs-resolver copy; else supply your own per the C.11 port pattern. opportunistic profile = content gates + cheap grounding, no 3-file floor, no session-scope; cold-start = full gate. If the main-body has its own producer prompt, upgrade it producer-first. Accept on node 22 with build:check + a re-point test + a currently-passing-corpus regression (bounded new-reject set) + full test green. Main only, no push; touch only the main-body; do not touch Core/Plugin/Agent/FieldSpec. Backfill commit + diff + new-reject set + reuse-or-own. STOP and return needs-review if a should-pass recipe is rejected.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T01:37:32.941Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-mainbody-inprocess-repoint__Alembic__p1-mainbody-inprocess-repoint",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-mainbody-inprocess-repoint__Alembic__p1-mainbody-inprocess-repoint.json",
+        "deliveryRunId": "run-delivery-p1-mainbody-inprocess-repoint__Alembic__p1-mainbody-inprocess-repoint",
+        "dispatchGroup": "p1-mainbody-inprocess-repoint",
+        "sentAt": "2026-06-30T01:38:03.110Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-mainbody-inprocess-repoint"
+    },
+    {
+      "targetTaskId": "p1-mainbody-aiscan-gate",
+      "taskPackageId": "p1-mainbody-aiscan-gate",
+      "targetWindow": "Alembic",
+      "summary": "Option A (controller-confirmed): gate the REAL live in-process AI create AiScanService.ts:159 (not the dead Gateway actions). Before knowledgeService.create, run validateAgainst([recipe], {stage:'all', path:'in-process', profile: resolveAuthoringProfile(ctx), sourceRefResolver, dimensionId}) from @alembic/core/knowledge; on violations skip-and-report that recipe. opportunistic = content + cheap grounding, no 3-file floor, no session-scope. Verify the ai-scan producer is the embedded AlembicAgent insightProducer (already upgraded P1.4b); supply your own C.11 fs resolver (AlembicAgent gate not re-exported). Accept on node 22 with build:check + re-point test + currently-passing-corpus regression (bounded new-reject set) + full test green. Main only, no push; touch only main-body; do NOT gate the dead Gateway actions or the HTTP route. Backfill commit + diff + new-reject set + producer finding. STOP and return needs-review if a should-pass recipe is rejected.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T01:59:02.122Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-mainbody-aiscan-gate__Alembic__p1-mainbody-aiscan-gate",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-mainbody-aiscan-gate__Alembic__p1-mainbody-aiscan-gate.json",
+        "deliveryRunId": "run-delivery-p1-mainbody-aiscan-gate__Alembic__p1-mainbody-aiscan-gate",
+        "dispatchGroup": "p1-mainbody-aiscan-gate",
+        "sentAt": "2026-06-30T01:59:30.762Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-mainbody-aiscan-gate"
+    },
+    {
+      "targetTaskId": "p2-core-builder-checklist-collapse",
+      "taskPackageId": "p2-core-builder-checklist-collapse",
+      "targetWindow": "AlembicCore",
+      "summary": "P2 Core guidance foundation (guidance-only, gates untouched): collapse the two parallel submissionSpec builders (MissionBriefingBuilder ~311-331 + DimensionCatalogPayload ~178-196) onto the module buildSubmissionSpec(dim), and the two checklists (DimensionSop PRE_SUBMIT_CHECKLIST + SHARED_SUBMIT_CHECKLIST) onto buildPreSubmitChecklist(), from @alembic/core/knowledge. Apply decision D-B: the collapsed submissionSpec floor is >=3 for rule/pattern (single source; intentional alembic_plan visible change — draft no longer says 0 OK); verify plan-tool.ts ~417 still type-checks. Guidance now states the real verbs/floor (guidance==gate). Accept on node 22 with build:check + Core test + plan-tool type-check + a proof the rendered guidance states >=3 and the real verb allowlist. Main only, no push; do not relax gates; the 3 lint:naming files are out of scope. Backfill commit + collapse diff + type-check + rendered-guidance proof.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T02:19:25.375Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-core-builder-checklist-collapse__AlembicCore__p2-core-builder-checklist-collapse",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-builder-checklist-collapse__AlembicCore__p2-core-builder-checklist-collapse.json",
+        "deliveryRunId": "run-delivery-p2-core-builder-checklist-collapse__AlembicCore__p2-core-builder-checklist-collapse",
+        "dispatchGroup": "p2-core-builder-checklist-collapse",
+        "sentAt": "2026-06-30T02:19:58.596Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-core-builder-checklist-collapse"
+    },
+    {
+      "targetTaskId": "p2-plugin-coldstart-frontload",
+      "taskPackageId": "p2-plugin-coldstart-frontload",
+      "targetWindow": "AlembicPlugin",
+      "summary": "CORE FIX (guidance-only): make the host-agent cold-start agent see the full per-field authoring contract + a gate-passing example BEFORE generating. In cold-start.ts, summarizeSubmissionSchema (~976-986) must CARRY the worked example (exempt it from the 18KB strip) — the #1 root cause. Front-load the per-field contract via renderGuidance('host-cold-start') (Section 13.L). OnboardingContract renders from buildSubmitKnowledgeContract + getEvidenceFloorPolicy + getImperativeVerbAllowlist (real 45 verbs + scope-escape). mcp-tools .describe() from describeSubmitToolFields. D-A: confidence = recommended not enforced. C.3: re-point or grep-prove the deepMining/moduleMining rescan briefing. Folded P2.4: flatten PRE_SUBMIT_CHECKLIST to buildPreSubmitChecklist + single-source FAIL_EXAMPLES + update the cold-start compactor + HostMcpServer test. Accept on node 22 with build:check + handler/cold-start tests + the real-machine briefing grep (example + verbs + scope-escape all present). Guidance-only, gates untouched, main only no push. Backfill commit + diffs + briefing grep proof + C.3 finding. STOP and return needs-review on a cross-repo blocker.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T02:50:16.179Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-plugin-coldstart-frontload__AlembicPlugin__p2-plugin-coldstart-frontload",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-coldstart-frontload__AlembicPlugin__p2-plugin-coldstart-frontload.json",
+        "deliveryRunId": "run-delivery-p2-plugin-coldstart-frontload__AlembicPlugin__p2-plugin-coldstart-frontload",
+        "dispatchGroup": "p2-plugin-coldstart-frontload",
+        "sentAt": "2026-06-30T02:50:46.864Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-plugin-coldstart-frontload"
+    },
+    {
+      "targetTaskId": "p3-core-examples",
+      "taskPackageId": "p3-core-examples",
+      "targetWindow": "AlembicCore",
+      "summary": "P3 examples — make the worked examples REAL gate-clean. Move EXAMPLE_TEMPLATES from MissionBriefingSupport.ts (~106-213) DOWN into the module recipe-authoring-spec/examples/ (MissionBriefingSupport re-imports downward, INTERNAL-only per C.9 — no facade re-export leak; re-run boundary + update snapshot). Fix the 4 anti-examples that FAIL the gate today (each ✅/❌ marker line needs >=4 non-space chars after it; objectivec doClause must lead with an allowlisted verb). Add real languages (swift/kotlin/java/go/rust/csharp/javascript) + grow _default to gate-passing. Add the standing tripwire test/recipe-authoring-spec/examples-gate-passing.test.ts: every example(lang) passes validateAgainst({stage:'all'}) with zero violations. Accept on node 22 with build:check + the examples-gate-passing test + briefing tests + npm run check boundary (updated snapshot) + full Core test. Do NOT relax the gate to pass a bad example — fix the example. Main only, no push; the 3 lint:naming files out of scope. Backfill commit + examples-gate-passing proof + anti-example fixes + languages + snapshot update.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T03:40:20.791Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-core-examples__AlembicCore__p3-core-examples",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-examples__AlembicCore__p3-core-examples.json",
+        "deliveryRunId": "run-delivery-p3-core-examples__AlembicCore__p3-core-examples",
+        "dispatchGroup": "p3-core-examples",
+        "sentAt": "2026-06-30T03:40:49.872Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-core-examples"
+    },
+    {
+      "targetTaskId": "p4-core-drift-parity",
+      "taskPackageId": "p4-core-drift-parity",
+      "targetWindow": "AlembicCore",
+      "summary": "Extend Core RecipeAuthoringSpecDrift.test.ts to the full guidance-equals-gate drift suite (allowlist/marker/evidence-floor/matrix parity + D-A confidence) plus a section 12.5 host-vs-in-process path-parity tripwire on a fixture corpus; Core non-regression green; gates byte-identical; fix guidance not gate on any mismatch.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T04:02:49.499Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-core-drift-parity__AlembicCore__p4-core-drift-parity",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-drift-parity__AlembicCore__p4-core-drift-parity.json",
+        "deliveryRunId": "run-delivery-p4-core-drift-parity__AlembicCore__p4-core-drift-parity",
+        "dispatchGroup": "p4-core-drift-parity",
+        "sentAt": "2026-06-30T04:03:14.561Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-core-drift-parity"
+    },
+    {
+      "targetTaskId": "p4-plugin-drift-parity",
+      "taskPackageId": "p4-plugin-drift-parity",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Extend Plugin recipe-gate-drift-tripwire.test.ts to the full Plugin-consumer guidance-equals-gate drift suite (allowlist + scope-escape + Plugin-side D-A confidence wording + A.6 imports-allowlist guard) plus the host-path side of the section 12.5 parity tripwire (Plugin wrapper verdict equals direct Core validateAgainst); re-run the golden corpus byte-identical; gates byte-identical; fix guidance not gate on any mismatch.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T04:13:44.917Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-plugin-drift-parity__AlembicPlugin__p4-plugin-drift-parity",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-drift-parity__AlembicPlugin__p4-plugin-drift-parity.json",
+        "deliveryRunId": "run-delivery-p4-plugin-drift-parity__AlembicPlugin__p4-plugin-drift-parity",
+        "dispatchGroup": "p4-plugin-drift-parity",
+        "sentAt": "2026-06-30T04:14:35.022Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-plugin-drift-parity"
+    },
+    {
+      "targetTaskId": "p4-agent-inprocess-parity",
+      "taskPackageId": "p4-agent-inprocess-parity",
+      "targetWindow": "AlembicAgent",
+      "summary": "Add the AlembicAgent in-process side of the section 12.5 parity tripwire: assert runInProcessRecipeAuthoringGate verdict equals a direct Core validateAgainst with path in-process and opportunistic profile and matching ports on a fixture corpus; Agent suite green; additive test only; wrapper unchanged; gates not relaxed.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T04:13:58.348Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity.json",
+        "deliveryRunId": "run-delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity",
+        "dispatchGroup": "p4-agent-inprocess-parity",
+        "sentAt": "2026-06-30T04:14:41.907Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-agent-inprocess-parity"
+    },
+    {
+      "targetTaskId": "p5-realmachine-coldstart-acceptance",
+      "taskPackageId": "p5-realmachine-coldstart-acceptance",
+      "targetWindow": "AlembicWorkspace",
+      "summary": "Controller self-validation: P5 real-machine cold-start acceptance on the refreshed plugin build (Core 47391c6 + Plugin ea186ad), ALEMBIC_HOME sandbox, no DeepSeek. Front-load briefing has the full contract + gate-clean worked example inline; a contract-following recipe one-passes alembic_submit_knowledge; a violating one is rejected with the warned codes; doc-score contentDepth 0.884 > 0.65.",
+      "status": "accepted",
+      "createdAt": "2026-06-30T04:48:47.445Z",
+      "resultId": "tr-p5-realmachine-coldstart-acceptance",
+      "reviewDecision": "accept"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p0-recipe-authoring-spec-module",
+        "p0b-core-module-build",
+        "p1-core-stage3-repoint",
+        "p1-core-profile-model",
+        "p2-core-builder-checklist-collapse",
+        "p3-core-examples",
+        "p4-core-drift-parity"
+      ],
+      "targetTaskIds": [
+        "p0-core-recipe-authoring-spec-module",
+        "p0b-core-module-build",
+        "p1-core-stage3-repoint",
+        "p1-core-profile-model",
+        "p2-core-builder-checklist-collapse",
+        "p3-core-examples",
+        "p4-core-drift-parity"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-plugin-gate-repoint",
+        "p2-plugin-coldstart-frontload",
+        "p4-plugin-drift-parity"
+      ],
+      "targetTaskIds": [
+        "p1-plugin-gate-repoint",
+        "p2-plugin-coldstart-frontload",
+        "p4-plugin-drift-parity"
+      ]
+    },
+    {
+      "windowName": "AlembicAgent",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-agent-inprocess-flatten",
+        "p4-agent-inprocess-parity"
+      ],
+      "targetTaskIds": [
+        "p1-agent-inprocess-flatten",
+        "p4-agent-inprocess-parity"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-mainbody-inprocess-repoint",
+        "p1-mainbody-aiscan-gate"
+      ],
+      "targetTaskIds": [
+        "p1-mainbody-inprocess-repoint",
+        "p1-mainbody-aiscan-gate"
+      ]
+    },
+    {
+      "windowName": "AlembicWorkspace",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p5-realmachine-coldstart-acceptance"
+      ],
+      "targetTaskIds": [
+        "p5-realmachine-coldstart-acceptance"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p5-realmachine-coldstart-acceptance"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-30T04:50:16.306Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity",
+    "lastDeliveryRunId": "run-delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity",
+    "lastDispatchGroup": "p4-agent-inprocess-parity",
+    "lastTargetTaskId": "p4-agent-inprocess-parity",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-30T04:14:41.910Z"
+  }
+}

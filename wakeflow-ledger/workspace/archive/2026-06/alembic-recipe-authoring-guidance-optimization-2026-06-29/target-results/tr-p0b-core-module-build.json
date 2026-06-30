@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p0b-core-module-build",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p0b-core-module-build",
+  "dispatchGroup": "p0b-core-module-build",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p0b-core-module-build",
+  "status": "needs-review",
+  "summary": "P0.1–P0.6 RecipeAuthoringSpec canonical module built additively on the controller-verified P0.0 matrix. AlembicCore commit a2329ce on main (no push/tag/version bump). One gateRules() table (11 rules: stage1=4, stage2=5, stage3=2) is read by BOTH validateAgainst (enforcement) and renderGuidance (guidance) — the structural guidance==gate guarantee. Files: src/types/recipeAuthoringSpec.ts (C.11 injected ports); src/domain/knowledge/recipe-authoring-spec/{gateRules,contentContract,failureModes,fields,guidanceGenerator,examples/index,index}.ts (A.3 API); facade wired in src/knowledge.ts (NEW symbols only — FieldSpec getters already exported, no dup) + domain barrel + types barrel; StyleGuide.ts re-imports PROJECT_SNAPSHOT_STYLE_GUIDE from contentContract.ts byte-identical. C.1 split honored: gateRules.ts lifts stage 1/2/3 constants+predicates byte-identical (CG-3, moved bodies not retyped) and carries ZERO node:fs/node:path/host-agent-workflows (grep-proven); fs source-ref reads + bootstrap-session scope stay behind injected sourceRefResolver/sessionScope ports. Gates keep inline originals (additive, P1 re-points them back); FieldSpec untouched; dead recipe-evidence-gate duplicate left out of scope.\n\nACCEPTANCE (node 22.22.1): 5 of 6 commands fully green; npm run check green through every stage EXCEPT lint:naming, which fails on 3 PRE-EXISTING non-p0b files only. (1) build:check PASS. (2) spec-shape test/RecipeAuthoringSpec.test.ts PASS. (3) matrix test/RecipeGateEnforcementMatrix.test.ts PASS (16 combined). (4) lint:layer-contract PASS (407 cross-area, 261 type-only bridges; spec module zero fs/workflows imports). (5) npm run check — public-api-boundary/layer-contract/consumer-core-imports/scope-resolution/smoke:public-api/output-budgets/space-edges/doctrine ALL PASS; lint:naming FAILS only on src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts; full suite separately 1458/1458 PASS; biome lint 677 files clean. (6) cross-package facade resolve from Alembic consumer (@alembic/core/knowledge → dist/knowledge.js): typeof validateAgainst=function, typeof renderGuidance=function, imperative positive verbs=45 (negative=12); renderGuidance rules==gateRules count and guidance text states the derived 45 — guidance==gate proven cross-package.\n\nWHY needs-review: the mandated full Core check (command 5) cannot go fully green without touching files outside this demand. lint:naming is RED at clean HEAD (proven via git stash --include-untracked probe with all p0b work removed). SN4/0.3.0-RW3 un-parked the src naming scope (config/naming-lint.json parkedScopes:[]), retroactively flagging 3 committed kebab files — project-context-capabilities.ts (2675af6, 06-24), recipe-context-capabilities.ts (f3fc8e9, 06-21), test-fixtures.ts (2675af6); 2 predate even P0.0. All 3 are PUBLIC package-export subpaths (3 package.json refs + cross-package consumers each) — same category as the already-exempted src/project-context.ts / recipe-context.ts / host-agent-workflows.ts barrels in naming-lint.json exceptions; the SN4 census missed these variants. p0b adds ZERO new naming debt (my 5 new src files are camelCase; the P0.0 test was renamed to PascalCase RecipeGateEnforcementMatrix.test.ts, R100-identical content), so lint:naming is now red EXCLUSIVELY on those 3 non-mine files.\n\nRECOMMENDATION: accept p0b on the zero-new-debt basis and route a config-only fix to the SN4 owner — add three naming-lint.json {file,owner,reason} exceptions mirroring the existing public-export-subpath barrel exceptions. Do NOT rename them: renaming a public export subpath breaks the @alembic/core/* consumer contract and ripples into Alembic/Plugin/Agent. Needs controller decision because it edits governance config + files outside this demand's authority.",
+  "evidenceRefs": [
+    "AlembicCore/src/domain/knowledge/recipe-authoring-spec/gateRules.ts",
+    "AlembicCore/src/types/recipeAuthoringSpec.ts",
+    "AlembicCore/src/domain/knowledge/recipe-authoring-spec/guidanceGenerator.ts",
+    "AlembicCore/src/domain/knowledge/recipe-authoring-spec/contentContract.ts",
+    "AlembicCore/src/domain/knowledge/recipe-authoring-spec/index.ts",
+    "AlembicCore/src/knowledge.ts",
+    "AlembicCore/test/RecipeAuthoringSpec.test.ts",
+    "AlembicCore/test/RecipeGateEnforcementMatrix.test.ts"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm run build:check → PASS (tsc -p tsconfig.json --noEmit, clean)",
+    "vitest run test/RecipeAuthoringSpec.test.ts → PASS (spec-shape + guidance==gate)",
+    "vitest run test/RecipeGateEnforcementMatrix.test.ts → PASS (P0.0 matrix round-trip; 16 tests combined with spec-shape)",
+    "npm run lint:layer-contract → PASS (407 cross-area runtime imports OK, 261 type-only bridges exempt)",
+    "grep proof: spec module has zero node:fs / node:path / host-agent-workflows import specifiers (only same-module + type-only types-layer bridges)",
+    "npm run check → ALL stages PASS except lint:naming (fails on 3 pre-existing non-p0b public-export files); chain stops before test/lint",
+    "npm run test → 1458/1458 PASS (151 files)",
+    "npm run lint (biome) → 677 files clean, no fixes",
+    "npm run build → dist/ built (clean-dist + tsc), enabling cross-package resolve",
+    "cross-package resolve @alembic/core/knowledge from Alembic consumer → validateAgainst=function, renderGuidance=function, 45 positive imperative verbs, 11 gateRules (4+5+2), evidenceFloor {ruleFiles:3,factFiles:1}"
+  ],
+  "risks": [
+    "BLOCKER for full-check acceptance (controller decision): npm run check red at lint:naming on 3 PRE-EXISTING public-export kebab files (project-context-capabilities.ts, recipe-context-capabilities.ts, test-fixtures.ts) outside p0b scope — red at clean HEAD per stash probe; fix = add naming-lint.json exceptions (SN4-owned config change), NOT rename (rename breaks public @alembic/core/* exports + cross-package consumers).",
+    "Additive-only by design: the live gates still run their inline originals this phase; byte-identity holds gate behavior, but re-pointing the gates to validateAgainst and closing the in-process parity gap (CG-4) is P1 — no runtime behavior change shipped in P0.",
+    "validateAgainst stage-2 fs/session checks only fire when the host injects sourceRefResolver/sessionScope; pure runs intentionally skip the fs SOURCE_REF_* codes (verified in test). Host must wire the ports in P1.",
+    "example() is the P0 default worked-example stub (one gate-passing TS candidate); full multi-language EXAMPLE_TEMPLATES down-move is P3 per design.",
+    "Neither this commit nor the prior P0.0 commit is pushed to origin/main (per task: main only, no push); controller verification is local."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p0b-core-module-build__AlembicCore__p0b-core-module-build",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0b-core-module-build__AlembicCore__p0b-core-module-build.json",
+    "deliveryRunId": "run-delivery-p0b-core-module-build__AlembicCore__p0b-core-module-build",
+    "dispatchGroup": "p0b-core-module-build",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0b-core-module-build__AlembicCore__p0b-core-module-build.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 8,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p0b-core-module-build",
+    "targetTaskId": "p0b-core-module-build",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p0b-core-module-build",
+    "resultId": "tr-p0b-core-module-build",
+    "createdAt": "2026-06-29T23:24:39.859Z"
+  },
+  "createdAt": "2026-06-29T23:24:39.859Z",
+  "stateRevisionObserved": 8,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p0-core-recipe-authoring-spec-module",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p0-recipe-authoring-spec-module",
+  "dispatchGroup": "p0-recipe-authoring-spec-module",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p0-core-recipe-authoring-spec-module",
+  "status": "needs-review",
+  "summary": "P0.0（任务包明确的 HARD FIRST STEP）已完成并提交；RecipeAuthoringSpec 模块本体（P0.1–P0.6 + facade + 余下验收）为剩余范围，按本仓 CLAUDE.md「完整性自检：窗口内无法证明完整→needs-review，不报 completed」如实回 needs-review。\n\n已完成（commit 92992a6，main，仅 2 文件，未碰 CLAUDE.md 的他方工作树改动）：\n- enforcement-matrix fixture `test/fixtures/recipe-gate-enforcement-matrix.json` —— 按控制器 oracle（evidence/p0-gate-truth-matrix-2026-06-30.md）枚举三阶段全 reject code + path 标注，落实「分层非重复」结论：stage1(Plugin,always) 管 verb/marker、stage2(Plugin,cold-start-only) 管 evidence/snippet/graph、stage3(Core,all paths) 管 field/floor/uniqueness；记 dead `SOURCE_REF_BARE`（never-emitted, paths[]）、DIMENSION_*/QUALITY_GATE_FAILED 标 dimension-complete path。\n- round-trip 测试 `test/recipe-gate-enforcement-matrix.test.ts` —— 读 LIVE 三 gate 源做防漂移断言：stage1/2 矩阵 code keys 必等于 live 声明的 reject-code union（RecipeContentQualityViolationCode 8 / RecipeEvidenceViolationCode 19），stage3 条目数必等于 live UnifiedValidator errors.push 数（11，派生非硬编码），verb 计数从 live Set 派生（never hardcode 45/12，§C.10）。5 测试通过。\n\n剩余范围（P0.1–P0.6 + 验收，未做）：\n- P0.1 模块文件树 `src/domain/knowledge/recipe-authoring-spec/`（index barrel + fields/gate-rules/content-contract/failure-modes/examples/guidance-generator）。\n- P0.2 fields.ts 重导 V3_FIELD_SPEC 等 AS-IS（不改 FieldSpec）。\n- P0.3 gate-rules.ts —— **byte-identical 提取**（CG-3）verbs/regex/floor/snippet/placeholder/graph/stage-3 常量 + validateAgainst；C.1 拆分：纯谓词进 domain，fs/session 经注入 typed ports `sourceRefResolver`/`sessionScope`（types 层），gate-rules **零 node:fs / host-agent-workflows import**（lint:layer-contract）。\n- P0.4 content-contract / P0.5 failure-modes / P0.6 guidance-generator + index 公共 API（examples 允许 stub）。\n- facade：`src/domain/knowledge/index.ts` + `src/knowledge.ts` 复用 `@alembic/core/knowledge`（不新铸 subpath）。\n- 验收：build:check + spec-shape test + lint:layer-contract + npm run check + 跨包 facade resolve（node -e import @alembic/core/knowledge）。",
+  "evidenceRefs": [
+    "AlembicCore/test/fixtures/recipe-gate-enforcement-matrix.json",
+    "AlembicCore/test/recipe-gate-enforcement-matrix.test.ts"
+  ],
+  "verification": [
+    "commit 92992a6（main，2 files，无 push/tag/bump，未碰 vendor，未动他方工作树的 M CLAUDE.md）",
+    "npx vitest run test/recipe-gate-enforcement-matrix.test.ts → 5 tests passed",
+    "npm run build:check → tsc --noEmit 0 error（JSON import + import-attribute 下通过）",
+    "biome check 两文件 → 0 error/warning",
+    "防漂移证据：stage1 union=RecipeContentQualityViolationCode（8 码，live grep）、stage2 union=RecipeEvidenceViolationCode（19 码含 dead SOURCE_REF_BARE）、stage3 条目=live errors.push 数（11）均由源派生；POSITIVE>NEGATIVE>0 从 live Set 派生、未硬编码"
+  ],
+  "risks": [
+    "最危险纪律 CG-3 byte-identity：gate-rules.ts 必须从 live recipe-content-quality-gate.ts + recipe-evidence-gate.ts + UnifiedValidator.ts **逐字提取函数体/常量**（不重打）才保证字节一致；需完整读 evidence-gate 纯谓词区（snippet 705-738 / floor 283-318 / placeholder 694-703 / graph 613-668 / source-ref 正则+path-shape 510-554 等，oracle 已给 verbatim 常量）。这是本次未完成的主体、且错不得。",
+    "C.1 拆分门禁：gate-rules 零 fs/workflows import（lint:layer-contract）；fs/session 经注入 sourceRefResolver/sessionScope typed ports（INSUFFICIENT_EVIDENCE/SNIPPET_MISMATCH 纯谓词但消费 fs-bound validateSourceRef 产出的 validRefs/rangeText——port 需产出已验证 {sourcePath,rangeText}）。",
+    "模块 facade 走现有 ./knowledge（不新铸 ./recipe-spec，防 expectedCounts.stable-public:24 churn）；EXAMPLE_TEMPLATES 下沉 = P0.6/P3。本阶段 PURELY ADDITIVE：Plugin/Core gates 保留 inline 原件至 P1，所有现有测试保绿。",
+    "推荐：控制器评审 P0.0 证据后，继续派发（或同窗口新轮）完成 P0.1–P0.6+facade+六项验收；dead duplicate lib/runtime/mcp/.../recipe-evidence-gate.ts 不碰（oracle 明言出范围）。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p0-recipe-authoring-spec-module__AlembicCore__p0-core-recipe-authoring-spec-module",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-recipe-authoring-spec-module__AlembicCore__p0-core-recipe-authoring-spec-module.json",
+    "deliveryRunId": "run-delivery-p0-recipe-authoring-spec-module__AlembicCore__p0-core-recipe-authoring-spec-module",
+    "dispatchGroup": "p0-recipe-authoring-spec-module",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-recipe-authoring-spec-module__AlembicCore__p0-core-recipe-authoring-spec-module.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 4,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p0-recipe-authoring-spec-module",
+    "targetTaskId": "p0-core-recipe-authoring-spec-module",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p0-recipe-authoring-spec-module",
+    "resultId": "tr-p0-core-recipe-authoring-spec-module",
+    "createdAt": "2026-06-29T22:44:56.061Z"
+  },
+  "createdAt": "2026-06-29T22:44:56.061Z",
+  "stateRevisionObserved": 4,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

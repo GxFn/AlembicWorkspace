@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-plugin-drift-parity",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p4-plugin-drift-parity",
+  "dispatchGroup": "p4-plugin-drift-parity",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p4-plugin-drift-parity",
+  "status": "completed",
+  "summary": "p4-plugin-drift-parity（Plugin-consumer drift + host-path parity + 非回归）完成，commit ea186ad（main，未 push/tag/bump），消费 Core @ 47391c6（@alembic/core/knowledge）。**纯 additive 测试**——parity 断言全过=Plugin guidance 已正确 Core-sourced（自 P2），无漂移、无需 guidance 修正；门禁 byte-identical 未动。我自做（非 offload；parity/byte-identical 核验须自 own）。仅 1 测试文件改动（recipe-gate-drift-tripwire.test.ts，5→13 测试）。\n\nA.6 Plugin-consumer guidance==gate parity（扩展 drift-tripwire）：\n- OnboardingContract submitKnowledgeContract + recipeGuidanceFloor + cold-start front-load 列出的祈使动词逐字节 === getImperativeVerbAllowlist（45 positive / 12 negative），绝非硬编码副本、绝非 vague 'verb-led'——A.6 #1 imports-allowlist guard。\n- 渲染 guidance 陈述 getEvidenceFloorPolicy 下限（ruleFiles 3 / factFiles 1）+ 暴露 scope narrow|file-local 逃逸。\n- D-A：OnboardingContract confidence（fieldFloors.confidence / candidateContent.confidenceRecommendation）= 'recommended >= 0.85 (not enforced)'，断言绝非硬 floor。\n- mcp-tools submit-knowledge doClause/dontClause describe（SubmitKnowledgeItemSchema.shape.*.description）=== describeSubmitToolFields()（Core 规范派生，非 vague）。\n\n§12.5 host-path parity tripwire：Plugin 门禁 wrapper 判定逐字节 === 直调 Core validateAgainst（同 profile/path host-cold-start + 同注入端口）——stage-1（validateSubmitKnowledgeContentQuality.violations === validateAgainst stage1）+ stage-2（validateRecipeProductionEvidenceGate 在 session 合法时 === validateAgainst stage2 同 sourceRefResolver+sessionScope），覆盖纯谓词 + fs-bound（SOURCE_REF_NOT_FOUND 经 resolver）两路——证明 wrapper 不篡改 Core 判定。\n\nP4.2 非回归：recipe-gate-golden-corpus byte-identical（21/21，无 --update）；门禁 byte-identical（recipe-content-quality-gate.ts / recipe-evidence-gate.ts 均未碰）；全量 unit failed-set vs 08f6e87 无新增。\n\n纪律：门禁不 relax/不碰；additive tests（parity 全过→未触发任何 guidance 修正）；main only 不 push；CLAUDE.md（他窗口预存）未碰未 staged。",
+  "evidenceRefs": [
+    "ea186ad",
+    "AlembicPlugin/test/unit/recipe-gate-drift-tripwire.test.ts",
+    "AlembicPlugin/test/unit/recipe-gate-golden-corpus.test.ts",
+    "AlembicPlugin/lib/runtime/status/OnboardingContract.ts",
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/cold-start.ts",
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/recipe-evidence-gate.ts",
+    "AlembicPlugin/lib/runtime/mcp/handlers/recipe-content-quality-gate.ts",
+    ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29/evidence/p0-gate-truth-matrix-2026-06-30.md"
+  ],
+  "verification": [
+    "recipe-gate-drift-tripwire.test.ts 13/13 通过（5 原 P1.5/sessionScope + 6 新 A.6 parity + 2 新 §12.5 host-path parity）；parity 全过 = Plugin guidance 无漂移，未触发任何 guidance 修正",
+    "A.6 #1 imports-allowlist guard 过：submitKnowledgeContract/recipeGuidanceFloor/front-load 的 imperativeVerbs.positive/negative 逐元素 toEqual getImperativeVerbAllowlist（45/12）",
+    "证据下限+scope 逆转 parity 过：evidenceFloor.ruleFiles/factFiles/scopeEscape === getEvidenceFloorPolicy；scopeEscape 含 narrow|file-local",
+    "D-A parity 过：confidence 文案 recommended + not enforced、反漂移断言拒绝 'for normal submit'/hard floor",
+    "§12.5 host-path parity 过：stage-1 + stage-2（valid session）wrapper.violations 逐字节 toEqual 直调 validateAgainst（同端口），覆盖纯+fs-bound（SOURCE_REF_NOT_FOUND）",
+    "**门禁 byte-identical 未动**：git diff vs HEAD 对 recipe-content-quality-gate.ts + recipe-evidence-gate.ts = 空",
+    "P4.2 golden-corpus byte-identical：21/21 通过、无快照重写（无 --update）",
+    "build:check 绿（Core build used ../AlembicCore @ 47391c6；tsc --noEmit 无错）；biome drift test 0 问题",
+    "严格全量 unit baseline-diff vs 干净 08f6e87（同 Core 47391c6）：after 11=baseline 11、NEW failed=[]、Fixed/flipped=[]；drift-tripwire after passed 0/13 = baseline passed 0/5（in-suite + 单跑均过）",
+    "结构核：HEAD 未动（提交前 08f6e87）、提交 ea186ad 仅含 1 测试文件、CLAUDE.md 未 staged、无生产码改动"
+  ],
+  "risks": [
+    "§12.5 stage-2 parity 在 session 合法（无 SESSION/SCOPE 违规、前置为空）下断言 wrapper===直调；这是有意选择——P1 设计中 Plugin wrapper 将 session 违规 Plugin 侧前置（Core per-item sessionScope 端口会改 WRONG_SCOPE 双发顺序），故 parity 验的是「合法 session 时 wrapper 不篡改 per-item evidence 判定」。WRONG_SCOPE 双发的 wrapper-vs-Core 差异是已知设计差异（非篡改），不在本 parity 范围。",
+    "§12.5 fs byte-identical 全量覆盖由现有 golden-corpus（mkdtemp 真实临时文件触发全部 fs-bound code）锁定；本§12.5 parity 以 SOURCE_REF_NOT_FOUND（引用不存在文件）覆盖 resolver 注入路径，不额外造临时文件。",
+    "buildColdStartOnboardingContract 以最小入参（仅 projectRoot）渲染；其它可选字段缺省。parity 验的是 guidance 渲染面读自 Core 表，与项目具体内容无关，最小入参足够。",
+    "全量 unit 套件存在预存测序 flaky（HostMcpServer 9/44 + 部分文件跨跑洗牌，10~11 failed 间波动）——与本卡无关，NEW=[]/Fixed=[] 证零回归。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-plugin-drift-parity__AlembicPlugin__p4-plugin-drift-parity",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-drift-parity__AlembicPlugin__p4-plugin-drift-parity.json",
+    "deliveryRunId": "run-delivery-p4-plugin-drift-parity__AlembicPlugin__p4-plugin-drift-parity",
+    "dispatchGroup": "p4-plugin-drift-parity",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-drift-parity__AlembicPlugin__p4-plugin-drift-parity.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 54,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p4-plugin-drift-parity",
+    "targetTaskId": "p4-plugin-drift-parity",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p4-plugin-drift-parity",
+    "resultId": "tr-p4-plugin-drift-parity",
+    "createdAt": "2026-06-30T04:28:31.727Z"
+  },
+  "createdAt": "2026-06-30T04:28:31.727Z",
+  "stateRevisionObserved": 54,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

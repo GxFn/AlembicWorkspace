@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-core-stage3-repoint",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p1-core-stage3-repoint",
+  "dispatchGroup": "p1-core-stage3-repoint",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1-core-stage3-repoint",
+  "status": "completed",
+  "summary": "P1.3 Core stage-3 re-point complete — AlembicCore commit 736b530 on main (no push/tag/version bump). UnifiedValidator's stage-3 field gate now reads its constants from the RecipeAuthoringSpec gate-rules table instead of inline literals, BYTE-IDENTICAL. This completes the gate-side re-point (Plugin stage-1/2 done; Core stage-3 here).\n\nWHAT MOVED (byte-identical, values verified line-by-line against the inline originals):\n- markdown length floor 200, code-block regex /```[\\s\\S]*?```/, file-ref regex /\\.\\w{1,10}(:\\d+)?/, coreCode bracket predicate (}/)/]), generic-title regex /^(Singleton|Factory|Observer|MVC|MVVM) (pattern|模式)$/i, codeFingerprint normalization, and the uniqueness floors (pattern≥30, fingerprint≥20). Field-presence (V3_FIELD_SPEC) is UNCHANGED. All 11 errors.push sites kept (matrix stage-3 count test still green).\n\nMODULE PARAMS — added vs already present:\n- ALREADY present from P0: the consts MARKDOWN_FLOOR/CODE_BLOCK_RE/FILE_REF_RE/GENERIC_TITLE_RE/INCOMPLETE_CORECODE_FIRST_CHARS, the exported codeFingerprint(), and the field-content + uniqueness GateRule entries (params as regex .source strings — not directly usable by a consumer that needs real RegExp objects with flags).\n- ADDED in P1.3 (completes the P0.3 lift): getStage3FieldPolicy() returning the real values — markdownFloor, fresh RegExp instances rebuilt from source+flags (genericTitleRe keeps its i flag; none carry g so .test() is stateless), incompleteCoreCodeFirstChars Set, codeFingerprintFloor, patternFloor — plus the Stage3FieldPolicy type. Hoisted PATTERN_FLOOR(30)/CODE_FINGERPRINT_FLOOR(20) to module consts so the uniqueness rule + the policy share one source. Exposed via the module barrel + the @alembic/core/knowledge facade.\n\nBYTE-IDENTICAL PROOF: a 12-case corpus (test/fixtures/stage3-corpus.json) hits every stage-3 path — missing required field, content/reasoning not object, invalid kind, markdown too short, markdown missing code/file-ref, incomplete coreCode, generic title, the three uniqueness duplicates — plus a fully valid base (pass=true, errors=[]). The baseline (test/fixtures/unified-validator-stage3-baseline.json) was captured from the PRE-re-point validator (dist build at a2329ce); test/UnifiedValidatorStage3ByteIdentical.test.ts asserts the re-pointed validator emits identical {pass, errors, warnings} for all 12 cases — green before AND after the re-point.\n\nACCEPTANCE (node 22.22.1): Core build PASS; build:check PASS; UnifiedValidator/stage-3 suite green WITH byte-identical output (byte-identical 13 tests + CandidateValidationFloor + CandidateValidationFacade + matrix stage-3 count); gate-constants drift snapshot test/RecipeAuthoringSpecDrift.test.ts green (3 tests, A.6 #4 floor+required-field parity + #6 no-relaxation constants snapshot); full suite 1474/1474 (153 files); biome lint 681 files clean. Per the task's stated green bar (build:check + test + drift) — fully met. npm run check is red ONLY on the 3 pre-existing out-of-scope lint:naming files (project-context-capabilities.ts, recipe-context-capabilities.ts, test-fixtures.ts) — the exact carve-out the task pre-authorized; NOT touched (they are public package-export subpaths; renaming breaks the export contract).\n\nTRANSPARENCY (controller please note): I also adapted test/RecipeGateEnforcementMatrix.test.ts sub-test 4 (verb-count) — it parsed the Plugin gate's INLINE POSITIVE/NEGATIVE Sets, but the accepted P1-Plugin re-point moved those Sets out of the Plugin source into the module, so the test was red at clean HEAD (proven by git stash probe — fallout from P1-Plugin, not my Core change). I re-pointed that one assertion to read getImperativeVerbAllowlist() from the module (the live source post-re-point) and removed the now-unused setMembers helper; structural assertions (no-dup, positive>negative>0) unchanged, and sub-tests 1/2 still parse the Plugin's violation-code unions. This was needed to make the `test` green bar pass. If a stronger guard is wanted (assert the Plugin IMPORTS the allowlist, proving consumption), that is a Plugin-side / follow-up concern.",
+  "evidenceRefs": [
+    "AlembicCore/src/domain/knowledge/recipe-authoring-spec/gateRules.ts",
+    "AlembicCore/src/domain/knowledge/UnifiedValidator.ts",
+    "AlembicCore/test/UnifiedValidatorStage3ByteIdentical.test.ts",
+    "AlembicCore/test/fixtures/unified-validator-stage3-baseline.json",
+    "AlembicCore/test/fixtures/stage3-corpus.json",
+    "AlembicCore/test/RecipeAuthoringSpecDrift.test.ts",
+    "AlembicCore/test/RecipeGateEnforcementMatrix.test.ts",
+    "AlembicCore/src/knowledge.ts"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm run build → PASS (clean-dist + tsc -p tsconfig.json)",
+    "npm run build:check → PASS (tsc --noEmit clean)",
+    "vitest test/UnifiedValidatorStage3ByteIdentical.test.ts → PASS 13 (byte-identical: 12-case corpus identical {pass,errors,warnings} pre/post re-point)",
+    "vitest test/RecipeAuthoringSpecDrift.test.ts → PASS 3 (A.6 #4 floor+required-field parity, #6 no-relaxation constants snapshot)",
+    "vitest test/CandidateValidationFloor.test.ts + CandidateValidationFacade.test.ts → PASS (existing stage-3 regression guard)",
+    "vitest test/RecipeGateEnforcementMatrix.test.ts → PASS 5/5 (stage-3 errors.push count still 11; verb-count now reads the module)",
+    "npm run test → 1474/1474 PASS (153 files)",
+    "npm run lint (biome) → 681 files clean",
+    "npm run check → all stages PASS except lint:naming, red ONLY on the 3 pre-existing out-of-scope files (task-pre-authorized carve-out)",
+    "byte-identical baseline captured from dist@a2329ce (pre-re-point) then asserted against the re-pointed src — 0 byte differences"
+  ],
+  "risks": [
+    "Matrix-test adaptation (controller review): I edited test/RecipeGateEnforcementMatrix.test.ts (P0.0, same demand) sub-test 4 to read the verb allowlist from the module instead of the Plugin inline Set, because P1-Plugin moved the Sets out of the Plugin source (red at clean HEAD per stash probe). Minimal change, structural assertions preserved; flagged for awareness. A stronger 'Plugin imports the allowlist' assertion would be a Plugin-side/follow-up guard.",
+    "npm run check red on the 3 pre-existing public-export naming files is the task-pre-authorized carve-out; NOT a p1-core regression and NOT touched (rename breaks @alembic/core/* export contract — SN4 config-exception territory).",
+    "Re-point is gate-side only: the in-process main-body/AlembicAgent stage-1+2 parity flatten (P1.4) is a separate downstream wave and is NOT in this commit.",
+    "getStage3FieldPolicy() returns fresh RegExp instances per call (rebuilt from source+flags); UnifiedValidator caches one policy instance at module load — safe because no regex carries the g flag (stateless .test()).",
+    "Commit 736b530 is local only (no push), consistent with the main-only/no-push constraint; controller verification is local."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-core-stage3-repoint__AlembicCore__p1-core-stage3-repoint",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-stage3-repoint__AlembicCore__p1-core-stage3-repoint.json",
+    "deliveryRunId": "run-delivery-p1-core-stage3-repoint__AlembicCore__p1-core-stage3-repoint",
+    "dispatchGroup": "p1-core-stage3-repoint",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-stage3-repoint__AlembicCore__p1-core-stage3-repoint.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 16,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p1-core-stage3-repoint",
+    "targetTaskId": "p1-core-stage3-repoint",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1-core-stage3-repoint",
+    "resultId": "tr-p1-core-stage3-repoint",
+    "createdAt": "2026-06-30T00:31:59.411Z"
+  },
+  "createdAt": "2026-06-30T00:31:59.411Z",
+  "stateRevisionObserved": 16,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-core-drift-parity",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p4-core-drift-parity",
+  "dispatchGroup": "p4-core-drift-parity",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p4-core-drift-parity",
+  "status": "completed",
+  "summary": "P4 wave 1 (Core, producer-first) complete — AlembicCore commit 47391c6 on main (no push/tag/version bump). ADDITIVE TESTS ONLY: no gate file touched (gateRules.ts / UnifiedValidator.ts / recipe-content-quality-gate.ts / recipe-evidence-gate.ts unchanged; gates byte-identical from P1 — git status shows ONLY test/RecipeAuthoringSpecDrift.test.ts modified). No guidance fix was needed: every parity assertion passed against the current renderGuidance, which already lists the verbs + scope-escape + marker rule.\n\nExtended test/RecipeAuthoringSpecDrift.test.ts (was A.6 #4/#6 snapshots only) into the full guidance==gate drift + parity suite, every assertion reading the one gateRules() table:\n- #1 allowlist parity: renderGuidance('host-cold-start').imperativeVerbs.positive === getImperativeVerbAllowlist().positive AND the rendered text contains the EXACT verb join + the derived count '共 45 个' (never the vague 'verb-led'); oracle 45 positive / 12 negative.\n- #2 marker parity: the content-contrast gate rule guidanceText states both ✅/❌ markers + the '≥4' rule, the rendered text surfaces that exact string, AND the guidance's own worked example (block.example.candidate) passes validateAgainst({stage:1}) with zero violations.\n- #3 evidence-floor parity: getEvidenceFloorPolicy() {ruleFiles:3, factFiles:1, scopeEscape} equals the rendered '≥3'/'≥1' floor + the scope-escape source the gate honors (file-local/narrow tested live).\n- #7 enforcement-matrix parity: every module gateRules() reject code per stage is present in the checked-in recipe-gate-enforcement-matrix.json — stage-1 is an EXACT set match (8), stage-2 (12⊆19) and stage-3 (7⊆11) are subsets (the matrix also holds the dead SOURCE_REF_BARE + dimension-complete codes + UnifiedValidator field-presence codes); counts frozen 8/19/11 so the layered-not-duplicated matrix can never silently reopen.\n- D-A confidence: gateRules() exposes NO confidence-floor reject code AND the rendered guidance text contains no 'confidence' claim — confidence stays recommended, never a fake hard floor.\n- §12.5 path-parity tripwire: for a fixture corpus under a FIXED profile (tested cold-start AND opportunistic) and FIXED ports (a deterministic sourceRefResolver + a SESSION_NOT_FOUND sessionScope), validateAgainst(path:'host-cold-start') produces byte-identical violation arrays to validateAgainst(path:'in-process') (toEqual), and the corpus is non-vacuous (host.length>0) — proving the path LABEL does not change the verdict and both real submission paths face the same bar at the Core API.\n\nThe standing siblings are referenced, not duplicated: #5 example self-consistency lives in RecipeAuthoringSpecExamplesGatePassing.test.ts (P3); the live gate-file round-trip (matrix codes grepped from the three gate sources) lives in RecipeGateEnforcementMatrix.test.ts (P0.0, P1.3-updated).\n\nACCEPTANCE (node 22.22.1): build:check PASS; the drift+parity suite PASS (10 tests: 3 existing #4/#6 + 5 new parity #1/#2/#3/#7/D-A + 2 path-parity profiles); full Core suite 1502/1502 (156 files); biome 684 files clean (removed an unused 'example' import). npm run check red ONLY on the 3 pre-existing out-of-scope lint:naming files (carve-out; not touched). Gates NOT relaxed — additive tests only; on any mismatch the discipline is fix-the-guidance, which was unnecessary here.",
+  "evidenceRefs": [
+    "47391c6",
+    "AlembicCore/test/RecipeAuthoringSpecDrift.test.ts",
+    "AlembicCore/test/RecipeAuthoringSpecExamplesGatePassing.test.ts",
+    "AlembicCore/test/RecipeGateEnforcementMatrix.test.ts",
+    ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29/evidence/p0-gate-truth-matrix-2026-06-30.md"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm run build:check → PASS (tsc --noEmit clean)",
+    "vitest test/RecipeAuthoringSpecDrift.test.ts → PASS 10 (#4/#6 snapshots + #1/#2/#3/#7/D-A parity + §12.5 path-parity × cold-start/opportunistic)",
+    "npm run test → 1502/1502 PASS (156 files)",
+    "npm run lint (biome) → 684 files clean (removed unused example import)",
+    "npm run check → all stages PASS except lint:naming red ONLY on the 3 pre-existing files (carve-out)",
+    "git status proof: ONLY test/RecipeAuthoringSpecDrift.test.ts modified — gateRules.ts/UnifiedValidator.ts and the Plugin gate files untouched (gates byte-identical)",
+    "guidance==gate verified live: renderGuidance text contains the full 45-verb join + 共 45 个 + scope-escape source + the content-contrast rule string; gateRules() has no confidence reject code; the worked example passes validateAgainst({stage:1})"
+  ],
+  "risks": [
+    "Gates byte-identical (verified): git status shows ONLY the test file changed; no gateRules/UnifiedValidator/recipe-content-quality-gate/recipe-evidence-gate edit. This is purely additive test coverage.",
+    "§12.5 path-parity passes by construction today (validateAgainst uses `profile` to gate the floor/session but never branches on `path`); the test makes that contract explicit so any future path-branching would fail loudly.",
+    "drift#7 stage-2/3 are SUBSET (not equal) checks because the matrix intentionally also lists the dead SOURCE_REF_BARE, the dimension-complete-path codes, and UnifiedValidator field-presence codes that the module's validateAgainst does not emit; stage-1 is an exact match. The live gate-file round-trip (RecipeGateEnforcementMatrix.test.ts) remains the guard against the three gate sources.",
+    "No guidance wording fix was required (the parity assertions passed against current guidance); had any failed, the discipline is fix-the-guidance, never relax the gate.",
+    "Commit 47391c6 is local only (no push), per main-only/no-push; controller verification is local."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-core-drift-parity__AlembicCore__p4-core-drift-parity",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-drift-parity__AlembicCore__p4-core-drift-parity.json",
+    "deliveryRunId": "run-delivery-p4-core-drift-parity__AlembicCore__p4-core-drift-parity",
+    "dispatchGroup": "p4-core-drift-parity",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-drift-parity__AlembicCore__p4-core-drift-parity.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 48,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p4-core-drift-parity",
+    "targetTaskId": "p4-core-drift-parity",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p4-core-drift-parity",
+    "resultId": "tr-p4-core-drift-parity",
+    "createdAt": "2026-06-30T04:10:26.032Z"
+  },
+  "createdAt": "2026-06-30T04:10:26.032Z",
+  "stateRevisionObserved": 48,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

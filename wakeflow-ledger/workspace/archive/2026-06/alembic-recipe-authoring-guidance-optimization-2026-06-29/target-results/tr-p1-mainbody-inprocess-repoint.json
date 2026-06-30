@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-mainbody-inprocess-repoint",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p1-mainbody-inprocess-repoint",
+  "dispatchGroup": "p1-mainbody-inprocess-repoint",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p1-mainbody-inprocess-repoint",
+  "status": "needs-review",
+  "summary": "P1.4c needs-review (NO code committed): the task's named enforcement point is verified DEAD code, so gating it would close CG-4 for zero live paths and would NOT satisfy the demand completion definition (\"CG-4 across all submission paths\"). The correct enforcement point is outside the named scope and changes visible behavior -> controller decision required.\n\nVERIFIED GROUND TRUTH (independent 2-pass grep + call-site reads, Node not needed):\n- Finding 1: GatewayActionRegistry.ts candidate:create (:24-29) + recipe:create (:77-82) have NO live dispatcher. Whole-repo scan: the only live `req.gw(...)` Gateway dispatch is 'guard_rule:create' (guardRules.ts:185); candidate:create/recipe:create appear only as the 2 register() defs + 1 docstring (gatewayMiddleware.ts:31); buildGatewayRequest (:221) is never called; no dynamic ${resource}:create reaches them. Of 31 registered gateway actions only guard_rule:create is dispatched -> the knowledge/recipe create-action layer is vestigial (V3 unified Candidate+Recipe; creates moved to direct service calls). Gating these two = real-caller-less glue code.\n- Finding 2: the REAL live main-body knowledge-create entries BYPASS the Gateway: (a) lib/cli/AiScanService.ts:159 knowledgeService.create(recipe) -- the in-process AI producer (authors via embedded AlembicAgent runScanAgentTask extract, then create+publish; only Core stage-3, no stage-1/2), live via bin/cli.ts:1210; this is the genuine main-body CG-4 in-process gap and exactly the 'independent knowledgeService.create' path design §C.7 told us to re-point ('若独立，P1.4 增显式 re-point'). (b) lib/http/routes/knowledge.ts:186 POST /api/v1/knowledge, live via HttpServer.ts:307 -- external HTTP. The task's named line numbers are a stale pointer (P0.0 oracle recorded the dead Gateway regs as the independent-create site).\n- Finding 3: REUSE of AlembicAgent runInProcessRecipeAuthoringGate is impossible without touching AlembicAgent (forbidden): it lives only in AlembicAgent/src/tools/runtime/handlers/{recipeAuthoringGate,knowledge}.ts and is NOT re-exported from any @alembic/agent public subpath. Sanctioned fallback (own §C.11 fs resolver, byte-faithful, consuming @alembic/core/knowledge validateAgainst/resolveAuthoringProfile) is ready -- not the blocker.\n\nOPTIONS: A (recommended) re-aim gate to the live independent create AiScanService.ts:159 (§C.7 intent), opportunistic profile (content+cheap grounding, no 3-file floor/session-scope), producer-prompt-first already satisfied via embedded AlembicAgent insightProducer (P1.4b); closes the real CG-4 in-process gap. B also gate external HTTP knowledge.ts:186 = public-contract visible-behavior change, high should-pass risk -> separate USER gate. C implement literal task (gate the 2 dead Gateway actions) as defense-in-depth = matches named scope+acceptance but closes zero live paths and leaves AiScanService open -> does NOT satisfy CG-4-all-paths; low value alone. Recommend A (+optionally C); B separate user decision. Ready to implement A immediately on confirmation. Full evidence + options in ledger doc.",
+  "evidenceRefs": [
+    "Alembic/lib/governance/gateway/GatewayActionRegistry.ts",
+    "Alembic/lib/http/middleware/gatewayMiddleware.ts",
+    "Alembic/lib/http/routes/guardRules.ts",
+    "Alembic/lib/cli/AiScanService.ts",
+    "Alembic/bin/cli.ts",
+    "Alembic/lib/http/routes/knowledge.ts",
+    "Alembic/lib/http/HttpServer.ts",
+    "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md"
+  ],
+  "verification": [
+    "Independent grep pass 1: `grep -rn 'candidate:create|recipe:create' lib/ bin/ test/` -> only GatewayActionRegistry.ts:24,77 (register defs) + gatewayMiddleware.ts:31 (docstring). No dispatch.",
+    "Independent grep pass 2: whole-repo live `req.gw(...)` -> only 'guard_rule:create' (guardRules.ts:185); 31 gateway.register actions but only guard_rule:create dispatched; buildGatewayRequest never called; no dynamic ${resource}:create dispatch.",
+    "Call-site reads: AiScanService.scan() create at :159 is live via bin/cli.ts:1210-1211 (new AiScanService -> scan); knowledge.ts POST create at :186 is live via HttpServer.ts:307 route mount.",
+    "@alembic/agent exports map has no public subpath re-exporting runInProcessRecipeAuthoringGate; `grep -rln` across AlembicAgent/src = 2 files only (handlers). Reuse needs touching AlembicAgent (forbidden).",
+    "@alembic/core/knowledge exports validateAgainst/resolveAuthoringProfile/renderGuidance + types RecipeAuthoringViolation/RecipeSourceRefResolver/RecipeAuthoringProfile confirmed; dist built (knowledge.js/.d.ts); main-body node_modules/@alembic/core -> workspace AlembicCore symlink.",
+    "No code committed. HEAD ef30c0d unchanged. build:check / test NOT run (no code change). Only the installer-managed CLAUDE.md shows a pre-existing wakeflow:scope marker edit (not mine)."
+  ],
+  "risks": [
+    "Premise conflict: the task package + P0.0 oracle name the two Gateway create actions as a live in-process entry, but they are dead. Following the literal instruction yields a green acceptance test on a path nobody calls -> a misleading 'CG-4 complete' signal. This is the blocker that makes the result needs-review, not completed.",
+    "If controller picks Option A: gating AiScanService.ts:159 changes the visible behavior of the `alembic ai-scan` CLI (newly-rejects low-quality recipes -- bounded content/cheap-grounding tightening). Will deliver the currently-passing-corpus new-reject set at impl. STOP-if-should-pass-rejected discipline applies.",
+    "If Option B: tightening POST /api/v1/knowledge changes a public HTTP API accept contract for human/dashboard/API clients (high should-pass risk) -> likely a USER gate, not just controller.",
+    "Option C alone (literal gate on dead actions) leaves CG-4 open for the live AiScanService path while turning the acceptance green -> do not accept C as CG-4 closure.",
+    "Reuse impossibility (Finding 3) means a 3rd in-process fs-resolver copy will exist in main-body (host plugin + AlembicAgent + main-body); §12.5 parity test mitigates by asserting same-resolver host-vs-in-process equality; a future Core-exported reference resolver could de-dup (out of scope)."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-mainbody-inprocess-repoint__Alembic__p1-mainbody-inprocess-repoint",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-mainbody-inprocess-repoint__Alembic__p1-mainbody-inprocess-repoint.json",
+    "deliveryRunId": "run-delivery-p1-mainbody-inprocess-repoint__Alembic__p1-mainbody-inprocess-repoint",
+    "dispatchGroup": "p1-mainbody-inprocess-repoint",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-mainbody-inprocess-repoint__Alembic__p1-mainbody-inprocess-repoint.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 28,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p1-mainbody-inprocess-repoint",
+    "targetTaskId": "p1-mainbody-inprocess-repoint",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p1-mainbody-inprocess-repoint",
+    "resultId": "tr-p1-mainbody-inprocess-repoint",
+    "createdAt": "2026-06-30T01:52:07.448Z"
+  },
+  "createdAt": "2026-06-30T01:52:07.448Z",
+  "stateRevisionObserved": 28,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

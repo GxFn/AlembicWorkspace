@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-coldstart-frontload",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p2-plugin-coldstart-frontload",
+  "dispatchGroup": "p2-plugin-coldstart-frontload",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-coldstart-frontload",
+  "status": "completed",
+  "summary": "p2-plugin-coldstart-frontload（demand CORE FIX，guidance-only）完成，commit 08f6e87（main，未 push/tag/bump），消费 Core @ 4869db2（@alembic/core/knowledge 规范模块）。subagent-offload 实现 + 主窗口独立核验（含亲自复现真机 grep 验收 + 门禁 byte-identical 字节核）。6 文件（4 lib + 2 test）。\n\nP2.3（#1 root cause）cold-start.ts LIVE：buildRecipeAuthoringFrontLoad 渲染 renderGuidance('host-cold-start') → {perFieldContract(describeSubmitToolFields)、guidanceText(45 verbs+scope-escape+rules)、workedExample(guidance.example)、failureModeCatalog(failureModes)、preSubmitChecklist(buildPreSubmitChecklist)}；attachRecipeAuthoringFrontLoad 挂 hostAgentContract（clean-output 可见）+镜像 submissionSchema。worked example 豁免 18KB strip：summarizeSubmissionSchema 保留 front-load、compactColdStartLargeAnalysisFields 先瘦身其它重分析字段；完整 front-load 始终写 fullBriefingRef。\n\n13.L front-load：每字段 {含义|生成规则|示例值} 契约 + active profile + gate-clean example + failure-mode 目录前置。\n\nP2.2 OnboardingContract.ts：buildSubmitKnowledgeContract/buildRecipeGuidanceFloor 从模块渲染（buildSubmitKnowledgeContract + getEvidenceFloorPolicy + getImperativeVerbAllowlist）——修两漂移：列出真实 45 个 allowlist 动词 + 暴露 scope:narrow|file-local 证据下限逃逸。\n\nP2.5 mcp-tools.ts：submit-knowledge .describe() 串从 describeSubmitToolFields() 生成（规范派生）。\n\nD-A：confidence 渲染为 'recommended >= 0.85 (guidance, not enforced)'（门禁不强制 confidence）——唯一 floor 订正。\n\nC.3 knowledge-rescan.ts：deepMining/moduleMining briefing 经同一 attachRecipeAuthoringFrontLoad re-pointed；并 grep 证明 mining 路径复用 buildProjectContextMissionBriefing（与 cold-start 同一 Core 产物）。\n\nP2.4（folded）：checklist/FAIL_EXAMPLES 经 buildPreSubmitChecklist + failureModes 单源化；cold-start compactor + HostMcpServer test 更新。\n\n纪律：guidance-only（门禁 byte-identical 未动、不 relax）；D-A 是唯一 floor 订正；ai-scan carved out 未碰；dead cold-start 副本(lib/runtime/mcp/host-agent-workflows/cold-start.ts)/dead evidence-gate 副本/CLAUDE.md(他窗口预存) 未碰。",
+  "evidenceRefs": [
+    "08f6e87",
+    "AlembicCore@4869db248f22991e84cb5b5d396b3966f3308327",
+    "lib/recipe-generation/host-agent-workflows/cold-start.ts",
+    "lib/runtime/status/OnboardingContract.ts",
+    "lib/shared/schemas/mcp-tools.ts",
+    "lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "test/unit/RecipeAuthoringFrontLoad.test.ts",
+    "test/unit/HostMcpServer.test.ts"
+  ],
+  "verification": [
+    "**真机 grep 验收（主窗口亲自复现）**：独立跑 renderGuidance('host-cold-start') 从 Core dist——(a) workedExample present + ✅/❌、(b) 45-verb allowlist（positive count=45、text 含 use/validate）、(c) scope:narrow escape（scopeEscape regex 含 narrow）**三者全 TRUE**；example title='OrderRepository 软删除约定'（P0 stub）",
+    "RecipeAuthoringFrontLoad.test.ts 通过（断言真实：OrderRepository/✅/❌/markdown 含✅❌/'use, validate'/positive 含 use,validate,prefer/'scope: narrow'/perFieldContract/failureModeCatalog/preSubmitChecklist）",
+    "**门禁 byte-identical 未动**：git diff vs HEAD c1c3922 对 recipe-content-quality-gate.ts + recipe-evidence-gate.ts(LIVE) = 空",
+    "guidance-only 核：OnboardingContract/mcp-tools diff 无 shouldBlock/rejectCode/validateAgainst/relax 加入",
+    "D-A 核：confidence '>=0.85 for normal submit' → 'recommended >= 0.85 (guidance, not enforced)'；confidenceFloorBeforeSubmit:0.85 → confidenceRecommendation 推荐表述",
+    "build:check 绿（Core build used ../AlembicCore @ 4869db2；tsc --noEmit 无错）——主窗口亲跑；biome 6 文件 0 问题；lint:repo-boundary 0/75；lint:core-import-boundary OK（450 文件/468 imports）",
+    "严格全量 unit baseline-diff vs 干净 c1c3922（同 Core 4869db2）：文件级 10=10、NEW failed=[]、REGRESSED=[]；**我改的 HostMcpServer.test.ts after 9/44 = baseline 9/44 IDENTICAL**（front-load 断言未增失败）；RecipeAuthoringFrontLoad 新增 passed",
+    "结构核：HEAD 未动（提交前 c1c3922）、提交 08f6e87 仅含我 6 文件、CLAUDE.md 未 staged、ai-scan/dead-dup 未碰"
+  ],
+  "risks": [
+    "诚实：HostMcpServer.test.ts 新增的 front-load 断言位于一个存在 pre-existing 失败（structuredContent 21247>20480 @:1823，沙箱预存、该套件 9/44 与 baseline 一致）的 it 块后，可能不执行。权威真机证据是独立 RecipeAuthoringFrontLoad.test.ts + 主窗口 renderGuidance grep（均可达且通过）。该 pre-existing 失败非我引入（byte 计数保持 baseline）。",
+    "over-budget 边缘：cold-start briefing >18KB 时内联 hostAgentContract 省略 front-load（仅在 fullBriefingRef），以保 HostMcpServer byte-identity；under-budget 常见小项目场景内联。完整 front-load（含 example）始终在 fullBriefingRef，Agent 可读。真机验收覆盖 under-budget 内联态。",
+    "C.3 rescan：rescan clean-output allowlist 无 hostAgentContract/submissionSchema，故 rescan 的 front-load 经 fullBriefingRef 触达 Agent（非内联 clean output）；cold-start（13.L 主目标）内联获得。已 grep 证 mining 复用同一 buildProjectContextMissionBriefing。",
+    "表面化的 worked example 是 P0 stub（OrderRepository）；真实多语言 gate-clean 范例在 P3 填充（producer-consumer，非本卡）。真机 cold-start submit 一过率提升的端到端（含真实 Agent 生成）归 P5 真机 gates。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-coldstart-frontload__AlembicPlugin__p2-plugin-coldstart-frontload",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-coldstart-frontload__AlembicPlugin__p2-plugin-coldstart-frontload.json",
+    "deliveryRunId": "run-delivery-p2-plugin-coldstart-frontload__AlembicPlugin__p2-plugin-coldstart-frontload",
+    "dispatchGroup": "p2-plugin-coldstart-frontload",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-coldstart-frontload__AlembicPlugin__p2-plugin-coldstart-frontload.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 40,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p2-plugin-coldstart-frontload",
+    "targetTaskId": "p2-plugin-coldstart-frontload",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-coldstart-frontload",
+    "resultId": "tr-p2-plugin-coldstart-frontload",
+    "createdAt": "2026-06-30T03:35:56.707Z"
+  },
+  "createdAt": "2026-06-30T03:35:56.707Z",
+  "stateRevisionObserved": 40,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

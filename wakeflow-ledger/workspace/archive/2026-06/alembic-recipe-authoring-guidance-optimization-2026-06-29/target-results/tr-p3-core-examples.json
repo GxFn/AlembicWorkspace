@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-core-examples",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p3-core-examples",
+  "dispatchGroup": "p3-core-examples",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p3-core-examples",
+  "status": "completed",
+  "summary": "P3 examples complete — AlembicCore commit 16b775e on main (no push/tag/version bump). The four shipped EXAMPLE_TEMPLATES were anti-examples that FAILED the gate; they are now real, gate-passing, multi-language worked examples living in the module.\n\nP3.1 DOWN-MOVE (C.9 internal-only): EXAMPLE_TEMPLATES moved from MissionBriefingSupport.ts (~106-213) into the RecipeAuthoringSpec module (recipe-authoring-spec/examples/index.ts). It is NOT re-exported through the host-agent-workflows facade — grep-proven: MissionBriefingSupport now has 0 EXAMPLE_TEMPLATES, and BOTH dist/host-agent-workflows.d.ts and dist/knowledge.d.ts mention it 0 times (only example() is public). MissionBriefingBuilder now injects recipeExample(lang).candidate (was EXAMPLE_TEMPLATES[lang] || [lang.toLowerCase()] || _default). The examples module imports only a types-layer type (RecipeAuthoringViolation) — zero workflows-layer imports (the line-145 hit is example DATA, a string).\n\nC.5 ANTI-EXAMPLE FIXES (every example built by buildExample so the invariants hold structurally):\n- CONTENT_CONTRAST_MISSING: the ✅/❌ lines now carry ≥4 non-space chars after the marker (e.g. \"✅ correct: @interface BDVideoPlayer : UIView\") — before, \"// ✅ 正确\" left only 2 trimmed chars (正确), below the 4-char floor.\n- DO_CLAUSE/DONT_CLAUSE_NON_IMPERATIVE: objectivec doClause now leads with \"Use\" (was \"Prefix\", not allowlisted) and dontClause with \"Do not\" (was \"create\", not a negative verb).\n- SOURCE_REF_LINE_MISSING (also latent): reasoning.sources + sourceRefs now carry line numbers (BDVideoPlayer.h:5) — before they were bare filenames, which fail the stage-2 source-ref line-format check on a pure run.\n\nP3.2 LANGUAGES: added swift, kotlin, java, go, rust, csharp, javascript (+ existing objectivec/typescript/python) and grew _default to gate-passing — unlisted languages now fall to a gate-clean _default.\n\nP3.3 INJECTION: Core MissionBriefingBuilder keeps its injection via example(); the in-process main-body ColdStartWorkflow/KnowledgeRescanWorkflow injection is NOT in Core (Core has no such workflows — they live in the Plugin/AlembicAgent), so it is a follow-up carry-item (ai-scan carved out per the task).\n\nC.5 STANDING TRIPWIRE: test/RecipeAuthoringSpecExamplesGatePassing.test.ts runs EVERY example(lang) (all 11 templates incl _default + known/unknown resolution) through validateAgainst({stage:'all'}) and asserts ZERO violations — the structural opposite of the anti-examples, forever. The gate was NEVER relaxed to pass a bad example; the examples were fixed.\n\nACCEPTANCE (node 22.22.1): build:check PASS; the tripwire PASS (13 tests — every example, all languages incl _default, passes the full gate); briefing tests PASS (MissionBriefingBuilder injection intact); npm run check boundary OK (61 exports; wildcard stayed 7; removed-export-resurrection + shrink-only passed — removing EXAMPLE_TEMPLATES from the wildcard host-agent-workflows facade needed NO snapshot change, no leak); full Core suite 1495/1495 (156 files); biome 684 files clean (fixed a noTemplateCurlyInString in the js example by using string concat). npm run check red ONLY on the 3 pre-existing out-of-scope lint:naming files (carve-out; not touched).",
+  "evidenceRefs": [
+    "16b775e",
+    "AlembicCore/src/domain/knowledge/recipe-authoring-spec/examples/index.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/MissionBriefingSupport.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/MissionBriefingBuilder.ts",
+    "AlembicCore/test/RecipeAuthoringSpecExamplesGatePassing.test.ts"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm run build:check → PASS (tsc --noEmit clean)",
+    "npm run build → PASS (dist rebuilt; used to grep-prove the facade .d.ts)",
+    "vitest test/RecipeAuthoringSpecExamplesGatePassing.test.ts → PASS 13 (every EXAMPLE_TEMPLATES[lang] + example(known/unknown) passes validateAgainst({stage:'all'}) with zero violations)",
+    "npm run test → 1495/1495 PASS (156 files); briefing tests (DimensionCatalogPayload etc.) green — MissionBriefingBuilder injection intact",
+    "npm run lint (biome) → 684 files clean (noTemplateCurlyInString warning fixed via string concat in the js example)",
+    "npm run check → lint:public-api-boundary OK (61 exports, wildcard<=7 (7), removed-export-resurrection passed); all stages PASS except lint:naming red ONLY on the 3 pre-existing files",
+    "C.9 grep proof: examples/index.ts imports only types-layer RecipeAuthoringViolation (zero workflows imports); MissionBriefingSupport EXAMPLE_TEMPLATES count=0; dist/host-agent-workflows.d.ts + dist/knowledge.d.ts EXAMPLE_TEMPLATES count=0 (no facade leak)"
+  ],
+  "risks": [
+    "P3.3 in-process injection (follow-up carry-item, NOT Core): the in-process main-body ColdStartWorkflow/KnowledgeRescanWorkflow example injection lives in the Plugin/AlembicAgent (Core has no such workflows), so it is out of this Core task's scope per the task itself (ai-scan carved out). Core's MissionBriefingBuilder injection IS done via example(). Recommend the in-process example injection be confirmed/added in the Plugin/Agent windows.",
+    "Boundary snapshot: removing EXAMPLE_TEMPLATES from the host-agent-workflows wildcard facade needed NO snapshot/config change — it was a wildcard member (not an individually-tracked exact export), so wildcard count stayed 7 and removed-export-resurrection passed. The 'intentionally update the snapshot' step was a no-op in practice.",
+    "The examples now carry stage-2-grade evidence (line-numbered sourceRefs + reasoning.sources) so they pass a pure (resolver-free) validateAgainst({stage:'all'}); this is intentional (gate-clean), not gate relaxation — the gate is byte-identical from P1 and untouched.",
+    "Gate NEVER relaxed: the tripwire proves the examples pass the real gate; any future anti-example reintroduction fails the tripwire loudly.",
+    "Commit 16b775e is local only (no push), per main-only/no-push; controller verification is local."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-core-examples__AlembicCore__p3-core-examples",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-examples__AlembicCore__p3-core-examples.json",
+    "deliveryRunId": "run-delivery-p3-core-examples__AlembicCore__p3-core-examples",
+    "dispatchGroup": "p3-core-examples",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-examples__AlembicCore__p3-core-examples.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 44,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p3-core-examples",
+    "targetTaskId": "p3-core-examples",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p3-core-examples",
+    "resultId": "tr-p3-core-examples",
+    "createdAt": "2026-06-30T03:54:08.451Z"
+  },
+  "createdAt": "2026-06-30T03:54:08.451Z",
+  "stateRevisionObserved": 44,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

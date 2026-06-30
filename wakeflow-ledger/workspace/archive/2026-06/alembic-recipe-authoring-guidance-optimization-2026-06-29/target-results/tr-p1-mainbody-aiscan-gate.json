@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-mainbody-aiscan-gate",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p1-mainbody-aiscan-gate",
+  "dispatchGroup": "p1-mainbody-aiscan-gate",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p1-mainbody-aiscan-gate",
+  "status": "needs-review",
+  "summary": "P1.4c ai-scan gate needs-review (NO code committed): per the task's explicit STOP clause + design §C.4 ('先升 producer prompt → 再启门'), gating AiScanService.ts:159 opportunistically as-is would reject ~100% of ai-scan recipes (should-pass-rejected), because the ai-scan producer is a SEPARATE contract-unaware prompt living in AlembicAgent — which this task forbids touching. The fix is cross-repo and must be sequenced first.\n\nVERIFIED BY OWN SOURCE READS (AlembicAgent read-only):\n- Finding 1: ai-scan extract does NOT use the P1.4b-upgraded insightProducer. runScanAgentTask({task:'extract'}) (ScanAgentRun.ts:31) -> profile scan-extract (scan.profile.ts:19-28: basePreset insight BUT strategy pipeline scanPipeline) -> produce stage systemPrompt = the inline extract.producePrompt (scanPrompts.ts:251 wires :80-119). scanPrompts imports only buildCodeContextSection + producerRejectionGateEvaluator from insightProducer, NOT PRODUCER_SYSTEM_PROMPT/STYLE_GUIDE; the renderGuidance('in-process') upgrade (insightProducer.ts:144) is the bootstrap preset, not used by scan. => producer-prompt-first NOT in place for ai-scan.\n- Finding 2: read scanPrompts.ts:80-119 verbatim — the extract prompt asks title/content.markdown/reasoning.sources/kind/trigger/doClause/whenClause but NEVER dontClause and NEVER the ✅/❌ contrast markers stage-1 requires. (summarize task :126-152 same.)\n- Finding 3: the recipe reaching create is lean unnormalized LLM JSON, not the enriched item. ScanRecipe (ScanRunProjection.ts:4-13) = title?/description?/summary?/usageGuide?/category?/headers?/tags?/trigger? only; projectScanRunResult picks collected-tool recipes OR fallback-parses the produce reply as JSON (:38-97). AiScanService.ts:128-168 only mutates source/tags/moduleName/aiInsight — no authoring-field synthesis.\n\nCONSEQUENCE: opportunistic validateAgainst before AiScanService.ts:159 => near-100% reject dominated by DONT_CLAUSE_REQUIRED + CONTENT_CONTRAST_MISSING/CONTENT_MARKDOWN_REQUIRED (and likely SOURCE_REFS_MISSING/SOURCE_REF_LINE_MISSING). That breaks `alembic ai-scan` (publishes ~0) and is the §C.4 逆向试错门 trap. NOT a bounded tightening.\n\nCANNOT FIX IN-BOUNDARY: the producer-prompt-first fix is in AlembicAgent (scanPrompts.ts) — forbidden by this task; host-side synthesis of dontClause/✅❌/sourceRefs is fabrication (no-guess + the standing anti-auto-fix sourceRef discipline at AlembicAgent knowledge.ts:121-123); selectively disabling content gates = 放松门禁.\n\nOPTIONS: A (recommended) sequence a producer-prompt-first upgrade to AlembicAgent FIRST (scanPrompts extract+summarize render the Core authoring contract: dontClause + ✅/❌ + sourceRefs path:line, mirroring P1.4b; ideally also reconcile the scan projection so a full-shaped recipe reaches create), THEN re-dispatch the main-body ai-scan gate (gate module is a ready §C.11 mirror) with a now-bounded new-reject set = true CG-4 closure for ai-scan. B treat AlembicAgent P1.4b as the CG-4 in-process closure and scope ai-scan OUT of this demand's CG-4 (ai-scan = CLI extract utility with a separate non-contract producer; gate it in a follow-up once its producer is contract-aware). Recommend A, producer fix FIRST; do NOT gate ai-scan before that. Full evidence + line anchors in the ledger doc.",
+  "evidenceRefs": [
+    "AlembicAgent/src/agent/prompts/scanPrompts.ts",
+    "AlembicAgent/src/agent/profiles/definitions/scan.profile.ts",
+    "AlembicAgent/src/agent/runs/scan/ScanRunProjection.ts",
+    "AlembicAgent/src/agent/prompts/insightProducer.ts",
+    "Alembic/lib/cli/AiScanService.ts",
+    "Design/docs/current/alembic-recipe-authoring-guidance-optimization-2026-06-29.md"
+  ],
+  "verification": [
+    "Read scanPrompts.ts:80-119 verbatim: extract.producePrompt requests title/content.markdown/reasoning.sources/kind/trigger/doClause/whenClause; NO dontClause, NO ✅/❌ markers. Produce stage systemPrompt=producePrompt at scanPrompts.ts:251.",
+    "Read scan.profile.ts:19-28: scan-extract profile uses strategy pipeline scanPipeline (basePreset insight is not the producer-prompt source); buildScanPipelineStages takes producePrompt from SCAN_TASK_CONFIGS.extract.",
+    "Read ScanRunProjection.ts:4-13 (lean ScanRecipe type) + :38-97 (collected-recipes path has status:'collected' filter; else fallback JSON parse of produce reply) — recipe shape is unnormalized LLM JSON, not the enriched item built in knowledge.ts:152-177.",
+    "Read AiScanService.ts:128-168: only source/tags/moduleName/aiInsight mutated before create; no doClause/dontClause/markdown-✅❌/sourceRefs synthesis.",
+    "No code committed. Draft §C.11 gate module (lib/shared/recipeAuthoringGate.ts) written then REMOVED to keep tree clean (unwired glue until precondition met). HEAD ef30c0d; git status = only pre-existing modified CLAUDE.md. build:check/test intentionally NOT run (no shippable code change)."
+  ],
+  "risks": [
+    "Gating ai-scan opportunistically as-is breaks the `alembic ai-scan` CLI (~100% recipe rejection) and violates §C.4 (producer-prompt-first unmet) — a should-pass-rejected case the task's STOP clause covers. This is the blocker making the result needs-review.",
+    "The fix (producer-prompt-first: make scanPrompts extract/summarize render the Core authoring contract incl dontClause + ✅/❌ + sourceRefs) is in AlembicAgent, out of this task's boundary; host-side field synthesis is forbidden (no-guess / anti-auto-fix). So no in-boundary GO exists.",
+    "Secondary structural risk (verified shape, agent-flagged behavior): the scan projection may yield lean or even empty recipes (the collected-status path has no emitter I could find; the fallback parses the produce reply as JSON, and scan finalize may not emit JSON) — a projection reconciliation in AlembicAgent may also be needed so a full-shaped recipe reaches create. Confirm during the AlembicAgent producer-first work.",
+    "If the controller picks Option B (scope ai-scan out of CG-4), note that CG-4 'across all submission paths' then means the contract-aware authoring paths (host-agent + AlembicAgent bootstrap P1.4b), with ai-scan as an explicit carve-out follow-up — record so the demand-completion claim stays honest."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-mainbody-aiscan-gate__Alembic__p1-mainbody-aiscan-gate",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-mainbody-aiscan-gate__Alembic__p1-mainbody-aiscan-gate.json",
+    "deliveryRunId": "run-delivery-p1-mainbody-aiscan-gate__Alembic__p1-mainbody-aiscan-gate",
+    "dispatchGroup": "p1-mainbody-aiscan-gate",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-mainbody-aiscan-gate__Alembic__p1-mainbody-aiscan-gate.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 32,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p1-mainbody-aiscan-gate",
+    "targetTaskId": "p1-mainbody-aiscan-gate",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p1-mainbody-aiscan-gate",
+    "resultId": "tr-p1-mainbody-aiscan-gate",
+    "createdAt": "2026-06-30T02:09:39.432Z"
+  },
+  "createdAt": "2026-06-30T02:09:39.432Z",
+  "stateRevisionObserved": 32,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

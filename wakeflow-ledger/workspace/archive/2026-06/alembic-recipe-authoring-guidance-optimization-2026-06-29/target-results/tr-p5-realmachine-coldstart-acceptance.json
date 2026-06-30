@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-realmachine-coldstart-acceptance",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p5-realmachine-coldstart-acceptance",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicWorkspace",
+  "targetTaskId": "p5-realmachine-coldstart-acceptance",
+  "status": "completed",
+  "summary": "P5 real-machine acceptance (controller self-validation per user direction: test the host-agent Recipe-production logic via the refreshed ClaudeCode plugin, not DeepSeek generation quality). Built AlembicPlugin (Core 47391c6 + Plugin ea186ad) and drove its own HostMcpServer runtime (real alembic_init + alembic_submit_knowledge handlers) in an ALEMBIC_HOME sandbox protecting real ~/.asd; no DeepSeek/Qwen (cold-start front-load + submit gate are deterministic; the host agent authored the recipe by hand following the front-loaded contract). ALL GREEN. (A) cold-start briefing front-loads the full contract + a gate-clean worked example inline at submissionSchema.recipeAuthoringFrontLoad (15082 chars; ✅/❌ markers, validate verb, 45-verb count, narrow/file-local scope-escape, 3-distinct-file floor, marker rule, per-field contract; worked example language-matched typescript = UserService Injectable convention). (B) a fully contract-following recipe one-passed alembic_submit_knowledge on first submit (success true, errorCode null, recipe id created); the live iteration loop was shown (first incomplete attempt rejected INCOMPLETE_SUBMISSION with a precise per-field list, second following the contract one-passed). (C) a contract-violating recipe rejected QUALITY_GATE_FAILED with exactly DO_CLAUSE_NON_IMPERATIVE + DONT_CLAUSE_REQUIRED + CONTENT_CONTRAST_MISSING; the message is the guidance itself (guidance==gate live). (D) QualityScorer contentDepth doc-score on the one-passed recipe = 0.884, clearly above the 0.65 baseline (overall 0.814 grade B). Design P5 (a)/(b)/(c) all met + guidance==gate rejection + live iteration. Gates NOT relaxed. User-gated deployment follow-ups: live CC plugin reinstall+restart and push/release (all four repos local unpushed).",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29/evidence/p5-realmachine-coldstart-acceptance-2026-06-30.md",
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/cold-start.ts",
+    "AlembicPlugin/lib/runtime/mcp/handlers/tool-router.ts",
+    "AlembicCore/src/service/quality/QualityScorer.ts",
+    "47391c6",
+    "ea186ad"
+  ],
+  "verification": [
+    "AlembicPlugin npm run build exit 0, Core build used ../AlembicCore @ 47391c6 (accepted P4 commit); dist carries the updated Core+Plugin",
+    "Sandbox 護真 confirmed: resolved dataRoot under scratchpad/p5/home/.asd/...; real ~/.asd untouched",
+    "Subject A: attachRecipeAuthoringFrontLoad output fingerprints all true (✅,❌,validate,45,scope-escape,3-file floor,marker rule,per-field contract); workedExample present inline language=typescript",
+    "Subject B: alembic_submit_knowledge with the contract-complete recipe → success:true, errorCode:null, ids:[43f98bfc-...], rejectCodes:[] (first submit)",
+    "Subject B iteration: first incomplete attempt rejected INCOMPLETE_SUBMISSION listing description/coreCode/headers/knowledgeType/language/usageGuide/whyStandard; following that contract → one-pass",
+    "Subject C: violating recipe rejected QUALITY_GATE_FAILED + DO_CLAUSE_NON_IMPERATIVE + DONT_CLAUSE_REQUIRED + CONTENT_CONTRAST_MISSING; message equals the guidance strings",
+    "Subject D: QualityScorer.score(one-passed recipe).dimensions.contentDepth = 0.884 > 0.65 (overall 0.814 grade B)",
+    "No DeepSeek/Qwen used; gates not relaxed (violating recipe still rejected with exact codes)"
+  ],
+  "risks": [
+    "Controller self-validation (not a dispatched window) per the user direction to test via the refreshed plugin; the host-agent Recipe logic is deterministic and LLM-free so this is a lightweight integration check within the controller self-validation boundary, not a real-project Test-window scenario",
+    "Drove the plugin runtime via in-process handleToolCall rather than a literal in-CC MCP client; the tool handlers and Recipe logic are identical, so this faithfully tests the refreshed plugin code. Making the plugin live in the user's daily ClaudeCode (reinstall + restart-to-apply) is a separate user-gated deployment step",
+    "Bootstrap full cold-start scan was degraded in the minimal sandbox (project-scope-unavailable) — a sandbox-setup condition, not a P0-P4 defect; the front-load + gate subjects were verified directly against the same updated build",
+    "All four repos' commits remain LOCAL UNPUSHED; push/release/version-bump are user-gated"
+  ],
+  "deliveryContext": {
+    "deliveryId": null,
+    "deliveryFile": null,
+    "deliveryRunId": null,
+    "dispatchGroup": null,
+    "deliveryEnvelopeFile": null,
+    "deliveryEnvelopeFound": false,
+    "resolution": "state-only-result",
+    "returnRoute": null,
+    "returnPolicy": null,
+    "controllerWindow": null,
+    "controllerReturnRequired": false
+  },
+  "controllerActionRequired": false,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 57,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p5-realmachine-coldstart-acceptance",
+    "targetTaskId": "p5-realmachine-coldstart-acceptance",
+    "targetWindow": "AlembicWorkspace",
+    "resultId": "tr-p5-realmachine-coldstart-acceptance",
+    "createdAt": "2026-06-30T04:49:25.270Z"
+  },
+  "createdAt": "2026-06-30T04:49:25.270Z",
+  "stateRevisionObserved": 57,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

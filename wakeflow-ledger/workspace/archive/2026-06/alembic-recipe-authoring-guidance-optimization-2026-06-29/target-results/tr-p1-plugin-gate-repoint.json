@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-plugin-gate-repoint",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p1-plugin-gate-repoint",
+  "dispatchGroup": "p1-plugin-gate-repoint",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p1-plugin-gate-repoint",
+  "status": "completed",
+  "summary": "p1-plugin-gate-repoint 完成，commit c1c3922（main，未 push/tag/bump），消费 Core @ a2329ce（@alembic/core/knowledge validateAgainst）。CG-3 纪律：gates RE-SOURCED 非 relaxed 非 rewritten，byte-identical 输出。subagent-offload 实现 + 主窗口独立核验（含 dual-run byte-identical 检验，不依赖信任 subagent）。\n\nP1.0 oracle：test/unit/recipe-gate-golden-corpus.test.ts —— 每 reject code 一过一拒，stage-1 8 code + stage-2 12 code 全覆盖（SOURCE_REF_BARE 正确排除为 dead/never-emitted），snapshot 从旧 inline 行为生成。\n\nP1.1 stage-1（recipe-content-quality-gate.ts）：删全部 inline（verb Sets/NON_ENGLISH_SCRIPT_RE/FIRST_WORD_RE/validateClause/isImperativeVerbLeading/validateContentContrast/hasMarkerExample），改调 validateAgainst(items,{stage:1,path:'host-cold-start'})，返回同 {ok,violations} 形状、保留类型导出；tool-router:163 call site 不变。\n\nP1.2 stage-2 LIVE（recipe-generation/host-agent-workflows/recipe-evidence-gate.ts）：删 P0 已上移的纯谓词（floor table/snippet algo/source-ref format regex/placeholder blacklist/relationship keywords，grep=0 确认全删），per-item evidence 委托 validateAgainst(stage:2) + 注入 createSourceRefResolver 端口包裹 fs 读取（SOURCE_REF_NOT_FOUND/LINE_OUT_OF_RANGE）。**byte-order 决策**：session scope 留 Plugin 侧前置（Core 的 per-item sessionScope 端口会交错/合并 WRONG_SCOPE 双发→字节差异），故 wrapper 用 validateRecipeSessionScope 直出并前置、只把 per-item 委托 validateAgainst；sessionScope 端口仍按 Core 契约构建并由 drift 测试消费。shouldRunRecipeEvidenceGate + tool-router 172-180 不变（stage-2 仍仅 cold-start）。\n\nP1.5 drift tripwire：test/unit/recipe-gate-drift-tripwire.test.ts 快照 Core 暴露的 getImperativeVerbAllowlist(45/12) + getEvidenceFloorPolicy(3/1)，未来 Core 改门禁值即响铃。\n\n测试替身修复（非门禁改动）：SubmitKnowledgeRouter.test.ts 的 @alembic/core/knowledge mock 原是缺 validateAgainst 的 partial factory（stage-1 re-point 后经该 barrel 调 validateAgainst 会崩），改 importOriginal 委托真实 validateAgainst，**不削弱任何断言**（git-stash 基线证旧 gates 本就过该测试）。\n\n文件位置偏差（已 flag）：vitest.config include 仅 'test/**/*.test.ts'，lib/ 下测试不被发现，故新测试置于 test/unit/（既有约定）而非卡片字面的 lib/runtime/mcp/handlers/，基名一致。\n\n边界：dead 副本 lib/runtime/mcp/host-agent-workflows/recipe-evidence-gate.ts 未碰（git status 空；它 export* LIVE 文件、透明再导出新增端口无冲突）；Core/vendor 未碰（Core HEAD 仍 a2329ce）；CLAUDE.md 预存 M（他窗口）未碰未 staged。",
+  "evidenceRefs": [
+    "c1c3922",
+    "AlembicCore@a2329ce04cb067df4e97e766bee331c47a0e6511",
+    "lib/runtime/mcp/handlers/recipe-content-quality-gate.ts",
+    "lib/recipe-generation/host-agent-workflows/recipe-evidence-gate.ts",
+    "test/unit/recipe-gate-golden-corpus.test.ts",
+    "test/unit/recipe-gate-drift-tripwire.test.ts",
+    "test/unit/__snapshots__/recipe-gate-golden-corpus.test.ts.snap",
+    "test/unit/SubmitKnowledgeRouter.test.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/.wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29/evidence/p0-gate-truth-matrix-2026-06-30.md"
+  ],
+  "verification": [
+    "**DUAL-RUN byte-identical 证明（主窗口独立、不依赖 subagent）**：golden-corpus snapshot 对 re-pointed gates 21/21 通过（RUN1，无 --update）；git-stash 回旧 inline gates 后对同一 snapshot 同样 21/21 通过（RUN2）→ 旧与新逐字节匹配同一 oracle = byte-identical 证实",
+    "corpus 覆盖完整性：snapshot 含全部 20 个 P0 矩阵 reject code（stage-1 DO/DONT_CLAUSE_REQUIRED/NON_ENGLISH/NON_IMPERATIVE + CONTENT_MARKDOWN_REQUIRED/CONTRAST_MISSING；stage-2 SESSION_NOT_FOUND/WRONG_SCOPE/SOURCE_REFS_MISSING/LINE_MISSING/INVALID/NOT_FOUND/LINE_OUT_OF_RANGE/SNIPPET_MISMATCH/PLACEHOLDER_EVIDENCE/INSUFFICIENT_EVIDENCE/GRAPH_REF_INVALID/STALE_GRAPH）逐一存在",
+    "build:check 绿（Core build used ../AlembicCore @ a2329ce；tsc --noEmit 无错）——主窗口亲跑",
+    "biome lint 5 文件 0 问题",
+    "lint:repo-boundary 通过（@escape-hatch 0/75）；lint:core-import-boundary OK（449 文件/465 @alembic/core imports，仅经 @alembic/core/knowledge barrel）；report:agent-extraction-boundary 全 0",
+    "drift tripwire test 5/5；HostAgentRecipeEvidenceGate 14/14；SubmitKnowledgeRouter 15/15（mock fix 后）",
+    "纯谓词全删核：recipe-evidence-gate.ts grep looksLikePlaceholder/EVIDENCE_FLOOR=/RELATIONSHIP_KEYWORDS/snippetMatchesSourceRange = 0（已 source 自 Core）",
+    "全量 unit baseline-diff vs 干净 808f661（同 Core a2329ce）：NEW failed files=[]、REGRESSED=[]（零新回归）；touched/new 测试全 passed。PlanDrivenGenerationGate 由 baseline-fail→after-pass 经核为预存套件测序 flaky（单跑 10/10、仅 import KnowledgeEntry 非我改的面），非我 fix、非回归",
+    "结构核：HEAD 未动（提交前 808f661）、提交 c1c3922 仅含我 7 文件、CLAUDE.md 未 staged、dead 副本/Core/vendor 未碰"
+  ],
+  "risks": [
+    "stage-2 为部分委托（per-item evidence→validateAgainst；session scope 留 Plugin 侧前置）——这是 byte-identical 硬纪律驱动的有意决策（Core per-item sessionScope 端口会改 WRONG_SCOPE 双发顺序）。纯谓词已全 source 自 Core（re-sourcing 达成）；sessionScope 端口按 Core 契约构建+drift 测试消费、契约真实。P1.3（Core stage-3 re-point）/P1.4（in-process parity flatten）为后续独立波次。",
+    "测试文件位置与卡片字面 lib/runtime/mcp/handlers/ 不符（vitest include 仅 test/**，lib/ 测试不被发现）——置于 test/unit/ 既有约定使 oracle 真实运行，基名一致。如总控要求改 vitest include 收纳 lib/ 测试，属独立配置改动、超本卡门禁范围。",
+    "PlanDrivenGenerationGate.test.ts 在全量套件存在预存测序 flaky（baseline 套件内失败、单跑通过）——与本卡无关，但提示套件存在隔离/顺序脆弱，可作独立 follow-up 观察（非本卡）。",
+    "真机 cold-start submit→gate 端到端（含真实 bootstrap session + on-disk source-ref）归 Test/后续波次；本窗口以 golden-corpus（含 mkdtemp 真实临时文件触发 fs-bound code）+ 现有 handler/evidence 套件覆盖。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-plugin-gate-repoint__AlembicPlugin__p1-plugin-gate-repoint",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-gate-repoint__AlembicPlugin__p1-plugin-gate-repoint.json",
+    "deliveryRunId": "run-delivery-p1-plugin-gate-repoint__AlembicPlugin__p1-plugin-gate-repoint",
+    "dispatchGroup": "p1-plugin-gate-repoint",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-gate-repoint__AlembicPlugin__p1-plugin-gate-repoint.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 12,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p1-plugin-gate-repoint",
+    "targetTaskId": "p1-plugin-gate-repoint",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p1-plugin-gate-repoint",
+    "resultId": "tr-p1-plugin-gate-repoint",
+    "createdAt": "2026-06-30T00:04:21.906Z"
+  },
+  "createdAt": "2026-06-30T00:04:21.906Z",
+  "stateRevisionObserved": 12,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

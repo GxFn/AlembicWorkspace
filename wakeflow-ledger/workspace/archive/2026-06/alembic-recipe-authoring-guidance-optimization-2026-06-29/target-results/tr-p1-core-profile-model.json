@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-core-profile-model",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p1-core-profile-model",
+  "dispatchGroup": "p1-core-profile-model",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1-core-profile-model",
+  "status": "completed",
+  "summary": "P1.4a Core profile model complete — AlembicCore commit 8771524 on main (no push/tag/version bump). Added the §12.3 context-profile axis (cold-start | opportunistic) to the RecipeAuthoringSpec module's validateAgainst + renderGuidance, the producer foundation for the P1.4b in-process flatten.\n\nWHAT SHIPPED:\n- types/recipeAuthoringSpec.ts: RecipeAuthoringProfile = 'cold-start' | 'opportunistic'.\n- gateRules.ts validateAgainst: ValidateAgainstOptions.profile (default 'cold-start'). cold-start = the full gate, byte-identical to today, and the DEFAULT — so the already-accepted Plugin stage-1/2 and Core stage-3 consumers (which call validateAgainst WITHOUT a profile) are unaffected. opportunistic gates OFF exactly two stage-2 checks: the 3-distinct-files evidence floor (INSUFFICIENT_EVIDENCE) and the session-scope port (SESSION_NOT_FOUND/WRONG_SCOPE). Every content gate (stage 1) + the cheap grounding (SOURCE_REFS_MISSING, SOURCE_REF_LINE_MISSING, fs resolution, placeholder, SNIPPET_MISMATCH, graph) + stage-3 still run identically — a DECLARED lighter bar, not a relaxation.\n- gateRules.ts resolveAuthoringProfile(): byte-faithful mirror of the live shouldRunRecipeEvidenceGate (recipe-evidence-gate.ts:101) — session OR string sessionId/bootstrapSessionRef OR requireProductionSession===true OR string args.dimensionId OR any item with string dimensionId → cold-start; else opportunistic. The host resolves the session then passes the profile.\n- guidanceGenerator.ts renderGuidance(path, stage?, profile='cold-start'): drops exactly the rules the opportunistic gate skips (evidence-floor + session-scope) from both the rules array and the rendered text, so guidance==gate per profile; cold-start text is byte-identical to before; GuidanceBlock now carries the profile.\n- Exposed resolveAuthoringProfile + RecipeAuthoringProfile via the module barrel + the @alembic/core/knowledge facade.\n\nCOLD-START BYTE-IDENTICAL PROOF: cold-start is the default, so the existing P1 suites — RecipeAuthoringSpec (stage-1/2 validateAgainst), UnifiedValidatorStage3ByteIdentical, RecipeAuthoringSpecDrift, RecipeGateEnforcementMatrix — all pass unchanged (they call without a profile). The new test additionally asserts validateAgainst(items, {…}) === validateAgainst(items, {…, profile:'cold-start'}) on a corpus that actually triggers the floor + session-scope (zero change).\n\nOPPORTUNISTIC PROOF (new RecipeAuthoringProfile test): a combo candidate that triggers content gates + the floor + session-scope shows opportunistic === cold-start MINUS exactly {INSUFFICIENT_EVIDENCE, SESSION_NOT_FOUND} (full-array equality via cold.filter), keeping DO_CLAUSE_NON_IMPERATIVE / DONT_CLAUSE_REQUIRED / CONTENT_CONTRAST_MISSING / STAGE3_MARKDOWN_TOO_SHORT; a separate case proves SOURCE_REF_LINE_MISSING (cheap grounding) is kept in opportunistic; resolveAuthoringProfile mirrors all shouldRunRecipeEvidenceGate branches; renderGuidance opportunistic drops the evidence-floor + session-scope rules and the 证据下限 text while keeping the content rules + the 45-verb allowlist.\n\nACCEPTANCE (node 22.22.1): Core build PASS; build:check PASS; new profile test PASS; existing P1 golden-corpus + stage-3 byte-identical + drift + matrix tests stay green (cold-start default); full suite 1479/1479 (154 files); biome lint 682 files clean. Per the task's green bar (build:check + test + drift) — fully met. npm run check red ONLY on the 3 pre-existing out-of-scope lint:naming files (project-context-capabilities.ts, recipe-context-capabilities.ts, test-fixtures.ts) — the task-authorized carve-out; NOT touched.",
+  "evidenceRefs": [
+    "AlembicCore/src/types/recipeAuthoringSpec.ts",
+    "AlembicCore/src/domain/knowledge/recipe-authoring-spec/gateRules.ts",
+    "AlembicCore/src/domain/knowledge/recipe-authoring-spec/guidanceGenerator.ts",
+    "AlembicCore/test/RecipeAuthoringProfile.test.ts",
+    "AlembicCore/src/knowledge.ts"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm run build → PASS (clean-dist + tsc)",
+    "npm run build:check → PASS (tsc --noEmit clean)",
+    "vitest test/RecipeAuthoringProfile.test.ts → PASS (cold-start==omit-profile zero-change; opportunistic==cold-start minus exactly {INSUFFICIENT_EVIDENCE,SESSION_NOT_FOUND}; grounding kept; resolveAuthoringProfile mirrors shouldRunRecipeEvidenceGate; renderGuidance profile)",
+    "vitest existing P1 suites (RecipeAuthoringSpec + UnifiedValidatorStage3ByteIdentical + RecipeAuthoringSpecDrift + RecipeGateEnforcementMatrix) → PASS unchanged (cold-start default = byte-identical proof)",
+    "npm run test → 1479/1479 PASS (154 files)",
+    "npm run lint (biome) → 682 files clean",
+    "npm run check → all stages PASS except lint:naming, red ONLY on the 3 pre-existing out-of-scope files (task-authorized carve-out)"
+  ],
+  "risks": [
+    "Opportunistic-scope interpretation: I implemented the LITERAL task spec — opportunistic drops EXACTLY two named checks (the 3-distinct-files evidence floor INSUFFICIENT_EVIDENCE, and session-scope). SOURCE_REFS_MISSING (requires ≥1 ref) is KEPT (it is not the 3-file floor) — the most conservative, least-relaxing reading. If the controller intends opportunistic to also make sourceRefs fully optional, that is a one-line follow-up; flagged for confirmation.",
+    "This is the PRODUCER axis only (P1.4a). The P1.4b in-process re-point (AlembicAgent + main-body GatewayActionRegistry call validateAgainst({profile: resolveAuthoringProfile(...)}) before gateway.create) is a separate downstream wave with producer-prompt-first discipline — NOT in this commit.",
+    "npm run check red on the 3 pre-existing public-export naming files is the task-authorized carve-out; NOT touched (rename breaks @alembic/core/* export contract; SN4 config-exception territory).",
+    "renderGuidance gained a 3rd optional param (profile, default cold-start) and GuidanceBlock gained a profile field — additive; all existing callers (buildSubmissionSpec, spec-shape/facade tests) pass without change.",
+    "Commit 8771524 is local only (no push), consistent with main-only/no-push; controller verification is local."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-core-profile-model__AlembicCore__p1-core-profile-model",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-profile-model__AlembicCore__p1-core-profile-model.json",
+    "deliveryRunId": "run-delivery-p1-core-profile-model__AlembicCore__p1-core-profile-model",
+    "dispatchGroup": "p1-core-profile-model",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-profile-model__AlembicCore__p1-core-profile-model.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 20,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p1-core-profile-model",
+    "targetTaskId": "p1-core-profile-model",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1-core-profile-model",
+    "resultId": "tr-p1-core-profile-model",
+    "createdAt": "2026-06-30T00:49:03.920Z"
+  },
+  "createdAt": "2026-06-30T00:49:03.920Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

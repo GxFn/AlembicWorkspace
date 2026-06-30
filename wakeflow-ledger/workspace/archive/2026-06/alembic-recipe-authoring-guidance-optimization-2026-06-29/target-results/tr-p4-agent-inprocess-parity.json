@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-agent-inprocess-parity",
+  "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "taskPackageId": "p4-agent-inprocess-parity",
+  "dispatchGroup": "p4-agent-inprocess-parity",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p4-agent-inprocess-parity",
+  "status": "completed",
+  "summary": "P4 wave 2 (AlembicAgent in-process wrapper parity) complete — commit f8ddddd on main (baseline eab6c88; no push/tag/version bump). ADDITIVE TEST ONLY: git status shows ONLY the new test/recipe-authoring-inprocess-parity.test.ts added — the P1.4b wrapper (recipeAuthoringGate.ts), the in-process gate (knowledge.ts), the producer prompt (insightProducer.ts) and the P1.4b suite are byte-unchanged (git diff --stat = empty); gates not relaxed. Consumes AlembicCore 47391c6 (P4 wave 1, gates byte-identical) via @alembic/core/knowledge.\n\nAdded the IN-PROCESS side of the §12.5 two-paths-tie parity tripwire: for a fixture corpus (gate-clean + stage-1/2/3 + fs NOT_FOUND/LINE_OUT_OF_RANGE), asserts runInProcessRecipeAuthoringGate(item) verdict is byte-identical (toEqual) to a direct Core validateAgainst([item], {stage:'all', path:'in-process', profile, sourceRefResolver: createInProcessSourceRefResolver(), projectRoot, dimensionId}) — proving the in-process WRAPPER faithfully passes through the same Core bar without mutating the verdict. Three cases: (1) opportunistic per-item over the full corpus, non-vacuous (≥1 clean item AND ≥1 with violations); (2) anti-trivial — the wrapper SELECTS opportunistic for a dimensionless submission and is NOT equal to the cold-start verdict (cold-start adds the 3-file floor on a single-file rule); (3) cold-start (dimension-bearing) wrapper == direct Core cold-start, proving the profile-resolution branch also doesn't mutate.\n\nTRANSITIVE CLOSURE of host-vs-in-process tie: P1.4b already proved Core(path:host-cold-start) == Core(path:in-process) (path-label invariance); P4 proves in-process-wrapper == Core(path:in-process); the Plugin sibling (p4-plugin-drift-parity) proves host-wrapper == Core(host path). ⇒ host-wrapper == in-process-wrapper transitively (both equal the same Core validateAgainst).",
+  "evidenceRefs": [
+    "f8ddddd",
+    "47391c6",
+    "AlembicAgent/test/recipe-authoring-inprocess-parity.test.ts",
+    "AlembicAgent/src/tools/runtime/handlers/recipeAuthoringGate.ts",
+    ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29/evidence/p0-gate-truth-matrix-2026-06-30.md"
+  ],
+  "verification": [
+    "node 22.22.1, tsc 5.9.3, biome 2.4.6, vitest 4.1.6",
+    "npm run check → exit 0 (build:check + lint + agent/public-api/core-import-boundary[250 files/50 @alembic/core imports; knowledge facade stable] + space-edges + layer-contract[43 runtime edges] + doctrine + naming + smoke:public-signatures[12 exports unchanged] + verify:validation-floor[43 files/311 cases] + test)",
+    "npm run test → 43 files / 311 tests PASS / 0 fail (was 42/308; +1 file +3 cases)",
+    "vitest test/recipe-authoring-inprocess-parity.test.ts → 3/3 PASS (opportunistic per-item corpus parity / wrapper-selects-opportunistic anti-trivial / cold-start parity)",
+    "git status proof: ONLY test/recipe-authoring-inprocess-parity.test.ts added; git diff --stat on recipeAuthoringGate.ts + knowledge.ts + insightProducer.ts + recipe-authoring-inprocess-flatten.test.ts = empty (wrapper + gates byte-unchanged)",
+    "AlembicCore HEAD 47391c6, dist fresh (newer than all src); @alembic/core/knowledge exports validateAgainst + resolveAuthoringProfile"
+  ],
+  "risks": [
+    "Additive test only (verified): git status shows ONLY the new test file; recipeAuthoringGate.ts wrapper + all gate paths byte-unchanged. No gate relaxed.",
+    "Parity passes by construction today: runInProcessRecipeAuthoringGate is a thin pass-through (resolveAuthoringProfile + validateAgainst, result returned unmutated); the test makes that contract EXPLICIT so any future wrapper-side mutation or profile-misresolution fails loudly. Per the task, on a future mismatch the discipline is to make the wrapper call the unified Core validateAgainst, NEVER to relax the gate.",
+    "The wrapper is single-item (validateAgainst([item])); the test compares per-item (itemIndex 0 on both sides), the faithful comparison for a single-item wrapper. A corpus-level validateAgainst would assign ascending itemIndex and is intentionally NOT the comparison target.",
+    "Cross-repo host-vs-in-process byte-identity is closed TRANSITIVELY (in-process-wrapper == Core == host-wrapper via the Plugin sibling p4-plugin-drift-parity), not by one in-repo test importing both wrappers (AlembicAgent cannot import AlembicPlugin internals). The Core §12.5 path-parity (tr-p4-core-drift-parity) + this in-process tie + the Plugin host tie are the three legs.",
+    "Consumes Core 47391c6 dist (fresh, verified). P4 wave 1 (Core) was additive-test-only so validateAgainst behavior is unchanged from the P1.4a profile model; the wrapper's consumption is stable."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity.json",
+    "deliveryRunId": "run-delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity",
+    "dispatchGroup": "p4-agent-inprocess-parity",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-agent-inprocess-parity__AlembicAgent__p4-agent-inprocess-parity.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "stateRevision": 54,
+    "demandKey": "alembic-recipe-authoring-guidance-optimization-2026-06-29",
+    "taskPackageId": "p4-agent-inprocess-parity",
+    "targetTaskId": "p4-agent-inprocess-parity",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p4-agent-inprocess-parity",
+    "resultId": "tr-p4-agent-inprocess-parity",
+    "createdAt": "2026-06-30T04:20:30.125Z"
+  },
+  "createdAt": "2026-06-30T04:20:30.125Z",
+  "stateRevisionObserved": 54,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}
