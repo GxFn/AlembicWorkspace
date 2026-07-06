@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-test-um-advance-baseline",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave1-test-um-advance-baseline",
+  "dispatchGroup": "wave1-um-advance",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "test-um-advance-baseline",
+  "status": "completed",
+  "summary": "GREEN BASELINE achieved (reproduced 3/3). Real-machine commit-driven maintenance proof on AlembicPlugin@799ceac/AlembicCore@d49fc05 (pre-UM). Method = faithful replica (task-sanctioned, protects real ~/.asd + real BiliDili): git clone BiliDili@a3ea6a25 + better-sqlite3 .backup() of the real workspace DB (02a25032, read-only) into a sandbox-init'd replica workspace, rewriting ONLY git_diff_checkpoints.project_root (read-only scan confirmed it is the sole absolute-path column; recipe_source_refs.source_path is relative; residual OLD-path after rewrite=NONE). Drove the real cc-plugin MCP. Precondition replica = real: initialized/a3ea6a25/advanced_at=NULL/0 proposals/3 active recipes/11 refs. Made a MODIFIED (not created) in-region edit to a covered file (appended inline comment to line 56 RouterModule(), within BiliDili/AppDelegate.swift:51-61 = recipe d84c424a region), revertable commit 653ab9b (parent a3ea6a2). Triggered COMMIT_DRIVEN_TRIGGER_TOOLS (alembic_work x2 + alembic_code_guard), DB reset before each. RESULT (all 3 runs, DB ground truth): git_diff_checkpoints last_route_status initialized->routed, checkpoint_commit a3ea6a25->653ab9b (merge_base=a3ea6a25,target=653ab9b), advanced_at non-null, reason 'Plugin commit-driven unified evolution routed the git diff range successfully'; evolution_proposals 0->1 type=update source=file-change target_recipe_id=d84c424a confidence0.72 status=observing. Attribution: source=file-change + type=update + target=covering recipe => MODIFIED maintenance path (FileChangeHandler.#handleModified->#submitUpdateProposal), NOT created/generation. => modified/deleted maintenance path advances independently of generation; generation can be safely retired => UM implementation unlocked. N1 (out-of-scope, informational): all 3 trigger tools returned isError:true to the MCP client (alembic_work no-phase=missing-arg; work phase=start & code_guard='Unrecognized key: data' — the attached data.unifiedEvolution surface trips tool output-schema), yet the maintenance ran+persisted in every case => attach is post-tool unconditional; whether the host-facing isError is a real contract issue or a minimal-client/protocol artifact needs Plugin/Design, does not affect this baseline. Isolation: real BiliDili untouched (a3ea6a2 clean, replica used); real ~/.asd 02a25032 untouched (re-checked read-only: initialized/a3ea6a25/0). No product code/Core/vendor changed; Node22; no push/tag/bump.",
+  "evidenceRefs": [
+    "tmp/um-baseline/evidence/UM-ADVANCE-BASELINE-REPORT.md",
+    "tmp/um-baseline/evidence/pre-real-readonly.json",
+    "tmp/um-baseline/evidence/pre-replica.json",
+    "tmp/um-baseline/evidence/post-replica.json",
+    "tmp/um-baseline/evidence/post2-replica.json",
+    "tmp/um-baseline/evidence/post3-replica.json",
+    "tmp/um-baseline/evidence/trigger-raw.json",
+    "tmp/um-baseline/evidence/test-commit-hash.txt",
+    "tmp/um-baseline/run-mcp-bd.sh",
+    "tmp/um-baseline/build-replica-db.cjs"
+  ],
+  "verification": [
+    "① cursor advance — PASS (3/3): git_diff_checkpoints last_route_status initialized->routed, checkpoint_commit a3ea6a25->653ab9b, advanced_at non-null, merge_base=a3ea6a25 (evidence/post-replica.json, post2-replica.json, post3-replica.json)",
+    "② proposal 0->1 — PASS: evolution_proposals 1 row type=update source=file-change target_recipe_id=d84c424a (the recipe covering the modified AppDelegate.swift:51-61) confidence0.72 status=observing",
+    "③ modified-path attribution — PASS: source=file-change + type=update + evidence 'Committed git-head event modified covered source' + target=covering recipe => FileChangeHandler.#handleModified->#submitUpdateProposal (maintenance path), not created/generation",
+    "precondition fidelity — replica = real: pre-replica.json (initialized/a3ea6a25/NULL/0/3-active/11-refs) matches controller-self-verified real read-only (pre-real-readonly.json); only git_diff_checkpoints.project_root rewritten, residual OLD-path=NONE",
+    "reproducibility — 3 independent runs (DB reset to precondition each), 2 distinct trigger tools (alembic_work, alembic_code_guard): identical advance+proposal",
+    "N1 out-of-scope — trigger tools isError:true (work no-phase=missing-arg; work phase=start & code_guard 'Unrecognized key: data' from attached data.unifiedEvolution); maintenance ran+persisted regardless => post-tool unconditional attach; needs Plugin/Design view, not this baseline",
+    "isolation — real BiliDili source untouched (a3ea6a2 clean); real ~/.asd workspace 02a25032 untouched (read-only recheck: initialized/a3ea6a25/advanced_at=NULL/0 proposals); no product code changed"
+  ],
+  "risks": [
+    "N1 (out-of-scope, route to Plugin/Design if pursued): commit-driven trigger tools surface isError:true to the MCP client when the data.unifiedEvolution surface is attached ('Unrecognized key: data' output-schema validation); the maintenance still runs+persists. Possibly a host-facing contract issue OR a minimal-test-client protocol/output-schema artifact — needs confirmation in a real cc host. Does not affect the green baseline.",
+    "Baseline used a faithful replica (disclosed); it proves the CODE's modified-maintenance path advances from the exact precondition. The REAL workspace 02a25032 cursor remains at initialized (untouched) — if the controller wants the real cursor itself advanced, that is a separate authorized real-workspace action.",
+    "Only the modified-covered path was exercised (per task scope). created->generation and deleted paths are not part of this baseline (created=generation is exactly what UM will change; deleted not requested here)."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave1-um-advance__Test__test-um-advance-baseline",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-advance__Test__test-um-advance-baseline.json",
+    "deliveryRunId": "run-delivery-wave1-um-advance__Test__test-um-advance-baseline",
+    "dispatchGroup": "wave1-um-advance",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-advance__Test__test-um-advance-baseline.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 8,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave1-test-um-advance-baseline",
+    "targetTaskId": "test-um-advance-baseline",
+    "targetWindow": "Test",
+    "dispatchGroup": "wave1-um-advance",
+    "resultId": "tr-test-um-advance-baseline",
+    "createdAt": "2026-06-25T20:39:59.626Z"
+  },
+  "createdAt": "2026-06-25T20:39:59.626Z",
+  "stateRevisionObserved": 8,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

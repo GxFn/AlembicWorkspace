@@ -1,0 +1,491 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "title": "主体 Agent 好用终端大部分已端到端通(code.*+terminal.exec 真 Seatbelt)；真实工作=①接缺口 E-1 Evolution 只读 allowlist 终端(衰退判定时间维度证据)②收硬化 E-2(结构化 policy 移植+cwd 修+审计必达+沙箱降级显式)③定双轨 E-3=A 删 dead 栈维持 exec-only④E-4 删 phantom 工具广告⑤E-5 prompt 引导+guard 注释。安全=read-mostly grounding+allowlist+沙箱审计必达、不给写终端。§10 全阶段代码级落地。退 tools/terminal public subpath 走总控确认。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Archive completed terminal-tools enhancement demand after controller acceptance and final 28/28 E2E evidence.",
+  "revision": 54,
+  "activeStageId": null,
+  "updatedAt": "2026-06-27T12:02:36.653Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "e2-agent-live-terminal-safety-p1",
+      "summary": "E-2 safety preflight producer for AlembicAgent. Implement only the AlembicAgent live terminal.exec hardening from Design §10: add src/tools/runtime/handlers/terminalSafety.ts by copying only input-agnostic DENIED_BINS/detectDangerousShellPayload primitives into a live-side wrapper (do not import dead terminal stack); replace terminal.ts local substring deny constants with terminalSafety; fix cwd jail with path.relative boundary; extend ToolContext/registry types with optional auditSink duck type; record exactly one audit attempt for live terminal.exec success/failure with action terminal.exec, result, duration, sha256 commandHash only (do not store command text; audit failure must not change tool result); surface sandboxed=false/degradeReason/fallbackUsed diagnostics in terminal result metadata/output. Do not give Agent write terminal access, do not add Evolution terminal yet, do not delete dead stack yet, do not change AnalyzeGroundingGuard default. Validate with Node >=22: build/typecheck, targeted terminal safety tests covering sudo spacing/quoted bypass, shell payload, rm -fr/fork bomb denial, benign read-only command pass, cwd sibling rejection, audit hash/no raw command, audit sink throwing non-fatal, and sandbox fallback diagnostic. Commit on AlembicAgent main and return TargetResultEnvelope with commit hash, changed files, commands, outputs, residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-2",
+      "createdAt": "2026-06-27T09:33:15.372Z"
+    },
+    {
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-1-p1",
+      "summary": "E-2 AlembicAgent rework after controller review. Keep commit b2088045's accepted safety/cwd/sandbox work, but fix the audit contract drift only: Design §10 E2-4 requires ToolContext auditSink to be a host-agnostic duck type mirroring AuditLogger.log(entry), and E2-5 requires action terminal.exec, result, duration, data.commandHash=sha256(command) with no raw command text. Current Agent commit defines ToolAuditSinkLike.record(event), terminal.ts calls sink.record(event), and tests only cover record(), so Alembic ToolContextFactory cannot pass tryGet('auditLogger') directly. Rework: replace the record() surface with log(entry); shape ToolAuditEntry to be directly compatible with Alembic AuditLogger.log, including action:'terminal.exec', result, duration, data:{commandHash}, and safe host-agnostic actor/resource/context defaults as needed; keep audit failures non-fatal; ensure every live terminal.exec path attempts exactly one audit when sink exists; remove/replace tests that only prove record(); add targeted tests proving a log sink receives one hash-only entry and a throwing log sink is non-fatal; assert raw command text is absent. Do not support/keep the rejected record() alias unless a source requirement is found; do not expand into E-1 terminal allowlist, E-3 dead-stack deletion, E-4 phantom cleanup, or AnalyzeGroundingGuard. Validate with Node >=22: targeted runtime terminal safety tests, build:check, and any affected contract/public-signature tests. Commit on AlembicAgent main and return TargetResultEnvelope with commit hash, changed files, command outputs, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-2",
+      "createdAt": "2026-06-27T09:48:51.898Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-2-p1",
+      "summary": "E-2 AlembicAgent rework-2 after controller raw-evidence review. Rework-1 fixed .log(entry) and data.commandHash, but it still violates the E-2 audit persistence requirement because terminal.ts builds requestId as terminal.exec:<commandHash-prefix>. Alembic AuditLogger.log maps requestId to audit_logs.id, and audit_logs.id is TEXT PRIMARY KEY, so repeated identical commands reuse the same audit id; later inserts fail and are swallowed, meaning not every live terminal.exec leaves an audit row. Scope is ONLY this persistence blocker. Fix by making ToolAuditEntry.requestId optional and omitting it for terminal.exec so AuditLogger generates unique ids, OR by generating a per-invocation unique requestId that is not derived solely from command hash. Preserve action:'terminal.exec', result, duration, data:{commandHash}, no raw command text, .log(entry), and audit failure non-fatal behavior. Add a regression that runs/logs repeated identical commands and proves requestId is absent or unique per entry and the two audit attempts cannot collapse to the same persistence id; keep the hash-only/no-raw-command assertion. Do not expand into E-1 allowlist, E-3 dead-stack deletion/public subpath retirement, E-4 phantom cleanup, E-5 prompt/guard, or Alembic main wiring. Validate with Node >=22: targeted runtime terminal safety tests, build:check, and affected contract/public-signature tests as needed. Commit on AlembicAgent main and return TargetResultEnvelope with commit hash, changed files, command outputs, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-2",
+      "createdAt": "2026-06-27T09:58:48.626Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-3-p1",
+      "summary": "E-2 AlembicAgent rework-3 after controller raw-evidence review. Rework-2 correctly fixed terminal.exec audit persistence by omitting/uniquing requestId, but controller source review found a separate E2-7 blocker: execInSandboxOrDirect still overwrites any sandboxExecutor-provided diagnostics with {sandboxed:true,fallbackUsed:false} after executor.exec returns. That makes the later Alembic ToolContextFactory bridge repair impossible to observe from Agent results, violating E2-7 sandbox degradation explicitness. Scope is ONLY this producer contract gap. Preserve all accepted E-2 behavior from prior rounds: structured terminalSafety allowlist/cwd jail, auditSink.log(entry), action terminal.exec, result/duration, data.commandHash only, no raw command text, audit failures non-fatal, and no stable commandHash-derived requestId. Change Agent terminal runtime so SandboxExecutorLike may return optional diagnostics {sandboxed:boolean,fallbackUsed:boolean,degradeReason?:string}; when present, preserve it instead of overwriting. When absent, keep the sandboxed:true/fallbackUsed:false default. Ensure the existing result decoration continues to set _meta.fallbackUsed and output [unsandboxed:<reason>] for fallback/degraded runs. Add a regression where a fake sandboxExecutor returns stdout/stderr/exitCode plus diagnostics {sandboxed:false,fallbackUsed:true,degradeReason:'seatbelt_unavailable'} and assert the terminal.exec ToolResult exposes fallbackUsed plus the unsandboxed diagnostic; this must prove an Alembic bridge can pass degradation through. Keep the existing missing-sandboxExecutor fallback and repeated-audit tests. Do not expand into E-1 allowlist consumer, E-3 dead-stack deletion/public subpath retirement, E-4 phantom cleanup, E-5 prompt/guard, or Alembic main wiring. Validate with Node >=22: targeted runtime terminal safety tests, build:check, tool-v2 contract/public-signature checks as affected, and grep showing no terminal.exec:<hash> requestId and no diagnostics overwrite. Commit on AlembicAgent main and return TargetResultEnvelope with commit hash, changed files, command outputs, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E2-7",
+      "createdAt": "2026-06-27T10:06:13.847Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "e2-main-toolcontext-audit-sandbox-p1",
+      "summary": "E-2 Alembic main consumer package after accepted AlembicAgent producer commit 1b8d5009da34613272ce93112589897515649d74. Scope is ONLY ToolContextFactory consumer wiring for live terminal.exec safety: (1) E2-6 inject auditSink from the existing single DI factory so daemon/HTTP/CLI tool calls all receive the same audit logger path; (2) E2-7 preserve sandboxExec diagnostics through SandboxExecutorBridge so Agent terminal.exec can expose sandbox fallback/degradation. Current evidence: Alembic/lib/tools/v2/ToolContextFactory.ts create() already builds ToolContext for V2 tools but lacks auditSink, and SandboxExecutorBridge.exec() returns only stdout/stderr/exitCode, dropping sandboxExec result.sandboxed/result.degradeReason. Implement narrowly in Alembic: add auditSink: tryGet(c,'auditLogger') in ToolContextFactory.create(); extend SandboxExecutorBridge return shape to include diagnostics compatible with AlembicAgent's accepted contract {sandboxed:boolean,fallbackUsed:boolean,degradeReason?:string}; map sandboxExec result.sandboxed=false to fallbackUsed:true and carry degradeReason, and sandboxed=true to fallbackUsed:false. Do not change command policy, sandbox profile, filesystem/network intent, command execution semantics, Agent repository, Core, Plugin, E-1 Evolution terminal access, E-3 dead stack deletion/public subpath, E-4 phantom cleanup, or E-5 prompts. Add/adjust tests around ToolContextFactory/V2 tool system proving auditSink comes from container auditLogger and SandboxExecutorBridge/terminal.exec output can surface degraded diagnostics when sandboxExec reports sandboxed:false. If direct bridge unit seams are hard because of dynamic imports, add the smallest testable seam without broad refactor; avoid mock-only success with no real consumer. Validate with Node >=22: npm run build:check, relevant unit tests, lint:repo-boundary, and if touched shared assets then check:shared-asset-drift. Commit on Alembic main and return TargetResultEnvelope with commit hash, changed files, validation outputs, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E2-6-E2-7",
+      "createdAt": "2026-06-27T10:13:08.425Z"
+    },
+    {
+      "taskPackageId": "e1-agent-evolution-readonly-allowlist-terminal-p1",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e1-agent-evolution-readonly-allowlist-terminal-p1, Design §10 E-1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Implement exactly E-1 Evolution read-only allowlist terminal access on the live terminal.exec path, reusing the accepted E-2 chokepoint. Add optional CapabilityDef/ToolContext commandAllowlist, router projection, RuntimeCapability.toDef projection, Evolution allowedTools terminal exec + read-only bins/subcommands, and promptFragment guidance for git/grep/test evidence while preserving no-submit. Enforce allowlist only when ctx.commandAllowlist is present; undefined allowlist behavior for other capabilities must stay unchanged. Deny shell-meta and write/destructive/install/fix commands before executor is called. Do not do E-3 dead-stack deletion/public-subpath changes, E-4 Core work, E-5 prompt/guard work, or cross-repo edits. Commit locally and backfill commit hash, changed files, Node>=22 build/test outputs, and allow/deny evidence.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-1",
+      "createdAt": "2026-06-27T10:26:23.772Z"
+    },
+    {
+      "taskPackageId": "e4-core-phantom-terminal-advertising-cleanup-p1",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e4-core-phantom-terminal-advertising-cleanup-p1, Design §10 E-4, and AlembicCore/CLAUDE.md; declare AlembicCore identity. Implement exactly the Core-first E-4 phantom terminal advertising cleanup. Remove Core advertising/instructions for nonexistent terminal_shell and terminal_pty from BootstrapTerminalToolset and current Core prompt/report owners, collapsing to live router-parseable terminal exec/run naming while keeping the real terminal capability. Clean WorkflowReportWriter terminal toolset counts so phantom terminal_shell/terminal_pty are not reported as available tools. If design file names moved or are absent, search the actual Core prompt/toolset owners and record exact evidence; do not fabricate paths or alter unrelated surfaces. Do not touch AlembicPlugin vendor, AlembicAgent, Alembic, E-1, E-2, E-3, or E-5. Commit locally and backfill commit hash, changed files, Node>=22 build/test outputs, and grep/test evidence that Core live prompts/toolsets no longer advertise terminal_shell/terminal_pty.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-4",
+      "createdAt": "2026-06-27T10:26:34.998Z"
+    },
+    {
+      "taskPackageId": "e4-plugin-phantom-terminal-vendor-consumer-sync-p1",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, this task package e4-plugin-phantom-terminal-vendor-consumer-sync-p1, Design §10 E-4, and AlembicPlugin/CLAUDE.md; declare AlembicPlugin identity. Consume accepted AlembicCore commit 90c2295c0fb1eafe0e0a6468f8fb820343a2c695. Complete only the E-4 Plugin consumer/vendor propagation explicitly required by the design: refresh/sync the portable/fallback vendor/Core runtime surface so AlembicPlugin no longer advertises phantom terminal_shell or terminal_pty in live bootstrap/toolset/report paths, and update Plugin tests/snapshots that still expect those retired ids to the new terminal-run/terminal behavior. Current controller evidence shows residual hits in AlembicPlugin/vendor/AlembicCore/src/workflows/capabilities/planning/dimensions/BootstrapTerminalToolset.ts, AlembicPlugin/vendor/AlembicCore/src/workflows/capabilities/persistence/WorkflowReportWriter.ts, and AlembicPlugin/test/unit/BootstrapTerminalToolset.test.ts. Because local development uses @alembic/core:file:../AlembicCore while portable Plugin depends on vendor/AlembicCore, verify both the live sibling-Core path and the vendor/fallback path as applicable. Do not directly change AlembicCore source in this task; sync or move the vendor snapshot from the already accepted Core commit according to AlembicPlugin repository rules. If the vendor sync requires release authorization beyond this E-4 design, stop and backfill the exact blocker instead of silently skipping. Do not perform E-3 dead terminal stack/public subpath retirement, E-5 prompt/guard cleanup, AlembicAgent changes, Alembic main changes, Test, push, tag, or version bump. Validate with Node>=22, targeted Plugin unit tests including test/unit/BootstrapTerminalToolset.test.ts and any affected runtime/vendor tests, npm run build:check, relevant boundary/lint checks from AlembicPlugin/CLAUDE.md, npm run build or plugin smoke when runtime/package assets are touched, grep proof that live Plugin/vendor prompt/toolset surfaces no longer advertise terminal_shell/terminal_pty, and git diff --check. Commit locally and backfill commit hash, changed files, validation output, residual grep explanation, and risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-4",
+      "createdAt": "2026-06-27T10:41:47.893Z"
+    },
+    {
+      "taskPackageId": "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, this task package e3-main-dead-terminal-adapter-consumer-cleanup-p1, Design §10 E-3 branch A, and Alembic/CLAUDE.md; declare Alembic window/repository identity. E-3 branch A is already user-confirmed: keep live terminal.exec exec-only, delete the dead terminal stack, and retire the @alembic/agent/tools/terminal public subpath later in AlembicAgent. This Alembic package is the Main consumer cleanup that must happen before Agent removes the public subpath. Remove Alembic Main consumption of @alembic/agent/tools/terminal and the dead host terminal adapter stack: lib/tools/adapters/TerminalAdapter.ts, lib/tools/adapters/TerminalSessionManager.ts, lib/tools/adapters/MacSystemAdapter.ts, lib/tools/adapters/terminal-adapter/*, AgentModule dead wiring around TERMINAL_CAPABILITY_MANIFESTS / LightweightRouter / TerminalAdapter / MacSystemAdapter, and associated unit tests or fixtures that exist only for terminal_run / terminal_shell / terminal_pty dead stack. Preserve the already accepted live ToolContextFactory -> AlembicAgent runtime terminal.exec path from E-2 and do not weaken audit/sandbox behavior. Keep UnifiedToolCatalog only if still needed as the live runtime tool registry/manifest store; do not delete it just because terminal dead stack used to pass through it. Clean Main live surfaces so terminal_shell, terminal_pty, terminal_run, terminal-adapter, and @alembic/agent/tools/terminal are not advertised or imported as live tools; any remaining strings must be explicitly justified as historical migration notes or absent. Do not modify AlembicAgent, AlembicCore, AlembicPlugin, Dashboard, E-4, E-5, push, tag, or version bump. Validate with Node>=22, npm run build:check, targeted unit tests for AgentModule/ToolContextFactory/PcvNodeEvidence or updated replacements, npm run lint:repo-boundary, relevant import/grep checks proving no @alembic/agent/tools/terminal import and no live terminal_shell/terminal_pty/terminal_run/terminal-adapter surfaces, git diff --check, and any additional tests needed after deleting obsolete tests. Commit locally and backfill commit hash, changed files, validation output, grep evidence, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-3",
+      "createdAt": "2026-06-27T10:53:43.640Z"
+    },
+    {
+      "taskPackageId": "e3-agent-dead-terminal-public-subpath-retirement-p1",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, this task package e3-agent-dead-terminal-public-subpath-retirement-p1, Design §10 E-3 branch A, and AlembicAgent/CLAUDE.md; declare AlembicAgent window/repository identity. E-3 branch A is confirmed: maintain live runtime terminal.exec exec-only, delete the dead governed terminal stack, and retire the @alembic/agent/tools/terminal public subpath. Alembic Main consumer cleanup is already accepted at commit 077f7ce70a44a0ddc8101d205540c95cae5f1a3d, so this package must now remove the Agent-side dead stack rather than preserving it for old consumers. Delete AlembicAgent src/tools/terminal/** and src/tools/core/LightweightRouter.ts, remove the ./tools/terminal package export and root/tools index exports that expose the retired terminal public subpath or old lightweight router, and update/delete tests/fixtures/docs that only assert the dead terminal_run/terminal_shell/terminal_pty/session/policy contract or LightweightRouter surface. Preserve the live src/tools/runtime/** terminal.exec path, terminalSafety.ts copied primitives, RuntimeCapabilityCatalog, ToolRouterAdapter, UnifiedToolCatalog if still used by live registry/introspection, and all accepted E-1/E-2 safety/allowlist behavior. Remove phantom live prompt references to terminal_pty/terminal_shell only where they are Agent-side live prompts within this E-3 scope; do not perform E-5 broader prompt/guard cleanup beyond necessary E-3 phantom removal. Do not modify Alembic, AlembicCore, AlembicPlugin, Dashboard, push, tag, or version bump. Validate with Node>=22, npm run build:check (or repository equivalent), targeted tests for runtime terminal.exec / tool-system / public surface after deleted tests are removed, grep proving no src/tools/terminal, no ./tools/terminal export, no LightweightRouter export, and no live terminal_shell/terminal_pty/terminal_run advertisements outside historical/negative assertions, plus git diff --check. Commit locally and backfill commit hash, changed files, validation output, grep evidence, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-3",
+      "createdAt": "2026-06-27T11:15:06.761Z"
+    },
+    {
+      "taskPackageId": "e5-agent-grounding-prompt-guard-cleanup-p1",
+      "summary": "E-5 final cleanup for terminal-tools enhancement. Implement only Design §10 E-5 in AlembicAgent: add always-on analyst prompt guidance for read-only git/test/grep evidence via the live terminal.exec capability where available, and correct AnalyzeGroundingGuard comments/docs to match default-off/per-run opt-in behavior. Preserve all accepted E1/E2/E3/E4 boundaries: no dead terminal stack, no retired @alembic/agent/tools/terminal public subpath, no phantom terminal_shell/terminal_pty/terminal_run prompts, no write terminal, no daemon, and no default-on grounding enforcement.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-5",
+      "createdAt": "2026-06-27T11:32:36.710Z"
+    },
+    {
+      "taskPackageId": "test-agent-terminal-tools-final-e2e-p1",
+      "summary": "Final Test validation for alembic-agent-terminal-tools-enhancement after E-2/E-1/E-4/E-3/E-5 are controller-accepted. Verify the real terminal-tools behavior promised by the requirement: in-process Agent read-mostly terminal grounding is useful and safe, Evolution can use read-only terminal evidence, phantom/dead terminal surfaces stay removed, guard remains default-off/per-run opt-in, and live terminal.exec safety/audit/sandbox behavior remains observable. This is a real-scenario acceptance card, not product implementation or unit-test rediscovery.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#final-terminal-tools-real-e2e",
+      "createdAt": "2026-06-27T11:42:58.569Z"
+    },
+    {
+      "taskPackageId": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+      "summary": "Repair Alembic Main local runtime dist residue found by final Test E2E. Test passed 27/28 checks; the only blocker is Alembic/dist/lib/injection/modules/AgentModule.js still importing retired @alembic/agent/tools/terminal and registering old LightweightRouter/TerminalAdapter while Alembic/lib/injection/modules/AgentModule.ts is already clean. This package is a product/runtime propagation repair before final retest, not Test rework and not scope expansion.",
+      "status": "accepted",
+      "sourceRef": "Test/tmp/test-agent-terminal-tools-final-e2e-t1/terminal-tools-final-e2e-summary.md",
+      "createdAt": "2026-06-27T11:53:45.887Z",
+      "reviewRoute": "rework"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "e2-agent-live-terminal-safety-t1",
+      "taskPackageId": "e2-agent-live-terminal-safety-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-agent-live-terminal-safety-p1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Implement exactly E-2 Agent-side live terminal.exec safety hardening from the task package and Design §10, with no cross-repo edits and no dead-stack deletion. Commit locally and backfill evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T09:33:15.372Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 3
+      },
+      "delivery": {
+        "deliveryId": "delivery-e2-agent-live-terminal-safety-p1__AlembicAgent__e2-agent-live-terminal-safety-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-agent-live-terminal-safety-p1__AlembicAgent__e2-agent-live-terminal-safety-t1.json",
+        "deliveryRunId": "run-delivery-e2-agent-live-terminal-safety-p1__AlembicAgent__e2-agent-live-terminal-safety-t1",
+        "dispatchGroup": "e2-agent-live-terminal-safety-p1",
+        "sentAt": "2026-06-27T09:34:11.757Z",
+        "readbackOk": true
+      },
+      "resultId": "e2-agent-live-terminal-safety-t1-result-b2088045"
+    },
+    {
+      "targetTaskId": "e2-agent-live-terminal-safety-rework-1-t1",
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-1-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-agent-live-terminal-safety-rework-1-p1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Apply only the audit contract rework from the package: .log(entry) + AuditLogger-compatible hash-only entry shape; no cross-repo edits and no scope expansion. Commit locally and backfill evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T09:48:51.898Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-e2-agent-live-terminal-safety-rework-1-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-1-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-agent-live-terminal-safety-rework-1-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-1-t1.json",
+        "deliveryRunId": "run-delivery-e2-agent-live-terminal-safety-rework-1-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-1-t1",
+        "dispatchGroup": "e2-agent-live-terminal-safety-rework-1-p1",
+        "sentAt": "2026-06-27T09:49:29.238Z",
+        "readbackOk": true
+      },
+      "resultId": "e2-agent-live-terminal-safety-rework-1-t1-result-941a31e9"
+    },
+    {
+      "targetTaskId": "e2-agent-live-terminal-safety-rework-2-t1",
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-2-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-agent-live-terminal-safety-rework-2-p1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Apply only the audit persistence rework: avoid stable commandHash-derived requestId so repeated identical terminal.exec calls still persist distinct audit entries. No cross-repo edits and no scope expansion. Commit locally and backfill evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T09:58:48.626Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e2-agent-live-terminal-safety-rework-2-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-2-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-agent-live-terminal-safety-rework-2-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-2-t1.json",
+        "deliveryRunId": "run-delivery-e2-agent-live-terminal-safety-rework-2-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-2-t1",
+        "dispatchGroup": "e2-agent-live-terminal-safety-rework-2-p1",
+        "sentAt": "2026-06-27T09:59:30.800Z",
+        "readbackOk": true
+      },
+      "resultId": "e2-agent-live-terminal-safety-rework-2-t1-result-a4cf3f8"
+    },
+    {
+      "targetTaskId": "e2-agent-live-terminal-safety-rework-3-t1",
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-3-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-agent-live-terminal-safety-rework-3-p1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Apply only E2-7 producer-contract rework: preserve optional sandboxExecutor diagnostics instead of overwriting them, prove degraded executor diagnostics surface in ToolResult/meta/output, and keep prior audit/cwd/safety fixes. No cross-repo edits and no scope expansion. Commit locally and backfill evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T10:06:13.847Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e2-agent-live-terminal-safety-rework-3-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-3-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-agent-live-terminal-safety-rework-3-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-3-t1.json",
+        "deliveryRunId": "run-delivery-e2-agent-live-terminal-safety-rework-3-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-3-t1",
+        "dispatchGroup": "e2-agent-live-terminal-safety-rework-3-p1",
+        "sentAt": "2026-06-27T10:06:45.667Z",
+        "readbackOk": true
+      },
+      "resultId": "e2-agent-live-terminal-safety-rework-3-t1-result-1b8d500"
+    },
+    {
+      "targetTaskId": "e2-main-toolcontext-audit-sandbox-t1",
+      "taskPackageId": "e2-main-toolcontext-audit-sandbox-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-main-toolcontext-audit-sandbox-p1, and Alembic/CLAUDE.md; declare Alembic identity. Apply only E-2 main consumer wiring: ToolContextFactory injects auditSink from auditLogger, and SandboxExecutorBridge preserves sandboxed/degradeReason diagnostics as {sandboxed,fallbackUsed,degradeReason} for Agent terminal.exec. No cross-repo edits, no E-1/E-3/E-4/E-5 scope expansion. Commit locally and backfill evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T10:13:08.425Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e2-main-toolcontext-audit-sandbox-p1__Alembic__e2-main-toolcontext-audit-sandbox-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-main-toolcontext-audit-sandbox-p1__Alembic__e2-main-toolcontext-audit-sandbox-t1.json",
+        "deliveryRunId": "run-delivery-e2-main-toolcontext-audit-sandbox-p1__Alembic__e2-main-toolcontext-audit-sandbox-t1",
+        "dispatchGroup": "e2-main-toolcontext-audit-sandbox-p1",
+        "sentAt": "2026-06-27T10:13:41.969Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-e2-main-toolcontext-audit-sandbox-t1"
+    },
+    {
+      "targetTaskId": "e1-agent-evolution-readonly-allowlist-terminal-t1",
+      "taskPackageId": "e1-agent-evolution-readonly-allowlist-terminal-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "E-1 Agent package: Evolution capability gets a scoped read-only terminal.exec allowlist with positive bin/subcommand gate, shell-meta denial, RuntimeCapability projection, targeted tests proving allowed git/test/grep commands execute and destructive/write/shell-meta commands do not reach executor. Keep non-Evolution/default capability behavior byte-compatible.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T10:26:23.772Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e1-agent-evolution-readonly-allowlist-terminal-p1__AlembicAgent__e1-agent-evolution-readonly-allowlist-terminal-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e1-agent-evolution-readonly-allowlist-terminal-p1__AlembicAgent__e1-agent-evolution-readonly-allowlist-terminal-t1.json",
+        "deliveryRunId": "run-delivery-e1-agent-evolution-readonly-allowlist-terminal-p1__AlembicAgent__e1-agent-evolution-readonly-allowlist-terminal-t1",
+        "dispatchGroup": "e1-agent-evolution-readonly-allowlist-terminal-p1",
+        "sentAt": "2026-06-27T10:27:13.947Z",
+        "readbackOk": true
+      },
+      "resultId": "e1-agent-evolution-readonly-allowlist-terminal-t1-result-c2b5ba3"
+    },
+    {
+      "targetTaskId": "e4-core-phantom-terminal-advertising-cleanup-t1",
+      "taskPackageId": "e4-core-phantom-terminal-advertising-cleanup-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "E-4 Core package: Core-only removal of phantom terminal_shell/terminal_pty advertising from bootstrap terminal toolset, prompt/report outputs, and tests proving live Core toolset/prompt surfaces no longer instruct unavailable terminal_shell/terminal_pty. Vendor/plugin propagation waits for a later consumer package after Core is accepted.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T10:26:34.998Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e4-core-phantom-terminal-advertising-cleanup-p1__AlembicCore__e4-core-phantom-terminal-advertising-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e4-core-phantom-terminal-advertising-cleanup-p1__AlembicCore__e4-core-phantom-terminal-advertising-cleanup-t1.json",
+        "deliveryRunId": "run-delivery-e4-core-phantom-terminal-advertising-cleanup-p1__AlembicCore__e4-core-phantom-terminal-advertising-cleanup-t1",
+        "dispatchGroup": "e4-core-phantom-terminal-advertising-cleanup-p1",
+        "sentAt": "2026-06-27T10:27:59.066Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-e4-core-phantom-terminal-advertising-cleanup-t1-evidence-normalized"
+    },
+    {
+      "targetTaskId": "e4-plugin-phantom-terminal-vendor-consumer-sync-t1",
+      "taskPackageId": "e4-plugin-phantom-terminal-vendor-consumer-sync-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "E-4 Plugin consumer: sync accepted Core phantom-terminal cleanup into AlembicPlugin portable/fallback vendor/runtime path and tests, proving no live Plugin/vendor prompt/toolset advertises terminal_shell or terminal_pty.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T10:41:47.893Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e4-plugin-phantom-terminal-vendor-consumer-sync-p1__AlembicPlugin__e4-plugin-phantom-terminal-vendor-consumer-sync-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e4-plugin-phantom-terminal-vendor-consumer-sync-p1__AlembicPlugin__e4-plugin-phantom-terminal-vendor-consumer-sync-t1.json",
+        "deliveryRunId": "run-delivery-e4-plugin-phantom-terminal-vendor-consumer-sync-p1__AlembicPlugin__e4-plugin-phantom-terminal-vendor-consumer-sync-t1",
+        "dispatchGroup": "e4-plugin-phantom-terminal-vendor-consumer-sync-p1",
+        "sentAt": "2026-06-27T10:42:31.607Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-e4-plugin-phantom-terminal-vendor-consumer-sync-t1-evidence-normalized"
+    },
+    {
+      "targetTaskId": "e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+      "taskPackageId": "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+      "targetWindow": "Alembic",
+      "summary": "E-3 Main consumer cleanup: remove Alembic Main dead terminal adapter/public-subpath consumption before AlembicAgent retires @alembic/agent/tools/terminal, preserving live terminal.exec ToolContextFactory path.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T10:53:43.640Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e3-main-dead-terminal-adapter-consumer-cleanup-p1__Alembic__e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e3-main-dead-terminal-adapter-consumer-cleanup-p1__Alembic__e3-main-dead-terminal-adapter-consumer-cleanup-t1.json",
+        "deliveryRunId": "run-delivery-e3-main-dead-terminal-adapter-consumer-cleanup-p1__Alembic__e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+        "dispatchGroup": "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+        "sentAt": "2026-06-27T10:55:11.987Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-e3-main-dead-terminal-adapter-consumer-cleanup-t1"
+    },
+    {
+      "targetTaskId": "e3-agent-dead-terminal-public-subpath-retirement-t1",
+      "taskPackageId": "e3-agent-dead-terminal-public-subpath-retirement-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "E-3 Agent branch A: delete AlembicAgent dead terminal contract stack and retire @alembic/agent/tools/terminal public subpath after Main consumer cleanup, preserving live terminal.exec runtime path.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T11:15:06.761Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e3-agent-dead-terminal-public-subpath-retirement-p1__AlembicAgent__e3-agent-dead-terminal-public-subpath-retirement-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e3-agent-dead-terminal-public-subpath-retirement-p1__AlembicAgent__e3-agent-dead-terminal-public-subpath-retirement-t1.json",
+        "deliveryRunId": "run-delivery-e3-agent-dead-terminal-public-subpath-retirement-p1__AlembicAgent__e3-agent-dead-terminal-public-subpath-retirement-t1",
+        "dispatchGroup": "e3-agent-dead-terminal-public-subpath-retirement-p1",
+        "sentAt": "2026-06-27T11:15:42.975Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-e3-agent-dead-terminal-public-subpath-retirement-t1-20260627112714"
+    },
+    {
+      "targetTaskId": "e5-agent-grounding-prompt-guard-cleanup-t1",
+      "taskPackageId": "e5-agent-grounding-prompt-guard-cleanup-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS, active index/status, this state root task package, Design §10 E-5, and AlembicAgent/CLAUDE.md; declare AlembicAgent window/repo identity. Change only AlembicAgent-owned E-5 surfaces: ANALYST_SYSTEM_PROMPT / prompt construction should explicitly guide safe read-only git log/blame/diff/status, npm/vitest/test, tsc --noEmit, lint, grep/rg/find evidence where terminal.exec is available, and forbid install/network/write/delete/sudo/daemon. Update AnalyzeGroundingGuard comment/doc wording so it says default off and per-run opt-in; do not flip defaults or make guard global. Ensure terminal result evidence remains compatible with PcvNodeEvidence/guard evidence. Validate with Node>=22: build:check, targeted prompt/guard tests, public/import/boundary checks as relevant, full npm run check or justified equivalent, negative grep for terminal_shell/terminal_pty/terminal_run and retired public subpath in live prompts/public surfaces, guard default-off assertion, git diff --check. Commit locally and backfill commit, files, validations, residual risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T11:32:36.710Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-e5-agent-grounding-prompt-guard-cleanup-p1__AlembicAgent__e5-agent-grounding-prompt-guard-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e5-agent-grounding-prompt-guard-cleanup-p1__AlembicAgent__e5-agent-grounding-prompt-guard-cleanup-t1.json",
+        "deliveryRunId": "run-delivery-e5-agent-grounding-prompt-guard-cleanup-p1__AlembicAgent__e5-agent-grounding-prompt-guard-cleanup-t1",
+        "dispatchGroup": "e5-agent-grounding-prompt-guard-cleanup-p1",
+        "sentAt": "2026-06-27T11:33:04.617Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-e5-agent-grounding-prompt-guard-cleanup-t1"
+    },
+    {
+      "targetTaskId": "test-agent-terminal-tools-final-e2e-t1",
+      "taskPackageId": "test-agent-terminal-tools-final-e2e-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS, active index/status, this state root, Design §10 and §9 static-to-real-test note, and Test/CLAUDE.md; declare Test window identity. Use the latest accepted local repos after E5: AlembicAgent commit ea055569c64d5874bdf3cbc0ff578987328e9b03 plus accepted Alembic/AlembicCore/AlembicPlugin terminal-tools commits recorded in the state root. Run a real Test scenario, preferably against the configured real project fixture if available, that proves: (1) Evolution/analyst terminal grounding can execute allowed read-only evidence commands such as git log/diff/status, grep/rg/find, npm/vitest test or tsc --noEmit through live terminal.exec and surface terminal output as reviewable evidence; (2) write/network/install/daemon/sudo/chmod/chown/delete or shell-meta smuggling are denied and executor is not invoked for denied write cases; (3) cwd jail rejects sibling/outside paths; (4) live exec audit/sandbox diagnostics are observable through the host path; (5) no terminal_shell/terminal_pty/terminal_run or retired @alembic/agent/tools/terminal public subpath is advertised or callable from live Agent/Core/Plugin surfaces; (6) AnalyzeGroundingGuard is still default off and only per-run opt-in. Use Node>=22. Provide raw logs/JSON/DB/audit files/commands sufficient for controller review. Do not modify product code; if a product defect is found, return blocked/needs-review with exact owner and evidence. Do not push/tag/bump.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T11:42:58.569Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-test-agent-terminal-tools-final-e2e-p1__Test__test-agent-terminal-tools-final-e2e-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-agent-terminal-tools-final-e2e-p1__Test__test-agent-terminal-tools-final-e2e-t1.json",
+        "deliveryRunId": "run-delivery-test-agent-terminal-tools-final-e2e-p1__Test__test-agent-terminal-tools-final-e2e-t1",
+        "dispatchGroup": "test-agent-terminal-tools-final-e2e-p1",
+        "sentAt": "2026-06-27T11:43:28.465Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-test-agent-terminal-tools-final-e2e-t1-20260627115000"
+    },
+    {
+      "targetTaskId": "w6-main-runtime-dist-stale-terminal-cleanup-t1",
+      "taskPackageId": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, and Alembic/CLAUDE.md; declare Alembic window/repository identity. Reproduce/inspect the final Test failure from Test/tmp/test-agent-terminal-tools-final-e2e-t1/*. Repair only Alembic Main runtime propagation: refresh/remove stale ignored dist artifacts so live runtime no longer imports @alembic/agent/tools/terminal, TERMINAL_CAPABILITY_MANIFESTS, LightweightRouter, TerminalAdapter, terminal_shell, terminal_pty, or terminal_run from retired terminal stack. Preserve branch A source semantics: live terminal surface is exec-only through the current v2 ToolContext/ToolRouter path; do not reintroduce daemon/dead terminal stack, phantom ads, write terminal surfaces, or public terminal subpath. Verify with Node>=22: Alembic build/check as applicable, negative rg over Alembic/lib and Alembic/dist for retired imports/ids except explicitly unrelated historical tests/comments, the import check from the failing Test evidence, and rerun Test/tmp/test-agent-terminal-tools-final-e2e-t1/run-final-e2e.mjs if feasible. If source changes are needed, commit locally on Alembic main and backfill commit hash, files, commands, and runtime evidence; if only ignored dist/runtime cleanup is needed, backfill exact cleanup/build evidence and no-commit reason.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T11:53:45.887Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1.json",
+        "deliveryRunId": "run-delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1",
+        "dispatchGroup": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+        "sentAt": "2026-06-27T11:54:49.805Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w6-main-runtime-dist-stale-terminal-cleanup-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicAgent",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "e2-agent-live-terminal-safety-p1",
+        "e2-agent-live-terminal-safety-rework-1-p1",
+        "e2-agent-live-terminal-safety-rework-2-p1",
+        "e2-agent-live-terminal-safety-rework-3-p1",
+        "e1-agent-evolution-readonly-allowlist-terminal-p1",
+        "e3-agent-dead-terminal-public-subpath-retirement-p1",
+        "e5-agent-grounding-prompt-guard-cleanup-p1"
+      ],
+      "targetTaskIds": [
+        "e2-agent-live-terminal-safety-t1",
+        "e2-agent-live-terminal-safety-rework-1-t1",
+        "e2-agent-live-terminal-safety-rework-2-t1",
+        "e2-agent-live-terminal-safety-rework-3-t1",
+        "e1-agent-evolution-readonly-allowlist-terminal-t1",
+        "e3-agent-dead-terminal-public-subpath-retirement-t1",
+        "e5-agent-grounding-prompt-guard-cleanup-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "e2-main-toolcontext-audit-sandbox-p1",
+        "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+        "w6-main-runtime-dist-stale-terminal-cleanup-p1"
+      ],
+      "targetTaskIds": [
+        "e2-main-toolcontext-audit-sandbox-t1",
+        "e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+        "w6-main-runtime-dist-stale-terminal-cleanup-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "e4-core-phantom-terminal-advertising-cleanup-p1"
+      ],
+      "targetTaskIds": [
+        "e4-core-phantom-terminal-advertising-cleanup-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "e4-plugin-phantom-terminal-vendor-consumer-sync-p1"
+      ],
+      "targetTaskIds": [
+        "e4-plugin-phantom-terminal-vendor-consumer-sync-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "test-agent-terminal-tools-final-e2e-p1"
+      ],
+      "targetTaskIds": [
+        "test-agent-terminal-tools-final-e2e-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-w6-main-runtime-dist-stale-terminal-cleanup-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-27T12:02:16.893Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1",
+    "lastDeliveryRunId": "run-delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1",
+    "lastDispatchGroup": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+    "lastTargetTaskId": "w6-main-runtime-dist-stale-terminal-cleanup-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-27T11:54:49.808Z"
+  }
+}

@@ -1,0 +1,581 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "title": "plan 作主体 AI Agent 正交前置组件(新 AgentProfile+runPlanAgent，方案 A)；coldStart 接线/deepMining 单 job 多轮/moduleMining per-cell fan-out/evolution 宿主接线(Core 零改)；PD-5 plan 硬 gate(失败 abort 不回退全量)；Core 补共享 applyPlanSelection 投影收敛 Plugin 双写；全 10 PD 闭合；A-F 全阶段代码级(§4b)。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Demand completed and all task packages accepted after final W4 Test evidence review.",
+  "revision": 63,
+  "activeStageId": null,
+  "updatedAt": "2026-06-27T09:20:29.230Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "w1-core-planselection-foundation-p1",
+      "summary": "W1 Core foundation for alembic-mainbody-lifecycle-adaptation-2026-06-26. User confirmed A4: PlanSelection shape validation belongs in Core as shared assertPlanSelectionShape, not local Agent validation. Implement §4b B1-B3 plus A4 shape assertion in AlembicCore only: add pure applyPlanSelection(selection, options?) near service/planIntent/planIntent.ts, add assertPlanSelectionShape for thin PlanSelection shape only (generationStage valid, dimensions non-empty string[], scale.totalRecipeBudget>0; length===1 valid, length===0 invalid), export both through @alembic/core/plans. Preserve PD-1 no I/O/no planLedger/no DB/no await, PD-8 do not touch analyst/token budget semantics, keep unknown dimension reporting non-throwing for projection. Do not modify AlembicPlugin/Alembic/AlembicAgent/vendor. Run Node>=22 build:check and focused tests/exports proof; commit on main and return commit hash, changed files, validation output, downstream consumption notes, residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(B), §8(A4); user confirmation 2026-06-27: A4=Core shared assertPlanSelectionShape",
+      "createdAt": "2026-06-27T01:52:23.655Z"
+    },
+    {
+      "taskPackageId": "w1-main-evolution-host-wiring-p1",
+      "summary": "W1 Alembic main F evolution host wiring for alembic-mainbody-lifecycle-adaptation-2026-06-26. Implement §4b F only in Alembic main repo: keep F1/F2/F5/F6 as reuse evidence, add EvolutionMaintenanceSweep in Alembic/lib/service/evolution mirroring Plugin tick-on-access/sweep shape but as daemon timerRegistry setInterval driver, and fix KnowledgeModule DecayDetector options to inject lifecycleStateMachine so scanAll can transition active->decaying. Preserve boundary: AlembicCore/src zero changes, no Plugin/Agent edits, no schema changes, no guard relaxation. Sweep must be bounded, idempotent, reentry guarded, timerRegistry-cleaned, and drive checkAndPromote/checkTimeouts/checkAndExecute/scanAll without changing Core judgments. Validate with Node>=22 build:check and focused tests/probes proving lifecycleStateMachine non-null/active->decaying transition, sweep non-zero on seeded due items, empty DB no fake status, timer cleanup, reactive rename/update path not broken. Commit on main and return commit hash, changed files, validation output, raw evidence paths, residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(F), §5 W1",
+      "createdAt": "2026-06-27T01:52:40.821Z"
+    },
+    {
+      "taskPackageId": "w1-agent-plan-profile-runner-p1",
+      "summary": "W1 AlembicAgent Stage A for alembic-mainbody-lifecycle-adaptation-2026-06-26. Implement only §4b(A): add plan-selection Agent profile and runPlanAgent producer now that Core shared assertPlanSelectionShape/applyPlanSelection is accepted. No adjacent repo edits. Use @alembic/core/plans PlanSelection + assertPlanSelectionShape; do not invent a local validatePlanSelection with different semantics. Keep profile single-step chat, actionSpace none, memory disabled, projection json-object, maxIterations 1. runPlanAgent must call agentService.run once, pass generationStage/projectContextFacts, throw on non-success/parse failure/invalid shape, allow dimensions.length===1, reject length===0, and avoid repository/sharedState/ledger/tool action use. Export from runs and agent/service surfaces. Validate with Node>=22 build/typecheck, lint, contract-surface, focused profile/run tests covering success/failure/invalid/len1/len0 and no repository/ledger imports. Commit on main and return commit hash, changed files, validation output, raw evidence, residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(A), §5 W1; W1 Core accepted commit 1553e2f8 provides assertPlanSelectionShape/applyPlanSelection",
+      "createdAt": "2026-06-27T02:24:52.764Z"
+    },
+    {
+      "taskPackageId": "w2-plugin-plan-gate-projection-convergence-p1",
+      "summary": "W2 AlembicPlugin §4b(B4) gate convergence for alembic-mainbody-lifecycle-adaptation-2026-06-26. Consume accepted AlembicCore commit 1553e2f8b7167b596b4c305f0bc40f46dd047359 providing @alembic/core/plans applyPlanSelection/assertPlanSelectionShape. Replace duplicated projection logic in AlembicPlugin plan-generation-gate.ts B4 only: swap the three local dimension/budget/moduleScope resolution calls to one applyPlanSelection(selection, options) and use projection.executionDimensions/projection.budget/projection.moduleScope. Delete the replaced private helpers and DEFAULT_* constants only when imports/consumers are clean. Preserve MCP shell behavior: existing validatePlanSelection stage/lease/blocked checks and attachPlanGenerationGateData field shape stay stable; do not rename public tool semantics, do not relax gates, do not touch AlembicCore/Alembic/AlembicAgent. Validation must include Node>=22 build:check, focused PlanDrivenGenerationGate tests including fixed selection parity/budget floor/testMode override/clamp/moduleScope, grep proving old helper/default duplication gone, lint:core-import-boundary, and git diff --check. Commit on AlembicPlugin main and return commit hash, changed files, validation output, raw evidence, residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(B4), §5 W2; W1 Core accepted commit 1553e2f8b7167b596b4c305f0bc40f46dd047359",
+      "createdAt": "2026-06-27T02:38:47.975Z"
+    },
+    {
+      "taskPackageId": "w2-main-coldstart-plan-hard-gate-p1",
+      "summary": "W2 Alembic main §4b(C) coldStart hard gate and plan-driven dimensions/budget for alembic-mainbody-lifecycle-adaptation-2026-06-26. Consume accepted producers: AlembicCore commit 1553e2f8b7167b596b4c305f0bc40f46dd047359 (@alembic/core/plans applyPlanSelection/assertPlanSelectionShape) and AlembicAgent commit 4ab2beeb05a78619144cb0d45f663801705f8e11 (@alembic/agent/service runPlanAgent). Implement only §4b(C1-C4) in Alembic main repo. At DaemonJobRunner executeApiAiWorkflow bootstrap path, build ProjectContext facts, runPlanAgent for generationStage coldStart, applyPlanSelection, and pass executionDimensions/budget/moduleScope into coldStart. Enforce PD-5 hard gate: plan failure/timeout/provider error/invalid or empty dimensions must record job error, mark job failed, runColdStartWorkflow 0 times, no fallback-to-full wording or behavior. Preserve PD-9 explicit intent.dimensionIds precedence over plan; preserve PD-8 separation: plan.scale controls maxFiles/contentMaxLines/totalRecipeBudget but does not replace computeAnalystBudget/token quality floor. ColdStartWorkflow must use plan executionDimensions instead of all baseDimensions for coldStart while retaining baseDimensions as facts seed pool. No AlembicCore/AlembicAgent/AlembicPlugin edits, no schema changes, no guard relaxation. Validate Node>=22 build:check and focused tests for PD-5 failure, legal narrow selection length>=1, empty length abort, plan-driven dimension count not full set, explicit dimension precedence, scale budget pass-through with computeAnalystBudget still called, logs without fallback-to-full. Commit on Alembic main and return commit hash, changed files, validation output, raw evidence, residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(C1-C4), §5 W2; W1 Core accepted commit 1553e2f8b7167b596b4c305f0bc40f46dd047359; W1 Agent accepted commit 4ab2beeb05a78619144cb0d45f663801705f8e11",
+      "createdAt": "2026-06-27T02:39:01.356Z"
+    },
+    {
+      "taskPackageId": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+      "summary": "W2 Alembic main rework for §4b(C1) PD-5 hard gate: controller raw review found runBootstrapPlanGate requests generationStage coldStart but does not verify the returned PlanSelection.generationStage matches coldStart before applyPlanSelection/coldStart. This leaves a wrong-stage but shape-valid PlanSelection able to drive coldStart, which violates the coldStart plan hard precondition and AI failure surfacing. Implement only this guard in Alembic main: after runPlanAgent and before applyPlanSelection, reject any selection whose generationStage is not coldStart, record the same plan-gate error/job failure path, runColdStartWorkflow 0 times, and keep no fallback-to-full wording or behavior. Add a focused unit test with generationStage deepMining + non-empty dimensions proving the job fails before coldStart. Re-run Node>=22 focused DaemonJobRunnerPlanGate/ColdStartPlanSelection tests plus build:check/typecheck/lint/import-boundary/diff-check as appropriate. Commit on Alembic main and return commit hash, changed files, validations, raw evidence, and residual risks. Do not edit AlembicCore, AlembicAgent, AlembicPlugin, vendor, schema, or public contracts.",
+      "status": "accepted",
+      "sourceRef": "Controller raw review of Alembic commit 08c920d8adc2dd48d89ed65457ae168e7274f2a6 against Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(C1), PD-5, R8; evidence: Alembic/lib/daemon/DaemonJobRunner.ts runBootstrapPlanGate lacks selection.generationStage === 'coldStart' check while AlembicAgent PlanAgentRun only shape-validates generationStage as one of coldStart/deepMining/moduleMining.",
+      "createdAt": "2026-06-27T03:00:59.447Z"
+    },
+    {
+      "taskPackageId": "w3-agent-module-mining-fanout-producer-p1",
+      "summary": "W3 AlembicAgent producer for alembic-mainbody-lifecycle-adaptation-2026-06-26 §4b(E1-E3) moduleMining fan-out support. W2 is accepted; W3 depends on C mode and Core U2 coverage ledger (already base dependency). Implement only AlembicAgent module-mining producer surfaces needed by Alembic main W3 consumer: add projectContextModules partitioner in AgentRunCoordinator that reads params.modules (not dimensions), yields one child per module with moduleId/moduleName/ownedFiles/phase module-mining-child, and throws on empty modules; add module-mining-session/module-mining-dimension profile(s) with fanout strategy/partitioner/merge and bounded concurrency; add/export runModuleMining({modules, projectFacts, budget, scaleCap}) that applies scaleCap before child creation and preserves full per-child analyst budget semantics (do not divide budget by module count). Preserve PD-3 profile-only/no new Plan capability, PD-8 scale as module count cap not token floor replacement, R5 no reuse of moduleSeeds as fan-out source, no repository/ledger/sharedState writes. Do not edit Alembic, AlembicCore, AlembicPlugin, vendor, schema, or public contracts outside AlembicAgent intended exports. Validate Node>=22 build/typecheck/lint/public-api boundary, focused tests for 3 modules -> 3 children with no dimension cross, empty modules throw, 8 modules + scaleCap 3 -> exactly 3 children each full budget, and exports available to Alembic main. Commit on AlembicAgent main and return commit hash, changed files, validations, raw evidence, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(E1-E3), §5 W3; W2 accepted at state revision 21; Core U2 coverage ledger dependency already satisfied by post-umbrella base; producer/consumer boundary requires AlembicAgent moduleMining exports before Alembic main W3 consumer.",
+      "createdAt": "2026-06-27T03:09:06.482Z"
+    },
+    {
+      "taskPackageId": "w3-main-deepmining-modulemining-consumer-p1",
+      "summary": "W3 Alembic main consumer for alembic-mainbody-lifecycle-adaptation-2026-06-26 §4b(D/E). Producer dependencies are accepted: Core plan projection/applyPlanSelection, Agent runPlanAgent, Alembic coldStart hard gate, and AlembicAgent runModuleMining/module fan-out producer commit c38d2c46853cb2cba8049dbee617b93c069e3bc2. Implement only Alembic main host wiring for deepMining and moduleMining: add deepMining single-job multi-round route in DaemonJobRunner with per-round runPlanAgent(deepMining) hard gate, applyPlanSelection, moduleScope/per-cell targets passed through buildDaemonRescanWorkflowArgs -> runKnowledgeRescanWorkflow, Core CoverageLedgerAdvisor/coverage_ledger consumption only (do not create local ledger), deep_mining_rounds recording, stop on convergence/new_recipes<K/maxRounds, no git_diff_checkpoints, no cross-job enqueue. Extend rescan args/intents additively with moduleScope/perDimensionTargets/moduleDimensionTargets/roundIndex/miningMode only for deepMining/moduleMining and preserve coldStart/normal rescan behavior. Add moduleMining route that runs the same PD-5 plan hard gate, derives module axis from ProjectMap/projectMapModules (not moduleSeeds), intersects with plan moduleBindings/executionDimensions, calls AlembicAgent runModuleMining over ProjectMap modules, applies scaleCap as module-count cap, preserves computeAnalystBudget/token quality floor, and fails on zero modules/zero recipes. Do not edit AlembicCore/AlembicAgent/AlembicPlugin/vendor/schema/public contracts. Validate Node>=22 build:check/typecheck/lint/boundary, focused tests for D: target gap existing=6 target=8 => gap=2 and no target => gap=0, plan failure aborts before rescan, single job multi-round no enqueue, round ledger rows/stops; E: module axis from projectMapModules not moduleSeeds, 8 modules+scale=3 => exactly 3 module children/full budget, empty modules fail, moduleName non-empty; R5 guard ProjectContextWorkflowFacts sampling loop unchanged and coldStart/rescan suites green. Commit on Alembic main and return commit hash, changed files, validation output, raw evidence, and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(D1-D8,E4-E7), §5 W3; accepted W3 Agent producer commit c38d2c46853cb2cba8049dbee617b93c069e3bc2; accepted W2 coldStart hard gate ff6f01efeadc99842c4f1650a9e96400308f5277; Core U2 coverage ledger dependency satisfied by post-umbrella/realverify base.",
+      "createdAt": "2026-06-27T03:22:26.259Z"
+    },
+    {
+      "taskPackageId": "w3-main-deepmining-modulemining-consumer-rework-1-p1",
+      "summary": "Rework W3 Alembic deepMining consumer only. Keep accepted W1/W2/W3-agent producer work intact. Fix the implementation so Design §4b D1/D6 are true: deepMining must run the PlanSelection hard gate inside every round of the single daemon-job while loop, and K/maxRounds must come from PlanSelection.scale projection/defaults rather than only job args. Do not weaken plan gate, do not enqueue follow-up jobs, do not persist plans, do not change normal rescan/coldStart behavior, and do not expand scope beyond W3 D/E consumer gaps.",
+      "status": "accepted",
+      "sourceRef": "Controller raw review of Alembic commit cdc5d8593c50ee0bb7692311ff18efd32b54791c against Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b D1/D6; review decision evt-20260627034810-0029.",
+      "createdAt": "2026-06-27T03:48:26.338Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+      "summary": "W4 true BiliDili acceptance for mainbody lifecycle adaptation. All implementation waves W1/W2/W3 are accepted, including W3 rework fb6782f. Test must run a real BiliDili scenario in an ALEMBIC_HOME sandbox on Node >=22 and collect DB/log/runtime evidence for C/D/E/F: coldStart plan precondition, deepMining single-job multi-round, moduleMining per-module fan-out, and host evolution/lifecycle maintenance wiring. This is verification only; do not repair product code in Test, do not relax anti-fabrication/evidence/transition gates, and do not treat a zero-output module or empty DB as success.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §2 CD-6 and §5 W4 after W1/W2/W3 accepted; accepted baselines include AlembicCore@1553e2f, AlembicAgent@c38d2c4, AlembicPlugin@ae97e0f, Alembic@fb6782f.",
+      "createdAt": "2026-06-27T03:59:49.721Z"
+    },
+    {
+      "taskPackageId": "w4-main-mainbody-lifecycle-e2e-repair-p1",
+      "summary": "Repair Alembic main runtime integration gaps exposed by W4 BiliDili E2E. Keep accepted Core/Agent/Plugin contracts, no fallback-to-full, no fake recipe success, no adjacent repo edits. Fix only public rescan stage controls, deepMining rescan evidence handoff, ProjectContext module map availability for moduleMining, and lifecycle maintenance DI so C-F can pass on real BiliDili.",
+      "status": "accepted",
+      "sourceRef": "W4 Test real BiliDili evidence: Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-t1/w4-mainbody-lifecycle-e2e-summary.json + http-public-route-probe.json; Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b C-F and §5 W4.",
+      "createdAt": "2026-06-27T04:23:28.449Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+      "summary": "Rerun W4 real BiliDili mainbody lifecycle C-F acceptance after Alembic main repair commit be39ab5. This is not a product-code implementation package; it must prove the repaired chain with true DB/log/JSON evidence before demand acceptance.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §2 CD-6, §4b C-F, §5 W4; accepted Alembic repair commit be39ab5aeb0d15294ea7960d30e8a9cc17f38989; prior W4 Test blocker route.",
+      "createdAt": "2026-06-27T05:00:20.443Z"
+    },
+    {
+      "taskPackageId": "w4-main-runtime-dist-propagation-repair-p1",
+      "summary": "Repair W4 runtime gap found by Test after-main-repair rerun: Alembic source changes from be39ab5 are not present in dist/runtime, causing public rescan generation controls to be stripped, ProjectContext module fallback to remain unavailable, and StagingManager lifecycle wiring to be missing at runtime. Fix Alembic live source plus dist/runtime propagation and prove with targeted tests before Test reruns W4.",
+      "status": "accepted",
+      "sourceRef": "Test result tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1; Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/http-public-route-probe.json; Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/w4-after-main-repair-e2e-summary.json; Alembic source/dist comparison for jobs route, ProjectContextWorkflowFacts, KnowledgeModule.",
+      "createdAt": "2026-06-27T05:14:28.512Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-p1",
+      "summary": "Rerun W4 BiliDili mainbody lifecycle e2e after Alembic runtime/dist propagation repair. This validates the previous Test blocker is gone: public jobs route preserves W4 fields, ProjectContext derives target modules from real refs/files when map modules are empty, deep/module mining writes real coverage evidence, and maintenance lifecycle transitions use lifecycleStateMachine. This is final W4 evidence collection, not a request to relax gates.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §2 CD-6, §4b C-F, §5 W4; accepted Alembic repair be39ab5aeb0d15294ea7960d30e8a9cc17f38989; target result tr-w4-main-runtime-dist-propagation-repair-t1-controller-evidence-repaired; prior Test blocker w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1.",
+      "createdAt": "2026-06-27T05:30:59.745Z"
+    },
+    {
+      "taskPackageId": "w4-main-projectcontext-modulebinding-repair-p1",
+      "summary": "Repair W4 mainbody ProjectContext/module binding chain after Test verified runtime/dist and HTTP fixes but BiliDili still produced moduleCount=0/projectMapModules=[] despite targetCount=15. The fix must make real ProjectContext target refs/owned files become ProjectMap modules/moduleBindings so deepMining and moduleMining can produce DB evidence. Do not touch already-green HTTP field preservation or lifecycle sweep behavior except where required by the same chain.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b D/E, §5 W4; Test evidence Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1/w4-after-runtime-dist-repair-e2e-summary.json and w4-after-runtime-dist-repair-report.md; controller rework decision tc-20260627082902-0052.",
+      "createdAt": "2026-06-27T08:30:02.860Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+      "summary": "Rerun W4 BiliDili mainbody lifecycle e2e after Alembic ProjectContext/module binding repair. This validates the exact previous blocker is gone: BiliDili ProjectContext target refs/files must become non-empty ProjectMap modules/moduleBindings, enabling deepMining and moduleMining to write real DB evidence while preserving the already-green HTTP route and lifecycle maintenance behavior.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §2 CD-6, §4b C-F, §5 W4; accepted Alembic ProjectContext/module binding repair eebe4ade6e8c5446def839af6b1e061e7c37e935; controller evidence result tr-w4-main-projectcontext-modulebinding-repair-t1-controller-evidence-repaired; prior Test blocker w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1.",
+      "createdAt": "2026-06-27T08:58:51.669Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "w1-core-planselection-foundation-t1",
+      "taskPackageId": "w1-core-planselection-foundation-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read ../CLAUDE.md, ../.wakeflow-active/index.md, current state root, and AlembicCore/CLAUDE.md. Declare AlembicCore identity. Implement only Core §4b B1-B3 + confirmed A4 assertPlanSelectionShape. No product-code downgrades, no plan persistence, no outer repo edits.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T01:52:23.655Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w1-core-planselection-foundation-p1__AlembicCore__w1-core-planselection-foundation-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w1-core-planselection-foundation-p1__AlembicCore__w1-core-planselection-foundation-t1.json",
+        "deliveryRunId": "run-delivery-w1-core-planselection-foundation-p1__AlembicCore__w1-core-planselection-foundation-t1",
+        "dispatchGroup": "w1-core-planselection-foundation-p1",
+        "sentAt": "2026-06-27T01:53:58.113Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w1-core-planselection-foundation-t1-controller-reviewed"
+    },
+    {
+      "targetTaskId": "w1-main-evolution-host-wiring-t1",
+      "taskPackageId": "w1-main-evolution-host-wiring-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read ../CLAUDE.md, ../.wakeflow-active/index.md, current state root, and Alembic/CLAUDE.md. Declare Alembic identity. Implement only §4b F host wiring in Alembic main repo; AlembicCore/src must remain untouched. No product-code downgrades and no generated fake success.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T01:52:40.821Z",
+      "resultId": "tr-w1-main-evolution-host-wiring-t1-controller-reviewed",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w1-main-evolution-host-wiring-p1__Alembic__w1-main-evolution-host-wiring-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w1-main-evolution-host-wiring-p1__Alembic__w1-main-evolution-host-wiring-t1.json",
+        "deliveryRunId": "run-delivery-w1-main-evolution-host-wiring-p1__Alembic__w1-main-evolution-host-wiring-t1",
+        "dispatchGroup": "w1-main-evolution-host-wiring-p1",
+        "sentAt": "2026-06-27T02:08:00.729Z",
+        "readbackOk": true
+      }
+    },
+    {
+      "targetTaskId": "w1-agent-plan-profile-runner-t1",
+      "taskPackageId": "w1-agent-plan-profile-runner-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read ../CLAUDE.md, ../.wakeflow-active/index.md, current state root, and AlembicAgent/CLAUDE.md. Declare AlembicAgent identity. Implement only §4b(A) plan-selection profile/runPlanAgent in AlembicAgent; consume Core shared assertPlanSelectionShape from @alembic/core/plans; no adjacent repo edits and no thin/mock-only implementation.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T02:24:52.764Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w1-agent-plan-profile-runner-p1__AlembicAgent__w1-agent-plan-profile-runner-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w1-agent-plan-profile-runner-p1__AlembicAgent__w1-agent-plan-profile-runner-t1.json",
+        "deliveryRunId": "run-delivery-w1-agent-plan-profile-runner-p1__AlembicAgent__w1-agent-plan-profile-runner-t1",
+        "dispatchGroup": "w1-agent-plan-profile-runner-p1",
+        "sentAt": "2026-06-27T02:25:53.108Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w1-agent-plan-profile-runner-t1"
+    },
+    {
+      "targetTaskId": "w2-plugin-plan-gate-projection-convergence-t1",
+      "taskPackageId": "w2-plugin-plan-gate-projection-convergence-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read ../AGENTS.md or ../CLAUDE.md as present, ../.wakeflow-active/index.md, the current state root, and AlembicPlugin/CLAUDE.md. Declare AlembicPlugin identity. Implement only §4b(B4) Plugin gate convergence using Core applyPlanSelection; no public MCP semantic drift and no adjacent repo edits.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T02:38:47.975Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w2-plugin-plan-gate-projection-convergence-p1__AlembicPlugin__w2-plugin-plan-gate-projection-convergence-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w2-plugin-plan-gate-projection-convergence-p1__AlembicPlugin__w2-plugin-plan-gate-projection-convergence-t1.json",
+        "deliveryRunId": "run-delivery-w2-plugin-plan-gate-projection-convergence-p1__AlembicPlugin__w2-plugin-plan-gate-projection-convergence-t1",
+        "dispatchGroup": "w2-plugin-plan-gate-projection-convergence-p1",
+        "sentAt": "2026-06-27T02:40:00.021Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w2-plugin-plan-gate-projection-convergence-t1-controller-reviewed"
+    },
+    {
+      "targetTaskId": "w2-main-coldstart-plan-hard-gate-t1",
+      "taskPackageId": "w2-main-coldstart-plan-hard-gate-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read ../AGENTS.md or ../CLAUDE.md as present, ../.wakeflow-active/index.md, the current state root, and Alembic/CLAUDE.md. Declare Alembic identity. Implement only §4b(C) coldStart plan hard gate/plan-driven dimensions and budget in Alembic main; consume accepted Core+Agent package surfaces; no adjacent repo edits and no fallback to full when plan fails.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T02:39:01.356Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w2-main-coldstart-plan-hard-gate-p1__Alembic__w2-main-coldstart-plan-hard-gate-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w2-main-coldstart-plan-hard-gate-p1__Alembic__w2-main-coldstart-plan-hard-gate-t1.json",
+        "deliveryRunId": "run-delivery-w2-main-coldstart-plan-hard-gate-p1__Alembic__w2-main-coldstart-plan-hard-gate-t1",
+        "dispatchGroup": "w2-main-coldstart-plan-hard-gate-p1",
+        "sentAt": "2026-06-27T02:40:00.625Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w2-main-coldstart-plan-hard-gate-t1"
+    },
+    {
+      "targetTaskId": "w2-main-coldstart-plan-hard-gate-rework-1-t1",
+      "taskPackageId": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read ../AGENTS.md or ../CLAUDE.md as present, ../.wakeflow-active/index.md, current state root, and Alembic/CLAUDE.md. Declare Alembic identity. Rework only W2 §4b(C1) PD-5 stage-match hard gate in Alembic main: wrong-stage PlanSelection from runPlanAgent must abort before coldStart with plan-gate error evidence and regression test; no fallback to full and no adjacent repo edits.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T03:00:59.447Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w2-main-coldstart-plan-hard-gate-rework-1-p1__Alembic__w2-main-coldstart-plan-hard-gate-rework-1-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w2-main-coldstart-plan-hard-gate-rework-1-p1__Alembic__w2-main-coldstart-plan-hard-gate-rework-1-t1.json",
+        "deliveryRunId": "run-delivery-w2-main-coldstart-plan-hard-gate-rework-1-p1__Alembic__w2-main-coldstart-plan-hard-gate-rework-1-t1",
+        "dispatchGroup": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+        "sentAt": "2026-06-27T03:01:28.105Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w2-main-coldstart-plan-hard-gate-rework-1-t1"
+    },
+    {
+      "targetTaskId": "w3-agent-module-mining-fanout-producer-t1",
+      "taskPackageId": "w3-agent-module-mining-fanout-producer-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read ../CLAUDE.md, ../.wakeflow-active/index.md, current state root, and AlembicAgent/CLAUDE.md. Declare AlembicAgent identity. Implement only W3 §4b(E1-E3) moduleMining fan-out producer surfaces in AlembicAgent; no adjacent repo edits, no thin/mock fan-out, no moduleSeeds shortcut.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T03:09:06.482Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w3-agent-module-mining-fanout-producer-p1__AlembicAgent__w3-agent-module-mining-fanout-producer-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w3-agent-module-mining-fanout-producer-p1__AlembicAgent__w3-agent-module-mining-fanout-producer-t1.json",
+        "deliveryRunId": "run-delivery-w3-agent-module-mining-fanout-producer-p1__AlembicAgent__w3-agent-module-mining-fanout-producer-t1",
+        "dispatchGroup": "w3-agent-module-mining-fanout-producer-p1",
+        "sentAt": "2026-06-27T03:10:33.531Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w3-agent-module-mining-fanout-producer-t1-controller-reviewed"
+    },
+    {
+      "targetTaskId": "w3-main-deepmining-modulemining-consumer-t1",
+      "taskPackageId": "w3-main-deepmining-modulemining-consumer-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read ../AGENTS.md or ../CLAUDE.md as present, ../.wakeflow-active/index.md, current state root, and Alembic/CLAUDE.md. Declare Alembic identity. Implement only W3 §4b(D/E) deepMining single-job multi-round and moduleMining fan-out host wiring in Alembic main, consuming accepted Core/Agent surfaces; no adjacent repo edits, no Core ledger fork, no moduleSeeds shortcut, no fallback-to-full.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T03:22:26.259Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w3-main-deepmining-modulemining-consumer-p1__Alembic__w3-main-deepmining-modulemining-consumer-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w3-main-deepmining-modulemining-consumer-p1__Alembic__w3-main-deepmining-modulemining-consumer-t1.json",
+        "deliveryRunId": "run-delivery-w3-main-deepmining-modulemining-consumer-p1__Alembic__w3-main-deepmining-modulemining-consumer-t1",
+        "dispatchGroup": "w3-main-deepmining-modulemining-consumer-p1",
+        "sentAt": "2026-06-27T03:22:52.544Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w3-main-deepmining-modulemining-consumer-t1-controller-reviewed"
+    },
+    {
+      "targetTaskId": "w3-main-deepmining-modulemining-consumer-rework-1-t1",
+      "taskPackageId": "w3-main-deepmining-modulemining-consumer-rework-1-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, task package w3-main-deepmining-modulemining-consumer-rework-1-p1, and Alembic/CLAUDE.md. Declare identity as Alembic product window. Rework commit cdc5d8593c50ee0bb7692311ff18efd32b54791c: (1) In Alembic/lib/daemon/DaemonJobRunner.ts, move/structure runPlanSelectionGate({generationStage:'deepMining'}) so each deepMining round invokes runPlanAgent(deepMining) before that round's rescan. Each round must use that round's PlanSelection projection for executionDimensions, moduleScope, perDimensionTargets, moduleDimensionTargets, budget, and moduleCount. If a later round plan gate fails, fail the job before running that round's rescan and record the existing plan-gate error event. (2) Satisfy Design §4b D6: feed CoverageLedgerAdvisor planK/planMaxRounds from PlanSelection.scale projection/defaults. Do not rely only on options.args.minNewRecipes/options.args.maxRounds. If current Core PlanSelection.scale lacks explicit typed K/maxRounds fields, use the existing accepted projection shape conservatively and route missing values to Core advisor defaults; do not invent a new persisted plan contract. (3) Add/repair tests in Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts: a two-round deepMining job must assert runPlanAgent is called once per round; round 2 may return changed module bindings/targets and the second rescan must receive the changed projection; a plan failure in round 2 must abort before second rescan; K/maxRounds source must be guarded. Preserve existing moduleMining ProjectMap fan-out tests and normal rescan tests. Validate with Node 22: npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/DaemonJobRunner.test.ts test/unit/ProjectContextWorkflowFacts.test.ts; npm run build:check && npm run typecheck; git diff --check HEAD; npm run lint:core-import-boundary; npm run lint:repo-boundary. Commit to Alembic main and backfill commit hash, changed files, validation output, and any remaining risk.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T03:48:26.338Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w3-main-deepmining-modulemining-consumer-rework-1-p1__Alembic__w3-main-deepmining-modulemining-consumer-rework-1-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w3-main-deepmining-modulemining-consumer-rework-1-p1__Alembic__w3-main-deepmining-modulemining-consumer-rework-1-t1.json",
+        "deliveryRunId": "run-delivery-w3-main-deepmining-modulemining-consumer-rework-1-p1__Alembic__w3-main-deepmining-modulemining-consumer-rework-1-t1",
+        "dispatchGroup": "w3-main-deepmining-modulemining-consumer-rework-1-p1",
+        "sentAt": "2026-06-27T03:48:55.978Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w3-main-deepmining-modulemining-consumer-rework-1-t1"
+    },
+    {
+      "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md/CLAUDE.md as present, .wakeflow-active/index.md, current state root, task package w4-test-bilidili-mainbody-lifecycle-e2e-p1, Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md especially §2 CD-6, §4b acceptance lines C-F, and §5 W4, plus Test/CLAUDE.md. Declare Test window identity. Use the real BiliDili project available in this workspace (record exact BiliDili commit; if it differs from design's historical 02a25032, use current main and report that fact). Use ALEMBIC_HOME sandbox and Node >=22. Validate accepted local product heads: AlembicCore@1553e2f, AlembicAgent@c38d2c4, AlembicPlugin@ae97e0f, Alembic@fb6782f. Required evidence: (1) C coldStart: plan precondition runs; mock/invalid plan or forced plan failure blocks before coldStart with no fallback-to-full evidence; valid narrow plan drives strict executionDimensions/dimensions and scale budget into DB/log/runtime output. (2) D deepMining: one daemon job runs >=2 rounds, deep_mining_rounds has >=2 rows, new_recipes decreases or stop reason is recorded, coverage_ledger blank/thin count decreases, later-round recipes land in previously uncovered module/dimension cells, module-scope+depth budget visibly affect execution, same job id has no new enqueue, no git_diff_checkpoints/planLedger write path is used. (3) E moduleMining: module fan-out comes from ProjectMap.modules rather than moduleSeeds; for selected modules each module produces >=1 recipe; recipe moduleName is non-empty and belongs to ProjectMap.modules; scale=3 with >=8 modules runs exactly 3 child module jobs with full child budget; zero-output module is FAIL, not pass. (4) F host maintenance: lifecycleStateMachine is injected; scan/sweep/tick with staged/proposal/dead fixtures produces nonzero real work, records lifecycle_transition_events, active/dead/decaying states classify correctly, reactive rename/update proposal path remains alive, empty DB returns all-zero without fake state, daemon/timer cleanup leaves no residual timer. Record exact commands, logs/report paths, SQL snippets or JSON exports, Alembic/BiliDili commit hashes, DB path under sandbox, and failure classification. If blocked, return TargetResultEnvelope status=blocked with the first failing chain and owning repo recommendation; otherwise completed with raw evidence refs.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T03:59:49.721Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w4-test-bilidili-mainbody-lifecycle-e2e-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-t1.json",
+        "deliveryRunId": "run-delivery-w4-test-bilidili-mainbody-lifecycle-e2e-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+        "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+        "sentAt": "2026-06-27T04:00:35.957Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-t1"
+    },
+    {
+      "targetTaskId": "w4-main-mainbody-lifecycle-e2e-repair-t1",
+      "taskPackageId": "w4-main-mainbody-lifecycle-e2e-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md/CLAUDE.md as present, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, task package w4-main-mainbody-lifecycle-e2e-repair-p1, Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b C-F and §5 W4, plus Alembic/CLAUDE.md. Declare identity as Alembic product window. Rework commit fb6782f13d2fa201edae8a3cd2e8736ce793ccd5 only in Alembic main. Controller-reviewed W4 evidence says true BiliDili current main failed C-F: (1) Alembic/lib/http/routes/jobs.ts RescanJobBody strips generationStage/maxRounds/scaleCap, so public /api/v1/jobs/rescan cannot enqueue deepMining/moduleMining. Add bounded schema parsing/tests so legacy reason/dimensions/maxFiles/contentMaxLines remain, but generationStage deepMining|moduleMining, maxRounds, minNewRecipes, scaleCap, and any existing daemon runner accepted stage controls survive request -> job.request; invalid values must reject, not silently strip. (2) Alembic/lib/daemon/DaemonJobRunner.ts + Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts: deepMining plan gate currently succeeds, writes one deep_mining_round, then fails before production with '[MissionBriefing] rescan-host-agent profile requires rescan evidence input'. Wire the real rescan evidence/decision context required by MissionBriefing for deepMining rounds so a single daemon job can complete >=2 rounds; preserve no git_diff_checkpoints/planLedger writes and fail closed on missing evidence. (3) Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts / moduleMining path: BiliDili ProjectContext reports targets but projectMapModules=0, so moduleMining throws 'requires at least one ProjectMap module'. Produce real ProjectMap modules from ProjectContext map/targets/package manifest data for Swift Package targets (ownedFiles/modulePath populated from real files), not fixture modules or moduleSeeds shortcuts; moduleMining must fan out from ProjectMap.modules and fail zero-output modules. (4) Alembic/lib/injection/modules/KnowledgeModule.ts: stagingManager is registered without lifecycleStateMachine; expired auto-approvable staging remains waiting with no lifecycle_transition_events. Inject lifecycleStateMachine or otherwise wire StagingManager through legal Core lifecycle transition path; maintenance sweep must promote/transition eligible staging and record lifecycle_transition_events while empty DB remains all-zero. Add targeted unit/regression tests covering all four gaps: JobsRoute parsing keeps new fields; deepMining runner passes rescan evidence and completes multi-round under controlled AgentService; moduleMining uses ProjectMap modules from BiliDili-like Swift Package facts and honors scaleCap=3; KnowledgeModule/staging sweep records lifecycle transition. Validate with Node 22: npm run test:unit -- relevant touched tests including JobsRoute, DaemonJobRunnerPlanGate/ProjectContextWorkflowFacts/KnowledgeModuleEvolutionWiring/EvolutionMaintenanceSweep as applicable; npm run build:check && npm run typecheck; npm run lint:core-import-boundary; npm run lint:repo-boundary; git diff --check HEAD. Commit to Alembic main and backfill commit hash, changed files, validation output, and remaining risk. Do not edit AlembicCore/AlembicAgent/AlembicPlugin/Test/BiliDili.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T04:23:28.449Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w4-main-mainbody-lifecycle-e2e-repair-p1__Alembic__w4-main-mainbody-lifecycle-e2e-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-main-mainbody-lifecycle-e2e-repair-p1__Alembic__w4-main-mainbody-lifecycle-e2e-repair-t1.json",
+        "deliveryRunId": "run-delivery-w4-main-mainbody-lifecycle-e2e-repair-p1__Alembic__w4-main-mainbody-lifecycle-e2e-repair-t1",
+        "dispatchGroup": "w4-main-mainbody-lifecycle-e2e-repair-p1",
+        "sentAt": "2026-06-27T04:24:28.673Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w4-main-mainbody-lifecycle-e2e-repair-t1-evidence-repaired"
+    },
+    {
+      "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+      "targetWindow": "Test",
+      "summary": "You are Test, not a product repository. Read parent AGENTS.md/CLAUDE.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, this task package, the design doc §2 CD-6 + §4b C-F + §5 W4, and Test/CLAUDE.md. Declare Test identity and execute only this verification. Use real BiliDili current main and record exact BiliDili commit plus exact local heads for Alembic, AlembicCore, AlembicAgent, and AlembicPlugin. Expected Alembic repair head is be39ab5aeb0d15294ea7960d30e8a9cc17f38989. Use isolated ALEMBIC_HOME and Node >=22. Re-test the prior blockers after the accepted Alembic repair: (1) public /api/v1/jobs/rescan accepts generationStage=deepMining with maxRounds/scaleCap and preserves those fields in accepted job.request; (2) deepMining one daemon job completes at least two rounds, deep_mining_rounds records >=2, MissionBriefing has no rescan evidence error, no git_diff_checkpoints/planLedger writes, and coverage ledger improves or records a valid stop reason; (3) moduleMining uses real ProjectMap/target modules rather than fixtures/moduleSeeds, selected modules produce at least one recipe each, moduleName is non-empty and present in ProjectMap evidence, and scale=3 with >=8 eligible modules produces exactly 3 child module jobs/full budget; zero-output module is failure; (4) maintenance sweep with staging/proposal/dead fixtures uses lifecycleStateMachine, records lifecycle_transition_events, and produces correct active/dead/decaying semantics; empty DB all-zero must not fake state. Provide raw JSON/DB/log/report paths, SQL snippets or DB exports, command output summaries, and failure classification. If any blocker persists, return status=blocked with owning repo and exact next repair recommendation. Do not loosen anti-fabrication, quality floor, FP guard, or transition guard.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T05:00:20.443Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1.json",
+        "deliveryRunId": "run-delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+        "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+        "sentAt": "2026-06-27T05:01:20.941Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1"
+    },
+    {
+      "targetTaskId": "w4-main-runtime-dist-propagation-repair-t1",
+      "taskPackageId": "w4-main-runtime-dist-propagation-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "You are Alembic, the owning product repository window. Read parent AGENTS.md/CLAUDE.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, this task package, Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §2 CD-6 + §4b C-F + §5 W4, and Alembic/CLAUDE.md. Declare Alembic repository identity and execute only this repair. Do not push, tag, release, or change non-Alembic repositories. Node must be >=22. Controller evidence: Test rerun at Alembic be39ab5 blocked because runtime dist did not include prior source repair. HTTP POST /api/v1/jobs/rescan sent generationStage=deepMining, miningMode=deepMining, maxRounds=2, minNewRecipes=1, scaleCap=3, maxFiles=5, contentMaxLines=20, but accepted job.request retained only reason/dimensions/maxFiles/contentMaxLines. Controller verified Alembic/lib/http/routes/jobs.ts has widened RescanJobBody, while Alembic/dist/lib/http/routes/jobs.js still has the old schema. Controller also verified Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts has buildProjectMapModulesFromTargets/target fallback while dist lacks it, and Alembic/lib/injection/modules/KnowledgeModule.ts injects lifecycle into StagingManager while dist lacks the runtime lifecycle wiring. Required repair: (1) make the public jobs route runtime preserve all W4 rescan controls end to end in accepted job.request: generationStage, miningMode, maxRounds, minNewRecipes, scaleCap, moduleScope, perDimensionTargets, moduleDimensionTargets, roundIndex, without weakening validation; (2) make the actual runtime used by daemon/Test include ProjectContext target-module fallback so real BiliDili ProjectContext exposes non-empty projectMapModules/moduleCount when targets exist; (3) make actual runtime StagingManager receive lifecycleStateMachine and record lifecycle_transition_events for eligible staging promotion; (4) ensure dist/runtime artifacts are regenerated/committed or otherwise made consistent with source. Source-only fixes are not sufficient. Required verification before backfill: git diff review; targeted unit/integration tests for route request preservation, ProjectContext target-module fallback, and StagingManager lifecycle wiring; npm run build or the repo's equivalent dist generation plus npm run build:check, npm run typecheck, npm run lint:core-import-boundary, npm run lint:repo-boundary, git diff --check. Include grep/source evidence that dist now contains the widened RescanJobBody fields, buildProjectMapModulesFromTargets path, and StagingManager lifecycle injection. If deepMining still records 0 rounds/coverage or moduleMining still has moduleCount=0 after source+dist consistency, diagnose and fix in Alembic within W4 C-F scope rather than handing back to Test. Backfill commit hash, files changed, exact command outputs, and remaining risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T05:14:28.512Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w4-main-runtime-dist-propagation-repair-p1__Alembic__w4-main-runtime-dist-propagation-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-main-runtime-dist-propagation-repair-p1__Alembic__w4-main-runtime-dist-propagation-repair-t1.json",
+        "deliveryRunId": "run-delivery-w4-main-runtime-dist-propagation-repair-p1__Alembic__w4-main-runtime-dist-propagation-repair-t1",
+        "dispatchGroup": "w4-main-runtime-dist-propagation-repair-p1",
+        "sentAt": "2026-06-27T05:15:08.135Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w4-main-runtime-dist-propagation-repair-t1-controller-evidence-repaired"
+    },
+    {
+      "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1",
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-p1",
+      "targetWindow": "Test",
+      "summary": "You are Test. Read parent AGENTS.md, .wakeflow-active/index.md, the current controller status, this state root, and Test/CLAUDE.md. Declare Test window/repository identity. Use real BiliDili current main with an isolated ALEMBIC_HOME and Node >=22. Before running, verify the shared Alembic runtime is refreshed from source: Alembic/dist/lib/http/routes/jobs.js must preserve generationStage/miningMode/maxRounds/minNewRecipes/scaleCap/moduleScope/perDimensionTargets/moduleDimensionTargets/roundIndex, Alembic/dist/lib/workflows/project-context/ProjectContextWorkflowFacts.js must include target-module fallback helpers, and Alembic/dist/lib/injection/modules/KnowledgeModule.js must inject lifecycleStateMachine into StagingManager; if stale, run npm run build in Alembic and record that evidence. Then rerun W4 BiliDili lifecycle checks. Required evidence: (1) public /api/v1/jobs/rescan accepted job.request preserves W4 fields and rejects incompatible stage/mode; (2) controlled DeepMining records >=2 real deep_mining_rounds and coverage_ledger rows, or a valid design-supported stop reason, with no git_diff_checkpoints or planLedger writes; (3) ModuleMining uses real ProjectMap/target refs, moduleCount/projectMapModules non-empty, selected modules produce recipes with non-empty moduleName/evidence, scale=3 with >=8 eligible modules yields exactly 3 child module jobs/full budget, and zero-output module fails; (4) maintenance sweep over staging/proposal/dead fixtures uses lifecycleStateMachine and records lifecycle_transition_events with correct active/dead/decaying outcomes; empty DB all-zero must not be treated as success. Return raw JSON/DB/log/report paths, SQL snippets or exports, exact repo heads, exact commands, and failure owner if anything fails. Do not accept copied/stale dist or a loyal read-only duplicate as evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T05:30:59.745Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1.json",
+        "deliveryRunId": "run-delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1",
+        "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-p1",
+        "sentAt": "2026-06-27T05:31:51.025Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1"
+    },
+    {
+      "targetTaskId": "w4-main-projectcontext-modulebinding-repair-t1",
+      "taskPackageId": "w4-main-projectcontext-modulebinding-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "You are Alembic. Read Alembic/CLAUDE.md, parent AGENTS/CLAUDE, .wakeflow-active/index.md, the current state root, this task package, and Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b D/E + W4. Declare Alembic window/repository identity. Goal: fix the remaining W4 blocker proven by Test: BiliDili ProjectContext facts show targetCount=15 but moduleCount=0/projectMapModules=[], so deepMining fails with `deepMining requires plan moduleBindings with module×dimension targets` and moduleMining fails with `moduleMining requires at least one ProjectMap module`. Investigate and repair the Alembic runtime chain around ProjectContextWorkflowFacts target-derived modules, runPlan/PlanSelection moduleBindings, DaemonJobRunner buildDeepMiningRoundPlanContext/runDeepMiningRounds/runModuleMiningWorkflow, and any mainbody ProjectMap/module axis wiring that prevents real BiliDili refs/files from becoming owned modules. Acceptance: (1) real or representative BiliDili ProjectContext facts expose non-empty projectMapModules with real owned file coverage when target refs/files exist; (2) deepMining PlanSelection has moduleBindings with module×dimension targets before running rounds and no planLedger/git_diff_checkpoints writes; (3) moduleMining fan-out reads ProjectMap modules, respects scaleCap=3 over >=8 eligible modules as exactly 3 child module jobs/full per-module budget, and zero-output module fails; (4) existing green behavior stays green: dist jobs route preserves W4 fields/rejects bad stage-mode, lifecycleStateMachine injection remains, maintenance lifecycle events still work; (5) rebuild dist if runtime uses dist in Test. Validation: Node >=22, targeted tests for ProjectContext target module fallback/moduleBindings/moduleMining, npm run build, npm run build:check, npm run lint:repo-boundary, git diff --check, and any existing W4 harness/probe you can run without Test. Commit on main if product code changes; return commit hash, changed files, commands, outputs, raw evidence paths, risks, and whether Test must rerun W4. Do not relax W4 gates, do not accept empty modules, do not create mock-only modules, and do not move scope to Core/Agent unless you identify a true cross-repo blocker and return it as blocked with file/line evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T08:30:02.860Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w4-main-projectcontext-modulebinding-repair-p1__Alembic__w4-main-projectcontext-modulebinding-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-main-projectcontext-modulebinding-repair-p1__Alembic__w4-main-projectcontext-modulebinding-repair-t1.json",
+        "deliveryRunId": "run-delivery-w4-main-projectcontext-modulebinding-repair-p1__Alembic__w4-main-projectcontext-modulebinding-repair-t1",
+        "dispatchGroup": "w4-main-projectcontext-modulebinding-repair-p1",
+        "sentAt": "2026-06-27T08:30:38.140Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w4-main-projectcontext-modulebinding-repair-t1-controller-evidence-repaired"
+    },
+    {
+      "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+      "targetWindow": "Test",
+      "summary": "You are Test. Read parent AGENTS.md/CLAUDE.md as present, .wakeflow-active/index.md, current state root, this task package, Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §2 CD-6 + §4b C-F + §5 W4, and Test/CLAUDE.md. Declare Test window identity. Use real BiliDili current main with an isolated ALEMBIC_HOME and Node >=22. Expected Alembic HEAD is eebe4ade6e8c5446def839af6b1e061e7c37e935. Before W4, verify Alembic/dist/lib/workflows/project-context/ProjectContextWorkflowFacts.js contains buildProjectMapModulesFromTargets/readSwiftPackageTargetPathMap/collectOwnedFilesFromProjectRoot; if stale, run npm run build in Alembic and record that evidence. Required evidence: (1) public /api/v1/jobs/rescan still preserves W4 fields and rejects incompatible generationStage/miningMode; (2) BiliDili ProjectContext facts now report targetCount=15 and moduleCount/projectMapModules non-empty from real refs/files, with sample moduleName/modulePath/ownedFiles evidence; (3) controlled DeepMining one daemon job records >=2 deep_mining_rounds and coverage_ledger rows, or a design-supported stop reason, with no git_diff_checkpoints or planLedger writes; (4) ModuleMining uses real ProjectMap/target modules, selected modules produce recipes with non-empty moduleName/evidence, scale=3 with >=8 eligible modules yields exactly 3 child module jobs/full per-module budget, and zero-output module fails; (5) maintenance sweep over staging/proposal/dead fixtures still uses lifecycleStateMachine and records lifecycle_transition_events with correct active/dead/decaying outcomes; empty DB all-zero must not be treated as success. Return raw JSON/DB/log/report paths, SQL snippets or exports, exact repo heads, exact commands, and failure owner if anything fails. Do not loosen anti-fabrication, quality floor, FP guard, transition guard, or accept copied/stale dist.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T08:58:51.669Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1.json",
+        "deliveryRunId": "run-delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+        "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+        "sentAt": "2026-06-27T08:59:48.702Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "w1-core-planselection-foundation-p1"
+      ],
+      "targetTaskIds": [
+        "w1-core-planselection-foundation-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "w1-main-evolution-host-wiring-p1",
+        "w2-main-coldstart-plan-hard-gate-p1",
+        "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+        "w3-main-deepmining-modulemining-consumer-p1",
+        "w3-main-deepmining-modulemining-consumer-rework-1-p1",
+        "w4-main-mainbody-lifecycle-e2e-repair-p1",
+        "w4-main-runtime-dist-propagation-repair-p1",
+        "w4-main-projectcontext-modulebinding-repair-p1"
+      ],
+      "targetTaskIds": [
+        "w1-main-evolution-host-wiring-t1",
+        "w2-main-coldstart-plan-hard-gate-t1",
+        "w2-main-coldstart-plan-hard-gate-rework-1-t1",
+        "w3-main-deepmining-modulemining-consumer-t1",
+        "w3-main-deepmining-modulemining-consumer-rework-1-t1",
+        "w4-main-mainbody-lifecycle-e2e-repair-t1",
+        "w4-main-runtime-dist-propagation-repair-t1",
+        "w4-main-projectcontext-modulebinding-repair-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicAgent",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "w1-agent-plan-profile-runner-p1",
+        "w3-agent-module-mining-fanout-producer-p1"
+      ],
+      "targetTaskIds": [
+        "w1-agent-plan-profile-runner-t1",
+        "w3-agent-module-mining-fanout-producer-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "w2-plugin-plan-gate-projection-convergence-p1"
+      ],
+      "targetTaskIds": [
+        "w2-plugin-plan-gate-projection-convergence-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+        "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+        "w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-p1",
+        "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1"
+      ],
+      "targetTaskIds": [
+        "w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+        "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+        "w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1",
+        "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-27T01:52:51.093Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+    "lastDeliveryRunId": "run-delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+    "lastDispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+    "lastTargetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-27T08:59:48.705Z"
+  }
+}

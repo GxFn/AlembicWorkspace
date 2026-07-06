@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rvrf-test-bilidili-realverify-current-main-p1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "阶段 RV/Test：Core@051ddf2 与 Plugin@17e6690 真跑前 HIGH 修复已接受。用户已确认本轮不再卡 02a25032，改用当前 BiliDili 最新 main@a3ea6a2 做 §8.5 真机真实生成与 DB 直读验收；Ollama qwen3-embedding:0.6b 已由总控预检可达。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md#85-真-bilidili-真测执行指导cg-1-已定直接真-02a25032-真跑重建无虑",
+  "createdAt": "2026-06-26T12:34:42.308Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rvrf-test-bilidili-realverify-current-main-t1",
+      "taskPackageId": "rvrf-test-bilidili-realverify-current-main-p1",
+      "targetWindow": "Test",
+      "summary": "你是 Test 窗口，只做真实场景验证，不改 AlembicCore/AlembicPlugin 产品代码。先读 ../AGENTS.md、../.wakeflow-active/index.md、../.wakeflow-active/current/workspace-current-status.md、state root `.wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26`、本 Test/CLAUDE.md、Test/skills/alembic-real-routes/SKILL.md，并声明窗口/角色身份。权威需求是 Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md §8.5/§8.6。\n\n已接受前置：AlembicCore@051ddf282309e485e8f3359337b9b9f3be011515；AlembicPlugin@17e66902139714042d89134c1fe617b69c1d6e7f。用户已确认本轮使用当前 `/Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili` 最新 main，而不是旧提示里的 02a25032；总控预检当前 BiliDili HEAD=`a3ea6a2` 且工作区干净。总控预检本机 Ollama `qwen3-embedding:0.6b` 可达，CG-2 按“接通跑”处理。\n\n任务：按 §8.5 在真实 BiliDili 工作区做 6 步真机链路验收，必须是 codex host-agent + 本地 AlembicPlugin/MCP 的真实生成和真 DB 直读证据，不接受忠实只读副本替代。可为了 §8.5 第 5 步创建受控测试 commit，但不得 push/tag/bump，不得修改 AlembicCore/AlembicPlugin 产品代码。若需要清理/重建 Alembic 数据，先备份 DB/记录路径，再执行；CG-1 已定重建无虑。\n\n必须执行并回填原始证据：\n1) migration 落真 DB：触发 rescan/migration；SQL 验 `coverage_ledger`、`deep_mining_rounds` 两表存在，`recipe_source_refs.content_fp` 存在，`SELECT count(*),count(content_fp) FROM recipe_source_refs` 符合首填预期且 status 不误 drifted。\n2) plan→全维 coldStart→anti-fabrication 真拦：alembic_plan draft/confirm→alembic_bootstrap rebuild true→逐维 submit_knowledge/dimension_complete；故意提交一条不达标 recipe（无 line refs/coreCode 不配源/title 超 20 中文字等）并证明 production floor 拒绝且未落库。\n3) deepMining 多轮填账本 + Advisor 判停：多轮 `alembic_rescan{generationStage:'deepMining'}` 至 advisory shouldStop 或明确停止原因；SQL `coverage_ledger` 与 `deep_mining_rounds`。重点验证 RF-9/U2-a：不能出现所有 cell 恒 empty/thin 且 covered_count=0 的目录 under-match 假象；观察 RF-3：同 rescanId 幂等/轮次可对账，如仍缺陷则 backfill 为产品修复证据。\n4) moduleMining per-cell + moduleName 非空：先核 ProjectMap.modules 是否带 `ref.scope.filePath`；跑 `alembic_rescan{generationStage:'moduleMining', moduleScope:[...]}`；SQL 验新 recipe moduleName 非空且为 canonical 名，原 3 条不要求回填。\n5) 真 commit→evolution committed→propose + checkpoint advance + merge before≠after：改一个已覆盖文件 region 并 commit，触发 `alembic_work`/`alembic_code_guard`；SQL 验 git_diff_checkpoints 从 initialized 到 routed/新 HEAD/advanced_at，evolution_proposals 增加。重点验证 RF-10/U6-a drifted→update、RF-12 suggestedChanges 为 StructuredPatch JSON 且不是 prose、U5 merge 执行后至少 1 个字段字节变化。RF-4 若工具回 isError 但 DB 正确，仍记录为 schema defect 证据。\n6) Ollama→semantic_memories：用本机 `qwen3-embedding:0.6b`，重跑 submit/dimension_complete 或最小语义落库路径；SQL `SELECT count(*) FROM semantic_memories` 从 0 到非 0，若失败必须给 Ollama/log/MCP 原始错误，不可静默 skip。\n\n硬护栏：不放松 anti-fabrication/质量地板/FP 护栏；不把 RF-2 decayScore 量纲交给 Test 或产品直修，若真测触发只记录 Design 重设计证据；RF-7 recipe_map fullMapRef 在本轮只观察/记录是否影响真测，不作为无授权前置修复；不用只读副本冒充真生成；真实 thread id 只在 Wakeflow local；不 push。\n\n回填必须包含：BiliDili commit before/after、DB 路径与备份路径、每步工具调用摘要、关键 SQL 原始输出、拒绝不达标 recipe 的返回/DB 证据、recipe 样本 1-2 条源码引用可点开一致性、semantic_memories 计数、工作区最终状态、是否需要 Core/Plugin rework 或 Design redesign。",
+      "status": "pending",
+      "createdAt": "2026-06-26T12:34:42.308Z"
+    }
+  ]
+}

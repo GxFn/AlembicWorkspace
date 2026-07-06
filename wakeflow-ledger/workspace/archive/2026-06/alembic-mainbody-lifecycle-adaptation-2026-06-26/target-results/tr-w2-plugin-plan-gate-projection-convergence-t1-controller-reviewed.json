@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w2-plugin-plan-gate-projection-convergence-t1-controller-reviewed",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w2-plugin-plan-gate-projection-convergence-p1",
+  "dispatchGroup": "w2-plugin-plan-gate-projection-convergence-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "w2-plugin-plan-gate-projection-convergence-t1",
+  "status": "completed",
+  "summary": "Controller-reviewed AlembicPlugin W2 B4 plan gate projection convergence. Raw review confirmed commit ae97e0f018aa0c5cdc9d101de2732f8025cf4f53 changes only plan-generation-gate projection, cold-start minimal inline data allow-list, and PlanDrivenGenerationGate tests. plan-generation-gate now consumes @alembic/core/plans applyPlanSelection from AlembicCore 1553e2f8 for executionDimensions/budget/moduleScope; old local projection helpers/default constants are absent. validatePlanSelection shell, lease handling, attachPlanGenerationGateData field shape, and public MCP semantics remain in place. cold-start change only preserves existing gated response fields in minimal inline data.",
+  "evidenceRefs": [
+    "AlembicPlugin commit ae97e0f018aa0c5cdc9d101de2732f8025cf4f53",
+    "AlembicPlugin/lib/recipe-generation/plan-generation-gate.ts",
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/cold-start.ts",
+    "AlembicPlugin/test/unit/PlanDrivenGenerationGate.test.ts",
+    "AlembicCore/src/service/planIntent/planIntent.ts",
+    "AlembicCore/src/plans.ts"
+  ],
+  "verification": [
+    "Controller validation: node -v -> v22.22.1",
+    "Controller validation: AlembicCore HEAD 1553e2f8b7167b596b4c305f0bc40f46dd047359; @alembic/core/plans exports applyPlanSelection/assertPlanSelectionShape as functions",
+    "Controller validation: npm run build:check -> PASS",
+    "Controller validation: npm run test:unit -- PlanDrivenGenerationGate PlanSelectionGateStateless McpCoreToolsCleanOutputContract -> PASS (3 files, 26 tests)",
+    "Controller validation: npm run lint:core-import-boundary -> PASS (438 files, 441 @alembic/core imports)",
+    "Controller validation: npx biome check lib/recipe-generation/plan-generation-gate.ts lib/recipe-generation/host-agent-workflows/cold-start.ts test/unit/PlanDrivenGenerationGate.test.ts -> PASS",
+    "Controller validation: rg old projection helpers/default constants in plan-generation-gate.ts -> no matches",
+    "Controller validation: git diff --check -> PASS; git status main ahead 1 clean"
+  ],
+  "risks": [
+    "Alembic code guard MCP returned an internal output-schema error for the target; no guard verdict was available, so acceptance relies on raw source review plus build/test/lint/boundary evidence.",
+    "PlanDrivenGenerationGate test updates also align stale assertions for current retired top-level gitDiffEvidence/moduleMiningRoutes contract; controller reviewed this as test-only expectation alignment with no product-code change."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w2-plugin-plan-gate-projection-convergence-p1__AlembicPlugin__w2-plugin-plan-gate-projection-convergence-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w2-plugin-plan-gate-projection-convergence-p1__AlembicPlugin__w2-plugin-plan-gate-projection-convergence-t1.json",
+    "deliveryRunId": "run-delivery-w2-plugin-plan-gate-projection-convergence-p1__AlembicPlugin__w2-plugin-plan-gate-projection-convergence-t1",
+    "dispatchGroup": "w2-plugin-plan-gate-projection-convergence-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w2-plugin-plan-gate-projection-convergence-p1__AlembicPlugin__w2-plugin-plan-gate-projection-convergence-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 17,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w2-plugin-plan-gate-projection-convergence-p1",
+    "targetTaskId": "w2-plugin-plan-gate-projection-convergence-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "w2-plugin-plan-gate-projection-convergence-p1",
+    "resultId": "tr-w2-plugin-plan-gate-projection-convergence-t1-controller-reviewed",
+    "createdAt": "2026-06-27T02:57:29.819Z"
+  },
+  "createdAt": "2026-06-27T02:57:29.819Z",
+  "stateRevisionObserved": 17,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

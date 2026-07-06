@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rvrf-test-bilidili-realverify-after-empty-session-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-test-bilidili-realverify-after-empty-session-repair-p1",
+  "dispatchGroup": "rvrf-test-bilidili-realverify-after-empty-session-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "rvrf-test-bilidili-realverify-after-empty-session-repair-t1",
+  "status": "needs-review",
+  "summary": "Test reran the real BiliDili Alembic route after AlembicPlugin d221f99659e011998406241ee29c0f99167e60ce. The previous stale empty session no longer blocks deepMining: alembic_rescan deepMining completed with ok=true/status=ready and added deep_mining_rounds row 3. However the deepMining run created a new empty active session bs-<redacted> with no completed dimensions, reports, submissions, tracker dimensions, or file evidence; immediate moduleMining then failed with BOOTSTRAP_IN_PROGRESS on that fresh empty session. Per package boundary, Test did not manually delete or edit active-sessions.json, so §8.5 cannot legitimately proceed to moduleName, real commit evolution, checkpoint/StructuredPatch, or semantic-memory follow-through from this run. Deliberate invalid recipe submission was independently rejected by QUALITY_GATE_FAILED and its trigger count remained 0.",
+  "evidenceRefs": [
+    "AlembicPlugin HEAD d221f99659e011998406241ee29c0f99167e60ce",
+    "AlembicCore HEAD 051ddf282309e485e8f3359337b9b9f3be011515",
+    "BiliDili HEAD 6f1bf34cf1b6daca4e08895db211939115dac868",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/bootstrap-sessions/active-sessions.json",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db"
+  ],
+  "verification": [
+    "BiliDili git status: ## main...origin/main [ahead 1], no worktree changes",
+    "MCP alembic_rescan deepMining rescanId=rvrf-after-empty-session-repair-deep-20260626 ok=true/status=ready; coverageAdvisory shouldStop=true, stopReason=converged",
+    "MCP alembic_rescan moduleMining rescanId=rvrf-after-empty-session-repair-module-20260626 ok=false/status=failed; code=BOOTSTRAP_IN_PROGRESS; activeSessionId=bs-<redacted>",
+    "active-sessions.json count=1; id=bs-<redacted>; dimensions=architecture,networking-api,swift-objc-idiom; completedDimensionCount=0; reportCount=0; submittedCount=0; trackerDimensionCount=0; fileEvidenceCount=0",
+    "SQLite totals after run: knowledge_entries=42; module_nonempty=0; semantic_memories=42; recipe_source_refs=128 rows / 42 distinct recipe_id / 128 content_fp; coverage_ledger=0; deep_mining_rounds=3 and sum(new_recipes_this_round)=0; evolution_proposals=3",
+    "deep_mining_rounds newest row: id=3, round_index=3, new_recipes_this_round=0, trigger_actor=host-agent-rescan",
+    "coverage_ledger query returned no rows; moduleName query returned no rows",
+    "Invalid probe @rvrf-invalid-rejection-after-empty-session-repair rejected with QUALITY_GATE_FAILED: DONT_CLAUSE_NON_IMPERATIVE and CONTENT_CONTRAST_MISSING; SQL trigger count=0"
+  ],
+  "risks": [
+    "Residual defect: d221f99 releases the old stale empty session enough for deepMining, but deepMining can leave a fresh empty active session that immediately blocks moduleMining without manual cleanup.",
+    "Coverage ledger/materialized coverage remains absent for this BiliDili DB path despite deep_mining_rounds advancing; RF-3 rescanId column is also absent from deep_mining_rounds schema observed during this run.",
+    "ModuleMining-specific canonical moduleName remains unproven because moduleMining is blocked before it can write rows.",
+    "Real commit to evolution/checkpoint/StructuredPatch and Ollama semantic-memory follow-through were not run because the main chain was blocked; running surrounding flows after BOOTSTRAP_IN_PROGRESS would exceed Test boundary."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-test-bilidili-realverify-after-empty-session-repair-p1__Test__rvrf-test-bilidili-realverify-after-empty-session-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-realverify-after-empty-session-repair-p1__Test__rvrf-test-bilidili-realverify-after-empty-session-repair-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-test-bilidili-realverify-after-empty-session-repair-p1__Test__rvrf-test-bilidili-realverify-after-empty-session-repair-t1",
+    "dispatchGroup": "rvrf-test-bilidili-realverify-after-empty-session-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-realverify-after-empty-session-repair-p1__Test__rvrf-test-bilidili-realverify-after-empty-session-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 28,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-test-bilidili-realverify-after-empty-session-repair-p1",
+    "targetTaskId": "rvrf-test-bilidili-realverify-after-empty-session-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "rvrf-test-bilidili-realverify-after-empty-session-repair-p1",
+    "resultId": "tr-rvrf-test-bilidili-realverify-after-empty-session-repair-t1",
+    "createdAt": "2026-06-26T14:24:22.855Z"
+  },
+  "createdAt": "2026-06-26T14:24:22.855Z",
+  "stateRevisionObserved": 28,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

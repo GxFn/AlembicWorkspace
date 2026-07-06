@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-core-scope-resolution-write-guard-t1",
+  "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+  "taskPackageId": "p1-core-scope-resolution-write-guard-p1",
+  "dispatchGroup": "p1-core-scope-resolution-write-guard-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-space-membership-scoping-2026-06-29",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1-core-scope-resolution-write-guard-t1",
+  "status": "completed",
+  "summary": "Implemented Core P1 scope-resolution/write-guard work. C1/C2 DiscovererRegistry, C3/C4 resolveProjectRoot, and C6 WriteZone now use WorkspaceResolver.fromProjectScopeRegistry; C5/C7 single-root sites are annotated; DatabaseConnection now loud-fails projectScope excluded-root redirects; lint:scope-resolution is wired into check. Committed AlembicCore change 421a241 (Wire scope registry data roots).",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-plan-space-membership-scoping-2026-06-29/evidence/p1-core-scope-resolution-write-guard-t1-report.md",
+    "AlembicCore commit 421a241"
+  ],
+  "verification": [
+    "npm run lint:scope-resolution -> passed",
+    "npx vitest run test/DatabaseConnectionScopeGuard.test.ts test/resolveProjectRoot.test.ts test/LintScopeResolution.test.ts test/ProjectScopeRegistryLoader.test.ts test/WorkspaceResolver.test.ts -> 5 files passed, 22 tests passed",
+    "npm run build:check -> passed",
+    "npm run build -> passed",
+    "npm run lint:public-api-boundary -> passed",
+    "npm test -> 148 files passed, 1432 tests passed",
+    "npm run lint -> passed, 665 files checked",
+    "dynamic import('./dist/shared/index.js') AlembicPlugin databasePath probe -> {\"databasePath\":\"/Users/gaoxuefeng/.asd/workspaces/ecf32806/.asd/alembic.db\",\"hasPid\":true,\"notTmp\":true,\"notCoreGhost\":true,\"notPluginGhost\":true}",
+    "negative lint fixture proof -> {\"status\":1,\"stderr\":true,\"file\":true}",
+    "git diff --cached --check -> passed before commit",
+    "git diff --check -> passed before commit",
+    "node JSON.parse config/public-api-boundary.json -> passed"
+  ],
+  "risks": [
+    "npm run check was attempted. After a command-order artifact on the first run, the second run passed build:check, public API, layer, consumer imports, scope lint, smoke, output budgets, space edges, and doctrine, then stopped at pre-existing lint:naming violations in untouched files: src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts. Those facade renames are outside this P1 task diff; npm test and npm run lint were run separately and passed.",
+    "Alembic code_guard was attempted but failed with an Alembic MCP internal schema error at data.unifiedEvolution.checkpoint.initializationSource; local repository validation passed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-core-scope-resolution-write-guard-p1__AlembicCore__p1-core-scope-resolution-write-guard-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-scope-resolution-write-guard-p1__AlembicCore__p1-core-scope-resolution-write-guard-t1.json",
+    "deliveryRunId": "run-delivery-p1-core-scope-resolution-write-guard-p1__AlembicCore__p1-core-scope-resolution-write-guard-t1",
+    "dispatchGroup": "p1-core-scope-resolution-write-guard-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-scope-resolution-write-guard-p1__AlembicCore__p1-core-scope-resolution-write-guard-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-space-membership-scoping-2026-06-29",
+    "stateRevision": 12,
+    "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+    "taskPackageId": "p1-core-scope-resolution-write-guard-p1",
+    "targetTaskId": "p1-core-scope-resolution-write-guard-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1-core-scope-resolution-write-guard-p1",
+    "resultId": "tr-p1-core-scope-resolution-write-guard-t1",
+    "createdAt": "2026-06-29T04:14:13.261Z"
+  },
+  "createdAt": "2026-06-29T04:14:13.261Z",
+  "stateRevisionObserved": 12,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

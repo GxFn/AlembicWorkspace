@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p2-core-load-bearing-consumers-test-migration-p1",
+  "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+  "summary": "P2 Core first after P1 write chokepoints accepted: repoint the Core load-bearing ProjectContext/source-graph consumers from workspace.config.json fallback to native ProjectScope loader/descriptor paths and migrate Core tests without deleting multi-folder coverage. Scope is Core-only §12.P2 2a/2b/2c/2d plus Core-side F-6 tests. Do not touch Plugin plan-tool/project-source-facts, Alembic/AlembicAgent, P3 host/runtime parity, P4 definition deletion/init detect-or-refuse, vendor refresh, or freeze values.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P2",
+  "createdAt": "2026-06-29T04:41:13.633Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p2-core-load-bearing-consumers-test-migration-t1",
+      "taskPackageId": "p2-core-load-bearing-consumers-test-migration-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, this state root/dispatch packet/envelope, and AlembicCore/AGENTS.md; confirm currentWindow=AlembicCore. Implement only Core §12.P2: (1) src/service/project-context/space/space.ts must preserve explicit payload.sourceFolders priority, then use loadProjectScopeForFolder(projectRoot) instead of workspace.config.json probing/readProjectScopeFromWorkspaceConfig, removing the query-unavailable branch tied to workspace.config; keep folderInputs and projectId fallback semantics. (2) src/service/project-context/repo/repo.ts must use loadProjectScopeForFolder(projectRoot) while preserving repoRoot containment/realpath behavior and resolveProjectScopeForFolder identity use. (3) src/core/ast/ProjectGraph.ts remove workspaceConfigProjectScope option and readProjectScopeFromWorkspaceConfig fallback block; keep options.projectScope/listProjectScopeFolders descriptor path. (4) src/service/source-graph/SourceGraphIndexer.ts remove workspaceConfigProjectScope option and readProjectScopeFromWorkspaceConfig fallback block; keep input.projectScopeDescriptor/activeProjectScopeFolders descriptor path. (5) Migrate Core tests, not delete coverage: ProjectScopeContracts.test.ts should stop asserting the old reader as active contract while retaining native loader contracts; ProjectContextProjectSpace.test.ts must use a temp native project-scopes.json fixture and preserve real multi-folder coverage; ProjectContextEndToEnd.test.ts and SourceGraphIndexer.test.ts should use native fixture or explicit sourceFolders as appropriate. Do not modify AlembicPlugin tests in this Core task. Verify with Node>=22: npm run build:check, targeted ProjectContextProjectSpace/ProjectScopeContracts/ProjectContextEndToEnd/SourceGraphIndexer tests, npm run lint:scope-resolution, npm run check if feasible, grep proving workspaceConfigProjectScope is gone from src and space/repo/ProjectGraph/SourceGraphIndexer no longer import readProjectScopeFromWorkspaceConfig, and evidence that descriptor/native multi-folder behavior still works while single-folder fallback remains. Commit locally on main; do not push.",
+      "status": "pending",
+      "createdAt": "2026-06-29T04:41:13.633Z"
+    }
+  ]
+}

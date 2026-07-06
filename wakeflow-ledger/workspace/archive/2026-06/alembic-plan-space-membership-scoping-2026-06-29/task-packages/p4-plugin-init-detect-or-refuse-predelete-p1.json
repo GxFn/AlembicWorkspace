@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-plugin-init-detect-or-refuse-predelete-p1",
+  "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+  "summary": "P4 pre-delete hard-gate task for AlembicPlugin only: implement the SetupService lockstep init detect-or-refuse guard before any Core workspace.config reader deletion. Match the accepted Alembic pre-delete guard semantics while preserving Plugin-specific config: existing native ProjectScope is idempotent and creates no per-repo ghosts; fresh multi-repo checkout with no native scope refuses clearly before registry/runtime writes and never falls back to single-root or /tmp; generated config stops writing stale core.dir, core.constitution, and watch.* while retaining core.subRepoDir/subRepoUrl, guard, and Plugin vector config. Do not delete AlembicCore reader/definition blocks, do not modify Alembic, do not perform ghost hygiene, vendor refresh, push, release, or P4 Core deletion.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P4 G-3, §12.R, §12.M, §12.Z",
+  "createdAt": "2026-06-29T07:43:22.478Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-plugin-init-detect-or-refuse-predelete-t1",
+      "taskPackageId": "p4-plugin-init-detect-or-refuse-predelete-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, state root/task package/envelope, Design §12.P4 G-3/§12.R/§12.M/§12.Z, and AlembicPlugin/AGENTS.md; confirm currentWindow=AlembicPlugin. Implement only AlembicPlugin SetupService pre-delete guard: use loadProjectScopeForFolder(projectRoot), WorkspaceResolver.fromProjectScopeRegistry, or an equivalent Core native project-scope loader at init start; existing native scope => idempotent no-op with no new projects.json/project-scopes rows and no per-repo ghost; multi-repo shape with no scope => refuse with clear 'No native project scope ... run project-scope add <folder>' guidance, no sibling auto-scan, no /tmp/alembic-dev DB, no single-root scan. Remove stale generated config fields core.dir, core.constitution, watch.* from Plugin only; keep core.subRepoDir/subRepoUrl, guard, vector/localEmbedding config. Validation: Node>=22; npm run build:check; targeted SetupService/init tests or probes for ecf32806 idempotent under ALEMBIC_HOME sandbox and fresh two-repo fixture refusal; grep stale config fields absent from generated config path; run relevant Plugin lint/boundary checks if available; prove no Core reader deletion, no Alembic edits, no ghost deletion, no vendor/dist hand edits, no external AI/cold-start, no push. Commit locally on main and backfill commit hash, commands, raw evidence paths, risks, and next required Core P4 tasks.",
+      "status": "pending",
+      "createdAt": "2026-06-29T07:43:22.478Z"
+    }
+  ]
+}

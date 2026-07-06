@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-e4-core-phantom-terminal-advertising-cleanup-t1-evidence-normalized",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "taskPackageId": "e4-core-phantom-terminal-advertising-cleanup-p1",
+  "dispatchGroup": "e4-core-phantom-terminal-advertising-cleanup-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "e4-core-phantom-terminal-advertising-cleanup-t1",
+  "status": "completed",
+  "summary": "Controller evidence-normalization for AlembicCore E-4 after raw review. Product commit remains 90c2295c0fb1eafe0e0a6468f8fb820343a2c695. Implementation removed Core phantom terminal_shell/terminal_pty advertising from BootstrapTerminalToolset/testMode live config and sanitized WorkflowReportWriter report projection. The previous result had validation command strings in evidenceRefs, which Wakeflow interpreted as missing paths; this normalized result keeps only reviewable commit/file evidence refs and moves command outputs into verification. No product code was changed by this normalization.",
+  "evidenceRefs": [
+    "AlembicCore commit 90c2295c0fb1eafe0e0a6468f8fb820343a2c695 (Remove phantom terminal tool advertising)",
+    "AlembicCore/src/workflows/capabilities/planning/dimensions/BootstrapTerminalToolset.ts",
+    "AlembicCore/src/shared/testMode.ts",
+    "AlembicCore/src/workflows/capabilities/persistence/WorkflowReportWriter.ts",
+    "AlembicCore/test/BootstrapTerminalToolset.test.ts"
+  ],
+  "verification": [
+    "Controller reviewed git show --stat/diff for 90c2295c0fb1eafe0e0a6468f8fb820343a2c695: only Core E-4 files changed, no Plugin/Agent/Alembic edits.",
+    "Controller ran node --version in AlembicCore -> v22.22.1.",
+    "Controller ran npm run test -- test/BootstrapTerminalToolset.test.ts -> 1 file, 4 tests passed.",
+    "Controller ran npm run build:check -> passed.",
+    "Controller ran npm run lint -> passed, 639 files checked.",
+    "Controller ran npm run test -> 143 files, 1407 tests passed.",
+    "Controller ran git diff --check HEAD^ HEAD -> passed.",
+    "Controller ran rg terminal_shell|terminal_pty src/workflows/capabilities/planning/dimensions src/shared/testMode.ts -> no matches.",
+    "Controller ran full src/test grep: remaining retired ids only exist in WorkflowReportWriter sanitizer constants and tests/legacy normalization assertions, not live bootstrap prompt/toolset advertising."
+  ],
+  "risks": [
+    "Alembic Guard MCP unavailable due tool-surface/schema internal error; controller substituted raw diff review plus repository build/lint/test evidence.",
+    "AlembicPlugin vendor propagation is intentionally not included in this Core-only E-4 package and remains a later consumer package after Core acceptance."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-e4-core-phantom-terminal-advertising-cleanup-p1__AlembicCore__e4-core-phantom-terminal-advertising-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e4-core-phantom-terminal-advertising-cleanup-p1__AlembicCore__e4-core-phantom-terminal-advertising-cleanup-t1.json",
+    "deliveryRunId": "run-delivery-e4-core-phantom-terminal-advertising-cleanup-p1__AlembicCore__e4-core-phantom-terminal-advertising-cleanup-t1",
+    "dispatchGroup": "e4-core-phantom-terminal-advertising-cleanup-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e4-core-phantom-terminal-advertising-cleanup-p1__AlembicCore__e4-core-phantom-terminal-advertising-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "stateRevision": 26,
+    "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "taskPackageId": "e4-core-phantom-terminal-advertising-cleanup-p1",
+    "targetTaskId": "e4-core-phantom-terminal-advertising-cleanup-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "e4-core-phantom-terminal-advertising-cleanup-p1",
+    "resultId": "tr-e4-core-phantom-terminal-advertising-cleanup-t1-evidence-normalized",
+    "createdAt": "2026-06-27T10:38:46.513Z"
+  },
+  "createdAt": "2026-06-27T10:38:46.513Z",
+  "stateRevisionObserved": 26,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

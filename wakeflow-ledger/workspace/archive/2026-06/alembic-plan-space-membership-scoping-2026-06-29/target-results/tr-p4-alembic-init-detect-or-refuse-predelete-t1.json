@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-alembic-init-detect-or-refuse-predelete-t1",
+  "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+  "taskPackageId": "p4-alembic-init-detect-or-refuse-predelete-p1",
+  "dispatchGroup": "p4-alembic-init-detect-or-refuse-predelete-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plan-space-membership-scoping-2026-06-29",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p4-alembic-init-detect-or-refuse-predelete-t1",
+  "status": "completed",
+  "summary": "Alembic SetupService P4 pre-delete guard completed in commit ef30c0dab1669802b015cf9f0284061168810073. SetupService now resolves existing native ProjectScope before ProjectRegistry registration, uses the ProjectScope dataRoot for workspace/member init without creating per-repo ghosts, refuses fresh multi-repo checkouts with no native scope before registry/runtime writes, and no longer writes stale .asd/config.json fields core.dir, core.constitution, or watch.* while retaining core.subRepoDir/subRepoUrl, guard, and ai. No Core reader deletion, Plugin edits, ghost hygiene, vendor refresh, external AI/cold-start, push, or release work was performed.",
+  "evidenceRefs": [
+    "commit:ef30c0dab1669802b015cf9f0284061168810073",
+    "file:Alembic/lib/cli/SetupService.ts",
+    "file:Alembic/test/unit/SetupService.test.ts",
+    "test:npx vitest run test/unit/SetupService.test.ts -> 7 passed",
+    "test:npm run build:check -> passed using local ../AlembicCore",
+    "test:npm run build -> passed",
+    "probe:fresh two-repo ALEMBIC_HOME sandbox setup -> exit 1 with No native project scope guidance; no projects.json, no project .asd, no workspaces dir",
+    "probe:ecf32806 ALEMBIC_HOME sandbox -> workspace root and AlembicCore member resolve project-scope-a8083fdb335c/dataRoot ecf32806; projectsExists=false; configHasCoreDir=false; configHasConstitution=false; configHasWatch=false; scopeStable=true",
+    "test:npm run lint -> exit 0 with pre-existing noExplicitAny warnings only",
+    "test:npm run test:unit -> 124 files passed, 1 skipped; 1008 passed, 1 skipped",
+    "test:npm run lint:repo-boundary -> passed",
+    "test:npm run lint:core-import-boundary -> passed",
+    "test:git diff --check -> passed",
+    "test:git grep exact workspace.config/readProjectScopeFromWorkspaceConfig/resolveWorkspaceConfigProjectFolders/WorkspaceConfigProjectScopeOptions/workspaceConfigProjectScope/repoNames over Alembic lib/test -> 0 matches"
+  ],
+  "verification": [
+    "npx biome check lib/cli/SetupService.ts test/unit/SetupService.test.ts",
+    "npx vitest run test/unit/SetupService.test.ts",
+    "npm run build:check",
+    "npm run build",
+    "fresh two-repo sandbox CLI refusal probe",
+    "ecf32806 sandbox SetupService stepRuntime idempotency probe",
+    "npm run lint",
+    "npm run test:unit",
+    "npm run lint:repo-boundary",
+    "npm run lint:core-import-boundary",
+    "git diff --check",
+    "git grep exact stale workspace-config pattern over Alembic lib/test"
+  ],
+  "risks": [
+    "Alembic Guard could not produce a verdict because alembic_code_guard failed internally on schema key data.unifiedEvolution.checkpoint.initializationSource.",
+    "This target intentionally did not implement the paired AlembicPlugin SetupService lockstep guard, Core P4 reader deletion, v2 workspace runtime config schema, ghost hygiene, vendor refresh, push, release, or cold-start/AI validation; those remain controller-routed P4 follow-up scope."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-alembic-init-detect-or-refuse-predelete-p1__Alembic__p4-alembic-init-detect-or-refuse-predelete-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-init-detect-or-refuse-predelete-p1__Alembic__p4-alembic-init-detect-or-refuse-predelete-t1.json",
+    "deliveryRunId": "run-delivery-p4-alembic-init-detect-or-refuse-predelete-p1__Alembic__p4-alembic-init-detect-or-refuse-predelete-t1",
+    "dispatchGroup": "p4-alembic-init-detect-or-refuse-predelete-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-init-detect-or-refuse-predelete-p1__Alembic__p4-alembic-init-detect-or-refuse-predelete-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-plan-space-membership-scoping-2026-06-29",
+    "stateRevision": 52,
+    "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+    "taskPackageId": "p4-alembic-init-detect-or-refuse-predelete-p1",
+    "targetTaskId": "p4-alembic-init-detect-or-refuse-predelete-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p4-alembic-init-detect-or-refuse-predelete-p1",
+    "resultId": "tr-p4-alembic-init-detect-or-refuse-predelete-t1",
+    "createdAt": "2026-06-29T07:38:36.960Z"
+  },
+  "createdAt": "2026-06-29T07:38:36.960Z",
+  "stateRevisionObserved": 52,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

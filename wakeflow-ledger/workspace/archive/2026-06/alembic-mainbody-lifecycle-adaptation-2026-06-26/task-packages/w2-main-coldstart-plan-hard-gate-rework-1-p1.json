@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "summary": "W2 Alembic main rework for §4b(C1) PD-5 hard gate: controller raw review found runBootstrapPlanGate requests generationStage coldStart but does not verify the returned PlanSelection.generationStage matches coldStart before applyPlanSelection/coldStart. This leaves a wrong-stage but shape-valid PlanSelection able to drive coldStart, which violates the coldStart plan hard precondition and AI failure surfacing. Implement only this guard in Alembic main: after runPlanAgent and before applyPlanSelection, reject any selection whose generationStage is not coldStart, record the same plan-gate error/job failure path, runColdStartWorkflow 0 times, and keep no fallback-to-full wording or behavior. Add a focused unit test with generationStage deepMining + non-empty dimensions proving the job fails before coldStart. Re-run Node>=22 focused DaemonJobRunnerPlanGate/ColdStartPlanSelection tests plus build:check/typecheck/lint/import-boundary/diff-check as appropriate. Commit on Alembic main and return commit hash, changed files, validations, raw evidence, and residual risks. Do not edit AlembicCore, AlembicAgent, AlembicPlugin, vendor, schema, or public contracts.",
+  "status": "pending",
+  "sourceRef": "Controller raw review of Alembic commit 08c920d8adc2dd48d89ed65457ae168e7274f2a6 against Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(C1), PD-5, R8; evidence: Alembic/lib/daemon/DaemonJobRunner.ts runBootstrapPlanGate lacks selection.generationStage === 'coldStart' check while AlembicAgent PlanAgentRun only shape-validates generationStage as one of coldStart/deepMining/moduleMining.",
+  "createdAt": "2026-06-27T03:00:59.447Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "w2-main-coldstart-plan-hard-gate-rework-1-t1",
+      "taskPackageId": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read ../AGENTS.md or ../CLAUDE.md as present, ../.wakeflow-active/index.md, current state root, and Alembic/CLAUDE.md. Declare Alembic identity. Rework only W2 §4b(C1) PD-5 stage-match hard gate in Alembic main: wrong-stage PlanSelection from runPlanAgent must abort before coldStart with plan-gate error evidence and regression test; no fallback to full and no adjacent repo edits.",
+      "status": "pending",
+      "createdAt": "2026-06-27T03:00:59.447Z"
+    }
+  ]
+}

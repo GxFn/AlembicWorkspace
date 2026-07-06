@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "e2-main-toolcontext-audit-sandbox-p1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "summary": "E-2 Alembic main consumer package after accepted AlembicAgent producer commit 1b8d5009da34613272ce93112589897515649d74. Scope is ONLY ToolContextFactory consumer wiring for live terminal.exec safety: (1) E2-6 inject auditSink from the existing single DI factory so daemon/HTTP/CLI tool calls all receive the same audit logger path; (2) E2-7 preserve sandboxExec diagnostics through SandboxExecutorBridge so Agent terminal.exec can expose sandbox fallback/degradation. Current evidence: Alembic/lib/tools/v2/ToolContextFactory.ts create() already builds ToolContext for V2 tools but lacks auditSink, and SandboxExecutorBridge.exec() returns only stdout/stderr/exitCode, dropping sandboxExec result.sandboxed/result.degradeReason. Implement narrowly in Alembic: add auditSink: tryGet(c,'auditLogger') in ToolContextFactory.create(); extend SandboxExecutorBridge return shape to include diagnostics compatible with AlembicAgent's accepted contract {sandboxed:boolean,fallbackUsed:boolean,degradeReason?:string}; map sandboxExec result.sandboxed=false to fallbackUsed:true and carry degradeReason, and sandboxed=true to fallbackUsed:false. Do not change command policy, sandbox profile, filesystem/network intent, command execution semantics, Agent repository, Core, Plugin, E-1 Evolution terminal access, E-3 dead stack deletion/public subpath, E-4 phantom cleanup, or E-5 prompts. Add/adjust tests around ToolContextFactory/V2 tool system proving auditSink comes from container auditLogger and SandboxExecutorBridge/terminal.exec output can surface degraded diagnostics when sandboxExec reports sandboxed:false. If direct bridge unit seams are hard because of dynamic imports, add the smallest testable seam without broad refactor; avoid mock-only success with no real consumer. Validate with Node >=22: npm run build:check, relevant unit tests, lint:repo-boundary, and if touched shared assets then check:shared-asset-drift. Commit on Alembic main and return TargetResultEnvelope with commit hash, changed files, validation outputs, and residual risks.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E2-6-E2-7",
+  "createdAt": "2026-06-27T10:13:08.425Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "e2-main-toolcontext-audit-sandbox-t1",
+      "taskPackageId": "e2-main-toolcontext-audit-sandbox-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-main-toolcontext-audit-sandbox-p1, and Alembic/CLAUDE.md; declare Alembic identity. Apply only E-2 main consumer wiring: ToolContextFactory injects auditSink from auditLogger, and SandboxExecutorBridge preserves sandboxed/degradeReason diagnostics as {sandboxed,fallbackUsed,degradeReason} for Agent terminal.exec. No cross-repo edits, no E-1/E-3/E-4/E-5 scope expansion. Commit locally and backfill evidence.",
+      "status": "pending",
+      "createdAt": "2026-06-27T10:13:08.425Z"
+    }
+  ]
+}

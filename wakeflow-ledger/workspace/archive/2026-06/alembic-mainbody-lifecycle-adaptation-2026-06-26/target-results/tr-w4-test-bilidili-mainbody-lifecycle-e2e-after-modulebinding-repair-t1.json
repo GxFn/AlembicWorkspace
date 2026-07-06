@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+  "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+  "status": "needs-review",
+  "summary": "W4 BiliDili mainbody lifecycle e2e after ProjectContext/modulebinding repair is ready for controller review. Alembic HEAD eebe4ade6e8c5446def839af6b1e061e7c37e935 dist is synced. Public /api/v1/jobs/rescan preserved W4 fields and rejected incompatible generationStage/miningMode. BiliDili ProjectContext now reports targetCount=15 and moduleCount=15 with real target-derived modulePath/ownedFiles. DeepMining wrote 6 coverage_ledger rows and 1 deep_mining_rounds row, with design-supported stopReason=diminishing-returns, git_diff_checkpoints=0, planLedger absent. ModuleMining scaleCap=3 selected exactly 3 modules with moduleName/evidence and zero-output moduleMining failed as required. Maintenance sweep recorded lifecycleStateMachine transitions for staging promotion, proposal attach/complete, decaying timeout deprecation, and active dead decay.",
+  "evidenceRefs": [
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/http-public-route-probe.json",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/w4-after-modulebinding-repair-e2e-summary.json",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/w4-after-modulebinding-repair-daemon-db-snapshot.json",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/w4-after-modulebinding-repair-db-snapshot.json",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/w4-after-modulebinding-repair-report.md",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/run-http-public-route-probe.mjs",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/run-w4-after-modulebinding-repair-e2e.mjs",
+    "Alembic/dist/lib/workflows/project-context/ProjectContextWorkflowFacts.js",
+    "Alembic/dist/lib/http/routes/jobs.js",
+    "Alembic/dist/lib/injection/modules/KnowledgeModule.js",
+    "AlembicCore/dist/workflows/capabilities/host-agent/CoverageLedgerAdvisor.js"
+  ],
+  "verification": [
+    "git -C Alembic rev-parse HEAD => eebe4ade6e8c5446def839af6b1e061e7c37e935; git -C Alembic status --short => clean.",
+    "git -C BiliDili rev-parse HEAD => 6f1bf34cf1b6daca4e08895db211939115dac868; git -C BiliDili status --short --branch => main...origin/main [ahead 1], no working tree changes.",
+    "node -v => v22.22.1.",
+    "dist grep confirmed buildProjectMapModulesFromTargets, inferTargetModulePath, inferTargetOwnedFiles, readSwiftPackageTargetPathMap, collectOwnedFilesFromProjectRoot in ProjectContextWorkflowFacts.js.",
+    "ALEMBIC_HOME=Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/alembic-home ALEMBIC_TEST_MODE=1 node Alembic/dist/bin/cli.js setup --dir BiliDili --ghost --force => setup completed; migrations through 016_deep_mining_rounds_rescan_id applied.",
+    "ALEMBIC_HOME=... ALEMBIC_TEST_MODE=1 ALEMBIC_TEST_BOOTSTRAP_DIMS=architecture ALEMBIC_TEST_RESCAN_DIMS=architecture ALEMBIC_PARALLEL_CONCURRENCY=1 ALEMBIC_EVOLUTION_MAINTENANCE_SWEEP_INTERVAL_MS=1000 node Test/scripts/restart-alembic.mjs --project BiliDili --alembic Alembic --wait 20000 --status-timeout 5000 --no-dev-link --json => ready true, apiBaseUrl http://127.0.0.1:56262, pid 63773.",
+    "node Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/run-http-public-route-probe.mjs http://127.0.0.1:56262 => missingPreservedFields=[], incompatibleRejected=true.",
+    "kill 63773; ps -p 63773 -o pid=,stat=,command= => no process.",
+    "node Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1/run-w4-after-modulebinding-repair-e2e.mjs => acceptance overall needs-review; criteria all true.",
+    "SQL snapshot: coverage_ledger rows=6, deep_mining_rounds rows=1, git_diff_checkpoints=0, planLedgerTablePresent=false; deepMining stopReason=diminishing-returns, K=1, maxRounds=2.",
+    "ProjectContext facts: targetCount=15, moduleCount=15; sample modules Account, AOXFoundationKit, AOXNetworkKit, AOXPlayer, AOXUIKit include modulePath and ownedFiles.",
+    "ModuleMining: positive run status completed, moduleCount=3, newRecipes=3, scaleCap=3; module evidence includes Account/AccountManager.swift, AOXFoundationKit/Array+BD.swift, AOXNetworkKit/DownloadClient.swift. Zero-output run status failed with moduleMining produced zero recipes.",
+    "Lifecycle: staging->active, active->evolving->active, decaying->deprecated, and active->decaying transition expectations all true."
+  ],
+  "risks": [
+    "External AI provider was not configured in the isolated ghost workspace; Test used a controlled AgentService for plan/module/bootstrap calls and validates runtime wiring, DB/state-machine behavior, and route preservation, not external-provider recipe quality.",
+    "DeepMining stopped after one round because CoverageLedgerAdvisor returned design-supported stopReason=diminishing-returns with newRecipesThisRound=0<K; controller should decide whether this satisfies W4 acceptance or needs a provider-backed follow-up.",
+    "BiliDili local branch is ahead of origin/main by 1 commit but has no working tree changes; Test did not modify BiliDili source."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1.json",
+    "deliveryRunId": "run-delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+    "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 59,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+    "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-p1",
+    "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-modulebinding-repair-t1",
+    "createdAt": "2026-06-27T09:15:43.539Z"
+  },
+  "createdAt": "2026-06-27T09:15:43.539Z",
+  "stateRevisionObserved": 59,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

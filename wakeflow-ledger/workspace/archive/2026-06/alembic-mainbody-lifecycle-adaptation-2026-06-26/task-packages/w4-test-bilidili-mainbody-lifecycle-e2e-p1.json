@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "summary": "W4 true BiliDili acceptance for mainbody lifecycle adaptation. All implementation waves W1/W2/W3 are accepted, including W3 rework fb6782f. Test must run a real BiliDili scenario in an ALEMBIC_HOME sandbox on Node >=22 and collect DB/log/runtime evidence for C/D/E/F: coldStart plan precondition, deepMining single-job multi-round, moduleMining per-module fan-out, and host evolution/lifecycle maintenance wiring. This is verification only; do not repair product code in Test, do not relax anti-fabrication/evidence/transition gates, and do not treat a zero-output module or empty DB as success.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §2 CD-6 and §5 W4 after W1/W2/W3 accepted; accepted baselines include AlembicCore@1553e2f, AlembicAgent@c38d2c4, AlembicPlugin@ae97e0f, Alembic@fb6782f.",
+  "createdAt": "2026-06-27T03:59:49.721Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+      "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md/CLAUDE.md as present, .wakeflow-active/index.md, current state root, task package w4-test-bilidili-mainbody-lifecycle-e2e-p1, Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md especially §2 CD-6, §4b acceptance lines C-F, and §5 W4, plus Test/CLAUDE.md. Declare Test window identity. Use the real BiliDili project available in this workspace (record exact BiliDili commit; if it differs from design's historical 02a25032, use current main and report that fact). Use ALEMBIC_HOME sandbox and Node >=22. Validate accepted local product heads: AlembicCore@1553e2f, AlembicAgent@c38d2c4, AlembicPlugin@ae97e0f, Alembic@fb6782f. Required evidence: (1) C coldStart: plan precondition runs; mock/invalid plan or forced plan failure blocks before coldStart with no fallback-to-full evidence; valid narrow plan drives strict executionDimensions/dimensions and scale budget into DB/log/runtime output. (2) D deepMining: one daemon job runs >=2 rounds, deep_mining_rounds has >=2 rows, new_recipes decreases or stop reason is recorded, coverage_ledger blank/thin count decreases, later-round recipes land in previously uncovered module/dimension cells, module-scope+depth budget visibly affect execution, same job id has no new enqueue, no git_diff_checkpoints/planLedger write path is used. (3) E moduleMining: module fan-out comes from ProjectMap.modules rather than moduleSeeds; for selected modules each module produces >=1 recipe; recipe moduleName is non-empty and belongs to ProjectMap.modules; scale=3 with >=8 modules runs exactly 3 child module jobs with full child budget; zero-output module is FAIL, not pass. (4) F host maintenance: lifecycleStateMachine is injected; scan/sweep/tick with staged/proposal/dead fixtures produces nonzero real work, records lifecycle_transition_events, active/dead/decaying states classify correctly, reactive rename/update proposal path remains alive, empty DB returns all-zero without fake state, daemon/timer cleanup leaves no residual timer. Record exact commands, logs/report paths, SQL snippets or JSON exports, Alembic/BiliDili commit hashes, DB path under sandbox, and failure classification. If blocked, return TargetResultEnvelope status=blocked with the first failing chain and owning repo recommendation; otherwise completed with raw evidence refs.",
+      "status": "pending",
+      "createdAt": "2026-06-27T03:59:49.721Z"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-fix-main-deepmining-real-coverage-production-t1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "fix-main-deepmining-real-coverage-production-p1",
+  "dispatchGroup": "fix-main-deepmining-real-coverage-production-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "fix-main-deepmining-real-coverage-production-t1",
+  "status": "completed",
+  "summary": "Repaired Alembic daemon deepMining real coverage production. DeepMining rounds now opt into inline rescan dimension fill, wait for the real AI dimension pipeline, count only coverage-written accepted source-ref-backed candidates as newRecipesThisRound, and return inline coverage stats so advisor review happens after coverage ledger writes. Also routed planning helper imports through the Core public facade and avoided retired workflow naming in logs for CI boundary tests.",
+  "evidenceRefs": [
+    "Alembic commit 0e4b369d0c20f460b8d8cba4022acc494deafde2 (fix: run deepMining rescan fill inline)",
+    "Alembic commit e8ec1669ba90323ca455083491625dd0de0ca38b (fix: route rescan planning imports through facade)",
+    "Alembic commit 9e5555df194d32715a44b8bd6f028b45f133efd2 (fix: avoid retired workflow naming in rescan log) pushed to origin/main",
+    "AlembicCore commit 934d043a0d12ac364aa582d6c39445f14a0af2e1 pushed to origin/main; CI needed the Core facade/export commits for sibling checkout",
+    "GitHub Actions CI success for Alembic main head 9e5555df194d32715a44b8bd6f028b45f133efd2: https://github.com/GxFn/Alembic/actions/runs/28296887289",
+    "Source evidence: lib/daemon/DaemonJobRunner.ts passes internalExecution.runAsyncFillInline for deepMining rounds; lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts awaits runAiDimensionPipelineForResult only for that internal opt-in; lib/workflows/project-context/ProjectContextWorkflowFacts.ts returns newRecipesThisRound/coverageLedger for inline completion",
+    "Test evidence: test/unit/DaemonJobRunnerPlanGate.test.ts adds counts-only-inline-source-ref-backed-deepMining-production-before-advisor-review; existing test/unit/KnowledgeRescanCoverageLedgerWrite.test.ts proves rejected/source-ref-less output does not increase coverage"
+  ],
+  "verification": [
+    "node --version => v22.22.1",
+    "npm run build:check => passed",
+    "npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/KnowledgeRescanCoverageLedgerWrite.test.ts => 17 passed",
+    "npm run test:unit -- test/unit/WorkflowNamingBoundary.test.ts => 4 passed",
+    "npm run test:unit => 122 files passed, 967 tests passed, 1 skipped",
+    "npm run lint:core-import-boundary => passed",
+    "./node_modules/.bin/biome check changed files => passed",
+    "git diff --check => passed",
+    "gh run watch 28296887289 --repo GxFn/Alembic --exit-status => success: Build & Lint, Unit Tests, Integration Tests, API Smoke Test all passed"
+  ],
+  "risks": [
+    "Alembic code guard MCP was attempted twice but failed before review with internal schema error: unrecognized key \"data\". This is a tool-surface blocker, not a code finding.",
+    "Final BiliDili real e2e deepMining verification remains intentionally outside this target per task package; controller/Test should run it after acceptance."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-fix-main-deepmining-real-coverage-production-p1__Alembic__fix-main-deepmining-real-coverage-production-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-deepmining-real-coverage-production-p1__Alembic__fix-main-deepmining-real-coverage-production-t1.json",
+    "deliveryRunId": "run-delivery-fix-main-deepmining-real-coverage-production-p1__Alembic__fix-main-deepmining-real-coverage-production-t1",
+    "dispatchGroup": "fix-main-deepmining-real-coverage-production-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-deepmining-real-coverage-production-p1__Alembic__fix-main-deepmining-real-coverage-production-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 70,
+    "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "fix-main-deepmining-real-coverage-production-p1",
+    "targetTaskId": "fix-main-deepmining-real-coverage-production-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "fix-main-deepmining-real-coverage-production-p1",
+    "resultId": "tr-fix-main-deepmining-real-coverage-production-t1",
+    "createdAt": "2026-06-27T17:47:11.801Z"
+  },
+  "createdAt": "2026-06-27T17:47:11.801Z",
+  "stateRevisionObserved": 70,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

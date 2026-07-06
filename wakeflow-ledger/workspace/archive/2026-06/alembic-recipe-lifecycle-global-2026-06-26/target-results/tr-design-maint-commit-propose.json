@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-design-maint-commit-propose",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-design-maint-commit-propose",
+  "dispatchGroup": "wave2-maint-contract",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "Design",
+  "targetTaskId": "design-maint-commit-propose",
+  "status": "completed",
+  "summary": "commit-driven 维护契约缺口(advance XOR propose)裁定。①契约: committed-impactful 既有覆盖文件改动→update proposal 是目标契约=须修 BUG(依据 UM验收#3/D3/完成定义#3·#4),否决 advance-on-commit/propose-on-working-tree。定性=普通 bug(valid 需求+错 impl,非 valid-impl-仍偏离的 redesign),不改完成定义→控制器可直接 intake 派修、不走需求 redesign。②修复形态: 确认控制器提议——assessFileImpact 对 git-head 事件改用 scanner 已算 commit-range diff(scan.range=mergeBase..HEAD)替工作树 git diff HEAD,之后 LP7 零token抑制照旧(不重开 LP7,只换 diff 源,LP7 从全抑制变精确抑制,正好调和 CG-5+committed→propose)。③范围: UM-followup 伞形内 bug,纯 additive。落点 Core(diffParser.ts:31 getFileDiff/ContentImpactAnalyzer.ts:54 assessFileImpact 加可选 revisionRange,默认 HEAD 保工作树)→Plugin(CommitDrivenMaintenance.ts:82 handleFileChanges(events,scan.range) 透传 + FileChangeHandler.ts:165/275 git-head 传 commitRange,LP7:277-294 logic 不变+订正:279 错误前提注释;scanner range 已产不改)。Core 先 Plugin 后。Design 产契约裁定+推荐形态+落点边界,未改产品码/未 mutate/未 dispatch。",
+  "evidenceRefs": [
+    "Design/docs/current/alembic-recipe-maint-commit-propose-contract-2026-06-26.md",
+    "AlembicPlugin/lib/recipe-generation/evolution/FileChangeHandler.ts",
+    "AlembicCore/src/service/evolution/ContentImpactAnalyzer.ts",
+    "AlembicCore/src/shared/diffParser.ts",
+    "AlembicPlugin/lib/recipe-generation/evolution/git-diff-checkpoint/CommitDrivenMaintenance.ts"
+  ],
+  "verification": [
+    "Design 一手逐函数复核确证控制器根因: assessFileImpact@ContentImpactAnalyzer.ts:54 → getFileDiff@diffParser.ts:31 跑 git diff HEAD(工作树,commit 后空)→null→LP7 skip@FileChangeHandler.ts:277-294;scanner@GitDiffScanner.ts:204-240 用 mergeBase..HEAD(commit-range,对)→游标 advance;两半 diff 源构造性不一致坎实",
+    "加深: ContentImpactAnalyzer.ts:121 + RecipeImpactPlanner.ts:8 注释自证分析器本为实时 IDE 工作树事件设计;LP7 注释:279'工作树 diff 已不可得'前提可证伪(commit-range 已被 scanner 算出、range 在 GitDiffScanResult.range:44)",
+    "修复缝核验: assessDiffImpact:84 已是 diff-源无关导出 scorer=干净注入点;commit-range 已算无需新算;编排点 CommitDrivenMaintenance.ts:82 持 scan.range 仅传 scan.events=range 上一层已可达;FileChangeEvent:34-42 不带 range(故用 handleFileChanges 第二参不改 Core 类型)",
+    "完整性自检: 覆盖三问(契约/形态/范围)+落点边界 file:line + LP7 调和 + UM#7 dedup 依赖 + E2 镜像验收口径;缺口标 must-confirm"
+  ],
+  "risks": [
+    "双 propose 重叠依赖 UM#7 dedup: 修复后 impactful 改动可能 uncommitted(E1)+committed(E2)两次入提案,靠 UM#7(CG-6)(targetRecipeId,type,status∈pending/observing)dedup 兜重叠→committed→propose 须在 UM#7 landed 之上;待确认契约保双面(荐)还是 committed-only",
+    "range 坐标须一致: impact diff 用 scanner 检测同一 range(scan.range=mergeBase..HEAD),勿另引 previousHead..HEAD 避免非快进历史 detect/impact 错配",
+    "LP7 FileChangeHandler.ts:279 错误前提注释须订正(“工作树 diff 已不可得”已伪),防未来据错前提复原 skip 再引入 bug",
+    "失效证据: Test 复验 committed→propose 仍 0 则根因别处(range 未达 handler/token 提取对真 impactful 零交集);验收=E2 镜像(impactful commit→update proposal observing+游标 advance 并存非 XOR;trivial commit→仍 skip)",
+    "跨仓: 落地前 grep getFileDiff/assessFileImpact 全调用方(两仓)确认可选参不破位置参;ContentImpactAnalyzer:117+ 另有 unified 入口,range 透传以 FileChangeHandler:275 基础 assessFileImpact 为准勿误扩"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-maint-contract__Design__design-maint-commit-propose",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-contract__Design__design-maint-commit-propose.json",
+    "deliveryRunId": "run-delivery-wave2-maint-contract__Design__design-maint-commit-propose",
+    "dispatchGroup": "wave2-maint-contract",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-contract__Design__design-maint-commit-propose.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 24,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-design-maint-commit-propose",
+    "targetTaskId": "design-maint-commit-propose",
+    "targetWindow": "Design",
+    "dispatchGroup": "wave2-maint-contract",
+    "resultId": "tr-design-maint-commit-propose",
+    "createdAt": "2026-06-25T22:08:37.566Z"
+  },
+  "createdAt": "2026-06-25T22:08:37.566Z",
+  "stateRevisionObserved": 24,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

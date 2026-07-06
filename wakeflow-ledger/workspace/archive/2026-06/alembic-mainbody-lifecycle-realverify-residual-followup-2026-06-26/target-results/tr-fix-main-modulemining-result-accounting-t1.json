@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-fix-main-modulemining-result-accounting-t1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "fix-main-modulemining-result-accounting-p1",
+  "dispatchGroup": "fix-main-modulemining-result-accounting-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "fix-main-modulemining-result-accounting-t1",
+  "status": "completed",
+  "summary": "Alembic repaired the moduleMining false-zero completion guard. DaemonJobRunner now keeps the Agent result projection count as primary, then snapshots knowledgeRepository and recipeSourceRefRepository around runModuleMining to count only newly persisted recipe ids with non-empty, non-stale source refs. True zero-output moduleMining still fails. Local commit 47889f9 (no push).",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-main-modulemining-result-accounting-t1.md",
+    "Alembic/lib/daemon/DaemonJobRunner.ts",
+    "Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1/evidence/modulemining-db-delta-summary.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1/evidence/source-ref-coverage-fix-realverify-summary.md"
+  ],
+  "verification": [
+    "commit 47889f9 fix: count persisted module mining recipes",
+    "npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts: PASS (16 tests)",
+    "npm run build:check: PASS",
+    "./node_modules/.bin/biome check lib/daemon/DaemonJobRunner.ts test/unit/DaemonJobRunnerPlanGate.test.ts: PASS",
+    "git diff --check: PASS",
+    "npm run test:unit: PASS (122 files, 970 tests, 1 skipped)",
+    "post-commit git diff --check HEAD: PASS",
+    "post-commit npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts: PASS (16 tests)",
+    "alembic_code_guard attempted but failed internally with unrecognized key data"
+  ],
+  "risks": [
+    "Final direct BiliDili e2e was not rerun by Alembic target per package boundary; after controller acceptance, Test should rerun moduleMining/evolution/anti-fabrication chain.",
+    "Persisted-output delta is scoped to the synchronous runModuleMining call window and requires new recipe ids plus non-stale source refs; if future persistence becomes asynchronous after return, a separate job/result contract may be needed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-fix-main-modulemining-result-accounting-p1__Alembic__fix-main-modulemining-result-accounting-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-modulemining-result-accounting-p1__Alembic__fix-main-modulemining-result-accounting-t1.json",
+    "deliveryRunId": "run-delivery-fix-main-modulemining-result-accounting-p1__Alembic__fix-main-modulemining-result-accounting-t1",
+    "dispatchGroup": "fix-main-modulemining-result-accounting-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-modulemining-result-accounting-p1__Alembic__fix-main-modulemining-result-accounting-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 86,
+    "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "fix-main-modulemining-result-accounting-p1",
+    "targetTaskId": "fix-main-modulemining-result-accounting-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "fix-main-modulemining-result-accounting-p1",
+    "resultId": "tr-fix-main-modulemining-result-accounting-t1",
+    "createdAt": "2026-06-27T19:26:37.700Z"
+  },
+  "createdAt": "2026-06-27T19:26:37.700Z",
+  "stateRevisionObserved": 86,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

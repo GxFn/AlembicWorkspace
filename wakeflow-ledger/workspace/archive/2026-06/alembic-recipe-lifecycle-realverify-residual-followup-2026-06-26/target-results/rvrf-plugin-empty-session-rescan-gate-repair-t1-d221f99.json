@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "resultId": "rvrf-plugin-empty-session-rescan-gate-repair-t1-d221f99",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-plugin-empty-session-rescan-gate-repair-p1",
+  "dispatchGroup": "rvrf-plugin-empty-session-rescan-gate-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "rvrf-plugin-empty-session-rescan-gate-repair-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin completed the empty bootstrap session rescan gate repair. Commit d221f99659e011998406241ee29c0f99167e60ce adds a container/projectRoot stale-empty session preflight to alembic_rescan after planSelection validation, keeps createProjectContextHostAgentSession protected with a one-time retry only when a BOOTSTRAP_IN_PROGRESS lease is confirmed stale and empty, and adds file-backed active-sessions.json regression coverage proving moduleMining rescan can proceed without manual cleanup while non-empty sessions still block. No AlembicCore, BiliDili data, vendor, push, tag, or bump changes.",
+  "evidenceRefs": [
+    "commit:d221f99659e011998406241ee29c0f99167e60ce",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/host-agent-workflows/project-context-analysis.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/HostAgentSessionLease.test.ts"
+  ],
+  "verification": [
+    "npx biome check lib/recipe-generation/host-agent-workflows/project-context-analysis.ts lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts test/unit/HostAgentSessionLease.test.ts => pass",
+    "npm run build:check => pass; Core build used ../AlembicCore @ 051ddf282309e485e8f3359337b9b9f3be011515",
+    "npx vitest run test/unit/HostAgentSessionLease.test.ts => 1 file / 6 tests passed; includes file-backed stale empty active-sessions.json and moduleMining rescan workflow regression",
+    "npx vitest run test/unit/HostAgentSessionLease.test.ts test/unit/ModuleServiceHostManagedBoundary.test.ts test/unit/HostAgentDimensionCompletionWorkflow.test.ts test/unit/CoverageLedgerWiring.test.ts test/unit/McpCoreToolsCleanOutputContract.test.ts test/unit/McpCleanOutputContract.test.ts => 6 files / 52 tests passed",
+    "npm run build => pass",
+    "dist non-MCP temp probe => releaseEmptyHostAgentSessionLeaseForProject released bs-dist-empty and createProjectContextHostAgentSession replaced it with one new session id"
+  ],
+  "risks": [
+    "Existing test/unit/PlanSelectionGateStateless.test.ts still fails when run alone on an old assertion expecting data.planGate in a cold-start response where current output leaves data.planGate empty; this predates and is unrelated to the rescan session gate repair.",
+    "BiliDili true MCP verification still needs Test rerun after plugin refresh/reload; the fix does not manually delete the real active-sessions.json."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-plugin-empty-session-rescan-gate-repair-p1__AlembicPlugin__rvrf-plugin-empty-session-rescan-gate-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-plugin-empty-session-rescan-gate-repair-p1__AlembicPlugin__rvrf-plugin-empty-session-rescan-gate-repair-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-plugin-empty-session-rescan-gate-repair-p1__AlembicPlugin__rvrf-plugin-empty-session-rescan-gate-repair-t1",
+    "dispatchGroup": "rvrf-plugin-empty-session-rescan-gate-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-plugin-empty-session-rescan-gate-repair-p1__AlembicPlugin__rvrf-plugin-empty-session-rescan-gate-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 24,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-plugin-empty-session-rescan-gate-repair-p1",
+    "targetTaskId": "rvrf-plugin-empty-session-rescan-gate-repair-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "rvrf-plugin-empty-session-rescan-gate-repair-p1",
+    "resultId": "rvrf-plugin-empty-session-rescan-gate-repair-t1-d221f99",
+    "createdAt": "2026-06-26T14:13:00.611Z"
+  },
+  "createdAt": "2026-06-26T14:13:00.611Z",
+  "stateRevisionObserved": 24,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

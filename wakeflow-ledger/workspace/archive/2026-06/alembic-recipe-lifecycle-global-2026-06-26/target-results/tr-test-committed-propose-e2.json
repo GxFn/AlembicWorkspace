@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-test-committed-propose-e2",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-test-committed-propose-e2",
+  "dispatchGroup": "wave2-test-cp-e2",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "test-committed-propose-e2",
+  "status": "completed",
+  "summary": "committed→propose E2 closeout (fixes Test#2 LP7 gap: advance XOR propose). Fix under test AlembicCore@afd4302 (getFileDiff/assessFileImpact optional revisionRange) + AlembicPlugin@31f17d5 (CommitDrivenMaintenance passes scan.range; FileChangeHandler git-head feeds commitRange; LP7 precise). Faithful replica (real ~/.asd 02a25032 + BiliDili a3ea6a2 protected, confirmed untouched), runtime rebuilt with fix (cache @alembic/core→afd4302; dist diffParser revisionRange + FileChangeHandler/CommitDrivenMaintenance commit-range). VERDICT: PASS — committed→propose works on real machine, maintenance walk-through closeout achieved. ①IMPACTFUL committed reformat of covered ModuleManager.add block+commit 213b26a+trigger → git_diff_checkpoints initialized→routed + checkpoint a3ea6a25→213b26a + advanced_at AND evolution_proposals 0→1 type=update/source=file-change/target=d84c424a/observing → ADVANCE+PROPOSE COEXIST (vs Test#2 E2 on 0fa2ac3: committed→advance but 0 proposal). ②TRIVIAL committed (zero recipe-token comment)+commit aa77cd2+trigger → cursor advanced, 0 proposal → LP7 precise suppression intact (precise not blanket). ③dedup UM#7 (isolated work-only trigger to avoid staging-sweep gate): T1 uncommitted impactful→1 observing (no advance); commit same 895100d+T2→still 1 observing+advance → committed submit deduped vs existing observing. backward-compat: uncommitted impactful→proposal (T1) unchanged. NOTE(not defect): when trigger includes alembic_status (staging-sweep member), ProposalExecutor.checkAndExecute correctly rejects the no-usage update for d84c424a (guardHits=0&&searchHits=0 → evaluateUpdate no-usage reject) = lifecycle gate working (matches first task #6); that confounded the un-isolated dedup (1 rejected+1 observing), resolved by work-only re-run. Isolation: real BiliDili a3ea6a2 clean, real ~/.asd 02a25032 initialized/a3ea6a25/0 untouched, no product code changed (Plugin 31f17d5/Core afd4302 clean), Node22, no push. N1(carried out-of-scope): trigger tools isError:true (output-schema 'Unrecognized key: data' from data.unifiedEvolution) but maintenance persists (DB ground truth).",
+  "evidenceRefs": [
+    "tmp/um-baseline/evidence-cp/COMMITTED-PROPOSE-E2-REPORT.md",
+    "tmp/um-baseline/evidence-cp/s1-trigger.json",
+    "tmp/um-baseline/evidence-cp/s2-trigger.json",
+    "tmp/um-baseline/evidence-cp/s3clean-t1.json",
+    "tmp/um-baseline/evidence-cp/s3clean-t2.json",
+    "tmp/um-baseline/run-cp-e2.sh",
+    "tmp/um-baseline/impactful-edit.cjs"
+  ],
+  "verification": [
+    "① impactful committed → advance AND propose (closeout) — PASS: commit 213b26a → git_diff_checkpoints initialized→routed + a3ea6a25→213b26a + advanced_at; evolution_proposals 0→1 type=update source=file-change target=d84c424a status=observing. advance+propose coexist (vs Test#2 E2 XOR) (evidence-cp/s1-trigger.json + DB)",
+    "② trivial committed → advance only — PASS: zero-recipe-token comment commit aa77cd2 → cursor advanced, evolution_proposals=0 (LP7 precise suppression) (evidence-cp/s2-trigger.json + DB)",
+    "③ UM#7 dedup (work-only trigger) — PASS: T1 uncommitted impactful → 1 observing (cursor not advanced); commit same 895100d + T2 → still 1 observing + cursor advanced (committed submit deduped vs existing observing) (evidence-cp/s3clean-t1.json/s3clean-t2.json + DB)",
+    "backward-compat (working-tree) — PASS: uncommitted impactful still proposes (T1)",
+    "lifecycle gate (note, not defect) — staging-sweep alembic_status → checkAndExecute rejects no-usage update for d84c424a (evaluateUpdate no-usage) = gate working, matches first task #6; confounded un-isolated dedup, resolved via work-only",
+    "fix-in-binary — rebuilt live Core afd4302, cache @alembic/core→afd4302, dist diffParser revisionRange + FileChangeHandler/CommitDrivenMaintenance commit-range feed",
+    "isolation — real BiliDili a3ea6a2 clean; real ~/.asd 02a25032 untouched (initialized/a3ea6a25/advanced_at=NULL/0); no product code changed (AlembicPlugin 31f17d5 / AlembicCore afd4302 clean)"
+  ],
+  "risks": [
+    "N1 (carried, out-of-scope): commit-driven trigger tools return isError:true to the MCP client (output-schema 'Unrecognized key: data' from attached data.unifiedEvolution surface); maintenance persists + lands in DB regardless (verified by DB). Needs real-cc-host confirmation whether host-facing or minimal-client artifact; does not affect this closeout.",
+    "no-usage update proposals (e.g. for d84c424a which has guardHits=0&&searchHits=0) are rejected by the staging-access-sweep's checkAndExecute on the next status/rescan-class tool call (lifecycle gate, intended). So a committed update proposal for an unused recipe is short-lived; this is correct gate behavior, not part of this closeout's scope.",
+    "Test scope was the committed→propose closeout only (impactful/trivial/dedup/backward-compat); not the full all-dimension/all-stage chain (U7)."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-test-cp-e2__Test__test-committed-propose-e2",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-test-cp-e2__Test__test-committed-propose-e2.json",
+    "deliveryRunId": "run-delivery-wave2-test-cp-e2__Test__test-committed-propose-e2",
+    "dispatchGroup": "wave2-test-cp-e2",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-test-cp-e2__Test__test-committed-propose-e2.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 38,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-test-committed-propose-e2",
+    "targetTaskId": "test-committed-propose-e2",
+    "targetWindow": "Test",
+    "dispatchGroup": "wave2-test-cp-e2",
+    "resultId": "tr-test-committed-propose-e2",
+    "createdAt": "2026-06-25T23:26:02.704Z"
+  },
+  "createdAt": "2026-06-25T23:26:02.704Z",
+  "stateRevisionObserved": 38,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

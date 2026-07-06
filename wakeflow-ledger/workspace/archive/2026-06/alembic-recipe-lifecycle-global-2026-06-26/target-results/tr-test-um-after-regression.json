@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-test-um-after-regression",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave1-test-um-after-regression",
+  "dispatchGroup": "wave1-um-after-regression",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "test-um-after-regression",
+  "status": "needs-review",
+  "summary": "After-regression of UM retirement on real BiliDili (new code AlembicPlugin@0fa2ac3 UM#1-7/LP7 + AlembicCore@b3a8d81), faithful replica (real ~/.asd 02a25032 + real BiliDili a3ea6a2 protected, confirmed untouched). VERDICT: retire-no-collateral HOLDS — NONE of the task's failure conditions triggered (#2 still advances; created-uncovered does not seed a Recipe; delete does not directly delete). ②③④⑤ fully GREEN. ONE needs-review nuance on #2 (LP7, for controller/Design). Per-check: ①#2 — committed modified covered file → git_diff_checkpoints initialized→routed + checkpoint advance + advanced_at (ROUTING INTACT), but 0 proposals with generationChangeLog 'source-modified-git-head-no-impact'. Root cause (source-read): assessFileImpact→getFileDiff='git diff HEAD' (working-tree vs HEAD), empty after commit → impact null → LP7 git-head skip. Proposal machinery PROVEN intact via E1 (uncommitted impactful reformat of ModuleManager.add block → update proposal type=update source=file-change target=d84c424a observing); E2 (same edit COMMITTED) → cursor advances a3ea6a25→caa7adf but 0 proposals. So a single committed change advances XOR proposes (mutually exclusive post-LP7); committed-no-proposal is intended LP7 (commit 750ef70), NOT created-retirement collateral, but deviates from baseline #1 / #2 literal 'committed→proposal same as baseline'. ②created uncovered AfterRegProbe.swift+commit+trigger → knowledge_entries unchanged(3), 0 proposals, no candidate/recipe, routeStatus=skipped (retirement effective). ③delete all 4 files of recipe 31665276+commit+trigger → evolution_proposals 0→1 type=deprecate source=file-change target=31665276 observing, recipe NOT row-deleted(knowledge=3, refs stale). ④git mv covered AppCoordinator.swift→Renamed+commit+trigger → both 2cf70b25 refs repaired to AppCoordinatorRenamed.swift (active), cursor advanced, no proposal(high-confidence rename). ⑤idempotency: T1 advances to 77eb506, T2(no new commit)→routeStatus=skipped advanced=false headChanged=false events=0 cursor unchanged. Isolation: real BiliDili a3ea6a2 clean, real ~/.asd 02a25032 initialized/a3ea6a25/0 untouched, no product code changed (Plugin 0fa2ac3/Core b3a8d81 clean), Node22, no push. N1(out-of-scope, carried from baseline): trigger tools isError:true (output-schema 'Unrecognized key: data' from data.unifiedEvolution) but maintenance persists (DB ground truth). NEEDS-REVIEW: controller/Design confirm whether committed-modified→advance-without-proposal (proposals require working-tree visibility, LP7) is the accepted commit-driven-maintenance contract for the umbrella's 'evolution 维护走通' goal.",
+  "evidenceRefs": [
+    "tmp/um-baseline/evidence-after/UM-AFTER-REGRESSION-REPORT.md",
+    "tmp/um-baseline/evidence-after/s1-trigger.json",
+    "tmp/um-baseline/evidence-after/e1-trigger.json",
+    "tmp/um-baseline/evidence-after/e2-trigger.json",
+    "tmp/um-baseline/evidence-after/s2-trigger.json",
+    "tmp/um-baseline/evidence-after/s3-trigger.json",
+    "tmp/um-baseline/evidence-after/s4-trigger.json",
+    "tmp/um-baseline/evidence-after/s5-t2.json",
+    "tmp/um-baseline/run-steps345.sh",
+    "tmp/um-baseline/impactful-edit.cjs"
+  ],
+  "verification": [
+    "① #2 retire-no-collateral — routing/advance INTACT + proposal machinery INTACT: committed modified covered → initialized→routed + checkpoint a3ea6a25→1d5c662 + advanced_at (s1-trigger.json); E1 uncommitted impactful → update proposal type=update/source=file-change/target=d84c424a/observing (e1-trigger.json + DB); E2 committed impactful → advance a3ea6a25→caa7adf but 0 proposals (e2-trigger.json). committed-no-proposal = LP7 (getFileDiff='git diff HEAD' empty after commit), intended, not created-retirement collateral",
+    "② created uncovered → no generation — PASS: AfterRegProbe.swift committed+triggered → knowledge_entries unchanged=3, 0 proposals, no candidate/recipe seeded, routeStatus=skipped (s2-trigger.json + DB)",
+    "③ delete covered → deprecation — PASS: deleted all 4 files of recipe 31665276 → evolution_proposals 0→1 type=deprecate source=file-change target=31665276 observing; recipe NOT row-deleted (knowledge=3, refs stale) (s3-trigger.json + DB)",
+    "④ rename covered → source-ref repair — PASS: git mv AppCoordinator.swift→AppCoordinatorRenamed.swift → both 2cf70b25 refs repaired to BiliDili/AppCoordinatorRenamed.swift:13-17/:91-103 (status active), cursor advanced, no proposal (s4-trigger.json + DB)",
+    "⑤ idempotency — PASS: T1 advances cursor to 77eb506; T2 no new commit → routeStatus=skipped advanced=false headChanged=false events=0 cursor unchanged, no new proposal (s5-t1/s5-t2.json + DB)",
+    "task FAILURE conditions NONE triggered: #2 still advances (not '不再 advance'); created does not seed Recipe; delete does not directly delete Recipe → retire-no-collateral holds",
+    "isolation — real BiliDili a3ea6a2 clean; real ~/.asd 02a25032 untouched (read-only recheck: initialized/a3ea6a25/advanced_at=NULL/0); no product code changed (AlembicPlugin 0fa2ac3 / AlembicCore b3a8d81 clean)",
+    "fix-in-binary confirmed: rebuilt with live Core b3a8d81, cache @alembic/core→b3a8d81, dist has uncoveredCreated + CommitDrivenMaintenance.js (post-UM)"
+  ],
+  "risks": [
+    "NEEDS-REVIEW (controller/Design): post-UM, committed modified covered changes ADVANCE the cursor but do NOT produce an update proposal (LP7: assessFileImpact uses 'git diff HEAD' = working-tree, empty after commit). Update proposals now require an uncommitted working-tree change (≥0.3 recipe-token overlap). Intended LP7 (commit 750ef70) but supersedes baseline #1 + #2's literal 'committed→proposal'. Decision needed: is 'advance-on-commit, propose-on-working-tree' the accepted contract for the umbrella 'evolution 维护走通' goal, or should committed changes also auto-propose? Retire-no-collateral holds either way (routing + machinery intact).",
+    "N1 (out-of-scope, carried from baseline): commit-driven trigger tools return isError:true to the MCP client (output-schema 'Unrecognized key: data' from attached data.unifiedEvolution); maintenance persists+lands in DB regardless. Needs real-cc-host confirmation; surface fields (e.g. uncoveredCreated diagnostic) not client-readable on isError, so step② confirmed via DB (knowledge unchanged + 0 proposals) rather than the surface counter.",
+    "Replica data quirk (not a product issue): recipe d84c424a references Packages/AOXFoundationKit/... files that are NOT tracked in the BiliDili repo (phantom active refs); delete→deprecation was therefore demonstrated on recipe 31665276 (all 4 ref files exist) instead. Faithful to the real workspace DB."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave1-um-after-regression__Test__test-um-after-regression",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-after-regression__Test__test-um-after-regression.json",
+    "deliveryRunId": "run-delivery-wave1-um-after-regression__Test__test-um-after-regression",
+    "dispatchGroup": "wave1-um-after-regression",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-after-regression__Test__test-um-after-regression.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 22,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave1-test-um-after-regression",
+    "targetTaskId": "test-um-after-regression",
+    "targetWindow": "Test",
+    "dispatchGroup": "wave1-um-after-regression",
+    "resultId": "tr-test-um-after-regression",
+    "createdAt": "2026-06-25T21:53:27.211Z"
+  },
+  "createdAt": "2026-06-25T21:53:27.211Z",
+  "stateRevisionObserved": 22,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

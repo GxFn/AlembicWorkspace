@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w2-main-coldstart-plan-hard-gate-rework-1-t1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+  "dispatchGroup": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "w2-main-coldstart-plan-hard-gate-rework-1-t1",
+  "status": "completed",
+  "summary": "Alembic W2 rework completed for §4b(C1)/PD-5 stage-match hard gate. Commit ff6f01efeadc99842c4f1650a9e96400308f5277 adds a DaemonJobRunner check after runPlanAgent and before applyPlanSelection so any PlanSelection whose generationStage is not coldStart aborts through the existing plan-gate error path. Added a focused regression where a shape-valid deepMining selection with non-empty dimensions fails the daemon job before runColdStartWorkflow, with no fallback-to-full behavior. Scope stayed in Alembic main only; no AlembicCore, AlembicAgent, AlembicPlugin, vendor, schema, or public contract edits.",
+  "evidenceRefs": [
+    "commit:ff6f01efeadc99842c4f1650a9e96400308f5277",
+    "Alembic/lib/daemon/DaemonJobRunner.ts",
+    "Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts",
+    "guard:alembic_code_guard-internal-schema-error-unrecognized-data",
+    "boundary:AlembicCore-clean,AlembicAgent-ahead1-clean,AlembicPlugin-ahead1-clean,Alembic-main-ahead3-clean"
+  ],
+  "verification": [
+    "Node v22.22.1 confirmed.",
+    "npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/ColdStartPlanSelection.test.ts passed after commit: 2 files, 8 tests.",
+    "npm run build:check passed after commit and used local AlembicCore source ../AlembicCore.",
+    "npm run typecheck passed before commit.",
+    "npm run lint passed before commit with 5 pre-existing noExplicitAny warnings only in lib/service/handler-runtime/types.ts and lib/workflows/ai-execution/AgentRunProjections.ts.",
+    "npm run lint:core-import-boundary passed before commit: scanned 365 files and 415 @alembic/core imports.",
+    "npm run lint:repo-boundary passed before commit.",
+    "./node_modules/.bin/biome check lib/daemon/DaemonJobRunner.ts test/unit/DaemonJobRunnerPlanGate.test.ts passed before commit.",
+    "git diff --check and git diff --cached --check passed.",
+    "rg fallback-to-full/回退全量 in Alembic/lib/daemon/DaemonJobRunner.ts returned no matches.",
+    "Post-commit git status for Alembic is clean on main ahead 3; changed files in commit are exactly lib/daemon/DaemonJobRunner.ts and test/unit/DaemonJobRunnerPlanGate.test.ts."
+  ],
+  "risks": [
+    "Alembic Guard MCP failed with CODEX_MCP_ERROR / core.failure.internal-error / unrecognized key \"data\" despite explicit file scope; no guard findings were available.",
+    "Alembic main is local ahead 3 and was not pushed because this target package requested commit/hash return, not push.",
+    "Workspace index/status projections still show stale idle historical content; execution used explicit delivery envelope, dispatch packet, and state root task package for this target."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w2-main-coldstart-plan-hard-gate-rework-1-p1__Alembic__w2-main-coldstart-plan-hard-gate-rework-1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w2-main-coldstart-plan-hard-gate-rework-1-p1__Alembic__w2-main-coldstart-plan-hard-gate-rework-1-t1.json",
+    "deliveryRunId": "run-delivery-w2-main-coldstart-plan-hard-gate-rework-1-p1__Alembic__w2-main-coldstart-plan-hard-gate-rework-1-t1",
+    "dispatchGroup": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w2-main-coldstart-plan-hard-gate-rework-1-p1__Alembic__w2-main-coldstart-plan-hard-gate-rework-1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 19,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+    "targetTaskId": "w2-main-coldstart-plan-hard-gate-rework-1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "w2-main-coldstart-plan-hard-gate-rework-1-p1",
+    "resultId": "tr-w2-main-coldstart-plan-hard-gate-rework-1-t1",
+    "createdAt": "2026-06-27T03:05:01.100Z"
+  },
+  "createdAt": "2026-06-27T03:05:01.100Z",
+  "stateRevisionObserved": 19,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-maint-fix-core",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-maint-fix-core",
+  "dispatchGroup": "wave2-maint-fix-core",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "maint-fix-core",
+  "status": "completed",
+  "summary": "maint-fix-core 完成：committed→propose 修复（Core 侧），纯 additive、默认行为字节兼容，commit afd4302。\n\n根因：assessFileImpact→getFileDiff 跑 `git diff HEAD`（工作树，改动 commit 后为空）→null→上层 LP7 skip→committed-impactful 改动无 update proposal；而 scanner 用 mergeBase..HEAD（commit-range）→游标 advance，两半 diff 源不一致。assessDiffImpact:84 已是 diff-源无关 scorer = 干净注入点。\n\n修复：#1 getFileDiff(diffParser.ts:31) 加可选 revisionRange —— 缺省→`git diff HEAD`（工作树，与改前逐字节兼容），给定→`git diff <revisionRange>`（commit-range，如 mergeBase..HEAD；仅替换 diff 源，-U0/--/路径/silent-degrade 语义不变；revisionRange 作单个 git 修订实参传 execFileSync，无 shell、`..` 安全）。#2 assessFileImpact(ContentImpactAnalyzer.ts:54) 加可选 revisionRange 透传 getFileDiff；assessDiffImpact scorer 不改（diff-源无关）。\n\n边界：未误扩 assessImpactUnified:132 unified 入口（保持 3-arg 工作树默认；range 透传归 Plugin 侧 FileChangeHandler:275 基础 assessFileImpact）。LP7 逻辑未碰（Plugin 侧）。Plugin 透传（CommitDrivenMaintenance scan.range + FileChangeHandler git-head commitRange + 订正 LP7 注释）= maint-fix-plugin（本任务 landed 后派）。",
+  "evidenceRefs": [
+    "AlembicCore/src/shared/diffParser.ts",
+    "AlembicCore/src/service/evolution/ContentImpactAnalyzer.ts",
+    "AlembicCore/test/unit/DiffRevisionRange.test.ts"
+  ],
+  "verification": [
+    "commit afd4302cff129b19d6582555c32e8e4557e38638（main，无分支/无 push/无 tag/无 bump，3 files +131/-5，git ls-files dist/ 空=无 dist 跟踪）",
+    "npm run build:check → tsc --noEmit 通过，0 error",
+    "npm run test → 134 files / 1367 tests passed（基线 133/1364；新增 1 file +3 tests，零回归）",
+    "npm run lint → biome Checked 625 files, no fixes applied, 0 warning / 0 error",
+    "npm run build → clean-dist + tsc 重生 dist 成功（供 maint-fix-plugin 接入）",
+    "git diff --check → clean",
+    "验收1 默认零回归[unit]：DiffRevisionRange.test.ts '验收1' passed —— 不传 range：未提交改动 getFileDiff 可见且含 makeWidgetAsync，提交后工作树干净→null（保留旧语义/BUG 根因）；SharedBasics '非 git 目录…安静降级' 回归保留",
+    "验收2 commit-range[unit]：'验收2 commit-range' + '验收2 committed 改动经 revisionRange' passed —— commit 后 getFileDiff(no range)=null，getFileDiff(range 'HEAD~1..HEAD')≠null 且含 makeWidgetAsync；assessFileImpact(no range)=null，assessFileImpact(range)≠null 且 matchedTokens 含 makeWidgetAsync",
+    "验收3 可选参不破位置调用[grep/build]：getFileDiff 调用方=ContentImpactAnalyzer:63（已透传 range）+ SharedBasics.test:58（2-arg 位置调用，字节兼容）；assessFileImpact 调用方=assessImpactUnified:141（3-arg 未扩）+ evolution.ts:48 re-export；build:check 通过",
+    "禁止项核验：grep -nE 'git_diff_checkpoints|gitDiffCheckpoint' diffParser.ts + ContentImpactAnalyzer.ts → 0 hits；unified 入口未扩；默认行为未变（diffTarget 缺省='HEAD'，args 与改前完全相同）"
+  ],
+  "risks": [
+    "Plugin 侧透传（CommitDrivenMaintenance.ts:82 透传 scan.range + FileChangeHandler.ts:165/275 git-head 传 commitRange + 订正 LP7:279 错误注释）= maint-fix-plugin，本任务范围内未碰 Plugin/LP7 —— landed 后派。",
+    "默认不传 revisionRange 时行为与改前逐字节一致（diffTarget='HEAD'，git 实参完全相同）；现有调用方（SharedBasics:58 / assessImpactUnified:141）零改动、字节兼容。",
+    "commit-range 仅在调用方显式传 revisionRange 时启用；Core 自身无调用方传 range（groundwork），真机生效 gated on maint-fix-plugin。",
+    "单测依赖本机 git 可用（建隔离临时仓 init/commit）；无 git 时 getFileDiff 走 catch→null，range 断言会失败暴露而非静默通过。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-maint-fix-core__AlembicCore__maint-fix-core",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-fix-core__AlembicCore__maint-fix-core.json",
+    "deliveryRunId": "run-delivery-wave2-maint-fix-core__AlembicCore__maint-fix-core",
+    "dispatchGroup": "wave2-maint-fix-core",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-fix-core__AlembicCore__maint-fix-core.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 30,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-maint-fix-core",
+    "targetTaskId": "maint-fix-core",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "wave2-maint-fix-core",
+    "resultId": "tr-maint-fix-core",
+    "createdAt": "2026-06-25T22:57:46.572Z"
+  },
+  "createdAt": "2026-06-25T22:57:46.572Z",
+  "stateRevisionObserved": 30,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

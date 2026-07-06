@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p1-plugin-write-gate-scope-resolution-p1",
+  "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+  "summary": "P1 Plugin after accepted Core 421a241: land the Plugin write-side/gate scope-resolution chokepoints that are required before any deletion hard gate. Scope is Plugin §12.P1 blocking subset plus §12.Z3 lint wiring: C12 resolveHostAgentDataRoot and C16 inspectKnowledge must resolve native project scope from disk; add required single-root annotations/lint so future bare fromProject in Plugin scan/write paths is blocked. Do not start P2 plan-tool/project-source-facts, P3 host/parity/runtime sweep, P4 deletion/init detect-or-refuse, vendor refresh, or Alembic/AlembicAgent work.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P1+12.Z3",
+  "createdAt": "2026-06-29T04:21:16.176Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p1-plugin-write-gate-scope-resolution-t1",
+      "taskPackageId": "p1-plugin-write-gate-scope-resolution-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, state root/dispatch packet/envelope, and AlembicPlugin/AGENTS.md. Implement only Plugin P1 write-side/gate scope-resolution: (1) C12 lib/recipe-generation/host-agent-workflows/project-data-root.ts must keep explicit projectRoot semantics but use WorkspaceResolver.fromProjectScopeRegistry(projectRoot).dataRoot so cold-start/dimension-completion/tool-router write roots bind the ecf32806 space DB instead of member/per-repo or /tmp. (2) C16 lib/runtime/KnowledgeState.ts must try WorkspaceResolver.fromProjectScopeRegistry(projectRoot), retaining the existing fallback new WorkspaceResolver({ projectRoot }) only for missing native scope/single-root cases; verify inspectKnowledge reads the space DB and does not create fake already-initialized behavior. (3) Add/extend Plugin scope boundary lint per §12.Z3 and wire it into package.json check because Plugin check currently lacks lint:repo-boundary; the lint must reject new bare WorkspaceResolver.fromProject/WR.fromProject in Plugin scan/write paths and must not force P2/P3 sites to migrate early. Add explicit @scope-singleroot(permanent|temporary) comments where this P1 lint needs intentional single-root exceptions, but do not migrate C11/C15/C17 runtime/parity sites unless the lint can otherwise not be made faithful to the P1/P3 boundary; if unavoidable, stop and backfill the conflict instead of silently starting P3. Verify with Node>=22: npm run build:check, npm run lint:repo-boundary or the new scope lint directly, package.json check wiring proof, targeted tests/probes for C12 member AlembicPlugin dataRoot -> ~/.asd/workspaces/ecf32806/.asd/alembic.db and not /tmp/ghost, targeted tests/probes for C16 space DB read/fallback, negative lint fixture proof, and an appropriate targeted unit suite or npm run test:unit if feasible. Commit locally on main; do not push.",
+      "status": "pending",
+      "createdAt": "2026-06-29T04:21:16.176Z"
+    }
+  ]
+}

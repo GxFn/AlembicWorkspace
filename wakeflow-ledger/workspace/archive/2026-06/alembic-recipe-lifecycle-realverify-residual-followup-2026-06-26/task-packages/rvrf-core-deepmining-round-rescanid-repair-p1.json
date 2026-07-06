@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rvrf-core-deepmining-round-rescanid-repair-p1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "Repair RF-3 Core producer primitives for deep_mining_rounds rescanId traceability/idempotency. Add an additive migration/schema/repository path so deep_mining_rounds can store and upsert by rescanId without breaking existing round_index behavior. This is a confirmed original residual, not new scope.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md §8.4 RF-3 and §8.5#3; controller raw DB PRAGMA table_info(deep_mining_rounds) on /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db shows no rescanId/rescan_id column after accepted Test projection-refresh result.",
+  "createdAt": "2026-06-26T15:55:24.560Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rvrf-core-deepmining-round-rescanid-repair-t1",
+      "taskPackageId": "rvrf-core-deepmining-round-rescanid-repair-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "You are the AlembicCore window. Read parent AGENTS.md, .wakeflow-active/index.md, this state root, the task package, Design requirement §8.4 RF-3 and §8.5#3, and AlembicCore rules; declare repository identity. Work only in /Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore, do not edit AlembicPlugin/BiliDili/vendor and do not push/tag/bump. Controller raw evidence after Test acceptance: real BiliDili DB has deep_mining_rounds columns id, project_root, round_index, started_at, completed_at, new_recipes_this_round, trigger_actor, created_at, updated_at with no rescanId/rescan_id; §8.4 says RF-3 deep_mining_rounds no rescanId is confirmed and codex-fixable; §8.5#3 says repeated same rescanId must be accountable/idempotent.\n\nRequired Core repair: add additive migration after 015 that adds nullable rescan_id (or established local naming if repository already has one) to deep_mining_rounds for existing DBs, add safe indexes/unique handling for project_root+rescan_id when non-null, update drizzle schema, DeepMiningRoundRecord and UpsertDeepMiningRoundInput, and CoverageLedgerRepository so upsertRound can persist rescanId and avoid duplicate rows for the same projectRoot+rescanId while preserving old projectRoot+roundIndex behavior when rescanId is absent. Add tests proving migration idempotency on an existing 015 DB, repository roundtrip includes rescanId, same rescanId upsert does not duplicate, and existing round_index-only callers still work.\n\nHard guards: do not relax coverage/advisor/quality gates; do not fabricate ledger rows; do not alter BiliDili DB directly; do not make Plugin changes in this package. If a consumer API needs Plugin changes, document the exact new Core interface and leave Plugin consumption to a follow-up package. Validate with Node 22, AlembicCore build:check, and targeted migration/repository tests. Backfill commit hash, changed files, exact validation outputs, and any Plugin follow-up contract.",
+      "status": "pending",
+      "createdAt": "2026-06-26T15:55:24.560Z"
+    }
+  ]
+}

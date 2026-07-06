@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w1-main-evolution-host-wiring-t1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w1-main-evolution-host-wiring-p1",
+  "dispatchGroup": "w1-main-evolution-host-wiring-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "w1-main-evolution-host-wiring-t1",
+  "status": "completed",
+  "summary": "Implemented Alembic main §4b(F) evolution host wiring only. Added daemon-owned EvolutionMaintenanceSweep that drives bounded checkAndPromote, checkTimeouts, checkAndExecute, and scanAll through @alembic/core/events timerRegistry with reentry guard, per-driver error isolation, env cap/interval, and shutdown cleanup. Wired daemon-server to start/stop the sweep and injected lifecycleStateMachine into KnowledgeModule DecayDetector options so Core scanAll can drive active->decaying. Added focused unit coverage for non-zero sweep drivers, empty zero-count sweeps, timer cleanup, reentry, actual Core DecayDetector transition with lifecycle injection, DI constructor options, and existing reactive file-change paths. Committed on Alembic main as 73bd7809ebfd597766be2ff1544932849b55269c. AlembicCore/AlembicPlugin/vendor were not modified.",
+  "evidenceRefs": [
+    "commit:73bd7809ebfd597766be2ff1544932849b55269c",
+    "files:bin/daemon-server.ts,lib/injection/modules/KnowledgeModule.ts,lib/service/evolution/EvolutionMaintenanceSweep.ts,test/unit/EvolutionMaintenanceSweep.test.ts,test/unit/KnowledgeModuleEvolutionWiring.test.ts",
+    "boundary:AlembicCore-status-clean,AlembicPlugin-status-clean,vendor-AlembicCore-src-no-diff",
+    "guard:alembic_code_guard-internal-schema-error-unrecognized-data"
+  ],
+  "verification": [
+    "npm run test:unit -- test/unit/FileChangeHandler.test.ts test/unit/FileChangesRoute.test.ts test/unit/DaemonFileChangeCollector.test.ts test/unit/ProposalExecutor.test.ts test/unit/PresentationRoutes.test.ts test/unit/EvolutionMaintenanceSweep.test.ts test/unit/KnowledgeModuleEvolutionWiring.test.ts: passed (7 files, 68 tests)",
+    "npm run build:check: passed using local AlembicCore source ../AlembicCore",
+    "npm run lint: passed with existing noExplicitAny warnings in lib/service/handler-runtime/types.ts and lib/workflows/ai-execution/AgentRunProjections.ts only",
+    "npm run lint:core-import-boundary: passed, scanned 363 files and 410 @alembic/core imports",
+    "git diff --check HEAD~1 HEAD: passed",
+    "git -C ../AlembicCore status --short --branch: clean on main...origin/main",
+    "git -C ../AlembicPlugin status --short --branch: clean on main...origin/main"
+  ],
+  "risks": [
+    "alembic_status reports initialized_empty knowledge, and alembic_code_guard failed with internal schema error CODEX_MCP_ERROR / unrecognized key \"data\"; no Guard findings were produced.",
+    "No product push was performed because the task package requires commit on main and return hash, while current workspace status treats product push as a separate user gate.",
+    "This W1 task used focused unit/probe evidence rather than a real BiliDili daemon sqlite e2e; the design places full true-machine C/D/E/F validation in later W4."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w1-main-evolution-host-wiring-p1__Alembic__w1-main-evolution-host-wiring-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w1-main-evolution-host-wiring-p1__Alembic__w1-main-evolution-host-wiring-t1.json",
+    "deliveryRunId": "run-delivery-w1-main-evolution-host-wiring-p1__Alembic__w1-main-evolution-host-wiring-t1",
+    "dispatchGroup": "w1-main-evolution-host-wiring-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w1-main-evolution-host-wiring-p1__Alembic__w1-main-evolution-host-wiring-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 7,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w1-main-evolution-host-wiring-p1",
+    "targetTaskId": "w1-main-evolution-host-wiring-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "w1-main-evolution-host-wiring-p1",
+    "resultId": "tr-w1-main-evolution-host-wiring-t1",
+    "createdAt": "2026-06-27T02:17:03.841Z"
+  },
+  "createdAt": "2026-06-27T02:17:03.841Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

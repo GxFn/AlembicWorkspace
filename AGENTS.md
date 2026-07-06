@@ -44,7 +44,7 @@ Wakeflow root block should stay reusable across installed workspaces.
 - `AlembicWorkspace` is the controller workspace for cross-repository goal
   intake, planning, dispatch, acceptance, boundaries, TODO routing, templates,
   and collaboration rules. It does not implement managed products.
-- Managed product windows, Design, and Test are defined by `workspace.config.json`
+- Managed product windows, Design, and Test are defined by `wakeflow.config.json`
   and explicit user decisions. Do not treat sibling tooling, history, ledger,
   scratch, or Wakeflow source directories as work windows just because they
   appear next to product repositories.
@@ -223,8 +223,8 @@ omitted the blocker.
 
 Wakeflow is a reusable controller capability for multi-window agent work. It is
 not the parent workspace, not a product source repository, and not a sandbox for
-managed projects. Product scope and window roles come from `workspace.config.json`
-and local runtime config. `.wakeflow-local/workspace.config.json` may override
+managed projects. Product scope and window roles come from `wakeflow.config.json`
+and local runtime config. `.wakeflow-local/wakeflow.config.json` may override
 local installation details and must not be committed.
 
 ## Controller Posture
@@ -265,7 +265,7 @@ reusable file. This file keeps Wakeflow's roles, process, and posture.
 - Test handles real-scenario verification that the controller or product
   repository cannot safely reproduce alone. Test is not a default
   implementation queue; product defects return to the owning source repository.
-- Product windows are repositories listed in `workspace.config.json` or local
+- Product windows are repositories listed in `wakeflow.config.json` or local
   override. Each owns its source, tests, commits, evidence, and backfill.
 - Wakeflow owns reusable controller runtime, plugin packaging, AGENTS
   installation, MCP capability surface, state roots, delivery envelopes, result

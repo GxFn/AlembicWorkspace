@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-core-delete-workspace-config-reader-v2-schema-p1",
+  "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+  "summary": "P4 Core final deletion/schema package after hard gate: P0 native loader accepted; P1 write chokepoints accepted; Alembic and AlembicPlugin init detect-or-refuse predelete guards accepted. Implement only AlembicCore §12.P4 F-1/G-3 Core-side work: delete the obsolete workspace.config.json reader/definition block and add v2 workspace runtime config schema/non-regression coverage. Do not touch Alembic, AlembicPlugin, AlembicAgent, AlembicDashboard, vendor, ghost hygiene, release, push, or true ~/.asd cleanup.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P4, §12.Z2, §12.M P4",
+  "createdAt": "2026-06-29T08:04:59.487Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-core-delete-workspace-config-reader-v2-schema-t1",
+      "taskPackageId": "p4-core-delete-workspace-config-reader-v2-schema-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, state root/task package/envelope, AlembicCore/AGENTS.md, and Design §12.P4/§12.Z. Confirm currentWindow=AlembicCore. Implement only Core P4 after the hard gate: remove readProjectScopeFromWorkspaceConfig export from src/shared/index.ts; delete WorkspaceConfigProjectScopeOptions, readProjectScopeFromWorkspaceConfig, createProjectScopeFromWorkspaceConfig, resolveWorkspaceConfigProjectFolders, and private helpers normalizeWorkspaceConfigRepositories/isInternalRepository/normalizeStringArray/resolveWorkspaceConfigFolderPath from src/shared/ProjectScope.ts after confirming no remaining uses. KEEP native APIs: ALEMBIC_PROJECT_SCOPE_ENDPOINTS, createProjectDescriptor, listProjectScopeFolders, resolveProjectScopeForFolder, createProjectScopeRegistryDocument, upsertProjectScopeInRegistry, addProjectScopeFolderToRegistry, resolveProjectScopeRegistryFolder, PROJECT_SCOPE_REGISTRY_FILENAME, readProjectScopeRegistryDocument, loadProjectScopeForFolder, and WorkspaceResolver.fromProjectScopeRegistry. Add/export WorkspaceRuntimeConfigSchema (or the existing Core schema location chosen by local patterns) for v2 .asd/config.json: accept version=2, projectName, database, core.subRepoDir/subRepoUrl plus passthrough known config; reject stale core.dir, core.constitution, and watch.* such as watch.extensions. Wire it only where Core has the relevant config/schema reader if present; do not invent Plugin/Alembic wiring in this Core task. Migrate/delete old tests so native loader/multi-folder coverage remains; add schema tests for stale field rejection and valid v2 config. Validation with Node>=22: npm run build:check; npm run check if feasible; targeted ProjectScope/WorkspaceResolver/config schema tests; exact grep over AlembicCore src/test excluding vendor/dist/node_modules for workspace\\.config\\.json|readProjectScopeFromWorkspaceConfig|resolveWorkspaceConfigProjectFolders|WorkspaceConfigProjectScopeOptions|workspaceConfigProjectScope|repoNames returns 0 per §12.Z2; prove no fromProject semantics change; git diff --check; git status clean. Commit locally on main; do not push; backfill commit hash, commands, raw evidence, residual risks, and note that final P4 real/synthetic validation remains controller-routed.",
+      "status": "pending",
+      "createdAt": "2026-06-29T08:04:59.487Z"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "Repair the direct BiliDili coldStart -> deepMining blocker: completed coldStart leaves an active Core bootstrap workflow session lease, so subsequent rescan/deepMining fails with BootstrapSessionLeaseError before the verification chain can continue.",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-controller-review.md",
+  "createdAt": "2026-06-27T16:34:32.724Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+      "taskPackageId": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, this state root, Alembic repository CLAUDE/AGENTS rules, and the controller review evidence `evidence/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-controller-review.md`. Declare Alembic mainbody repository identity. This is a narrow live source repair for the direct BiliDili realverify blocker after accepted Core/Agent/Alembic moduleBindings repairs. Test proved coldStart completed and deepMining passed plan gate with 6 execution dimensions and non-empty moduleScope, then failed in `runKnowledgeRescanWorkflow` because the completed coldStart left a same-project active Core bootstrap session lease. Inspect live source only: `Alembic/lib/workflows/cold-start/ColdStartWorkflow.ts`, `Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts`, `Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts`, `Alembic/lib/daemon/DaemonJobRunner.ts`, and related tests. Do not edit dist/vendor/Test/BiliDili. Fix the coldStart/internal AI workflow session lifecycle so completed coldStart does not leave the Core ProjectContext workflow session as a blocking active lease for subsequent rescan/deepMining. Prefer using existing Core public lifecycle primitives (`releaseProjectLease`, `clearSession`, or completion status) rather than deleting data or weakening lease checks; if Core lacks a safe public primitive, stop and backfill the exact Core API need instead of inventing a local workaround. Preserve quality gates, anti-fabrication gates, plan-selection stage validation, coverage-ledger writeback, no-fallback-to-full behavior, and DeepSeek/Ollama provider split. Add/adjust focused tests proving: (1) coldStart completion releases or completes the ProjectContext workflow session lease, (2) same-project deepMining/rescan can create/open its workflow session after coldStart without manual active-session deletion, (3) active in-progress sessions still block concurrent conflicting starts, and (4) failed/partial coldStart does not silently erase useful evidence. Run Node>=22 targeted tests and `npm run build:check`; run lint/check if touched boundary requires it. Commit locally on main, no push. Backfill commit hash, changed files, exact commands/output summaries, risks, and whether a follow-up Core task is required.",
+      "status": "pending",
+      "createdAt": "2026-06-27T16:34:32.724Z"
+    }
+  ]
+}

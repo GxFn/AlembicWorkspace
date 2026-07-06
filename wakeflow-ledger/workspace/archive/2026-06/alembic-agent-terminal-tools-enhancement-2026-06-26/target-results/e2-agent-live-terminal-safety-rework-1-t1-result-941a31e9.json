@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "e2-agent-live-terminal-safety-rework-1-t1-result-941a31e9",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "taskPackageId": "e2-agent-live-terminal-safety-rework-1-p1",
+  "dispatchGroup": "e2-agent-live-terminal-safety-rework-1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "e2-agent-live-terminal-safety-rework-1-t1",
+  "status": "completed",
+  "summary": "AlembicAgent E-2 audit contract rework completed on main at commit 941a31e9c8320fe940e33fcfd4e52cb76b226a21. Kept the accepted safety/cwd/sandbox work from b2088045, replaced the rejected auditSink.record(event) contract with AuditLogger-compatible auditSink.log(entry), exported ToolAuditEntry, emitted action terminal.exec/result/duration/data.commandHash hash-only audit entries with safe actor/resource/context defaults, removed the record() alias from runtime/tests, kept audit failures non-fatal, and added/updated targeted tests for log sink one-entry hash-only behavior and early failure audit. No cross-repo edits, E-1 allowlist, E-3 dead-stack deletion, E-4 phantom cleanup, or AnalyzeGroundingGuard changes were made.",
+  "evidenceRefs": [
+    "commit:941a31e9c8320fe940e33fcfd4e52cb76b226a21",
+    "AlembicAgent/src/tools/kernel/registry.ts",
+    "AlembicAgent/src/tools/runtime/index.ts",
+    "AlembicAgent/src/tools/runtime/handlers/terminal.ts",
+    "AlembicAgent/test/runtime-terminal-safety.test.ts"
+  ],
+  "verification": [
+    "rg -n \"ToolAuditEvent|ToolAuditEntry|ToolAuditSinkLike|auditSink|\\\\.record\\\\(|\\\\.log\\\\(\" src/tools/runtime src/tools/kernel test/runtime-terminal-safety.test.ts: record alias absent; only log(entry) audit sink remains",
+    "npm run test -- test/runtime-terminal-safety.test.ts: passed (1 file, 7 tests)",
+    "npm run build:check: passed",
+    "npm run test -- test/tool-v2-contract.test.ts: passed (1 file, 12 tests)",
+    "npm run smoke:public-signatures: passed (13 exports, 478 bindings)",
+    "npm run lint: passed with existing 4 warnings in scripts/codemod-rename.mjs, scripts/smoke-agent-public-signatures.mjs, and scripts/verify-agent-validation-floor.mjs",
+    "npm run lint:public-api-boundary: passed",
+    "npm run lint:core-import-boundary: passed",
+    "npm run test: passed (42 files, 296 tests)",
+    "git diff --check: passed"
+  ],
+  "risks": [
+    "Alembic code guard MCP was attempted and returned the same internal output schema error as the prior E-2 run; this is recorded as a tool-surface blocker, not a code finding.",
+    "Repository main is ahead of origin by 2 local commits because E-2 and this rework were committed locally but not pushed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-e2-agent-live-terminal-safety-rework-1-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-agent-live-terminal-safety-rework-1-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-1-t1.json",
+    "deliveryRunId": "run-delivery-e2-agent-live-terminal-safety-rework-1-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-1-t1",
+    "dispatchGroup": "e2-agent-live-terminal-safety-rework-1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-agent-live-terminal-safety-rework-1-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "stateRevision": 8,
+    "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "taskPackageId": "e2-agent-live-terminal-safety-rework-1-p1",
+    "targetTaskId": "e2-agent-live-terminal-safety-rework-1-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "e2-agent-live-terminal-safety-rework-1-p1",
+    "resultId": "e2-agent-live-terminal-safety-rework-1-t1-result-941a31e9",
+    "createdAt": "2026-06-27T09:55:04.720Z"
+  },
+  "createdAt": "2026-06-27T09:55:04.720Z",
+  "stateRevisionObserved": 8,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

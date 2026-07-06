@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u4-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave3-u4-plugin",
+  "dispatchGroup": "wave3-u4-plugin",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "u4-plugin",
+  "status": "completed",
+  "summary": "u4-plugin（decay 第4 sweep driver + lifecycleStateMachine 注入 + stale 注释订正）完成，commit b04cb0d（main，未 push/tag/bump），消费 Core @ 27ef04b（a96c4ee 后并行 advance；DecayDetector 契约 scanAll(cap?)/lifecycleStateMachine option 已核仍在）。\n\nd1 decay 第4 driver：staging-access-sweep.ts runSweep 在 checkAndExecute 之后、同一 tick/同一 try-catch 信封内新增第4 driver，调 Core DecayDetector.scanAll(cap)，沿用同一共享 cap（resolveStagingAccessSweepCap，caller-limited 有界）；新增 DecayDetectorLike ducktype（scanAll(cap?): Promise<unknown[]>）；additive 可观测计数 decayScannedCount 加入 StagingAccessSweepResult（alphabetical 在 checkedTimeouts 后）与 logSweepResult meta；既有字段语义不变、flat 字段排序不变。\n\nd2 lifecycleStateMachine 注入：KnowledgeModule decayDetector 单例注册新增 lifecycleStateMachine: ct.get('lifecycleStateMachine')；注入后 scanAll 命中的 active recipe 经 Core DecayDetector 内部直走 transition(trigger='decay-detection')→decaying 并记 lifecycle_transition_events（B1：不依赖信号订阅；isValidTransition 幂等）。已核 LifecycleStateMachine 已 import（:22）、lifecycleStateMachine 单例已注册（:358）、其 factory 不反向依赖 decayDetector→无循环依赖；缺省不注入时 Core 仅打分不迁移（向后兼容）。生产调用点 HostMcpServer.runStagingAccessSweep 的 getContainer 解析真实 plugin-owned DI 容器（已注册 decayDetector），第4 driver 解析正常。\n\nd3 stale 注释订正：staging-access-sweep.ts:137 与 :270-271 两处过时注释（\"P3...本次不接线\"/\"P3 checkAndExecute 驱动暂未接线\"）订正为现状（4 driver 均接线；subscribeToSignals 在 KnowledgeModule init 接线、不在 sweep）；grep 确认无 \"不接线\" 残留。\n\n测试：StagingAccessSweep.test.ts 加 decayDetector 容器分支（makeSweepContainer + throttle 测试 inline 容器，避免第4 driver \"unexpected container key\" 抛错误入 skipped）+ 2 新 decay-driver 用例（共享 cap=11 透传 + 顺序 promote→checkTimeouts→checkAndExecute→scanAll + decayScannedCount=2；scanAll 抛错→skipped 兜底）。该文件 11 测试全过。零新回归。",
+  "evidenceRefs": [
+    "b04cb0d",
+    "AlembicCore@27ef04b009ada3875497e40fdb6c23cb0807232",
+    "lib/runtime/mcp/host/staging-access-sweep.ts",
+    "lib/injection/modules/KnowledgeModule.ts",
+    "test/unit/StagingAccessSweep.test.ts",
+    "lib/runtime/mcp/HostMcpServer.ts"
+  ],
+  "verification": [
+    "build:check 绿（Core build used ../AlembicCore @ 27ef04b；tsc --noEmit 无错）",
+    "biome lint 3 文件 0 问题",
+    "lint:repo-boundary 通过（@escape-hatch 0/75）",
+    "lint:core-import-boundary OK（433 文件/425 @alembic/core imports，无源码路径绕过）",
+    "report:agent-extraction-boundary 全 0（无 agent/ai/tool 重引入）",
+    "targeted StagingAccessSweep.test.ts 11/11 通过（9 原 + 2 新 decay）",
+    "全量 unit baseline-diff vs 干净 3915d8e（同 Core 27ef04b）：after=12 / baseline=12 failed 文件，新增失败=[]，IDENTICAL=true；StagingAccessSweep.test.ts 在 after-set 为 passed",
+    "D3 grep：3 文件 diff 无 git_diff_checkpoints 引用",
+    "d3 grep：staging-access-sweep.ts 无 '不接线'/'暂未接线' 残留"
+  ],
+  "risks": [
+    "真机 decay→deprecate 端到端（active→decaying→...→deprecated 全链 + lifecycle_transition_events 落库）属验收#1 真机范围，归 Test/U7，本窗口仅单测覆盖 driver 接通+cap+顺序+计数+lifecycleStateMachine 注入（非 undefined）。",
+    "消费 Core HEAD 27ef04b（task 卡前置 a96c4ee）——Core 在波次间并行 advance，已核 DecayDetector.scanAll(cap?)/lifecycleStateMachine option 契约在 27ef04b 仍成立；回填记实际消费 commit。",
+    "全量 unit 既有 12 个 failed 文件为本 sandbox 预存在失败（与 baseline 3915d8e 同 Core 完全一致，非本任务引入）。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave3-u4-plugin__AlembicPlugin__u4-plugin",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u4-plugin__AlembicPlugin__u4-plugin.json",
+    "deliveryRunId": "run-delivery-wave3-u4-plugin__AlembicPlugin__u4-plugin",
+    "dispatchGroup": "wave3-u4-plugin",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u4-plugin__AlembicPlugin__u4-plugin.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 64,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave3-u4-plugin",
+    "targetTaskId": "u4-plugin",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave3-u4-plugin",
+    "resultId": "tr-u4-plugin",
+    "createdAt": "2026-06-26T01:57:14.097Z"
+  },
+  "createdAt": "2026-06-26T01:57:14.097Z",
+  "stateRevisionObserved": 64,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

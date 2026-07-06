@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "wave2-u5-core-2",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "summary": "波2 u5-core-2（U5 #1 embedding conduit 收口，Core additive hook）。缘起=u5-plugin 控制器证实的跨仓 gap：U5-Core 给 RecipeSimilarity.compute 加可选第3参 embeddingSim? 但 RecipeSimilarity 未导出 + 3 消费点(ConsolidationAdvisor:567/ProposalExecutor:588/RedundancyAnalyzer:117)全调 2 参、ctor 零注入位→Plugin 无 conduit。=§U5#6 原始 scope 未接通 seam(非新增)。方案A(推荐)：给 3 消费服务加可选 embeddingSimProvider:(a,b)=>number|undefined ctor 选项(同步，喂预算好的相似度，RecipeRegionVectorIndex 预计算向量 sync cosine 可行，domain 不发起 embed)，调用点改 compute(a,b,provider?.(a,b))；缺省 undefined→纯 Jaccard 字节级向后兼容。不导出 RecipeSimilarity(走 ctor 注入保 barrel 纯度)。验收：provider 接通 unit(stub 0.9→max(Jaccard,0.9))/缺省回退确定性+现有 evolution 单测全过/additive build:check/签名一致。改 live 禁 vendor；提交 main 不 push；landed+dist→派 u5-plugin-2(Plugin DI 注入 provider，代码已备)。复核 HEAD 行号(u6-core 已 advance Core)。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u5-core-2.md",
+  "createdAt": "2026-06-26T00:49:03.643Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "u5-core-2",
+      "taskPackageId": "wave2-u5-core-2",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore U5 #1 conduit：给 ConsolidationAdvisor/ProposalExecutor/RedundancyAnalyzer 加可选 embeddingSimProvider ctor hook→串 compute 第3参，缺省字节级回退 Jaccard，不导出 RecipeSimilarity。验收 provider 接通+缺省回退确定+additive+现有单测全过+build:check；改 live 禁 vendor、main 不 push；landed+dist 解锁 u5-plugin-2。复核 HEAD 行号。",
+      "status": "pending",
+      "createdAt": "2026-06-26T00:49:03.643Z"
+    }
+  ]
+}

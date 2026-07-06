@@ -1,0 +1,656 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+  "title": "删除所有 Alembic 中 workspace.config.json 代码逻辑、把原生 ProjectScope（~/.asd/project-scopes.json）提升为前置（chokepoint=新增 fromProjectScopeRegistry，迁移 19 个 fromProject 站点）、插件在成员子仓调用时能拿整空间 Recipe、修复全 5 仓项目空间使用逻辑；§11 权威设计 + §12 代码级分阶段实现指南（P0-P4 + 每阶段可运行验收 + 真机 ecf32806）。最危险纪律：写侧 /tmp 碰撞 + 删除硬门。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Completed Alembic plan-space membership scoping demand after P0-P4 acceptance and final ecf32806 nonregression gate passed.",
+  "revision": 76,
+  "activeStageId": null,
+  "updatedAt": "2026-06-29T09:07:48.258Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p0-core-project-scope-loader-p1",
+      "summary": "P0 Core first: implement native ProjectScope registry loader and explicit WorkspaceResolver.fromProjectScopeRegistry chokepoint without changing fromProject semantics. Scope is §12.P0 G-1a/G-1b plus additive loader tests and P0 Core verification only. Do not delete workspace.config.json reader/definition block, do not migrate 19 sites, do not touch vendor by hand, do not change freeze/floor.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P0",
+      "createdAt": "2026-06-29T03:07:50.558Z"
+    },
+    {
+      "taskPackageId": "p0-plugin-project-scope-dead-code-delete-p1",
+      "summary": "P0 Plugin zero-risk deletion after accepted Core loader: remove the dead ProjectScopeFolders workspace.config reader surface and stop treating workspace.config.json as a graph seed file. Scope is §12.P0-step1 F-3 only. Do not consume the new Core loader yet, do not migrate fromProject sites, do not refresh vendor/AlembicCore by hand, do not touch write-side chokepoints, and do not proceed to P1.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P0-step1",
+      "createdAt": "2026-06-29T03:25:07.393Z"
+    },
+    {
+      "taskPackageId": "p1-core-scope-resolution-write-guard-p1",
+      "summary": "P1 Core first: migrate Core scan/write WorkspaceResolver.fromProject sites to fromProjectScopeRegistry, add singleRoot annotations for intentional Core single-root sites, add DatabaseConnection project-scope write guard, and introduce Core lint:scope-resolution. Scope is Core-side §12.P1 only; Plugin/Alembic migration waits for later packages.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P1",
+      "createdAt": "2026-06-29T03:57:47.052Z"
+    },
+    {
+      "taskPackageId": "p1-plugin-write-gate-scope-resolution-p1",
+      "summary": "P1 Plugin after accepted Core 421a241: land the Plugin write-side/gate scope-resolution chokepoints that are required before any deletion hard gate. Scope is Plugin §12.P1 blocking subset plus §12.Z3 lint wiring: C12 resolveHostAgentDataRoot and C16 inspectKnowledge must resolve native project scope from disk; add required single-root annotations/lint so future bare fromProject in Plugin scan/write paths is blocked. Do not start P2 plan-tool/project-source-facts, P3 host/parity/runtime sweep, P4 deletion/init detect-or-refuse, vendor refresh, or Alembic/AlembicAgent work.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P1+12.Z3",
+      "createdAt": "2026-06-29T04:21:16.176Z"
+    },
+    {
+      "taskPackageId": "p2-core-load-bearing-consumers-test-migration-p1",
+      "summary": "P2 Core first after P1 write chokepoints accepted: repoint the Core load-bearing ProjectContext/source-graph consumers from workspace.config.json fallback to native ProjectScope loader/descriptor paths and migrate Core tests without deleting multi-folder coverage. Scope is Core-only §12.P2 2a/2b/2c/2d plus Core-side F-6 tests. Do not touch Plugin plan-tool/project-source-facts, Alembic/AlembicAgent, P3 host/runtime parity, P4 definition deletion/init detect-or-refuse, vendor refresh, or freeze values.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P2",
+      "createdAt": "2026-06-29T04:41:13.633Z"
+    },
+    {
+      "taskPackageId": "p2-plugin-plan-draft-native-scope-wiring-p1",
+      "summary": "P2 Plugin after accepted Core 3308c4f: wire plan draft/project-source-facts consumption to the native ProjectScope membership model so workspace-root and member-subrepo calls collect the bound 5-member Alembic space rather than the old single-root/noise surface. Scope is Plugin §12.P2 F-2/F-6 only. Do not start P3 host/runtime parity, P4 definition deletion/init detect-or-refuse, vendor refresh, Alembic/AlembicAgent work, or any external AI/cold-start run.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P2",
+      "createdAt": "2026-06-29T04:59:47.952Z"
+    },
+    {
+      "taskPackageId": "p3-core-project-index-generation-scope-p1",
+      "summary": "P3 Core producer for F-3: wire native ProjectScope member folders into project-index/full-mode generation so cold-start/bootstrap generation scans only the bound project-space member folders, not the control root noise surface. Scope is AlembicCore ProjectIndexPlan/ColdStartWorkflowIntent/projectAnalysis plumbing only. Do not delete workspace.config reader definitions, do not start P4 detect-or-refuse, do not edit vendors, and do not change WorkspaceResolver.fromProject semantics.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md#12.P3",
+      "createdAt": "2026-06-29T05:31:17.447Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-host-native-scope-runtime-wiring-p1",
+      "summary": "P3 Plugin host/runtime native ProjectScope wiring after Core ProjectIndexPlan sourceFolders acceptance. Scope: consume Core P3 full-mode sourceFolders in host project-index/bootstrap generation path; wire bootstrap env-absent and runtime/status data-root resolution to fromProjectScopeRegistry per §12.P3/C11/C15/C17; keep ProjectRootResolver/transient/resident single-root sites only with documented permanent scope; do not touch P4 delete/init config/freeze/vendor/release.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P3 C11/C15/C17 + F-3 generation scope consumer + §12.M P3",
+      "createdAt": "2026-06-29T05:50:49.397Z"
+    },
+    {
+      "taskPackageId": "p3-alembic-inprocess-analysis-scope-wiring-p1",
+      "summary": "P3 Alembic in-process native ProjectScope wiring after Core ProjectIndexPlan acceptance. Scope: stop dropping analysisScope in ProjectContextWorkflowFacts; derive member sourceFolders from analysisScope.projectScope.folders relative to controlRoot; inject sourceFolders into Core space payload; stamp per-file sourceIdentity for RuntimeInitializer parity; do not modify AlembicAgent unless evidence proves a consumer-side source sink is required, and do not touch P4 delete/init config/freeze/vendor/release.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P3 F-4 in-process + F-5 module-axis parity preparation + §12.M P3",
+      "createdAt": "2026-06-29T05:51:01.200Z"
+    },
+    {
+      "taskPackageId": "p3-ecf32806-dual-host-parity-realtest-p1",
+      "summary": "P3 Test gate after accepted Core+Plugin+Alembic source wiring: verify the real Alembic project space ecf32806 dual-host/native ProjectScope behavior before any P4 delete/init/freeze work. Scope is §12.P3 runnable acceptance only: true 5-member Alembic workspace, not BiliDili; prove daemon-off/member-subrepo space access, in-process vs Plugin host parity for member module set + primaryLanguage + canonical module ids, non-empty RuntimeInitializer source identity map, and full-mode scan roots limited to bound member folders. Do not use external AI providers for generation in this Codex-host verification; if a step would require non-Codex AI execution, stop with exact blocker and preserve deterministic evidence.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P3 runnable acceptance + §12.R real ecf32806 subject",
+      "createdAt": "2026-06-29T06:21:57.904Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-host-production-scope-parity-repair-p1",
+      "summary": "P3 rework from Test ecf32806 parity failure: repair AlembicPlugin host production project-context analysis so scoped sourceFolders constrain the public production outputs, not only sourceFileFacts. Evidence shows sourceFileFacts are correctly limited to Alembic/AlembicCore/AlembicPlugin/AlembicDashboard/AlembicAgent and infer typescript, but production output still returns primaryLanguage=swift and moduleAxis=0. Keep P0-P3 accepted decisions, no P4 deletion/init/freeze/vendor/release work. Completion requires local build/check plus a deterministic probe or test proving host production analysis on ecf32806 (or equivalent non-empty 5-member fixture) returns primaryLanguage=typescript, non-empty member module axis, no BiliDili/Test tmp roots, and sourceFolders are wired through the relevant ProjectContext/module/presenter path.",
+      "status": "accepted",
+      "sourceRef": null,
+      "createdAt": "2026-06-29T06:41:52.522Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p3-alembic-inprocess-production-scope-parity-repair-p1",
+      "summary": "P3 rework from Test ecf32806 parity failure: repair Alembic in-process production ProjectContextWorkflowFacts / analysis-scope propagation so true ecf32806 project scope source identities and member-root filtering reach production facts. Evidence shows analysisScope itself is correct (controlRoot, projectScopeId, five folders, dataRoot), and RuntimeInitializer direct probe accepts five member identities, but production facts still return primaryLanguage=swift, projectMapModules=180 with BiliDili/Test tmp leakage, allFiles=0, and sourceIdentityCount=0. Keep P0-P3 accepted decisions, no P4 deletion/init/freeze/vendor/release work. Completion requires local build/check plus deterministic probe or test proving in-process production facts on ecf32806 (or equivalent non-empty 5-member fixture) return primaryLanguage=typescript, non-empty member module axis only for Alembic space members, non-empty allFiles/sourceIdentityCount, and no BiliDili/Test tmp roots.",
+      "status": "accepted",
+      "sourceRef": null,
+      "createdAt": "2026-06-29T06:42:05.046Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-p1",
+      "summary": "P3 rerun after accepted production-scope repairs: verify true ecf32806 dual-host ProjectContext parity after AlembicPlugin@ead761338b53d8e337992af48171d8eea7a477ea and Alembic@d99961fa55cbc9adb53944b18aa7e68c6361b3fb. This is not P4 and must not run BiliDili as the subject. Completion requires fresh raw Test evidence on the real Alembic project space ecf32806: Plugin host and Alembic in-process both resolve the native five-member ProjectScope, primaryLanguage is typescript on both sides, module axis/member module set is non-empty and equal with diff=[], canonical coverage-ledger module ids match, source identities/allFiles are non-empty, and no BiliDili/Test/tmp/wakeflow-ledger/legacy roots leak. Use Codex host only; do not invoke external AI generation or full cold-start unless the state root explicitly requires it. Keep P0-P3 accepted decisions; no P4 delete/init/freeze/vendor/release work.",
+      "status": "accepted",
+      "sourceRef": null,
+      "createdAt": "2026-06-29T07:09:23.186Z"
+    },
+    {
+      "taskPackageId": "p4-alembic-init-detect-or-refuse-predelete-p1",
+      "summary": "P4 pre-delete hard-gate task for Alembic only: implement SetupService init detect-or-refuse before any Core workspace.config reader deletion. Add a start-of-init guard using the Core native project-scope loader so an existing ecf32806/native scope is idempotent and does not create per-repo ghosts, while a multi-repo checkout with no native scope refuses clearly instead of silently falling back to single-root or /tmp. Remove stale Alembic config output fields core.dir, core.constitution, and watch.* while keeping core.subRepoDir, core.subRepoUrl, guard, and Alembic ai config. Do not delete AlembicCore reader/definition blocks, do not modify AlembicPlugin, do not perform ghost hygiene, vendor refresh, push, release, or P4 Core deletion.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P4 G-3, §12.R, §12.M, §12.Z",
+      "createdAt": "2026-06-29T07:25:45.196Z"
+    },
+    {
+      "taskPackageId": "p4-plugin-init-detect-or-refuse-predelete-p1",
+      "summary": "P4 pre-delete hard-gate task for AlembicPlugin only: implement the SetupService lockstep init detect-or-refuse guard before any Core workspace.config reader deletion. Match the accepted Alembic pre-delete guard semantics while preserving Plugin-specific config: existing native ProjectScope is idempotent and creates no per-repo ghosts; fresh multi-repo checkout with no native scope refuses clearly before registry/runtime writes and never falls back to single-root or /tmp; generated config stops writing stale core.dir, core.constitution, and watch.* while retaining core.subRepoDir/subRepoUrl, guard, and Plugin vector config. Do not delete AlembicCore reader/definition blocks, do not modify Alembic, do not perform ghost hygiene, vendor refresh, push, release, or P4 Core deletion.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P4 G-3, §12.R, §12.M, §12.Z",
+      "createdAt": "2026-06-29T07:43:22.478Z"
+    },
+    {
+      "taskPackageId": "p4-core-delete-workspace-config-reader-v2-schema-p1",
+      "summary": "P4 Core final deletion/schema package after hard gate: P0 native loader accepted; P1 write chokepoints accepted; Alembic and AlembicPlugin init detect-or-refuse predelete guards accepted. Implement only AlembicCore §12.P4 F-1/G-3 Core-side work: delete the obsolete workspace.config.json reader/definition block and add v2 workspace runtime config schema/non-regression coverage. Do not touch Alembic, AlembicPlugin, AlembicAgent, AlembicDashboard, vendor, ghost hygiene, release, push, or true ~/.asd cleanup.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P4, §12.Z2, §12.M P4",
+      "createdAt": "2026-06-29T08:04:59.487Z"
+    },
+    {
+      "taskPackageId": "p4-final-ecf32806-scope-config-nonregression-realtest-p1",
+      "summary": "Final P4 acceptance validation after all Core/Plugin/Alembic P0-P4 implementation tasks are accepted. This is not implementation. Verify the completed demand against Design §12.P4/§12.R/§12.M and §12.Z using the true Alembic project space ecf32806 (5 members) plus synthetic single-repo/fresh-checkout fixtures. Do not use BiliDili. Do not invoke external AI generation; Codex-host deterministic probes/builds/tests only.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P4 §12.R §12.M §12.Z",
+      "createdAt": "2026-06-29T08:25:20.777Z"
+    },
+    {
+      "taskPackageId": "p4-plugin-projectgraph-stale-workspace-fixture-repair-p1",
+      "summary": "Repair the only failed P4 final gate found by Test: AlembicPlugin ProjectGraphTool.test.ts still contains stale workspace.config.json/repoNames fixture text, violating Design §12.Z2 exact residual grep=0. This is a narrow test-fixture migration/cleanup only; no production behavior changes unless required by tests.",
+      "status": "accepted",
+      "sourceRef": "Test report failedChecks exactResidualGrep.exactResidualMatchesZero; Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.Z2",
+      "createdAt": "2026-06-29T08:45:40.511Z"
+    },
+    {
+      "taskPackageId": "p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1",
+      "summary": "Final P4 Test rerun after AlembicPlugin ProjectGraph stale workspace fixture repair. Re-run the original ecf32806 scope/config nonregression validation without changing subject or AI/provider setup. Acceptance questions: ecf32806 5-member real Alembic workspace scope behavior remains green; init detect-or-refuse/fresh checkout refusal remains green; synthetic single-repo nonregression remains green; exact residual grep over governed Alembic/AlembicCore/AlembicPlugin/AlembicAgent/AlembicDashboard surfaces for workspace.config reader aliases and repoNames is now 0; no BiliDili; no extra source repair by Test.",
+      "status": "accepted",
+      "sourceRef": null,
+      "createdAt": "2026-06-29T08:56:13.576Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p0-core-project-scope-loader-t1",
+      "taskPackageId": "p0-core-project-scope-loader-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read AGENTS.md, state root, and AlembicCore/AGENTS.md. Implement §12.P0-step2/3/4: add Core loader in src/shared/ProjectScope.ts, export it from shared/index.ts, add WorkspaceResolver.fromProjectScopeRegistry, add ProjectScopeRegistryLoader tests. Verify with Node>=22 build:check, targeted loader tests, and dynamic-import dist probes per §12.Z1. Confirm readProjectScopeFromWorkspaceConfig is still present and fromProject body unchanged.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T03:07:50.558Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0-core-project-scope-loader-p1__AlembicCore__p0-core-project-scope-loader-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-core-project-scope-loader-p1__AlembicCore__p0-core-project-scope-loader-t1.json",
+        "deliveryRunId": "run-delivery-p0-core-project-scope-loader-p1__AlembicCore__p0-core-project-scope-loader-t1",
+        "dispatchGroup": "p0-core-project-scope-loader-p1",
+        "sentAt": "2026-06-29T03:11:59.137Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0-core-project-scope-loader-t1"
+    },
+    {
+      "targetTaskId": "p0-plugin-project-scope-dead-code-delete-t1",
+      "taskPackageId": "p0-plugin-project-scope-dead-code-delete-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, the active state root, dispatch envelope, and AlembicPlugin/AGENTS.md; confirm currentWindow=AlembicPlugin. Implement §12.P0-step1 only: git rm lib/service/project-knowledge-context/project/ProjectScopeFolders.ts (confirmed zero external importer) and remove only 'workspace.config.json' from the basename include list in lib/service/project-knowledge-context/project/ProjectGraphProvider.ts. Verify with rg ProjectScopeFolders/imports, rg workspace.config.json at the target line is gone but tests' fixture references are not blindly deleted, npm run build:check, npm run lint:repo-boundary, and an appropriate targeted ProjectGraph/ProjectContext test or npm run test:unit if reasonable. Commit locally on main; do not push.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T03:25:07.393Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0-plugin-project-scope-dead-code-delete-p1__AlembicPlugin__p0-plugin-project-scope-dead-code-delete-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-plugin-project-scope-dead-code-delete-p1__AlembicPlugin__p0-plugin-project-scope-dead-code-delete-t1.json",
+        "deliveryRunId": "run-delivery-p0-plugin-project-scope-dead-code-delete-p1__AlembicPlugin__p0-plugin-project-scope-dead-code-delete-t1",
+        "dispatchGroup": "p0-plugin-project-scope-dead-code-delete-p1",
+        "sentAt": "2026-06-29T03:26:31.682Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0-plugin-project-scope-dead-code-delete-t1"
+    },
+    {
+      "targetTaskId": "p1-core-scope-resolution-write-guard-t1",
+      "taskPackageId": "p1-core-scope-resolution-write-guard-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, state root, dispatch packet/envelope, and AlembicCore/AGENTS.md. Implement only Core §12.P1: C1/C2 DiscovererRegistry and C3/C4 resolveProjectRoot plus C6 WriteZone must use WorkspaceResolver.fromProjectScopeRegistry; C5 DaemonState and C7 WorkspaceSettingsStore remain single-root with @scope-singleroot(permanent) comments; add DatabaseConnection guard so a resolver with projectScope cannot silently redirect an excluded member root to /tmp/alembic-dev; add scripts/lint-scope-resolution.mjs and wire package.json lint:scope-resolution into check. Do not change WorkspaceResolver.fromProject semantics, do not delete workspace.config reader/definition block, do not touch Plugin/Alembic/AlembicAgent/AlembicDashboard/vendor, do not start P2/P3/P4. Verify with Node>=22: npm run build:check, npm test or targeted DatabaseConnection/WriteZone/resolveProjectRoot tests plus full if feasible, npm run lint:scope-resolution, npm run check if feasible, dynamic-import dist probe showing AlembicPlugin member databasePath includes ecf32806 and not /tmp, and a negative lint fixture/proof that bare fromProject in scan/write path fails. Commit locally on main; do not push.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T03:57:47.052Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-core-scope-resolution-write-guard-p1__AlembicCore__p1-core-scope-resolution-write-guard-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-scope-resolution-write-guard-p1__AlembicCore__p1-core-scope-resolution-write-guard-t1.json",
+        "deliveryRunId": "run-delivery-p1-core-scope-resolution-write-guard-p1__AlembicCore__p1-core-scope-resolution-write-guard-t1",
+        "dispatchGroup": "p1-core-scope-resolution-write-guard-p1",
+        "sentAt": "2026-06-29T04:01:54.304Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-core-scope-resolution-write-guard-t1"
+    },
+    {
+      "targetTaskId": "p1-plugin-write-gate-scope-resolution-t1",
+      "taskPackageId": "p1-plugin-write-gate-scope-resolution-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, state root/dispatch packet/envelope, and AlembicPlugin/AGENTS.md. Implement only Plugin P1 write-side/gate scope-resolution: (1) C12 lib/recipe-generation/host-agent-workflows/project-data-root.ts must keep explicit projectRoot semantics but use WorkspaceResolver.fromProjectScopeRegistry(projectRoot).dataRoot so cold-start/dimension-completion/tool-router write roots bind the ecf32806 space DB instead of member/per-repo or /tmp. (2) C16 lib/runtime/KnowledgeState.ts must try WorkspaceResolver.fromProjectScopeRegistry(projectRoot), retaining the existing fallback new WorkspaceResolver({ projectRoot }) only for missing native scope/single-root cases; verify inspectKnowledge reads the space DB and does not create fake already-initialized behavior. (3) Add/extend Plugin scope boundary lint per §12.Z3 and wire it into package.json check because Plugin check currently lacks lint:repo-boundary; the lint must reject new bare WorkspaceResolver.fromProject/WR.fromProject in Plugin scan/write paths and must not force P2/P3 sites to migrate early. Add explicit @scope-singleroot(permanent|temporary) comments where this P1 lint needs intentional single-root exceptions, but do not migrate C11/C15/C17 runtime/parity sites unless the lint can otherwise not be made faithful to the P1/P3 boundary; if unavoidable, stop and backfill the conflict instead of silently starting P3. Verify with Node>=22: npm run build:check, npm run lint:repo-boundary or the new scope lint directly, package.json check wiring proof, targeted tests/probes for C12 member AlembicPlugin dataRoot -> ~/.asd/workspaces/ecf32806/.asd/alembic.db and not /tmp/ghost, targeted tests/probes for C16 space DB read/fallback, negative lint fixture proof, and an appropriate targeted unit suite or npm run test:unit if feasible. Commit locally on main; do not push.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T04:21:16.176Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-plugin-write-gate-scope-resolution-p1__AlembicPlugin__p1-plugin-write-gate-scope-resolution-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-write-gate-scope-resolution-p1__AlembicPlugin__p1-plugin-write-gate-scope-resolution-t1.json",
+        "deliveryRunId": "run-delivery-p1-plugin-write-gate-scope-resolution-p1__AlembicPlugin__p1-plugin-write-gate-scope-resolution-t1",
+        "dispatchGroup": "p1-plugin-write-gate-scope-resolution-p1",
+        "sentAt": "2026-06-29T04:22:20.048Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-plugin-write-gate-scope-resolution-t1"
+    },
+    {
+      "targetTaskId": "p2-core-load-bearing-consumers-test-migration-t1",
+      "taskPackageId": "p2-core-load-bearing-consumers-test-migration-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, this state root/dispatch packet/envelope, and AlembicCore/AGENTS.md; confirm currentWindow=AlembicCore. Implement only Core §12.P2: (1) src/service/project-context/space/space.ts must preserve explicit payload.sourceFolders priority, then use loadProjectScopeForFolder(projectRoot) instead of workspace.config.json probing/readProjectScopeFromWorkspaceConfig, removing the query-unavailable branch tied to workspace.config; keep folderInputs and projectId fallback semantics. (2) src/service/project-context/repo/repo.ts must use loadProjectScopeForFolder(projectRoot) while preserving repoRoot containment/realpath behavior and resolveProjectScopeForFolder identity use. (3) src/core/ast/ProjectGraph.ts remove workspaceConfigProjectScope option and readProjectScopeFromWorkspaceConfig fallback block; keep options.projectScope/listProjectScopeFolders descriptor path. (4) src/service/source-graph/SourceGraphIndexer.ts remove workspaceConfigProjectScope option and readProjectScopeFromWorkspaceConfig fallback block; keep input.projectScopeDescriptor/activeProjectScopeFolders descriptor path. (5) Migrate Core tests, not delete coverage: ProjectScopeContracts.test.ts should stop asserting the old reader as active contract while retaining native loader contracts; ProjectContextProjectSpace.test.ts must use a temp native project-scopes.json fixture and preserve real multi-folder coverage; ProjectContextEndToEnd.test.ts and SourceGraphIndexer.test.ts should use native fixture or explicit sourceFolders as appropriate. Do not modify AlembicPlugin tests in this Core task. Verify with Node>=22: npm run build:check, targeted ProjectContextProjectSpace/ProjectScopeContracts/ProjectContextEndToEnd/SourceGraphIndexer tests, npm run lint:scope-resolution, npm run check if feasible, grep proving workspaceConfigProjectScope is gone from src and space/repo/ProjectGraph/SourceGraphIndexer no longer import readProjectScopeFromWorkspaceConfig, and evidence that descriptor/native multi-folder behavior still works while single-folder fallback remains. Commit locally on main; do not push.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T04:41:13.633Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-core-load-bearing-consumers-test-migration-p1__AlembicCore__p2-core-load-bearing-consumers-test-migration-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-load-bearing-consumers-test-migration-p1__AlembicCore__p2-core-load-bearing-consumers-test-migration-t1.json",
+        "deliveryRunId": "run-delivery-p2-core-load-bearing-consumers-test-migration-p1__AlembicCore__p2-core-load-bearing-consumers-test-migration-t1",
+        "dispatchGroup": "p2-core-load-bearing-consumers-test-migration-p1",
+        "sentAt": "2026-06-29T04:41:55.873Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-core-load-bearing-consumers-test-migration-t1"
+    },
+    {
+      "targetTaskId": "p2-plugin-plan-draft-native-scope-wiring-t1",
+      "taskPackageId": "p2-plugin-plan-draft-native-scope-wiring-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, this state root/dispatch packet/envelope, and AlembicPlugin/AGENTS.md; confirm currentWindow=AlembicPlugin. Implement only Plugin §12.P2: (1) lib/recipe-generation/plan-tool.ts collectPlanProjectContext must load native scope once via @alembic/core/shared loadProjectScopeForFolder(projectRoot), use scanBase = scope.controlRoot.path when scope exists, derive active member sourceFolders relative to scanBase, preserve schema focusModules but wire it to narrow member folders, pass sourceFolders/projectId to the space query, bind repo query to an in-scope member such as primary/first member (or equivalent faithful per-member/primary strategy), and call collectProjectSourceFileFacts(scanBase, { sourceFolders }) when scoped. (2) lib/recipe-generation/project-source-facts.ts must add options.sourceFolders, scan only those roots when present, prefix relativePath with the member folder name, keep existing excludes, and use a fair per-folder budget so one large member does not starve smaller members. (3) Migrate/add Plugin tests, especially AlembicPlanTool and ProjectGraphTool coverage, to native project-scopes.json or explicit sourceFolders fixtures; preserve multi-folder coverage and single-root fallback. (4) Verify no P3/P4/vendoring/host-runtime sweep was started. Validation with Node>=22: npm run build:check, targeted unit tests for plan draft native scope/focusModules/project-source-facts/ProjectGraphTool as appropriate, npm run lint:scope-resolution and package check if feasible, grep proving focusModules schema remains and collectPlanProjectContext no longer ignores hints, and a deterministic local probe/test showing AlembicWorkspace root draft/context has top-level members Alembic/AlembicCore/AlembicPlugin/AlembicDashboard/AlembicAgent, excludes Test/wakeflow-ledger/legacy, is TypeScript not Swift, and focusModules:['AlembicCore'] narrows to AlembicCore. Do not invoke external AI providers, do not run true cold-start/rebuild, commit locally on main, and do not push.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T04:59:47.952Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-plugin-plan-draft-native-scope-wiring-p1__AlembicPlugin__p2-plugin-plan-draft-native-scope-wiring-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-plan-draft-native-scope-wiring-p1__AlembicPlugin__p2-plugin-plan-draft-native-scope-wiring-t1.json",
+        "deliveryRunId": "run-delivery-p2-plugin-plan-draft-native-scope-wiring-p1__AlembicPlugin__p2-plugin-plan-draft-native-scope-wiring-t1",
+        "dispatchGroup": "p2-plugin-plan-draft-native-scope-wiring-p1",
+        "sentAt": "2026-06-29T05:00:33.326Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-plugin-plan-draft-native-scope-wiring-t1-evidence-repair-1"
+    },
+    {
+      "targetTaskId": "p3-core-project-index-generation-scope-t1",
+      "taskPackageId": "p3-core-project-index-generation-scope-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, this state root/task package/envelope, and AlembicCore/AGENTS.md; confirm currentWindow=AlembicCore. Implement only §12.P3 F-3 in AlembicCore source: ProjectIndexPlan full-mode currently sets projectAnalysis.projectRoot=input.projectRoot with no member list. Add native ProjectScope member-folder plumbing into ColdStartWorkflowIntent.projectAnalysis (for example sourceFolders relative to the control root) and make the project-index scan/full-mode generation consume it so generation artifacts scan only Alembic/AlembicCore/AlembicPlugin/AlembicDashboard/AlembicAgent for ecf32806 and exclude Test/wakeflow-ledger/legacy. Keep cleanup.projectRoot semantics unchanged and assert it never points at a member project root for full-reset. Preserve production floor/freeze values and WorkspaceResolver.fromProject semantics. Validation: Node>=22; npm run build:check; targeted tests for ProjectIndexPlan/cold-start/project-index scope; any existing project-index workflow tests affected; grep proving no workspace.config reader deletion/P4 work and no vendor/dist edits; deterministic fixture or probe showing sourceFolders/member folders are threaded into full-mode scan roots and single-repo fallback is unchanged. Commit locally on main, do not push.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T05:31:17.447Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-core-project-index-generation-scope-p1__AlembicCore__p3-core-project-index-generation-scope-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-project-index-generation-scope-p1__AlembicCore__p3-core-project-index-generation-scope-t1.json",
+        "deliveryRunId": "run-delivery-p3-core-project-index-generation-scope-p1__AlembicCore__p3-core-project-index-generation-scope-t1",
+        "dispatchGroup": "p3-core-project-index-generation-scope-p1",
+        "sentAt": "2026-06-29T05:31:46.114Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-core-project-index-generation-scope-t1"
+    },
+    {
+      "targetTaskId": "p3-plugin-host-native-scope-runtime-wiring-t1",
+      "taskPackageId": "p3-plugin-host-native-scope-runtime-wiring-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Implement only AlembicPlugin P3 consumer wiring: bootstrap env-absent native scope loader, runtime/status space-aware dataRoot facts, host full-mode project-index generation scan roots from Core sourceFolders. Preserve single-root decisions for ProjectRootResolver/transient/resident, run Plugin targeted tests/build/check/lint boundary, backfill commit/evidence/risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T05:50:49.397Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-host-native-scope-runtime-wiring-p1__AlembicPlugin__p3-plugin-host-native-scope-runtime-wiring-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-host-native-scope-runtime-wiring-p1__AlembicPlugin__p3-plugin-host-native-scope-runtime-wiring-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-host-native-scope-runtime-wiring-p1__AlembicPlugin__p3-plugin-host-native-scope-runtime-wiring-t1",
+        "dispatchGroup": "p3-plugin-host-native-scope-runtime-wiring-p1",
+        "sentAt": "2026-06-29T05:51:45.029Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-host-native-scope-runtime-wiring-t1-evidence-repair-1"
+    },
+    {
+      "targetTaskId": "p3-alembic-inprocess-analysis-scope-wiring-t1",
+      "taskPackageId": "p3-alembic-inprocess-analysis-scope-wiring-p1",
+      "targetWindow": "Alembic",
+      "summary": "Implement only Alembic P3 in-process scope propagation in ProjectContextWorkflowFacts/buildWorkflowFiles: carry analysisScope member folders into executeProjectContextRequest payload.sourceFolders, preserve dataRoot/projectRoot semantics, stamp sourceIdentity so runtime identity map is non-empty. Run targeted Alembic tests/build/check and backfill commit/evidence/risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T05:51:01.200Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-alembic-inprocess-analysis-scope-wiring-p1__Alembic__p3-alembic-inprocess-analysis-scope-wiring-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-alembic-inprocess-analysis-scope-wiring-p1__Alembic__p3-alembic-inprocess-analysis-scope-wiring-t1.json",
+        "deliveryRunId": "run-delivery-p3-alembic-inprocess-analysis-scope-wiring-p1__Alembic__p3-alembic-inprocess-analysis-scope-wiring-t1",
+        "dispatchGroup": "p3-alembic-inprocess-analysis-scope-wiring-p1",
+        "sentAt": "2026-06-29T05:51:56.074Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-alembic-inprocess-analysis-scope-wiring-t1-evidence-repair-1"
+    },
+    {
+      "targetTaskId": "p3-ecf32806-dual-host-parity-realtest-t1",
+      "taskPackageId": "p3-ecf32806-dual-host-parity-realtest-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, state root, Test rules, and Design §12.P3/§12.R. Run the smallest real ecf32806 verification needed: use the true AlembicWorkspace native project scope (5 members) and current accepted commits Core 9b53c4f, Plugin 606b47d, Alembic 3b1226b. Do not use BiliDili. Prove: (1) member-root/projectRoot under AlembicCore resolves ecf32806 dataRoot and whole-space recipe/source refs when daemon is off or no resident dependency is present; (2) Plugin host project-index analysis and Alembic in-process facts produce equal non-empty member module set, primaryLanguage=typescript, and matching canonical module ids; (3) RuntimeInitializer receives non-empty _projectScopeSourceIdentityMap/source identities per member folder; (4) full-mode/bootstrap/project-index job artifacts or deterministic plan/probe show scan roots are exactly bound member folders Alembic, AlembicCore, AlembicPlugin, AlembicAgent, AlembicDashboard and exclude Test, wakeflow-ledger, legacy; (5) no P4 delete/init/freeze/vendor/release changes or real ~/.asd outside the bound test workspace. If full cold-start would invoke non-Codex AI generation, do not run that generation; instead use deterministic project-index/ProjectContext probes and report the blocked AI boundary separately. Backfill raw evidence: commands, JSON/log/report paths, DB/state paths inspected, parity diff, pass/fail meanings, and residual risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T06:21:57.904Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-ecf32806-dual-host-parity-realtest-p1__Test__p3-ecf32806-dual-host-parity-realtest-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-ecf32806-dual-host-parity-realtest-p1__Test__p3-ecf32806-dual-host-parity-realtest-t1.json",
+        "deliveryRunId": "run-delivery-p3-ecf32806-dual-host-parity-realtest-p1__Test__p3-ecf32806-dual-host-parity-realtest-t1",
+        "dispatchGroup": "p3-ecf32806-dual-host-parity-realtest-p1",
+        "sentAt": "2026-06-29T06:22:31.596Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-ecf32806-dual-host-parity-realtest-t1-controller-evidence-repair-r1"
+    },
+    {
+      "targetTaskId": "p3-plugin-host-production-scope-parity-repair-t1",
+      "taskPackageId": "p3-plugin-host-production-scope-parity-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Fix AlembicPlugin host production analysis scope propagation after P3 Test failure: primaryLanguage must be typescript, moduleAxis non-empty, member roots only; no P4 scope.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T06:41:52.522Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-host-production-scope-parity-repair-p1__AlembicPlugin__p3-plugin-host-production-scope-parity-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-host-production-scope-parity-repair-p1__AlembicPlugin__p3-plugin-host-production-scope-parity-repair-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-host-production-scope-parity-repair-p1__AlembicPlugin__p3-plugin-host-production-scope-parity-repair-t1",
+        "dispatchGroup": "p3-plugin-host-production-scope-parity-repair-p1",
+        "sentAt": "2026-06-29T06:42:36.996Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-host-production-scope-parity-repair-t1-controller-evidence-repair-r1"
+    },
+    {
+      "targetTaskId": "p3-alembic-inprocess-production-scope-parity-repair-t1",
+      "taskPackageId": "p3-alembic-inprocess-production-scope-parity-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Fix Alembic in-process ProjectContext/source identity propagation after P3 Test failure: no BiliDili/Test tmp leak, primaryLanguage typescript, non-empty member module/source identities; no P4 scope.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T06:42:05.046Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-alembic-inprocess-production-scope-parity-repair-p1__Alembic__p3-alembic-inprocess-production-scope-parity-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-alembic-inprocess-production-scope-parity-repair-p1__Alembic__p3-alembic-inprocess-production-scope-parity-repair-t1.json",
+        "deliveryRunId": "run-delivery-p3-alembic-inprocess-production-scope-parity-repair-p1__Alembic__p3-alembic-inprocess-production-scope-parity-repair-t1",
+        "dispatchGroup": "p3-alembic-inprocess-production-scope-parity-repair-p1",
+        "sentAt": "2026-06-29T06:43:30.130Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-alembic-inprocess-production-scope-parity-repair-t1"
+    },
+    {
+      "targetTaskId": "p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-t1",
+      "taskPackageId": "p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-p1",
+      "targetWindow": "Test",
+      "summary": "Rerun real ecf32806 dual-host parity after accepted Plugin and Alembic production-scope repairs; produce raw report with host vs in-process primaryLanguage, module sets/canonical ids, source identity/file counts, leak checks, commits, and pass/fail verdict.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T07:09:23.186Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-p1__Test__p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-p1__Test__p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-t1.json",
+        "deliveryRunId": "run-delivery-p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-p1__Test__p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-t1",
+        "dispatchGroup": "p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-p1",
+        "sentAt": "2026-06-29T07:10:08.907Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-t1"
+    },
+    {
+      "targetTaskId": "p4-alembic-init-detect-or-refuse-predelete-t1",
+      "taskPackageId": "p4-alembic-init-detect-or-refuse-predelete-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, state root/task package/envelope, Design §12.P4 G-3/§12.R/§12.M/§12.Z, and Alembic/AGENTS.md; confirm currentWindow=Alembic. Implement only Alembic SetupService pre-delete guard: use loadProjectScopeForFolder(projectRoot) or equivalent Core native loader at init start; existing native scope => idempotent no-op with no new projects.json/project-scopes rows and no per-repo ghost; multi-repo shape with no scope => refuse with clear 'No native project scope ... run project-scope add <folder>' guidance, no sibling auto-scan, no /tmp/alembic-dev DB, no single-root scan. Remove stale generated config fields core.dir, core.constitution, watch.* from Alembic only; keep core.subRepoDir/subRepoUrl, guard, ai. Validation: Node>=22; npm run build/check or repo-equivalent; targeted SetupService tests/probes for ecf32806 idempotent under ALEMBIC_HOME sandbox and fresh two-repo fixture refusal; grep stale config fields absent; prove no Core reader deletion, no Plugin edits, no ghost deletion, no vendor/dist hand edits, no external AI/cold-start, no push. Commit locally on main and backfill commit hash, commands, raw evidence paths, risks, and next required Plugin/Core P4 tasks.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T07:25:45.196Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-alembic-init-detect-or-refuse-predelete-p1__Alembic__p4-alembic-init-detect-or-refuse-predelete-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-init-detect-or-refuse-predelete-p1__Alembic__p4-alembic-init-detect-or-refuse-predelete-t1.json",
+        "deliveryRunId": "run-delivery-p4-alembic-init-detect-or-refuse-predelete-p1__Alembic__p4-alembic-init-detect-or-refuse-predelete-t1",
+        "dispatchGroup": "p4-alembic-init-detect-or-refuse-predelete-p1",
+        "sentAt": "2026-06-29T07:26:34.335Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-alembic-init-detect-or-refuse-predelete-t1-controller-evidence-repair-r1"
+    },
+    {
+      "targetTaskId": "p4-plugin-init-detect-or-refuse-predelete-t1",
+      "taskPackageId": "p4-plugin-init-detect-or-refuse-predelete-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, state root/task package/envelope, Design §12.P4 G-3/§12.R/§12.M/§12.Z, and AlembicPlugin/AGENTS.md; confirm currentWindow=AlembicPlugin. Implement only AlembicPlugin SetupService pre-delete guard: use loadProjectScopeForFolder(projectRoot), WorkspaceResolver.fromProjectScopeRegistry, or an equivalent Core native project-scope loader at init start; existing native scope => idempotent no-op with no new projects.json/project-scopes rows and no per-repo ghost; multi-repo shape with no scope => refuse with clear 'No native project scope ... run project-scope add <folder>' guidance, no sibling auto-scan, no /tmp/alembic-dev DB, no single-root scan. Remove stale generated config fields core.dir, core.constitution, watch.* from Plugin only; keep core.subRepoDir/subRepoUrl, guard, vector/localEmbedding config. Validation: Node>=22; npm run build:check; targeted SetupService/init tests or probes for ecf32806 idempotent under ALEMBIC_HOME sandbox and fresh two-repo fixture refusal; grep stale config fields absent from generated config path; run relevant Plugin lint/boundary checks if available; prove no Core reader deletion, no Alembic edits, no ghost deletion, no vendor/dist hand edits, no external AI/cold-start, no push. Commit locally on main and backfill commit hash, commands, raw evidence paths, risks, and next required Core P4 tasks.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T07:43:22.478Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-plugin-init-detect-or-refuse-predelete-p1__AlembicPlugin__p4-plugin-init-detect-or-refuse-predelete-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-init-detect-or-refuse-predelete-p1__AlembicPlugin__p4-plugin-init-detect-or-refuse-predelete-t1.json",
+        "deliveryRunId": "run-delivery-p4-plugin-init-detect-or-refuse-predelete-p1__AlembicPlugin__p4-plugin-init-detect-or-refuse-predelete-t1",
+        "dispatchGroup": "p4-plugin-init-detect-or-refuse-predelete-p1",
+        "sentAt": "2026-06-29T07:44:19.015Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-plugin-init-detect-or-refuse-predelete-t1"
+    },
+    {
+      "targetTaskId": "p4-core-delete-workspace-config-reader-v2-schema-t1",
+      "taskPackageId": "p4-core-delete-workspace-config-reader-v2-schema-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, state root/task package/envelope, AlembicCore/AGENTS.md, and Design §12.P4/§12.Z. Confirm currentWindow=AlembicCore. Implement only Core P4 after the hard gate: remove readProjectScopeFromWorkspaceConfig export from src/shared/index.ts; delete WorkspaceConfigProjectScopeOptions, readProjectScopeFromWorkspaceConfig, createProjectScopeFromWorkspaceConfig, resolveWorkspaceConfigProjectFolders, and private helpers normalizeWorkspaceConfigRepositories/isInternalRepository/normalizeStringArray/resolveWorkspaceConfigFolderPath from src/shared/ProjectScope.ts after confirming no remaining uses. KEEP native APIs: ALEMBIC_PROJECT_SCOPE_ENDPOINTS, createProjectDescriptor, listProjectScopeFolders, resolveProjectScopeForFolder, createProjectScopeRegistryDocument, upsertProjectScopeInRegistry, addProjectScopeFolderToRegistry, resolveProjectScopeRegistryFolder, PROJECT_SCOPE_REGISTRY_FILENAME, readProjectScopeRegistryDocument, loadProjectScopeForFolder, and WorkspaceResolver.fromProjectScopeRegistry. Add/export WorkspaceRuntimeConfigSchema (or the existing Core schema location chosen by local patterns) for v2 .asd/config.json: accept version=2, projectName, database, core.subRepoDir/subRepoUrl plus passthrough known config; reject stale core.dir, core.constitution, and watch.* such as watch.extensions. Wire it only where Core has the relevant config/schema reader if present; do not invent Plugin/Alembic wiring in this Core task. Migrate/delete old tests so native loader/multi-folder coverage remains; add schema tests for stale field rejection and valid v2 config. Validation with Node>=22: npm run build:check; npm run check if feasible; targeted ProjectScope/WorkspaceResolver/config schema tests; exact grep over AlembicCore src/test excluding vendor/dist/node_modules for workspace\\.config\\.json|readProjectScopeFromWorkspaceConfig|resolveWorkspaceConfigProjectFolders|WorkspaceConfigProjectScopeOptions|workspaceConfigProjectScope|repoNames returns 0 per §12.Z2; prove no fromProject semantics change; git diff --check; git status clean. Commit locally on main; do not push; backfill commit hash, commands, raw evidence, residual risks, and note that final P4 real/synthetic validation remains controller-routed.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T08:04:59.487Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-core-delete-workspace-config-reader-v2-schema-p1__AlembicCore__p4-core-delete-workspace-config-reader-v2-schema-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-delete-workspace-config-reader-v2-schema-p1__AlembicCore__p4-core-delete-workspace-config-reader-v2-schema-t1.json",
+        "deliveryRunId": "run-delivery-p4-core-delete-workspace-config-reader-v2-schema-p1__AlembicCore__p4-core-delete-workspace-config-reader-v2-schema-t1",
+        "dispatchGroup": "p4-core-delete-workspace-config-reader-v2-schema-p1",
+        "sentAt": "2026-06-29T08:06:08.280Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-core-delete-workspace-config-reader-v2-schema-t1"
+    },
+    {
+      "targetTaskId": "p4-final-ecf32806-scope-config-nonregression-realtest-t1",
+      "taskPackageId": "p4-final-ecf32806-scope-config-nonregression-realtest-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, the state root, Test rules, and Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P4/§12.R/§12.M/§12.Z. Verify final P4 acceptance, not implementation: (1) exact residual grep over AlembicCore, AlembicPlugin, Alembic, AlembicAgent, AlembicDashboard source/test excluding vendor/dist/node_modules for workspace\\.config\\.json|readProjectScopeFromWorkspaceConfig|resolveWorkspaceConfigProjectFolders|WorkspaceConfigProjectScopeOptions|workspaceConfigProjectScope|repoNames returns 0 per §12.Z2; (2) true ecf32806 5-member native ProjectScope still resolves member roots to the shared space dataRoot, and deterministic host/in-process project context/parity probes remain typescript, member-bound, non-empty, with no Test/wakeflow-ledger/legacy leakage; (3) fresh two-repo fixture with empty ALEMBIC_HOME refuses init/cold-start clearly with the native-scope guidance and does not create /tmp/alembic-dev DB or silently single-root scan; (4) synthetic single-repo fixture without native scope remains single-root non-regression; (5) v2 .asd/config.json schema rejects stale core.dir/core.constitution/watch.* and valid runtime config still exposes core.subRepoDir/subRepoUrl; note any vector/localEmbedding projection behavior if observed; (6) freeze/production-floor values are not changed, no vendor/dist hand edits, no real ~/.asd mutation outside bound/sandboxed test workspace. Backfill raw evidence: commands, JSON/log/report paths, inspected DB/state paths, parity diff, grep output, pass/fail meaning, and residual risks. Do not use BiliDili, do not run DeepSeek/Qwen/external AI, do not push.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T08:25:20.777Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-ecf32806-scope-config-nonregression-realtest-p1__Test__p4-final-ecf32806-scope-config-nonregression-realtest-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-ecf32806-scope-config-nonregression-realtest-p1__Test__p4-final-ecf32806-scope-config-nonregression-realtest-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-ecf32806-scope-config-nonregression-realtest-p1__Test__p4-final-ecf32806-scope-config-nonregression-realtest-t1",
+        "dispatchGroup": "p4-final-ecf32806-scope-config-nonregression-realtest-p1",
+        "sentAt": "2026-06-29T08:26:09.248Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-ecf32806-scope-config-nonregression-realtest-t1"
+    },
+    {
+      "targetTaskId": "p4-plugin-projectgraph-stale-workspace-fixture-repair-t1",
+      "taskPackageId": "p4-plugin-projectgraph-stale-workspace-fixture-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, state root/task package/envelope, AlembicPlugin/AGENTS.md, Design §12.P4/§12.Z2, and Test raw report Test/tmp/p4-final-ecf32806-scope-config-nonregression-realtest-t1/p4-final-ecf32806-scope-config-nonregression-report.json. Implement only the AlembicPlugin repair for ProjectGraphTool.test.ts stale fixture residue: migrate the two tests at current lines ~420 and ~447 away from createWorkspaceFixtureProject()/writeWorkspaceFixtureConfig to the existing native ProjectScope fixture or equivalent sourceFolders/native fixture, then delete writeWorkspaceFixtureConfig and any helper that only exists to write workspace.config.json/repoNames. The exact residual grep over Alembic/lib,test; AlembicCore/src,test; AlembicPlugin/lib,test; AlembicAgent/src; AlembicDashboard/src excluding vendor/dist/node_modules for workspace\\.config\\.json|readProjectScopeFromWorkspaceConfig|resolveWorkspaceConfigProjectFolders|WorkspaceConfigProjectScopeOptions|workspaceConfigProjectScope|repoNames must return 0. Preserve graph behavior coverage: ProjectContext ownership neighborhood still works, generated artifact paths remain suppressed, native ProjectScope graph boundary remains covered, and single-root/basic graph tests are unchanged. Do not edit Core/Alembic/AlembicAgent/Dashboard, vendor/dist, runtime logic, freeze/floor, or setup behavior. Validation: Node>=22; npm run build:check; targeted ProjectGraphTool test(s) or full unit subset as feasible; npm run check if feasible; exact residual grep=0; git diff --check; git status clean; commit locally on main, no push. Backfill commit hash, commands, raw evidence, risks, and state that final P4 Test rerun is required.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T08:45:40.511Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-plugin-projectgraph-stale-workspace-fixture-repair-p1__AlembicPlugin__p4-plugin-projectgraph-stale-workspace-fixture-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-projectgraph-stale-workspace-fixture-repair-p1__AlembicPlugin__p4-plugin-projectgraph-stale-workspace-fixture-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-plugin-projectgraph-stale-workspace-fixture-repair-p1__AlembicPlugin__p4-plugin-projectgraph-stale-workspace-fixture-repair-t1",
+        "dispatchGroup": "p4-plugin-projectgraph-stale-workspace-fixture-repair-p1",
+        "sentAt": "2026-06-29T08:46:25.007Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-plugin-projectgraph-stale-workspace-fixture-repair-t1"
+    },
+    {
+      "targetTaskId": "p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1",
+      "taskPackageId": "p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1",
+      "targetWindow": "Test",
+      "summary": "Test window: rerun final P4 ecf32806 scope/config nonregression after Plugin commit 808f6619c6a1ee87aed94c07e3cd6e40143b7655. Use the same §12.R subject and boundaries as the previous p4-final card; verify exact residual grep=0 plus prior P4 axes still green. Backfill raw report path, commands, key JSON/log excerpts, status, and whether demand can complete or needs source repair.",
+      "status": "accepted",
+      "createdAt": "2026-06-29T08:56:13.576Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1__Test__p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1__Test__p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1__Test__p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1",
+        "dispatchGroup": "p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1",
+        "sentAt": "2026-06-29T08:56:56.434Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p0-core-project-scope-loader-p1",
+        "p1-core-scope-resolution-write-guard-p1",
+        "p2-core-load-bearing-consumers-test-migration-p1",
+        "p3-core-project-index-generation-scope-p1",
+        "p4-core-delete-workspace-config-reader-v2-schema-p1"
+      ],
+      "targetTaskIds": [
+        "p0-core-project-scope-loader-t1",
+        "p1-core-scope-resolution-write-guard-t1",
+        "p2-core-load-bearing-consumers-test-migration-t1",
+        "p3-core-project-index-generation-scope-t1",
+        "p4-core-delete-workspace-config-reader-v2-schema-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p0-plugin-project-scope-dead-code-delete-p1",
+        "p1-plugin-write-gate-scope-resolution-p1",
+        "p2-plugin-plan-draft-native-scope-wiring-p1",
+        "p3-plugin-host-native-scope-runtime-wiring-p1",
+        "p3-plugin-host-production-scope-parity-repair-p1",
+        "p4-plugin-init-detect-or-refuse-predelete-p1",
+        "p4-plugin-projectgraph-stale-workspace-fixture-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p0-plugin-project-scope-dead-code-delete-t1",
+        "p1-plugin-write-gate-scope-resolution-t1",
+        "p2-plugin-plan-draft-native-scope-wiring-t1",
+        "p3-plugin-host-native-scope-runtime-wiring-t1",
+        "p3-plugin-host-production-scope-parity-repair-t1",
+        "p4-plugin-init-detect-or-refuse-predelete-t1",
+        "p4-plugin-projectgraph-stale-workspace-fixture-repair-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p3-alembic-inprocess-analysis-scope-wiring-p1",
+        "p3-alembic-inprocess-production-scope-parity-repair-p1",
+        "p4-alembic-init-detect-or-refuse-predelete-p1"
+      ],
+      "targetTaskIds": [
+        "p3-alembic-inprocess-analysis-scope-wiring-t1",
+        "p3-alembic-inprocess-production-scope-parity-repair-t1",
+        "p4-alembic-init-detect-or-refuse-predelete-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p3-ecf32806-dual-host-parity-realtest-p1",
+        "p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-p1",
+        "p4-final-ecf32806-scope-config-nonregression-realtest-p1",
+        "p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p3-ecf32806-dual-host-parity-realtest-t1",
+        "p3-ecf32806-dual-host-parity-rerun-after-production-scope-repairs-t1",
+        "p4-final-ecf32806-scope-config-nonregression-realtest-t1",
+        "p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-29T03:06:36.117Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1__Test__p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1",
+    "lastDeliveryRunId": "run-delivery-p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1__Test__p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1",
+    "lastDispatchGroup": "p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-p1",
+    "lastTargetTaskId": "p4-final-ecf32806-scope-config-nonregression-rerun-after-plugin-fixture-repair-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-29T08:56:56.437Z"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "wave3-u2-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "summary": "波3 u2-plugin（U2 消费侧，伞形最后实现任务；前置 u2-core 74387b2 已 landed+dist）。把覆盖账本接成 deepMining 多轮覆盖循环。红线：plan 仍每轮无状态 draft→confirm(账本非 plan 持久化)/advisory 非自动调度(建议非自动后台扫)/no-guess(Plugin 给 options+信号 Agent confirm 决)/D3(账本链零 git_diff_checkpoints)。U2a 写点 dimension-completion:1183→Core buildCoverageLedger→repo upsert(project_root+canonical ownedPaths Plugin 供)；U2b draft SEED plan-tool:208-217,259-276 deepMining 加载账本产 gapCandidates+existingCount/rating/deficit、buildDraftConfirmNextAction:278-341 不硬编码 coldStart、D2 perRoundCellBudget(S50/M60/L80)限单轮 cell + 链路 intent perDimensionTargets/moduleDimensionTargets→gate:191-306 聚合(不改 totalRecipeBudget)；U2c coldStart confirm:1283-1331 Agent 决扫哪些其余 defer、首写账本 defer 格 grade=empty,deferred=1；U2d attach knowledge-rescan:243-271 调 CoverageLedgerAdvisor 三停止+建议→response+status advisory 不阻断、rescanId 幂等键、round 边界写 deep_mining_rounds；U2e FileChangeHandler git-diff 增量生成退役(case created:194/410-493、defaultModuleMiningAnalyzer:169/705-718、moduleMiningRoutes 分支多处、attachRescanUnifiedEvolution:448-474)——**先复核 um-impl 0fa2ac3 是否已部分切 + moduleMiningRoutes 死字段全量 grep 清理消费方避免 undefined**。验收 coldStart 产账本含 defer 格/deepMining 多轮喂账本+D2 cap/Agent per-cell 目标非硬5/Advisor 建议+三停止不无限扫/git-diff 生成退役 grep/plan 无状态/Node22 build:check+边界门禁+D3 grep 零回归。可 subagent-offload(主窗口 own 核验+提交)。禁改 Core/vendor、main 不 push、记消费 Core commit。复核 HEAD。本卡完成→U2 闭合→解锁 U7。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u2-plugin.md",
+  "createdAt": "2026-06-26T02:58:35.117Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "u2-plugin",
+      "taskPackageId": "wave3-u2-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U2 消费侧(deepMining 多轮覆盖循环)：U2a 写点 dimension-completion→buildCoverageLedger→upsert / U2b draft SEED 加载账本产 gapCandidates+D2 perRoundCellBudget+intent perDimensionTargets→gate / U2c coldStart defer 格 grade=empty,deferred=1 / U2d attach CoverageLedgerAdvisor 三停止+建议(advisory 不阻断/rescanId 幂等) / U2e FileChangeHandler git-diff 生成退役(先核 um-impl 重叠+moduleMiningRoutes 全量 grep 清理)。红线：plan 无状态/advisory 非自动调度/no-guess/D3。验收 coldStart 产账本+defer/多轮喂账本+D2 cap/Agent 目标非硬5/三停止不无限扫/生成退役/plan 无状态/Node22 build:check+边界+D3 零回归；可 subagent-offload；禁改 Core/vendor、main 不 push、记消费 Core commit。复核 HEAD。完成→U2 闭合解锁 U7。",
+      "status": "pending",
+      "createdAt": "2026-06-26T02:58:35.117Z"
+    }
+  ]
+}

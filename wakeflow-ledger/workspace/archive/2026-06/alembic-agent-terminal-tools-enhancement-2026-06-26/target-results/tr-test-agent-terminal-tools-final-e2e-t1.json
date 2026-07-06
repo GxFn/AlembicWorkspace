@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-test-agent-terminal-tools-final-e2e-t1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "taskPackageId": "test-agent-terminal-tools-final-e2e-p1",
+  "dispatchGroup": "test-agent-terminal-tools-final-e2e-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "test-agent-terminal-tools-final-e2e-t1",
+  "status": "blocked",
+  "summary": "Final E2E completed with 27/28 checks passing. terminal.exec live behavior passed for BiliDili git status/log, rg, find, AlembicAgent npm run build:check; deny/cwd/audit/sandbox fallback/guard-default checks passed. Blocking failure: Alembic Main compiled dist live import `Alembic/dist/lib/injection/modules/AgentModule.js` still imports retired `@alembic/agent/tools/terminal`, producing ERR_PACKAGE_PATH_NOT_EXPORTED because AlembicAgent correctly no longer exports ./tools/terminal. Source `Alembic/lib/injection/modules/AgentModule.ts` is already updated, so the blocker appears to be stale/retired dist runtime artifacts in Alembic Main.",
+  "evidenceRefs": [
+    "Test/tmp/test-agent-terminal-tools-final-e2e-t1/run-final-e2e.mjs",
+    "Test/tmp/test-agent-terminal-tools-final-e2e-t1/terminal-tools-final-e2e-evidence.json",
+    "Test/tmp/test-agent-terminal-tools-final-e2e-t1/terminal-tools-final-e2e-summary.md",
+    "Alembic/dist/lib/injection/modules/AgentModule.js:7",
+    "Alembic/dist/lib/injection/modules/AgentModule.js:10",
+    "Alembic/lib/injection/modules/AgentModule.ts:8",
+    "Alembic/lib/injection/modules/AgentModule.ts:50"
+  ],
+  "verification": [
+    "node Test/tmp/test-agent-terminal-tools-final-e2e-t1/run-final-e2e.mjs -> exit 1 with status fail; only failure Alembic Main dist AgentModule import retired terminal subpath",
+    "node -e summary confirmed 28 cases: 27 PASS, 1 FAIL",
+    "Allowed live terminal.exec evidence: BiliDili git status/log, BiliDili rg AppDelegate, BiliDili find listing, AlembicAgent npm run build:check all passed with audit entries",
+    "Denied commands rm -rf, sudo, npm install, git checkout, redirect, pipe tee, chmod, curl|sh all blocked before executor invocation",
+    "cwd ../Alembic rejected before executor invocation",
+    "missing sandbox and executor-provided fallback diagnostics surfaced in terminal.exec output/meta",
+    "Retired @alembic/agent/tools/terminal direct public import blocked with ERR_PACKAGE_PATH_NOT_EXPORTED",
+    "AnalyzeGroundingGuard default/off and guard-only opt-in needles present in AgentRuntime/LoopContext/LLMInputAssembly dist"
+  ],
+  "risks": [
+    "Alembic Main runtime compiled dist is disconnected from updated source and can fail before agent services initialize.",
+    "Alembic/dist/lib/tools/adapters/* still contains retired TerminalAdapter/terminal_shell/terminal_pty/terminal_run references; even if source is clean, packaged/runtime dist remains unsafe until rebuilt or deleted."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-test-agent-terminal-tools-final-e2e-p1__Test__test-agent-terminal-tools-final-e2e-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-agent-terminal-tools-final-e2e-p1__Test__test-agent-terminal-tools-final-e2e-t1.json",
+    "deliveryRunId": "run-delivery-test-agent-terminal-tools-final-e2e-p1__Test__test-agent-terminal-tools-final-e2e-t1",
+    "dispatchGroup": "test-agent-terminal-tools-final-e2e-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-test-agent-terminal-tools-final-e2e-p1__Test__test-agent-terminal-tools-final-e2e-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "stateRevision": 46,
+    "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "taskPackageId": "test-agent-terminal-tools-final-e2e-p1",
+    "targetTaskId": "test-agent-terminal-tools-final-e2e-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "test-agent-terminal-tools-final-e2e-p1",
+    "resultId": "tr-test-agent-terminal-tools-final-e2e-t1",
+    "createdAt": "2026-06-27T11:49:40.593Z"
+  },
+  "createdAt": "2026-06-27T11:49:40.593Z",
+  "stateRevisionObserved": 46,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u1-plugin-cont",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-u1-plugin-cont",
+  "dispatchGroup": "wave2-u1-plugin-cont",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "u1-plugin-cont",
+  "status": "completed",
+  "summary": "U1-Plugin 续作 #2/#5/#6 完成（commit ecded14 直提 main）；连同 #1(f1dfcfc) 整个 U1-Plugin 落地→解锁 U2a。按 cont 包强制上下文策略：用 fresh-context subagent 承载多文件 wiring，主窗口独立核验 diff+硬约束+亲跑全门禁后提交（subagent 输出仅 advisory，我 own 验证+提交）。#2 透传：knowledge-rescan.ts 把 gate.moduleBindings 透传进 Core buildKnowledgeRescanPlan；新 flattenModuleBindingsToCells 把 Plugin per-module PlanSelectionModuleBinding(dimensions[]) 展平为 Core per-cell ModuleCellBinding[]（每 module×dimension 一条，dimensionId+targetRecipes），moduleCount=canonical ProjectMap.modules.length(presenterInput.map.modules)，map 缺省则省略（Core 退回去重模块数、零回归）。#5 moduleName 轴：新 canonical-module-axis.ts(buildKnownModuleNames+buildResolveModuleFromSourceRefs)；ModuleService 加只读 listCanonicalModules()(投影已加载 #mapContext.modules)；async submit-knowledge gateway(tool-router) 向既有 RecipeProductionGateway 构造 spread 注入 knownModuleNames+resolveModuleFromSourceRefs(best-effort、取不到则 undefined→Core passthrough)，激活 Core #deriveModuleName。#6 方案A：project-context-analysis 把返回的 moduleSeeds 重打 canonical name/id，seed 保留不退役。硬约束守住：flat moduleScope 出口字节不变(plan-generation-gate.ts 未改)、不走方案B、不读写 git_diff_checkpoints(D3)、不碰死副本/shim、仅经 @alembic/core 包入口消费。真机 moduleName 落库 gated→U7/Test。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/project-context-analysis.ts",
+    "AlembicPlugin/lib/runtime/mcp/handlers/tool-router.ts",
+    "AlembicPlugin/lib/service/module/ModuleService.ts",
+    "AlembicPlugin/lib/injection/modules/KnowledgeModule.ts",
+    "AlembicPlugin/lib/recipe-generation/canonical-module-axis.ts",
+    "AlembicPlugin/test/unit/ModuleBindingFlatten.test.ts",
+    "AlembicPlugin/test/unit/CanonicalModuleAxis.test.ts",
+    "AlembicPlugin/test/unit/CanonicalModuleSeedRefs.test.ts"
+  ],
+  "verification": [
+    "主窗口独立核验(非橡皮图章 subagent 自报): node v22.22.1; npm run build:check EXIT=0(消费 Core@afd4302)",
+    "biome 改动+新 9 文件 clean(No fixes applied)",
+    "边界门禁亲跑全 PASS: lint:repo-boundary(0/75) / lint:layer-boundary(无 L1→L2) / report:agent-extraction-boundary(filesWithBoundaryImports=0) / lint:core-import-boundary(429 files,421 @alembic/core imports OK)",
+    "新 unit: ModuleBindingFlatten+CanonicalModuleAxis+CanonicalModuleSeedRefs 3 files/22 passed(展平正确 + per-cell 驱动 cellPlans + moduleName 派生在轴/越界留空 + #6 seed canonical 保留)",
+    "全量 unit(Node22): 1623 tests/1575 passed/48 failed/13 文件; failed-set 与上一基线(maint-fix 后) diff IDENTICAL=零新回归(+22 新测试入 passed)。PlanDrivenGenerationGate.test.ts 在基线中=pre-existing(非本改引入)",
+    "硬约束 grep 核实: plan-generation-gate.ts 未在 diff(flat 出口字节不变); 改动文件 git_diff_checkpoints=0; 无 ../AlembicCore/src 直引; 无死副本/shim 改动",
+    "commit ecded14 (main, baseline 31f17d5→HEAD ecded14, 9 files +597/-2); 未 push/tag/bump/未碰 vendor/Core 只读"
+  ],
+  "risks": [
+    "#5 双构造点决策(已核、可复查): async submit-knowledge 路径(tool-router)的 RecipeProductionGateway 注入 canonical 模块轴; 同步 DI 单例(KnowledgeModule)保持 undefined deps(同步工厂不能 await moduleService.load，强同步扫描错误)——submit 是需要轴的路径、已覆盖，其他用单例处 Core passthrough(向后兼容)。若要每个 gateway 构造都带轴，需另做 lazy/async DI 形状(超范围、留控制器决)。",
+    "#2 flatten 落在 knowledge-rescan.ts(唯一 buildKnowledgeRescanPlan 调用点)，非任务提示的 project-context-analysis(零 buildKnowledgeRescanPlan 调用)——在真实 Core 调用点接线更准。#6 只重打「返回的」seeds(驱动 map 查询的 seed 保留派生名，chicken-and-egg)。",
+    "subagent 承载多文件 wiring(per cont 包强制策略)，但本窗口独立核验了 diff/硬约束/全门禁/baseline-diff 后才提交——所有权在主窗口。subagent 未动 git(我 own 提交)。",
+    "真机 moduleName 落库(验收#3 真机部分)gated→U7/Test; content-patcher 失败=Core 漂移、非本回归(diff vs 上一基线 IDENTICAL)。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-u1-plugin-cont__AlembicPlugin__u1-plugin-cont",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-plugin-cont__AlembicPlugin__u1-plugin-cont.json",
+    "deliveryRunId": "run-delivery-wave2-u1-plugin-cont__AlembicPlugin__u1-plugin-cont",
+    "dispatchGroup": "wave2-u1-plugin-cont",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-plugin-cont__AlembicPlugin__u1-plugin-cont.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 42,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-u1-plugin-cont",
+    "targetTaskId": "u1-plugin-cont",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave2-u1-plugin-cont",
+    "resultId": "tr-u1-plugin-cont",
+    "createdAt": "2026-06-25T23:56:14.462Z"
+  },
+  "createdAt": "2026-06-25T23:56:14.462Z",
+  "stateRevisionObserved": 42,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "e2-agent-live-terminal-safety-rework-2-t1-result-a4cf3f8",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "taskPackageId": "e2-agent-live-terminal-safety-rework-2-p1",
+  "dispatchGroup": "e2-agent-live-terminal-safety-rework-2-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "e2-agent-live-terminal-safety-rework-2-t1",
+  "status": "completed",
+  "summary": "AlembicAgent rework-2 completed. Commit a4cf3f8b23a23a92226a128fdee32b0633e6abdd fixes terminal.exec audit persistence by making ToolAuditEntry.requestId optional and omitting requestId from live terminal audit entries, so repeated identical commands no longer reuse a commandHash-derived AuditLogger persistence id. Preserved .log(entry), action/resource terminal.exec, result, duration, data.commandHash, no raw command text, and non-fatal audit failure behavior. Added regression coverage for repeated identical terminal.exec audit attempts.",
+  "evidenceRefs": [
+    "commit:a4cf3f8b23a23a92226a128fdee32b0633e6abdd",
+    "AlembicAgent/src/tools/kernel/registry.ts",
+    "AlembicAgent/src/tools/runtime/handlers/terminal.ts",
+    "AlembicAgent/test/runtime-terminal-safety.test.ts"
+  ],
+  "verification": [
+    "./node_modules/.bin/biome check --fix src/tools/kernel/registry.ts src/tools/runtime/handlers/terminal.ts test/runtime-terminal-safety.test.ts — passed, no fixes applied",
+    "npm run test -- test/runtime-terminal-safety.test.ts — passed, 1 file / 8 tests",
+    "npm run build:check — passed",
+    "npm run test -- test/tool-v2-contract.test.ts — passed, 1 file / 12 tests",
+    "npm run smoke:public-signatures — passed, 13 exports / 478 bindings",
+    "npm run lint:public-api-boundary — passed",
+    "npm run lint:core-import-boundary — passed, 263 files / 46 @alembic/core imports scanned",
+    "npm run lint — passed with existing 4 warnings in scripts/codemod-rename.mjs, scripts/smoke-agent-public-signatures.mjs, scripts/verify-agent-validation-floor.mjs",
+    "npm run test — passed, 42 files / 297 tests",
+    "git diff --check — passed",
+    "rg checks — no terminal.exec:<hash> requestId remains in terminal handler; no .record() in scoped files"
+  ],
+  "risks": [
+    "Alembic code guard MCP still returns the same internal schema/tool-surface error observed in prior E-2 rework attempts; recorded as a tool-surface blocker, not a code finding.",
+    "Local main is ahead of origin/main by 3 commits; no push was performed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-e2-agent-live-terminal-safety-rework-2-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-2-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-agent-live-terminal-safety-rework-2-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-2-t1.json",
+    "deliveryRunId": "run-delivery-e2-agent-live-terminal-safety-rework-2-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-2-t1",
+    "dispatchGroup": "e2-agent-live-terminal-safety-rework-2-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-agent-live-terminal-safety-rework-2-p1__AlembicAgent__e2-agent-live-terminal-safety-rework-2-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "stateRevision": 12,
+    "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "taskPackageId": "e2-agent-live-terminal-safety-rework-2-p1",
+    "targetTaskId": "e2-agent-live-terminal-safety-rework-2-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "e2-agent-live-terminal-safety-rework-2-p1",
+    "resultId": "e2-agent-live-terminal-safety-rework-2-t1-result-a4cf3f8",
+    "createdAt": "2026-06-27T10:02:39.341Z"
+  },
+  "createdAt": "2026-06-27T10:02:39.341Z",
+  "stateRevisionObserved": 12,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

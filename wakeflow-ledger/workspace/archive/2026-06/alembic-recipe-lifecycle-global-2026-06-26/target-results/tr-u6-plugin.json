@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u6-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-u6-plugin",
+  "dispatchGroup": "wave2-u6-plugin",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "u6-plugin",
+  "status": "needs-review",
+  "summary": "u6-plugin（rescan 内容级保鲜+audit 闭环 Plugin 消费侧）：P4/P5/gateway/drift 完成，D2 cap 注入 blocked-on-Core，请控制器决 Core 跟进。commit 6cf0a99 直提 main。多文件 wiring 经 fresh-context subagent（任务显式允许），主窗口独立核实每个 claim+亲跑全门禁+full-unit baseline-diff 后才提交（subagent 仅 advisory，我 own 验证+提交）。消费 Core build=a96c4ee（Core 并行 advance）。\n\nP4 接活 rename 修复[DONE]：knowledge-index-rebuild.ts reconcileSourceRefs 在 reconcile 后 stale>0 时调既往死码 Core SourceRefReconciler.repairRenames()→applyRepairs()（git rename→renamed→写回 .md+DB→active），renamed/applied 并入 report。幂等（Core 空集早返 + stale<=0 短路）；方法缺失 best-effort 降级不抛。独立证实改前 repairRenames/applyRepairs 在 Plugin lib 零 call-site（死码另一半激活）。\nP5 报告透出+skip[DONE]：rebuildRescanIndexes 现返回 report（原丢弃），经 prepareRescanState captured 为 indexRebuild；region-vector status=skipped/failed 时发高可见 warning（semantic_memories 留 0）；返回类型 additive 加宽、唯一消费方 knowledge-rescan 已同步。\ngateway/audit 激活[VERIFY+测试]：auditRecipesForRescan 已在 knowledge-rescan:286 带 container 调用，Core resolveEvolutionGateway(:156) 自解析已注册 evolutionGateway、缺省降级 proposalsCreated=0 不抛——已接线、无需新 wiring；加注入(dead→deprecate proposal)+降级两路测试。\ndrift[VERIFY-ONLY]：findDrifted() 在 Core src 零消费方、惰性不破状态机，P3-gate 消费留 U7。\nD2 batch 护栏[验收#4 met，注入 BLOCKED]：加 resolveRescanScanBatchCap tier 表 S=50/M=150/L=400 + env ALEMBIC_RESCAN_SCAN_BATCH_CAP + 守卫（仿 resolveStagingAccessSweepCap）。独立证实 Core SourceRefReconciler.reconcile(opts?{force?}) 无 cap 参、且 Plugin 侧无可批 scan loop——resolver wire-ready 但当前无消费方=batch 限流未激活。按 Stop Card 未造假 cap-pass；resolver 满足验收#4(tier 表+测试)故保留并文档化。\n\n建议：控制器派 Core additive 给 SourceRefReconciler.reconcile 加可选 cap 参（或等价 caller-limited fingerprint scan），Core 落地后 Plugin 一行把 resolveRescanScanBatchCap(tier) 喂入。真机 rename/audit→U7/Test。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-index-rebuild.ts",
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "AlembicPlugin/test/unit/KnowledgeIndexRebuildRepair.test.ts",
+    "AlembicPlugin/test/unit/KnowledgeRescanPlan.test.ts"
+  ],
+  "verification": [
+    "主窗口独立核验 claim(非橡皮图章): reconcile(opts?{force?}) 无 cap 参已证实(SourceRefReconciler.ts:123); resolveRescanScanBatchCap grep 仅定义处无调用=无消费方; repairRenames/applyRepairs 改前 Plugin lib 零 call-site=死码激活; gateway auditRecipesForRescan@knowledge-rescan:286 + Core resolveEvolutionGateway:156 自解析已验",
+    "node v22.22.1; npm run build:check: green; “Core build used ../AlembicCore @ a96c4ee24bf6ed3f10377f63fed1bb58cac76528”(记录消费 Core commit)",
+    "biome 4 文件 clean; lint:repo-boundary PASS / lint:core-import-boundary OK(431 files) / report:agent-extraction-boundary filesWithBoundaryImports=0; D3 grep git_diff_checkpoints 在 2 lib 文件均 0",
+    "新+改测试: KnowledgeIndexRebuildRepair(8: P4 激活/幂等/降级 + P5 skip-warn + D2 tier/env/guard) + KnowledgeRescanPlan(8, 含 2 新 gateway audit 注入/降级) = 16 passed",
+    "全量 unit(Node22): 1635 tests/1588 passed/47 failed/12 文件; failed-set 与上一基线(u5-after 12 文件) diff IDENTICAL=零新回归(passed+10); HostMcpServer.test.ts 7-fail 在基线=pre-existing",
+    "commit 6cf0a99 (main, baseline d68228c→HEAD 6cf0a99, 4 files +481/-8); 未 push/tag/bump/Core 只读"
+  ],
+  "risks": [
+    "D2 cap 注入 blocked-on-Core(需控制器决): SourceRefReconciler.reconcile 无 cap 参、Plugin 无可批 scan loop——resolver wire-ready 但未消费=batch 限流未激活。需 Core additive 加 reconcile(opts.cap)或等价 caller-limited scan，Plugin 再一行接线。未造假 cap-pass(守 Stop Card)；resolver 满足验收#4(tier 表+测试)故保留+文档化。",
+    "subagent 承载多文件 wiring(任务显式允许)，但主窗口独立核实了其所有关键 claim(reconcile 无 cap/resolver 无消费方/repair 零 call-site/gateway 已接线)+亲跑门禁+baseline-diff 后才决策保留 resolver、提交。所有权在主窗口。",
+    "Core 并行高频 advance(c60eb92→a96c4ee，build 实测 a96c4ee)——发布/验收前需明确准备发布的 Core commit。P4 激活的 repairRenames/applyRepairs 与具体 Core HEAD 无关(接口稳定)。",
+    "真机 rename 修复(git mv→active+新路径幂等)与 audit→deprecate 端到端归 U7/Test；本窗口出 unit/集成 + 死码激活证据。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-u6-plugin__AlembicPlugin__u6-plugin",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u6-plugin__AlembicPlugin__u6-plugin.json",
+    "deliveryRunId": "run-delivery-wave2-u6-plugin__AlembicPlugin__u6-plugin",
+    "dispatchGroup": "wave2-u6-plugin",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u6-plugin__AlembicPlugin__u6-plugin.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 54,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-u6-plugin",
+    "targetTaskId": "u6-plugin",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave2-u6-plugin",
+    "resultId": "tr-u6-plugin",
+    "createdAt": "2026-06-26T01:09:11.372Z"
+  },
+  "createdAt": "2026-06-26T01:09:11.372Z",
+  "stateRevisionObserved": 54,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

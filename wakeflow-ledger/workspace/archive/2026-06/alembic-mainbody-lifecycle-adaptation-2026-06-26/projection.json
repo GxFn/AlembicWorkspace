@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "title": "plan 作主体 AI Agent 正交前置组件(新 AgentProfile+runPlanAgent，方案 A)；coldStart 接线/deepMining 单 job 多轮/moduleMining per-cell fan-out/evolution 宿主接线(Core 零改)；PD-5 plan 硬 gate(失败 abort 不回退全量)；Core 补共享 applyPlanSelection 投影收敛 Plugin 双写；全 10 PD 闭合；A-F 全阶段代码级(§4b)。",
+  "interfaceLanguage": "zh",
+  "sourceRevision": 4,
+  "sourceEventId": "evt-20260627015240-0004",
+  "progressDoc": "developer-progress.md",
+  "unifiedStatus": {
+    "demand": "alembic-mainbody-lifecycle-adaptation-2026-06-26 - plan 作主体 AI Agent 正交前置组件(新 AgentProfile+runPlanAgent，方案 A)；coldStart 接线/deepMining 单 job 多轮/moduleMining per-cell fan-out/evolution 宿主接线(Core 零改)；PD-5 plan 硬 gate(失败 abort 不回退全量)；Core 补共享 applyPlanSelection 投影收敛 Plugin 双写；全 10 PD 闭合；A-F 全阶段代码级(§4b)。",
+    "mainState": "planned",
+    "stage": "无",
+    "currentTaskPackages": "w1-core-planselection-foundation-p1(pending), w1-main-evolution-host-wiring-p1(pending)",
+    "windows": "AlembicCore(pending), Alembic(pending)",
+    "blockers": "无",
+    "nextAction": "prepare-dispatch-from-state, add-task-package, wakeflow-render-progress",
+    "review": "无",
+    "automation": "未启用",
+    "userDecisionsNeeded": "无",
+    "lastUpdated": "2026-06-27T01:52:51.093Z"
+  },
+  "slices": {
+    "windows": [
+      {
+        "windowName": "AlembicCore",
+        "windowState": "pending",
+        "taskPackageIds": [
+          "w1-core-planselection-foundation-p1"
+        ],
+        "targetTaskIds": [
+          "w1-core-planselection-foundation-t1"
+        ]
+      },
+      {
+        "windowName": "Alembic",
+        "windowState": "pending",
+        "taskPackageIds": [
+          "w1-main-evolution-host-wiring-p1"
+        ],
+        "targetTaskIds": [
+          "w1-main-evolution-host-wiring-t1"
+        ]
+      }
+    ],
+    "taskPackages": [
+      {
+        "taskPackageId": "w1-core-planselection-foundation-p1",
+        "status": "pending",
+        "summary": "W1 Core foundation for alembic-mainbody-lifecycle-adaptation-2026-06-26. User confirmed A4: PlanSelection shape validation belongs in Core as shared assertPlanSelectionShape, not local Agent validation. Implement §4b B1-B3 plus A4 shape assertion in AlembicCore only: add pure applyPlanSelection(selection, options?) near service/planIntent/planIntent.ts, add assertPlanSelectionShape for thin PlanSelection shape only (generationStage valid, dimensions non-empty string[], scale.totalRecipeBudget>0; length===1 valid, length===0 invalid), export both through @alembic/core/plans. Preserve PD-1 no I/O/no planLedger/no DB/no await, PD-8 do not touch analyst/token budget semantics, keep unknown dimension reporting non-throwing for projection. Do not modify AlembicPlugin/Alembic/AlembicAgent/vendor. Run Node>=22 build:check and focused tests/exports proof; commit on main and return commit hash, changed files, validation output, downstream consumption notes, residual risks."
+      },
+      {
+        "taskPackageId": "w1-main-evolution-host-wiring-p1",
+        "status": "pending",
+        "summary": "W1 Alembic main F evolution host wiring for alembic-mainbody-lifecycle-adaptation-2026-06-26. Implement §4b F only in Alembic main repo: keep F1/F2/F5/F6 as reuse evidence, add EvolutionMaintenanceSweep in Alembic/lib/service/evolution mirroring Plugin tick-on-access/sweep shape but as daemon timerRegistry setInterval driver, and fix KnowledgeModule DecayDetector options to inject lifecycleStateMachine so scanAll can transition active->decaying. Preserve boundary: AlembicCore/src zero changes, no Plugin/Agent edits, no schema changes, no guard relaxation. Sweep must be bounded, idempotent, reentry guarded, timerRegistry-cleaned, and drive checkAndPromote/checkTimeouts/checkAndExecute/scanAll without changing Core judgments. Validate with Node>=22 build:check and focused tests/probes proving lifecycleStateMachine non-null/active->decaying transition, sweep non-zero on seeded due items, empty DB no fake status, timer cleanup, reactive rename/update path not broken. Commit on main and return commit hash, changed files, validation output, raw evidence paths, residual risks."
+      }
+    ],
+    "targetTasks": [
+      {
+        "targetTaskId": "w1-core-planselection-foundation-t1",
+        "taskPackageId": "w1-core-planselection-foundation-p1",
+        "targetWindow": "AlembicCore",
+        "status": "pending",
+        "reviewDecision": null,
+        "counts": null
+      },
+      {
+        "targetTaskId": "w1-main-evolution-host-wiring-t1",
+        "taskPackageId": "w1-main-evolution-host-wiring-p1",
+        "targetWindow": "Alembic",
+        "status": "pending",
+        "reviewDecision": null,
+        "counts": null
+      }
+    ],
+    "blockers": [],
+    "decisionsRequired": []
+  }
+}

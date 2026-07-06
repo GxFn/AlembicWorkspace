@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w6-main-runtime-dist-stale-terminal-cleanup-t1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "taskPackageId": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+  "dispatchGroup": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "w6-main-runtime-dist-stale-terminal-cleanup-t1",
+  "status": "completed",
+  "summary": "W6 Alembic Main runtime dist stale terminal cleanup completed. The final Test E2E blocker was reproduced in ignored Alembic/dist: dist/lib/injection/modules/AgentModule.js and deleted adapter dist artifacts still imported @alembic/agent/tools/terminal, TERMINAL_CAPABILITY_MANIFESTS, LightweightRouter, TerminalAdapter, terminal_shell, terminal_pty, and terminal_run while Alembic/lib was already clean. Ran npm run build, which executes build:core, clean:dist, tsc, and postbuild; this removed stale ignored dist artifacts and regenerated current dist from the accepted source. No tracked source changes were needed and no commit was created because dist/ is gitignored and this package explicitly allows no-commit when only ignored runtime cleanup is needed. Final E2E rerun now passes 28/28 with zero failures.",
+  "evidenceRefs": [
+    "no-commit-ignored-dist-runtime-rebuild",
+    "npm-run-build-pass",
+    "dist-agentmodule-import-ok",
+    "stale-terminal-dist-files-removed",
+    "negative-rg-retired-terminal-zero",
+    "final-e2e-28-pass",
+    "buildcheck-pass",
+    "repo-boundary-pass",
+    "agent-extraction-boundary-pass",
+    "git-diff-check-pass",
+    "git-status-clean-ahead2"
+  ],
+  "verification": [
+    "node -v => v22.22.1",
+    "Initial rg reproduced stale ignored dist hits in dist/lib/injection/modules/AgentModule.js, dist/lib/tools/adapters/TerminalAdapter.js, dist/lib/tools/adapters/terminal-adapter/*, and dist/lib/workflows/ai-execution/PcvNodeEvidence.js while tracked lib was clean",
+    "git check-ignore -v confirmed dist/ ignores dist/lib/injection/modules/AgentModule.js and related stale files via .gitignore:11",
+    "npm run build => passed; ran build:core, clean:dist, tsc, and npm lifecycle postbuild",
+    "find dist/lib/tools/adapters -maxdepth 3 -type f => only live adapters remain: DashboardOperationAdapter, DashboardOperations, MacSystemCapabilities, SkillAdapter, SkillCapabilities, WorkflowAdapter",
+    "rg -n retired terminal identifiers over lib dist/lib/injection/modules/AgentModule.js dist/lib test package.json => no matches",
+    "node --input-type=module import('./dist/lib/injection/modules/AgentModule.js') => agent-module-dist-import-ok",
+    "node --input-type=module stale file probe => {agentModuleImport:'ok', staleFilesRemoved:true}",
+    "node Test/tmp/test-agent-terminal-tools-final-e2e-t1/run-final-e2e.mjs => status pass, failures [], evidence summary pass",
+    "terminal-tools-final-e2e-evidence.json => status pass, totalCases 28, failures []",
+    "npm run build:check => passed",
+    "npm run lint:repo-boundary => passed; @escape-hatch count 1 / 75",
+    "npm run lint:agent-extraction-boundary => passed; @alembic/agent/tools/terminal consumer files: 0; stale deleted duplicate dist artifacts: 0",
+    "git diff --check => passed",
+    "git status --short --branch => clean tracked tree, main...origin/main [ahead 2]"
+  ],
+  "risks": [
+    "No commit was created because the repair only refreshed ignored dist/runtime artifacts and updated ignored Test/tmp evidence; tracked Alembic source remained unchanged. Existing branch ahead count is from prior accepted local commits, not this W6 cleanup.",
+    "The Test sourceRef evidence path was present under /Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/test-agent-terminal-tools-final-e2e-t1; rerunning the script overwrote its local ignored evidence files with pass results."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1.json",
+    "deliveryRunId": "run-delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1",
+    "dispatchGroup": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w6-main-runtime-dist-stale-terminal-cleanup-p1__Alembic__w6-main-runtime-dist-stale-terminal-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "stateRevision": 50,
+    "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "taskPackageId": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+    "targetTaskId": "w6-main-runtime-dist-stale-terminal-cleanup-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "w6-main-runtime-dist-stale-terminal-cleanup-p1",
+    "resultId": "tr-w6-main-runtime-dist-stale-terminal-cleanup-t1",
+    "createdAt": "2026-06-27T11:58:20.495Z"
+  },
+  "createdAt": "2026-06-27T11:58:20.495Z",
+  "stateRevisionObserved": 50,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

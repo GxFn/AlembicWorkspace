@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+  "dispatchGroup": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+  "status": "completed",
+  "summary": "Alembic main repaired completed ProjectContext workflow session lifecycle after coldStart/internal rescan. Commit e88cc82f9f35b952db89aa4d04ebf84cdb2afb95 uses Core BootstrapSessionManager public clearSession/getAnySession primitives to clear the exact workflow session id only after a clean bootstrap:all-completed event, keeps active in-progress/partial sessions blocking, wires coldStart and internal rescan/moduleMining/no-fill completion paths, and leaves controller produce sessions intact.",
+  "evidenceRefs": [
+    "Alembic commit e88cc82f9f35b952db89aa4d04ebf84cdb2afb95",
+    "Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts",
+    "Alembic/lib/workflows/cold-start/ColdStartWorkflow.ts",
+    "Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts",
+    "Alembic/test/unit/ProjectContextWorkflowFacts.test.ts"
+  ],
+  "verification": [
+    "npm run test:unit -- test/unit/ProjectContextWorkflowFacts.test.ts => 9 tests passed",
+    "npm run build:check => passed (build:core using ../AlembicCore, tsc --noEmit passed)",
+    "./node_modules/.bin/biome check --no-errors-on-unmatched lib/workflows/project-context/ProjectContextWorkflowFacts.ts lib/workflows/cold-start/ColdStartWorkflow.ts lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts test/unit/ProjectContextWorkflowFacts.test.ts => passed",
+    "git diff --check => passed",
+    "alembic_code_guard attempted twice but plugin returned internal schema error: unrecognized key \"data\""
+  ],
+  "risks": [
+    "No live BiliDili coldStart/deepMining chain was rerun in this target window; verification is focused unit/build evidence plus Core manager semantics.",
+    "Alembic Code Guard plugin surface failed internally with schema error, so guard evidence is unavailable."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-fix-main-bootstrap-session-lifecycle-after-coldstart-p1__Alembic__fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-bootstrap-session-lifecycle-after-coldstart-p1__Alembic__fix-main-bootstrap-session-lifecycle-after-coldstart-t1.json",
+    "deliveryRunId": "run-delivery-fix-main-bootstrap-session-lifecycle-after-coldstart-p1__Alembic__fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+    "dispatchGroup": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-bootstrap-session-lifecycle-after-coldstart-p1__Alembic__fix-main-bootstrap-session-lifecycle-after-coldstart-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 59,
+    "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+    "targetTaskId": "fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+    "resultId": "tr-fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+    "createdAt": "2026-06-27T16:45:50.313Z"
+  },
+  "createdAt": "2026-06-27T16:45:50.313Z",
+  "stateRevisionObserved": 59,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

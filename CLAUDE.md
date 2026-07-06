@@ -43,7 +43,7 @@ Wakeflow root block should stay reusable across installed workspaces.
 - `AlembicWorkspace` is the controller workspace for cross-repository goal
   intake, planning, dispatch, acceptance, boundaries, TODO routing, templates,
   and collaboration rules. It does not implement managed products.
-- Managed product windows, Design, and Test are defined by `workspace.config.json`
+- Managed product windows, Design, and Test are defined by `wakeflow.config.json`
   and explicit user decisions. Do not treat sibling tooling, history, ledger,
   scratch, or Wakeflow source directories as work windows just because they
   appear next to product repositories.
@@ -222,8 +222,8 @@ omitted the blocker.
 
 Wakeflow is a reusable controller capability for multi-window agent work. It is
 not the parent workspace, not a product source repository, and not a sandbox for
-managed projects. Product scope and window roles come from `workspace.config.json`
-and local runtime config. `.wakeflow-local/workspace.config.json` may override
+managed projects. Product scope and window roles come from `wakeflow.config.json`
+and local runtime config. `.wakeflow-local/wakeflow.config.json` may override
 local installation details and must not be committed.
 
 ## Controller Posture
@@ -245,18 +245,11 @@ definition, local code, docs, tests, and release path before decomposing work.
   requirement design and current state root; when the confirmed demand plan is
   complete, stop, and mark any work outside the confirmed design as pending decision.
 
-The operator's stop-card, confirmation-gate, and decision-checklist discipline lives
-in the installed workspace's own `CLAUDE.md`/`AGENTS.md` (its preserved local rules),
-not in this reusable file. This file keeps Wakeflow's roles, process, and posture.
-
 ## Role Map
 
 - The controller workspace owns cross-repository goal intake, planning,
   dispatch, acceptance, boundaries, TODO routing, templates, and collaboration
   rules. It does not implement managed products.
-- The controller window is the workspace brain, not a dispatch table. For a new
-  request, analyze the feature, user scenario, completion definition, local
-  code, docs, tests, builds, and release paths before decomposing work.
 - Design clarifies requirements, compares options, exposes risks, redesigns
   non-bug outcome mismatches, and prepares signals or handoff candidates.
   Design does not dispatch implementation, accept work, edit product code, or
@@ -264,7 +257,7 @@ not in this reusable file. This file keeps Wakeflow's roles, process, and postur
 - Test handles real-scenario verification that the controller or product
   repository cannot safely reproduce alone. Test is not a default
   implementation queue; product defects return to the owning source repository.
-- Product windows are repositories listed in `workspace.config.json` or local
+- Product windows are repositories listed in `wakeflow.config.json` or local
   override. Each owns its source, tests, commits, evidence, and backfill.
 - Wakeflow owns reusable controller runtime, plugin packaging, CLAUDE.md
   installation, MCP capability surface, state roots, delivery envelopes, result
@@ -298,11 +291,12 @@ implementation churn until Design returns a complete adjustment plan.
 ## Auto-Claim Boundary
 
 The controller may auto-claim (init) a demand without a fresh user prompt ONLY from a
-Design-set `controller-claimable` handoff row via `wakeflow_claim_next`: only Design
-can set that typed status, it carries every ready-row invariant plus design-key
-provenance, and it is init-only — dispatch and acceptance still require their own
-evidence and confirmation. A free-text TODO row cannot drive auto-claim. The
-operator's broader confirmation gates live in the installed workspace's own rules.
+global TODO row that Design delivered with Auto Claim = yes, via `wakeflow_claim_next`:
+that immutable delivery property is set once at `wakeflow_deliver` time and, for a
+requirement, requires a linked Original Plan + Requirement Design, so it carries the
+ready-row invariants plus design-key provenance. It is init-only — dispatch and
+acceptance still require their own evidence and confirmation. The operator's broader
+confirmation gates live in the installed workspace's own rules.
 
 ## Testing And Acceptance
 
@@ -449,8 +443,8 @@ forbidden paths, or automation manuals in `CLAUDE.md`.
 - `CLAUDE.md` keeps Wakeflow identity, role boundaries, the controller posture, the
   dispatch/wave/acceptance process, repository protection, and validation
   requirements. The operator's stop-card, confirmation-gate, and decision-checklist
-  discipline lives in this workspace's own preserved local rules (the Personal
-  Operating Constraints above), not in the reusable Wakeflow block.
+  discipline lives in the installed workspace's own `CLAUDE.md`/`AGENTS.md` (its
+  preserved local rules), not in this reusable file.
 - Skills and references keep operation steps, command order, templates,
   examples, troubleshooting, and script details.
 

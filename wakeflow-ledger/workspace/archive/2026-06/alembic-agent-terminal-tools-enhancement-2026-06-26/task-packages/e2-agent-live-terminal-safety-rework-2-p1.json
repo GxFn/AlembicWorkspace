@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "e2-agent-live-terminal-safety-rework-2-p1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "summary": "E-2 AlembicAgent rework-2 after controller raw-evidence review. Rework-1 fixed .log(entry) and data.commandHash, but it still violates the E-2 audit persistence requirement because terminal.ts builds requestId as terminal.exec:<commandHash-prefix>. Alembic AuditLogger.log maps requestId to audit_logs.id, and audit_logs.id is TEXT PRIMARY KEY, so repeated identical commands reuse the same audit id; later inserts fail and are swallowed, meaning not every live terminal.exec leaves an audit row. Scope is ONLY this persistence blocker. Fix by making ToolAuditEntry.requestId optional and omitting it for terminal.exec so AuditLogger generates unique ids, OR by generating a per-invocation unique requestId that is not derived solely from command hash. Preserve action:'terminal.exec', result, duration, data:{commandHash}, no raw command text, .log(entry), and audit failure non-fatal behavior. Add a regression that runs/logs repeated identical commands and proves requestId is absent or unique per entry and the two audit attempts cannot collapse to the same persistence id; keep the hash-only/no-raw-command assertion. Do not expand into E-1 allowlist, E-3 dead-stack deletion/public subpath retirement, E-4 phantom cleanup, E-5 prompt/guard, or Alembic main wiring. Validate with Node >=22: targeted runtime terminal safety tests, build:check, and affected contract/public-signature tests as needed. Commit on AlembicAgent main and return TargetResultEnvelope with commit hash, changed files, command outputs, and residual risks.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-2",
+  "createdAt": "2026-06-27T09:58:48.626Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "e2-agent-live-terminal-safety-rework-2-t1",
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-2-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-agent-live-terminal-safety-rework-2-p1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Apply only the audit persistence rework: avoid stable commandHash-derived requestId so repeated identical terminal.exec calls still persist distinct audit entries. No cross-repo edits and no scope expansion. Commit locally and backfill evidence.",
+      "status": "pending",
+      "createdAt": "2026-06-27T09:58:48.626Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

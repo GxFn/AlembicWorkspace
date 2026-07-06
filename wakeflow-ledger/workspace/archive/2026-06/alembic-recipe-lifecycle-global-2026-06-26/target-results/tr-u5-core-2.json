@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u5-core-2",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-u5-core-2",
+  "dispatchGroup": "wave2-u5-core-2",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "u5-core-2",
+  "status": "completed",
+  "summary": "u5-core-2 完成：embedding 注入 conduit（U5 #6 收口，Core 侧 additive hook），commit a96c4ee。\n\n缘起=u5-plugin 实现 #1 embedding 时控制器独立证实的跨仓 conduit gap：U5-Core 已给 RecipeSimilarity.compute/computeDimensions 加可选第3参 embeddingSim（content=max(tokenContent, embeddingSim)），但 3 消费服务全调 2 参、ctor 零 embedding 注入位 → Plugin 无 conduit 喂入。非新增 scope，是 §U5 #6 未接通 seam。\n\n方案A（domain 不发起 embed、注入算好的 sim）：3 服务 ctor 加可选 embeddingSimProvider（同步 RecipeLike→RecipeLike→number|undefined），串到 compute 第3参：\n- h1 ConsolidationAdvisor：ctor 2nd 可选参 + #computeSimilarity 抽 candidateLike/recipeLike → compute(…, provider?.(candidateLike,recipeLike))。\n- h2 ProposalExecutor：ctor 6th 可选参 + :588 抽 candLike → compute(supersededLike, candLike, provider?.(…))。\n- h3 RedundancyAnalyzer：options.embeddingSimProvider + analyzePair 抽 aLike/bLike → computeDimensions(…, provider?.(…))。\n- 共享 EmbeddingSimProvider 类型（定义于 RecipeSimilarity.ts，保三处签名一致；经直接相对 import，非 barrel 导出）。\n\nprovider 缺省 → 第3参 undefined → 纯 Jaccard（字节级回退，现有 evolution 单测不变）。不导出 RecipeSimilarity（barrel 0 新增），conduit 走 ctor 注入。真机 embedding provider = u5-plugin-2（Plugin DI 注入 VectorService/RecipeRegionVectorIndex-backed provider）。",
+  "evidenceRefs": [
+    "AlembicCore/src/domain/evolution/RecipeSimilarity.ts",
+    "AlembicCore/src/service/evolution/ConsolidationAdvisor.ts",
+    "AlembicCore/src/service/evolution/ProposalExecutor.ts",
+    "AlembicCore/src/service/evolution/RedundancyAnalyzer.ts",
+    "AlembicCore/test/unit/EmbeddingSimProviderConduit.test.ts"
+  ],
+  "verification": [
+    "commit a96c4ee24bf6ed3f10377f63fed1bb58cac76528（main，5 files +137/-21，无 push/tag/bump，禁碰 vendor，无 dist 跟踪）",
+    "npm run build:check → tsc --noEmit 0 error",
+    "npm run test → 137 files / 1377 tests passed（基线 136/1375；+1 file +2 test；既有 evolution 5 file/62 test 零回归）",
+    "npm run lint → biome Checked 629 files, no fixes, 0 warning/error",
+    "npm run build → clean-dist + tsc 重生 dist",
+    "git diff --check → clean",
+    "① provider 接通[unit]：EmbeddingSimProviderConduit.test.ts '① provider 接通' passed —— 注入 0.9 → content=max(0.71,0.9)=0.9，withRes.content 0.9 > withoutRes.content 0.71，similarity 0.94>0.88",
+    "② 缺省回退[unit]：'② 缺省回退' passed —— 不注入 content=0.71=round(computeDimensions 无第3参 .content)，两跑同 similarity（同入同出确定）",
+    "③ additive[grep/build]：barrel（src/index.ts/evolution.ts/domain.ts）afd4302..HEAD 零新增 RecipeSimilarity/EmbeddingSimProvider 导出；build:check GREEN",
+    "④ 签名一致：3 ctor 均 embeddingSimProvider?: EmbeddingSimProvider（ConsolidationAdvisor:129 / ProposalExecutor:84 / RedundancyAnalyzer:72）；compute 第3参语义 max(tokenContent, embeddingSim) 未改"
+  ],
+  "risks": [
+    "真机 embedding 喂入 gated on u5-plugin-2（Plugin DI 注入 VectorService/RecipeRegionVectorIndex-backed provider，provider 代码 subagent 已备见 tr-u5-plugin）；Core 仅接通 conduit seam，缺省字节级回退 Jaccard。",
+    "provider 同步签名（RecipeLike→RecipeLike→number|undefined）；domain/service 不发起 embed（只接收算好的 sim），符纯度/确定性约束。RecipeRegionVectorIndex 已是预计算向量，sync cosine 可行。",
+    "未导出 RecipeSimilarity（barrel 纯度）；conduit 走 ctor 注入（ConsolidationAdvisor/ProposalExecutor 位置参、RedundancyAnalyzer options——注入风格随各 ctor，provider 函数签名三处一致）。",
+    "content 维度 token 取自 coreCode+代码块（非纯 prose）；测试据此构造 1 标识符差异对得 content 0.71<0.9，注入 0.9 必胜。与 u6-core 文件不冲突（本卡只碰 evolution 服务）。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-u5-core-2__AlembicCore__u5-core-2",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u5-core-2__AlembicCore__u5-core-2.json",
+    "deliveryRunId": "run-delivery-wave2-u5-core-2__AlembicCore__u5-core-2",
+    "dispatchGroup": "wave2-u5-core-2",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u5-core-2__AlembicCore__u5-core-2.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 54,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-u5-core-2",
+    "targetTaskId": "u5-core-2",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "wave2-u5-core-2",
+    "resultId": "tr-u5-core-2",
+    "createdAt": "2026-06-26T01:04:16.350Z"
+  },
+  "createdAt": "2026-06-26T01:04:16.350Z",
+  "stateRevisionObserved": 54,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

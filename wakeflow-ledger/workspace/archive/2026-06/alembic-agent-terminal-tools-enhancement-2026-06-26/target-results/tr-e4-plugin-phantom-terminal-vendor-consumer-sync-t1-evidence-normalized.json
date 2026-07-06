@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-e4-plugin-phantom-terminal-vendor-consumer-sync-t1-evidence-normalized",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "taskPackageId": "e4-plugin-phantom-terminal-vendor-consumer-sync-p1",
+  "dispatchGroup": "e4-plugin-phantom-terminal-vendor-consumer-sync-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "e4-plugin-phantom-terminal-vendor-consumer-sync-t1",
+  "status": "completed",
+  "summary": "Controller evidence-normalization for AlembicPlugin E-4 vendor/consumer sync after raw review. Product commit remains cb6a52dd486e236205f958434e08030c07e9c251. Implementation pins AlembicPlugin/vendor/AlembicCore to accepted Core commit 90c2295c0fb1eafe0e0a6468f8fb820343a2c695 and updates Plugin tests for legacy terminal-shell/terminal-pty collapse to terminal-run plus WorkflowReport projection sanitization. The previous result put validation strings and a gitlink arrow note in evidenceRefs, which Wakeflow interpreted as missing path refs; this normalized result keeps reviewable commit/file evidence refs and moves command outputs into verification. No product code changed by this normalization.",
+  "evidenceRefs": [
+    "commit:AlembicPlugin@cb6a52dd486e236205f958434e08030c07e9c251",
+    "AlembicPlugin/vendor/AlembicCore",
+    "AlembicPlugin/test/unit/BootstrapTerminalToolset.test.ts",
+    "AlembicPlugin/test/unit/TestMode.test.ts",
+    ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26/target-results/tr-e4-plugin-phantom-terminal-vendor-consumer-sync-t1.json"
+  ],
+  "verification": [
+    "Controller verified AlembicPlugin HEAD is cb6a52dd486e236205f958434e08030c07e9c251 and working tree is clean.",
+    "Controller verified AlembicPlugin ls-tree HEAD vendor/AlembicCore -> gitlink 90c2295c0fb1eafe0e0a6468f8fb820343a2c695; vendor/AlembicCore rev-parse HEAD returns the same accepted Core commit.",
+    "Controller reviewed git show: changed files are test/unit/BootstrapTerminalToolset.test.ts, test/unit/TestMode.test.ts, and vendor/AlembicCore gitlink only; no AlembicCore source was directly edited in Plugin.",
+    "Controller reviewed vendor BootstrapTerminalToolset: type is baseline|terminal-run, mode run only, analyze/evolution map only to terminal, policy hints say terminal({ action: \"exec\" }) and do not mention terminal_shell or terminal_pty.",
+    "Controller reviewed vendor testMode: legacy terminal-shell/terminal-pty env values collapse to terminal-run; baseline remains explicit disable.",
+    "Controller reviewed vendor WorkflowReportWriter: retired ids are filtered by RETIRED_TERMINAL_TOOL_IDS and only live terminal ids infer terminal-run.",
+    "Controller ran node --version -> v22.22.1.",
+    "Controller ran npm run test:unit -- BootstrapTerminalToolset TestMode -> 2 files, 23 tests passed.",
+    "Controller ran npm run build:check -> passed; Core build used ../AlembicCore @ 90c2295c0fb1eafe0e0a6468f8fb820343a2c695.",
+    "Controller ran npm run lint:core-import-boundary -> passed; scanned 438 files and 441 @alembic/core imports.",
+    "Controller ran npm run lint:repo-boundary -> passed; escape-hatch count 0/75.",
+    "Controller ran npx biome check test/unit/BootstrapTerminalToolset.test.ts test/unit/TestMode.test.ts -> passed.",
+    "Controller ran npm run smoke:codex-plugin -> passed; runtimePackageBoundary/startupRuntime/install/shellBootstrap/stdio all passed.",
+    "Controller ran git diff --check HEAD^ HEAD -> passed.",
+    "Controller ran rg terminal_shell|terminal_pty over live vendor toolset/shared/lib/plugins/skills scope -> no matches; broader grep only finds negative unit-test fixtures/assertions and WorkflowReportWriter retired-id cleanup constant.",
+    "Controller verified AlembicPlugin git status --short and vendor/AlembicCore git status --short are clean after verification."
+  ],
+  "risks": [
+    "npm run lint remains reported by target as failing on pre-existing unrelated Biome findings in unmodified files/scripts; controller did not use full lint as acceptance evidence and verified changed-file Biome plus repo/core boundary checks instead.",
+    "No push, tag, version bump, E-3 dead stack retirement, or E-5 prompt/guard work was performed.",
+    "Legacy terminal-shell/terminal-pty strings intentionally remain only in normalization tests and retired-id sanitizer logic, not live advertising surfaces."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-e4-plugin-phantom-terminal-vendor-consumer-sync-p1__AlembicPlugin__e4-plugin-phantom-terminal-vendor-consumer-sync-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e4-plugin-phantom-terminal-vendor-consumer-sync-p1__AlembicPlugin__e4-plugin-phantom-terminal-vendor-consumer-sync-t1.json",
+    "deliveryRunId": "run-delivery-e4-plugin-phantom-terminal-vendor-consumer-sync-p1__AlembicPlugin__e4-plugin-phantom-terminal-vendor-consumer-sync-t1",
+    "dispatchGroup": "e4-plugin-phantom-terminal-vendor-consumer-sync-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e4-plugin-phantom-terminal-vendor-consumer-sync-p1__AlembicPlugin__e4-plugin-phantom-terminal-vendor-consumer-sync-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "stateRevision": 30,
+    "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "taskPackageId": "e4-plugin-phantom-terminal-vendor-consumer-sync-p1",
+    "targetTaskId": "e4-plugin-phantom-terminal-vendor-consumer-sync-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "e4-plugin-phantom-terminal-vendor-consumer-sync-p1",
+    "resultId": "tr-e4-plugin-phantom-terminal-vendor-consumer-sync-t1-evidence-normalized",
+    "createdAt": "2026-06-27T10:52:13.283Z"
+  },
+  "createdAt": "2026-06-27T10:52:13.283Z",
+  "stateRevisionObserved": 30,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

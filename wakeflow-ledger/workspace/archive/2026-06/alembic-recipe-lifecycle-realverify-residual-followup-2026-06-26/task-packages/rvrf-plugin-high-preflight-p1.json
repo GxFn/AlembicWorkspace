@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rvrf-plugin-high-preflight-p1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "阶段 P1/Plugin consumer：Core HIGH preflight 已由 AlembicCore@051ddf282309e485e8f3359337b9b9f3be011515 接受。现在按权威 §8.1 修 Plugin 真跑前断点，之后才允许进入 BiliDili 真测。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md#8-实现审计设计-vs-真实落地代码-真测执行指导authoritative6-agent-对抗审计-2026-06-26",
+  "createdAt": "2026-06-26T11:20:13.756Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rvrf-plugin-high-preflight-t1",
+      "taskPackageId": "rvrf-plugin-high-preflight-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "你是 AlembicPlugin 窗口，只在 /Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin 改 live Plugin，不碰 vendor、不改 AlembicCore、不 push。先读 ../AGENTS.md、../.wakeflow-active/index.md、../.wakeflow-active/current/workspace-current-status.md、state root `.wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26`、本仓 CLAUDE.md，并声明窗口/仓库身份。权威需求是 Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md 的 §8（尤其 8.1/8.4/8.5/8.6），不是旧伞形状态表。\n\n上游已接受：AlembicCore@051ddf282309e485e8f3359337b9b9f3be011515 修了 Core 侧 pathsOverlap 目录归属与 drifted→update planner。Plugin 本包消费该行为并修 Plugin 侧 HIGH/条件 HIGH，不再改 Core。\n\n任务范围：\n1) 必修#1 Plugin 侧 U2-a/RF-9：审计并修 `dimension-completion.ts:648` 附近 `ownedPaths:[module.path]` 生产侧。若 ProjectMap/模块输入已有真实 ownedFiles/ownedPaths 文件清单，优先喂真实文件路径；若目录路径仍作为 fallback，必须证明它与 Core segment-safe 目录归属配合后不再 under-match。补测试覆盖引用模块内真实文件能归属模块、非 segment 伪前缀不归属；不得通过放松 coverage/advisor/quality gate 伪修。\n2) 必修#2 U3-a/RF-11：在 `knowledge-rescan.ts:316` 附近对齐 `cold-start.ts:273`，使用 `attachBriefingTransportMeta(response, ...)` 或等价方式把 `fullBriefingRef`/briefing transport meta 提到顶层 `response.meta`；不要只写 `data.meta`。在 `McpCoreToolsCleanOutputContract.test.ts:134` 附近加 `alembic_rescan` 分支，误写 data.meta 或 clean output 丢顶层 meta 必须红。\n3) 必修#4 条件 U5-a/RF-12：因 §8.5 第 5 步要验证 commit→maintenance update proposal 的 patch 内容，本包把它作为真测前修复项。修 `FileChangeHandler.ts:489,497` 附近，使 file-change update proposal 发 StructuredPatch / 可应用 patch 结构，而不是 prose `input.reason`；补测试证明 `evidence.suggestedChanges` 是结构化 patch JSON/对象且目标 recipe 内容有可应用变更依据，不是纯文字原因。\n\n非目标/硬护栏：RF-2 decayScore 量纲必须留给 Design redesign，不在 Plugin 直修；RF-6 rescan compact 瘦身、RF-7 fullMapRef 等不在本包除非你证明是上述 #2 的同一必要链路，否则只回填为后续残留；不改 true BiliDili DB；不改 vendor/AlembicCore；不放松 anti-fabrication、质量地板、FP 护栏、Advisor 收敛门禁；不新增 daemon/AI provider；不 push/tag/bump。\n\n验证要求：Node >=22；至少运行 AlembicPlugin `npm run build:check`，并运行覆盖 `McpCoreToolsCleanOutputContract`、dimension completion ownership、FileChangeHandler StructuredPatch 的定向 Vitest/测试；按改动范围补 `npm run lint` 或 repo-boundary/plugin smoke。回填必须包含 commit hash、改动文件、验证命令原始结果、对真 BiliDili §8.5 的影响说明、残留风险。",
+      "status": "pending",
+      "createdAt": "2026-06-26T11:20:13.756Z"
+    }
+  ]
+}

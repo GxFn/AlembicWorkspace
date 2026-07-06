@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u6-core",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-u6-core",
+  "dispatchGroup": "wave2-u6-core",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "u6-core",
+  "status": "completed",
+  "summary": "U6-Core 完成：rescan 内容级保鲜 + audit 闭环（Core producer 侧），全 live AlembicCore、纯 additive、分阶段提交（禁碰 vendor）。4 commits over afd4302：95bd754(P2 migration)→2a52874(P2 fp+drift+P6)→749e6c3(audit→deprecate)→c60eb92(migration manifest test).\n\nP2 migration：migration 014 给 recipe_source_refs 加可空 content_fp TEXT（PRAGMA 幂等 ALTER，仿 011）+ Drizzle schema + RecipeSourceRefEntity/Insert + upsert（content_fp 仅显式提供时写、undefined 保留旧指纹，stale/renamed 不误清空）+ findDrifted()。\n\nP2 指纹算法：新增模块级 computeSourceRegionFingerprint（域标签 'alembic:source-region-fp:v1' + region trim + computeContentHash 16-hex SHA-256）—— 独立于 computeKnowledgeHash（.md 剥 _contentHash 全文 hash），互不调用、同 .md 产出不同 + parseSourceLineRange(:N/:N-M/#LN/#LN-LM)。\n\nP2 接入：#reconcileSourceRef→#updateExistingSourceRef 比对 content_fp：exists 且 currentFp 算得→ existing.contentFp===null 首填只回填不改 status（CG⑥a）/ 相等→active 续期 / 变化→status='drifted'+verified_at 刷新（下游 P3 gate 决 update/deprecate）；新行 exists→插入基线指纹；指纹算不出→保守 active 不误报。新增 ReconcileReport.drifted 计数。\n\nP6：抽 #resolveExistingSourceFile 为唯一 resolve 出口（#resolveSourcePath ProjectScope-aware + sourcePathFilesystemCandidates 后缀剥离），#sourcePathExists（reconcile）/repairRenames:440（改走 #sourcePathExists(newPath)，替原裸 path.resolve+existsSync）/#sourceContentFingerprint 三处同套。\n\naudit→deprecate：auditRecipesForRescan 对 verdict='dead' recipe 经 EvolutionGateway submit type='deprecate'、source='metabolism'（CG⑥b：shouldImmediateExecute 对 metabolism 恒 false→进 observation-window 非立即执行）、confidence=classifyRelevance(score).confidence；proposalsCreated/immediateDeprecated 反映真实 Gateway 结果（替硬编码 0 / counters.dead 占位）。gateway 防御式取（evolutionGateway 直取 或 proposalRepository+lifecycleStateMachine+knowledgeRepository 组装既有类，不新建服务）；都不可用→降级 proposalsCreated=0 不抛。\n\nD3：U6 改动 diff 零 git_diff_checkpoints 读写（schema.ts 既存 gitDiffCheckpoints 表非本次改动）。CG⑥a/⑥b 固化。P4/P5（knowledge-index-rebuild.ts）= U6-Plugin 后续，未碰 Plugin/vendor。",
+  "evidenceRefs": [
+    "AlembicCore/src/infrastructure/database/migrations/014_recipe_source_refs_content_fp.ts",
+    "AlembicCore/src/infrastructure/database/drizzle/schema.ts",
+    "AlembicCore/src/repository/sourceref/RecipeSourceRefRepository.ts",
+    "AlembicCore/src/service/knowledge/SourceRefReconciler.ts",
+    "AlembicCore/src/workflows/capabilities/planning/knowledge/KnowledgeRescanPlanner.ts",
+    "AlembicCore/test/unit/SourceRefContentFingerprint.test.ts",
+    "AlembicCore/test/unit/AuditDeadDeprecate.test.ts",
+    "AlembicCore/test/DatabaseRepository.test.ts",
+    "AlembicCore/test/MigrationsRerunIdempotency.test.ts"
+  ],
+  "verification": [
+    "分阶段 commits（main，无 push/tag/bump，禁碰 vendor，无 dist 跟踪）：95bd754 P2-migration / 2a52874 P2-fp+drift+P6 / 749e6c3 audit→deprecate / c60eb92 migration-manifest-test",
+    "npm run build:check → tsc --noEmit 0 error",
+    "npm run test → 136 files / 1375 tests passed（U6 基线 134/1367；+2 file +8 test，零回归；migration manifest 修复后全绿）",
+    "npm run lint → biome Checked 628 files, no fixes, 0 warning/error",
+    "npm run build → clean-dist + tsc 重生 dist（供 U6-Plugin P4/P5 接入）",
+    "git diff --check → clean",
+    "①指纹独立[unit]：SourceRefContentFingerprint.test.ts '同一 .md：computeSourceRegionFingerprint ≠ computeKnowledgeHash' + 'region ≠ 全文/行尾归一' + 'parseSourceLineRange' passed",
+    "②migration+回填[unit]：migration 014 列由 DatabaseRepository/MigrationsRerunIdempotency manifest + floor test 跑迁移验证；SourceRefContentFingerprint '②CG⑥a 首填 null→只回填指纹、status 保持 active' passed",
+    "③drift 触发[unit]：'③drift：region 内改动→drifted+content_fp 变+verified_at 刷新'（含 findDrifted） + '③无误报：仅 region 外改动→保持 active、指纹不变' passed",
+    "④P6 口径统一[grep]：裸 path.resolve(this.#projectRoot,newPath)+absNewPath 从 repairRenames 移除（0 hits）；repairRenames:544 走 this.#sourcePathExists(newPath)；单一 #resolveExistingSourceFile 出口供 #sourcePathExists（reconcile/repair）+#sourceContentFingerprint 共用",
+    "⑤audit→deprecate[unit]：AuditDeadDeprecate.test.ts 'dead→submit deprecate(source=metabolism→观察窗口)，proposalsCreated 真实数'（summary.dead=1/proposalsCreated=1/immediateDeprecated=0，submitted source=metabolism，shouldImmediateExecute=false） + '无 gateway→降级 proposalsCreated=0 不抛' passed",
+    "⑥D3[grep]：git diff afd4302..HEAD -- src/ 中 git_diff_checkpoints|gitDiffCheckpoint → 0 hits；SourceRefReconciler/RecipeSourceRefRepository/KnowledgeRescanPlanner/migration014 符号级 0 命中（schema.ts 命中=预存 gitDiffCheckpoints 表，非本次改动）",
+    "边界核验：buildImpactMap source-deleted→score 10→classifyRelevance=dead 驱动测试；EvolutionPolicy.classifyRelevance 公开取 dead 置信度 0.95；vendor 未碰"
+  ],
+  "risks": [
+    "D2 fingerprint batch 护栏 50/150/400 归 P1 sweep 编排消费（本卡明言「不做 P1 编排」）；Core reconcile 保持 caller-limited（未加 cap 参，与 DecayDetector.scanAll(cap?) caller 供参同模）——边界决策，非漏项。",
+    "audit→deprecate 真机激活 gated on Plugin 在 rescan container 注入 evolutionGateway 或 proposalRepository+lifecycleStateMachine+knowledgeRepository（U6-Plugin）；都不可用时降级 proposalsCreated=0（安全，单测证明 wired+降级两路）。",
+    "行为变更：immediateDeprecated 由原硬编码 counters.dead（虚计——原 audit 无任何实际 deprecate）改为反映真实 Gateway 立即执行数（metabolism 观察窗口策略下=0）；唯一消费方 KnowledgeRescanPresenters 为展示透传，无逻辑/测试依赖旧值。",
+    "'drifted' 是 recipe_source_refs 新 status，下游 P3 gate（U6-Plugin/U7）消费；未接入前惰性（findDrifted() 已备），不进 findStale/findRenamed/findActive 查询，不破现有状态机。",
+    "P4/P5（knowledge-index-rebuild.ts:91-112 plugin 函数）= U6-Plugin；P1 非-commit 重校触发编排 = 平行源；均本卡不做。Core landed+dist 重生后解锁 U6-Plugin。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-u6-core__AlembicCore__u6-core",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u6-core__AlembicCore__u6-core.json",
+    "deliveryRunId": "run-delivery-wave2-u6-core__AlembicCore__u6-core",
+    "dispatchGroup": "wave2-u6-core",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u6-core__AlembicCore__u6-core.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 48,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-u6-core",
+    "targetTaskId": "u6-core",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "wave2-u6-core",
+    "resultId": "tr-u6-core",
+    "createdAt": "2026-06-26T00:39:03.266Z"
+  },
+  "createdAt": "2026-06-26T00:39:03.266Z",
+  "stateRevisionObserved": 48,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

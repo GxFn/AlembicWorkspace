@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rvrf-plugin-rf3-open-round-for-produce-dimensions-repair-p1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "Repair RF-3 live gap found by Test rvrf-test-bilidili-rf3-rescanid-live-verification-t1. Work only in AlembicPlugin unless a precise Core API/semantic blocker is proven; do not edit AlembicCore, BiliDili data, vendor, or push/tag/bump. Read parent AGENTS/CLAUDE, active index/status, this state root, task package, AlembicPlugin CLAUDE, and Design requirement §8.4 RF-3 + §8.5#3. Upstream accepted: AlembicCore 830f9028a7c4d145c8bb0ccbc23485901f1cdcd0 exposes deep_mining_rounds.rescan_id migration and rescan-aware upsert; AlembicPlugin 504cecd70db31eba92f5ba3fe6b101699e8173eb threads args.rescanId when openDeepMiningRound is reached. Controller raw evidence to verify first: Test/tmp/rvrf-test-bilidili-rf3-rescanid-live-verification-t1/evidence-summary.md, target result tr-rvrf-test-bilidili-rf3-rescanid-live-verification-t1, live DB /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db, combined.log. Finding: live migration exists, but all deep_mining_rounds rows have rescan_id NULL. Three explicit-rescanId MCP probes wrote zero non-null rows; two probes had executionDimensions=2 and produceDimensions=2, yet coverageAdvisory/deepMining-converged set noActionableRescanWork and knowledge-rescan.ts:603 skipped openDeepMiningRound. Required repair: make the public alembic_rescan deepMining path open/persist the rescanId round whenever there is real execution/produce work (or otherwise ensure coverageAdvisory cannot report shouldStop=true for produceDimensions>0). Preserve the original U2 advisory ordering invariant: do not let a just-opened empty round poison the advisory stop calculation. Preserve no-work converged behavior for produceDimensions=0. Preserve anti-fabrication, quality floor, FP guard, and empty-session cleanup; do not fabricate recipes or coverage rows. Add targeted tests proving: (1) deepMining with rescanId and produceDimensions>0 opens/upserts a round with that rescanId even if advisory would otherwise converge; (2) repeated same rescanId reuses the existing Core round/index, no duplicate fake rows; (3) produceDimensions=0/converged no-work still releases empty session and does not open a new round; (4) completion/reflow preserves latest.rescanId where applicable. Run Node 22, npm run build:check, and targeted tests around knowledge-rescan/CoverageLedger wiring; run git diff --check. Backfill commit hash, changed files, exact validation output, whether Core changes are truly needed, and Test rerun instructions: same explicit rescanId twice must yield SQL count exactly 1 for projectRoot+rescanId.",
+  "status": "pending",
+  "sourceRef": "Test/tmp/rvrf-test-bilidili-rf3-rescanid-live-verification-t1/evidence-summary.md + Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md §8.4 RF-3/§8.5#3",
+  "createdAt": "2026-06-26T16:58:17.135Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rvrf-plugin-rf3-open-round-for-produce-dimensions-repair-t1",
+      "taskPackageId": "rvrf-plugin-rf3-open-round-for-produce-dimensions-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Fix Plugin RF-3 live route so explicit rescanId deepMining with produceDimensions>0 writes one idempotent deep_mining_round row; preserve no-work cleanup and gates.",
+      "status": "pending",
+      "createdAt": "2026-06-26T16:58:17.135Z"
+    }
+  ]
+}

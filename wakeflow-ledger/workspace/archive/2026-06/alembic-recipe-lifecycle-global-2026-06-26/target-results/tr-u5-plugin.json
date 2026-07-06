@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u5-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-u5-plugin",
+  "dispatchGroup": "wave2-u5-plugin",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "u5-plugin",
+  "status": "needs-review",
+  "summary": "u5-plugin：#4+#2/#3 完成（commit d68228c 直提 main），#1 embedding 阻塞于 Core gap，请控制器决 Core-hook 跟进。多文件调查经 fresh-context subagent，主窗口独立核验所有 claim+亲跑门禁后才提交（subagent 仅 advisory，我 own 验证+提交）。\n\n#4 content-patcher 转绿[DONE]：Core U5(b3a8d81，build:check 实测消费 @2a52874) 把 ContentPatcher 对非结构化自然语言 suggestedChanges 的破坏式覆盖改为 skipped+skipReason no-op(content 字节不变)。content-patcher.test.ts:284 'non-JSON text' 断言对齐新契约(success=false/skipped=true/skipReason 'unstructured'/fieldsPatched[]/repo content 字节不变)——修我自 um-impl 起一直 flag 的长期跨仓测试漂移红。产品码未改(对齐测试非改 Core 回旧行为)。15/15 绿；全量 failed-set 13→12(content-patcher 移除、零新失败)。\n\n#2 subscribeToSignals[VERIFY-ONLY]：U5-Core 信号变更(#gateUpdate 内部统一)非新 Plugin-facing 信号；我 P3 已接的一次性幂等 subscribeToSignals(KnowledgeModule:407)完好未碰、不重复接线。无 Plugin 改动。\n#3 supersede 选定[VERIFY-ONLY + 测试]：Core 私有 ProposalExecutor.#selectMostSimilarReplacement(:554-598)选相似度最高者写 deprecated_by 边；Plugin 只读消费(RecipeRelationChainProvider:168)，无镜像/缓存需同步。加 SupersedeSelectionConsume.test.ts 经 Core 公开 RecipeSimilarity 加权 RedundancyAnalyzer 证「最高者胜出、非[0]」(满足验收#2 unit)。无 Plugin 产品改动。\n\n#1 embedding 注入[BLOCKED on Core gap，独立证实]：U5-Core 给 RecipeSimilarity.compute/computeDimensions 加了第3位可选形参 embeddingSim:number，但(a) RecipeSimilarity 未从 @alembic/core 任何 subpath 导出(barrel 故意省略 domain/evolution)、(b) 内部消费它的 Core 服务(ConsolidationAdvisor 仅 ctor(knowledgeRepo)/RedundancyAnalyzer 仅{signalBus,reportStore}/ProposalExecutor)均无注入 embedding-sim provider 的 hook、只调 compute(a,b) 2 参。即 U5-Core 加了形参但无 Plugin 喂入 conduit。Plugin 可建 embedding-sim provider(subagent 已建+测，含 cosine + Jaccard 确定性回退)，但目前无消费方=不可达。按本窗口 Stop Card「不可达 entrypoint/未用 contract≠完成」，未 land 该投机 provider(且会过早耦合未设计的 Core hook)；已 revert。\n\n建议：控制器派 Core 追加(U5-Core-2 或合并 U6)一个 additive 注入 hook——给 RedundancyAnalyzer/ConsolidationAdvisor/ProposalExecutor 加可选 embeddingSimProvider ctor 选项(或导出 RecipeSimilarity + gateway hint 用 findById)，Core 落地后再派 Plugin 一行接线(provider 代码已备、subagent 报告含)。或若控制器要先 land Plugin ready-seam(投机)，我可重落——但我推荐 Core-hook-first 避免过早耦合。真机 evolution→U7/Test。",
+  "evidenceRefs": [
+    "AlembicPlugin/test/unit/content-patcher.test.ts",
+    "AlembicPlugin/test/unit/SupersedeSelectionConsume.test.ts"
+  ],
+  "verification": [
+    "主窗口独立核验 #1 Core-gap claim(非橡皮图章): grep RecipeSimilarity 在 @alembic/core/dist/evolution.* 导出=0(未导出); grep embeddingSim/embeddingProvider 在 ConsolidationAdvisor/RedundancyAnalyzer/ProposalExecutor ctor=0(无 hook); recipeEmbeddingSimilarity provider grep 除注册处外=0(无消费方)——三 claim 均属实",
+    "node v22.22.1; npm run build:check: green(无 error TS)；“Core build used ../AlembicCore @ 2a52874b3d8bbc661088d80fc7761e8e9b1395bd”(记录消费的 Core commit；Core 并行高频 advance，git HEAD 曾读到 6691d9e，build 实测 2a52874)",
+    "#4 content-patcher.test.ts: 15/15 GREEN(独立跑)",
+    "#2/#3 SupersedeSelectionConsume.test.ts: 2/2 passed; biome 2 文件 clean",
+    "全量 unit(Node22): 1625 tests/1578 passed/47 failed/12 文件; vs 上一基线(u1c 13 文件) diff = 仅移除 content-patcher.test.ts(13→12文件/48→47failed)、零新失败——验收#4 content-patcher 从 failed-set 移除得证",
+    "#1 投机 provider 已 revert: grep recipeEmbeddingSimilarity/RecipeEmbeddingSimilarity 在 lib/test=0; 工作树仅 2 测试文件",
+    "commit d68228c (main, baseline ecded14→HEAD d68228c, 2 files +108/-5): content-patcher.test.ts, SupersedeSelectionConsume.test.ts; 未 push/tag/bump/Core 只读/未改产品码"
+  ],
+  "risks": [
+    "#1 跨仓依赖(需控制器决): U5-Core 加了 embeddingSim 形参但无 Plugin conduit(RecipeSimilarity 未导出 + 消费服务无注入 hook)。需 Core additive 追加注入点，再派 Plugin 接线。未 land 无消费方的投机 provider(避免过早耦合未设计的 Core hook + 守 Stop Card 不可达 entrypoint 红线)。",
+    "subagent 承载多文件调查与草稿，但主窗口独立核实了其所有关键 claim(RecipeSimilarity 未导出/无 hook/provider 无消费方)+亲跑门禁+baseline-diff 后才决策 revert #1、只提交 #4+#3。所有权在主窗口。",
+    "Core 并行高频 advance(afd4302→95bd754→6691d9e，build 实测 2a52874)——本任务仅改测试、与 Core 漂移解耦，但发布/验收前需明确准备发布的 Core commit。content-patcher 转绿与具体 Core HEAD 无关(新契约自 b3a8d81 起稳定)。",
+    "真机 evolution OUTCOME(embedding 高于 Jaccard 的端到端、supersede 真机边、merge 质量)归 U7/Test。SupersedeSelectionConsume 是消费契约代理证据(真选择是 Core 私有)。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-u5-plugin__AlembicPlugin__u5-plugin",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u5-plugin__AlembicPlugin__u5-plugin.json",
+    "deliveryRunId": "run-delivery-wave2-u5-plugin__AlembicPlugin__u5-plugin",
+    "dispatchGroup": "wave2-u5-plugin",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u5-plugin__AlembicPlugin__u5-plugin.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 48,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-u5-plugin",
+    "targetTaskId": "u5-plugin",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave2-u5-plugin",
+    "resultId": "tr-u5-plugin",
+    "createdAt": "2026-06-26T00:30:47.815Z"
+  },
+  "createdAt": "2026-06-26T00:30:47.815Z",
+  "stateRevisionObserved": 48,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

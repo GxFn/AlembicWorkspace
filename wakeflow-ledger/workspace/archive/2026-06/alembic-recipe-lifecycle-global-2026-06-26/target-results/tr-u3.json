@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u3",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave3-u3",
+  "dispatchGroup": "wave3-u3",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "u3",
+  "status": "completed",
+  "summary": "u3（rescan/deepMining/moduleMining 输出预算化对齐 + 共享步骤抽出）完成，commit d5c0eb5（main，未 push/tag/bump），消费 Core @ 27ef04b（只读核验 KnowledgeRescanPresenters data 形状）。\n\nitem1 共享步骤：新文件 lib/recipe-generation/host-agent-workflows/briefing-budget.ts 抽出 stage-无关 budgetBriefingResponseData(response,{dataRoot?,projectRoot,transportName,inlineBudgetBytes,attachRef,compact?})——读 response.data→以 null 占位测 jsonByteLength→≤预算 removeTransientTransportIfPresent+inline 回填 / >预算 writeTransientTransport(transportName)+（有 compact 走回调，无 compact 走 attachRef(fullInline,ref)）。复用 #shared/transient-transport 原语；compact 阶梯作回调注入不下沉。导出 attachFullBriefingRef（generic，写 meta.fullBriefingRef，复用 output allowlist 既有键）+ BRIEFING_INLINE_BUDGET_BYTES(18KB)。\n\nitem2 cold-start 改调（行为字节等价=硬验收）：budgetColdStartResponseData 改为委托共享步骤，cold-start 专属 compactColdStartBriefing→attachFullBriefingRef(ref)→trimColdStartBriefingToBudget 整链作 compact 回调注入，顺序逐字复现（trim 逐级测量含 ref 体积，故 attachRef(ref) 必在 trim 前）；删除本地 attachFullBriefingRef 改 import（同体）；readRecord 语义等价（isRecord：object/非 array/非 null）。回归证据：HostAgentProjectContextDirectSwitch + MissionBriefingProfile 单测改后仍 passed。\n\nitem3 rescan 预算：buildRescanResponse 在所有 attach*（unifiedEvolution/trashArchive/projectSelectionMismatch）之后调 budgetBriefingResponseData(transportName='rescan-briefing', attachRef=attachFullBriefingRef, 无 compact, 18KB)。沿用 fullBriefingRef 命名→零改 core-tools/output.ts allowlist（已核 ALLOWED_CLEAN_META_KEYS:94 含该键、output-contract.ts:35 有 schema；McpCoreToolsCleanOutputContract 单测仍 passed=output-contract 不破）。rescan 无 compact→超预算只附 transient 引用、不瘦身内联（与 cold-start 逐级压缩有意不对称，本卡范围）。\n\nitem4 moduleMining 计数对称：buildRescanBriefing 加 stage 守卫（generationStage==='moduleMining' || moduleScope 非空）才调已导出 attachPlanScopeTargetCounts(briefing,{moduleScope,sourceFileFacts})，与 cold-start.ts:290 对称；deepMining 不调（moduleScope 空时本就 no-op，显式守卫使意图可测）。moduleScope/sourceFileFacts 来自 projectContext（D1，不另造来源）。deepMining 不调用。\n\nitem5 describe：mcp-tools.ts BootstrapInput.generationStage(coldStart) / RescanInput.generationStage(deepMining|moduleMining) 补 .describe()（stage 语义 + fullBriefingRef 预算行为），纯文案。\n\nitem6 recipe-map fullMapRef：按卡 NOT 做（越 rescan-only 边界，用户/Design 决）。\n\n测试：新增 BriefingBudget.test.ts（7 用例）覆盖 item1（≤预算 inline+meta.fullBriefingRef=null+无 transient；遗留 transient 幂等清理；非 record data 起算空对象）、item3（无 compact 超预算=transient+ref 不瘦身、transient 落完整 payload）、item2（有 compact 超预算=回调收真实 ref+完整 fullInline、结果被采用）、item4（attachPlanScopeTargetCounts 空 moduleScope no-op / 命中按 sourceFileFacts 补计数）。无循环依赖（rescan→cold-start→briefing-budget→transient）。零新回归。",
+  "evidenceRefs": [
+    "d5c0eb5",
+    "AlembicCore@27ef04bb009ada3875497e40fdb6c23cb0807232",
+    "lib/recipe-generation/host-agent-workflows/briefing-budget.ts",
+    "lib/recipe-generation/host-agent-workflows/cold-start.ts",
+    "lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "lib/shared/schemas/mcp-tools.ts",
+    "test/unit/BriefingBudget.test.ts",
+    "lib/runtime/mcp/core-tools/output.ts",
+    "lib/runtime/mcp/output-contract.ts"
+  ],
+  "verification": [
+    "build:check 绿（Core build used ../AlembicCore @ 27ef04b；tsc --noEmit 无错）",
+    "biome lint 5 文件 0 问题（修了 1 处 unused import）",
+    "lint:repo-boundary 通过（@escape-hatch 0/75）",
+    "lint:core-import-boundary OK（435 文件/425 @alembic/core imports，无源码路径绕过）",
+    "report:agent-extraction-boundary 全 0",
+    "targeted BriefingBudget.test.ts 7/7 通过",
+    "全量 unit baseline-diff vs 干净 b04cb0d（同 Core 27ef04b）：after=12 / baseline=12 failed 文件，新增失败=[]，flipped=[]，IDENTICAL=true",
+    "回归抽查 passed：HostAgentProjectContextDirectSwitch + MissionBriefingProfile（cold-start 行为不变）+ McpCoreToolsCleanOutputContract（output-contract 不破）+ KnowledgeRescanPlan/Intent",
+    "output allowlist 只读核验：core-tools/output.ts:94 含 'fullBriefingRef'、output-contract.ts:35 有 fullBriefingRef schema→复用零改",
+    "D3 grep：5 文件无 git_diff_checkpoints 引用"
+  ],
+  "risks": [
+    "rescan 超预算路径无 compact——仅写 transient + 附 meta.fullBriefingRef、不瘦身内联（与 cold-start 逐级压缩有意不对称）。这是本卡明定范围；若后续需 rescan 内联真正瘦身，需为 rescan 提供 compact 回调（独立 follow-up，非本卡）。",
+    "item2 cold-start 字节等价依赖“compact 回调逐字复现原顺序”：已通过代码审查（compactColdStartBriefing→attachFullBriefingRef(ref)→trim，trim 测量含 ref 体积）+ HostAgentProjectContextDirectSwitch/MissionBriefingProfile 单测不变验证；真机 cold-start 超预算压缩端到端归 Test/U7。",
+    "rescan 预算/moduleMining 接线位于私有 buildRescanResponse/buildRescanBriefing（需完整 container），本窗口单测在共享步骤层覆盖其行为（无/有 compact 两路 + attachPlanScopeTargetCounts 空/命中）；真机 rescan 响应预算归 Test/U7。",
+    "消费 Core HEAD 27ef04b（只读）；KnowledgeRescanPresenters data:{rescan,relevanceAudit,...briefing} 形状已核，与 cold-start 同构。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave3-u3__AlembicPlugin__u3",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u3__AlembicPlugin__u3.json",
+    "deliveryRunId": "run-delivery-wave3-u3__AlembicPlugin__u3",
+    "dispatchGroup": "wave3-u3",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u3__AlembicPlugin__u3.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 68,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave3-u3",
+    "targetTaskId": "u3",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave3-u3",
+    "resultId": "tr-u3",
+    "createdAt": "2026-06-26T02:22:17.406Z"
+  },
+  "createdAt": "2026-06-26T02:22:17.406Z",
+  "stateRevisionObserved": 68,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

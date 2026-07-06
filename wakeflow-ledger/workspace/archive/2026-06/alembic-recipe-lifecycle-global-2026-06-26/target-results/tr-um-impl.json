@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-um-impl",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave1-um-impl",
+  "dispatchGroup": "wave1-um-impl",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "um-impl",
+  "status": "completed",
+  "summary": "UM commit-driven 维护链实现完成（UM#1-7+LP7 全落地，2 commit 直提 main：750ef70 + 0fa2ac3）。前置 Test 真机 advance 绿基线已满足，退役解锁。UM#1/#5：FileChangeHandler #handleCreated 未覆盖新文件不再调 moduleMiningAnalyzer 种 Recipe（不写 plan/不发信号/不提案），改为 uncoveredCreated 纯计数诊断（⑤b）；删死生成码（#routeNewModuleToModuleMining/#moduleMiningAnalyzer/defaultModuleMiningAnalyzer/analyzer 选项+类型）。**Strategy B 决策（需控制器确认）**：moduleMiningRoutes report 字段保留为恒空，仅退役行为+删死码，未删字段——因外部消费方 core-tools/output.ts(工具输出 schema，本仓 CLAUDE.md 要求向后兼容)、DurableGitDiffCheckpointRouting(routing)、PluginOpportunisticEvolution(surface) 仍读它；route-complete/suggestReview 逻辑已去除对它的死引用。若控制器要求彻底删字段（含工具 schema），可作后续（涉 schema 兼容决策）。UM#2：抽 runCommitDrivenMaintenance（git-diff-checkpoint/CommitDrivenMaintenance.ts）为 createPluginGitDiffCheckpointRuntime→scanOnce→handleFileChanges→recordRouteOutcome 单一编排，两入口（knowledge-rescan/presenter）都调、各删重复序列与 shouldRoute helper；信封语义不变，presenter resident 去抖以 residentSearchEnhancementReady 复刻，rescan prepareRescanState 顺序保留（在调用点之前）。UM#3：原子改名 mainServiceCanHandleProjectScope→residentSearchEnhancementReady 跨 4 站点+接口+defer 重定义为 resident 检索增强去抖+中文注释；grep 旧名 0。UM#5：created 未覆盖→纯计数诊断。UM#7（CG-6）：双入口同 recipe+type 重复 submit 只落一条测试（忠实建模 Core ProposalRepository #hasDuplicate 按 (target_recipe_id,type,status∈pending/observing)；无 source_path 列、不改 schema）。LP7（CG-5）：git-head 零 token 命中降为 generationChangeLog+skipped，不进 pendingProposals/needsReview。Core 只读不改、不碰 vendor、不 push/tag/bump。真机 #2 after-regression 归 Test。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-generation/evolution/FileChangeHandler.ts",
+    "AlembicPlugin/lib/recipe-generation/evolution/PluginOpportunisticEvolution.ts",
+    "AlembicPlugin/lib/runtime/mcp/host/opportunistic-evolution-presenter.ts",
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "AlembicPlugin/lib/recipe-generation/evolution/git-diff-checkpoint/CommitDrivenMaintenance.ts",
+    "AlembicPlugin/test/unit/FileChangeHandler.test.ts",
+    "AlembicPlugin/test/unit/PluginOpportunisticEvolution.test.ts",
+    "AlembicPlugin/test/unit/CommitDrivenMaintenanceDedup.test.ts"
+  ],
+  "verification": [
+    "node v22.22.1; npm run build:check: green EXIT=0（消费 Core，tsc 通过）",
+    "npm run lint:repo-boundary: PASS（@escape-hatch 0/75）; npm run report:agent-extraction-boundary: filesWithBoundaryImports=0（无新增违规）; npm run lint:layer-boundary: PASS（无 L1→L2 backslip）; biome 改动文件 clean",
+    "定向 unit 全绿: FileChangeHandler.test.ts 28 passed（退役后 created→uncoveredCreated 诊断 / LP7 git-head 零命中→changeLog+skipped 均重写）; PluginOpportunisticEvolution.test.ts 7 passed; GitDiffCheckpoint.test.ts passed; CommitDrivenMaintenanceDedup.test.ts(UM#7 新) 1 passed",
+    "全量 unit (vitest.unit.config.ts, Node22): 538 suites/1599 tests; failed-set vs canonical pre-UM 12-文件基线 diff 仅多 content-patcher.test.ts 一项——经 stash 隔离证实在 checkpoint 750ef70(无 UM#2/#7)上同样失败、且该测试只 import @alembic/core/evolution(不碰本人任一改动文件)，为 U4-Core 并行 advance(Core d49fc05→dde34d4)+dist 重建引入的 ContentPatcher 行为改变，非本 um-impl 回归。隔离跨 content-patcher 解析正常(full-suite 的 'Cannot find package' 为 build:core 重建与并行 load 的瞬时竞态)。",
+    "grep 证据: 改名旧名 mainServiceCanHandleProjectScope 全仓 0; 单一编排=两入口已不含 scanOnce/handleFileChanges/recordRouteOutcome 序列(仅 CommitDrivenMaintenance.ts); moduleMiningRoutes 仅剩 surface/output/routing 兼容读取(恒空)",
+    "commits: 750ef70(6 files +81/-254 UM#1/#3/#5/LP7) + 0fa2ac3(4 files +226/-124 UM#2/#7); baseline 799ceac→HEAD 0fa2ac3; 工作树 clean"
+  ],
+  "risks": [
+    "Strategy B 决策(需控制器确认): moduleMiningRoutes report 字段保留恒空(退役行为+删死码但不删字段)，因它仍被 core-tools/output.ts(工具输出 schema)/DurableGitDiffCheckpointRouting/surface 读取，且本仓 CLAUDE.md 要求工具返回结构向后兼容。若要彻底从 schema 删除，需一个带兼容决策的后续（跨 output schema 与下游消费方）。",
+    "content-patcher.test.ts 失败=Core 漂移(U4-Core dde34d4)引入、非本人回归(stash 隔离+import 分析双证)。建议路由控制器/U4-Core 看 ContentPatcher markdown fallback 行为变化；与 UM 无关。",
+    "真机 #2 after-regression(重跑 advance 仍绿/退役不误伤/删除重命名维护)归 Test，不在本窗口（本仓 CLAUDE.md 禁冒充用户项目跑真机）。本次产出代码+本地门禁/unit 绿+退役不误伤的 unit 证据。",
+    "N1(承自 Test baseline, out-of-scope): commit-driven trigger tools 在 attach data.unifiedEvolution 时对 MCP client 返 isError:true('Unrecognized key: data' output-schema)，但维护仍执行+落库。为可能的 host-facing 契约问题或 minimal-client artifact，需 Plugin/Design 另论；不在 um-impl 范围、本次未动。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave1-um-impl__AlembicPlugin__um-impl",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-impl__AlembicPlugin__um-impl.json",
+    "deliveryRunId": "run-delivery-wave1-um-impl__AlembicPlugin__um-impl",
+    "dispatchGroup": "wave1-um-impl",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-impl__AlembicPlugin__um-impl.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 14,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave1-um-impl",
+    "targetTaskId": "um-impl",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave1-um-impl",
+    "resultId": "tr-um-impl",
+    "createdAt": "2026-06-25T21:24:15.057Z"
+  },
+  "createdAt": "2026-06-25T21:24:15.057Z",
+  "stateRevisionObserved": 14,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

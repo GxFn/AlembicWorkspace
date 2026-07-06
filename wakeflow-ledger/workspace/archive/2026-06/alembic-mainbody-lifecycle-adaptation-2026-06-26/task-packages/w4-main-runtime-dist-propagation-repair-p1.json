@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "w4-main-runtime-dist-propagation-repair-p1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "summary": "Repair W4 runtime gap found by Test after-main-repair rerun: Alembic source changes from be39ab5 are not present in dist/runtime, causing public rescan generation controls to be stripped, ProjectContext module fallback to remain unavailable, and StagingManager lifecycle wiring to be missing at runtime. Fix Alembic live source plus dist/runtime propagation and prove with targeted tests before Test reruns W4.",
+  "status": "pending",
+  "sourceRef": "Test result tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1; Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/http-public-route-probe.json; Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/w4-after-main-repair-e2e-summary.json; Alembic source/dist comparison for jobs route, ProjectContextWorkflowFacts, KnowledgeModule.",
+  "createdAt": "2026-06-27T05:14:28.512Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "w4-main-runtime-dist-propagation-repair-t1",
+      "taskPackageId": "w4-main-runtime-dist-propagation-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "You are Alembic, the owning product repository window. Read parent AGENTS.md/CLAUDE.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, this task package, Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §2 CD-6 + §4b C-F + §5 W4, and Alembic/CLAUDE.md. Declare Alembic repository identity and execute only this repair. Do not push, tag, release, or change non-Alembic repositories. Node must be >=22. Controller evidence: Test rerun at Alembic be39ab5 blocked because runtime dist did not include prior source repair. HTTP POST /api/v1/jobs/rescan sent generationStage=deepMining, miningMode=deepMining, maxRounds=2, minNewRecipes=1, scaleCap=3, maxFiles=5, contentMaxLines=20, but accepted job.request retained only reason/dimensions/maxFiles/contentMaxLines. Controller verified Alembic/lib/http/routes/jobs.ts has widened RescanJobBody, while Alembic/dist/lib/http/routes/jobs.js still has the old schema. Controller also verified Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts has buildProjectMapModulesFromTargets/target fallback while dist lacks it, and Alembic/lib/injection/modules/KnowledgeModule.ts injects lifecycle into StagingManager while dist lacks the runtime lifecycle wiring. Required repair: (1) make the public jobs route runtime preserve all W4 rescan controls end to end in accepted job.request: generationStage, miningMode, maxRounds, minNewRecipes, scaleCap, moduleScope, perDimensionTargets, moduleDimensionTargets, roundIndex, without weakening validation; (2) make the actual runtime used by daemon/Test include ProjectContext target-module fallback so real BiliDili ProjectContext exposes non-empty projectMapModules/moduleCount when targets exist; (3) make actual runtime StagingManager receive lifecycleStateMachine and record lifecycle_transition_events for eligible staging promotion; (4) ensure dist/runtime artifacts are regenerated/committed or otherwise made consistent with source. Source-only fixes are not sufficient. Required verification before backfill: git diff review; targeted unit/integration tests for route request preservation, ProjectContext target-module fallback, and StagingManager lifecycle wiring; npm run build or the repo's equivalent dist generation plus npm run build:check, npm run typecheck, npm run lint:core-import-boundary, npm run lint:repo-boundary, git diff --check. Include grep/source evidence that dist now contains the widened RescanJobBody fields, buildProjectMapModulesFromTargets path, and StagingManager lifecycle injection. If deepMining still records 0 rounds/coverage or moduleMining still has moduleCount=0 after source+dist consistency, diagnose and fix in Alembic within W4 C-F scope rather than handing back to Test. Backfill commit hash, files changed, exact command outputs, and remaining risks.",
+      "status": "pending",
+      "createdAt": "2026-06-27T05:14:28.512Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

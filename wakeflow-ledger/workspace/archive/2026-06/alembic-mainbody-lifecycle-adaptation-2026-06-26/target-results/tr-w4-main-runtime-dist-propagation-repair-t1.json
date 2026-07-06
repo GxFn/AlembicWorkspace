@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w4-main-runtime-dist-propagation-repair-t1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w4-main-runtime-dist-propagation-repair-p1",
+  "dispatchGroup": "w4-main-runtime-dist-propagation-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "w4-main-runtime-dist-propagation-repair-t1",
+  "status": "completed",
+  "summary": "Alembic runtime dist propagation repair completed in the shared Alembic workspace. The prior source repair is already committed at Alembic HEAD/origin-main be39ab5aeb0d15294ea7960d30e8a9cc17f38989; this task found the live failure was ignored local dist/ being stale. Ran npm run build, which rebuilt dist from source and local AlembicCore. Verified dist/lib/http/routes/jobs.js now contains widened RescanJobBody fields and keeps validation, dist/lib/workflows/project-context/ProjectContextWorkflowFacts.js now contains buildProjectMapModulesFromTargets fallback, and dist/lib/injection/modules/KnowledgeModule.js now injects lifecycle into StagingManager. No new tracked Alembic commit was created because dist/ is intentionally ignored by .gitignore and git ls-files confirms no tracked dist files; forcing only selected dist files would create an incomplete runtime artifact, while forcing all dist would violate the repo's established build-output boundary. Test rerun in this shared workspace should now use the regenerated dist runtime; clean checkout/CI remains build-first as .github workflows already run npm run build.",
+  "evidenceRefs": [
+    "Alembic commit be39ab5aeb0d15294ea7960d30e8a9cc17f38989",
+    "Alembic/dist/lib/http/routes/jobs.js",
+    "Alembic/dist/lib/workflows/project-context/ProjectContextWorkflowFacts.js",
+    "Alembic/dist/lib/injection/modules/KnowledgeModule.js",
+    "Alembic/.gitignore: dist/ ignored",
+    "Alembic/package.json: build script regenerates dist",
+    "Alembic/.github/workflows/ci.yml: CI runs npm run build before checks"
+  ],
+  "verification": [
+    "node -v: v22.22.1",
+    "npm run build: passed; build:core used local ../AlembicCore, clean:dist, tsc, postbuild",
+    "npm run test:unit -- test/unit/JobsRoute.test.ts test/unit/ProjectContextWorkflowFacts.test.ts test/unit/KnowledgeModuleEvolutionWiring.test.ts: 3 files passed, 26 tests passed",
+    "npm run build:check: passed",
+    "npm run typecheck: passed",
+    "npm run lint:core-import-boundary: passed; scanned 365 files and 418 @alembic/core imports",
+    "npm run lint:repo-boundary: passed; escape-hatch count 1/75",
+    "git diff --check: passed",
+    "dist runtime parser probe via node import('./dist/lib/http/routes/jobs.js').parseRescanJobBody: preserved generationStage/miningMode/maxRounds/minNewRecipes/scaleCap/moduleScope/perDimensionTargets/moduleDimensionTargets/roundIndex and rejected mismatched generationStage/miningMode",
+    "rg dist/lib/http/routes/jobs.js: generationStage, maxRounds, minNewRecipes, scaleCap, miningMode, moduleScope, perDimensionTargets, moduleDimensionTargets, roundIndex present",
+    "rg dist/lib/workflows/project-context/ProjectContextWorkflowFacts.js: buildProjectMapModulesFromTargets and projectMapModules.push fallback present",
+    "sed dist/lib/injection/modules/KnowledgeModule.js: StagingManager constructed with lifecycle: ct.services.lifecycleStateMachine ? ct.get('lifecycleStateMachine') : undefined",
+    "git status --branch --short: ## main...origin/main with no tracked changes; git status --ignored showed !! dist/"
+  ],
+  "risks": [
+    "No new tracked commit was created for this target because the required repair was regeneration of ignored dist/ artifacts from already-committed source be39ab5. The regenerated dist exists in this shared workspace for the next Test rerun, but any fresh checkout must run npm run build before invoking dist/bin/cli.js.",
+    "alembic_code_guard failed with plugin internal schema error: unrecognized key \"data\"; no guard findings were produced.",
+    "This target did not rerun the full Test-owned BiliDili W4 e2e, to avoid a non-Test window creating or mutating Test delivery evidence; controller/Test should rerun after this runtime dist refresh."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w4-main-runtime-dist-propagation-repair-p1__Alembic__w4-main-runtime-dist-propagation-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-main-runtime-dist-propagation-repair-p1__Alembic__w4-main-runtime-dist-propagation-repair-t1.json",
+    "deliveryRunId": "run-delivery-w4-main-runtime-dist-propagation-repair-p1__Alembic__w4-main-runtime-dist-propagation-repair-t1",
+    "dispatchGroup": "w4-main-runtime-dist-propagation-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-main-runtime-dist-propagation-repair-p1__Alembic__w4-main-runtime-dist-propagation-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 47,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w4-main-runtime-dist-propagation-repair-p1",
+    "targetTaskId": "w4-main-runtime-dist-propagation-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "w4-main-runtime-dist-propagation-repair-p1",
+    "resultId": "tr-w4-main-runtime-dist-propagation-repair-t1",
+    "createdAt": "2026-06-27T05:25:23.934Z"
+  },
+  "createdAt": "2026-06-27T05:25:23.934Z",
+  "stateRevisionObserved": 47,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

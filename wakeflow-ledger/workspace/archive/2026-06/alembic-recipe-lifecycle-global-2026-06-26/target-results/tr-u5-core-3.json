@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u5-core-3",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave3-u5-core-3",
+  "dispatchGroup": "wave3-u5-core-3",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "u5-core-3",
+  "status": "completed",
+  "summary": "u5-core-3 完成：embedding 全激活（U5 #6/#7 收尾，让 recipe id 流通到 3 站点），全 Core additive，commit 27ef04b。\n\n缘起=u5-plugin-2 把 provider 接进 3 服务 ctor，但 embedding 仅在 RedundancyAnalyzer 直传带 id recipe 时 LIVE；ProposalExecutor #toRecipeLike 与 ConsolidationAdvisor hand-built candidateLike 返回对象无 id → provider 运行时按 id 查预计算向量取不到 → 恒 undefined→Jaccard（dormant）。本卡让这 2 处传带 id 对象激活。\n\n- t0 RecipeLike：加可选 id?: string（provider 据此查向量，不参与 Jaccard 计算本身；additive）。\n- t1 ProposalExecutor：#toRecipeLike 入参类型加 id?，返回对象加 id: e.id（supersede 两侧 superseded/cand 均 findById 实体、运行时带 id → supersededLike/candLike 均带 id → 激活）。\n- t2 ConsolidationAdvisor：**复核发现 CandidateForConsolidation 无 id/recipeId 字段**（新候选未持久化）→ 加可选 id?: string（additive），candidateLike 串 candidate.id；recipeLike 经 cast 自带 RecipeSummary.id（RecipeLike.id? 后可见）。带 id 候选（再合并/已持久化）→ provider 可查向量激活；全新无 id 候选 → provider 回退 Jaccard（不发起 on-the-fly embed）。\n\n仅让 id 流通，不改相似度算法/compute 第3参语义/不发起 embed；provider 在 Plugin 侧未碰。barrel 0 新增、RedundancyAnalyzer:131 live 路径未碰。本卡 landed → U5 embedding 全 3 站点 wiring 激活，真机生效验证→U7。",
+  "evidenceRefs": [
+    "AlembicCore/src/domain/evolution/RecipeSimilarity.ts",
+    "AlembicCore/src/service/evolution/ProposalExecutor.ts",
+    "AlembicCore/src/service/evolution/ConsolidationAdvisor.ts",
+    "AlembicCore/test/unit/EmbeddingSimIdFlow.test.ts"
+  ],
+  "verification": [
+    "commit 27ef04b（main，4 files，无 push/tag/bump，禁碰 vendor，无 dist 跟踪）",
+    "npm run build:check → tsc --noEmit 0 error",
+    "npm run test → 138 files / 1379 tests passed（基线 137/1377；+1 file +2 test；evolution 6 file/64 test 零回归）",
+    "npm run lint → biome Checked 630 files, no fixes, 0 warning/error（格式自修后）",
+    "npm run build → clean-dist + tsc 重生 dist",
+    "git diff --check → clean",
+    "① id 流通[unit]：EmbeddingSimIdFlow.test.ts '① id 流通' passed —— 按 id 返值 stub provider + 带 id candidate(cand-1)/sessionRecipe(r-1) → seen 含{aId:cand-1,bId:r-1}（证 id 流通、provider 不再恒 undefined），resWith.similarity > resWithout（max(Jaccard,0.9) 抬升）",
+    "② 无 id 回退[unit]：'② 无 id 回退' passed —— candidate 无 id → provider 收 aId=undefined → 返 undefined → 纯 Jaccard，resNoId.similarity === resPlain（与无 provider 逐值一致）",
+    "③ additive[grep/build]：RecipeLike.id?:string(:88) / #toRecipeLike id?+id:e.id(ProposalExecutor:615/625) / CandidateForConsolidation.id?+candidateLike id:candidate.id(ConsolidationAdvisor:35/576)；barrel(src/index.ts/evolution.ts/domain.ts) a96c4ee..HEAD 零新增；build:check GREEN",
+    "④ RedundancyAnalyzer 不回归：git diff a96c4ee..HEAD -- RedundancyAnalyzer.ts 空（:131 live 路径未改，u5-core-2 conduit 单测继续覆盖）"
+  ],
+  "risks": [
+    "边界发现：CandidateForConsolidation 原无 id/recipeId 字段（任务包 t2 假设有、标「复核实际字段名」）——新提交候选未持久化本无 recipe id。解法：加可选 id?（additive），带 id 时（再合并/已持久化）provider 可查向量激活，全新无 id 候选 → Jaccard（符「不发起 on-the-fly embed」）。",
+    "ProposalExecutor t1 站点（#toRecipeLike→#selectMostSimilarReplacement:563）为深私有，仅整条 supersede 执行可达；id 流通由 grep(id:e.id) + build:check + 共享 EmbeddingSimProvider/RecipeLike.id 机制（经 ConsolidationAdvisor analyze 单测证）保证，沿用 U5 #6 supersede grep 验证先例。",
+    "真机 embedding>Jaccard 端到端 gated on U7（需 Plugin provider 实接 RecipeRegionVectorIndex 预计算向量 + 各站点运行时带 id）；Core 仅完成 wiring 层 id 流通，缺省/无 id 字节级回退 Jaccard。",
+    "与 u6-core/u5-core-2 不冲突（只碰 evolution 相似度类型/服务）；不改状态机/排序/持久化/exports。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave3-u5-core-3__AlembicCore__u5-core-3",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u5-core-3__AlembicCore__u5-core-3.json",
+    "deliveryRunId": "run-delivery-wave3-u5-core-3__AlembicCore__u5-core-3",
+    "dispatchGroup": "wave3-u5-core-3",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u5-core-3__AlembicCore__u5-core-3.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 64,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave3-u5-core-3",
+    "targetTaskId": "u5-core-3",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "wave3-u5-core-3",
+    "resultId": "tr-u5-core-3",
+    "createdAt": "2026-06-26T01:52:42.057Z"
+  },
+  "createdAt": "2026-06-26T01:52:42.057Z",
+  "stateRevisionObserved": 64,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

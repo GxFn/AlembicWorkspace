@@ -1,0 +1,764 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "title": "主体适配 A-F 已实现+push 且控制器已归档 completed，但属 post-archive 假完成(归档 progress 零真机/零 finding#1)。真实剩余两段：Phase FIX 致命覆盖回写(deepMining runDeepMiningRounds:1020 只 ensureCoverageLedgerCells 播种 cell empty + 内联 upsertRound:1101 写轮，recipe 后从不回写 cell→cell 恒 empty/coveredCount0→CoverageLedgerAdvisor converged 分支死代码→覆盖永不前进；修=hook 进 KnowledgeRescanWorkflow per-dim 生成处镜像 Plugin dimension-completion:646，只补 per-CELL 回写、不调 reflow 避双计)+ Phase VERIFY 真 BiliDili 端到端(步3 GATE 修前证伪恒empty/修后grade晋级可达converged)。CG 全决：CG-3=B 下沉 Core(coverage-ledger-write 两函数移 @alembic/core 主体+Plugin 共消费、顺带分层重构下沉)/CG-1=沙箱(.backup() 护真~/.asd)/CG-2=Ollama 接通。门禁不放松(只回写真实 anti-fab recipe)。控制器 intake 须在归档 mainbody 记录挂 finding#1 残留注记，勿当已真实达成。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "state": "archived",
+  "stateReason": "Archive user-directed administrative completion for alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26; latest Test blocker retained as terminal evidence, no further dispatch authorized under this demand.",
+  "revision": 94,
+  "activeStageId": null,
+  "updatedAt": "2026-06-27T20:04:21.789Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "fix-core-coverage-ledger-write-downshift-p1",
+      "summary": "Phase FIX producer: move Plugin host-neutral coverage-ledger-write helpers into Core host-agent-workflows and export them without behavior change.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26.md#3.6",
+      "createdAt": "2026-06-27T12:55:58.625Z"
+    },
+    {
+      "taskPackageId": "fix-plugin-coverage-ledger-core-reimport-p1",
+      "summary": "Phase FIX consumer: rewire Plugin coverage-ledger write helper to Core host-agent-workflows after Core producer commit c4cac6b, proving zero behavior regression.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26.md §3.6 item 2; Core accepted evidence commit c4cac6b",
+      "createdAt": "2026-06-27T13:10:03.408Z"
+    },
+    {
+      "taskPackageId": "fix-main-knowledge-rescan-coverage-ledger-write-p1",
+      "summary": "Phase FIX mainbody hook: write coverage_ledger cells from KnowledgeRescanWorkflow per-dimension generation using Core host-agent-workflows helper, without changing round accounting.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26.md §3.4 and §3.6 item 3; Core accepted evidence commit c4cac6b",
+      "createdAt": "2026-06-27T13:10:15.804Z"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-p1",
+      "summary": "Phase VERIFY: BiliDili sandbox true-run for mainbody lifecycle realverify follow-up after Phase FIX accepted. Prove finding#1 coverage_ledger writeback on real DB and complete the seven-step validation chain.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26.md §6 Phase VERIFY and §7 true BiliDili execution guidance; accepted FIX evidence refs in state root",
+      "createdAt": "2026-06-27T13:38:47.284Z"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-direct-p1",
+      "summary": "Phase VERIFY retry with user-authorized direct BiliDili test-project boundary. The prior sandbox .backup() blocker is superseded for verification only: BiliDili is the test project, so Test must run the true mainbody lifecycle realverify chain directly against the BiliDili project/data root and collect fresh DB/runtime evidence.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26.md §6-§7 plus user authorization evidence/user-authorized-direct-bilidili-realverify-2026-06-27.md",
+      "createdAt": "2026-06-27T14:10:37.137Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "fix-agent-planselection-runtime-modelref-p1",
+      "summary": "Fix direct BiliDili cold-start blocker in AlembicAgent plan-selection/model-ref path before retesting mainbody lifecycle realverify.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-direct-controller-review.md",
+      "createdAt": "2026-06-27T14:32:52.716Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+      "summary": "Rerun direct BiliDili mainbody lifecycle real verification after AlembicAgent plan-selection/model-ref repair.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-agent-planselection-runtime-modelref-controller-acceptance.md",
+      "createdAt": "2026-06-27T14:44:32.286Z"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-deepseek-config-p1",
+      "summary": "Rerun the direct BiliDili mainbody lifecycle real verification after correcting the AI provider split: use DeepSeek for generation/planning; use Ollama only for Qwen embedding/vector semantics. The prior after-agent-planfix Test run is invalid for product-code judgment because it used Ollama/gemma3 as the generation provider and failed before coldStart completed.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-agent-planfix-controller-review.md",
+      "createdAt": "2026-06-27T14:58:58.851Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-p1",
+      "summary": "Re-run the direct BiliDili mainbody lifecycle real verification after the operator confirmed DeepSeek is now configured. Treat the previous deepseek-config run as historical invalid-environment evidence because it hit DeepSeek API 401 before a valid LLM response; do not use that run for product-code judgment. This package consumes the already accepted FIX phase and verifies the intended loop against the direct BiliDili test project.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26.md",
+      "createdAt": "2026-06-27T15:12:14.184Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "fix-core-deepmining-planselection-modulebindings-contract-p1",
+      "summary": "Repair the Core PlanSelection contract gap exposed by direct BiliDili verification: deepMining failed before coverage-ledger rounds because a shape-valid PlanSelection with empty moduleBindings reached the mainbody executor. Add/strengthen stage-aware validation/export(s) in @alembic/core/plans so deepMining/moduleMining confirmed selections cannot pass without valid moduleBindings that produce module×dimension targets, while preserving coldStart semantics required by the current design. Update focused Core tests around PlanSelection projection/validation. Do not relax anti-fabrication, quality floors, or Plan stateless-precondition semantics.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-controller-review.md",
+      "createdAt": "2026-06-27T15:37:12.745Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "fix-agent-deepmining-planselection-modulebindings-p1",
+      "summary": "Repair AlembicAgent plan-selection producer after Core stage-aware PlanSelection contract landed at AlembicCore 934d043. Direct BiliDili verification proved DeepSeek/coldStart works, then deepMining failed because the plan agent returned no moduleBindings/module×dimension targets. Update the plan-selection profile/prompt/parser/tests so deepMining and moduleMining outputs must include real moduleBindings derived from ProjectContext facts; remove/replace examples and tests that accept or encourage moduleBindings: []. Do not introduce tools, persistence, global state, or guessing outside provided ProjectContext facts.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-core-deepmining-planselection-modulebindings-contract-controller-review.md",
+      "createdAt": "2026-06-27T15:47:23.015Z"
+    },
+    {
+      "taskPackageId": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+      "summary": "Mainbody consumer gate repair for direct BiliDili realverify: enforce Core stage-aware PlanSelection requirements at Alembic daemon plan gate before deepMining/moduleMining can report plan-gate success or enter rescan/moduleMining execution.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-controller-review.md + accepted Core commit 934d043a0d12ac364aa582d6c39445f14a0af2e1 + accepted Agent commit afe4c2b48ece5475f9fbfdcdd1ac974ad61fedcf",
+      "createdAt": "2026-06-27T16:02:53.115Z"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+      "summary": "Direct BiliDili realverify after Core/Agent/Alembic moduleBindings plan-selection contract repairs. Prove the mainbody lifecycle follow-up completion gates against the real BiliDili project with DeepSeek generation/planning and Ollama/Qwen embeddings.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-main-deepmining-planselection-modulebindings-gate-controller-review.md + accepted Core commit 934d043a0d12ac364aa582d6c39445f14a0af2e1 + accepted Agent commit afe4c2b48ece5475f9fbfdcdd1ac974ad61fedcf + accepted Alembic commit 9f01a965b41fa2130a6eb605fa11cf19a6c52649",
+      "createdAt": "2026-06-27T16:13:46.040Z"
+    },
+    {
+      "taskPackageId": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+      "summary": "Repair the direct BiliDili coldStart -> deepMining blocker: completed coldStart leaves an active Core bootstrap workflow session lease, so subsequent rescan/deepMining fails with BootstrapSessionLeaseError before the verification chain can continue.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-controller-review.md",
+      "createdAt": "2026-06-27T16:34:32.724Z"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-p1",
+      "summary": "Rerun direct BiliDili mainbody lifecycle realverify after the Alembic session lifecycle repair. Prove fresh coldStart can be followed by deepMining without the previous active bootstrap-session lease blocker, then continue the real chain as far as it proceeds.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-main-bootstrap-session-lifecycle-after-coldstart-controller-review.md; Alembic commit e88cc82f9f35b952db89aa4d04ebf84cdb2afb95; previous Test evidence verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-controller-review.md",
+      "createdAt": "2026-06-27T16:50:50.422Z"
+    },
+    {
+      "taskPackageId": "fix-main-deepmining-real-coverage-production-p1",
+      "summary": "Repair the mainbody deepMining real-coverage production gap exposed by direct BiliDili verification: deepMining no longer hits the session lease blocker, but it produced zero recipes and left every coverage ledger cell empty/covered_count=0, so the original finding#1 gate remains unmet.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-controller-review.md; Test/tmp/verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1/evidence/job-events-deepmining-after-session-lifecycle-fix.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1/evidence/after-deepmining-after-session-lifecycle-fix-db-snapshot.json",
+      "createdAt": "2026-06-27T17:19:42.399Z"
+    },
+    {
+      "taskPackageId": "fix-agent-modulemining-child-profile-context-p1",
+      "summary": "Repair AlembicAgent moduleMining child profile/context failure exposed by direct BiliDili verification: moduleMining plan gate succeeded, then ModuleMiningAgentRun failed with undefined `.name` while consuming canonical moduleName payloads from Alembic mainbody.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-controller-review.md; Test/tmp/verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1/evidence/job-modulemining-after-session-lifecycle-fix.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1/evidence/modulemining-after-session-lifecycle-fix-job-run.json",
+      "createdAt": "2026-06-27T17:19:58.779Z"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-p1",
+      "summary": "Re-run direct BiliDili mainbody lifecycle real verification after accepting the Alembic deepMining real coverage production repair and AlembicAgent moduleMining child profile/context repair. This is still Phase VERIFY for the active demand; do not archive or broaden scope.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-main-deepmining-real-coverage-production-controller-review.md; .wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-agent-modulemining-child-profile-context-controller-review.md; .wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/user-authorized-direct-bilidili-realverify-2026-06-27.md; .wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-controller-review.md",
+      "createdAt": "2026-06-27T17:55:30.101Z"
+    },
+    {
+      "taskPackageId": "fix-main-source-ref-backed-coverage-cells-p1",
+      "summary": "Repair the remaining finding#1 gate after direct BiliDili Test proved deepMining now produces real recipes/source refs but coverage_ledger still records zero covered cells: coverage writes must be driven by accepted persisted recipe source refs, not only coarse dimension result referencedFiles.",
+      "status": "accepted",
+      "sourceRef": "evidence/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-controller-review.md; target-results/tr-verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1/evidence/deepmining-coverage-sql-summary.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1/evidence/deepmining-db-delta-summary.json; Design/docs/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26.md §3/§6/§7",
+      "createdAt": "2026-06-27T18:20:33.488Z"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-p1",
+      "summary": "Rerun direct BiliDili mainbody realverify after Alembic commit 1f141c8 repaired coverage writes from accepted persisted source refs. This is the next Phase VERIFY gate for finding#1 and the remaining direct end-to-end checks.",
+      "status": "accepted",
+      "sourceRef": "Alembic commit 1f141c847c4140233f9c9796e97db2579949c60a; .wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-main-source-ref-backed-coverage-cells-controller-review.md; .wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-main-source-ref-backed-coverage-cells-t1.md; Test/tmp/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1/evidence/deepmining-coverage-sql-summary.json",
+      "createdAt": "2026-06-27T18:32:51.004Z"
+    },
+    {
+      "taskPackageId": "fix-main-modulemining-result-accounting-p1",
+      "summary": "Repair Alembic mainbody moduleMining result accounting after direct BiliDili verification proved deepMining coverage now passes but moduleMining fails with `moduleMining produced zero recipes` despite persisted accepted output.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-controller-review.md; .wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/target-results/tr-verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1/evidence/source-ref-coverage-fix-realverify-summary.md; Test/tmp/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1/evidence/modulemining-after-source-ref-coverage-fix-job-run.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1/evidence/job-modulemining-after-source-ref-coverage-fix.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1/evidence/modulemining-db-delta-summary.json",
+      "createdAt": "2026-06-27T19:15:50.830Z"
+    },
+    {
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1",
+      "summary": "Rerun direct BiliDili mainbody lifecycle real verification after Alembic commit 47889f9 repaired moduleMining false-zero result accounting; prove moduleMining no longer fails and continue evolution/maintenance plus anti-fabrication probes.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-main-modulemining-result-accounting-controller-review.md; .wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/fix-main-modulemining-result-accounting-t1.md; Alembic/lib/daemon/DaemonJobRunner.ts; Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts; Test/tmp/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1/evidence/source-ref-coverage-fix-realverify-summary.md; Test/tmp/verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1/evidence/modulemining-db-delta-summary.json",
+      "createdAt": "2026-06-27T19:31:36.322Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "fix-core-coverage-ledger-write-downshift-t1",
+      "taskPackageId": "fix-core-coverage-ledger-write-downshift-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, the current state root, and AlembicCore AGENTS/CLAUDE rules. Declare AlembicCore identity. Implement CG-3 Option B producer only: add writeCoverageLedgerForCompletion and reflowDeepMiningRoundOnCompletion under @alembic/core/host-agent-workflows, preserving the existing Plugin helper behavior and types; export via the Core barrel. Do not change coverage semantics, anti-fabrication gates, adviseCoverageLedger, ensureCoverageLedgerCells, or round counting. Add/adjust targeted Core tests proving empty cell plus real source-ref-backed candidate can be written to partial/covered and adviseCoverageLedger can return converged when all cells are covered. Run Node>=22 build:check and targeted tests. Commit locally on main, no push. Backfill commit hash, files changed, commands, and raw evidence refs.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T12:55:58.625Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-core-coverage-ledger-write-downshift-p1__AlembicCore__fix-core-coverage-ledger-write-downshift-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-core-coverage-ledger-write-downshift-p1__AlembicCore__fix-core-coverage-ledger-write-downshift-t1.json",
+        "deliveryRunId": "run-delivery-fix-core-coverage-ledger-write-downshift-p1__AlembicCore__fix-core-coverage-ledger-write-downshift-t1",
+        "dispatchGroup": "fix-core-coverage-ledger-write-downshift-p1",
+        "sentAt": "2026-06-27T12:57:09.013Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-core-coverage-ledger-write-downshift-t1-controller-reviewed"
+    },
+    {
+      "targetTaskId": "fix-plugin-coverage-ledger-core-reimport-t1",
+      "taskPackageId": "fix-plugin-coverage-ledger-core-reimport-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read parent AGENTS.md, the current state root, and AlembicPlugin CLAUDE/AGENTS rules. Declare AlembicPlugin identity. Consume accepted Core commit c4cac6b: change AlembicPlugin lib/recipe-generation/host-agent-workflows/coverage-ledger-write.ts to re-export/import writeCoverageLedgerForCompletion and reflowDeepMiningRoundOnCompletion from @alembic/core/host-agent-workflows, or update direct consumers equivalently, with zero behavior change. Do not alter dimension-completion semantics, anti-fabrication gates, coverage scoring, generated recipe quality floor, plan gate, or B4/PD-7 scope. Remove duplicated Plugin helper logic only after import scan confirms consumers use the Core entrypoint. Run Node>=22 build:check and targeted Plugin coverage/dimension-completion tests plus relevant consumer import/boundary checks. Commit locally on main, no push. Backfill commit hash, changed files, commands, raw evidence refs, and any known pre-existing baseline failures separately from this change.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T13:10:03.408Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-plugin-coverage-ledger-core-reimport-p1__AlembicPlugin__fix-plugin-coverage-ledger-core-reimport-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-plugin-coverage-ledger-core-reimport-p1__AlembicPlugin__fix-plugin-coverage-ledger-core-reimport-t1.json",
+        "deliveryRunId": "run-delivery-fix-plugin-coverage-ledger-core-reimport-p1__AlembicPlugin__fix-plugin-coverage-ledger-core-reimport-t1",
+        "dispatchGroup": "fix-plugin-coverage-ledger-core-reimport-p1",
+        "sentAt": "2026-06-27T13:12:18.068Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-plugin-coverage-ledger-core-reimport-t1-controller-reviewed"
+    },
+    {
+      "targetTaskId": "fix-main-knowledge-rescan-coverage-ledger-write-t1",
+      "taskPackageId": "fix-main-knowledge-rescan-coverage-ledger-write-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, the current state root, and Alembic CLAUDE/AGENTS rules. Declare Alembic mainbody repository identity. Consume accepted Core commit c4cac6b and implement only finding#1: in Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts, hook per-dimension recipe generation/projection (mirror Plugin dimension-completion.ts:646-716) to call @alembic/core/host-agent-workflows writeCoverageLedgerForCompletion with real modules, dimensionIds, coveredPaths/sourceRefs, candidates, perCellTarget, projectRoot, and the existing coverage repository. Only write cells for real anti-fabrication-accepted persisted recipes/source refs. Do not call reflowDeepMiningRoundOnCompletion; keep existing runDeepMiningRounds upsertRound/newRecipesThisRound path to avoid double-counting. Do not alter ensureCoverageLedgerCells, adviseCoverageLedger, plan gates, A-F completed behavior, B4/PD-7, U2-a, or recipe quality floors. Add/adjust targeted tests proving seeded empty cell plus accepted source-ref-backed recipe advances grade/coveredCount and all cells can converge, while rejected/not-persisted recipe output does not increase coverage. Run Node>=22 build:check and targeted workflow/coverage tests. Commit locally on main, no push. Backfill commit hash, changed files, commands, raw DB/test evidence refs, and any known baseline failures separately.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T13:10:15.804Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-main-knowledge-rescan-coverage-ledger-write-p1__Alembic__fix-main-knowledge-rescan-coverage-ledger-write-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-knowledge-rescan-coverage-ledger-write-p1__Alembic__fix-main-knowledge-rescan-coverage-ledger-write-t1.json",
+        "deliveryRunId": "run-delivery-fix-main-knowledge-rescan-coverage-ledger-write-p1__Alembic__fix-main-knowledge-rescan-coverage-ledger-write-t1",
+        "dispatchGroup": "fix-main-knowledge-rescan-coverage-ledger-write-p1",
+        "sentAt": "2026-06-27T13:12:26.022Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-main-knowledge-rescan-coverage-ledger-write-t1-controller-reviewed"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-p1",
+      "targetWindow": "Test",
+      "summary": "Read Test AGENTS.md/CLAUDE.md, parent AGENTS.md, current state root, and Test skills including skills/alembic-real-routes/SKILL.md. Declare Test window identity. Use CG-1 sandbox: clone/copy BiliDili source at the requested test commit or current main if the design's commit is unavailable, make a better-sqlite3 .backup() of the real workspace DB into an ALEMBIC_HOME sandbox, rewrite only sandbox project_root paths, and do not touch true ~/.asd or the true BiliDili checkout. Use local Ollama per CG-2. Run the Phase VERIFY chain from the requirement design: preparation baseline, coldStart hard gate, deepMining multi-round, finding#1 gate, moduleMining, evolution sweep, and anti-fabrication rejection. The core gate is direct SQL on the sandbox true DB after the FIX: coverage_ledger must show grade partial/covered and covered_count > 0; stopReason/converged must be reachable when cells are covered. Also verify deep_mining_rounds have nonempty unique rescan_id rows with new_recipes trend evidence, moduleMining increases knowledge_entries, evolution sweep executes/promotes and active dead recipe moves toward decaying, and intentionally bad recipe input is rejected without increasing coverage. Backfill raw SQL outputs, command logs, sandbox paths, repository commit heads, runtime JSON/log paths, cleanliness, residual risks, and clear pass/block/rework recommendation. Do not edit product code, do not push, do not use read-only faithful replica as completion evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T13:38:47.284Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-p1__Test__verify-test-bilidili-mainbody-realverify-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-p1__Test__verify-test-bilidili-mainbody-realverify-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-p1__Test__verify-test-bilidili-mainbody-realverify-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-p1",
+        "sentAt": "2026-06-27T13:39:49.359Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-t1"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-direct-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-direct-p1",
+      "targetWindow": "Test",
+      "summary": "Read Test AGENTS.md/CLAUDE.md, parent AGENTS.md, current state root, requirement design, accepted FIX evidence, blocked Test evidence, and evidence/user-authorized-direct-bilidili-realverify-2026-06-27.md. Declare Test identity. User has authorized replacing the failed CG-1 .backup() sandbox precondition with direct BiliDili test-project execution: use /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili and its Alembic project data root directly. You may clean old BiliDili Alembic test/generated data as needed for a fresh true-run, but do not edit BiliDili source code, do not push, do not relax anti-fabrication or quality gates, and do not count pre-existing baseline rows as proof. Use local Ollama. Run the Phase VERIFY chain: preparation/baseline, coldStart hard gate, deepMining multi-round, finding#1 coverage_ledger gate, moduleMining, evolution sweep, and anti-fabrication rejection. Core gate: after the fresh run, direct SQL must show new/updated coverage_ledger rows from accepted source-ref-backed recipes with grade partial/covered and covered_count > 0; stopReason/converged must be reachable when cells are covered. Also verify fresh deep_mining_rounds have nonempty unique rescan_id rows with new_recipes trend evidence, moduleMining increases knowledge_entries, evolution sweep executes/promotes and active dead recipe moves toward decaying, and intentionally bad recipe input is rejected without increasing coverage. Backfill raw SQL outputs, command logs, repository heads, runtime JSON/log paths, data cleanup steps, residual risks, and clear pass/block/rework recommendation.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T14:10:37.137Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-direct-p1__Test__verify-test-bilidili-mainbody-realverify-direct-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-direct-p1__Test__verify-test-bilidili-mainbody-realverify-direct-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-direct-p1__Test__verify-test-bilidili-mainbody-realverify-direct-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-direct-p1",
+        "sentAt": "2026-06-27T14:11:34.212Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-direct-t1"
+    },
+    {
+      "targetTaskId": "fix-agent-planselection-runtime-modelref-t1",
+      "taskPackageId": "fix-agent-planselection-runtime-modelref-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "You are AlembicAgent target window for demand alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26. Read parent AGENTS.md, this state root, target repo CLAUDE/AGENTS, and the controller review evidence. Fix only AlembicAgent-owned causes exposed by direct BiliDili verification: (1) LLMGateway model-ref parsing must preserve tagged model ids after the first provider colon, e.g. ollama:gemma3:4b routes provider=ollama and model=gemma3:4b while preserving existing provider-prefixed refs; (2) plan-selection runtime/profile used by runPlanAgent must perform a real no-tool LLM call and return parseable PlanSelection JSON that passes @alembic/core assertPlanSelectionShape instead of stopping at forced-summary/non-contract output. Do not synthesize a fake plan, do not loosen assertPlanSelectionShape, and do not weaken Alembic's plan gate. Add targeted mock-provider tests for tagged model refs, successful JSON PlanSelection, invalid/no-JSON rejection, and no forced-summary-before-LLM behavior as feasible. Use Node >=22; run relevant AlembicAgent tests/build. Commit local main only, no push. Backfill commit hash, changed files, validation output, residual risks, and whether Alembic main/plugin consumer rebuild is needed next.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T14:32:52.716Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-agent-planselection-runtime-modelref-p1__AlembicAgent__fix-agent-planselection-runtime-modelref-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-agent-planselection-runtime-modelref-p1__AlembicAgent__fix-agent-planselection-runtime-modelref-t1.json",
+        "deliveryRunId": "run-delivery-fix-agent-planselection-runtime-modelref-p1__AlembicAgent__fix-agent-planselection-runtime-modelref-t1",
+        "dispatchGroup": "fix-agent-planselection-runtime-modelref-p1",
+        "sentAt": "2026-06-27T14:33:45.736Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-agent-planselection-runtime-modelref-t1"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+      "targetWindow": "Test",
+      "summary": "You are Test target window for demand alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26. Read parent AGENTS.md, this state root, Test rules, and controller acceptance evidence for AlembicAgent commit a98a22871a7ff883da69cb9b691845a6789eadb5. User authorized direct use of the BiliDili test project; do not use sandbox unless a hard safety blocker appears. Before running, rebuild/restart the Alembic/AlembicAgent consumer process so the direct run picks up the Agent commit. Then rerun the true BiliDili verification chain from a clean generated-data baseline: plan/coldStart -> deepMining -> moduleMining -> evolution as required by the demand. Required evidence: direct DB SQL/JSON snapshots before and after, command/log timeline, daemon/runtime logs, repo commits/status, and explicit finding#1 gate result: coverage_ledger grade becomes partial/covered with covered_count>0 and stopReason can reach converged when all cells are covered. Also verify deep_mining_rounds rows, moduleMining knowledge_entries increment, evolution sweep/proposal/lifecycle behavior, and anti-fabrication rejection for deliberately bad recipe. If coldStart still blocks, preserve raw logs and classify the exact owning repo/function; do not mark pass. Do not edit BiliDili source. Backfill TargetResultEnvelope with evidence refs, validation, risks, and next owner if blocked.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T14:44:32.286Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+        "sentAt": "2026-06-27T14:45:23.468Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-deepseek-config-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-deepseek-config-p1",
+      "targetWindow": "Test",
+      "summary": "You are Test. Read parent AGENTS.md, the active index/status, this state root, and Test repository rules; declare Test identity. Rerun the direct BiliDili real verification for alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26 with corrected provider configuration: DeepSeek must be the generation/planning model for coldStart/plan selection and all host-agent generation; Ollama must only provide qwen3-embedding:0.6b or equivalent vector semantic embeddings. Do not use Ollama/gemma3 as the generation/planning LLM. Before running, record environment evidence that proves the provider split. Use the direct BiliDili project as user authorized; clear prior generated Alembic test data for BiliDili as in the previous direct run. Keep skipGuard=false and do not relax anti-fabrication or quality gates. Run the real chain coldStart -> deepMining -> moduleMining -> evolution -> anti-fab rejection evidence. Gate for finding#1: after deepMining, direct DB reads from the real BiliDili Alembic DB must show coverage_ledger grades no longer stuck empty: covered_count > 0 and grade/status reaches partial or covered for real anti-fab-passing recipe sourceRefs; advise/stopReason must be able to converge when coverage is complete. Also collect deep_mining_rounds progression, moduleMining knowledge_entries increment, evolution sweep/proposal/lifecycle evidence, and a deliberate low-quality recipe rejection. If the run blocks, stop at the first blocker and backfill raw evidence, logs, DB snapshots, provider config, exact job ids, and owner classification. Do not edit product code.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T14:58:58.851Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-deepseek-config-p1__Test__verify-test-bilidili-mainbody-realverify-deepseek-config-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-deepseek-config-p1__Test__verify-test-bilidili-mainbody-realverify-deepseek-config-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-deepseek-config-p1__Test__verify-test-bilidili-mainbody-realverify-deepseek-config-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-deepseek-config-p1",
+        "sentAt": "2026-06-27T14:59:45.938Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-deepseek-config-t1"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-p1",
+      "targetWindow": "Test",
+      "summary": "Test window: read parent AGENTS.md, Test repository rules, this state root, and the requirement design. Declare Test identity. Use the direct BiliDili project as authorized by the user, not a sandbox copy. Confirm generation/planning uses the currently configured DeepSeek provider and Ollama/qwen3 remains embedding-only. Clear generated BiliDili Alembic test data, then run the real chain from coldStart through deepMining, moduleMining, evolution, and deliberate anti-fabrication rejection. Required evidence: provider split, successful DeepSeek LLM call evidence or retained runtime/session/log proof, true DB SQL/JSON snapshots before and after each stage, coverage_ledger showing grade moves from empty to partial/covered with covered_count>0 and converged reachable, deep_mining_rounds progression, moduleMining knowledge_entries increment, evolution sweep/promote/decay evidence, and anti-fab rejection proof. If it fails, stop at first blocker with raw logs and DB state; do not classify as product-code defect unless raw evidence proves the code path after valid DeepSeek response.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T15:12:14.184Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-p1",
+        "sentAt": "2026-06-27T15:13:02.812Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-t1"
+    },
+    {
+      "targetTaskId": "fix-core-deepmining-planselection-modulebindings-contract-t1",
+      "taskPackageId": "fix-core-deepmining-planselection-modulebindings-contract-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read parent AGENTS.md, AlembicCore/AGENTS or CLAUDE rules, this state root, and the controller review evidence. Declare AlembicCore identity. Implement only the Core-side contract repair for PlanSelection stage-required moduleBindings/module×dimension targets. Inspect src/service/planIntent/planIntent.ts, contracts.ts, and tests. Prefer additive stage-aware assertion if plain assertPlanSelectionShape must remain generic; export through src/plans.ts. Validation must include Node>=22 Core build/check and focused tests proving empty moduleBindings fail for deepMining/moduleMining and valid module bindings pass. Commit locally on main and backfill commit hash, files changed, command outputs, and any downstream compatibility notes.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T15:37:12.745Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-core-deepmining-planselection-modulebindings-contract-p1__AlembicCore__fix-core-deepmining-planselection-modulebindings-contract-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-core-deepmining-planselection-modulebindings-contract-p1__AlembicCore__fix-core-deepmining-planselection-modulebindings-contract-t1.json",
+        "deliveryRunId": "run-delivery-fix-core-deepmining-planselection-modulebindings-contract-p1__AlembicCore__fix-core-deepmining-planselection-modulebindings-contract-t1",
+        "dispatchGroup": "fix-core-deepmining-planselection-modulebindings-contract-p1",
+        "sentAt": "2026-06-27T15:38:03.564Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-core-deepmining-planselection-modulebindings-contract-t1"
+    },
+    {
+      "targetTaskId": "fix-agent-deepmining-planselection-modulebindings-t1",
+      "taskPackageId": "fix-agent-deepmining-planselection-modulebindings-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS.md, AlembicAgent repository rules, this state root, Core commit 934d043 contract, and controller evidence. Declare AlembicAgent identity. Implement only the Agent-side producer repair: plan-selection prompt/profile must require moduleBindings for deepMining/moduleMining, parse/validation should call Core's stage-aware assertion with expectedStage, and tests must prove empty moduleBindings are rejected for deepMining/moduleMining while coldStart semantics remain compatible. Use real ProjectContext facts shape when constructing guidance; do not fabricate module bindings outside input facts and do not reintroduce tools/persistence. Validate with Node>=22 build/check and focused plan-agent tests; commit locally on main and backfill commit hash, files changed, command outputs, and risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T15:47:23.015Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-agent-deepmining-planselection-modulebindings-p1__AlembicAgent__fix-agent-deepmining-planselection-modulebindings-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-agent-deepmining-planselection-modulebindings-p1__AlembicAgent__fix-agent-deepmining-planselection-modulebindings-t1.json",
+        "deliveryRunId": "run-delivery-fix-agent-deepmining-planselection-modulebindings-p1__AlembicAgent__fix-agent-deepmining-planselection-modulebindings-t1",
+        "dispatchGroup": "fix-agent-deepmining-planselection-modulebindings-p1",
+        "sentAt": "2026-06-27T15:48:15.485Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-agent-deepmining-planselection-modulebindings-t1"
+    },
+    {
+      "targetTaskId": "fix-main-deepmining-planselection-modulebindings-gate-t1",
+      "taskPackageId": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, the current state root, and Alembic CLAUDE/AGENTS rules. Declare Alembic mainbody repository identity. This is a narrow live-consumer repair following accepted Core commit 934d043a0d12ac364aa582d6c39445f14a0af2e1 and accepted Agent commit afe4c2b48ece5475f9fbfdcdd1ac974ad61fedcf. In Alembic/lib/daemon/DaemonJobRunner.ts, update runPlanSelectionGate so it consumes @alembic/core/plans assertPlanSelectionStageRequirements(selection, { expectedStage: gate.generationStage }) or equivalent public Core export before applyPlanSelection and before recording plan-gate success. deepMining/moduleMining selections without valid moduleBindings/module×dimension targets must fail at the plan gate with actionable diagnostics and must not enter runKnowledgeRescanWorkflow/runModuleMining; coldStart must remain compatible with empty moduleBindings. Preserve the existing no-fallback-to-full behavior, DeepSeek/Ollama provider split, coverage ledger writeback logic, runDeepMiningRounds accounting, quality/anti-fabrication gates, and all previous A-F behavior. Add or adjust Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts coverage proving: (1) coldStart empty moduleBindings still passes when dimensions are valid, (2) deepMining empty moduleBindings fails at plan gate before rescan and records an error event, (3) moduleMining empty moduleBindings fails at plan gate before moduleMining, and (4) valid deepMining/moduleMining bindings still pass and preserve projection/module targets. Run Node>=22 npm run build:check and targeted DaemonJobRunnerPlanGate tests; run broader npm run test or npm run check if touched boundary requires it. Commit locally on main, no push. Backfill commit hash, changed files, exact commands, outputs summary, and risks. Do not modify Core, Agent, Plugin, Test, BiliDili, vendor snapshots, or unrelated flow.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T16:02:53.115Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-main-deepmining-planselection-modulebindings-gate-p1__Alembic__fix-main-deepmining-planselection-modulebindings-gate-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-deepmining-planselection-modulebindings-gate-p1__Alembic__fix-main-deepmining-planselection-modulebindings-gate-t1.json",
+        "deliveryRunId": "run-delivery-fix-main-deepmining-planselection-modulebindings-gate-p1__Alembic__fix-main-deepmining-planselection-modulebindings-gate-t1",
+        "dispatchGroup": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+        "sentAt": "2026-06-27T16:03:51.273Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-main-deepmining-planselection-modulebindings-gate-t1"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, the current state root, and Test rules. Declare Test window identity. User has authorized direct testing on the BiliDili test project, no sandbox backup requirement for this run. Use the current BiliDili project as the real target. Use DeepSeek for generation/planning and Ollama qwen3-embedding:0.6b for vector embeddings; do not switch generation to Ollama. Pick up accepted local commits: Core 934d043a0d12ac364aa582d6c39445f14a0af2e1, Agent afe4c2b48ece5475f9fbfdcdd1ac974ad61fedcf, Alembic 9f01a965b41fa2130a6eb605fa11cf19a6c52649, plus prior accepted coverage-ledger writeback commits. Rebuild/restart any local Alembic runtime needed so the direct host process consumes these local commits. Clean only old BiliDili Alembic generated test data as prior Test runs did; do not modify source code outside the Test evidence setup. Run the direct BiliDili chain: plan/coldStart -> deepMining multi-round -> moduleMining -> evolution/maintenance -> anti-fabrication rejection probe. Required raw evidence: provider split redacted config showing DeepSeek generation/planning and Ollama/Qwen embedding; job HTTP/JSON records and process events for each stage; DB SQL/JSON snapshots before/after for knowledge_entries, recipe_source_refs, semantic_memories, coverage_ledger, deep_mining_rounds, lifecycle/proposal/event tables as relevant; retained job logs if failure occurs. Gate focus: coldStart still succeeds; deepMining no longer fails with empty plan moduleBindings; coverage_ledger grade becomes partial/covered with covered_count>0; deep_mining_rounds records rounds/stopReason; moduleMining creates real incremental knowledge where expected; evolution lifecycle/proposal path still executes or reaches the designed guarded state; deliberately bad recipe is rejected by anti-fabrication/quality gate. If blocked, stop at the first product/root-cause blocker, preserve DB/log evidence, and backfill a TargetResultEnvelope with exact failing stage, command/HTTP payload summary, error text, DB counts, and owning repository recommendation. If pass, backfill all evidence refs and final PASS conclusion. Do not push, tag, bump versions, or write thread ids to tracked docs.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T16:13:46.040Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+        "sentAt": "2026-06-27T16:14:33.939Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1"
+    },
+    {
+      "targetTaskId": "fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+      "taskPackageId": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, this state root, Alembic repository CLAUDE/AGENTS rules, and the controller review evidence `evidence/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-controller-review.md`. Declare Alembic mainbody repository identity. This is a narrow live source repair for the direct BiliDili realverify blocker after accepted Core/Agent/Alembic moduleBindings repairs. Test proved coldStart completed and deepMining passed plan gate with 6 execution dimensions and non-empty moduleScope, then failed in `runKnowledgeRescanWorkflow` because the completed coldStart left a same-project active Core bootstrap session lease. Inspect live source only: `Alembic/lib/workflows/cold-start/ColdStartWorkflow.ts`, `Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts`, `Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts`, `Alembic/lib/daemon/DaemonJobRunner.ts`, and related tests. Do not edit dist/vendor/Test/BiliDili. Fix the coldStart/internal AI workflow session lifecycle so completed coldStart does not leave the Core ProjectContext workflow session as a blocking active lease for subsequent rescan/deepMining. Prefer using existing Core public lifecycle primitives (`releaseProjectLease`, `clearSession`, or completion status) rather than deleting data or weakening lease checks; if Core lacks a safe public primitive, stop and backfill the exact Core API need instead of inventing a local workaround. Preserve quality gates, anti-fabrication gates, plan-selection stage validation, coverage-ledger writeback, no-fallback-to-full behavior, and DeepSeek/Ollama provider split. Add/adjust focused tests proving: (1) coldStart completion releases or completes the ProjectContext workflow session lease, (2) same-project deepMining/rescan can create/open its workflow session after coldStart without manual active-session deletion, (3) active in-progress sessions still block concurrent conflicting starts, and (4) failed/partial coldStart does not silently erase useful evidence. Run Node>=22 targeted tests and `npm run build:check`; run lint/check if touched boundary requires it. Commit locally on main, no push. Backfill commit hash, changed files, exact commands/output summaries, risks, and whether a follow-up Core task is required.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T16:34:32.724Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-main-bootstrap-session-lifecycle-after-coldstart-p1__Alembic__fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-bootstrap-session-lifecycle-after-coldstart-p1__Alembic__fix-main-bootstrap-session-lifecycle-after-coldstart-t1.json",
+        "deliveryRunId": "run-delivery-fix-main-bootstrap-session-lifecycle-after-coldstart-p1__Alembic__fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+        "dispatchGroup": "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+        "sentAt": "2026-06-27T16:35:06.963Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-main-bootstrap-session-lifecycle-after-coldstart-t1"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, the active state root, Test rules, and this task package; declare Test window identity. Use the direct BiliDili test project as user-authorized, not a sandbox. Use DeepSeek for generation/planning and Ollama qwen embeddings for vector semantic work; redact secrets. Ensure the live runtime consumes Alembic commit e88cc82f9f35b952db89aa4d04ebf84cdb2afb95 or newer. Preserve prior evidence snapshots, then clear only old generated Alembic test data / stale runtime state needed for a fresh BiliDili verification run. Run the chain from plan/coldStart into deepMining. Core gate: show fresh coldStart completes, then subsequent deepMining no longer fails with Bootstrap already in progress / active session lease; include active-session state after coldStart and after deepMining attempt plus DB snapshots. If the chain proceeds, continue moduleMining, evolution/maintenance, and anti-fabrication rejection per the demand. Stop at the first real product/runtime blocker with DB/runtime evidence, logs, job ids, provider split evidence, and no secrets. Do not modify product source. Backfill TargetResultEnvelope with direct DB SQL/JSON evidence, commands/probes, pass/fail conclusion, risks, and next owner if blocked.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T16:50:50.422Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-p1",
+        "sentAt": "2026-06-27T16:51:30.966Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1"
+    },
+    {
+      "targetTaskId": "fix-main-deepmining-real-coverage-production-t1",
+      "taskPackageId": "fix-main-deepmining-real-coverage-production-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, the active state root, Alembic repository rules, the task package, and the controller review evidence. Declare Alembic window/repository identity. Do not rerun Test. Diagnose and repair why direct BiliDili deepMining job rescan_mqwlzifz_af8b574d completed with newRecipesThisRound=0, stopReason=diminishing-returns, coverage_ledger=32 but all sampled cells grade=empty/covered_count=0/covered_source_refs=[] after the session lifecycle fix. Start from Alembic/lib/daemon/DaemonJobRunner.ts deepMining loop and Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts. Preserve the confirmed plan hard gate, no-fallback-to-full semantics, anti-fabrication/quality gates, DeepSeek generation and Ollama embeddings. Respect the earlier FIX boundary: do not casually change ensureCoverageLedgerCells or adviseCoverageLedger; if raw source proof shows the only viable fix requires those previously excluded primitives or AlembicCore changes, stop and backfill a hard-gate/root-cause report instead of guessing. Required acceptance evidence: local commit if code changes, Node>=22 build/check, targeted tests that reproduce the zero-useful-coverage condition and prove at least one real accepted sourceRefs recipe updates coverage to partial/covered with coveredCount>0 and does not count rejected/bad recipes, plus grep/source refs for the repaired call chain. Leave final BiliDili e2e to Test after controller acceptance.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T17:19:42.399Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-main-deepmining-real-coverage-production-p1__Alembic__fix-main-deepmining-real-coverage-production-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-deepmining-real-coverage-production-p1__Alembic__fix-main-deepmining-real-coverage-production-t1.json",
+        "deliveryRunId": "run-delivery-fix-main-deepmining-real-coverage-production-p1__Alembic__fix-main-deepmining-real-coverage-production-t1",
+        "dispatchGroup": "fix-main-deepmining-real-coverage-production-p1",
+        "sentAt": "2026-06-27T17:22:11.939Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-main-deepmining-real-coverage-production-t1-20260627174808"
+    },
+    {
+      "targetTaskId": "fix-agent-modulemining-child-profile-context-t1",
+      "taskPackageId": "fix-agent-modulemining-child-profile-context-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS.md, the active state root, AlembicAgent repository rules, the task package, and controller review evidence. Declare AlembicAgent window/repository identity. Do not rerun Test and do not modify Alembic mainbody. Diagnose and repair the moduleMining child path failure from Test: rescan_mqwm14ji_be97e391 failed with `Cannot read properties of undefined (reading 'name')` at AlembicAgent/dist/agent/runs/module/ModuleMiningAgentRun.js while Alembic mainbody passed modules with canonical moduleName/moduleId/modulePath/ownedFiles. Start from src/agent/runs/module/ModuleMiningAgentRun.ts, src/agent/coordination/AgentRunCoordinator.ts, src/agent/profiles/definitions/module.profile.ts, and src/agent/profiles/AgentStageFactoryRegistry.ts. Preserve moduleName as canonical; do not require callers to rename fields to name. Fix child profile/pipeline context so moduleMining children have the projectInfo/dimConfig or module-specific context required by the pipeline, or create a moduleMining-specific pipeline if reuse of bootstrapDimensionPipeline is the real root cause. Required evidence: local commit if code changes, Node>=22 build/check, targeted tests that would fail on moduleName-only module payloads and exercise the real profile/partition/prompt-building path (not only a fake runtime that skips the failing prompt builder), plus contract-surface regression. Backfill exact source refs, validation output, and whether any Alembic main compatibility work remains.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T17:19:58.779Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-agent-modulemining-child-profile-context-p1__AlembicAgent__fix-agent-modulemining-child-profile-context-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-agent-modulemining-child-profile-context-p1__AlembicAgent__fix-agent-modulemining-child-profile-context-t1.json",
+        "deliveryRunId": "run-delivery-fix-agent-modulemining-child-profile-context-p1__AlembicAgent__fix-agent-modulemining-child-profile-context-t1",
+        "dispatchGroup": "fix-agent-modulemining-child-profile-context-p1",
+        "sentAt": "2026-06-27T17:22:12.016Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-agent-modulemining-child-profile-context-t1-controller-evidence-repair"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, .wakeflow-active/index.md, this state root, current controller/progress docs, and Test repository rules. Declare Test window identity. Use latest local Alembic, AlembicAgent, AlembicCore and direct BiliDili project testing as user-authorized; do not use sandbox unless Test needs local safety for its own temporary files. Use DeepSeek for generation/host-agent LLM configuration and Ollama qwen only for vector embeddings. Re-run the BiliDili mainbody lifecycle chain from the latest known point needed to verify the repaired blockers: coldStart sanity, deepMining, moduleMining, and then continue to evolution/anti-fabrication if unblocked. Required gates: (1) deepMining must no longer produce zero real coverage forever; direct DB evidence must show coverage_ledger moves from empty to partial/covered or a valid converged path with covered_count > 0 and source refs, plus deep_mining_rounds records a positive newRecipesThisRound or equivalent accepted coverage-write production evidence; include before/after SQL snapshots. (2) moduleMining must no longer fail with missing `.name`; report completed job/DB deltas or the exact next runtime blocker with job JSON/logs. (3) anti-fabrication remains strict: an intentionally bad/not source-backed recipe must be rejected. (4) Do not weaken gates, do not accept faithful-copy-only evidence, and stop at first real blocker with raw DB/log/process evidence. Return TargetResultEnvelope with status completed only if gates pass, otherwise blocked/needs-review with exact evidence.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T17:55:30.101Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-p1__Test__verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-p1__Test__verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-p1__Test__verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-p1",
+        "sentAt": "2026-06-27T17:56:15.012Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1"
+    },
+    {
+      "targetTaskId": "fix-main-source-ref-backed-coverage-cells-t1",
+      "taskPackageId": "fix-main-source-ref-backed-coverage-cells-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, the active state root, Alembic repository rules, the task package, and the controller review evidence `evidence/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-controller-review.md`. Declare Alembic window/repository identity. Do not rerun Test. Test has now proved the live chain is past previous blockers: coldStart PASS, deepMining job completed, deep_mining_rounds +2, knowledge_entries +5, recipe_source_refs +25, coverage_ledger +57, but all coverage rows remain empty/thin with SUM(covered_count)=0 and covered_source_refs=[]. Diagnose and repair the Alembic mainbody coverage-write input chain so accepted, persisted recipe source refs for the deepMining dimension/round update coverage_ledger cells. Start from `Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts` and the repository/source-ref path used after anti-fabrication acceptance. The likely failure is that `writeKnowledgeRescanCoverageLedgerForDimension` still relies on `result.referencedFiles`/coarse dimension output rather than the accepted recipe source refs that were actually persisted to `recipe_source_refs`. Use only real accepted recipe/source-ref evidence; do not count rejected recipes, non-source-backed recipes, or fabricated refs. Ensure refs overlap canonical ProjectMap module owned files/ownedPaths through the existing Core coverage helper and path normalization. Preserve confirmed plan hard gate, no-fallback-to-full semantics, anti-fabrication and quality floors, DeepSeek generation, Ollama embeddings, runDeepMiningRounds accounting, and the earlier no-reflow/no-double-count boundary. Do not weaken gates to make converged pass. If a Core public contract bug is proven necessary, stop and backfill exact Core file/line/API need instead of broadening silently. Add focused regression tests that reproduce the real condition: accepted recipe source_refs exist while coverage would previously stay covered_count=0, and prove at least one real accepted source-ref-backed recipe writes covered_count>0 and non-empty covered_source_refs; add a negative case for rejected/bad/no-source-ref recipes. Run Node>=22 build:check and targeted tests. Commit locally on main, no push. Backfill commit hash, changed files, exact command outputs, raw evidence refs, risks, and whether Test should rerun the direct BiliDili chain after acceptance.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T18:20:33.488Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-main-source-ref-backed-coverage-cells-p1__Alembic__fix-main-source-ref-backed-coverage-cells-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-source-ref-backed-coverage-cells-p1__Alembic__fix-main-source-ref-backed-coverage-cells-t1.json",
+        "deliveryRunId": "run-delivery-fix-main-source-ref-backed-coverage-cells-p1__Alembic__fix-main-source-ref-backed-coverage-cells-t1",
+        "dispatchGroup": "fix-main-source-ref-backed-coverage-cells-p1",
+        "sentAt": "2026-06-27T18:20:59.044Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-main-source-ref-backed-coverage-cells-t1"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, the active state root, Test repository rules, and the controller review evidence `evidence/fix-main-source-ref-backed-coverage-cells-controller-review.md`. Declare Test window/repository identity. Use the real BiliDili test project directly, per user authorization; do not create a loyal-copy substitute for acceptance. Use the already configured provider split: DeepSeek for generation/planning, Ollama qwen3-embedding:0.6b for embeddings. Consume latest accepted local product repos, including Alembic commit `1f141c847c4140233f9c9796e97db2579949c60a`; verify live dist/runtime actually contains that Alembic repair before running. Clean prior BiliDili Alembic test/generated data enough to avoid false positive carryover, while preserving the BiliDili source project. Run the direct mainbody lifecycle verification chain again: plan/coldStart -> deepMining -> moduleMining -> evolution/maintenance -> anti-fabrication rejection probe as needed by the demand design. Primary gate: after deepMining, direct DB SQL must show coverage_ledger rows with `covered_count > 0` and non-empty `covered_source_refs`; include before/after counts for knowledge_entries, recipe_source_refs, coverage_ledger, deep_mining_rounds, semantic_memories, plus sample coverage rows proving source refs overlap real BiliDili files. Continue remaining Phase VERIFY checks only after the coverage gate passes: deep_mining_rounds should show real multi-round progress/stop reason, moduleMining should add knowledge_entries, evolution sweep should execute/promote or route maintenance state as designed, and intentionally bad/no-source recipe submission must be rejected by quality/anti-fabrication gates. Do not relax gates, do not accept replica-only evidence, and do not patch product code in Test. If blocked, stop with the exact failing command/API/log/SQL and classify the owning repo. Backfill a TargetResultEnvelope with raw evidence paths, command outputs, DB SQL summaries, provider/runtime config, BiliDili HEAD, product repo HEADs, and pass/fail for each verification step.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T18:32:51.004Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-p1",
+        "sentAt": "2026-06-27T18:33:41.433Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1"
+    },
+    {
+      "targetTaskId": "fix-main-modulemining-result-accounting-t1",
+      "taskPackageId": "fix-main-modulemining-result-accounting-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, this state root, the controller review evidence, and the Alembic repository rules. Declare Alembic window/repository identity. Do not rerun Test. Narrow task: direct BiliDili verification after Alembic 1f141c8 proved coldStart and deepMining source-ref coverage pass, then moduleMining job `rescan_mqwpvvg6_a00132ac` failed with `moduleMining produced zero recipes` while DB delta showed persisted output (`knowledge_entries +22`, `recipe_source_refs +50`, `knowledge_edges +66`, `lifecycle_transition_events +7`, `token_usage +136`). Start at `Alembic/lib/daemon/DaemonJobRunner.ts` `runModuleMiningWorkflow` and `Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts` moduleMining path/return projection. Diagnose and fix the mismatch between accepted persisted moduleMining output and zero-output completion guard/counting. Preserve the plan hard gate, no fallback-to-full behavior, quality/anti-fabrication floors, DeepSeek generation plus Ollama embedding split, source-ref coverage repair, and coverage ledger semantics. Do not mark success from audit/log/transition side effects alone; count only accepted persisted recipes/sourceRefs/knowledge_entries attributable to the current moduleMining job/round. If the persisted rows are from unrelated async background work or wrong projectRoot/dataRoot, stop and backfill exact root cause instead of masking it. Add regression coverage for the observed false-zero case and for true zero-output still failing. Run Node >=22 build/check plus targeted tests; commit locally on main, no push; backfill commit hash, files changed, command output, and remaining risks.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T19:15:50.830Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-fix-main-modulemining-result-accounting-p1__Alembic__fix-main-modulemining-result-accounting-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-modulemining-result-accounting-p1__Alembic__fix-main-modulemining-result-accounting-t1.json",
+        "deliveryRunId": "run-delivery-fix-main-modulemining-result-accounting-p1__Alembic__fix-main-modulemining-result-accounting-t1",
+        "dispatchGroup": "fix-main-modulemining-result-accounting-p1",
+        "sentAt": "2026-06-27T19:16:23.892Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-fix-main-modulemining-result-accounting-t1"
+    },
+    {
+      "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1",
+      "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1",
+      "targetWindow": "Test",
+      "summary": "Read parent AGENTS.md, this state root, the controller review evidence for `fix-main-modulemining-result-accounting-t1`, and Test rules. Declare Test window identity. Use the real BiliDili test project directly, per user authorization; use current/latest BiliDili checkout and current local Alembic stack with Alembic commit `47889f9` included. Provider split must be DeepSeek for generation/planning and Ollama qwen3 embeddings for vector semantics. Rebuild/restart the live Alembic runtime as needed so `47889f9` is active. Clean previous generated Alembic test data for BiliDili before the run unless a concrete runtime invariant forbids it; record the baseline counts. Run the direct BiliDili chain: coldStart -> deepMining -> moduleMining -> evolution/maintenance -> anti-fabrication rejection probe. Gates: (1) coldStart passes and creates real source-backed recipes; (2) deepMining coverage gate still shows coverage_ledger rows with covered_count > 0 and non-empty covered_source_refs; (3) moduleMining no longer fails with `moduleMining produced zero recipes`, job status is completed, result exposes moduleMining persisted/reported counts, and DB deltas show accepted source-ref-backed recipes; (4) evolution/maintenance path runs far enough to prove sweep/route behavior for a real source change or documented no-op reason; (5) intentionally bad/unsupported recipe submission must be rejected by existing quality/anti-fabrication gates. Stop at the first real blocker and backfill raw DB SQL/JSON, job ids, runtime logs, repo HEADs, command outputs, and secret-scan status. Do not accept loyal-copy evidence in place of direct DB evidence. Do not relax plan hard gate, quality floors, anti-fab, source-ref requirements, or provider split. Do not push or change product code from Test.",
+      "status": "accepted",
+      "createdAt": "2026-06-27T19:31:36.322Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1.json",
+        "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1",
+        "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1",
+        "sentAt": "2026-06-27T19:32:11.639Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "fix-core-coverage-ledger-write-downshift-p1",
+        "fix-core-deepmining-planselection-modulebindings-contract-p1"
+      ],
+      "targetTaskIds": [
+        "fix-core-coverage-ledger-write-downshift-t1",
+        "fix-core-deepmining-planselection-modulebindings-contract-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "fix-plugin-coverage-ledger-core-reimport-p1"
+      ],
+      "targetTaskIds": [
+        "fix-plugin-coverage-ledger-core-reimport-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "fix-main-knowledge-rescan-coverage-ledger-write-p1",
+        "fix-main-deepmining-planselection-modulebindings-gate-p1",
+        "fix-main-bootstrap-session-lifecycle-after-coldstart-p1",
+        "fix-main-deepmining-real-coverage-production-p1",
+        "fix-main-source-ref-backed-coverage-cells-p1",
+        "fix-main-modulemining-result-accounting-p1"
+      ],
+      "targetTaskIds": [
+        "fix-main-knowledge-rescan-coverage-ledger-write-t1",
+        "fix-main-deepmining-planselection-modulebindings-gate-t1",
+        "fix-main-bootstrap-session-lifecycle-after-coldstart-t1",
+        "fix-main-deepmining-real-coverage-production-t1",
+        "fix-main-source-ref-backed-coverage-cells-t1",
+        "fix-main-modulemining-result-accounting-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "verify-test-bilidili-mainbody-realverify-p1",
+        "verify-test-bilidili-mainbody-realverify-direct-p1",
+        "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+        "verify-test-bilidili-mainbody-realverify-deepseek-config-p1",
+        "verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-p1",
+        "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+        "verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-p1",
+        "verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-p1",
+        "verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-p1",
+        "verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1"
+      ],
+      "targetTaskIds": [
+        "verify-test-bilidili-mainbody-realverify-t1",
+        "verify-test-bilidili-mainbody-realverify-direct-t1",
+        "verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+        "verify-test-bilidili-mainbody-realverify-deepseek-config-t1",
+        "verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-t1",
+        "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+        "verify-test-bilidili-mainbody-realverify-after-session-lifecycle-fix-t1",
+        "verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1",
+        "verify-test-bilidili-mainbody-realverify-after-source-ref-coverage-fix-t1",
+        "verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicAgent",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "fix-agent-planselection-runtime-modelref-p1",
+        "fix-agent-deepmining-planselection-modulebindings-p1",
+        "fix-agent-modulemining-child-profile-context-p1"
+      ],
+      "targetTaskIds": [
+        "fix-agent-planselection-runtime-modelref-t1",
+        "fix-agent-deepmining-planselection-modulebindings-t1",
+        "fix-agent-modulemining-child-profile-context-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [],
+    "blockedResultIds": [
+      "tr-verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1"
+    ],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-27T12:55:08.537Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1",
+    "lastDeliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1",
+    "lastDispatchGroup": "verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-p1",
+    "lastTargetTaskId": "verify-test-bilidili-mainbody-realverify-after-modulemining-accounting-fix-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-27T19:32:11.644Z"
+  }
+}

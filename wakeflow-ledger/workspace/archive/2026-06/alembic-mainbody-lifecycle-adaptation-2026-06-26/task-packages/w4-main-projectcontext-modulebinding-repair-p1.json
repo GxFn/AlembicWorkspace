@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "w4-main-projectcontext-modulebinding-repair-p1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "summary": "Repair W4 mainbody ProjectContext/module binding chain after Test verified runtime/dist and HTTP fixes but BiliDili still produced moduleCount=0/projectMapModules=[] despite targetCount=15. The fix must make real ProjectContext target refs/owned files become ProjectMap modules/moduleBindings so deepMining and moduleMining can produce DB evidence. Do not touch already-green HTTP field preservation or lifecycle sweep behavior except where required by the same chain.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b D/E, §5 W4; Test evidence Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-runtime-dist-repair-t1/w4-after-runtime-dist-repair-e2e-summary.json and w4-after-runtime-dist-repair-report.md; controller rework decision tc-20260627082902-0052.",
+  "createdAt": "2026-06-27T08:30:02.860Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "w4-main-projectcontext-modulebinding-repair-t1",
+      "taskPackageId": "w4-main-projectcontext-modulebinding-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "You are Alembic. Read Alembic/CLAUDE.md, parent AGENTS/CLAUDE, .wakeflow-active/index.md, the current state root, this task package, and Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b D/E + W4. Declare Alembic window/repository identity. Goal: fix the remaining W4 blocker proven by Test: BiliDili ProjectContext facts show targetCount=15 but moduleCount=0/projectMapModules=[], so deepMining fails with `deepMining requires plan moduleBindings with module×dimension targets` and moduleMining fails with `moduleMining requires at least one ProjectMap module`. Investigate and repair the Alembic runtime chain around ProjectContextWorkflowFacts target-derived modules, runPlan/PlanSelection moduleBindings, DaemonJobRunner buildDeepMiningRoundPlanContext/runDeepMiningRounds/runModuleMiningWorkflow, and any mainbody ProjectMap/module axis wiring that prevents real BiliDili refs/files from becoming owned modules. Acceptance: (1) real or representative BiliDili ProjectContext facts expose non-empty projectMapModules with real owned file coverage when target refs/files exist; (2) deepMining PlanSelection has moduleBindings with module×dimension targets before running rounds and no planLedger/git_diff_checkpoints writes; (3) moduleMining fan-out reads ProjectMap modules, respects scaleCap=3 over >=8 eligible modules as exactly 3 child module jobs/full per-module budget, and zero-output module fails; (4) existing green behavior stays green: dist jobs route preserves W4 fields/rejects bad stage-mode, lifecycleStateMachine injection remains, maintenance lifecycle events still work; (5) rebuild dist if runtime uses dist in Test. Validation: Node >=22, targeted tests for ProjectContext target module fallback/moduleBindings/moduleMining, npm run build, npm run build:check, npm run lint:repo-boundary, git diff --check, and any existing W4 harness/probe you can run without Test. Commit on main if product code changes; return commit hash, changed files, commands, outputs, raw evidence paths, risks, and whether Test must rerun W4. Do not relax W4 gates, do not accept empty modules, do not create mock-only modules, and do not move scope to Core/Agent unless you identify a true cross-repo blocker and return it as blocked with file/line evidence.",
+      "status": "pending",
+      "createdAt": "2026-06-27T08:30:02.860Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

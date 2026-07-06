@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rvrf-plugin-live-mcp-projection-reload-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-plugin-live-mcp-projection-reload-repair-p1",
+  "dispatchGroup": "rvrf-plugin-live-mcp-projection-reload-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "rvrf-plugin-live-mcp-projection-reload-repair-t1",
+  "status": "completed",
+  "summary": "修复并提交 AlembicPlugin 本地 Codex MCP 投影刷新证据链：sync-codex-plugin-cache.mjs 现在在 .alembic-dev-refresh.json 写入 localProjection，记录 local-dev-direct-dist 的 mcpEntry/source-lib/runtime-dist hash 与 requiredMarkers releasedEmptySession/coverageLedgerSeed/noActionableHostAgentWork；dev-verify-codex-plugin.mjs probe-only 现在校验 cache marker gitHead、entry hash、source/dist marker 和 fresh MCP entryMode，防止 stale cache 或 stale dist 被误判为已刷新。已通过仓库自有 npm run dev:codex-plugin:reload 刷新两个本机 Codex cache 槽位 gxfn/alembic/0.2.0 与 gxfn/alembic-codex/0.2.0，marker gitHead 均为 a81c8582d52787327b79ac4a4a190ef83e46db3d。真实 BiliDili ghost workspace 02a25032 验证：调用前 active-sessions 有 stale 空会话 bs-<redacted>，coverage_ledger=24、knowledge_entries=42、recipe_source_refs=128、deep_mining_rounds=4；经 fresh MCP alembic_plan confirm + alembic_rescan(deepMining) 后响应包含 coverageAdvisory=converged 且“本次 deepMining 不保留空 host-agent session”，active-sessions 变为空数组，四项 DB 计数仍为 24/42/128/4。",
+  "evidenceRefs": [
+    "commit:a81c8582d52787327b79ac4a4a190ef83e46db3d",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/scripts/sync-codex-plugin-cache.mjs",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/scripts/dev-verify-codex-plugin.mjs",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/CodexPluginCacheSync.test.ts",
+    "/Users/gaoxuefeng/.codex/plugins/cache/gxfn/alembic/0.2.0/.alembic-dev-refresh.json",
+    "/Users/gaoxuefeng/.codex/plugins/cache/gxfn/alembic-codex/0.2.0/.alembic-dev-refresh.json",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/bootstrap-sessions/active-sessions.json",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/scratch/codex-plugin-dev-reload-probe-report.json"
+  ],
+  "verification": [
+    "Evidence shape repaired by controller: files/cache-marker/live-ghost/probe-report descriptors were converted to concrete file paths; original descriptor claims remain represented by the existing summary and verification lines.",
+    "Changed files: scripts/sync-codex-plugin-cache.mjs; scripts/dev-verify-codex-plugin.mjs; test/unit/CodexPluginCacheSync.test.ts.",
+    "Cache marker claims: /Users/gaoxuefeng/.codex/plugins/cache/gxfn/alembic/0.2.0/.alembic-dev-refresh.json and /Users/gaoxuefeng/.codex/plugins/cache/gxfn/alembic-codex/0.2.0/.alembic-dev-refresh.json gitHead=a81c8582d52787327b79ac4a4a190ef83e46db3d; markers releasedEmptySession, coverageLedgerSeed, noActionableHostAgentWork all true.",
+    "Live ghost dataRoot claim: /Users/gaoxuefeng/.asd/workspaces/02a25032 activeSessions 1 empty -> 0 via fresh MCP alembic_rescan; DB counts unchanged coverage_ledger=24, knowledge_entries=42, recipe_source_refs=128, deep_mining_rounds=4.",
+    "Probe report: /Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/scratch/codex-plugin-dev-reload-probe-report.json.",
+    "node -v => v22.22.1",
+    "npm run build:check => pass; Core build used ../AlembicCore @ 051ddf282309e485e8f3359337b9b9f3be011515",
+    "npx vitest run test/unit/CodexPluginCacheSync.test.ts test/unit/CodexDevReloadScript.test.ts test/unit/HostAgentSessionLease.test.ts => 3 files passed, 16 tests passed",
+    "git diff --check => pass",
+    "npm run dev:codex-plugin:reload -- --project-root /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili --mcp-timeout-ms 60000 => pass post-commit; rewrote /Users/gaoxuefeng/.codex/plugins/cache/gxfn/alembic/0.2.0 and /Users/gaoxuefeng/.codex/plugins/cache/gxfn/alembic-codex/0.2.0 to local dist/bin/host-mcp.js; fresh MCP probe pass",
+    "rg --hidden marker check => both cache .alembic-dev-refresh.json contain gitHead a81c8582d52787327b79ac4a4a190ef83e46db3d and required markerStatus true",
+    "fresh MCP BiliDili rescan => ok true/status ready/generationStage deepMining/message includes coverageAdvisory=converged and no empty host-agent session retained"
+  ],
+  "risks": [
+    "dev:codex-plugin:reload refreshes installed cache and probes a fresh MCP process; it intentionally does not inspect, stop, or restart an already-attached Codex MCP transport. A host thread with an already running old transport still needs normal Codex restart/reconnect to attach the refreshed projection."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-plugin-live-mcp-projection-reload-repair-p1__AlembicPlugin__rvrf-plugin-live-mcp-projection-reload-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-plugin-live-mcp-projection-reload-repair-p1__AlembicPlugin__rvrf-plugin-live-mcp-projection-reload-repair-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-plugin-live-mcp-projection-reload-repair-p1__AlembicPlugin__rvrf-plugin-live-mcp-projection-reload-repair-t1",
+    "dispatchGroup": "rvrf-plugin-live-mcp-projection-reload-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-plugin-live-mcp-projection-reload-repair-p1__AlembicPlugin__rvrf-plugin-live-mcp-projection-reload-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 40,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-plugin-live-mcp-projection-reload-repair-p1",
+    "targetTaskId": "rvrf-plugin-live-mcp-projection-reload-repair-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "rvrf-plugin-live-mcp-projection-reload-repair-p1",
+    "resultId": "tr-rvrf-plugin-live-mcp-projection-reload-repair-t1",
+    "createdAt": "2026-06-26T15:34:51.259Z"
+  },
+  "createdAt": "2026-06-26T15:34:51.259Z",
+  "stateRevisionObserved": 40,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

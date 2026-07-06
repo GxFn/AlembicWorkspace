@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rvrf-core-high-preflight-p1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "阶段 P1/Core producer：按权威 §8.1 先修真跑前 HIGH 断点的 Core 半边，Core 先于 Plugin。完成后控制器才会派 Plugin 消费包和真 BiliDili Test。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md#8-实现审计设计-vs-真实落地代码-真测执行指导authoritative6-agent-对抗审计-2026-06-26",
+  "createdAt": "2026-06-26T11:02:25.766Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rvrf-core-high-preflight-t1",
+      "taskPackageId": "rvrf-core-high-preflight-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "你是 AlembicCore 窗口，只在 /Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore 改 live Core，不碰 vendor、不碰 AlembicPlugin、不 push。先读 ../AGENTS.md、../.wakeflow-active/index.md、../.wakeflow-active/current/workspace-current-status.md、state root `.wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26`、本仓 CLAUDE.md，并声明窗口/仓库身份。权威需求是 Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md 的 §8（尤其 8.1/8.4/8.5/8.6），不是旧伞形状态表。\n\n任务范围（只做 Core producer 必修）：\n1) 必修#1 U2-a/RF-9 模块归属 under-match：在 `CompletenessCritic.ts:639` 附近修 `pathsOverlap`/module ownership，使文件候选能归属目录模块：`cand===owned || cand.startsWith(owned + '/')`，同时保持 segment 边界和既有全文件路径等值场景。补回归测试覆盖 `pathsOverlap('src/auth/login.ts','src/auth')`/目录前缀为 true，非 segment 伪匹配仍 false。不得用放宽 coverage/quality gate 替代真实归属修复。\n2) 必修#3 U6-a/RF-10 保鲜闭环断路：在 `KnowledgeRescanPlanner.ts:240` 附近实现 drifted source refs -> `action:'update'` 规划；接通 `RecipeSourceRefRepository.ts:102 findDrifted()` 的真实调用；`getStaleCountsByRecipe:211` 需把 drifted 计入 stale/需处理数量，避免 drifted 被当 active 导致 update 永不产出。补测试证明 content drift 能产生 update action，dead->deprecate 既有路径不回归，首填/rename 等 U6 既有门禁不放松。\n\n非目标/硬护栏：RF-2 decayScore 量纲不在 Core 直修，必须留给 Design redesign；必修#2 rescan meta、Plugin ownedFiles、StructuredPatch 属 Plugin/后续包；不改 true BiliDili DB；不改 vendor/AlembicCore；不放松 anti-fabrication/质量地板/FP 护栏；不新增 daemon/AI provider；不 push/tag/bump。\n\n验证要求：Node >=22；至少运行 AlembicCore `npm run build:check`，并运行覆盖上述两处的定向 Vitest；若全量测试不跑，说明理由。回填必须包含 commit hash、改动文件、验证命令原始结果、对 Plugin 后续消费的接口/行为说明、残留风险。",
+      "status": "pending",
+      "createdAt": "2026-06-26T11:02:25.766Z"
+    }
+  ]
+}

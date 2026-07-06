@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-maint-fix-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-maint-fix-plugin",
+  "dispatchGroup": "wave2-maint-fix-plugin",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "maint-fix-plugin",
+  "status": "completed",
+  "summary": "maint-fix-plugin 完成（committed→propose 收口，commit 31f17d5 直提 main）。消费 Core@afd4302(maint-fix-core，已验收) 给 assessFileImpact/getFileDiff 加的可选 revisionRange。改 2 活副本：(1) CommitDrivenMaintenance.ts:82 把 scanner 已算的 commit-range（scan.range→`${from}..${to}`）透传进 handler.handleFileChanges(events, commitRange)；range 直接取自 scan.range、不另查 checkpoint 游标表（D3）；工作树无 range 时 undefined。(2) FileChangeHandler handleFileChanges 加可选 commitRange 形参并透传给 #handleModified；#handleModified 对 eventSource==='git-head'（committed）事件以 commitRange 调 assessFileImpact(...,revisionRange) 走 commit-range diff，非 git-head（工作树）事件传 undefined=默认 git diff HEAD（向后兼容、字节不变）。订正 LP7 过时注释「工作树 diff 已不可得」（commit-range 现可得）。LP7 判定逻辑不重开：committed-impactful 改动现拿到真 commit-range impact→update proposal（不再被 LP7 误 skip）；trivial committed 改动 commit-range 内仍零 token 命中→LP7 skip（精确抑制，非全抑制）。Core 只读、不改 git_diff_checkpoints schema、不碰 vendor、不 push/tag/bump。真机 E2 镜像 committed→propose 归 Test 再验。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-generation/evolution/FileChangeHandler.ts",
+    "AlembicPlugin/lib/recipe-generation/evolution/git-diff-checkpoint/CommitDrivenMaintenance.ts",
+    "AlembicPlugin/test/unit/FileChangeHandler.test.ts"
+  ],
+  "verification": [
+    "node v22.22.1; Core sibling afd4302=maint-fix-core(已验收、dist 已 build); npm run build:check: green EXIT=0（消费 Core@afd4302 的 assessFileImpact(...,revisionRange)）",
+    "验收#2 git-head 传 commit-range[unit]: FileChangeHandler.test.ts 'git-head 事件以 commit-range 调 assessFileImpact；工作树事件不传' passed——git-head 第4参='base..HEAD'，工作树事件第4参=undefined",
+    "验收#3 LP7 精确抑制[unit]: 'impactful committed→update proposal(不再被 LP7 误 skip)' passed(needsReview=1/proposed=1/gateway.submit update); trivial committed→skip 由既有 LP7 测试(mockReturnValue null+git-head→changeLog+skipped)覆盖",
+    "验收#4 单一编排不破: FileChangeHandler.test.ts 30 passed(+2 maint-fix) / PluginOpportunisticEvolution+GitDiffCheckpoint 19 passed",
+    "验收#5 门禁: lint:repo-boundary PASS(0/75) / report:agent-extraction-boundary filesWithBoundaryImports=0; biome 改动 3 文件 clean; D3 grep git_diff_checkpoints 在 FileChangeHandler.ts/CommitDrivenMaintenance.ts 均 0",
+    "全量 unit (Node22): 1601 tests/1553 passed/48 failed/13 文件; failed-set 与上一基线(um-after,含 Core-drift content-patcher) diff IDENTICAL=零新回归(+2 maint-fix 测试入 passed)",
+    "commit 31f17d5 (main, baseline f1dfcfc→HEAD 31f17d5, 3 files +91/-10): FileChangeHandler.ts, CommitDrivenMaintenance.ts, FileChangeHandler.test.ts"
+  ],
+  "risks": [
+    "真机 committed→propose E2 镜像(impactful commit→update proposal observing + 游标 advance 并存非 XOR；trivial commit→仍 skip)归 Test 再验(维护走通收口验收)，不在本窗口(本仓 CLAUDE.md 禁冒充用户项目跑真机)。双 propose(uncommitted E1 + committed E2)靠已 landed UM#7 dedup 兜重叠。",
+    "content-patcher.test.ts 仍失败=Core 漂移(U4/后续 Core advance 至 afd4302)、非本回归(上一任务已 stash 隔离证实+import 分析；本次 diff vs um-after IDENTICAL)。与 maint-fix 无关。",
+    "本次仅改 2 活副本(FileChangeHandler #handleModified assessFileImpact diff 源 + CommitDrivenMaintenance 透传)+单测；未重开 LP7 判定、未改非 git-head 默认、未读写 git_diff_checkpoints(range 取自 scan.range)、未动死副本/shim。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-maint-fix-plugin__AlembicPlugin__maint-fix-plugin",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-fix-plugin__AlembicPlugin__maint-fix-plugin.json",
+    "deliveryRunId": "run-delivery-wave2-maint-fix-plugin__AlembicPlugin__maint-fix-plugin",
+    "dispatchGroup": "wave2-maint-fix-plugin",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-fix-plugin__AlembicPlugin__maint-fix-plugin.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 34,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-maint-fix-plugin",
+    "targetTaskId": "maint-fix-plugin",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave2-maint-fix-plugin",
+    "resultId": "tr-maint-fix-plugin",
+    "createdAt": "2026-06-25T23:13:31.872Z"
+  },
+  "createdAt": "2026-06-25T23:13:31.872Z",
+  "stateRevisionObserved": 34,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

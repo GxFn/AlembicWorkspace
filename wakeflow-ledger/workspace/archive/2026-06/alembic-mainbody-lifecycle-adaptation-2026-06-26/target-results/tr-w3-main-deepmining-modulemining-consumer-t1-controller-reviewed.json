@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w3-main-deepmining-modulemining-consumer-t1-controller-reviewed",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w3-main-deepmining-modulemining-consumer-p1",
+  "dispatchGroup": "w3-main-deepmining-modulemining-consumer-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "w3-main-deepmining-modulemining-consumer-t1",
+  "status": "completed",
+  "summary": "Controller raw review of Alembic commit cdc5d8593c50ee0bb7692311ff18efd32b54791c found W3 consumer integration is not acceptable yet. The implementation routes deepMining and moduleMining, but deepMining runs the PlanSelection gate once before the multi-round loop and reuses it for every round, while Design §4b D1 requires each round to run runPlanAgent(deepMining) as a hard gate. The deepMining stop budget also reads minNewRecipes/maxRounds only from job args instead of PlanSelection.scale projection/defaults required by §4b D6.",
+  "evidenceRefs": [
+    "commit:cdc5d8593c50ee0bb7692311ff18efd32b54791c",
+    "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md",
+    "Alembic/lib/daemon/DaemonJobRunner.ts",
+    "Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts",
+    "Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts",
+    "Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts",
+    "Alembic/test/unit/DaemonJobRunner.test.ts",
+    "Alembic/test/unit/ProjectContextWorkflowFacts.test.ts"
+  ],
+  "verification": [
+    "PASS node v22.22.1 npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/DaemonJobRunner.test.ts test/unit/ProjectContextWorkflowFacts.test.ts",
+    "PASS npm run build:check && npm run typecheck",
+    "PASS git diff --check HEAD && npm run lint:core-import-boundary && npm run lint:repo-boundary",
+    "Controller source review: Design §4b D1 line 143 requires each deepMining round to run runPlanAgent(deepMining); DaemonJobRunner.ts lines 1012-1017 run runPlanSelectionGate once before while loop at line 1063 and rescan calls at lines 1075-1093 reuse planGate.",
+    "Controller source review: Design §4b D6 line 148 requires K/maxRounds from PlanSelection.scale projection/defaults; DaemonJobRunner.ts lines 1048-1049 read options.args?.minNewRecipes and options.args?.maxRounds."
+  ],
+  "risks": [
+    "W3 cannot be accepted because the core PD-5 per-round Plan precondition is not enforced inside the deepMining loop.",
+    "A later round cannot adapt moduleScope, dimensions, per-cell targets, or stop budgets to the latest coverage ledger facts if the same planGate is reused.",
+    "Existing tests prove two rescan rounds but do not assert runPlanAgent is called once per round, so the regression is not guarded."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w3-main-deepmining-modulemining-consumer-p1__Alembic__w3-main-deepmining-modulemining-consumer-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w3-main-deepmining-modulemining-consumer-p1__Alembic__w3-main-deepmining-modulemining-consumer-t1.json",
+    "deliveryRunId": "run-delivery-w3-main-deepmining-modulemining-consumer-p1__Alembic__w3-main-deepmining-modulemining-consumer-t1",
+    "dispatchGroup": "w3-main-deepmining-modulemining-consumer-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w3-main-deepmining-modulemining-consumer-p1__Alembic__w3-main-deepmining-modulemining-consumer-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 27,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w3-main-deepmining-modulemining-consumer-p1",
+    "targetTaskId": "w3-main-deepmining-modulemining-consumer-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "w3-main-deepmining-modulemining-consumer-p1",
+    "resultId": "tr-w3-main-deepmining-modulemining-consumer-t1-controller-reviewed",
+    "createdAt": "2026-06-27T03:47:48.055Z"
+  },
+  "createdAt": "2026-06-27T03:47:48.055Z",
+  "stateRevisionObserved": 27,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

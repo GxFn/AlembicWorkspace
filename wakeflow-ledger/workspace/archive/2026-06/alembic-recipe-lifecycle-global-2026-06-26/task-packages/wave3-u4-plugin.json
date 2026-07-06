@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "wave3-u4-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "summary": "波3 u4-plugin（U4 消费侧，独立、不需 D2 CG-7；前置 U4-Core dde34d4 已 landed）。d1 decay 第4 sweep driver：Plugin sweep(现 3 driver=staging promote/checkTimeouts/proposal execute) 后加调 Core DecayDetector.scanAll(cap)→tick 直走 transition(U4-Core 已实现 trigger='decay-detection')，cap caller-limited 有界；d2 lifecycleStateMachine 注入 decay driver 调用链(decay→transition 记 lifecycle_transition_events，先核 lifecycle-followup 现状不重复)；d3 订正 staging-access-sweep.ts:137/251-252 \"P3 本次不接线\" 过时注释(P3 已接线，复核行号+文本)。验收：decay driver 接通 unit(scanAll(cap)+transition trigger=decay-detection 记事件 cap 有界)/lifecycleStateMachine 注入非 undefined/注释订正 grep/零新回归+Node22 build:check+边界门禁。读设计 §U4 定位接线点；禁改 Core/vendor 仅经 @alembic/core；main 不 push；记消费 Core commit；不引 daemon。复核 HEAD 行号。真机 decay→deprecate→U7。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u4-plugin.md",
+  "createdAt": "2026-06-26T01:42:19.474Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "u4-plugin",
+      "taskPackageId": "wave3-u4-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U4 消费侧：decay 第4 sweep driver(Core DecayDetector.scanAll(cap)→tick transition trigger=decay-detection，cap 有界)+lifecycleStateMachine 注入 decay 链(记 lifecycle_transition_events)+订正 staging-access-sweep:137/251-252 \"P3 不接线\" 过时注释。验收 decay driver 接通/注入非 undefined/注释订正/零回归+Node22 build:check+边界门禁；读设计 §U4；禁改 Core/vendor、main 不 push、记消费 Core commit、不引 daemon。复核 HEAD。真机→U7。",
+      "status": "pending",
+      "createdAt": "2026-06-26T01:42:19.474Z"
+    }
+  ]
+}

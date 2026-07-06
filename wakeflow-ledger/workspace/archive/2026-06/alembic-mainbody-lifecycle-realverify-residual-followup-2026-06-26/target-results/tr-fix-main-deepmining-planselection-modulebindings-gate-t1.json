@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-fix-main-deepmining-planselection-modulebindings-gate-t1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+  "dispatchGroup": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "fix-main-deepmining-planselection-modulebindings-gate-t1",
+  "status": "completed",
+  "summary": "Alembic mainbody consumer gate repaired for direct BiliDili realverify. Local main commit 9f01a965b41fa2130a6eb605fa11cf19a6c52649 imports Core assertPlanSelectionStageRequirements from @alembic/core/plans and calls it inside runPlanSelectionGate before applyPlanSelection and before any plan-gate success event. deepMining/moduleMining PlanSelection values without usable moduleBindings/module×dimension targets now fail in phase=plan-gate and do not enter runKnowledgeRescanWorkflow/runModuleMining; coldStart empty moduleBindings remain compatible. No Core, Agent, Plugin, Test, BiliDili, vendor, coverage-ledger writeback, provider split, anti-fabrication, or runDeepMiningRounds accounting changes were made. Per task package, committed locally on main and did not push.",
+  "evidenceRefs": [
+    "Alembic@9f01a965b41fa2130a6eb605fa11cf19a6c52649",
+    "Alembic/lib/daemon/DaemonJobRunner.ts",
+    "Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts",
+    ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/task-packages/fix-main-deepmining-planselection-modulebindings-gate-p1.json"
+  ],
+  "verification": [
+    "node --version => v22.22.1",
+    "npm run test -- test/unit/DaemonJobRunnerPlanGate.test.ts => passed after commit, 1 file / 13 tests",
+    "npm run build:check => passed after commit, local AlembicCore source build + tsc --noEmit",
+    "npm run lint => exit 0; printed existing noExplicitAny warnings in lib/service/handler-runtime/types.ts and lib/workflows/ai-execution/AgentRunProjections.ts, not touched by this task",
+    "git diff --check => passed before commit",
+    "mcp__alembic.alembic_code_guard on changed files => failed with Alembic plugin internal schema error: unrecognized key \"data\"; no actionable code finding",
+    "npm run lint:consumer-core-imports => failed on pre-existing transitional import at lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts:59; the new @alembic/core/plans import was not reported"
+  ],
+  "risks": [
+    "No push per dispatch packet; Alembic main is ahead of origin by 2 local commits, including the previous no-push coverage-ledger commit and this task commit.",
+    "Optional consumer-core-imports remains blocked by an existing coverage-ledger transitional import outside this narrow plan-gate task; controller may route it separately if still in scope."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-fix-main-deepmining-planselection-modulebindings-gate-p1__Alembic__fix-main-deepmining-planselection-modulebindings-gate-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-deepmining-planselection-modulebindings-gate-p1__Alembic__fix-main-deepmining-planselection-modulebindings-gate-t1.json",
+    "deliveryRunId": "run-delivery-fix-main-deepmining-planselection-modulebindings-gate-p1__Alembic__fix-main-deepmining-planselection-modulebindings-gate-t1",
+    "dispatchGroup": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-main-deepmining-planselection-modulebindings-gate-p1__Alembic__fix-main-deepmining-planselection-modulebindings-gate-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 51,
+    "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+    "targetTaskId": "fix-main-deepmining-planselection-modulebindings-gate-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+    "resultId": "tr-fix-main-deepmining-planselection-modulebindings-gate-t1",
+    "createdAt": "2026-06-27T16:09:42.553Z"
+  },
+  "createdAt": "2026-06-27T16:09:42.553Z",
+  "stateRevisionObserved": 51,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

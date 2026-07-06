@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "e2-agent-live-terminal-safety-rework-1-p1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "summary": "E-2 AlembicAgent rework after controller review. Keep commit b2088045's accepted safety/cwd/sandbox work, but fix the audit contract drift only: Design §10 E2-4 requires ToolContext auditSink to be a host-agnostic duck type mirroring AuditLogger.log(entry), and E2-5 requires action terminal.exec, result, duration, data.commandHash=sha256(command) with no raw command text. Current Agent commit defines ToolAuditSinkLike.record(event), terminal.ts calls sink.record(event), and tests only cover record(), so Alembic ToolContextFactory cannot pass tryGet('auditLogger') directly. Rework: replace the record() surface with log(entry); shape ToolAuditEntry to be directly compatible with Alembic AuditLogger.log, including action:'terminal.exec', result, duration, data:{commandHash}, and safe host-agnostic actor/resource/context defaults as needed; keep audit failures non-fatal; ensure every live terminal.exec path attempts exactly one audit when sink exists; remove/replace tests that only prove record(); add targeted tests proving a log sink receives one hash-only entry and a throwing log sink is non-fatal; assert raw command text is absent. Do not support/keep the rejected record() alias unless a source requirement is found; do not expand into E-1 terminal allowlist, E-3 dead-stack deletion, E-4 phantom cleanup, or AnalyzeGroundingGuard. Validate with Node >=22: targeted runtime terminal safety tests, build:check, and any affected contract/public-signature tests. Commit on AlembicAgent main and return TargetResultEnvelope with commit hash, changed files, command outputs, and residual risks.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-2",
+  "createdAt": "2026-06-27T09:48:51.898Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "e2-agent-live-terminal-safety-rework-1-t1",
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-1-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-agent-live-terminal-safety-rework-1-p1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Apply only the audit contract rework from the package: .log(entry) + AuditLogger-compatible hash-only entry shape; no cross-repo edits and no scope expansion. Commit locally and backfill evidence.",
+      "status": "pending",
+      "createdAt": "2026-06-27T09:48:51.898Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

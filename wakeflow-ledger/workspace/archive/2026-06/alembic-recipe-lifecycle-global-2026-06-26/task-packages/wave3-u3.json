@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "wave3-u3",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "summary": "波3 u3（rescan/deepMining/moduleMining 输出预算化对齐，leaf 几乎独立，wave1 遗漏；零改 Core）。1 新 briefing-budget.ts 抽 stage-无关 budgetBriefingResponseData(read response.data→jsonByteLength→≤预算 inline+removeTransient / >预算 writeTransientTransport+compact 回调+attachRef meta，复用 #shared/transient-transport，compact 不下沉)；2 cold-start.ts:434-461,270 budgetColdStartResponseData 改调共享步骤(bootstrap-briefing/18KB/compactColdStartBriefing/meta.fullBriefingRef)，行为逐字段一致=硬验收；3 knowledge-rescan:245-268 buildRescanResponse 在 attach* 后调 budgetBriefingResponseData(rescan-briefing,meta.fullBriefingRef)，沿用 fullBriefingRef 名零改 output.ts allowlist；4 knowledge-rescan:322-379 moduleMining 调 attachPlanScopeTargetCounts(与 cold-start:290 对称，moduleScope 来自 sourceFileFacts D1，deepMining 不调)；5 mcp-tools:1149,1071 generationStage .describe() 纯文案；6 recipe-map fullMapRef 不做(用户/Design 决)。验收：共享步骤 unit/cold-start 行为快照一致/rescan 预算 unit/moduleMining 计数对称/Node22 build:check+边界门禁+output-contract 不破零回归。零改 Core/vendor 仅只读核验 KnowledgeRescanPresenters data 形状；main 不 push；记消费 Core commit。复核 HEAD 行号。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u3.md",
+  "createdAt": "2026-06-26T02:03:34.302Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "u3",
+      "taskPackageId": "wave3-u3",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U3 输出预算化（零改 Core）：新 briefing-budget.ts 抽 budgetBriefingResponseData + cold-start 改调(行为逐字段一致硬验收) + rescan buildRescanResponse 预算化(fullBriefingRef 复用零改 allowlist) + moduleMining 调 attachPlanScopeTargetCounts(deepMining 不调) + mcp-tools describe；item6 recipe-map 不做(用户/Design 决)。验收 共享步骤/cold-start 快照一致/rescan 预算/moduleMining 计数对称/Node22 build:check+边界门禁+output-contract+零回归；零改 Core/vendor、main 不 push、记消费 Core commit。复核 HEAD。",
+      "status": "pending",
+      "createdAt": "2026-06-26T02:03:34.302Z"
+    }
+  ]
+}

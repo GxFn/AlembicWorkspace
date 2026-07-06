@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1",
+  "dispatchGroup": "rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-t1",
+  "status": "needs-review",
+  "summary": "Test reran the real BiliDili deepMining -> immediate moduleMining sequence through the current Codex Alembic MCP host after AlembicPlugin 63cefd278c934773ee56a6c4385d660556f694c0. Baseline matched the controller sourceRef: BiliDili active-sessions was empty and SQLite coverage_ledger=24 before the run. MCP deepMining succeeded (ok=true/status=ready), kept coverage_ledger populated, and advanced deep_mining_rounds from 3 to 4; however it created a new empty active session bs-<redacted> with no completed dimensions, reports, submitted candidates, tracker dimensions, or file evidence. Immediate MCP moduleMining then failed with BOOTSTRAP_IN_PROGRESS on that same fresh empty session. Quality gate remained strict: invalid probe @rvrf-invalid-rejection-after-deepmining-ledger-repair returned QUALITY_GATE_FAILED with DONT_CLAUSE_NON_IMPERATIVE and CONTENT_CONTRAST_MISSING, and SQL trigger count remained 0. Test did not manually delete or edit BiliDili DB/session data and did not continue to evolution/StructuredPatch/Ollama after the first true blocker. Additional cache evidence: local AlembicPlugin lib/dist contains 63cefd2 fields releasedEmptySession and coverageLedgerSeed, but the installed Codex plugin cache search found neither, so this result is most consistent with a current attached MCP projection/cache-stale blocker or an MCP wrapper path not using the repaired code; controller/Plugin should decide the reload/temporary-Test-window route before redispatch.",
+  "evidenceRefs": [
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/bootstrap-sessions/active-sessions.json",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/logs/combined.log",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/dist/lib/recipe-generation/host-agent-workflows/knowledge-rescan.js",
+    "/Users/gaoxuefeng/.codex/plugins/cache/gxfn/alembic-codex/0.2.0"
+  ],
+  "verification": [
+    "Git evidence: AlembicPlugin HEAD 63cefd278c934773ee56a6c4385d660556f694c0; AlembicCore HEAD 051ddf282309e485e8f3359337b9b9f3be011515; BiliDili HEAD 6f1bf34cf1b6daca4e08895db211939115dac868; BiliDili git status ## main...origin/main [ahead 1], no worktree changes.",
+    "MCP alembic_status: ok=true/status=ready for BiliDili, projectId=02a25032, recipeCount=42, bootstrapRunning=false, pure-local route, daemon removed/stopped.",
+    "Before retest: active-sessions count=0; SQLite coverage_ledger=24, coverage_grade covered=14/partial=10, knowledge_entries=42, module_nonempty=0, semantic_memories=42, recipe_source_refs=128 rows / 42 distinct recipe_id / 128 content_fp, deep_mining_rounds=3 before rerun.",
+    "MCP alembic_plan draft+confirm deepMining succeeded for dimensions architecture, networking-api, swift-objc-idiom and modules BiliDili/Modules, Sources/Infrastructure/Networking, Packages/AOXNetworkKit.",
+    "MCP alembic_rescan deepMining rescanId=rvrf-after-deepmining-ledger-repair-deep-20260626 returned ok=true/status=ready; coverageAdvisory shouldStop=true stopReason=converged; unifiedEvolution no-op at BiliDili HEAD 6f1bf34cf1b6daca4e08895db211939115dac868.",
+    "After deepMining: active-sessions count=1; id=bs-<redacted>; dimensions=architecture,networking-api,swift-objc-idiom; completedDimensionCount=0; reportCount=0; submittedCount=0; trackerDimensionCount=0; fileEvidenceCount=0.",
+    "After deepMining SQLite: knowledge_entries=42; module_nonempty=0; semantic_memories=42; recipe_source_refs=128/42/128; coverage_ledger=24; coverage_grade covered=14 partial=10; deep_mining_rounds=4 sum(new_recipes_this_round)=0 max(round_index)=4; evolution_proposals=3.",
+    "Representative coverage_ledger rows include BiliDili/architecture covered 5/5, BiliDili/networking-api partial 2/2, Packages/AOXNetworkKit/networking-api covered 5/5, Sources/networking-api covered 3/3, with non-empty covered_source_refs lengths from 473 to 3862 chars.",
+    "MCP alembic_plan draft+confirm moduleMining succeeded for BiliDili/Modules architecture/networking-api without manual session cleanup.",
+    "Immediate MCP alembic_rescan moduleMining rescanId=rvrf-after-deepmining-ledger-repair-module-20260626 returned ok=false/status=failed; error.code=BOOTSTRAP_IN_PROGRESS; activeSessionId=bs-<redacted>; retryable=true; httpStatus=409.",
+    "Final active-sessions remained count=1 with the same empty bs-<redacted>; moduleName query returned no rows (module_nonempty=0).",
+    "Invalid recipe probe @rvrf-invalid-rejection-after-deepmining-ledger-repair returned QUALITY_GATE_FAILED; rejectedItems DONT_CLAUSE_NON_IMPERATIVE and CONTENT_CONTRAST_MISSING; SQL invalid_trigger_count=0.",
+    "Log evidence: combined.log includes '[Rescan] ProjectContext Mission Briefing ready ... session bs-<redacted>', roundIndex=4, and subsequent MCP BOOTSTRAP_IN_PROGRESS for that same session at 2026-06-26T15:15:38.761Z.",
+    "Cache evidence: rg for releasedEmptySession/coverageLedgerSeed finds them in local AlembicPlugin lib/dist but returns no matches under /Users/gaoxuefeng/.codex/plugins/cache/gxfn/alembic-codex/0.2.0 and codex-marketplace-global."
+  ],
+  "risks": [
+    "Retest question 1 BLOCKED/FAIL: current live MCP still leaves a fresh empty no-work session after deepMining and immediate moduleMining still returns BOOTSTRAP_IN_PROGRESS.",
+    "Retest question 2 PARTIAL PASS: coverage_ledger is populated with 24 real rows and representative non-empty covered_source_refs, but moduleMining cannot consume it through current live MCP because the session blocker fires first.",
+    "Retest question 3 PASS: quality gate remains strict and invalid probe did not create a knowledge entry.",
+    "Retest question 4 BLOCKED: moduleMining/evolution/StructuredPatch/Ollama continuation was stopped at the first true blocker to avoid manual cleanup or surrounding-flow expansion.",
+    "Likely owner/boundary: AlembicPlugin current Codex plugin projection/current attached MCP cache, because local lib/dist has 63cefd2 repair markers while installed Codex plugin cache lacks them; if controller determines cache is stale, use Plugin-owned reload or a fresh temporary Test/Codex host, then redispatch. If fresh host still fails, repair the MCP rescan/session-release wiring in AlembicPlugin."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1__Test__rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1__Test__rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1__Test__rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-t1",
+    "dispatchGroup": "rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1__Test__rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 36,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1",
+    "targetTaskId": "rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-p1",
+    "resultId": "tr-rvrf-test-bilidili-realverify-after-deepmining-ledger-repair-t1",
+    "createdAt": "2026-06-26T15:17:40.265Z"
+  },
+  "createdAt": "2026-06-26T15:17:40.265Z",
+  "stateRevisionObserved": 36,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

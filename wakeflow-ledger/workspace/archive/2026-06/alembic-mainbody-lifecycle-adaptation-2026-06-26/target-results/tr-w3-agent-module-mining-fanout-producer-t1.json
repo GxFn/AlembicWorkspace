@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w3-agent-module-mining-fanout-producer-t1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w3-agent-module-mining-fanout-producer-p1",
+  "dispatchGroup": "w3-agent-module-mining-fanout-producer-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "w3-agent-module-mining-fanout-producer-t1",
+  "status": "completed",
+  "summary": "AlembicAgent implemented W3 moduleMining fan-out producer surfaces only in the AlembicAgent repo. Added projectContextModules partitioner/merge in AgentRunCoordinator, module-mining-session/module-mining-dimension profiles with bounded env concurrency, exported runModuleMining with pre-child scaleCap and full per-child budget preservation, added focused tests and public signature update. Commit c38d2c46853cb2cba8049dbee617b93c069e3bc2.",
+  "evidenceRefs": [
+    "AlembicAgent commit c38d2c46853cb2cba8049dbee617b93c069e3bc2 feat(agent): add module mining fanout runner",
+    "AlembicAgent/src/agent/coordination/AgentRunCoordinator.ts projectContextModules partitioner reads params.modules, omits dimensions/moduleSeeds, throws on empty modules, and merges moduleResults",
+    "AlembicAgent/src/agent/profiles/definitions/module.profile.ts module-mining-session/module-mining-dimension profiles with ALEMBIC_MODULE_MINING_CONCURRENCY default 2",
+    "AlembicAgent/src/agent/runs/module/ModuleMiningAgentRun.ts runModuleMining applies scaleCap before AgentService.run and passes full budget without division",
+    "AlembicAgent/test/module-mining-agent-run.test.ts focused 3 modules -> 3 children, empty modules throw, 8 modules + scaleCap 3 -> 3 children/full budget/no dimension cross/sharedState undefined",
+    "AlembicAgent/config/agent-public-api-signatures.json updated public binding snapshot to include runModuleMining"
+  ],
+  "verification": [
+    "node -v => v22.22.1",
+    "npm run build:check => PASS",
+    "npm run test -- test/module-mining-agent-run.test.ts test/contract-surface.test.ts => PASS (2 files, 10 tests)",
+    "npm run lint => PASS with 4 pre-existing warnings in scripts/codemod-rename.mjs, scripts/smoke-agent-public-signatures.mjs, scripts/verify-agent-validation-floor.mjs",
+    "npm run lint:public-api-boundary => PASS (13 exact exports, no wildcard exports)",
+    "npm run lint:core-import-boundary => PASS (261 files, 46 @alembic/core imports)",
+    "npm run smoke:public-signatures => PASS (13 exports, 478 bindings)",
+    "npm run smoke:public-imports => PASS (13 subpaths imported, 6 forbidden subpaths rejected)",
+    "npm run verify:validation-floor => PASS (testFiles=41 declaredTestCases=290 stablePublicExportCount=13 coreReferenceLimitTotal=52 packEntryCount=460)",
+    "npm run test => PASS (41 files, 289 tests)",
+    "git diff --check => PASS",
+    "rg -n 'moduleSeeds|repository|ledger|sharedState|dimensions' over W3 files showed moduleSeeds/dimensions only in exclusion/prohibition text, sharedState only in test asserting undefined, repository/ledger only in prohibition text"
+  ],
+  "risks": [
+    "AlembicAgent local main is ahead of origin by 2 commits and was not pushed, per window boundary.",
+    "npm run lint still reports 4 pre-existing warnings unrelated to this change, but exits 0.",
+    "W3 producer surfaces are ready for Alembic main consumer; actual Alembic main moduleMining job wiring remains a downstream/controller-owned task, not executed in this AlembicAgent window."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w3-agent-module-mining-fanout-producer-p1__AlembicAgent__w3-agent-module-mining-fanout-producer-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w3-agent-module-mining-fanout-producer-p1__AlembicAgent__w3-agent-module-mining-fanout-producer-t1.json",
+    "deliveryRunId": "run-delivery-w3-agent-module-mining-fanout-producer-p1__AlembicAgent__w3-agent-module-mining-fanout-producer-t1",
+    "dispatchGroup": "w3-agent-module-mining-fanout-producer-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w3-agent-module-mining-fanout-producer-p1__AlembicAgent__w3-agent-module-mining-fanout-producer-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 23,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w3-agent-module-mining-fanout-producer-p1",
+    "targetTaskId": "w3-agent-module-mining-fanout-producer-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "w3-agent-module-mining-fanout-producer-p1",
+    "resultId": "tr-w3-agent-module-mining-fanout-producer-t1",
+    "createdAt": "2026-06-27T03:18:02.634Z"
+  },
+  "createdAt": "2026-06-27T03:18:02.634Z",
+  "stateRevisionObserved": 23,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

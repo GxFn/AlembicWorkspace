@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "e2-agent-live-terminal-safety-p1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "summary": "E-2 safety preflight producer for AlembicAgent. Implement only the AlembicAgent live terminal.exec hardening from Design §10: add src/tools/runtime/handlers/terminalSafety.ts by copying only input-agnostic DENIED_BINS/detectDangerousShellPayload primitives into a live-side wrapper (do not import dead terminal stack); replace terminal.ts local substring deny constants with terminalSafety; fix cwd jail with path.relative boundary; extend ToolContext/registry types with optional auditSink duck type; record exactly one audit attempt for live terminal.exec success/failure with action terminal.exec, result, duration, sha256 commandHash only (do not store command text; audit failure must not change tool result); surface sandboxed=false/degradeReason/fallbackUsed diagnostics in terminal result metadata/output. Do not give Agent write terminal access, do not add Evolution terminal yet, do not delete dead stack yet, do not change AnalyzeGroundingGuard default. Validate with Node >=22: build/typecheck, targeted terminal safety tests covering sudo spacing/quoted bypass, shell payload, rm -fr/fork bomb denial, benign read-only command pass, cwd sibling rejection, audit hash/no raw command, audit sink throwing non-fatal, and sandbox fallback diagnostic. Commit on AlembicAgent main and return TargetResultEnvelope with commit hash, changed files, commands, outputs, residual risks.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E-2",
+  "createdAt": "2026-06-27T09:33:15.372Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "e2-agent-live-terminal-safety-t1",
+      "taskPackageId": "e2-agent-live-terminal-safety-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-agent-live-terminal-safety-p1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Implement exactly E-2 Agent-side live terminal.exec safety hardening from the task package and Design §10, with no cross-repo edits and no dead-stack deletion. Commit locally and backfill evidence.",
+      "status": "pending",
+      "createdAt": "2026-06-27T09:33:15.372Z"
+    }
+  ]
+}

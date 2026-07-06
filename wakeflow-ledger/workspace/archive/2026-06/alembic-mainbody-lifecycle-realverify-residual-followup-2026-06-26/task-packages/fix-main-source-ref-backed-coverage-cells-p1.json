@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "fix-main-source-ref-backed-coverage-cells-p1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "Repair the remaining finding#1 gate after direct BiliDili Test proved deepMining now produces real recipes/source refs but coverage_ledger still records zero covered cells: coverage writes must be driven by accepted persisted recipe source refs, not only coarse dimension result referencedFiles.",
+  "status": "pending",
+  "sourceRef": "evidence/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-controller-review.md; target-results/tr-verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1/evidence/deepmining-coverage-sql-summary.json; Test/tmp/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-t1/evidence/deepmining-db-delta-summary.json; Design/docs/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26.md §3/§6/§7",
+  "createdAt": "2026-06-27T18:20:33.488Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "fix-main-source-ref-backed-coverage-cells-t1",
+      "taskPackageId": "fix-main-source-ref-backed-coverage-cells-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, the active state root, Alembic repository rules, the task package, and the controller review evidence `evidence/verify-test-bilidili-mainbody-realverify-after-deepmining-agent-repairs-controller-review.md`. Declare Alembic window/repository identity. Do not rerun Test. Test has now proved the live chain is past previous blockers: coldStart PASS, deepMining job completed, deep_mining_rounds +2, knowledge_entries +5, recipe_source_refs +25, coverage_ledger +57, but all coverage rows remain empty/thin with SUM(covered_count)=0 and covered_source_refs=[]. Diagnose and repair the Alembic mainbody coverage-write input chain so accepted, persisted recipe source refs for the deepMining dimension/round update coverage_ledger cells. Start from `Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts` and the repository/source-ref path used after anti-fabrication acceptance. The likely failure is that `writeKnowledgeRescanCoverageLedgerForDimension` still relies on `result.referencedFiles`/coarse dimension output rather than the accepted recipe source refs that were actually persisted to `recipe_source_refs`. Use only real accepted recipe/source-ref evidence; do not count rejected recipes, non-source-backed recipes, or fabricated refs. Ensure refs overlap canonical ProjectMap module owned files/ownedPaths through the existing Core coverage helper and path normalization. Preserve confirmed plan hard gate, no-fallback-to-full semantics, anti-fabrication and quality floors, DeepSeek generation, Ollama embeddings, runDeepMiningRounds accounting, and the earlier no-reflow/no-double-count boundary. Do not weaken gates to make converged pass. If a Core public contract bug is proven necessary, stop and backfill exact Core file/line/API need instead of broadening silently. Add focused regression tests that reproduce the real condition: accepted recipe source_refs exist while coverage would previously stay covered_count=0, and prove at least one real accepted source-ref-backed recipe writes covered_count>0 and non-empty covered_source_refs; add a negative case for rejected/bad/no-source-ref recipes. Run Node>=22 build:check and targeted tests. Commit locally on main, no push. Backfill commit hash, changed files, exact command outputs, raw evidence refs, risks, and whether Test should rerun the direct BiliDili chain after acceptance.",
+      "status": "pending",
+      "createdAt": "2026-06-27T18:20:33.488Z"
+    }
+  ]
+}

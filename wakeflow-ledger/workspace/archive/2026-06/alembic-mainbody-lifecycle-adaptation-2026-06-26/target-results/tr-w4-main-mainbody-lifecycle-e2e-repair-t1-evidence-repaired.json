@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w4-main-mainbody-lifecycle-e2e-repair-t1-evidence-repaired",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w4-main-mainbody-lifecycle-e2e-repair-p1",
+  "dispatchGroup": "w4-main-mainbody-lifecycle-e2e-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "w4-main-mainbody-lifecycle-e2e-repair-t1",
+  "status": "completed",
+  "summary": "Evidence-ref repair for Alembic W4 main repair: controller verified Alembic commit be39ab5aeb0d15294ea7960d30e8a9cc17f38989 in local main/origin-main, reviewed changed code paths, reran targeted unit regression, build:check, typecheck, import/repo boundaries, diff check, and verified GitHub Actions run 28278959377 success for head be39ab5. The implementation addresses public rescan mining controls, rescan MissionBriefing evidence handoff, ProjectMap module fallback from real target/file facts, and StagingManager lifecycle wiring. Process risk remains: target reported pushing Alembic/AlembicAgent commits; this is recorded as governance risk, not as code evidence.",
+  "evidenceRefs": [
+    "Alembic/lib/http/routes/jobs.ts",
+    "Alembic/lib/workflows/knowledge-rescan/KnowledgeRescanWorkflow.ts",
+    "Alembic/lib/workflows/project-context/ProjectContextWorkflowFacts.ts",
+    "Alembic/lib/injection/modules/KnowledgeModule.ts",
+    "Alembic/test/unit/JobsRoute.test.ts",
+    "Alembic/test/unit/ProjectContextWorkflowFacts.test.ts",
+    "Alembic/test/unit/KnowledgeModuleEvolutionWiring.test.ts",
+    "Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts",
+    "Alembic/test/unit/EvolutionMaintenanceSweep.test.ts"
+  ],
+  "verification": [
+    "git -C Alembic show --stat be39ab5aeb0d15294ea7960d30e8a9cc17f38989 confirmed 7 files changed: jobs route, KnowledgeModule, KnowledgeRescanWorkflow, ProjectContextWorkflowFacts, and targeted tests.",
+    "npm run test:unit -- test/unit/JobsRoute.test.ts test/unit/ProjectContextWorkflowFacts.test.ts test/unit/KnowledgeModuleEvolutionWiring.test.ts test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/EvolutionMaintenanceSweep.test.ts: 5 files passed, 42 tests passed.",
+    "npm run build:check: passed.",
+    "npm run typecheck: passed.",
+    "npm run lint:core-import-boundary: passed, 365 files and 418 @alembic/core imports scanned.",
+    "npm run lint:repo-boundary: passed, @escape-hatch count 1/75.",
+    "git diff --check HEAD: passed.",
+    "gh run view 28278959377 --repo GxFn/Alembic: status completed, conclusion success, headSha be39ab5aeb0d15294ea7960d30e8a9cc17f38989; Build & Lint, API Smoke Test, Integration Tests, Unit Tests all success."
+  ],
+  "risks": [
+    "alembic_code_guard was not usable from target result due MCP schema error; controller substituted code review plus local/CI validation.",
+    "Target reported pushing Alembic/AlembicAgent commits despite push being normally user-gated. This is a governance/process risk already externalized; no further push/release action should be taken by controller.",
+    "This accepts only Alembic main repair implementation; final W4 demand acceptance still requires Test to rerun real BiliDili C-F after repair."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w4-main-mainbody-lifecycle-e2e-repair-p1__Alembic__w4-main-mainbody-lifecycle-e2e-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-main-mainbody-lifecycle-e2e-repair-p1__Alembic__w4-main-mainbody-lifecycle-e2e-repair-t1.json",
+    "deliveryRunId": "run-delivery-w4-main-mainbody-lifecycle-e2e-repair-p1__Alembic__w4-main-mainbody-lifecycle-e2e-repair-t1",
+    "dispatchGroup": "w4-main-mainbody-lifecycle-e2e-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-main-mainbody-lifecycle-e2e-repair-p1__Alembic__w4-main-mainbody-lifecycle-e2e-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 39,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w4-main-mainbody-lifecycle-e2e-repair-p1",
+    "targetTaskId": "w4-main-mainbody-lifecycle-e2e-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "w4-main-mainbody-lifecycle-e2e-repair-p1",
+    "resultId": "tr-w4-main-mainbody-lifecycle-e2e-repair-t1-evidence-repaired",
+    "createdAt": "2026-06-27T04:57:58.278Z"
+  },
+  "createdAt": "2026-06-27T04:57:58.278Z",
+  "stateRevisionObserved": 39,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

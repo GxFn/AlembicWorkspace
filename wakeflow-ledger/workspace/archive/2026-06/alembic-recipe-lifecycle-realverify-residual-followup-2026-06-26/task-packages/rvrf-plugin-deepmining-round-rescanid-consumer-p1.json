@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rvrf-plugin-deepmining-round-rescanid-consumer-p1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "Close RF-3 consumer wiring after accepted Core producer commit 830f9028a7c4d145c8bb0ccbc23485901f1cdcd0. Plugin must pass the MCP/request rescanId into deep_mining_rounds open/reflow paths so the new Core rescan_id column is populated and repeated same rescanId stays idempotent. This is original RF-3 scope, not new feature scope.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md §8.4 RF-3 and §8.5#3; accepted AlembicCore result rvrf-core-deepmining-round-rescanid-repair-t1; controller raw search in AlembicPlugin showing knowledge-rescan.ts and coverage-ledger-write.ts still drop rescanId.",
+  "createdAt": "2026-06-26T16:09:26.765Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rvrf-plugin-deepmining-round-rescanid-consumer-t1",
+      "taskPackageId": "rvrf-plugin-deepmining-round-rescanid-consumer-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "You are the AlembicPlugin window. Read parent AGENTS.md, .wakeflow-active/index.md, this state root, this task package, Design requirement §8.4 RF-3 and §8.5#3, accepted Core producer result rvrf-core-deepmining-round-rescanid-repair-t1, and AlembicPlugin rules; declare repository identity. Work only in /Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin, do not edit AlembicCore/BiliDili/vendor and do not push/tag/bump.\n\nController raw evidence after accepting Core commit 830f9028: AlembicCore now exposes UpsertDeepMiningRoundInput.rescanId?, DeepMiningRoundRecord.rescanId, getRoundByRescanId(), and migration 016 for deep_mining_rounds.rescan_id with partial unique index. Plugin still drops the id: lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts currently comments that round table has no rescanId and openDeepMiningRound(ctx, projectRoot) calls repo.upsertRound without rescanId; lib/recipe-generation/host-agent-workflows/coverage-ledger-write.ts reflowDeepMiningRoundOnCompletion updates latest round without preserving latest.rescanId; test fakes in test/unit/CoverageLedgerWiring.test.ts and related expectations do not model rescanId.\n\nRequired Plugin repair: thread args.rescanId from knowledge-rescan deepMining entry into openDeepMiningRound and repo.upsertRound({rescanId}); update comments to remove the obsolete “round 表无 rescanId 列” accepted-compromise text; preserve old behavior when rescanId is absent. In reflowDeepMiningRoundOnCompletion, carry latest.rescanId into the upsertRound update so Core's rescan-aware idempotency key is preserved across completion updates. Update TypeScript tests/fakes so DeepMiningRoundRecord includes rescanId, add assertions that (1) opening a deepMining rescan passes rescanId to upsertRound, (2) repeated same rescanId does not create duplicate fake rounds / keeps original roundIndex, and (3) reflow upsert includes latest.rescanId while still preserving startedAt/triggerActor. If existing tests use objectContaining around upsertRound, make the new expectation explicit rather than hiding rescanId.\n\nHard guards: do not relax coverage/advisor/quality/anti-fabrication gates; do not mutate true BiliDili DB directly; do not change alembic_plan, evidence gates, or unrelated rescan behavior; no new daemon/provider/runtime. Validate with Node 22, npm run build:check, targeted CoverageLedger/knowledge-rescan tests, and git diff --check. Backfill commit hash, changed files, exact validation output, and any remaining Test evidence needed.",
+      "status": "pending",
+      "createdAt": "2026-06-26T16:09:26.765Z"
+    }
+  ]
+}

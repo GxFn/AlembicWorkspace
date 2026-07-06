@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u4-core-decay-trigger",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave1-u4-core-decay",
+  "dispatchGroup": "wave1-u4-core",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "u4-core-decay-trigger",
+  "status": "completed",
+  "summary": "U4-Core DecayDetector 衰减触发器恢复完成（提交 main dde34d4）。范围仅 DecayDetector.ts + test/unit/DecayDetector.test.ts。#1+#2 authority 量纲：/100→/5（0-5 域，来源 KnowledgeService.ts:768 Math.round(score*5)）+ Math.max(0,..) 兜底；缺 key 默认 50→2.5(→0.5)。#3 cold-start grace：freshness 缺 lastHitAt 时回落 createdAt 锚点（镜像策略1 created_at 路径），健康新 recipe(lastHitAt=null/createdAt=now) freshness≈1、不被误判 severe/dead；仅新创建豁免，≥365d 从未使用仍随龄衰减（未放松判定门禁）。#4 scanAll(cap?)：透传 #loadActiveRecipes→findAllByLifecycles(['active'], cap)（已支持 limit+最旧优先）；undefined 无界（字节兼容）；Core 不设默认。#5 注入可选 lifecycleStateMachine：scanAll 对 level∈{decaying,severe,dead} 直驱 transition(active→decaying, trigger='decay-detection')；B1 不依赖信号订阅（decay 无预建 observing proposal，#onSignal 落空）；isValidTransition 保 decaying→decaying 幂等；保留 signalBus.send('decay') 可观测；decaying→deprecated 仍由现役 checkTimeouts 30d 接管。#6 测试域 0-100→0-5（healthy 4-5、severe/dead 0-1）+ 新增 authority 归一/cold-start/cap/transition 断言。注：任务包写 trigger:'decay'，但合法 TransitionTrigger 是 'decay-detection'（'decay' 不过类型检查），故用语义等价的后者。未改：5 策略/4 维权重/level 阈值/grace 语义；KnowledgeService:768（仅证据）；无 daemon；未碰 staging/ProposalExecutor(U5)。已 npm run build 重生 dist 供 U4-Plugin（file:../AlembicCore）消费；commit 仅 src+test。",
+  "evidenceRefs": [
+    "AlembicCore/src/service/evolution/DecayDetector.ts",
+    "AlembicCore/test/unit/DecayDetector.test.ts"
+  ],
+  "verification": [
+    "node -v: v22.22.1 (.nvmrc=22)",
+    "npm run build:check: green (tsc --noEmit)",
+    "npx vitest run test/unit/DecayDetector.test.ts: 1 file / 18 tests passed（14 转 0-5 域 + 4 新增：authority 归一/cold-start/cap/transition）",
+    "npm run test 全量: 131 files / 1346 tests passed，failed-set 为空（无回归；对基线 131/1342 为 +4 tests）",
+    "三态 decayScore（BiliDili 同形 lastHitAt=null/createdAt=now/quality=0.85/authority=4）：修前 18→dead（临时回退 authority+freshness 两修复实证：cold-start 测试 FAIL `expected 'dead' not to be 'dead'`）；仅修 authority 33→severe（解析：round(0+0+0.85×20+0.8×20)）；全修 63→watch（测试断言 decayScore===63）、不 transition",
+    "grep 证据：KnowledgeService.ts:768 `authority: Math.round(result.score * 5)`（0-5 域量纲来源，仅证据未改）；DecayDetector findAllByLifecycles(['active'], cap) 透传、transition trigger='decay-detection'、signalBus.send('decay') 保留",
+    "npm run build: green (clean-dist + tsc 重生 dist；dist gitignored 未提交)",
+    "npm run lint (Biome): Checked 622 files, no fixes — clean",
+    "git diff --check: 无空白错误",
+    "commit dde34d431bcb512f816c8c621871f2916c2592eb (main)；改动文件: src/service/evolution/DecayDetector.ts, test/unit/DecayDetector.test.ts (2 files +183/-38)"
+  ],
+  "risks": [
+    "transition trigger 用 'decay-detection'（任务包文本 'decay' 非合法 TransitionTrigger，会编译报错）；语义=衰减检测驱动，与设计一致。若控制器/Design 期望别名 trigger，可指出。",
+    "scanAll 注入 lifecycleStateMachine 为可选；现有无 lifecycle 调用方仅评估+发信号（向后兼容）。U4-Plugin 需注入 lifecycleStateMachine 并提供 cap（Core 不设默认，cap===undefined 视为无界）。",
+    "cold-start grace 仅覆盖 freshness 维；usage=0 对新 recipe 仍拉低 score（封顶 watch、非 healthy）——符合「不被 severe/dead/transition」目标，未额外给 usage grace（超范围）。",
+    "强制串：本任务须先于同窗口 U5-Core；至此 U4-Core 已 landed+green。decaying→deprecated 由现役 checkTimeouts 30d 接管，不在本任务。真机三态只读比对 BiliDili DB 属 Test 窗口域（Core 侧以同形构造单测 + 解析数值等价证明）。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave1-u4-core__AlembicCore__u4-core-decay-trigger",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-u4-core__AlembicCore__u4-core-decay-trigger.json",
+    "deliveryRunId": "run-delivery-wave1-u4-core__AlembicCore__u4-core-decay-trigger",
+    "dispatchGroup": "wave1-u4-core",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-u4-core__AlembicCore__u4-core-decay-trigger.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 6,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave1-u4-core-decay",
+    "targetTaskId": "u4-core-decay-trigger",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "wave1-u4-core",
+    "resultId": "tr-u4-core-decay-trigger",
+    "createdAt": "2026-06-25T20:21:12.381Z"
+  },
+  "createdAt": "2026-06-25T20:21:12.381Z",
+  "stateRevisionObserved": 6,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

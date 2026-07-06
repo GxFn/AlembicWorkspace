@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "Mainbody consumer gate repair for direct BiliDili realverify: enforce Core stage-aware PlanSelection requirements at Alembic daemon plan gate before deepMining/moduleMining can report plan-gate success or enter rescan/moduleMining execution.",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/evidence/verify-test-bilidili-mainbody-realverify-after-deepseek-keyfix-controller-review.md + accepted Core commit 934d043a0d12ac364aa582d6c39445f14a0af2e1 + accepted Agent commit afe4c2b48ece5475f9fbfdcdd1ac974ad61fedcf",
+  "createdAt": "2026-06-27T16:02:53.115Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "fix-main-deepmining-planselection-modulebindings-gate-t1",
+      "taskPackageId": "fix-main-deepmining-planselection-modulebindings-gate-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, the current state root, and Alembic CLAUDE/AGENTS rules. Declare Alembic mainbody repository identity. This is a narrow live-consumer repair following accepted Core commit 934d043a0d12ac364aa582d6c39445f14a0af2e1 and accepted Agent commit afe4c2b48ece5475f9fbfdcdd1ac974ad61fedcf. In Alembic/lib/daemon/DaemonJobRunner.ts, update runPlanSelectionGate so it consumes @alembic/core/plans assertPlanSelectionStageRequirements(selection, { expectedStage: gate.generationStage }) or equivalent public Core export before applyPlanSelection and before recording plan-gate success. deepMining/moduleMining selections without valid moduleBindings/module×dimension targets must fail at the plan gate with actionable diagnostics and must not enter runKnowledgeRescanWorkflow/runModuleMining; coldStart must remain compatible with empty moduleBindings. Preserve the existing no-fallback-to-full behavior, DeepSeek/Ollama provider split, coverage ledger writeback logic, runDeepMiningRounds accounting, quality/anti-fabrication gates, and all previous A-F behavior. Add or adjust Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts coverage proving: (1) coldStart empty moduleBindings still passes when dimensions are valid, (2) deepMining empty moduleBindings fails at plan gate before rescan and records an error event, (3) moduleMining empty moduleBindings fails at plan gate before moduleMining, and (4) valid deepMining/moduleMining bindings still pass and preserve projection/module targets. Run Node>=22 npm run build:check and targeted DaemonJobRunnerPlanGate tests; run broader npm run test or npm run check if touched boundary requires it. Commit locally on main, no push. Backfill commit hash, changed files, exact commands, outputs summary, and risks. Do not modify Core, Agent, Plugin, Test, BiliDili, vendor snapshots, or unrelated flow.",
+      "status": "pending",
+      "createdAt": "2026-06-27T16:02:53.115Z"
+    }
+  ]
+}

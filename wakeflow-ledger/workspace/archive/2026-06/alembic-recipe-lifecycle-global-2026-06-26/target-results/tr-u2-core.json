@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u2-core",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave3-u2-core",
+  "dispatchGroup": "wave3-u2-core",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "u2-core",
+  "status": "completed",
+  "summary": "U2-Core 完成：deepMining 覆盖账本（Core producer），全 Core additive、分阶段提交（禁碰 vendor）。5 commits over 27ef04b：164c87f(U2a 持久层)→f2b0483(U2d Advisor)→8978381(U2b intent+gap)→85a95ca(U2a buildCoverageLedger)→74387b2(注释整理)。\n\n红线守住：账本是覆盖状态持久化、不是 plan/session 持久化（plan 仍每轮无状态 draft→confirm；表无计划/会话字段）；grade/exhausted 是 advisory 覆盖信号、严禁当生产或阻断门。\n\nU2a 持久层：migration 015（非 014，已被 u6 占）建 coverage_ledger（UNIQUE project_root×module_id×dimension_id；covered/total_candidate_count、grade、exhausted+reason+source、covered_source_refs/uncovered_hints JSON、value_score、last_round、deferred）+ deep_mining_rounds（round_index/started/completed/new_recipes_this_round/trigger_actor）。drizzle schema + CoverageLedgerRepository（复刻 git-diff checkpoint 仓 upsert/onConflictDoUpdate/listByProjectRoot/#mapRow，键改 module×dimension + listByModule + 轮次 upsert/list）注册 repositories.ts。\n\nU2a buildCoverageLedger（CompletenessCritic.ts 加聚合层、不改单候选）：跨维候选+coveredPaths→per-(module×dimension) cell grade；module 归属用 caller 提供 canonical ModuleSummary ownedPaths + pathsOverlap（不读宿主 fs、不硬编码宿主路径，project_root 由 upsert 方供）；exhausted 仅 Agent 声明落库（agent-declared）；buildCompletenessCritic shouldBlockCompletion:false/targetGate:'advisory' 不变。\n\nU2b intent+gap：KnowledgeRescanWorkflowIntent 加 perDimensionTargets + moduleDimensionTargets（ModuleDimensionTarget，激活死字段 moduleBindings.targetRecipes）；buildKnowledgeRescanPlan existingCount 优先读账本（ledgerCoverageByDimension）无则回退现算、per-dim 目标优先 Agent（perDimensionTargets）否则回退 TARGET_RECIPES_PER_DIMENSION=5（仅 fallback，deepMining 不再被硬 5 锁死）。\n\nU2d CoverageLedgerAdvisor（host-agent 纯函数读账本）：三停止 收敛/收益递减(<K)/轮次上限(≥maxRounds) + highValueBlankCount + 价值排序 + 「还有 N 高价值空白」建议；K(S1/M2/L3)·maxRounds(S2/M3/L5) = plan ?? D2[tier]（const+env+guard，tier 由 resolveModuleTier）；advisory 非自动调度。U2c/U2e/draft/写点/attach = u2-plugin（Core 先出 Plugin 后接）。",
+  "evidenceRefs": [
+    "AlembicCore/src/infrastructure/database/migrations/015_coverage_ledger.ts",
+    "AlembicCore/src/infrastructure/database/drizzle/schema.ts",
+    "AlembicCore/src/repository/evolution/CoverageLedgerRepository.ts",
+    "AlembicCore/src/repositories.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/CoverageLedgerAdvisor.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/CompletenessCritic.ts",
+    "AlembicCore/src/workflows/capabilities/host-agent/index.ts",
+    "AlembicCore/src/workflows/capabilities/planning/knowledge/KnowledgeRescanPlanBuilder.ts",
+    "AlembicCore/src/workflows/knowledge-rescan/KnowledgeRescanIntent.ts",
+    "AlembicCore/test/CoverageLedgerRepository.test.ts",
+    "AlembicCore/test/unit/CoverageLedgerAdvisor.test.ts",
+    "AlembicCore/test/unit/BuildCoverageLedger.test.ts",
+    "AlembicCore/test/unit/KnowledgeRescanPlanBuilder.test.ts"
+  ],
+  "verification": [
+    "分阶段 commits（main，无 push/tag/bump，禁 vendor，无 dist 跟踪）：164c87f / f2b0483 / 8978381 / 85a95ca / 74387b2",
+    "npm run build:check → tsc --noEmit 0 error",
+    "npm run test → 141 files / 1394 tests passed（U2 基线 138/1379；+3 file +15 test，零回归；migration manifest + CompletenessCritic 既有单测全过）",
+    "npm run lint → biome Checked 636 files, no fixes, 0 warning/error",
+    "npm run build → clean-dist + tsc 重生 dist（供 u2-plugin 接入）",
+    "git diff --check → clean",
+    "验收1 migration+两表[unit]：CoverageLedgerRepository.test + DatabaseRepository/MigrationsRerunIdempotency manifest 跑迁 015；红线 grep migration015+repo 零 plan/session 字面（列无计划/会话字段）",
+    "验收2 repository[unit]：CoverageLedgerRepository.test 3 例 passed —— upsert/onConflictDoUpdate（键 module×dimension，不重复、保留 created_at、JSON/boolean 往返）/listByProjectRoot/listByModule/getCell；deep_mining_rounds upsert+升序 list+边际产出更新",
+    "验收3 buildCoverageLedger[unit]：BuildCoverageLedger.test 4 例 passed —— per-cell grade(partial/thin/empty/covered)；module 归属 canonical ownedPaths+pathsOverlap（含裸文件名后缀命中）；exhausted=agent-declared；valueScore 价值信号；输出无 shouldBlockCompletion 字段（grade 非门）；CompletenessCritic 单候选单测零回归",
+    "验收4 gap 消费 Agent 目标[unit]：KnowledgeRescanPlanBuilder.test U2b 2 例 passed —— perDimensionTargets 驱动 gap(8 非硬 5，目标 0→gap 0)；existingCount 优先账本(ledger 10→gap 0)无账本回退现算；TARGET_RECIPES_PER_DIMENSION=5 仅 fallback",
+    "验收5 Advisor 三停止[unit]：CoverageLedgerAdvisor.test 6 例 passed —— 收敛/收益递减(<K)/轮次上限(≥maxRounds) 各命中 + 价值排序 highValueBlankCount + 「还有 N 高价值空白」+ D2 K(S1/M2/L3)/maxRounds(S2/M3/L5)+env+guard + plan 显式优先",
+    "验收6 D3[grep]：git diff 27ef04b..HEAD -- src/ 中 git_diff_checkpoints|gitDiffCheckpoint → 0 hits；coverage/Advisor/gap/migration 符号级 0 命中（账本与维护游标严格分坐标系）"
+  ],
+  "risks": [
+    "U2c/U2e/draft SEED/写点(dimension-completion buildCoverageLedger→repo upsert)/出口 attach/FileChangeHandler git-diff 生成退役 = u2-plugin（Core 先出 Plugin 后接）；本卡未碰 Plugin。Core landed+dist 重生后解锁 u2-plugin。",
+    "buildCoverageLedger module 归属需 caller（Plugin）从 canonical ModuleSummary/ModuleContext.ownedFiles 提供 ownedPaths + project_root；Core 纯函数不读宙主 fs、不硬编码宙主路径（边界）。",
+    "Advisor/gap 的账本输入（cells/latestRound/ledgerCoverageByDimension/perDimensionTargets）需 Plugin 透传；缺省时 gap 逐字节回退 per-dimension、Advisor 按现有 cells 算——加性、零回归。",
+    "grade/exhausted 严格 advisory：buildCompletenessCritic shouldBlockCompletion:false/targetGate:'advisory' 未改；grade 阈值不当生产/阻断门；建议非自动调度（不自动后台扫）。红线均守。",
+    "D2 perRoundCellBudget(S~50/M60/L80) 本卡未实现（单轮 plan cell 上限属 Plugin draft 编排，u2-plugin）；Core 交 K/maxRounds + per-cell gap 足够驱动停止/缺口。与 u6/u5-core-* 不冲突（不同文件域）。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave3-u2-core__AlembicCore__u2-core",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u2-core__AlembicCore__u2-core.json",
+    "deliveryRunId": "run-delivery-wave3-u2-core__AlembicCore__u2-core",
+    "dispatchGroup": "wave3-u2-core",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u2-core__AlembicCore__u2-core.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 72,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave3-u2-core",
+    "targetTaskId": "u2-core",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "wave3-u2-core",
+    "resultId": "tr-u2-core",
+    "createdAt": "2026-06-26T02:53:56.206Z"
+  },
+  "createdAt": "2026-06-26T02:53:56.206Z",
+  "stateRevisionObserved": 72,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

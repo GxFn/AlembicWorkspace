@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "wave2-maint-fix-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "summary": "波2 maint-fix-plugin（committed→propose Plugin 透传，维护走通收口；消费 Core@afd4302）：把 scanner 已算 commit-range 喂给 git-head 事件的 assessFileImpact。#1 CommitDrivenMaintenance.ts:82 透传 scan.range(=GitDiffScanResult.range mergeBase..HEAD)进 handleFileChanges。#2 FileChangeHandler.ts:165/275 对 git-head(committed)事件调 assessFileImpact(...,commitRange) 走 Core afd4302 commit-range diff；非 git-head(工作树)不传=向后兼容。#3 订正 LP7:279 过时注释(工作树 diff 已不可得=伪)。LP7 逻辑(:277-294)不重开：仍零 token 命中 skip，但 impactful committed 经 commit-range 不再零命中→propose、trivial 仍 skip(全抑制→精确抑制)。验收 build:check(afd4302)+git-head 传 range unit+LP7 精确抑制 unit(impactful→propose/trivial→skip)+单一编排不破+Node22 门禁；真机 E2 镜像归 Test 再验(维护走通收口)，双 propose 靠 UM#7 dedup。不重开 LP7/不改工作树默认/不读写 git_diff_checkpoints/不碰死副本。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-maint-fix-plugin.md",
+  "createdAt": "2026-06-25T23:04:03.540Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "maint-fix-plugin",
+      "taskPackageId": "wave2-maint-fix-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin committed→propose 收口：CommitDrivenMaintenance 透传 scan.range + FileChangeHandler git-head 事件 assessFileImpact 传 commitRange(走 Core afd4302 commit-range)+订正 LP7 注释；LP7 全抑制→精确抑制(impactful committed→propose/trivial→skip)。build:check+unit+Node22；真机 E2 归 Test 再验。",
+      "status": "pending",
+      "createdAt": "2026-06-25T23:04:03.540Z"
+    }
+  ]
+}

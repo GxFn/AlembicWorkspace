@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u1-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-u1-plugin",
+  "dispatchGroup": "wave2-u1-plugin",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "u1-plugin",
+  "status": "needs-review",
+  "summary": "U1-Plugin 分步推进：基础键石 #1 已落地+验证绿（commit f1dfcfc），#2/#5/#6 给出 turnkey 续作计划，请控制器以新上下文续派（或确认分步）。诚实说明：本会话已连续完成 DH 系列 + P1/P2/P3 + UM(needs-review)+um-impl(~10 文件) 等海量工作；U1-Plugin 是又一个 um-impl 量级 4-文件 wiring，为避免在多文件 wiring 中途耗尽上下文留下破损树，按安全增量交付已验证绿的 #1，其余以完整 grounded 计划交回。\n\n#1 DONE（消费 Core@fe42940=u1-core）：plan-generation-gate.ts 的 PlanGenerationGateReady + buildPlanGenerationGateReady 加 top-level moduleBindings，直接复用既有 planSelection.moduleBindings（零新派生）。硬不变量守住：flat moduleScope 出口字节不变——lease idempotency key(:327 input.gate.moduleScope.join(','))、attachPlanGenerationGateData(:403/:409 gate.moduleScope) 仍只依赖 flat string[]；新字段 additive、不拍扁、不替换 flat 出口。build:check 绿（Core@fe42940）、biome clean、commit f1dfcfc(1 file +7)。\n\n剩余（grounded、turnkey）：\n#2 透传[未做]：把 gate.moduleBindings 经 knowledge-rescan.ts:165-170 analysis 调用 + project-context-analysis.ts:29-37/90-128 透传到 Core buildKnowledgeRescanPlan(moduleBindings,moduleCount) 驱动 per-cell gap。关键适配：Plugin PlanSelectionModuleBinding(per-module、dimensions[]) ≠ Core ModuleCellBinding(per-cell：moduleId?/moduleName?/dimensionId 单值/perCellCoverage?/targetRecipes?)，须把 per-module×dimensions 展平为 per-cell ModuleCellBinding[]（每 module×dimension 一条）；moduleCount=canonical ProjectMap.modules.length。\n#5 注入[未做]：mcp-tools.ts:597/710 RecipeProductionGateway 接入点加 deps knownModuleNames(canonical ProjectMap.modules 名集) + resolveModuleFromSourceRefs(从 ProjectMap.modules 路径前缀派生)，激活 Core #deriveModuleName(已在 RecipeProductionGateway.ts:306/:791)。\n#6 方案A[未做]：project-context-analysis.ts:258-327 plugin 续派 seed 但统一引用 canonical name/id（不退役 seed=方案B 拆独立需求）。\n测试：#1 心脏透传(flat+moduleBindings 并存、flat 字节不变回归) + #2 + #5；D3 grep(透传链无 git_diff_checkpoints)；门禁 build:check+gate/rescan unit+repo-boundary+agent-extraction-boundary。\n\n建议：控制器以新上下文续派 u1-plugin（#1 基础已就位、续作计划完整）；或确认本分步。Core 只读、不碰 vendor/不 push。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-generation/plan-generation-gate.ts"
+  ],
+  "verification": [
+    "身份门: AlembicPlugin 仓, HEAD f1dfcfc; Core sibling fe42940=u1-core(已验收、dist 已 build)",
+    "#1 build:check: green EXIT=0（消费 Core@fe42940 的 moduleBindings/NormalizedPlanSelection，tsc 通过）; biome plan-generation-gate.ts clean",
+    "flat 出口字节不变核实: lease key :327 input.gate.moduleScope.join(',') 不变; attachPlanGenerationGateData :403/:409 gate.moduleScope 不变；新 moduleBindings 为 additive 顶层字段",
+    "commit f1dfcfc (main, baseline 0fa2ac3→HEAD f1dfcfc, 1 file +7): lib/recipe-generation/plan-generation-gate.ts；未 push/tag/bump/未碰 vendor/Core 只读",
+    "grounded Core 消费 API 已核: ModuleCellBinding{moduleId?,moduleName?,dimensionId,perCellCoverage?,targetRecipes?}; BuildKnowledgeRescanPlanOptions.moduleBindings?:ModuleCellBinding[]+moduleCount?; RecipeProductionGateway deps knownModuleNames?:readonly string[] / resolveModuleFromSourceRefs?:(sourceRefs)=>string|undefined + #deriveModuleName@:306/:791"
+  ],
+  "risks": [
+    "分步原因(需控制器决): 本会话已连续完成多个大型任务(含 um-impl ~10 文件)，U1-Plugin 又为 4-文件 wiring。为避免中途上下文耗尽留破损树，交付已验证绿的基础 #1 + turnkey 计划。推荐控制器以新上下文续派续 #2/#5/#6。",
+    "#2 形状适配是核心难点: Plugin per-module binding(dimensions[]) → Core per-cell ModuleCellBinding[](单 dimensionId)，需展平 module×dimensions；moduleCount=canonical ProjectMap.modules.length。需仔细实现+测试，适合新上下文。",
+    "#1 是 additive 基础字段，本身无消费方(直到 #2 透传)；已绿+字节安全，作为 #2 的基础。真机 moduleName(验收#3)归后续 Test/U7。",
+    "本次仅改 plan-generation-gate.ts 活副本(additive)；未动死副本/shim、未读写 git_diff_checkpoints、未走方案B。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-u1-plugin__AlembicPlugin__u1-plugin",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-plugin__AlembicPlugin__u1-plugin.json",
+    "deliveryRunId": "run-delivery-wave2-u1-plugin__AlembicPlugin__u1-plugin",
+    "dispatchGroup": "wave2-u1-plugin",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-plugin__AlembicPlugin__u1-plugin.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 30,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-u1-plugin",
+    "targetTaskId": "u1-plugin",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave2-u1-plugin",
+    "resultId": "tr-u1-plugin",
+    "createdAt": "2026-06-25T22:58:20.149Z"
+  },
+  "createdAt": "2026-06-25T22:58:20.149Z",
+  "stateRevisionObserved": 30,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

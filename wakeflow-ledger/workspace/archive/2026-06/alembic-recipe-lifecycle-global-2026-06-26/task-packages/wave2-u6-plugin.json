@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "wave2-u6-plugin",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "summary": "波2 u6-plugin（U6 Plugin 消费侧 P4/P5；前置 U6-Core c60eb92 已 landed+dist 重生）。P4 接活 rename 修复：knowledge-index-rebuild.ts:91-112(C1 接线点=此 Plugin 函数)reconcile 后 report.stale>0→调 Core repairRenames()→applyRepairs()(git rename→renamed→写回 .md+DB→active)、report 增 renamed/applied、幂等(改前 grep 确认 Core repair 零 call site)；P5 rebuildRescanIndexes 返回 report + region-vector provider 不可用→skipped+高可见 warning/可用→semantic_memories 0→非0(改返回类型 grep 同步消费方)；gateway 注入：把 evolutionGateway(KnowledgeModule:343 已注册)注入 rescan/audit 调用点激活 U6-Core auditRecipesForRescan dead→deprecate(不注入→Core 降级 0 不抛、不新建服务)；D2 batch護栏 50/150/400(携带项，分批 cap 由本编排层供，Core reconcile caller-limited)；drift 消费按需(findDrifted 已备，惰性留 U7);D3 不读写 git_diff_checkpoints。验收：P4 rename 接活(renamed/applied+幂等)/P5 报告+skip/audit→deprecate 激活(注入+降级两路)/D2 cap/零新回归+Node22 build:check+边界门禁。禁改 Core/vendor 仅经 @alembic/core；main 不 push；记消费 Core commit(u5-core-2 可能并行)；多文件 wiring 可 subagent-offload。复核 HEAD 行号。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u6-plugin.md",
+  "createdAt": "2026-06-26T00:49:23.362Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "u6-plugin",
+      "taskPackageId": "wave2-u6-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U6 消费侧 P4/P5：knowledge-index-rebuild reconcile 后 stale>0→Core repairRenames→applyRepairs(幂等、renamed/applied)+rebuildRescanIndexes 返 report+region-vector skip(provider 不可用 skipped+warning/可用 semantic_memories 0→非0)+注入 evolutionGateway 激活 audit→deprecate(降级两路)+D2 batch護栏 50/150/400。验收 P4 接活/P5 报告+skip/audit 激活/零新回归/Node22 build:check+边界门禁；禁改 Core/vendor、main 不 push、记消费 Core commit；可 subagent-offload。复核 HEAD。",
+      "status": "pending",
+      "createdAt": "2026-06-26T00:49:23.362Z"
+    }
+  ]
+}

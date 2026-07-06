@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+  "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+  "status": "needs-review",
+  "summary": "Test executed W4 BiliDili mainbody lifecycle E2E against isolated ghost ALEMBIC_HOME. Result: W4 is NOT accepted. Public /api/v1/jobs/rescan strips generationStage/maxRounds/scaleCap, so Dashboard route cannot trigger deepMining/moduleMining. Direct daemon runner evidence: coldStart wrong-stage PlanSelection is hard-blocked before coldStart; valid coldStart reaches bootstrap skeleton only and async fill reports AI provider unavailable; deepMining plan gate succeeds but rescan fails with \"[MissionBriefing] rescan-host-agent profile requires rescan evidence input\" and records only one deep_mining_round with new_recipes_this_round=0; moduleMining fails because ProjectContext.projectMapModules is empty; maintenance empty sweep is all-zero, but expired auto-approvable staging fixture remains staging with waitingCount=1 and no lifecycle_transition_events because StagingManager is not configured with lifecycleStateMachine. Therefore C-F true-machine acceptance criteria are not met.",
+  "evidenceRefs": [
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-t1/w4-mainbody-lifecycle-e2e-summary.json",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-t1/http-public-route-probe.json",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-t1/run-w4-mainbody-lifecycle-e2e.mjs",
+    "Alembic/lib/http/routes/jobs.ts",
+    "Alembic/lib/injection/modules/KnowledgeModule.ts",
+    "Alembic/lib/service/evolution/EvolutionMaintenanceSweep.ts"
+  ],
+  "verification": [
+    "Confirmed repository heads: Alembic fb6782f13d2fa201edae8a3cd2e8736ce793ccd5; AlembicCore 1553e2f8b7167b596b4c305f0bc40f46dd047359; AlembicAgent c38d2c46853cb2cba8049dbee617b93c069e3bc2; AlembicPlugin ae97e0f018aa0c5cdc9d101de2732f8025cf4f53; BiliDili 6f1bf34cf1b6daca4e08895db211939115dac868.",
+    "Registered BiliDili in isolated ghost ALEMBIC_HOME via `node Alembic/dist/bin/cli.js setup --dir .../BiliDili --ghost --force`; migrations 001,004,005,006,007,008,009,010,011,013,014,015,016 applied.",
+    "Restarted isolated Alembic service: Dashboard/API http://127.0.0.1:50086, dataRoot Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-t1/alembic-home/.asd/workspaces/02a25032, AI config ready=false.",
+    "Posted public rescan body with generationStage=deepMining,maxRounds=2,scaleCap=3; accepted job.request omitted those fields and later failed with MissionBriefing rescan evidence error.",
+    "Ran `node Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-t1/run-w4-mainbody-lifecycle-e2e.mjs`; summary JSON records C/D/E/F results, DB paths, job statuses, events, deep_mining_rounds, coverage_ledger count, and maintenance fixture state."
+  ],
+  "risks": [
+    "AI provider is not configured in BiliDili ghost store or process env; Test used controlled AgentService only to exercise plan-selection boundaries and daemon runner behavior. This does not prove real AI recipe production success.",
+    "The direct runner exposed ProjectContext.projectMapModules=0 for BiliDili under current setup, so moduleMining cannot satisfy the >=8 modules / scale=3 requirement.",
+    "The public daemon started for HTTP probing was stopped after evidence collection; Dashboard URL may no longer be live.",
+    "Target result is Test evidence only; controller acceptance/rework decision remains with AlembicWorkspace."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w4-test-bilidili-mainbody-lifecycle-e2e-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-t1.json",
+    "deliveryRunId": "run-delivery-w4-test-bilidili-mainbody-lifecycle-e2e-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+    "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 35,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+    "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-p1",
+    "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-t1",
+    "createdAt": "2026-06-27T04:16:37.862Z"
+  },
+  "createdAt": "2026-06-27T04:16:37.862Z",
+  "stateRevisionObserved": 35,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

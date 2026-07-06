@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-e2-main-toolcontext-audit-sandbox-t1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "taskPackageId": "e2-main-toolcontext-audit-sandbox-p1",
+  "dispatchGroup": "e2-main-toolcontext-audit-sandbox-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "e2-main-toolcontext-audit-sandbox-t1",
+  "status": "completed",
+  "summary": "Implemented E-2 Alembic main consumer wiring only. ToolContextFactory now injects auditSink from the container auditLogger via the Agent {log(entry)} duck type, so daemon/HTTP/CLI V2 tool calls receive the same audit logger path. SandboxExecutorBridge now preserves sandboxExec diagnostics for live terminal.exec as {sandboxed,fallbackUsed,degradeReason}, mapping sandboxed=false to fallbackUsed=true while preserving execution semantics. Added a targeted ToolContextFactory unit test that proves auditSink injection and a real ToolRouterAdapter terminal.exec envelope surfacing degraded sandbox diagnostics. Committed locally on Alembic main as 825204899bd163221e2b7963689b3b724c6f6e9a; not pushed because this task package requested local commit/backfill, not remote push.",
+  "evidenceRefs": [
+    "commit-825204899bd163221e2b7963689b3b724c6f6e9a",
+    "changed-files-toolcontextfactory-and-unit-test",
+    "unit-toolcontextfactory-v2toolsystem-49-pass",
+    "buildcheck-pass",
+    "repo-boundary-pass",
+    "diff-check-pass"
+  ],
+  "verification": [
+    "node -v => v22.22.1",
+    "npm run test:unit -- test/unit/ToolContextFactory.test.ts test/unit/V2ToolSystem.test.ts => 2 files passed, 49 tests passed",
+    "npm run build:check => passed with local ../AlembicCore build and tsc --noEmit",
+    "npm run lint:repo-boundary => passed; escape hatch count 1/75 baseline",
+    "git diff --check => passed",
+    "git status --short after commit => clean"
+  ],
+  "risks": [
+    "mcp__alembic.alembic_code_guard did not return a usable guard decision; it failed internally with schema error: unrecognized key \"data\".",
+    "No full runtime Agent/daemon scenario was run in this Alembic target window; coverage is unit-level real ToolRouterAdapter terminal.exec plus build/typecheck/boundary checks. Controller may route Test later for end-to-end terminal audit persistence if required.",
+    "No push was performed; task package asked for local Alembic main commit and backfill evidence."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-e2-main-toolcontext-audit-sandbox-p1__Alembic__e2-main-toolcontext-audit-sandbox-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-main-toolcontext-audit-sandbox-p1__Alembic__e2-main-toolcontext-audit-sandbox-t1.json",
+    "deliveryRunId": "run-delivery-e2-main-toolcontext-audit-sandbox-p1__Alembic__e2-main-toolcontext-audit-sandbox-t1",
+    "dispatchGroup": "e2-main-toolcontext-audit-sandbox-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e2-main-toolcontext-audit-sandbox-p1__Alembic__e2-main-toolcontext-audit-sandbox-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "stateRevision": 20,
+    "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "taskPackageId": "e2-main-toolcontext-audit-sandbox-p1",
+    "targetTaskId": "e2-main-toolcontext-audit-sandbox-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "e2-main-toolcontext-audit-sandbox-p1",
+    "resultId": "tr-e2-main-toolcontext-audit-sandbox-t1",
+    "createdAt": "2026-06-27T10:20:48.738Z"
+  },
+  "createdAt": "2026-06-27T10:20:48.738Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

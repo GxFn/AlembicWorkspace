@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-um-commit-driven-maintenance",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave1-um-commit-driven-maintenance",
+  "dispatchGroup": "wave1-um",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "um-commit-driven-maintenance",
+  "status": "needs-review",
+  "summary": "UM（commit-driven 唯一维护链路）— 回 needs-review 请控制器定序，按任务硬性顺序+禁止项未动代码。身份门通过（AlembicPlugin 仓，HEAD 799ceac clean）。已完成「落地前复核当前 HEAD」re-baseline：U0 活/死副本图谱与关键行号在 799ceac 准确（FileChangeHandler.ts 876 行活；#handleCreated:410、#routeNewModuleToModuleMining:456、moduleMiningRoutes 消费方:124/143/204-205/680/692/723/736、defaultModuleMiningAnalyzer:169/705、git-head 分支:292；COMMIT_DRIVEN_TRIGGER_TOOLS=PluginOpportunisticEvolution.ts:221；改名 4 站点 knowledge-rescan.ts:430 / PluginOpportunisticEvolution.ts:19+135 / opportunistic-evolution-presenter.ts:92 全对），UM#1-7+LP7 已完整 scoped、代码层面可执行。\n\n硬阻塞：核心变更 UM#1（退役 created→moduleMining 生成）被任务自身「强制顺序」+「禁止：不得先退役生成再证 advance（顺序硬性）」门控；该 advance 证明=验收#1（真机 BiliDili：改覆盖源 region+revertable commit+触发 COMMIT_DRIVEN_TRIGGER_TOOL → git_diff_checkpoints 由 initialized→routed/catch-up-routed + checkpoint_commit 从 a3ea6a25 推进 + advanced_at 非空 + evolution_proposals 0→≥1）。只读复核 BiliDili DB(~/.asd/workspaces/02a25032/.asd/alembic.db) 确认游标仍 single-folder/root|initialized|a3ea6a25|advanced_at=NULL|0 proposals——advance 至今从未发生（与 U0 一致）。据 state root evidence/u0-rebaseline-2026-06-26.md line 60，该真机 advance 验收明确是 Test 职责（“UM advance 真机验收须 Test 在此造真 commit”）。故门控证明 (a) 未满足 (b) 在本窗口边界外。\n\n不擅自绕过：若先落 UM#1（退役）或 UM#2（重构 advance 链编排）于缺真机绿基线之前，既违反任务硬性顺序，又会在“唯一能产 advance、且从未跑通”的链上动刀而无基线辨别回归——正是任务高呼的“主循环失败却修周边”反模式与本窗口 Highest Stop Card 的退役/降级确认门。也不在本窗口跑真机触发（Test 域；本仓 CLAUDE.md 禁“冒充用户项目执行真实用户命令”）。\n\n建议（请控制器决策定序）：①优先序：控制器派 Test 先证验收#1（真机 advance 绿基线）→ 再派我原子落 UM#1-7+LP7（按强制顺序），Test #2/#4/#5（重跑 advance 仍绿/游标必要性/删改名维护）作 after-regression。我已 ready，#1 绿即可执行。②或若要即时前进：显式授权我只落「不碰 advance 链」子集 UM#3 改名+UM#7 双入口去重测试（机械/加测、build:check+unit 自证），UM#1/#2/#5/LP7 仍待 #1。我推荐①以保波1原子落地并守硬性顺序。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-generation/evolution/FileChangeHandler.ts",
+    "AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "AlembicPlugin/lib/runtime/mcp/host/opportunistic-evolution-presenter.ts",
+    "AlembicPlugin/lib/recipe-generation/evolution/PluginOpportunisticEvolution.ts",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/evidence/u0-rebaseline-2026-06-26.md"
+  ],
+  "verification": [
+    "身份门: AlembicPlugin 仓, HEAD 799ceac (git rev-parse) clean (git status 空)",
+    "只读复核 BiliDili DB (~/.asd/workspaces/02a25032/.asd/alembic.db, 507KB): sqlite3 'SELECT scope_id,folder_id,last_route_status,substr(checkpoint_commit,1,8),advanced_at FROM git_diff_checkpoints' → single-folder|root|initialized|a3ea6a25|<NULL>；SELECT count(*) FROM evolution_proposals → 0。advance 未发生(与 U0 一致)。未做任何写入/触发。",
+    "re-baseline grep@799ceac: FileChangeHandler.ts(live)=876 行；#handleCreated:410 / #routeNewModuleToModuleMining:456 / moduleMiningRoutes 消费方:124,143,204-205,680,692,723,736 / defaultModuleMiningAnalyzer:169,705 / git-head:292；COMMIT_DRIVEN_TRIGGER_TOOLS@PluginOpportunisticEvolution.ts:221；改名 4 站点 knowledge-rescan.ts:430,PluginOpportunisticEvolution.ts:19+135,opportunistic-evolution-presenter.ts:92 ——与任务包一致，行号非 stale",
+    "未运行 build/lint/unit/提交: 因本轮按硬性顺序未动代码；工作树保持 clean(无未提交变更)"
+  ],
+  "risks": [
+    "定序依赖(需控制器决): 退役 UM#1 被 Test 拥有、尚未满足的真机 advance 证明(#1)硬门控。推荐 Test 先证 #1 绿基线再派我原子落 UM。本窗口不跨界跑真机触发(Test 域)。",
+    "若控制器选择“即时前进”授权子集(UM#3 改名+UM#7 去重测试): 这两项不碰 advance/游标逻辑、可 build:check+unit 自证；但会使本波非原子落地(同文件二次动)、且 UM#3 改名的 PluginOpportunisticEvolution.ts:135 位于 UM#2 待重构的 defer 逻辑内。故仍推荐顺序①。",
+    "已完成心智准备: UM#1 retire(保 coveredCreated、未覆盖不再种 Recipe、grep 清理 moduleMiningRoutes/defaultModuleMiningAnalyzer 消费方避 undefined) / UM#2 抽 runCommitDrivenMaintenance 入 git-diff-checkpoint/ 且保 prepareRescanState 顺序 / UM#3 原子改名 4 站点 / UM#5 created未覆盖→纯计数诊断 / UM#7 核实现有 #hasDuplicate dedup+双入口测试(不立 source_path migration、无该列) / LP7 git-head 零 token 命中降为 changelog+skipped。#1 绿即可执行。",
+    "本次仅只读复核+grep re-baseline；未改任何 live 源/Core/vendor，未 push/tag/bump，未写 thread id。Core 只读(D3 游标语义保留)。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave1-um__AlembicPlugin__um-commit-driven-maintenance",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um__AlembicPlugin__um-commit-driven-maintenance.json",
+    "deliveryRunId": "run-delivery-wave1-um__AlembicPlugin__um-commit-driven-maintenance",
+    "dispatchGroup": "wave1-um",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um__AlembicPlugin__um-commit-driven-maintenance.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 6,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave1-um-commit-driven-maintenance",
+    "targetTaskId": "um-commit-driven-maintenance",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave1-um",
+    "resultId": "tr-um-commit-driven-maintenance",
+    "createdAt": "2026-06-25T20:15:14.388Z"
+  },
+  "createdAt": "2026-06-25T20:15:14.388Z",
+  "stateRevisionObserved": 6,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

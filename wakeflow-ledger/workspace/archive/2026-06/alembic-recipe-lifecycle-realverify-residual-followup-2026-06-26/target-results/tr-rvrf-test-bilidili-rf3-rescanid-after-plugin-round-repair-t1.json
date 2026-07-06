@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1",
+  "dispatchGroup": "rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1",
+  "status": "needs-review",
+  "summary": "Test reran BiliDili RF-3 live MCP rescan twice with the same explicit rescanId after AlembicPlugin reload. Plugin source and dist at c4c4d4f contain the round/session fix and rescanId upsert call, but the current attached MCP route still released the empty host-agent lease on coverageAdvisory=converged despite produceDimensions=2 and wrote 0 rows for the explicit rescanId. Evidence indicates current Codex session MCP process did not reconnect to the refreshed plugin build; controller review is needed to decide fresh MCP/session rerun or authorized temporary callback route.",
+  "evidenceRefs": [
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1/evidence-summary.md",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1/alembic-before-rf3-after-plugin-round-repair.sqlite",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/scratch/codex-plugin-dev-reload-probe-report.json",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/logs/combined.log"
+  ],
+  "verification": [
+    "Ran npm run dev:codex-plugin:reload in AlembicPlugin; reload reports exist.",
+    "Verified AlembicPlugin source repair points in lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts lines 594, 597, 600, 618.",
+    "Verified rebuilt dist repair points in dist/lib/recipe-generation/host-agent-workflows/knowledge-rescan.js lines 396-415.",
+    "Ran live mcp__alembic.alembic_rescan twice against /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili with generationStage=deepMining, force=true, the same explicit rescanId, and a gap-producing planSelection.",
+    "Queried true DB /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db after both runs: target rescanId row count remained 0; non-null duplicate rescanId groups remained 0; historical deep_mining_rounds rows all have NULL rescan_id.",
+    "Reviewed combined.log: both 17:12 and 17:15 runs had executionDimensions=2 and produceDimensions=2, then released empty host-agent lease with reason deepMining-converged; no new Opened deepMining round or Keeping deepMining round/session open log was emitted.",
+    "Checked active-session files: top-level active-sessions.json absent; bootstrap-sessions active-sessions.json exists with sessions: []."
+  ],
+  "risks": [
+    "Acceptance criterion exactly one row for project_root + explicit non-null rescanId after two runs was not met; actual row count is 0.",
+    "Live MCP validation appears blocked by attached MCP process staleness after plugin reload, so this Test result cannot prove the fix in the current session route.",
+    "A fresh Codex/MCP attachment or authorized temporary Test callback path is needed to verify the installed c4 build behavior end-to-end."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1__Test__rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1__Test__rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1__Test__rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1",
+    "dispatchGroup": "rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1__Test__rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 64,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1",
+    "targetTaskId": "rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-p1",
+    "resultId": "tr-rvrf-test-bilidili-rf3-rescanid-after-plugin-round-repair-t1",
+    "createdAt": "2026-06-26T17:18:31.521Z"
+  },
+  "createdAt": "2026-06-26T17:18:31.521Z",
+  "stateRevisionObserved": 64,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

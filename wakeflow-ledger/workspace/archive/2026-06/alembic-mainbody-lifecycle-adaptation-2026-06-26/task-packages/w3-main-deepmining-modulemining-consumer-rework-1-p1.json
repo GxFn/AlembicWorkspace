@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "w3-main-deepmining-modulemining-consumer-rework-1-p1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "summary": "Rework W3 Alembic deepMining consumer only. Keep accepted W1/W2/W3-agent producer work intact. Fix the implementation so Design §4b D1/D6 are true: deepMining must run the PlanSelection hard gate inside every round of the single daemon-job while loop, and K/maxRounds must come from PlanSelection.scale projection/defaults rather than only job args. Do not weaken plan gate, do not enqueue follow-up jobs, do not persist plans, do not change normal rescan/coldStart behavior, and do not expand scope beyond W3 D/E consumer gaps.",
+  "status": "pending",
+  "sourceRef": "Controller raw review of Alembic commit cdc5d8593c50ee0bb7692311ff18efd32b54791c against Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b D1/D6; review decision evt-20260627034810-0029.",
+  "createdAt": "2026-06-27T03:48:26.338Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "w3-main-deepmining-modulemining-consumer-rework-1-t1",
+      "taskPackageId": "w3-main-deepmining-modulemining-consumer-rework-1-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, .wakeflow-active/index.md, .wakeflow-active/current/workspace-current-status.md, this state root, task package w3-main-deepmining-modulemining-consumer-rework-1-p1, and Alembic/CLAUDE.md. Declare identity as Alembic product window. Rework commit cdc5d8593c50ee0bb7692311ff18efd32b54791c: (1) In Alembic/lib/daemon/DaemonJobRunner.ts, move/structure runPlanSelectionGate({generationStage:'deepMining'}) so each deepMining round invokes runPlanAgent(deepMining) before that round's rescan. Each round must use that round's PlanSelection projection for executionDimensions, moduleScope, perDimensionTargets, moduleDimensionTargets, budget, and moduleCount. If a later round plan gate fails, fail the job before running that round's rescan and record the existing plan-gate error event. (2) Satisfy Design §4b D6: feed CoverageLedgerAdvisor planK/planMaxRounds from PlanSelection.scale projection/defaults. Do not rely only on options.args.minNewRecipes/options.args.maxRounds. If current Core PlanSelection.scale lacks explicit typed K/maxRounds fields, use the existing accepted projection shape conservatively and route missing values to Core advisor defaults; do not invent a new persisted plan contract. (3) Add/repair tests in Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts: a two-round deepMining job must assert runPlanAgent is called once per round; round 2 may return changed module bindings/targets and the second rescan must receive the changed projection; a plan failure in round 2 must abort before second rescan; K/maxRounds source must be guarded. Preserve existing moduleMining ProjectMap fan-out tests and normal rescan tests. Validate with Node 22: npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/DaemonJobRunner.test.ts test/unit/ProjectContextWorkflowFacts.test.ts; npm run build:check && npm run typecheck; git diff --check HEAD; npm run lint:core-import-boundary; npm run lint:repo-boundary. Commit to Alembic main and backfill commit hash, changed files, validation output, and any remaining risk.",
+      "status": "pending",
+      "createdAt": "2026-06-27T03:48:26.338Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

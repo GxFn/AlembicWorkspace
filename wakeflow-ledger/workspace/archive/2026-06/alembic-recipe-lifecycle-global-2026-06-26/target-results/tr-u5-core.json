@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u5-core",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave1-u5-core",
+  "dispatchGroup": "wave1-u5-core",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "u5-core",
+  "status": "completed",
+  "summary": "U5-Core evolution 合并/执行 OUTCOME 质量修复完成（提交 main b3a8d81，U4-Core 后第 2 Core commit，全 Core additive）。8 项改法：#1 ConsolidationAdvisor.#buildMergePatch 把 merge「补充维度」标签升级为可应用 StructuredPatch（挂 ConsolidationAdvice.mergePatch；判定条件与 #computeMergeDirection 一致，不放宽相似度阈值）。#2 RecipeProductionGateway merge evidence 追加 suggestedChanges=JSON.stringify(advice.mergePatch)。#3 EvolutionPolicy.evaluateMerge：merge/consolidation 不要求 hasUsage（纠正被误用的 usage 闸）、保留 FP 护栏；ProposalExecutor.#gateUpdate 按 source==='consolidation'→evaluateMerge 否则 evaluateUpdate；#tryApplyPatch merge 传 patchSource='merge'。#4 退伪成功：consolidation 提案 patchResult.success=false（非抛错）→ markRejected('no applicable merge patch')，非 markExecuted+'reverted to active'（recipe 已回落 active、内容未变更）；非 merge update 保留 no-op valid。#5 ContentPatcher 退役「≥20 纯文本→content.markdown 全量替换」破坏式降级（#parsePatch 返回 null→skipResult、内容不变）；append 路径加去重+段落边界。#6 RecipeSimilarity.compute/computeDimensions 增可选注入 embeddingSim，content=max(tokenJaccard, embeddingSim)；domain 不发起 embed，缺则回退确定 Jaccard。#7 ProposalExecutor supersede 的 deprecated_by 边经 #selectMostSimilarReplacement 选相似度最高新建项（非 relatedRecipeIds[0]），<2 候选/加载失败回退首个。#8 #evaluateOnSignal 与 #executeUpdate 共用单一 #gateUpdate（两入口门禁不分叉）。门禁未放松：evaluateMerge 仅纠正 merge 语义、保留 FP/破坏式补丁护栏；evaluateUpdate/evaluateDeprecate/transition Guard 不动；KnowledgeService:768 仅证据；无 daemon；未碰 staging/DecayDetector(U4)。已 npm run build 重生 dist 供 U5-Plugin。U5-Core landed 解锁 U6 P3。",
+  "evidenceRefs": [
+    "AlembicCore/src/service/evolution/ConsolidationAdvisor.ts",
+    "AlembicCore/src/service/knowledge/RecipeProductionGateway.ts",
+    "AlembicCore/src/domain/evolution/EvolutionPolicy.ts",
+    "AlembicCore/src/service/evolution/ProposalExecutor.ts",
+    "AlembicCore/src/service/evolution/ContentPatcher.ts",
+    "AlembicCore/src/domain/evolution/RecipeSimilarity.ts",
+    "AlembicCore/test/EvolutionPolicy.test.ts",
+    "AlembicCore/test/unit/ConsolidationAdvisor.test.ts",
+    "AlembicCore/test/ProposalExecutorBounding.test.ts",
+    "AlembicCore/test/unit/ContentPatcher.test.ts",
+    "AlembicCore/test/unit/RecipeSimilarityEmbedding.test.ts"
+  ],
+  "verification": [
+    "node -v: v22.22.1 (.nvmrc=22)",
+    "npm run build:check: green (tsc --noEmit)",
+    "npm run test 全量: 132 files / 1355 tests passed，failed-set 为空（无回归；对基线 131/1346 为 +1 file/+9 tests）",
+    "[unit] 验收：#1 evaluateMerge 门禁分流（evaluateMerge({fp:0.1})→pass、usage=0 亦过；{fp:0.5}→fail；evaluateUpdate usage=0 仍 fail）——test/EvolutionPolicy.test.ts",
+    "[unit] #2 高重叠候选 → ConsolidationAdvice.mergePatch 非空 StructuredPatch（补 dontClause、候选原值进补丁）——test/unit/ConsolidationAdvisor.test.ts",
+    "[unit] #3 退伪成功：consolidation 提案空 suggestedChanges → status='rejected'、非 executed、recipe 回落 active——test/ProposalExecutorBounding.test.ts",
+    "[unit] #4 破坏式替换退场：自然语言≥5 0 字符 → skipped+skipReason('unstructured')、content byte-unchanged——test/unit/ContentPatcher.test.ts",
+    "[unit] #5 embeddingSim 注入→content 高于纯 Jaccard；不可用回退 Jaccard 确定；现有单测仍绿——test/unit/RecipeSimilarityEmbedding.test.ts",
+    "[grep] #7/#8 信号与兼底入口共用 #gateUpdate：ProposalExecutor.ts:173(#evaluateOnSignal) + :392(#executeUpdate)；#6 #selectMostSimilarReplacement 接线 :555(#executeDeprecate)",
+    "npm run build: green (clean-dist + tsc 重生 dist；dist gitignored 未提交)",
+    "npm run lint (Biome): Checked 623 files, no fixes — clean",
+    "git diff --check: 无空白错误",
+    "commit b3a8d816c2f6bbb20e1754036bce6a8308df32d6 (main)；11 files (+371/-44)"
+  ],
+  "risks": [
+    "#7 supersede 选定的「完整 executor-flow 单测」受 harness 限制未直跑：Stats 值对象固定 schema 丢弃 decayScore → #collectRecipeMetrics 恒得 50 → evaluateDeprecate 在到达 deprecated_by 边前即 reject。故 #7 以实现 + grep（#selectMostSimilarReplacement 接线 #executeDeprecate）+ 间接覆盖证明；真机 supersede 按 design 归后续 Test/U7（gated on UM）。该 decayScore 量纲属 U4/metrics 域，非 U5 owner。",
+    "gateway 提案级 replacedByRecipeId 提示仍 createdIds[0]：GatewayKnowledgeService 无 findById、无法加载被替代 Recipe 内容计算相似度（需 U5-Plugin 接线）；权威 deprecated_by 边由 executor 经 #selectMostSimilarReplacement 选最相似项。",
+    "evaluateMerge 的 hasStructuredPatch 为可选软校验（默认不传=不 fail）；空 mergePatch 的实际拦截在执行层 #4（patchResult.success=false→markRejected），与 acceptance #3 一致。embeddingSim 融入 content 维度（max），未新增独立 WEIGHTS 项以保证「无 embedding 数值不退化」+ 现有单测不破。",
+    "真机端到端 #1/#8（构造 ≥0.65 相似候选 → proposal source=consolidation + evidence LIKE %suggestedChanges% + before≠after + supersede 真机）依赖 UM 维护链 advance，按 task 归后续 Test/U7，不在本 Core-unit。本提交仅 U5-Core；U5-Plugin（KnowledgeModule embedding 注入 VectorService）为波2。U5-Core landed 解锁 U6 P3。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave1-u5-core__AlembicCore__u5-core",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-u5-core__AlembicCore__u5-core.json",
+    "deliveryRunId": "run-delivery-wave1-u5-core__AlembicCore__u5-core",
+    "dispatchGroup": "wave1-u5-core",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-u5-core__AlembicCore__u5-core.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 14,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave1-u5-core",
+    "targetTaskId": "u5-core",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "wave1-u5-core",
+    "resultId": "tr-u5-core",
+    "createdAt": "2026-06-25T21:23:10.749Z"
+  },
+  "createdAt": "2026-06-25T21:23:10.749Z",
+  "stateRevisionObserved": 14,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

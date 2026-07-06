@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-design-d2-default-table",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-design-d2-default-table",
+  "dispatchGroup": "wave2-d2-design",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "Design",
+  "targetTaskId": "design-d2-default-table",
+  "status": "completed",
+  "summary": "D2 通用默认表已出(规模分档 S/M/L × 各消费点默认值+依据)。U1 perCellTarget(替代 per-dim TARGET_RECIPES_PER_DIMENSION=5: S5/M3/L2,单模块项目 per-cell≈per-dim 故 S 取 5 保零回归,网格细化降档防爆炸)、U2 round(K 1/2/3·maxRounds 2/3/5·单轮 cell 全/60/80)、U6 内容指纹批量(仿 staging-cap 有界排空 50/150/400)、U3 inline 预算(复用 COLD_START 18KB·规模派生 defer 不阻塞)、UM created(生成路径已退役→纯计数诊断,无阈值);现存 U4 cap=50·U5 overlap0.65/enhance0.4/FP0.4 只注明不重定(U5=拆误用门禁非放松)。规模信号=canonical ProjectMap.modules(D1 轴,不另造)+ownedFileCount 次信号,U6 专用 active source_ref 轴。no-guess: plan 规模语义(binding.targetRecipes ?? 表[tier])优先,表是回退非强制。Design 文档已写,未改产品码/未 mutate 状态根/未 dispatch。",
+  "evidenceRefs": [
+    "Design/docs/current/alembic-recipe-d2-default-table-2026-06-26.md"
+  ],
+  "verification": [
+    "1-agent 代码级常量核验(AlembicCore/AlembicPlugin live 源,零 expectation mismatch): TARGET_RECIPES_PER_DIMENSION=5@KnowledgeRescanPlanBuilder.ts:6 / resolveStagingAccessSweepCap 默认50@staging-access-sweep.ts:8(env+guard≥1) / HIGH_OVERLAP=0.65·ENHANCE=0.4@ConsolidationAdvisor.ts:109,112 / UPDATE_FP=0.4@EvolutionPolicy.ts:39 / COLD_START_BRIEFING_INLINE_BUDGET_BYTES=18*1024@cold-start.ts:88",
+    "greenfield 确认: content_fp 在 AlembicCore/src 零命中、CoverageLedgerAdvisor.ts/maxRounds/单轮预算常量均不存在 → U2 round 与 U6 指纹为全新",
+    "规模信号核实: ProjectMap.modules@ProjectContextMap.ts:252 + ModuleSummary{id,name,kind,configLayer,ownedFileCount,...}@155-164(D1 canonical 轴,与 moduleMining 同源)",
+    "网格覆盖核对: perRoundCellBudget×maxRounds ≥ 各档 cell 数(cell=模块×14维): S 42 一轮全覆盖 / M 60×3=180≥168 / L 80×5=400≥280",
+    "完整性自检: 覆盖任务包全部消费点 U1/U2/U6/U3/UM + 现存 U4/U5 注明;缺口/边界全部标为 must-confirm 而非擅自定"
+  ],
+  "risks": [
+    "[最高·must-confirm#1] perCellTarget L 档=2 < recipe-evidence-gate floor=3: 若 floor 是 per-cell 硬'covered'门则 L 档须抬至 3,若 floor 是 per-recipe-evidence 与 per-cell 计数正交则维持 2。门禁语义级,Design 不擅自定,落地须对 recipe-evidence-gate 实读确认",
+    "三条规模轴不同: tier 主轴=模块数(D1)、U6=active source_ref 数(维护域)、U2 cell 预算=模块×维度(网格);实现各取对的轴,勿互相污染",
+    "表值是回退默认非硬常量: 实现须保 plan 规模语义优先,且 moduleBindings.targetRecipes 运行时不保证非空(normalizePlanSelection 只校验 dimensions)→ 必 ?? 默认",
+    "U3 规模派生本阶段 defer: 18KB flat 复用 cold-start 常量,size-derived(S 12KB/L 24-32KB)另起不阻塞;rescan 须复用且把 fullBriefingRef lift 到顶层 response.meta(否则假绿)",
+    "失效证据: 目标项目实测维度数≠14 或模块数落 tier 边界外 → cell 网格规模变,perRoundCellBudget/maxRounds 需按真实网格重算"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-d2-design__Design__design-d2-default-table",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-d2-design__Design__design-d2-default-table.json",
+    "deliveryRunId": "run-delivery-wave2-d2-design__Design__design-d2-default-table",
+    "dispatchGroup": "wave2-d2-design",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-d2-design__Design__design-d2-default-table.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 20,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-design-d2-default-table",
+    "targetTaskId": "design-d2-default-table",
+    "targetWindow": "Design",
+    "dispatchGroup": "wave2-d2-design",
+    "resultId": "tr-design-d2-default-table",
+    "createdAt": "2026-06-25T21:44:47.132Z"
+  },
+  "createdAt": "2026-06-25T21:44:47.132Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rvrf-test-bilidili-rf3-rescanid-live-verification-t1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-test-bilidili-rf3-rescanid-live-verification-p1",
+  "dispatchGroup": "rvrf-test-bilidili-rf3-rescanid-live-verification-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "rvrf-test-bilidili-rf3-rescanid-live-verification-t1",
+  "status": "needs-review",
+  "summary": "Test verified the live BiliDili RF-3 schema/migration path after accepted Core+Plugin repairs, but could not prove same-rescanId live idempotency because the public MCP rescan route never opened a new deep_mining_round for any explicit RF-3 rescanId. Live DB backup was captured before probing. After alembic_status, deep_mining_rounds gained nullable rescan_id and the partial unique index deep_mining_rounds_rescan_unique; DB stayed knowledge_entries=42 and coverage_ledger=30. Three real MCP rescan probes completed without stale empty-session BOOTSTRAP regression: an initial same-rescanId converged probe, a minimal-gap probe with architecture target 35/networking-api target 30, and a controllerAuthorized produceSession probe. The latter two returned executionDimensions=2 and produceDimensions=2, but response/logs still reported coverageAdvisory=converged and released the empty session; SQL showed count(*)=0 for every explicit RF-3 rescanId and all existing rounds retained rescan_id NULL. Source attribution points to AlembicPlugin knowledge-rescan.ts:593-604, where coverageAdvisory.shouldStop=true sets noActionableRescanWork and skips openDeepMiningRound; therefore the live ledger write/reflow path with rescanId remains unproven and needs Plugin/Core review.",
+  "evidenceRefs": [
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/rvrf-test-bilidili-rf3-rescanid-live-verification-t1/evidence-summary.md",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/rvrf-test-bilidili-rf3-rescanid-live-verification-t1/alembic-before-rf3.sqlite",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/logs/combined.log",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/tmp/rescan-briefing-02a250323c6c6ade.json",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/src/repository/evolution/CoverageLedgerRepository.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicCore/src/infrastructure/database/migrations/016_deep_mining_rounds_rescan_id.ts"
+  ],
+  "verification": [
+    "Git evidence: AlembicCore HEAD 830f9028a7c4d145c8bb0ccbc23485901f1cdcd0; AlembicPlugin HEAD 504cecd70db31eba92f5ba3fe6b101699e8173eb; BiliDili HEAD 6f1bf34cf1b6daca4e08895db211939115dac868; BiliDili status ## main...origin/main [ahead 1] with no dirty files.",
+    "Pre-migration live DB evidence: before alembic_status, PRAGMA table_info(deep_mining_rounds) lacked rescan_id and SELECT rescan_id failed with no such column; backup was copied to Test/tmp before status/rescan probes.",
+    "alembic_status evidence: MCP returned ok=true/status=ready for BiliDili; after this read, SQL showed deep_mining_rounds column 9 rescan_id TEXT and index deep_mining_rounds_rescan_unique present; counts deep_mining_rounds=4, knowledge_entries=42, coverage_ledger=30.",
+    "Initial explicit-rescanId probe rvrf-rf3-live-same-rescanid-20260627: alembic_rescan returned ok=true/status=ready, preserved 42, decayed 0, coverageAdvisory=converged; SQL after first and force retry showed count(*)=0 for that rescan_id and all four existing rounds had rescan_id NULL.",
+    "Minimal-gap probe rvrf-rf3-live-gap-rescanid-20260627: plan confirm set moduleBinding targets architecture=35 and networking-api=30; alembic_rescan returned ok=true/status=ready with executionDimensions=2, produceDimensions=2, totalGap=2; log lines at 2026-06-26T16:51:33Z show Dimension gaps and then BootstrapSession released empty host-agent lease with reason deepMining-converged; SQL count(*) for that rescan_id remained 0.",
+    "Controlled produceSession probe rvrf-rf3-live-produce-session-rescanid-20260627: alembic_rescan passed controllerAuthorized=true and produceSession.enabled=true with two one-item gaps; response still returned ok=true/status=ready, executionDimensions=2, produceDimensions=2, coverageAdvisory=converged; SQL count(*) for that rescan_id remained 0.",
+    "Final DB readback: all deep_mining_rounds rows are the pre-existing round_index 1-4 rows with rescan_id NULL, new_recipes_this_round sum 0, trigger_actor host-agent-rescan; no duplicate non-null rescan_id groups exist because no non-null rows were created.",
+    "Final session readback: /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/active-sessions.json missing; /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/bootstrap-sessions/active-sessions.json exists with normalized count=0. No fresh stale empty-session BOOTSTRAP regression occurred during this RF-3 probe.",
+    "Source attribution: AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts:593-604 skips openDeepMiningRound when coverageAdvisory.shouldStop is true; lines 670-699 would write/log rescanId if reached. AlembicCore CoverageLedgerRepository.ts:207-244 implements rescanId-aware upsert, but the live public route did not call it for RF-3 probes."
+  ],
+  "risks": [
+    "RF-3 live idempotency is not accepted: same-rescanId duplicate prevention could not be observed because the live public MCP route never wrote a non-null rescan_id row.",
+    "Completion/reflow preserving rescan_id is not accepted: reflow cannot be proven without an opened RF-3 round carrying rescan_id.",
+    "Likely owner is AlembicPlugin public alembic_rescan workflow/advisory ordering or AlembicCore advisor verdict behavior: route can return produceDimensions=2 while coverageAdvisory.shouldStop=true, causing openDeepMiningRound to be skipped.",
+    "Recommended next repair: make openDeepMiningRound run when deepMining has execution/produce dimensions, or adjust coverageAdvisory so shouldStop is not true for produceDimensions>0; then redispatch Test for two live MCP rescan calls with the same explicit rescanId and SQL count exactly 1."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-test-bilidili-rf3-rescanid-live-verification-p1__Test__rvrf-test-bilidili-rf3-rescanid-live-verification-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-rf3-rescanid-live-verification-p1__Test__rvrf-test-bilidili-rf3-rescanid-live-verification-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-test-bilidili-rf3-rescanid-live-verification-p1__Test__rvrf-test-bilidili-rf3-rescanid-live-verification-t1",
+    "dispatchGroup": "rvrf-test-bilidili-rf3-rescanid-live-verification-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-rf3-rescanid-live-verification-p1__Test__rvrf-test-bilidili-rf3-rescanid-live-verification-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 56,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-test-bilidili-rf3-rescanid-live-verification-p1",
+    "targetTaskId": "rvrf-test-bilidili-rf3-rescanid-live-verification-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "rvrf-test-bilidili-rf3-rescanid-live-verification-p1",
+    "resultId": "tr-rvrf-test-bilidili-rf3-rescanid-live-verification-t1",
+    "createdAt": "2026-06-26T16:55:21.870Z"
+  },
+  "createdAt": "2026-06-26T16:55:21.870Z",
+  "stateRevisionObserved": 56,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

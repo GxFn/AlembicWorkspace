@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+  "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+  "status": "blocked",
+  "summary": "Test reran the direct BiliDili realverify after the moduleBindings gate repairs with DeepSeek generation/planning and Ollama qwen3-embedding:0.6b embeddings. Runtime consumed the repaired local AlembicCore/AlembicAgent/Alembic dist and fresh coldStart passed: bootstrap_mqwkgtp2_dea5ce50 completed, classification=pass, 61 retained process events, 19 llm.input/19 llm.output/10 llm.reflection, extracted=5 and created=5 candidates, post-coldStart DB counts knowledge_entries=4, recipe_source_refs=15, semantic_memories=10, token_usage=21. The subsequent deepMining rescan did not reproduce the previous empty plan moduleBindings failure; it reached the plan-gate checkpoint with 6 execution dimensions and non-empty moduleScope for Networking/Home/LiveChat/AOXFoundationKit, wrote coverage_ledger=14 and deep_mining_rounds=1, then failed at the first remaining product/runtime blocker: BootstrapSessionManager.createSession rejected runKnowledgeRescanWorkflow because the completed fresh coldStart left active session bs-<redacted> recorded for the same BiliDili project. Per task stop condition, moduleMining, evolution/maintenance, and anti-fabrication probes were not run after this first blocker. Recommended owner routing: AlembicCore bootstrap session lease lifecycle, with Alembic mainbody workflow call sites in ProjectContextWorkflowFacts, KnowledgeRescanWorkflow, and DaemonJobRunner.runDeepMiningRounds.",
+  "evidenceRefs": [
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/modulebindings-gate-realverify-summary.md",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/logs/restart-alembic-after-session-clear.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/provider-split-redacted-after-session-clear.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/environment-verify-after-session-clear.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/bootstrap-active-sessions-before-clear-summary.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/bootstrap-active-sessions-after-session-clear-restart.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/cold-start-process-timeline-fresh-after-modulebindings-gate.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/job-bootstrap-fresh-after-modulebindings-gate.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/job-events-bootstrap-fresh-after-modulebindings-gate.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/after-fresh-coldstart-after-modulebindings-gate-db-snapshot.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/deepmining-after-modulebindings-gate-job-run.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/job-deepmining-after-modulebindings-gate.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/job-events-deepmining-after-modulebindings-gate.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/after-deepmining-failure-after-modulebindings-gate-db-snapshot.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1/evidence/bootstrap-active-sessions-after-deepmining-failure.json"
+  ],
+  "verification": [
+    "Provider split redacted snapshot confirms generation/planning provider deepseek deepseek-v4-pro with key presence only, embedding provider ollama qwen3-embedding:0.6b.",
+    "Restart evidence shows Alembic daemon ok at http://127.0.0.1:53964 with target-project AI config ready and DeepSeek secret provider present.",
+    "Fresh coldStart probe passed with job bootstrap_mqwkgtp2_dea5ce50 completed, classification=pass, durationMs=226855, 61 retained events, hiddenCount=0, and no missing producer events.",
+    "Fresh coldStart DB snapshot shows knowledge_entries=4, recipe_source_refs=15, semantic_memories=10, coverage_ledger=0, deep_mining_rounds=0, token_usage=21.",
+    "DeepMining job rescan_mqwkmo3x_01cc3a43 reached plan-gate checkpoint with 6 executionDimensions and moduleScope for Networking, Home, LiveChat, and AOXFoundationKit; no 'deepMining requires plan moduleBindings with module×dimension targets' error was observed.",
+    "DeepMining failed with BootstrapSessionLeaseError: Bootstrap already in progress for BiliDili with session bs-<redacted>; stack points through AlembicCore BootstrapSessionManager and Alembic knowledge rescan/deepMining workflow.",
+    "Post-failure DB snapshot shows coverage_ledger=14, deep_mining_rounds=1, knowledge_entries=4, semantic_memories=0, token_usage=22.",
+    "Final health check for http://127.0.0.1:53964/api/v1/health returned success=true status=healthy.",
+    "Product repos BiliDili, Alembic, AlembicCore, AlembicAgent, and AlembicPlugin had clean git status after the test; only Test tmp evidence was added."
+  ],
+  "risks": [
+    "moduleMining, evolution/maintenance, and anti-fabrication rejection were not run because the assigned task requires stopping at the first product/root-cause blocker.",
+    "Manual clearing of an old stale bootstrap active-session file was needed once to get a fresh coldStart baseline; the fresh passing coldStart then created the new blocking active session, proving the direct chain still has a lifecycle blocker.",
+    "The failed deepMining attempt left semantic_memories at 0 in the post-failure DB snapshot while knowledge_entries remained 4; owner should inspect whether rescan cleanup runs before session acquisition and should rollback or defer destructive cleanup until session lease acquisition succeeds.",
+    "Controller should route repair to AlembicCore bootstrap session lease lifecycle plus Alembic workflow call sites, not to Test and not to BiliDili source."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1.json",
+    "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+    "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1__Test__verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 55,
+    "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+    "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-p1",
+    "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-modulebindings-gate-t1",
+    "createdAt": "2026-06-27T16:30:08.450Z"
+  },
+  "createdAt": "2026-06-27T16:30:08.450Z",
+  "stateRevisionObserved": 55,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

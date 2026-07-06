@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "taskPackageId": "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+  "dispatchGroup": "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "targetWindow": "Alembic",
+  "targetTaskId": "e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+  "status": "completed",
+  "summary": "E-3 branch A Main cleanup completed in Alembic. Committed 077f7ce70a44a0ddc8101d205540c95cae5f1a3d (Remove dead terminal adapter consumers). Removed Main AgentModule consumption of the old lightweight router, public terminal contract subpath, and dead terminal/mac adapter/session stack; deleted obsolete terminal adapter unit tests; preserved ToolContextFactory -> Agent runtime terminal.exec path and v2 ToolRouterAdapter route. Boundary lint now treats @alembic/agent/tools/terminal Main consumption as retired and reports 0 live consumer files. Product live-surface grep for terminal_shell/terminal_pty/terminal_run/terminal-adapter/old adapter imports returned zero matches.",
+  "evidenceRefs": [
+    "commit-077f7ce70a44a0ddc8101d205540c95cae5f1a3d",
+    "e3-dead-terminal-adapter-stack-deleted",
+    "agentmodule-old-router-terminal-consumption-removed",
+    "toolcontextfactory-terminal-exec-path-preserved",
+    "grep-main-live-terminal-phantom-zero",
+    "buildcheck-pass",
+    "unit-targeted-66-pass",
+    "unit-codex-baseline-951-pass",
+    "repo-boundary-pass",
+    "agent-extraction-boundary-pass",
+    "diff-check-pass"
+  ],
+  "verification": [
+    "node -v => v22.22.1",
+    "npm run build:check => passed",
+    "npm run test:unit -- test/unit/BootstrapTerminalToolset.test.ts test/unit/PcvNodeEvidence.test.ts test/unit/ToolContextFactory.test.ts test/unit/V2ToolSystem.test.ts test/unit/AgentModuleBoundaries.test.ts => 5 files passed, 66 tests passed",
+    "npm run test:unit -- test/unit/TestMode.test.ts test/unit/BootstrapTerminalToolset.test.ts test/unit/PcvNodeEvidence.test.ts => 3 files passed, 25 tests passed",
+    "npm run test:unit:codex => 120 files passed, 1 skipped; 951 tests passed, 1 skipped",
+    "npm run lint:repo-boundary => passed; @escape-hatch count 1 / 75",
+    "npm run lint:agent-extraction-boundary => passed; @alembic/agent/tools/terminal consumer files: 0; duplicate terminal capability/policy/session/envelope files: 0",
+    "rg live-surface scan over lib test bin package.json vitest.unit.codex.config.ts docs/testing.md => no matches for terminal_shell, terminal_pty, terminal_run, @alembic/agent/tools/terminal imports, terminal-adapter, old adapter classes",
+    "git diff --check HEAD^ HEAD => passed",
+    "git status --short --branch => clean, main...origin/main [ahead 2]"
+  ],
+  "risks": [
+    "Alembic code guard MCP check could not complete because the tool returned an internal schema error: unrecognized key \"data\". This was recorded as tooling blocker evidence, not a repository validation failure.",
+    "No push/tag/version bump performed because the task package boundary forbids push, tag, and version bump."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-e3-main-dead-terminal-adapter-consumer-cleanup-p1__Alembic__e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e3-main-dead-terminal-adapter-consumer-cleanup-p1__Alembic__e3-main-dead-terminal-adapter-consumer-cleanup-t1.json",
+    "deliveryRunId": "run-delivery-e3-main-dead-terminal-adapter-consumer-cleanup-p1__Alembic__e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+    "dispatchGroup": "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-e3-main-dead-terminal-adapter-consumer-cleanup-p1__Alembic__e3-main-dead-terminal-adapter-consumer-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "stateRevision": 34,
+    "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+    "taskPackageId": "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+    "targetTaskId": "e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "e3-main-dead-terminal-adapter-consumer-cleanup-p1",
+    "resultId": "tr-e3-main-dead-terminal-adapter-consumer-cleanup-t1",
+    "createdAt": "2026-06-27T11:10:32.912Z"
+  },
+  "createdAt": "2026-06-27T11:10:32.912Z",
+  "stateRevisionObserved": 34,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

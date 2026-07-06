@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rvrf-plugin-deepmining-session-ledger-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-plugin-deepmining-session-ledger-repair-p1",
+  "dispatchGroup": "rvrf-plugin-deepmining-session-ledger-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "rvrf-plugin-deepmining-session-ledger-repair-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin 修复 alembic_rescan/deepMining 空 session 阻塞 moduleMining 的真实链路：按 sessionId 仅释放同项目且确认为空的 no-work host-agent session；rescan 在 planning/advisory 前从现有 Recipe sourceRefs + ProjectContext 模块轴写 coverage_ledger；coverage advisory 收敛时 deepMining/moduleMining 都不保留新建空 session。提交 63cefd2。真实 BiliDili live probe：旧空 session 自然 stale 后被正常入口释放；deepMining success/errorCode=null，coverageLedgerSeed writtenCells=24 coveredPathCount=32 moduleCount=8，coverageAdvisory converged，releasedEmptySession=true，afterDeepMining sessions=0；随后 moduleMining success/errorCode=null，同样 releasedEmptySession=true，afterModuleMining sessions=0。最终 BiliDili coverage_ledger=24（covered=14, partial=10），knowledge_entries=42，recipe_source_refs=128，moduleName_nonempty=0/42（现状已报告，未伪造历史 moduleName）。",
+  "evidenceRefs": [
+    "commit:AlembicPlugin@63cefd2",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/host-agent-workflows/project-context-analysis.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/test/unit/HostAgentSessionLease.test.ts",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/bootstrap-sessions/active-sessions.json"
+  ],
+  "verification": [
+    "Node 22 confirmed: node -v => v22.22.1",
+    "git diff --check passed before commit",
+    "Biome check passed on changed files",
+    "npx biome check --write lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts test/unit/HostAgentSessionLease.test.ts -> pass",
+    "npx vitest run test/unit/HostAgentSessionLease.test.ts -> 8 passed",
+    "npx vitest run test/unit/HostAgentSessionLease.test.ts test/unit/CoverageLedgerWiring.test.ts test/unit/SubmitKnowledgeRouter.test.ts test/unit/HostAgentRecipeEvidenceGate.test.ts -> 54 passed",
+    "npm run build -> pass; Core 051ddf282309e485e8f3359337b9b9f3be011515",
+    "npm run build:check -> pass; Core 051ddf282309e485e8f3359337b9b9f3be011515",
+    "Targeted session/coverage/quality tests passed",
+    "Build and typecheck passed",
+    "BiliDili direct workflow non-MCP live probe after stale threshold -> deepMining success errorCode=null, moduleMining success errorCode=null, final active sessions=0, coverage_ledger=24",
+    "Live BiliDili direct workflow probe passed without manual DB/session deletion; it used normal stale-empty release and no-actionable by-id release paths"
+  ],
+  "risks": [
+    "alembic_code_guard MCP was attempted but the installed tool surface returned internal CODEX_MCP_ERROR: unrecognized key \"data\"; this is recorded as a tool-surface blocker, not a code finding.",
+    "BiliDili knowledge_entries.moduleName remains 0/42; this task reports the status and advances coverage/moduleMining through sourceRefs + module bindings instead of backfilling historical moduleName fields.",
+    "Live probe changed BiliDili local Alembic runtime state through the normal workflow: coverage_ledger now has 24 advisory cells and active-sessions is empty. No manual DB/session deletion was used."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-plugin-deepmining-session-ledger-repair-p1__AlembicPlugin__rvrf-plugin-deepmining-session-ledger-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-plugin-deepmining-session-ledger-repair-p1__AlembicPlugin__rvrf-plugin-deepmining-session-ledger-repair-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-plugin-deepmining-session-ledger-repair-p1__AlembicPlugin__rvrf-plugin-deepmining-session-ledger-repair-t1",
+    "dispatchGroup": "rvrf-plugin-deepmining-session-ledger-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-plugin-deepmining-session-ledger-repair-p1__AlembicPlugin__rvrf-plugin-deepmining-session-ledger-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 32,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-plugin-deepmining-session-ledger-repair-p1",
+    "targetTaskId": "rvrf-plugin-deepmining-session-ledger-repair-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "rvrf-plugin-deepmining-session-ledger-repair-p1",
+    "resultId": "tr-rvrf-plugin-deepmining-session-ledger-repair-t1",
+    "createdAt": "2026-06-26T15:06:46.358Z"
+  },
+  "createdAt": "2026-06-26T15:06:46.358Z",
+  "stateRevisionObserved": 32,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rvrf-core-deepmining-round-rescanid-repair-t1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-core-deepmining-round-rescanid-repair-p1",
+  "dispatchGroup": "rvrf-core-deepmining-round-rescanid-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "rvrf-core-deepmining-round-rescanid-repair-t1",
+  "status": "completed",
+  "summary": "AlembicCore completed RF-3 deep_mining_rounds rescanId traceability/idempotency repair in commit 830f9028a7c4d145c8bb0ccbc23485901f1cdcd0. Added migration 016 to add nullable rescan_id plus a partial unique index on (project_root,rescan_id) where non-null; updated Drizzle schema and CoverageLedgerRepository types/API with getRoundByRescanId and rescanId-aware upsertRound that preserves existing round_index behavior when rescanId is absent; added tests for existing-015 migration idempotency, rescanId roundtrip, same-rescanId non-duplication, and legacy round_index-only behavior. No AlembicPlugin/BiliDili/vendor/dist changes; no push/tag/bump.",
+  "evidenceRefs": [
+    "AlembicCore commit 830f9028a7c4d145c8bb0ccbc23485901f1cdcd0 (Add rescan ids to deep mining rounds)",
+    "src/infrastructure/database/migrations/016_deep_mining_rounds_rescan_id.ts",
+    "src/infrastructure/database/drizzle/schema.ts",
+    "src/repository/evolution/CoverageLedgerRepository.ts",
+    "test/CoverageLedgerRepository.test.ts",
+    "test/MigrationsRerunIdempotency.test.ts",
+    "test/DatabaseRepository.test.ts",
+    ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26/task-packages/rvrf-core-deepmining-round-rescanid-repair-p1.json",
+    "Design/docs/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26.md"
+  ],
+  "verification": [
+    "node --version => v22.22.1",
+    "npm run build:check => PASS (tsc -p tsconfig.json --noEmit)",
+    "npm run test -- CoverageLedgerRepository.test.ts MigrationsRerunIdempotency.test.ts DatabaseRepository.test.ts => PASS (3 files, 13 tests)",
+    "npm run lint => PASS (Biome checked 637 files)",
+    "npm run build => PASS (clean-dist + tsc)",
+    "npm run test => PASS (141 files, 1399 tests)",
+    "git diff --check => PASS",
+    "npm run check => FAIL only at existing lint:naming baseline after prior gates passed; reported src/project-context-capabilities.ts, src/recipe-context-capabilities.ts, src/test-fixtures.ts naming violations, none touched by this task",
+    "mcp__alembic.alembic_status => degraded because Alembic selected/active project points to BiliDili and Core knowledge is not initialized",
+    "mcp__alembic.alembic_code_guard explicit files => tool internal failure: unrecognized key \"data\" (CODEX_MCP_ERROR/core.failure.internal-error), no guard review produced"
+  ],
+  "risks": [
+    "AlembicPlugin or host consumer must pass the MCP/request rescanId into Core UpsertDeepMiningRoundInput to populate the new column in live DB; this Core package intentionally did not edit Plugin per task boundary.",
+    "Concurrent same-rescanId inserts with different roundIndex are protected by the DB partial unique index, while repository idempotency covers normal serialized upsert paths; no true BiliDili DB mutation was performed in this Core task.",
+    "npm run check remains blocked by pre-existing naming lint baseline files outside this task scope; targeted, lint, build, and full Vitest validations passed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-core-deepmining-round-rescanid-repair-p1__AlembicCore__rvrf-core-deepmining-round-rescanid-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-core-deepmining-round-rescanid-repair-p1__AlembicCore__rvrf-core-deepmining-round-rescanid-repair-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-core-deepmining-round-rescanid-repair-p1__AlembicCore__rvrf-core-deepmining-round-rescanid-repair-t1",
+    "dispatchGroup": "rvrf-core-deepmining-round-rescanid-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-core-deepmining-round-rescanid-repair-p1__AlembicCore__rvrf-core-deepmining-round-rescanid-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 48,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-core-deepmining-round-rescanid-repair-p1",
+    "targetTaskId": "rvrf-core-deepmining-round-rescanid-repair-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "rvrf-core-deepmining-round-rescanid-repair-p1",
+    "resultId": "tr-rvrf-core-deepmining-round-rescanid-repair-t1",
+    "createdAt": "2026-06-26T16:05:12.182Z"
+  },
+  "createdAt": "2026-06-26T16:05:12.182Z",
+  "stateRevisionObserved": 48,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

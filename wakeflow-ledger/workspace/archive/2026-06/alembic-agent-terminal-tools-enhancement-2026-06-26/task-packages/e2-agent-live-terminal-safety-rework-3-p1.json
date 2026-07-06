@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "e2-agent-live-terminal-safety-rework-3-p1",
+  "demandKey": "alembic-agent-terminal-tools-enhancement-2026-06-26",
+  "summary": "E-2 AlembicAgent rework-3 after controller raw-evidence review. Rework-2 correctly fixed terminal.exec audit persistence by omitting/uniquing requestId, but controller source review found a separate E2-7 blocker: execInSandboxOrDirect still overwrites any sandboxExecutor-provided diagnostics with {sandboxed:true,fallbackUsed:false} after executor.exec returns. That makes the later Alembic ToolContextFactory bridge repair impossible to observe from Agent results, violating E2-7 sandbox degradation explicitness. Scope is ONLY this producer contract gap. Preserve all accepted E-2 behavior from prior rounds: structured terminalSafety allowlist/cwd jail, auditSink.log(entry), action terminal.exec, result/duration, data.commandHash only, no raw command text, audit failures non-fatal, and no stable commandHash-derived requestId. Change Agent terminal runtime so SandboxExecutorLike may return optional diagnostics {sandboxed:boolean,fallbackUsed:boolean,degradeReason?:string}; when present, preserve it instead of overwriting. When absent, keep the sandboxed:true/fallbackUsed:false default. Ensure the existing result decoration continues to set _meta.fallbackUsed and output [unsandboxed:<reason>] for fallback/degraded runs. Add a regression where a fake sandboxExecutor returns stdout/stderr/exitCode plus diagnostics {sandboxed:false,fallbackUsed:true,degradeReason:'seatbelt_unavailable'} and assert the terminal.exec ToolResult exposes fallbackUsed plus the unsandboxed diagnostic; this must prove an Alembic bridge can pass degradation through. Keep the existing missing-sandboxExecutor fallback and repeated-audit tests. Do not expand into E-1 allowlist consumer, E-3 dead-stack deletion/public subpath retirement, E-4 phantom cleanup, E-5 prompt/guard, or Alembic main wiring. Validate with Node >=22: targeted runtime terminal safety tests, build:check, tool-v2 contract/public-signature checks as affected, and grep showing no terminal.exec:<hash> requestId and no diagnostics overwrite. Commit on AlembicAgent main and return TargetResultEnvelope with commit hash, changed files, command outputs, and residual risks.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-agent-terminal-tools-enhancement-2026-06-26.md#E2-7",
+  "createdAt": "2026-06-27T10:06:13.847Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "e2-agent-live-terminal-safety-rework-3-t1",
+      "taskPackageId": "e2-agent-live-terminal-safety-rework-3-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Read parent AGENTS/CLAUDE, current state root, task package e2-agent-live-terminal-safety-rework-3-p1, and AlembicAgent/CLAUDE.md; declare AlembicAgent identity. Apply only E2-7 producer-contract rework: preserve optional sandboxExecutor diagnostics instead of overwriting them, prove degraded executor diagnostics surface in ToolResult/meta/output, and keep prior audit/cwd/safety fixes. No cross-repo edits and no scope expansion. Commit locally and backfill evidence.",
+      "status": "pending",
+      "createdAt": "2026-06-27T10:06:13.847Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

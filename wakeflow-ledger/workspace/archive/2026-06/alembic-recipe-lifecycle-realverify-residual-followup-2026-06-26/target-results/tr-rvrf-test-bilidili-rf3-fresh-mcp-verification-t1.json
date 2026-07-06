@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rvrf-test-bilidili-rf3-fresh-mcp-verification-t1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "rvrf-test-bilidili-rf3-fresh-mcp-verification-p1",
+  "dispatchGroup": "rvrf-test-bilidili-rf3-fresh-mcp-verification-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "rvrf-test-bilidili-rf3-fresh-mcp-verification-t1",
+  "status": "needs-review",
+  "summary": "Temporary fresh Test/Codex MCP attachment verified the RF-3 repaired branch on true BiliDili DB. AlembicPlugin source/dist at c4c4d4f contain the repair; live alembic_plan draft+confirm produced the gap plan for architecture + networking-api. First live alembic_rescan with rescanId rvrf-rf3-fresh-mcp-20260627-temp-test returned ok=true with executionDimensions=2, produceDimensions=2, coverageAdvisory.shouldStop=true/converged, logged the repaired Keeping deepMining round/session open branch, and opened deep_mining_round roundIndex 5 with that non-null rescanId. After the second same-rescanId call attempt, SQL showed exactly one row for project_root + rescanId and duplicate non-null rescanId groups=0. The nuance requiring controller review: the second call returned BOOTSTRAP_IN_PROGRESS for the first call's still-open produce session, so Test proved the fresh repaired branch and no duplicate row, but did not prove two successful same-rescanId MCP calls can complete back-to-back while that produce session remains open.",
+  "evidenceRefs": [
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/rvrf-test-bilidili-rf3-fresh-mcp-verification-t1/evidence-summary.md",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/Test/tmp/rvrf-test-bilidili-rf3-fresh-mcp-verification-t1/alembic-before-rf3-fresh-mcp.sqlite",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/alembic.db",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/logs/combined.log",
+    "/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/logs/error.log",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/lib/recipe-generation/host-agent-workflows/knowledge-rescan.ts",
+    "/Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin/dist/lib/recipe-generation/host-agent-workflows/knowledge-rescan.js"
+  ],
+  "verification": [
+    "Read parent AGENTS.md, Test/AGENTS.md, active state index/status, state-root task package, dispatch packet, delivery envelope, dispatch group, and Test alembic-real-routes skill.",
+    "Verified Test identity and scope: no product code edits; this was fresh Codex/MCP verification only.",
+    "Ran mcp__alembic.alembic_status for /Users/gaoxuefeng/Documents/AlembicWorkspace/BiliDili: ok=true, status=ready, selected project id 02a25032, recipeCount=42, pure-local route.",
+    "Verified version evidence: BiliDili HEAD 6f1bf34cf1b6daca4e08895db211939115dac868, AlembicPlugin HEAD c4c4d4f7f950fff5929f94d257056e828100a8be, AlembicCore HEAD 830f9028a7c4d145c8bb0ccbc23485901f1cdcd0; BiliDili and AlembicPlugin git status --short returned no dirty files.",
+    "Verified AlembicPlugin source lines 593-618 and dist lines 395-415 contain hasActionableProduceWork, the Keeping deepMining round/session open log, and openDeepMiningRound(ctx, state.projectRoot, state.rescanId).",
+    "Ran mcp__alembic.alembic_plan draft then confirm to satisfy the current Plan API contract; confirmed planSelection uses generationStage=deepMining, dimensions architecture and networking-api, moduleBindings BiliDili/Modules target 35 and Packages/AOXNetworkKit target 30, totalRecipeBudget=2.",
+    "Copied true DB backup before live calls to Test/tmp/rvrf-test-bilidili-rf3-fresh-mcp-verification-t1/alembic-before-rf3-fresh-mcp.sqlite; baseline SQL target_before=0, duplicate_groups_before=0, existing rows ids 1-4 all rescan_id NULL; combined.log baseline line=1534.",
+    "First live mcp__alembic.alembic_rescan with force=true and rescanId rvrf-rf3-fresh-mcp-20260627-temp-test returned ok=true/status=ready; response had coverageAdvisory.shouldStop=true/converged and dimensions architecture/networking-api need 1 each.",
+    "Second live mcp__alembic.alembic_rescan with the same rescanId returned ok=false/status=failed with BOOTSTRAP_IN_PROGRESS for session bs-<redacted>.",
+    "Post-run SQL on true DB: target_after_both count=1, min_id=max_id=5, min_round=max_round=5, trigger_actor=host-agent-rescan, duplicate_groups_after=0, latest row rescan_id=rvrf-rf3-fresh-mcp-20260627-temp-test.",
+    "Post-run combined.log lines 1562-1563 show the repaired branch: Keeping deepMining round/session open despite coverage advisory stop because produce dimensions exist, then Opened deepMining round with roundIndex=5 and the explicit rescanId; line 1589 records the second-call BOOTSTRAP_IN_PROGRESS.",
+    "Session readback: top-level active-sessions.json missing; bootstrap-sessions active-sessions.json contains one active BiliDili session bs-<redacted> for architecture and networking-api."
+  ],
+  "risks": [
+    "The core RF-3 fresh-route behavior is now proven for first-call open/upsert: repaired branch executes and SQL has exactly one non-null rescanId row with no duplicate groups.",
+    "The second same-rescanId call did not complete successfully; it failed with BOOTSTRAP_IN_PROGRESS because the first call kept the produce session open. Controller must decide whether this satisfies the task's two-call intent or needs a follow-up focused on same-id retry semantics/session lease behavior.",
+    "An active bootstrap session remains for BiliDili until completion or expiry; Test did not release or complete it because the task did not authorize dimension completion, knowledge submission, or product/session repair.",
+    "Target result is evidence only; it is not controller acceptance or task-package closure."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-rvrf-test-bilidili-rf3-fresh-mcp-verification-p1__Test__rvrf-test-bilidili-rf3-fresh-mcp-verification-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-rf3-fresh-mcp-verification-p1__Test__rvrf-test-bilidili-rf3-fresh-mcp-verification-t1.json",
+    "deliveryRunId": "run-delivery-rvrf-test-bilidili-rf3-fresh-mcp-verification-p1__Test__rvrf-test-bilidili-rf3-fresh-mcp-verification-t1",
+    "dispatchGroup": "rvrf-test-bilidili-rf3-fresh-mcp-verification-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-rvrf-test-bilidili-rf3-fresh-mcp-verification-p1__Test__rvrf-test-bilidili-rf3-fresh-mcp-verification-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 68,
+    "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "rvrf-test-bilidili-rf3-fresh-mcp-verification-p1",
+    "targetTaskId": "rvrf-test-bilidili-rf3-fresh-mcp-verification-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "rvrf-test-bilidili-rf3-fresh-mcp-verification-p1",
+    "resultId": "tr-rvrf-test-bilidili-rf3-fresh-mcp-verification-t1",
+    "createdAt": "2026-06-26T17:30:22.471Z"
+  },
+  "createdAt": "2026-06-26T17:30:22.471Z",
+  "stateRevisionObserved": 68,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

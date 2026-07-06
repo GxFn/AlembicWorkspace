@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u1-core",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave2-u1-core",
+  "dispatchGroup": "wave2-u1-core",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "u1-core",
+  "status": "completed",
+  "summary": "U1-Core (wave2) 完成：moduleMining 心脏接通（per-cell gap）+ moduleName canonical 派生，全 Core additive，commit fe42940。\n\n#3 KnowledgeRescanPlanBuilder：BuildKnowledgeRescanPlanOptions 加可选 moduleBindings(+moduleCount)；仅当提供时按 cell 算 gap=max(0, perCellTarget−perCellCoverage) 与 createBudget，落 ModuleCellPlan[] cellPlans。perCellTarget 优先级 binding.targetRecipes ?? D2[tier]（D2 默认表 S5/M3/L2 + ALEMBIC_PER_CELL_TARGET_{S,M,L} env 覆盖 + <1/非有限 guard 回退，仿 resolveStagingAccessSweepCap；tier 由 moduleCount，缺省回退 moduleBindings 去重模块数）。未提供 moduleBindings 时逐字段退回现有 per-dimension(TARGET_RECIPES_PER_DIMENSION=5)，cellPlans=undefined —— 保护 deepMining 零回归。\n\n#4 buildCoverageByDimension 不升 per-cell 覆盖统计（defer→U2a），仅把模块轴接进 gap 计算签名。\n\n#5 RecipeProductionGateway：加可选 knownModuleNames + resolveModuleFromSourceRefs deps + #deriveModuleName(item, metadata)，替换 :753 恒空兜底。Agent 显式 moduleName 校验属 canonical 模块轴（注入 knownModuleNames 时；越界→留空+warn 诊断），未显式则 resolveModuleFromSourceRefs(item.sourceRefs) 从落点 canonical 模块派生（与覆盖轴同源），派生不出→留空+info 诊断（不再恒空兜底）；未注入轴 deps 时退回原行为（显式透传，否则留空），向后兼容。project-context-anchoring.ts 未改（creation-guide 非派生点）。\n\nD3：KnowledgeRescanPlanBuilder gap/coverage 函数集对 git_diff_checkpoints/gitDiffCheckpoint 0 命中读写（注释改为分坐标系描述以免误报）。floor 正交未改：per-cell 不把维度判 covered（per-维度 floor 归 critic/U2a）。U1-Plugin（出口 gate + 透传 + mcp 引导 + seed 降级）= 后续，本任务不碰 Plugin。",
+  "evidenceRefs": [
+    "AlembicCore/src/workflows/capabilities/planning/knowledge/KnowledgeRescanPlanBuilder.ts",
+    "AlembicCore/src/service/knowledge/RecipeProductionGateway.ts",
+    "AlembicCore/test/unit/KnowledgeRescanPlanBuilder.test.ts",
+    "AlembicCore/test/unit/RecipeProductionGateway.test.ts"
+  ],
+  "verification": [
+    "commit fe4294011aa104624465be3c74c9eb221d062567（main，无分支/无 push/无 tag/无 bump，4 files +301/-1，git ls-files dist/ 空=无 dist 跟踪）",
+    "npm run build:check → tsc -p tsconfig.json --noEmit 通过，0 error",
+    "npm run test → 133 files / 1364 tests passed（基线 132/1355；新增 1 file +9 tests，零回归）",
+    "npm run lint → biome Checked 624 files, no fixes applied, 0 warning / 0 error",
+    "npm run build → node scripts/clean-dist.mjs && tsc 重生 dist 成功（供 U1-Plugin 接入）",
+    "git diff --check → clean",
+    "验收1 双路[unit]：KnowledgeRescanPlanBuilder.test.ts 'U1 #1 双路' passed —— moduleBindings 提供时 cellA{target3,cov1,gap2,budget2}/cellB{target2,cov2,gap0,budget0}，不提供时 cellPlans=undefined 且 targetPerDimension=5",
+    "验收2 perCellTarget 优先级[unit]：'U1 #2 perCellTarget 优先级'(cell(1)=5/cell(8)=3/cell(20)=2/cell(20,7)=7) + 'U1 #2 tier resolver + D2 默认值直测'(resolveModuleTier 3=S/4=M/12=M/13=L; resolvePerCellTargetDefault S5/M3/L2) + 'U1 #2 env 覆盖 + guard'(=9 / 0→5 / abc→5) passed",
+    "验收3 moduleName 派生[unit]：RecipeProductionGateway.test.ts 'U1 #5' 4 名 passed —— sourceRefs 落 auth→moduleName=auth；显式 payment 属轴保留 / nonexistent-module 越界→''；resolver undefined→''；未注入 deps→显式 whatever-passthrough 透传",
+    "验收4 floor 正交[unit]：'U1 #4 floor 正交' passed —— coverageByDimension={} 不受 moduleBindings 影响，moduleCount 缺省回退去重模块数(2→S=5)",
+    "验收5 D3[grep]：grep -nE 'git_diff_checkpoints|gitDiffCheckpoint' KnowledgeRescanPlanBuilder.ts → 0 hits"
+  ],
+  "risks": [
+    "per-cell 心脏真机透传 gated on U1-Plugin（出口 gate moduleBindings + knowledge-rescan 透传 + mcp-tools moduleName 引导 + plugin seed 降级引用 canonical），本任务范围内未碰 Plugin —— landed 后解锁 U1-Plugin→U2a。",
+    "#5 派生依赖 U1-Plugin 注入 knownModuleNames + resolveModuleFromSourceRefs（从 canonical ProjectMap.modules / ProjectContextMap）；未注入时退回原 passthrough（向后兼容，无新风险）。",
+    "#5 越界→留空 是行为收紧（原 :753 恒空兜底改为：注入轴后拒越界+诊断）。仅当 U1-Plugin 注入 knownModuleNames 后才生效校验；未注入则行为完全等同旧版。",
+    "#4 per-cell 覆盖仍是 caller 提供的 perCellCoverage 快照，per-cell 覆盖账本升级=U2a（设计 defer，非缺口）；U1-Core 不用 per-cell gap 判维度 covered。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave2-u1-core__AlembicCore__u1-core",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-core__AlembicCore__u1-core.json",
+    "deliveryRunId": "run-delivery-wave2-u1-core__AlembicCore__u1-core",
+    "dispatchGroup": "wave2-u1-core",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-core__AlembicCore__u1-core.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 24,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave2-u1-core",
+    "targetTaskId": "u1-core",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "wave2-u1-core",
+    "resultId": "tr-u1-core",
+    "createdAt": "2026-06-25T22:25:11.154Z"
+  },
+  "createdAt": "2026-06-25T22:25:11.154Z",
+  "stateRevisionObserved": 24,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

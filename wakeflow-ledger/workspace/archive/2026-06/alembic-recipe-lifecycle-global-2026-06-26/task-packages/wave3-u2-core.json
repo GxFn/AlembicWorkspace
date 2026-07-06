@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "wave3-u2-core",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "summary": "波3 u2-core（U2 Core 侧 producer，deepMining 覆盖账本；红线=覆盖账本是覆盖状态持久化非 plan 持久化）。U2a：migration **用下一可用号(≥015，014 已被 u6-core content_fp 占用)** 新表 coverage_ledger(UNIQUE module×dimension+grade empty/thin/partial/covered+exhausted/source=agent-declared+covered_source_refs/uncovered_hints JSON+value_score/last_round/deferred，刻意无 plan/session 字段)+deep_mining_rounds；drizzle schema.ts:633 仿 gitDiffCheckpoints；新 CoverageLedgerRepository 复刻 GitDiffCheckpointRepository:60-170 键 module×dimension+listByModule 注册 repositories.ts:207/242；buildCoverageLedger 扩 CompletenessCritic.ts:176 只加聚合层不改单候选(module 归属 canonical ModuleSummary 路径前缀 pathsOverlap:639，必须保持 shouldBlockCompletion:false/targetGate:advisory:136-137 grade 非门=门禁不放松，exhausted=agent-declared:550，不硬编码宿主路径)。U2b：intent KnowledgeRescanIntent:42+WorkflowIntent 加 perDimensionTargets/moduleDimensionTargets(激活死字段)、KnowledgeRescanPlanBuilder:73-134 消费 Agent 目标 existingCount 优先账本无则回退 buildCoverageByDimension、TARGET_RECIPES_PER_DIMENSION:6 仅 fallback。U2d：新 CoverageLedgerAdvisor.ts 纯函数三停止(收敛/收益递减<K/轮次上限≥maxRounds)+highValueBlankCount+价值排序，K/maxRounds 从 D2 表。验收 migration 两表无 plan 字段/repository/buildCoverageLedger advisory 保持/gap 消费 Agent 目标非硬5/Advisor 三停止 D2/D3 grep/Node22 build:check+additive+dist 重生。分阶段提交 main 不 push 禁 vendor；landed+dist 解锁 u2-plugin(U2c/U2e/draft/写点/attach)。复核 HEAD 行号。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u2-core.md",
+  "createdAt": "2026-06-26T02:27:25.608Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "u2-core",
+      "taskPackageId": "wave3-u2-core",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore U2 覆盖账本：migration 下一可用号(非014)新 coverage_ledger(UNIQUE module×dimension,无 plan/session 字段)+deep_mining_rounds+drizzle+CoverageLedgerRepository(复刻 GitDiffCheckpointRepository)+buildCoverageLedger(扩 CompletenessCritic 聚合层,保持 advisory/shouldBlockCompletion:false grade 非门,不硬编码宿主路径)+intent perDimensionTargets/moduleDimensionTargets+KnowledgeRescanPlanBuilder 消费 Agent 目标(非硬5,existingCount 优先账本)+CoverageLedgerAdvisor 三停止(收敛/递减<K/上限,K/maxRounds 从D2)。验收 两表无 plan 字段/repository/advisory 保持/gap 非硬5/Advisor 三停止/D3/Node22 build:check+dist 重生；分阶段 main 不 push 禁 vendor；landed 解锁 u2-plugin。复核 HEAD。",
+      "status": "pending",
+      "createdAt": "2026-06-26T02:27:25.608Z"
+    }
+  ]
+}

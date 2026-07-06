@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rvrf-plugin-empty-session-rescan-gate-repair-p1",
+  "demandKey": "alembic-recipe-lifecycle-realverify-residual-followup-2026-06-26",
+  "summary": "Repair the remaining real BiliDili blocker proven by Test after Plugin commit 879b42b: a stale/empty same-project active bootstrap session in active-sessions.json still causes deepMining and moduleMining alembic_rescan to fail with BOOTSTRAP_IN_PROGRESS. This is the current root blocker before coverage_ledger/moduleName/StructuredPatch can be reverified.",
+  "status": "pending",
+  "sourceRef": "Controller accepted rvrf-test-bilidili-realverify-after-plugin-gap-repair-t1 as failure evidence: stale empty same-project active session still blocks real deepMining/moduleMining; coverage_ledger=0 and moduleName=0/42 remain unverified behind that blocker.",
+  "createdAt": "2026-06-26T14:01:24.230Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rvrf-plugin-empty-session-rescan-gate-repair-t1",
+      "taskPackageId": "rvrf-plugin-empty-session-rescan-gate-repair-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "You are the AlembicPlugin window. Work only in /Users/gaoxuefeng/Documents/AlembicWorkspace/AlembicPlugin live source; do not edit AlembicCore, BiliDili data, vendor, or push/tag/bump. Read ../AGENTS.md, active index/status, this state root, this task package, AlembicPlugin CLAUDE.md, and the requirement design §8.5/§8.6. Upstream accepted: AlembicCore 051ddf282309e485e8f3359337b9b9f3be011515 and AlembicPlugin 879b42b2b9d98ee0fd026df15b59f7b71fd6c4a1. Controller raw evidence: /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/bootstrap-sessions/active-sessions.json contains same-project session bs-<redacted> with 14 dimensions but completedDimensions={}, sessionStore.dimensionReports={}, sessionStore.submittedCandidates={}, submissionTracker.dimensionSubmissions={}, fileEvidenceMap={}, rejections={}, usedTriggers=[]; age was about 63 minutes at controller review. Both real mcp__alembic.alembic_rescan deepMining and moduleMining still returned BOOTSTRAP_IN_PROGRESS on this empty session after commit 879b42b. Fix the live runtime/session gate so stale empty same-project sessions are released or ignored before rescan/moduleMining/bootstrap precondition checks, while truly active/non-empty host-agent sessions remain protected. Do not implement by manually deleting the real BiliDili active-sessions.json or changing Test data. Add regression tests that reproduce an active-sessions.json/file-backed empty stale session blocking rescan/moduleMining and prove the fix, plus tests that a non-empty/in-progress session still blocks. If the current releaseEmptyHostAgentSessionLease is only called on createProjectContextHostAgentSession, move/share the cleanup at the actual precondition path used by rescan/moduleMining. Keep anti-fabrication/quality/floor gates unchanged. Validation: Node >=22; run npm run build:check and targeted Vitest around HostAgentSessionLease/session manager/rescan gate. Backfill commit hash, changed files, exact validation output, and why BiliDili Test should rerun without manual cleanup.",
+      "status": "pending",
+      "createdAt": "2026-06-26T14:01:24.230Z"
+    }
+  ]
+}

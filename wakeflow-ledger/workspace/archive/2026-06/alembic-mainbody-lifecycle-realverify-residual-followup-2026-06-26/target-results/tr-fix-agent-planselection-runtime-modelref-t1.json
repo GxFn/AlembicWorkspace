@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-fix-agent-planselection-runtime-modelref-t1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "fix-agent-planselection-runtime-modelref-p1",
+  "dispatchGroup": "fix-agent-planselection-runtime-modelref-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "fix-agent-planselection-runtime-modelref-t1",
+  "status": "completed",
+  "summary": "Fixed AlembicAgent plan-selection direct BiliDili blockers: LLMGateway now preserves provider-tagged model ids after the first colon (ollama:gemma3:4b -> gemma3:4b), and plan-selection no-tool runtime now gets a real first LLM turn before BudgetPolicy pre-iteration stop. Core assertPlanSelectionShape remains unchanged. Local commit a98a22871a7ff883da69cb9b691845a6789eadb5.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26/target-results/fix-agent-planselection-runtime-modelref-t1-evidence.md",
+    "commit a98a22871a7ff883da69cb9b691845a6789eadb5",
+    "src/ai/gateway/LLMGateway.ts",
+    "src/agent/profiles/definitions/plan.profile.ts",
+    "test/LLMGateway.test.ts",
+    "test/plan-agent-run.test.ts"
+  ],
+  "verification": [
+    "npm run test -- test/LLMGateway.test.ts test/plan-agent-run.test.ts passed",
+    "npm run build:check passed",
+    "npm run check passed with existing four Biome warnings",
+    "git diff --check passed",
+    "Tagged model-ref routing covered by request-body assertion for ollama:gemma3:4b",
+    "runPlanAgent runtime path covered with AgentService + AgentRuntimeBuilder + one no-tool provider call returning valid PlanSelection JSON",
+    "Invalid/no-JSON and invalid PlanSelection parser rejection covered by plan-agent-run tests"
+  ],
+  "risks": [
+    "Alembic code guard plugin returned an internal schema error instead of a usable guard result; repository build, targeted tests, diff check, and full npm run check passed.",
+    "Alembic mainbody direct verification should rebuild/restart the consumer process before retest to pick up this AlembicAgent commit.",
+    "No AlembicPlugin rebuild is required by this Agent-only patch unless controller later decides to refresh packaged/vendor Agent artifacts.",
+    "Other non-plan profiles with maxIterations:1 were observed but not changed because this task authorized only the plan-selection blocker."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-fix-agent-planselection-runtime-modelref-p1__AlembicAgent__fix-agent-planselection-runtime-modelref-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-agent-planselection-runtime-modelref-p1__AlembicAgent__fix-agent-planselection-runtime-modelref-t1.json",
+    "deliveryRunId": "run-delivery-fix-agent-planselection-runtime-modelref-p1__AlembicAgent__fix-agent-planselection-runtime-modelref-t1",
+    "dispatchGroup": "fix-agent-planselection-runtime-modelref-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-fix-agent-planselection-runtime-modelref-p1__AlembicAgent__fix-agent-planselection-runtime-modelref-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 25,
+    "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "fix-agent-planselection-runtime-modelref-p1",
+    "targetTaskId": "fix-agent-planselection-runtime-modelref-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "fix-agent-planselection-runtime-modelref-p1",
+    "resultId": "tr-fix-agent-planselection-runtime-modelref-t1",
+    "createdAt": "2026-06-27T14:40:07.464Z"
+  },
+  "createdAt": "2026-06-27T14:40:07.464Z",
+  "stateRevisionObserved": 25,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

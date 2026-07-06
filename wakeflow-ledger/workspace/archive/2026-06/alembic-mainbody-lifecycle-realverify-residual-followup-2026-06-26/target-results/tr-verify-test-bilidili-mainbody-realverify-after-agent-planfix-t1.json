@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+  "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+  "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+  "status": "blocked",
+  "summary": "Fresh direct BiliDili coldStart after AlembicAgent planfix still blocks at Alembic plan gate. Environment is healthy and uses ollama/gemma3:4b; token_usage records one call, but PlanSelection returned generationStage=deepMining for a coldStart gate. DB remains empty for coverage_ledger, deep_mining_rounds, knowledge_entries, recipe_source_refs, evolution_proposals, lifecycle_transition_events, and related generated tables, so deepMining/moduleMining/evolution/anti-fabrication verification was correctly stopped.",
+  "evidenceRefs": [
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/environment-verify-after-agent-planfix.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/cold-start-process-timeline-after-agent-planfix.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/job-bootstrap-fresh-after-agent-planfix.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/job-events-bootstrap-fresh-after-agent-planfix.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/job-display-snapshot-bootstrap-fresh-after-agent-planfix.http.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/db-after-agent-planfix-fresh-coldstart-failure.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/post-after-agent-planfix-fresh-coldstart-alembic.db.copy",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/fresh-coldstart-blocker-summary-after-agent-planfix.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/fresh-bootstrap-files/bootstrap_mqwhb1oo_b589abeb.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/fresh-bootstrap-files/snapshot.json",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/fresh-bootstrap-files/error.log",
+    "Test/tmp/verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1/evidence/fresh-bootstrap-files/combined.log"
+  ],
+  "verification": [
+    "Built AlembicAgent at a98a228 with npm run build before restart.",
+    "Restarted Alembic for BiliDili with process-env AI config: provider=ollama, model=gemma3:4b, embed provider=ollama/qwen3-embedding:0.6b, no AI fallback.",
+    "Verified daemon health, test-mode enabled with bootstrapDims/rescanDims architecture, projectRoot BiliDili, dataRoot ~/.asd/workspaces/02a25032.",
+    "Cleared generated data before rerun and captured pre/post DB snapshots.",
+    "Triggered fresh /api/v1/jobs/bootstrap with skipGuard=false, maxFiles=8, contentMaxLines=60, polled to terminal failed status.",
+    "Inspected HTTP job detail, job events, display snapshot, local job/snapshot/log files, and SQLite post-run counts."
+  ],
+  "risks": [
+    "Planfix removed model-ref truncation but did not make plan-selection obey the requested coldStart generationStage in the real BiliDili scenario.",
+    "Job display snapshot still has evidence warnings: no retained LLM IO events and no final session payload, which reduces provider-output diagnosability.",
+    "Because coldStart did not pass, finding#1 coverage_ledger covered_count/grade, deepMining rounds, moduleMining knowledge growth, evolution lifecycle, and anti-fabrication rejection remain unverified by this target run."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1.json",
+    "deliveryRunId": "run-delivery-verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+    "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1__Test__verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "stateRevision": 29,
+    "demandKey": "alembic-mainbody-lifecycle-realverify-residual-followup-2026-06-26",
+    "taskPackageId": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+    "targetTaskId": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "verify-test-bilidili-mainbody-realverify-after-agent-planfix-p1",
+    "resultId": "tr-verify-test-bilidili-mainbody-realverify-after-agent-planfix-t1",
+    "createdAt": "2026-06-27T14:54:18.531Z"
+  },
+  "createdAt": "2026-06-27T14:54:18.531Z",
+  "stateRevisionObserved": 29,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

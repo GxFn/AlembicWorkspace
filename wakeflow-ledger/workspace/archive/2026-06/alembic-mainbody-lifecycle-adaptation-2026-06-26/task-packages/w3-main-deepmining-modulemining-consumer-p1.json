@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "w3-main-deepmining-modulemining-consumer-p1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "summary": "W3 Alembic main consumer for alembic-mainbody-lifecycle-adaptation-2026-06-26 §4b(D/E). Producer dependencies are accepted: Core plan projection/applyPlanSelection, Agent runPlanAgent, Alembic coldStart hard gate, and AlembicAgent runModuleMining/module fan-out producer commit c38d2c46853cb2cba8049dbee617b93c069e3bc2. Implement only Alembic main host wiring for deepMining and moduleMining: add deepMining single-job multi-round route in DaemonJobRunner with per-round runPlanAgent(deepMining) hard gate, applyPlanSelection, moduleScope/per-cell targets passed through buildDaemonRescanWorkflowArgs -> runKnowledgeRescanWorkflow, Core CoverageLedgerAdvisor/coverage_ledger consumption only (do not create local ledger), deep_mining_rounds recording, stop on convergence/new_recipes<K/maxRounds, no git_diff_checkpoints, no cross-job enqueue. Extend rescan args/intents additively with moduleScope/perDimensionTargets/moduleDimensionTargets/roundIndex/miningMode only for deepMining/moduleMining and preserve coldStart/normal rescan behavior. Add moduleMining route that runs the same PD-5 plan hard gate, derives module axis from ProjectMap/projectMapModules (not moduleSeeds), intersects with plan moduleBindings/executionDimensions, calls AlembicAgent runModuleMining over ProjectMap modules, applies scaleCap as module-count cap, preserves computeAnalystBudget/token quality floor, and fails on zero modules/zero recipes. Do not edit AlembicCore/AlembicAgent/AlembicPlugin/vendor/schema/public contracts. Validate Node>=22 build:check/typecheck/lint/boundary, focused tests for D: target gap existing=6 target=8 => gap=2 and no target => gap=0, plan failure aborts before rescan, single job multi-round no enqueue, round ledger rows/stops; E: module axis from projectMapModules not moduleSeeds, 8 modules+scale=3 => exactly 3 module children/full budget, empty modules fail, moduleName non-empty; R5 guard ProjectContextWorkflowFacts sampling loop unchanged and coldStart/rescan suites green. Commit on Alembic main and return commit hash, changed files, validation output, raw evidence, and residual risks.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-mainbody-lifecycle-adaptation-2026-06-26.md §4b(D1-D8,E4-E7), §5 W3; accepted W3 Agent producer commit c38d2c46853cb2cba8049dbee617b93c069e3bc2; accepted W2 coldStart hard gate ff6f01efeadc99842c4f1650a9e96400308f5277; Core U2 coverage ledger dependency satisfied by post-umbrella/realverify base.",
+  "createdAt": "2026-06-27T03:22:26.259Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "w3-main-deepmining-modulemining-consumer-t1",
+      "taskPackageId": "w3-main-deepmining-modulemining-consumer-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read ../AGENTS.md or ../CLAUDE.md as present, ../.wakeflow-active/index.md, current state root, and Alembic/CLAUDE.md. Declare Alembic identity. Implement only W3 §4b(D/E) deepMining single-job multi-round and moduleMining fan-out host wiring in Alembic main, consuming accepted Core/Agent surfaces; no adjacent repo edits, no Core ledger fork, no moduleSeeds shortcut, no fallback-to-full.",
+      "status": "pending",
+      "createdAt": "2026-06-27T03:22:26.259Z"
+    }
+  ]
+}

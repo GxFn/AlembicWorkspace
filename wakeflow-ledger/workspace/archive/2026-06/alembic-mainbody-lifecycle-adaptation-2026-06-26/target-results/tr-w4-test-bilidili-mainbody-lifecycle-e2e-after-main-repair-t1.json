@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+  "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+  "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+  "targetWindow": "Test",
+  "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+  "status": "blocked",
+  "summary": "Test executed W4 after-main-repair real BiliDili verification at Alembic be39ab5aeb0d15294ea7960d30e8a9cc17f38989 with isolated ALEMBIC_HOME and Node v22.22.1. Result remains blocked: public /api/v1/jobs/rescan still strips generationStage/maxRounds/minNewRecipes/scaleCap/miningMode from accepted job.request; ProjectContext for BiliDili still exposes fileCount=4,targetCount=15,moduleCount=0,projectMapModules=[] so moduleMining cannot run; deepMining controlled run completed without error but recorded 0 deep_mining_rounds and 0 coverage_ledger rows, so >=2 rounds and coverage improvement are unproven; maintenance sweep still leaves expired auto-approvable staging row in lifecycle=staging with waitingCount=1 and no lifecycle_transition_events. Source shows Alembic/lib/injection/modules/KnowledgeModule.ts injects lifecycle into StagingManager, but Alembic/dist/lib/injection/modules/KnowledgeModule.js used by runtime does not, causing the live warning 'StagingManager: cannot promote ... lifecycle state machine is not configured'.",
+  "evidenceRefs": [
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/http-public-route-probe.json",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/w4-after-main-repair-e2e-summary.json",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/run-w4-after-main-repair-e2e.mjs",
+    "Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/alembic-home/.asd/workspaces/02a25032/.asd/alembic.db",
+    "Alembic/lib/http/routes/jobs.ts",
+    "Alembic/lib/injection/modules/KnowledgeModule.ts",
+    "Alembic/dist/lib/injection/modules/KnowledgeModule.js"
+  ],
+  "verification": [
+    "ALEMBIC_HOME=Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/alembic-home ALEMBIC_TEST_MODE=1 node Alembic/dist/bin/cli.js setup --dir BiliDili --ghost --force -> migrations through 016 applied",
+    "Restarted isolated Alembic daemon with Test/scripts/restart-alembic.mjs; health initially ready at http://127.0.0.1:51643, aiConfig.ready=false; stopped test daemon after HTTP probe",
+    "HTTP probe POST /api/v1/jobs/rescan with generationStage=deepMining,miningMode=deepMining,maxRounds=2,minNewRecipes=1,scaleCap=3,maxFiles=5,contentMaxLines=20 -> accepted job.request retained only reason/dimensions/maxFiles/contentMaxLines",
+    "node Test/tmp/w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1/run-w4-after-main-repair-e2e.mjs -> acceptance.overall=blocked",
+    "DB summary from isolated sqlite: knowledge_entries=1, coverage_ledger=0, deep_mining_rounds=0, lifecycle_transition_events=0, git_diff_checkpoints=0"
+  ],
+  "risks": [
+    "Local AI provider configuration is not ready; controlled AgentService was used only to test plan/module/bootstrap wiring and runtime/DB boundaries, not to claim real AI recipe quality.",
+    "ALEMBIC_GROUNDING_ENFORCEMENT was not disabled by the after-main-repair probe; anti-fabrication guard was not intentionally relaxed.",
+    "The public-route blocker alone is sufficient to block W4 C-F; other failures were still recorded to help controller route repair.",
+    "Runtime uses Alembic/dist; source and dist disagree for StagingManager lifecycle injection, so a build/dist propagation repair may be required before re-test."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1.json",
+    "deliveryRunId": "run-delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+    "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1__Test__w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "stateRevision": 43,
+    "demandKey": "alembic-mainbody-lifecycle-adaptation-2026-06-26",
+    "taskPackageId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+    "targetTaskId": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-p1",
+    "resultId": "tr-w4-test-bilidili-mainbody-lifecycle-e2e-after-main-repair-t1",
+    "createdAt": "2026-06-27T05:10:59.635Z"
+  },
+  "createdAt": "2026-06-27T05:10:59.635Z",
+  "stateRevisionObserved": 43,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-u5-plugin-2",
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "taskPackageId": "wave3-u5-plugin-2",
+  "dispatchGroup": "wave3-u5-plugin-2",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "u5-plugin-2",
+  "status": "needs-review",
+  "summary": "u5-plugin-2（U5 #1 embedding provider DI 接线收口）：Plugin wiring 完整、5 验收全 met、RedundancyAnalyzer embedding LIVE；但 ProposalExecutor/ConsolidationAdvisor 因 Core 调用点剥/缺 recipe id 而 dormant——返 needs-review 请控制器决是否派 Core 跟进。commit 3915d8e 直提 main，消费 Core a96c4ee。多文件 wiring 经 fresh-context subagent，主窗口独立核实每 claim+亲跑全门禁+full-unit baseline-diff 后才提交。\n\n实现：新 lib/recipe-generation/vector/recipe-embedding-sim-provider.ts —— 同步 EmbeddingSimProvider（签名 (a,b)=>number|undefined，结构化从 ConstructorParameters<typeof RedundancyAnalyzer> 推导，因 Core 未导出该类型）：读 vectorStore.searchByFilter 的 recipe-semantic-region 预计算向量，按 recipeId 分组 L2 归一+mean-pool，cosine(1-cosineDistance,clamp[0,1])；任一向量缺/store 不可用/维不符→undefined→Core 确定性 Jaccard；绝不 on-the-fly embed（domain 不发起 embed）。async 区域向量 load 在 VectorModule.initializeVectorService 预热一次，provider 本身同步。DI：KnowledgeModule 注册 embeddingSimProvider 单例（无 vectorStore→null→Jaccard），喂入 3 ctor（RedundancyAnalyzer options / ProposalExecutor 6th 位 / ConsolidationAdvisor 2nd 位）。\n\ndormancy（独立证实，须控制器决）：embedding 仅在 RedundancyAnalyzer:134 live（直传带 id 的 DB recipe a/b）；ProposalExecutor:601 用 #toRecipeLike() 输出（剥 id）、ConsolidationAdvisor:589 hand-built candidateLike（缺 id）→ provider 查不到向量→undefined→Jaccard。provider 须 id 查预计算向量、又不能 on-the-fly embed（spec 禁），故这 2 处须 Core 传带 id 对象（或 RecipeLike 携稳定 recipe key）才激活。Plugin 侧无法修（禁改 Core）。RedundancyAnalyzer 是主 dedup/merge 评分器、其 embedding 活=主要价值已达。\n\n建议：控制器派 Core 微调让 ProposalExecutor #toRecipeLike 保留 id + ConsolidationAdvisor candidateLike 带 id，即可全激活。真机 embedding 端到端→U7/Test。",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-generation/vector/recipe-embedding-sim-provider.ts",
+    "AlembicPlugin/lib/injection/modules/KnowledgeModule.ts",
+    "AlembicPlugin/lib/injection/modules/VectorModule.ts",
+    "AlembicPlugin/lib/injection/ServiceMap.ts",
+    "AlembicPlugin/test/unit/RecipeEmbeddingSimProvider.test.ts"
+  ],
+  "verification": [
+    "主窗口独立核验 claim(非橡皮图章): id-剥离已证 —— RedundancyAnalyzer:134 aLike=a as RecipeLike(直传带 id) live; ProposalExecutor:601 用 #toRecipeLike(superseded/cand) 输出(剥 id) dormant; provider VectorService-backed(cosineDistance@core/vector + vectorStore.searchByFilter, 非 stub); 类型结构化推导无 Core-src 引",
+    "node v22.22.1; npm run build:check: green; “Core build used ../AlembicCore @ a96c4ee24bf6ed3f10377f63fed1bb58cac76528”(记录消费 Core commit)",
+    "biome 5 文件 0 error(20 warning 在测试文件、同既有 RedundancyAnalyzer.test 约定、lint-staged diagnostic-level=error 不阻塞); lint:repo-boundary PASS / lint:core-import-boundary OK(433 files) / report:agent-extraction-boundary filesWithBoundaryImports=0; 改动文件 git_diff_checkpoints/AlembicCore-src 均 0",
+    "新+邻测试: RecipeEmbeddingSimProvider(10: cosine/mean-pool/undefined 回退 + RedundancyAnalyzer 端到端 embedding>Jaccard) + RedundancyAnalyzer + ProposalExecutorBounding = 17 passed; 现有 evolution 单测全过(回退确定性不破)",
+    "全量 unit(Node22): 1645 tests/1598 passed/47 failed/12 文件; failed-set 与上一基线(u6-after 12 文件) diff IDENTICAL=零新回归(passed+10)",
+    "3 站点接线 grep: resolveEmbeddingSimProvider(ct) 喂入 redundancyAnalyzer:330 options / proposalExecutor:373 6th / consolidationAdvisor:379 2nd; embeddingSimProvider 单例@:314",
+    "commit 3915d8e (main, baseline 6cf0a99→HEAD 3915d8e, 5 files +573/-2); 未 push/tag/bump/Core 只读"
+  ],
+  "risks": [
+    "embedding 2 站点 dormant(需控制器决): ProposalExecutor(supersede 选定)/ConsolidationAdvisor(consolidate) 因 Core 调用点剥/缺 recipe id，provider 恒 undefined→Jaccard。需 Core 微调传带 id 对象才全激活。Plugin wiring 已全 3 ctor、不可修 Core。RedundancyAnalyzer(主 dedup/merge)embedding 已 live。",
+    "subagent 承载多文件 wiring，但主窗口独立核实了其所有关键 claim(id-剥离/provider VectorService-backed/类型结构化/3 站点)+亲跑门禁+baseline-diff 后才决策 needs-review+提交。所有权在主窗口。",
+    "provider preheat 是 container init 一次性快照；区域向量仅 rescan/rebuild 生成(region-vector-lifecycle memory)，故 init 快照是合适粒度；同进程后续生成的向量需下次 init/preheat 才入图(preheat 幂等可重跑)。若要 rescan 完成后重跑 preheat=小后续。",
+    "Core 并行高频 advance——发布/验收前需明确准备发布的 Core commit(本次消费 a96c4ee)。真机 embedding>Jaccard 端到端归 U7/Test。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-wave3-u5-plugin-2__AlembicPlugin__u5-plugin-2",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u5-plugin-2__AlembicPlugin__u5-plugin-2.json",
+    "deliveryRunId": "run-delivery-wave3-u5-plugin-2__AlembicPlugin__u5-plugin-2",
+    "dispatchGroup": "wave3-u5-plugin-2",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u5-plugin-2__AlembicPlugin__u5-plugin-2.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26",
+    "stateRevision": 58,
+    "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+    "taskPackageId": "wave3-u5-plugin-2",
+    "targetTaskId": "u5-plugin-2",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "wave3-u5-plugin-2",
+    "resultId": "tr-u5-plugin-2",
+    "createdAt": "2026-06-26T01:36:11.745Z"
+  },
+  "createdAt": "2026-06-26T01:36:11.745Z",
+  "stateRevisionObserved": 58,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

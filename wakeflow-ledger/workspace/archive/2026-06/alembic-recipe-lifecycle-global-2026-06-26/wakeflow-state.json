@@ -1,0 +1,831 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-recipe-lifecycle-global-2026-06-26",
+  "title": "把 plan→coldStart/deepMining/moduleMining 生成 + evolution 维护 整条链路在真实 BiliDili 走通,补在途未覆盖:moduleMining 心脏/deepMining 深语义/衰减触发器/evolution OUTCOME 质量/rescan 内容级保鲜/全维全stage 真机端到端;全局统筹 4 需求职责。49 confirmed 问题,U0-U7 分阶段",
+  "interfaceLanguage": "zh",
+  "controllerHost": "claude-code",
+  "state": "archived",
+  "stateReason": "伞形 alembic-recipe-lifecycle-global-2026-06-26 完成归档（用户 option 1 验证基础完成）。全 24 目标接受、U1-U6+UM 全闭合、U7 真机验证基础达成。基线 AlembicCore@74387b2/AlembicPlugin@8a44368。redactNeeded=false。danglingRefs=.wakeflow-local delivery/return 信封按设计留本地。",
+  "revision": 84,
+  "activeStageId": null,
+  "updatedAt": "2026-06-26T10:18:00.245Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "wave1-u4-core-decay",
+      "summary": "波1 U4-Core：恢复 DecayDetector 衰减触发器（Core 侧）。同 commit 修 authority /100→/5 + ??50→??2.5 + freshness cold-start grace(CG-4) + 0-5 域测；additive scanAll(cap?) 经 #loadActiveRecipes 透传 + 注入可选 lifecycleStateMachine 对 decaying/severe/dead tick 直走 transition(B1 不依赖信号)。只改 DecayDetector.ts + 单测；不碰 ProposalExecutor(U5)/staging/Plugin。强制先于 U5-Core 落地。门禁不放松、Node22、build 重生 dist。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave1-u4-core-decay.md",
+      "createdAt": "2026-06-25T20:05:29.241Z"
+    },
+    {
+      "taskPackageId": "wave1-um-commit-driven-maintenance",
+      "summary": "波1 UM（全局第1，最危险）：打通 commit-driven 唯一维护触发链(D3)。硬性顺序=先真机证 modified/deleted 维护链能把 BiliDili 游标从 initialized advance 到 routed(proposals≥1)，再退役 created→生成路径(UM#1，=U1#1+U2e 合并单次落地 FileChangeHandler.ts:410-493)。抽 runCommitDrivenMaintenance 共享两入口、原子改名 mainServiceCanHandleProjectScope→residentSearchEnhancementReady 跨4站点、created 未覆盖→纯诊断信号(⑤b)、UM#7 固化现有(recipeId,type,status) dedup 不动 schema(CG-6)、LP7 git-head 零命中闸移入(CG-5)。Core git_diff_checkpoints 只读不改。活副本绝对路径已钉。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave1-um-commit-driven-maintenance.md",
+      "createdAt": "2026-06-25T20:05:38.764Z"
+    },
+    {
+      "taskPackageId": "wave1-test-um-advance-baseline",
+      "summary": "波1 Test：UM 真机 advance 绿基线（验收#1，UM 实现硬前置）。在当前 AlembicPlugin@799ceac（UM 改动前），对 BiliDili 一个被既有 Recipe 覆盖的源文件做 modified(非created) 改动+revertable commit+跑 COMMIT_DRIVEN_TRIGGER_TOOL(PluginOpportunisticEvolution.ts:221 工具集)，验证 git_diff_checkpoints 从 initialized→routed/catch-up-routed + checkpoint_commit 从 a3ea6a25 推进 + advanced_at 非空 + evolution_proposals 0→≥1，且 advance 来自 modified 维护路径。隔离维护路径=生成退役前安全基线。成功→解锁 UM 实现；造 commit+触发后仍停 initialized/0 proposal→blocked+失败证据(维护链当前即断,最危险真相,只取证不改产品码)。真机只读前置已由控制器自验(initialized/a3ea6a25/0)。Node22,不改产品码,测试 commit 可 revert。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave1-test-um-advance-baseline.md",
+      "createdAt": "2026-06-25T20:22:56.057Z"
+    },
+    {
+      "taskPackageId": "wave1-um-impl",
+      "summary": "波1 um-impl（resume UM 实现，前置已满足）：Test 已证真机 advance 绿基线(验收#1 GREEN 3/3，modified 路径 commit 653ab9b，控制器独立核验真机未触碰)→\"先证 advance 再退役\"硬序的 advance 步 DONE→现安全实现 UM#1-7+LP7。重读原包 wave1-um-commit-driven-maintenance.md(行号/活副本上轮已核)。UM#1 退役 created→生成(=U1#1+U2e 合并 FileChangeHandler.ts:410-493，清 moduleMiningRoutes 消费方)、UM#2 抽 runCommitDrivenMaintenance 共享两入口、UM#3 原子改名 4 站点、UM#5 created未覆盖→纯诊断、UM#7 固化(recipeId,type,status)dedup+双入口测试(不动 schema)、LP7 git-head 零命中闸。Core git_diff_checkpoints 只读不改。本地 build:check/lint/repo-boundary/unit 绿 + 退役不误伤单测证据；真机 after-regression(#2/#5)你 landed 后由 Test 做。活副本绝对路径；不碰 vendor，不 push。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave1-um-impl.md",
+      "createdAt": "2026-06-25T20:51:20.516Z"
+    },
+    {
+      "taskPackageId": "wave1-u5-core",
+      "summary": "波1 U5-Core（U4-Core 后同窗口第 2 Core commit，共用 ProposalExecutor U4 先已满足；landed 解锁 U6 P3）：evolution 合并/执行 OUTCOME 质量，全 Core additive。①ConsolidationAdvisor #computeMergeDirection 组装 StructuredPatch→ConsolidationAdvice.mergePatch ②RecipeProductionGateway:974-1006 evidence 追加 mergePatch 为 suggestedChanges ③EvolutionPolicy.evaluateMerge(merge 不要求 hasUsage、校验 patch 存在+非破坏+FP 护栏)+ProposalExecutor 按 source==='consolidation' 在 update 臂分流(无 merge type) ④退伪成功(success=false&merge→markRejected/observing 非 markExecuted+revert，复核当前 HEAD 行) ⑤ContentPatcher 退破坏式全量替换→skipResult ⑥RecipeSimilarity 可选 embeddingSim(注入向量,回退 Jaccard) ⑦supersede 选最高相似(非 createdIds[0]) ⑧信号#evaluateOnSignal+兜底#processExpiredProposal 收敛单一(CG④a)。门禁不放松(纠正被误用 hasUsage、保留 FP)。Node22 build:check+test+lint+build(dist)；真机 OUTCOME(#1/#8)gated on UM landed→后续 Test/U7。不破坏 exports/状态机/持久化，不发起 embed，不碰 staging/DecayDetector。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave1-u5-core.md",
+      "createdAt": "2026-06-25T20:51:32.436Z"
+    },
+    {
+      "taskPackageId": "wave1-test-um-after-regression",
+      "summary": "波1 Test #2 after-regression（um-impl 0fa2ac3 退役后真机安全再验，Core b3a8d81）：忠实副本(保护真机 02a25032/BiliDili a3ea6a2)上 ①退役不误伤=改覆盖既有文件+commit+触发→advance 仍 initialized→routed+proposal update(modified 维护路径退役后仍绿) ②created 无生成=新无覆盖.swift+commit+触发→moduleMiningRoutes 空/uncoveredCreated 诊断、knowledge_entries 不增 ③删除→deprecation proposal 非直删 ④rename→source-ref 修复+游标推进 ⑤幂等增量。失败(退役后不 advance/created 仍种/删直删)→blocked+前后 DB 证据,不改产品码。控制器已自验 um-impl 本地门禁/unit;本卡只真机侧。Node22,副本,可 revert,不 push。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave1-test-um-after-regression.md",
+      "createdAt": "2026-06-25T21:33:32.813Z"
+    },
+    {
+      "taskPackageId": "wave2-design-d2-default-table",
+      "summary": "Design 产出 D2 通用默认表(CG-2,波2 前置)：按项目规模自适应的默认阈值表,实现侧只消费不拍脑袋(no-guess),plan 规模语义优先(binding.targetRecipes>默认)。覆盖 U1 perCellTarget(替代 TARGET_RECIPES_PER_DIMENSION=5)、U2 deepMining round(收益递减 K/maxRounds/单轮预算)、U6 内容指纹批量护栏、U3 rescan 预算(现 cold-start 同源)、UM created 退役阈值;现存阈值(U4 cap=resolveStagingAccessSweepCap 默认50/CG-7 实测、U5 overlap 0.65·ENHANCE 0.4·FP 0.4)只注明不重定。按规模信号(ProjectMap.modules 模块数/source_ref 数)分档。Design 产文档(Design/docs/current/)+返回表供 intake,不改产品码/不跑构建/不 mutate 状态。波1 不依赖,本表是 U1-Core/U2/U6 前置。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-design-d2-default-table.md",
+      "createdAt": "2026-06-25T21:33:40.794Z"
+    },
+    {
+      "taskPackageId": "wave2-u1-core",
+      "summary": "波2 U1-Core（关键链起点，landed 解锁 U1-Plugin→U2a）：moduleMining 心脏 per-cell gap + moduleName canonical 派生（D1 方案A），全 Core additive。#3 KnowledgeRescanPlanBuilder 加可选 moduleBindings：仅当提供时按 cell 算 gap=max(0,perCellTarget-perCellCoverage)，未提供逐字段退回 per-dim TARGET_RECIPES_PER_DIMENSION=5（deepMining 零回归）；perCellTarget=binding.targetRecipes ?? D2[tier](S5/M3/L2，第二轮 A.U1：targetRecipes 不保证非空必 ??)。#4 buildCoverageByDimension 不升 per-cell（defer U2a），只接模块轴进 gap 签名。#5 RecipeProductionGateway:753 moduleName 从 candidate sourceRefs 落点 canonical ModuleSummary 派生(非 project-context-anchoring)，越界留空+诊断(CG②a)。D3 gap/coverage 不碰 git_diff_checkpoints。控制器已核 D2-ready + floor=per-维度(DEFAULT_FLOOR_PER_DIMENSION,与 per-cell 正交,L=2 OK)。验收 Core 双路单测(传/不传 binding)+moduleName 派生+D3 grep+Node22 门禁+build dist；真机心脏透传 gated on U1-Plugin。不碰 Plugin/staging/DecayDetector/ProposalExecutor。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u1-core.md",
+      "createdAt": "2026-06-25T21:51:43.256Z"
+    },
+    {
+      "taskPackageId": "wave2-design-maint-commit-propose",
+      "summary": "Design 澄清 commit-driven 维护契约缺口（Test#2 真机+控制器源码核验）：post-UM(LP7) COMMITTED 既有覆盖文件 impactful 改动→游标 advance 但 0 update proposal；只 UNcommitted 工作树改动出 proposal。根因=scanner 用 commit-range(previousHead..HEAD,对)但 FileChangeHandler:275 assessFileImpact 经 getFileDiff='git diff HEAD'(工作树,commit 后空)→零命中→LP7 skip。与 UM 验收#3(committed→update proposal)+完成定义#3/#4(维护走通)冲突。请 Design 裁定:①契约(committed→propose 须修 还是 advance-on-commit/propose-on-working-tree 可接受)②修复形态(assessFileImpact 对 git-head 事件改用 commit-range diff 再套 LP7 零token抑制,调和 CG-5+committed→propose;不重开 LP7)③范围(UM-followup vs redesign)。Design 产契约决策+推荐形态+范围(spec 文档)返回供 intake,不改产品码/不 mutate/不 dispatch。gates U7 维护走通。retire-no-collateral 本身 HOLDS 与本缺口无关。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-design-maint-commit-propose.md",
+      "createdAt": "2026-06-25T22:00:44.088Z"
+    },
+    {
+      "taskPackageId": "wave2-maint-fix-core",
+      "summary": "波2 maint-fix-core（committed→propose 修复 Core 侧，Design 已裁须修 BUG 非 redesign；维护走通关键 blocker；Core 先 Plugin 后）：纯 additive 默认零变更。diffParser.ts:31 getFileDiff 加可选 revisionRange(未给=现 git diff HEAD 工作树字节兼容；给定=git diff <range> commit-range)；ContentImpactAnalyzer.ts:54 assessFileImpact 加可选 revisionRange 透传(默认工作树);assessDiffImpact:84 scorer 不改(diff-源无关);不误扩 :117 unified 入口。验收 Core-unit：默认零回归(不传=逐字段一致)+commit-range 路径(传 range→已提交场景 impact 非空)+可选参不破位置调用 grep+Node22 build:check/test/lint/build dist。不改默认行为/不重开 LP7/不碰 Plugin LP7 逻辑。基线 fe42940。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-maint-fix-core.md",
+      "createdAt": "2026-06-25T22:50:39.974Z"
+    },
+    {
+      "taskPackageId": "wave2-u1-plugin",
+      "summary": "波2 U1-Plugin（消费 u1-core fe42940 Core deps，续最长链；landed 解锁 U2a）：Plugin 侧出口/透传/注入激活 Core per-cell gap + moduleName 派生。#1 plan-generation-gate PlanGenerationGateReady 加 moduleBindings(复用 gate.planSelection.moduleBindings,additive,flat moduleScope+lease key+attachPlanGenerationGateData 字节不变)。#2 knowledge-rescan:165/project-context-analysis 透传 planGate.moduleBindings→buildKnowledgeRescanPlan(驱动 per-cell gap)+per-cell 意图带 briefing。#5 mcp-tools 向 RecipeProductionGateway 注入 knownModuleNames+resolveModuleFromSourceRefs(从 canonical ProjectMap.modules)激活 #deriveModuleName。#6 D1 方案A(seed 续派但引用 canonical name/id,不退役=方案B 独立需求)。验收 心脏透传 unit(≥2 binding 经 gate→flat+moduleBindings 并存、dimensions/targetRecipes 非空未拍扁、flat 出口字节不变)+module 来源接地+D3 grep+Node22 build:check(消费 fe42940)+gate/rescan 单测+lint:repo-boundary;moduleName 真机 gated→U7。活副本;不走方案B;不碰死副本/shim。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u1-plugin.md",
+      "createdAt": "2026-06-25T22:50:50.004Z"
+    },
+    {
+      "taskPackageId": "wave2-maint-fix-plugin",
+      "summary": "波2 maint-fix-plugin（committed→propose Plugin 透传，维护走通收口；消费 Core@afd4302）：把 scanner 已算 commit-range 喂给 git-head 事件的 assessFileImpact。#1 CommitDrivenMaintenance.ts:82 透传 scan.range(=GitDiffScanResult.range mergeBase..HEAD)进 handleFileChanges。#2 FileChangeHandler.ts:165/275 对 git-head(committed)事件调 assessFileImpact(...,commitRange) 走 Core afd4302 commit-range diff；非 git-head(工作树)不传=向后兼容。#3 订正 LP7:279 过时注释(工作树 diff 已不可得=伪)。LP7 逻辑(:277-294)不重开：仍零 token 命中 skip，但 impactful committed 经 commit-range 不再零命中→propose、trivial 仍 skip(全抑制→精确抑制)。验收 build:check(afd4302)+git-head 传 range unit+LP7 精确抑制 unit(impactful→propose/trivial→skip)+单一编排不破+Node22 门禁；真机 E2 镜像归 Test 再验(维护走通收口)，双 propose 靠 UM#7 dedup。不重开 LP7/不改工作树默认/不读写 git_diff_checkpoints/不碰死副本。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-maint-fix-plugin.md",
+      "createdAt": "2026-06-25T23:04:03.540Z"
+    },
+    {
+      "taskPackageId": "wave2-test-committed-propose-e2",
+      "summary": "波2 Test committed→propose 真机 E2 再验（维护走通收口；修复双侧已 landed：Core afd4302 + Plugin 31f17d5）：忠实副本(保护真机 02a25032/BiliDili a3ea6a2)上 ①impactful committed 既有覆盖文件改动+commit+触发→advance(initialized→routed+advanced_at)+evolution_proposals 0→≥1 type=update/source=file-change/target=覆盖 recipe/observing **并存(非 XOR，对照 Test#2 修前 committed→0 proposal)** ②trivial committed(零 token)→advance only+0 proposal(LP7 精确抑制仍在) ③(可选)双 propose UM#7 dedup 只留一条 ④工作树默认未变。成功=committed→propose 真机生效、维护走通收口达成；失败(impactful committed 仍 0 proposal / trivial 反产)→blocked+前后 DB+哪侧。控制器已自验本地 unit 绿;本卡只真机。Node22,副本,可 revert,不改产品码。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-test-committed-propose-e2.md",
+      "createdAt": "2026-06-25T23:17:38.419Z"
+    },
+    {
+      "taskPackageId": "wave2-u1-plugin-cont",
+      "summary": "波2 u1-plugin-cont（U1-Plugin 续作 #2/#5/#6；#1 已 landed f1dfcfc；消费 Core@afd4302；landed→解锁 U2a）。强制 subagent-offload 重 wiring(窗口上轮近饱和)。#2 透传 knowledge-rescan:165/project-context-analysis 把 gate.moduleBindings→buildKnowledgeRescanPlan(moduleBindings,moduleCount)；关键适配=Plugin PlanSelectionModuleBinding(per-module dimensions[])展平为 Core ModuleCellBinding[](每 module×dimension 一条,单 dimensionId)+moduleCount=ProjectMap.modules.length。#5 mcp-tools:597/710 注入 knownModuleNames+resolveModuleFromSourceRefs(canonical ProjectMap.modules)激活 Core #deriveModuleName(RecipeProductionGateway:306/791)。#6 方案A seed 引用 canonical name/id(不退役=方案B 独立需求)。验收 心脏透传 unit(flat moduleScope 出口字节不变+per-cell 展平驱动 gap)+展平正确+moduleName 派生 unit+D3 grep+Node22 build:check(afd4302)+gate/rescan/mcp 单测+lint:repo-boundary;真机 moduleName gated→U7。不走方案B/不读写 git_diff_checkpoints/不碰死副本/主窗口勿耗尽。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u1-plugin-cont.md",
+      "createdAt": "2026-06-25T23:32:44.692Z"
+    },
+    {
+      "taskPackageId": "wave2-u6-core",
+      "summary": "波2 u6-core（U6 Core 侧 producer，解锁 U6-Plugin）。前提满足：UM advance 已证+U5 门禁分流 landed+D2 表接受。P2 content_fp migration（recipe_source_refs 增 TEXT 列）+ 新 #sourceContentFingerprint（独立 computeKnowledgeHash 不互调：读 resolved 源文件按 :startLine-endLine 截 region→normalize→SHA-256 16hex）接入 #reconcileSourceRef:303-321(C4 订正非332-389)/#updateExistingSourceRef:342-368：变化→drifted+verified_at；P6 repairRenames:440 裸 path.resolve 改走 #resolveSourcePath+sourcePathFilesystemCandidates 与 fingerprint/reconcile 三处口径统一；audit→EvolutionGateway：dead→deprecate proposal 替硬编码 0。CG⑥a 首轮 null 只回填不改 status、⑥b dead→deprecate 进 observation-window；消费 D2 batch 50/150/400。验收：指纹独立 unit/migration+回填(首填不改 status)/drift region 内外对照/P6 口径/audit→deprecate observation-window/D3 grep/Node22 build:check。baseline afd4302 复核 HEAD 行号；改 live 禁 vendor；分阶段提交 main 不 push；P4/P5 归 U6-Plugin。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u6-core.md",
+      "createdAt": "2026-06-26T00:06:31.261Z"
+    },
+    {
+      "taskPackageId": "wave2-u5-plugin",
+      "summary": "波2 u5-plugin（U5 Plugin 消费侧；前置 U5-Core b3a8d81 已 landed）。#1 把 VectorService/RecipeRegionVectorIndex 注入 RecipeSimilarity 调用点激活 Core 已加的 embeddingSim 维度（embedding 不可用→回退 Jaccard 确定性下限，computeDimensions 同入同出）；#2 subscribeToSignals 补 U5 新增信号（先核现状，lifecycle-followup 已接一次性订阅，不重复/不破坏）；#3 消费 replacedByRecipeId/deprecated_by 按相似度最高选定（C3 Gateway 选 executor[0] 解析）；#4 修 content-patcher.test.ts 红=U5-Core destructive 退役(自然语言≥20→skipped+skipReason、content byte-unchanged 替静默覆盖)的跨仓测试漂移，对齐 Core 新契约(非改产品码回旧)。验收：embedding 高于 Jaccard+回退确定性 unit/supersede 选最相似(非 createdIds[0])/content-patcher 转绿(failed-set 移除)/零新回归/Node22 build:check+边界门禁。baseline ecded14 消费 Core@afd4302 复核 HEAD；禁改 Core/vendor 仅经 @alembic/core；提交 main 不 push；回填记消费的 Core commit(U6-Core 可能并行 advance)。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u5-plugin.md",
+      "createdAt": "2026-06-26T00:06:47.318Z"
+    },
+    {
+      "taskPackageId": "wave2-u5-core-2",
+      "summary": "波2 u5-core-2（U5 #1 embedding conduit 收口，Core additive hook）。缘起=u5-plugin 控制器证实的跨仓 gap：U5-Core 给 RecipeSimilarity.compute 加可选第3参 embeddingSim? 但 RecipeSimilarity 未导出 + 3 消费点(ConsolidationAdvisor:567/ProposalExecutor:588/RedundancyAnalyzer:117)全调 2 参、ctor 零注入位→Plugin 无 conduit。=§U5#6 原始 scope 未接通 seam(非新增)。方案A(推荐)：给 3 消费服务加可选 embeddingSimProvider:(a,b)=>number|undefined ctor 选项(同步，喂预算好的相似度，RecipeRegionVectorIndex 预计算向量 sync cosine 可行，domain 不发起 embed)，调用点改 compute(a,b,provider?.(a,b))；缺省 undefined→纯 Jaccard 字节级向后兼容。不导出 RecipeSimilarity(走 ctor 注入保 barrel 纯度)。验收：provider 接通 unit(stub 0.9→max(Jaccard,0.9))/缺省回退确定性+现有 evolution 单测全过/additive build:check/签名一致。改 live 禁 vendor；提交 main 不 push；landed+dist→派 u5-plugin-2(Plugin DI 注入 provider，代码已备)。复核 HEAD 行号(u6-core 已 advance Core)。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u5-core-2.md",
+      "createdAt": "2026-06-26T00:49:03.643Z"
+    },
+    {
+      "taskPackageId": "wave2-u6-plugin",
+      "summary": "波2 u6-plugin（U6 Plugin 消费侧 P4/P5；前置 U6-Core c60eb92 已 landed+dist 重生）。P4 接活 rename 修复：knowledge-index-rebuild.ts:91-112(C1 接线点=此 Plugin 函数)reconcile 后 report.stale>0→调 Core repairRenames()→applyRepairs()(git rename→renamed→写回 .md+DB→active)、report 增 renamed/applied、幂等(改前 grep 确认 Core repair 零 call site)；P5 rebuildRescanIndexes 返回 report + region-vector provider 不可用→skipped+高可见 warning/可用→semantic_memories 0→非0(改返回类型 grep 同步消费方)；gateway 注入：把 evolutionGateway(KnowledgeModule:343 已注册)注入 rescan/audit 调用点激活 U6-Core auditRecipesForRescan dead→deprecate(不注入→Core 降级 0 不抛、不新建服务)；D2 batch護栏 50/150/400(携带项，分批 cap 由本编排层供，Core reconcile caller-limited)；drift 消费按需(findDrifted 已备，惰性留 U7);D3 不读写 git_diff_checkpoints。验收：P4 rename 接活(renamed/applied+幂等)/P5 报告+skip/audit→deprecate 激活(注入+降级两路)/D2 cap/零新回归+Node22 build:check+边界门禁。禁改 Core/vendor 仅经 @alembic/core；main 不 push；记消费 Core commit(u5-core-2 可能并行)；多文件 wiring 可 subagent-offload。复核 HEAD 行号。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave2-u6-plugin.md",
+      "createdAt": "2026-06-26T00:49:23.362Z"
+    },
+    {
+      "taskPackageId": "wave3-u5-plugin-2",
+      "summary": "波3 u5-plugin-2（U5 #1 embedding provider Plugin DI 接线，前置 u5-core-2 a96c4ee 已 landed+dist）。把 Plugin 的 embedding-sim provider 喂进 Core 三服务的可选 ctor hook（ConsolidationAdvisor 2nd 位置参 / ProposalExecutor 6th 位置参 / RedundancyAnalyzer options.embeddingSimProvider，签名 (a,b)=>number|undefined）激活 embedding 维度。provider=VectorService/RecipeRegionVectorIndex 预计算向量查 a/b→cosine、任一缺失→undefined（Core 回退 Jaccard）、domain 不发起 embed（只读预计算、sync）；草稿 subagent 已建+测见 tr-u5-plugin.json，可复用但主窗口独立核验。验收：embedding 高于 Jaccard unit/缺省回退确定+现有 evolution 单测全过/三处接线 grep 签名匹配 a96c4ee/provider VectorService-backed 非 stub/Node22 build:check+边界门禁零新回归。禁改 Core/vendor 仅经 @alembic/core；main 不 push；记消费 Core commit；复核 HEAD。真机端到端→U7。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u5-plugin-2.md",
+      "createdAt": "2026-06-26T01:15:22.880Z"
+    },
+    {
+      "taskPackageId": "wave3-u5-core-3",
+      "summary": "波3 u5-core-3（U5 embedding 全激活收尾，前置 u5-core-2/u5-plugin-2 已 landed）。控制器证实 embedding 仅 RedundancyAnalyzer:131 LIVE，ProposalExecutor:601(#toRecipeLike:614-629 无 id)/ConsolidationAdvisor:589(candidateLike 无 id) dormant——provider 须运行时 id 查预计算向量、禁 on-the-fly。Core 微调让这 2 处传带 id 对象激活余 2 站点(provider 已接线、无需再 Plugin)。t0 RecipeLike 加可选 id?(若无)；t1 #toRecipeLike 返回加 id:e.id(入参加 id?)；t2 ConsolidationAdvisor candidateLike 带 candidate id/recipeLike 带 RecipeSummary.id。仅让 id 流通，不改相似度算法/compute 语义/不发起 embed。验收：id 流通 unit(stub-by-id→max(Jaccard,0.9))/缺省无 id 回退确定+现有 evolution 单测全过/additive build:check/RedundancyAnalyzer 不回归。改 live 禁 vendor；提交 main 不 push；build 重生 dist。本卡完成→U5 embedding 全 3 站点 wiring 激活，真机→U7。复核 HEAD 行号。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u5-core-3.md",
+      "createdAt": "2026-06-26T01:42:02.872Z"
+    },
+    {
+      "taskPackageId": "wave3-u4-plugin",
+      "summary": "波3 u4-plugin（U4 消费侧，独立、不需 D2 CG-7；前置 U4-Core dde34d4 已 landed）。d1 decay 第4 sweep driver：Plugin sweep(现 3 driver=staging promote/checkTimeouts/proposal execute) 后加调 Core DecayDetector.scanAll(cap)→tick 直走 transition(U4-Core 已实现 trigger='decay-detection')，cap caller-limited 有界；d2 lifecycleStateMachine 注入 decay driver 调用链(decay→transition 记 lifecycle_transition_events，先核 lifecycle-followup 现状不重复)；d3 订正 staging-access-sweep.ts:137/251-252 \"P3 本次不接线\" 过时注释(P3 已接线，复核行号+文本)。验收：decay driver 接通 unit(scanAll(cap)+transition trigger=decay-detection 记事件 cap 有界)/lifecycleStateMachine 注入非 undefined/注释订正 grep/零新回归+Node22 build:check+边界门禁。读设计 §U4 定位接线点；禁改 Core/vendor 仅经 @alembic/core；main 不 push；记消费 Core commit；不引 daemon。复核 HEAD 行号。真机 decay→deprecate→U7。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u4-plugin.md",
+      "createdAt": "2026-06-26T01:42:19.474Z"
+    },
+    {
+      "taskPackageId": "wave3-u3",
+      "summary": "波3 u3（rescan/deepMining/moduleMining 输出预算化对齐，leaf 几乎独立，wave1 遗漏；零改 Core）。1 新 briefing-budget.ts 抽 stage-无关 budgetBriefingResponseData(read response.data→jsonByteLength→≤预算 inline+removeTransient / >预算 writeTransientTransport+compact 回调+attachRef meta，复用 #shared/transient-transport，compact 不下沉)；2 cold-start.ts:434-461,270 budgetColdStartResponseData 改调共享步骤(bootstrap-briefing/18KB/compactColdStartBriefing/meta.fullBriefingRef)，行为逐字段一致=硬验收；3 knowledge-rescan:245-268 buildRescanResponse 在 attach* 后调 budgetBriefingResponseData(rescan-briefing,meta.fullBriefingRef)，沿用 fullBriefingRef 名零改 output.ts allowlist；4 knowledge-rescan:322-379 moduleMining 调 attachPlanScopeTargetCounts(与 cold-start:290 对称，moduleScope 来自 sourceFileFacts D1，deepMining 不调)；5 mcp-tools:1149,1071 generationStage .describe() 纯文案；6 recipe-map fullMapRef 不做(用户/Design 决)。验收：共享步骤 unit/cold-start 行为快照一致/rescan 预算 unit/moduleMining 计数对称/Node22 build:check+边界门禁+output-contract 不破零回归。零改 Core/vendor 仅只读核验 KnowledgeRescanPresenters data 形状；main 不 push；记消费 Core commit。复核 HEAD 行号。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u3.md",
+      "createdAt": "2026-06-26T02:03:34.302Z"
+    },
+    {
+      "taskPackageId": "wave3-u2-core",
+      "summary": "波3 u2-core（U2 Core 侧 producer，deepMining 覆盖账本；红线=覆盖账本是覆盖状态持久化非 plan 持久化）。U2a：migration **用下一可用号(≥015，014 已被 u6-core content_fp 占用)** 新表 coverage_ledger(UNIQUE module×dimension+grade empty/thin/partial/covered+exhausted/source=agent-declared+covered_source_refs/uncovered_hints JSON+value_score/last_round/deferred，刻意无 plan/session 字段)+deep_mining_rounds；drizzle schema.ts:633 仿 gitDiffCheckpoints；新 CoverageLedgerRepository 复刻 GitDiffCheckpointRepository:60-170 键 module×dimension+listByModule 注册 repositories.ts:207/242；buildCoverageLedger 扩 CompletenessCritic.ts:176 只加聚合层不改单候选(module 归属 canonical ModuleSummary 路径前缀 pathsOverlap:639，必须保持 shouldBlockCompletion:false/targetGate:advisory:136-137 grade 非门=门禁不放松，exhausted=agent-declared:550，不硬编码宿主路径)。U2b：intent KnowledgeRescanIntent:42+WorkflowIntent 加 perDimensionTargets/moduleDimensionTargets(激活死字段)、KnowledgeRescanPlanBuilder:73-134 消费 Agent 目标 existingCount 优先账本无则回退 buildCoverageByDimension、TARGET_RECIPES_PER_DIMENSION:6 仅 fallback。U2d：新 CoverageLedgerAdvisor.ts 纯函数三停止(收敛/收益递减<K/轮次上限≥maxRounds)+highValueBlankCount+价值排序，K/maxRounds 从 D2 表。验收 migration 两表无 plan 字段/repository/buildCoverageLedger advisory 保持/gap 消费 Agent 目标非硬5/Advisor 三停止 D2/D3 grep/Node22 build:check+additive+dist 重生。分阶段提交 main 不 push 禁 vendor；landed+dist 解锁 u2-plugin(U2c/U2e/draft/写点/attach)。复核 HEAD 行号。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u2-core.md",
+      "createdAt": "2026-06-26T02:27:25.608Z"
+    },
+    {
+      "taskPackageId": "wave3-u2-plugin",
+      "summary": "波3 u2-plugin（U2 消费侧，伞形最后实现任务；前置 u2-core 74387b2 已 landed+dist）。把覆盖账本接成 deepMining 多轮覆盖循环。红线：plan 仍每轮无状态 draft→confirm(账本非 plan 持久化)/advisory 非自动调度(建议非自动后台扫)/no-guess(Plugin 给 options+信号 Agent confirm 决)/D3(账本链零 git_diff_checkpoints)。U2a 写点 dimension-completion:1183→Core buildCoverageLedger→repo upsert(project_root+canonical ownedPaths Plugin 供)；U2b draft SEED plan-tool:208-217,259-276 deepMining 加载账本产 gapCandidates+existingCount/rating/deficit、buildDraftConfirmNextAction:278-341 不硬编码 coldStart、D2 perRoundCellBudget(S50/M60/L80)限单轮 cell + 链路 intent perDimensionTargets/moduleDimensionTargets→gate:191-306 聚合(不改 totalRecipeBudget)；U2c coldStart confirm:1283-1331 Agent 决扫哪些其余 defer、首写账本 defer 格 grade=empty,deferred=1；U2d attach knowledge-rescan:243-271 调 CoverageLedgerAdvisor 三停止+建议→response+status advisory 不阻断、rescanId 幂等键、round 边界写 deep_mining_rounds；U2e FileChangeHandler git-diff 增量生成退役(case created:194/410-493、defaultModuleMiningAnalyzer:169/705-718、moduleMiningRoutes 分支多处、attachRescanUnifiedEvolution:448-474)——**先复核 um-impl 0fa2ac3 是否已部分切 + moduleMiningRoutes 死字段全量 grep 清理消费方避免 undefined**。验收 coldStart 产账本含 defer 格/deepMining 多轮喂账本+D2 cap/Agent per-cell 目标非硬5/Advisor 建议+三停止不无限扫/git-diff 生成退役 grep/plan 无状态/Node22 build:check+边界门禁+D3 grep 零回归。可 subagent-offload(主窗口 own 核验+提交)。禁改 Core/vendor、main 不 push、记消费 Core commit。复核 HEAD。本卡完成→U2 闭合→解锁 U7。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave3-u2-plugin.md",
+      "createdAt": "2026-06-26T02:58:35.117Z"
+    },
+    {
+      "taskPackageId": "wave4-u7-e2e",
+      "summary": "波4 U7（全维+全 stage+evolution 真机端到端闭环，顶层完成定义，Test 窗口；全部上游 landed：Plugin@8a44368/Core@74387b2）。问题：post-全上游，真机 BiliDili 整条 Recipe 生命周期（全 14 维 coldStart→deepMining 多轮覆盖增量→moduleMining 分模块→evolution 触发/执行）能否一轮端到端跑通+各 stage 可核 DB 证据+semantic_memories 非0+checkpoint advance。忠实副本法保护真机(git clone BiliDili@a3ea6a25+better-sqlite3 .backup 真 workspace DB→副本仅改 git_diff_checkpoints.project_root→sandbox ALEMBIC_HOME，真 ~/.asd 02a25032+真 BiliDili 只读不动)。步骤+验收：①coldStart 全14维(非只1维，coverage_ledger 产账本+defer 格 grade=empty/deferred=1，强完成=dimension_complete)；②deepMining 多轮(deep_mining_rounds 多行+Agent per-cell 目标非硬5+Advisor 建议+停止条件收敛/递减<K/上限不无限扫+advisory 不阻断 plan 无状态不自动后台)；③moduleMining 分模块；④evolution(UM commit→checkpoint advance+proposal 0→≥1、U5 merge suggestedChanges 非空/supersede 选最相似、U6 content_fp drift、U4 decay→deprecate)；⑤semantic_memories 0→非0；⑥embedding>Jaccard。成功=各 stage 可核 DB 证据+semantic_memories 非0+checkpoint advance+多轮不无限扫→demand 完成定义达成；blocked=任一 stage 缺证据→返回 stage 前后 DB+触发+commit+哪能力+哪侧，不改产品码，控制器路由修复(产品缺陷→repo/非bug→Design)。出 scope 项(P1/D2 cap/F-B/N1)记录不阻断。Plugin@8a44368/Core@74387b2/Node≥22/测试 commit 可 revert/不改产品码/不 push/thread id 只留 .wakeflow-local。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-recipe-lifecycle-global-2026-06-26/task-packages/wave4-u7-e2e.md",
+      "createdAt": "2026-06-26T04:05:15.091Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "u4-core-decay-trigger",
+      "taskPackageId": "wave1-u4-core-decay",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore 恢复 DecayDetector 衰减触发器：authority 量纲修(0-5)+cold-start grace 同 commit、scanAll cap 有界、tick 经 LifecycleStateMachine.transition 落 active→decaying。真机三态 decayScore 对照 + 单测可证伪验收。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T20:05:29.241Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave1-u4-core__AlembicCore__u4-core-decay-trigger",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-u4-core__AlembicCore__u4-core-decay-trigger.json",
+        "deliveryRunId": "run-delivery-wave1-u4-core__AlembicCore__u4-core-decay-trigger",
+        "dispatchGroup": "wave1-u4-core",
+        "sentAt": "2026-06-25T20:07:29.516Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u4-core-decay-trigger"
+    },
+    {
+      "targetTaskId": "um-commit-driven-maintenance",
+      "taskPackageId": "wave1-um-commit-driven-maintenance",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin 打通 commit-driven 唯一维护触发链：先证 BiliDili 真机游标 advance(initialized→routed+proposals≥1)再退役生成，抽共享编排、原子改名、proposal dedup 固化、LP7 闸。真机 DB SELECT 前后值 + 门禁可证伪验收。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T20:05:38.764Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave1-um__AlembicPlugin__um-commit-driven-maintenance",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um__AlembicPlugin__um-commit-driven-maintenance.json",
+        "deliveryRunId": "run-delivery-wave1-um__AlembicPlugin__um-commit-driven-maintenance",
+        "dispatchGroup": "wave1-um",
+        "sentAt": "2026-06-25T20:07:31.853Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-um-commit-driven-maintenance"
+    },
+    {
+      "targetTaskId": "test-um-advance-baseline",
+      "taskPackageId": "wave1-test-um-advance-baseline",
+      "targetWindow": "Test",
+      "summary": "Test 证 UM 真机 advance 绿基线：BiliDili modified 既有覆盖文件+commit+触发→游标 initialized→routed+proposals 0→≥1（modified 维护路径归因）。绿=解锁 UM 实现；仍停 initialized/0=blocked+证据。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T20:22:56.057Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave1-um-advance__Test__test-um-advance-baseline",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-advance__Test__test-um-advance-baseline.json",
+        "deliveryRunId": "run-delivery-wave1-um-advance__Test__test-um-advance-baseline",
+        "dispatchGroup": "wave1-um-advance",
+        "sentAt": "2026-06-25T20:23:24.885Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-test-um-advance-baseline"
+    },
+    {
+      "targetTaskId": "um-impl",
+      "taskPackageId": "wave1-um-impl",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin resume 实现 commit-driven 维护链(UM#1-7+LP7)：advance 绿基线前置已满足，安全退役生成+抽共享编排+原子改名+dedup 固化+LP7 闸。本地门禁/单测+退役不误伤证据；真机 after-regression 由 Test 后做。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T20:51:20.516Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave1-um-impl__AlembicPlugin__um-impl",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-impl__AlembicPlugin__um-impl.json",
+        "deliveryRunId": "run-delivery-wave1-um-impl__AlembicPlugin__um-impl",
+        "dispatchGroup": "wave1-um-impl",
+        "sentAt": "2026-06-25T20:53:42.575Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-um-impl"
+    },
+    {
+      "targetTaskId": "u5-core",
+      "taskPackageId": "wave1-u5-core",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore evolution OUTCOME 质量(U4 后第 2 commit)：merge 路径产 StructuredPatch+evidence suggestedChanges、evaluateMerge 分流(不放松 FP)、退伪成功、退破坏式替换、embeddingSim 注入回退、supersede 最高相似、信号兜底收敛单一。Core-unit 可证伪验收 + Node22 门禁；真机 OUTCOME gated on UM。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T20:51:32.436Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave1-u5-core__AlembicCore__u5-core",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-u5-core__AlembicCore__u5-core.json",
+        "deliveryRunId": "run-delivery-wave1-u5-core__AlembicCore__u5-core",
+        "dispatchGroup": "wave1-u5-core",
+        "sentAt": "2026-06-25T20:53:45.296Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u5-core"
+    },
+    {
+      "targetTaskId": "test-um-after-regression",
+      "taskPackageId": "wave1-test-um-after-regression",
+      "targetWindow": "Test",
+      "summary": "Test 真机验 UM 退役后 after-regression：退役不误伤(advance 仍绿)+created 无生成+删除→deprecation+rename→ref 修复。副本保护真机。失败→blocked+DB 证据。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T21:33:32.813Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave1-um-after-regression__Test__test-um-after-regression",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave1-um-after-regression__Test__test-um-after-regression.json",
+        "deliveryRunId": "run-delivery-wave1-um-after-regression__Test__test-um-after-regression",
+        "dispatchGroup": "wave1-um-after-regression",
+        "sentAt": "2026-06-25T21:34:27.144Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-test-um-after-regression"
+    },
+    {
+      "targetTaskId": "design-d2-default-table",
+      "taskPackageId": "wave2-design-d2-default-table",
+      "targetWindow": "Design",
+      "summary": "Design 出 D2 通用默认表(规模分档×各消费点默认值+依据):U1 perCellTarget/U2 round 阈值/U6 指纹批量/U3 预算;现存阈值(U4 cap·U5 overlap/FP)只注明。no-guess=实现只消费、plan 规模语义优先。产 Design 文档+返回供 intake。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T21:33:40.794Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-d2-design__Design__design-d2-default-table",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-d2-design__Design__design-d2-default-table.json",
+        "deliveryRunId": "run-delivery-wave2-d2-design__Design__design-d2-default-table",
+        "dispatchGroup": "wave2-d2-design",
+        "sentAt": "2026-06-25T21:34:29.254Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-design-d2-default-table"
+    },
+    {
+      "targetTaskId": "u1-core",
+      "taskPackageId": "wave2-u1-core",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore moduleMining 心脏 per-cell gap（可选 moduleBindings、未传零回归）+ moduleName canonical 派生（RecipeProductionGateway:753）。消费 D2 perCellTarget S5/M3/L2(binding ?? tier)。Core 双路单测+Node22 门禁；真机透传 gated on U1-Plugin。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T21:51:43.256Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-u1-core__AlembicCore__u1-core",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-core__AlembicCore__u1-core.json",
+        "deliveryRunId": "run-delivery-wave2-u1-core__AlembicCore__u1-core",
+        "dispatchGroup": "wave2-u1-core",
+        "sentAt": "2026-06-25T21:52:20.014Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u1-core"
+    },
+    {
+      "targetTaskId": "design-maint-commit-propose",
+      "taskPackageId": "wave2-design-maint-commit-propose",
+      "targetWindow": "Design",
+      "summary": "Design 裁定 commit-driven 维护契约：committed-impactful→update proposal 须修(UM验收#3)还是可接受？修复形态(assessFileImpact git-head 用 commit-range+保 LP7)？范围(UM-followup vs redesign)？产 spec 返回供 intake→控制器派 Plugin 修→Test 再验。gates 维护走通/U7。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T22:00:44.088Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-maint-contract__Design__design-maint-commit-propose",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-contract__Design__design-maint-commit-propose.json",
+        "deliveryRunId": "run-delivery-wave2-maint-contract__Design__design-maint-commit-propose",
+        "dispatchGroup": "wave2-maint-contract",
+        "sentAt": "2026-06-25T22:01:11.177Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-design-maint-commit-propose"
+    },
+    {
+      "targetTaskId": "maint-fix-core",
+      "taskPackageId": "wave2-maint-fix-core",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore committed→propose 修复(Core)：getFileDiff/assessFileImpact 加可选 revisionRange(默认工作树零回归,给定走 commit-range)。Core-unit 双路+Node22 门禁+build dist;Plugin 侧透传 LP7 = maint-fix-plugin 后续。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T22:50:39.974Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-maint-fix-core__AlembicCore__maint-fix-core",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-fix-core__AlembicCore__maint-fix-core.json",
+        "deliveryRunId": "run-delivery-wave2-maint-fix-core__AlembicCore__maint-fix-core",
+        "dispatchGroup": "wave2-maint-fix-core",
+        "sentAt": "2026-06-25T22:51:49.053Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-maint-fix-core"
+    },
+    {
+      "targetTaskId": "u1-plugin",
+      "taskPackageId": "wave2-u1-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U1 心脏 Plugin 侧：gate 出 moduleBindings(flat 字节不变)+knowledge-rescan 透传驱动 per-cell gap+注入 knownModuleNames/resolveModuleFromSourceRefs 激活 moduleName 派生+D1 方案A。心脏透传 unit+Node22 门禁;真机 gated→U7。landed 解锁 U2a。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T22:50:50.004Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-u1-plugin__AlembicPlugin__u1-plugin",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-plugin__AlembicPlugin__u1-plugin.json",
+        "deliveryRunId": "run-delivery-wave2-u1-plugin__AlembicPlugin__u1-plugin",
+        "dispatchGroup": "wave2-u1-plugin",
+        "sentAt": "2026-06-25T22:51:50.936Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u1-plugin"
+    },
+    {
+      "targetTaskId": "maint-fix-plugin",
+      "taskPackageId": "wave2-maint-fix-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin committed→propose 收口：CommitDrivenMaintenance 透传 scan.range + FileChangeHandler git-head 事件 assessFileImpact 传 commitRange(走 Core afd4302 commit-range)+订正 LP7 注释；LP7 全抑制→精确抑制(impactful committed→propose/trivial→skip)。build:check+unit+Node22；真机 E2 归 Test 再验。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T23:04:03.540Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-maint-fix-plugin__AlembicPlugin__maint-fix-plugin",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-maint-fix-plugin__AlembicPlugin__maint-fix-plugin.json",
+        "deliveryRunId": "run-delivery-wave2-maint-fix-plugin__AlembicPlugin__maint-fix-plugin",
+        "dispatchGroup": "wave2-maint-fix-plugin",
+        "sentAt": "2026-06-25T23:04:45.039Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-maint-fix-plugin"
+    },
+    {
+      "targetTaskId": "test-committed-propose-e2",
+      "taskPackageId": "wave2-test-committed-propose-e2",
+      "targetWindow": "Test",
+      "summary": "Test 真机收口 committed→propose：impactful committed→advance+update proposal 并存(非 XOR) + trivial committed→advance-only(LP7 精确抑制)。副本保护真机。成功=维护走通收口;失败→blocked+DB 证据+哪侧。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T23:17:38.419Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-test-cp-e2__Test__test-committed-propose-e2",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-test-cp-e2__Test__test-committed-propose-e2.json",
+        "deliveryRunId": "run-delivery-wave2-test-cp-e2__Test__test-committed-propose-e2",
+        "dispatchGroup": "wave2-test-cp-e2",
+        "sentAt": "2026-06-25T23:18:29.559Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-test-committed-propose-e2"
+    },
+    {
+      "targetTaskId": "u1-plugin-cont",
+      "taskPackageId": "wave2-u1-plugin-cont",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U1 续作 #2/#5/#6：透传 gate.moduleBindings(展平 per-module→per-cell ModuleCellBinding[])驱动 Core per-cell gap + 注入 knownModuleNames/resolveModuleFromSourceRefs 激活 moduleName 派生 + 方案A。心脏透传 unit(flat 字节不变)+Node22；subagent-offload 重 wiring。landed→解锁 U2a。",
+      "status": "accepted",
+      "createdAt": "2026-06-25T23:32:44.692Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-u1-plugin-cont__AlembicPlugin__u1-plugin-cont",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u1-plugin-cont__AlembicPlugin__u1-plugin-cont.json",
+        "deliveryRunId": "run-delivery-wave2-u1-plugin-cont__AlembicPlugin__u1-plugin-cont",
+        "dispatchGroup": "wave2-u1-plugin-cont",
+        "sentAt": "2026-06-25T23:35:54.735Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u1-plugin-cont"
+    },
+    {
+      "targetTaskId": "u6-core",
+      "taskPackageId": "wave2-u6-core",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore U6 Core 侧：content_fp migration + #sourceContentFingerprint(独立 computeKnowledgeHash)+drift 触发 + P6 resolve 口径统一 + audit→deprecate(observation-window 替硬编码0)。CG⑥a 首填不改 status/⑥b observation-window；D2 batch 50/150/400。Node22 build:check+定向 unit；live 禁 vendor、分阶段提交 main 不 push；landed+build dist 解锁 U6-Plugin。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T00:06:31.261Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-u6-core__AlembicCore__u6-core",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u6-core__AlembicCore__u6-core.json",
+        "deliveryRunId": "run-delivery-wave2-u6-core__AlembicCore__u6-core",
+        "dispatchGroup": "wave2-u6-core",
+        "sentAt": "2026-06-26T00:07:29.832Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u6-core"
+    },
+    {
+      "targetTaskId": "u5-plugin",
+      "taskPackageId": "wave2-u5-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U5 消费侧：注入 VectorService 到 RecipeSimilarity 激活 embeddingSim(不可用回退 Jaccard)+subscribeToSignals 补 U5 信号(不重复)+消费 replacedByRecipeId 选最相似+修 content-patcher.test.ts 红(对齐 U5-Core destructive 新契约)。验收 embedding>Jaccard+回退确定/supersede 选最相似/content-patcher 转绿/零新回归/Node22 build:check+边界门禁；禁改 Core/vendor、main 不 push、记消费 Core commit。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T00:06:47.318Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-u5-plugin__AlembicPlugin__u5-plugin",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u5-plugin__AlembicPlugin__u5-plugin.json",
+        "deliveryRunId": "run-delivery-wave2-u5-plugin__AlembicPlugin__u5-plugin",
+        "dispatchGroup": "wave2-u5-plugin",
+        "sentAt": "2026-06-26T00:07:45.427Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u5-plugin"
+    },
+    {
+      "targetTaskId": "u5-core-2",
+      "taskPackageId": "wave2-u5-core-2",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore U5 #1 conduit：给 ConsolidationAdvisor/ProposalExecutor/RedundancyAnalyzer 加可选 embeddingSimProvider ctor hook→串 compute 第3参，缺省字节级回退 Jaccard，不导出 RecipeSimilarity。验收 provider 接通+缺省回退确定+additive+现有单测全过+build:check；改 live 禁 vendor、main 不 push；landed+dist 解锁 u5-plugin-2。复核 HEAD 行号。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T00:49:03.643Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-u5-core-2__AlembicCore__u5-core-2",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u5-core-2__AlembicCore__u5-core-2.json",
+        "deliveryRunId": "run-delivery-wave2-u5-core-2__AlembicCore__u5-core-2",
+        "dispatchGroup": "wave2-u5-core-2",
+        "sentAt": "2026-06-26T00:50:21.148Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u5-core-2"
+    },
+    {
+      "targetTaskId": "u6-plugin",
+      "taskPackageId": "wave2-u6-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U6 消费侧 P4/P5：knowledge-index-rebuild reconcile 后 stale>0→Core repairRenames→applyRepairs(幂等、renamed/applied)+rebuildRescanIndexes 返 report+region-vector skip(provider 不可用 skipped+warning/可用 semantic_memories 0→非0)+注入 evolutionGateway 激活 audit→deprecate(降级两路)+D2 batch護栏 50/150/400。验收 P4 接活/P5 报告+skip/audit 激活/零新回归/Node22 build:check+边界门禁；禁改 Core/vendor、main 不 push、记消费 Core commit；可 subagent-offload。复核 HEAD。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T00:49:23.362Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave2-u6-plugin__AlembicPlugin__u6-plugin",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave2-u6-plugin__AlembicPlugin__u6-plugin.json",
+        "deliveryRunId": "run-delivery-wave2-u6-plugin__AlembicPlugin__u6-plugin",
+        "dispatchGroup": "wave2-u6-plugin",
+        "sentAt": "2026-06-26T00:50:27.642Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u6-plugin"
+    },
+    {
+      "targetTaskId": "u5-plugin-2",
+      "taskPackageId": "wave3-u5-plugin-2",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U5 #1 收口：embedding-sim provider(VectorService/RecipeRegionVectorIndex 预计算→cosine、缺失→undefined 回退 Jaccard、sync)喂进 Core 三服务可选 ctor hook(ConsolidationAdvisor/ProposalExecutor/RedundancyAnalyzer)激活 embedding。验收 embedding>Jaccard/缺省回退确定+现有单测全过/三处接线/provider 非 stub/Node22 build:check+边界门禁零回归；禁改 Core/vendor、main 不 push、记消费 Core commit。复核 HEAD。真机→U7。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T01:15:22.880Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave3-u5-plugin-2__AlembicPlugin__u5-plugin-2",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u5-plugin-2__AlembicPlugin__u5-plugin-2.json",
+        "deliveryRunId": "run-delivery-wave3-u5-plugin-2__AlembicPlugin__u5-plugin-2",
+        "dispatchGroup": "wave3-u5-plugin-2",
+        "sentAt": "2026-06-26T01:16:05.207Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u5-plugin-2"
+    },
+    {
+      "targetTaskId": "u5-core-3",
+      "taskPackageId": "wave3-u5-core-3",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore U5 embedding 收尾：让 ProposalExecutor #toRecipeLike + ConsolidationAdvisor candidateLike/recipeLike 传带 recipe id(RecipeLike 加可选 id?)，激活余 2 dormant 站点(provider 已接线 id 流通即活)。验收 id 流通 stub-by-id/缺省回退确定+现有单测全过/additive/RedundancyAnalyzer 不回归；不改算法/不发起 embed；改 live 禁 vendor、main 不 push、build 重生 dist。复核 HEAD。真机→U7。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T01:42:02.872Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave3-u5-core-3__AlembicCore__u5-core-3",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u5-core-3__AlembicCore__u5-core-3.json",
+        "deliveryRunId": "run-delivery-wave3-u5-core-3__AlembicCore__u5-core-3",
+        "dispatchGroup": "wave3-u5-core-3",
+        "sentAt": "2026-06-26T01:43:11.328Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u5-core-3"
+    },
+    {
+      "targetTaskId": "u4-plugin",
+      "taskPackageId": "wave3-u4-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U4 消费侧：decay 第4 sweep driver(Core DecayDetector.scanAll(cap)→tick transition trigger=decay-detection，cap 有界)+lifecycleStateMachine 注入 decay 链(记 lifecycle_transition_events)+订正 staging-access-sweep:137/251-252 \"P3 不接线\" 过时注释。验收 decay driver 接通/注入非 undefined/注释订正/零回归+Node22 build:check+边界门禁；读设计 §U4；禁改 Core/vendor、main 不 push、记消费 Core commit、不引 daemon。复核 HEAD。真机→U7。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T01:42:19.474Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave3-u4-plugin__AlembicPlugin__u4-plugin",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u4-plugin__AlembicPlugin__u4-plugin.json",
+        "deliveryRunId": "run-delivery-wave3-u4-plugin__AlembicPlugin__u4-plugin",
+        "dispatchGroup": "wave3-u4-plugin",
+        "sentAt": "2026-06-26T01:43:18.521Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u4-plugin"
+    },
+    {
+      "targetTaskId": "u3",
+      "taskPackageId": "wave3-u3",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U3 输出预算化（零改 Core）：新 briefing-budget.ts 抽 budgetBriefingResponseData + cold-start 改调(行为逐字段一致硬验收) + rescan buildRescanResponse 预算化(fullBriefingRef 复用零改 allowlist) + moduleMining 调 attachPlanScopeTargetCounts(deepMining 不调) + mcp-tools describe；item6 recipe-map 不做(用户/Design 决)。验收 共享步骤/cold-start 快照一致/rescan 预算/moduleMining 计数对称/Node22 build:check+边界门禁+output-contract+零回归；零改 Core/vendor、main 不 push、记消费 Core commit。复核 HEAD。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T02:03:34.302Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave3-u3__AlembicPlugin__u3",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u3__AlembicPlugin__u3.json",
+        "deliveryRunId": "run-delivery-wave3-u3__AlembicPlugin__u3",
+        "dispatchGroup": "wave3-u3",
+        "sentAt": "2026-06-26T02:04:07.914Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u3"
+    },
+    {
+      "targetTaskId": "u2-core",
+      "taskPackageId": "wave3-u2-core",
+      "targetWindow": "AlembicCore",
+      "summary": "AlembicCore U2 覆盖账本：migration 下一可用号(非014)新 coverage_ledger(UNIQUE module×dimension,无 plan/session 字段)+deep_mining_rounds+drizzle+CoverageLedgerRepository(复刻 GitDiffCheckpointRepository)+buildCoverageLedger(扩 CompletenessCritic 聚合层,保持 advisory/shouldBlockCompletion:false grade 非门,不硬编码宿主路径)+intent perDimensionTargets/moduleDimensionTargets+KnowledgeRescanPlanBuilder 消费 Agent 目标(非硬5,existingCount 优先账本)+CoverageLedgerAdvisor 三停止(收敛/递减<K/上限,K/maxRounds 从D2)。验收 两表无 plan 字段/repository/advisory 保持/gap 非硬5/Advisor 三停止/D3/Node22 build:check+dist 重生；分阶段 main 不 push 禁 vendor；landed 解锁 u2-plugin。复核 HEAD。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T02:27:25.608Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave3-u2-core__AlembicCore__u2-core",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u2-core__AlembicCore__u2-core.json",
+        "deliveryRunId": "run-delivery-wave3-u2-core__AlembicCore__u2-core",
+        "dispatchGroup": "wave3-u2-core",
+        "sentAt": "2026-06-26T02:27:50.334Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u2-core"
+    },
+    {
+      "targetTaskId": "u2-plugin",
+      "taskPackageId": "wave3-u2-plugin",
+      "targetWindow": "AlembicPlugin",
+      "summary": "AlembicPlugin U2 消费侧(deepMining 多轮覆盖循环)：U2a 写点 dimension-completion→buildCoverageLedger→upsert / U2b draft SEED 加载账本产 gapCandidates+D2 perRoundCellBudget+intent perDimensionTargets→gate / U2c coldStart defer 格 grade=empty,deferred=1 / U2d attach CoverageLedgerAdvisor 三停止+建议(advisory 不阻断/rescanId 幂等) / U2e FileChangeHandler git-diff 生成退役(先核 um-impl 重叠+moduleMiningRoutes 全量 grep 清理)。红线：plan 无状态/advisory 非自动调度/no-guess/D3。验收 coldStart 产账本+defer/多轮喂账本+D2 cap/Agent 目标非硬5/三停止不无限扫/生成退役/plan 无状态/Node22 build:check+边界+D3 零回归；可 subagent-offload；禁改 Core/vendor、main 不 push、记消费 Core commit。复核 HEAD。完成→U2 闭合解锁 U7。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T02:58:35.117Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave3-u2-plugin__AlembicPlugin__u2-plugin",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave3-u2-plugin__AlembicPlugin__u2-plugin.json",
+        "deliveryRunId": "run-delivery-wave3-u2-plugin__AlembicPlugin__u2-plugin",
+        "dispatchGroup": "wave3-u2-plugin",
+        "sentAt": "2026-06-26T02:59:03.381Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u2-plugin"
+    },
+    {
+      "targetTaskId": "u7-e2e",
+      "taskPackageId": "wave4-u7-e2e",
+      "targetWindow": "Test",
+      "summary": "Test U7 真机端到端（顶层完成定义）：忠实副本 BiliDili(保护真 ~/.asd 02a25032+a3ea6a25)跑全 14 维 coldStart(含 defer 格)→deepMining 多轮(账本喂+Agent per-cell 非硬5+停止条件不无限扫)→moduleMining 分模块→evolution(UM advance+proposal/U5 OUTCOME/U6 drift/U4 decay)→semantic_memories 0→非0→checkpoint advance。Plugin@8a44368/Core@74387b2。成功=各 stage 可核 DB 证据+semantic_memories 非0+checkpoint advance+多轮不无限扫=demand 完成；blocked=缺证据→stage 前后 DB+触发+commit+哪能力/哪侧，不改产品码。出 scope 项记录不阻断。Node≥22/不 push/真机只读。",
+      "status": "accepted",
+      "createdAt": "2026-06-26T04:05:15.091Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-wave4-u7-e2e__Test__u7-e2e",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-wave4-u7-e2e__Test__u7-e2e.json",
+        "deliveryRunId": "run-delivery-wave4-u7-e2e__Test__u7-e2e",
+        "dispatchGroup": "wave4-u7-e2e",
+        "sentAt": "2026-06-26T04:06:06.786Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-u7-e2e"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "wave1-u4-core-decay",
+        "wave1-u5-core",
+        "wave2-u1-core",
+        "wave2-maint-fix-core",
+        "wave2-u6-core",
+        "wave2-u5-core-2",
+        "wave3-u5-core-3",
+        "wave3-u2-core"
+      ],
+      "targetTaskIds": [
+        "u4-core-decay-trigger",
+        "u5-core",
+        "u1-core",
+        "maint-fix-core",
+        "u6-core",
+        "u5-core-2",
+        "u5-core-3",
+        "u2-core"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "wave1-um-commit-driven-maintenance",
+        "wave1-um-impl",
+        "wave2-u1-plugin",
+        "wave2-maint-fix-plugin",
+        "wave2-u1-plugin-cont",
+        "wave2-u5-plugin",
+        "wave2-u6-plugin",
+        "wave3-u5-plugin-2",
+        "wave3-u4-plugin",
+        "wave3-u3",
+        "wave3-u2-plugin"
+      ],
+      "targetTaskIds": [
+        "um-commit-driven-maintenance",
+        "um-impl",
+        "u1-plugin",
+        "maint-fix-plugin",
+        "u1-plugin-cont",
+        "u5-plugin",
+        "u6-plugin",
+        "u5-plugin-2",
+        "u4-plugin",
+        "u3",
+        "u2-plugin"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "wave1-test-um-advance-baseline",
+        "wave1-test-um-after-regression",
+        "wave2-test-committed-propose-e2",
+        "wave4-u7-e2e"
+      ],
+      "targetTaskIds": [
+        "test-um-advance-baseline",
+        "test-um-after-regression",
+        "test-committed-propose-e2",
+        "u7-e2e"
+      ]
+    },
+    {
+      "windowName": "Design",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "wave2-design-d2-default-table",
+        "wave2-design-maint-commit-propose"
+      ],
+      "targetTaskIds": [
+        "design-d2-default-table",
+        "design-maint-commit-propose"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-u7-e2e"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-06-25T19:49:22.612Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-wave4-u7-e2e__Test__u7-e2e",
+    "lastDeliveryRunId": "run-delivery-wave4-u7-e2e__Test__u7-e2e",
+    "lastDispatchGroup": "wave4-u7-e2e",
+    "lastTargetTaskId": "u7-e2e",
+    "lastStatus": "sent",
+    "updatedAt": "2026-06-26T04:06:06.788Z"
+  }
+}

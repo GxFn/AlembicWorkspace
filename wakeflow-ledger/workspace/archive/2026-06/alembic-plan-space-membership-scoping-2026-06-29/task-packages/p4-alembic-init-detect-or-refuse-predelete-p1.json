@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-alembic-init-detect-or-refuse-predelete-p1",
+  "demandKey": "alembic-plan-space-membership-scoping-2026-06-29",
+  "summary": "P4 pre-delete hard-gate task for Alembic only: implement SetupService init detect-or-refuse before any Core workspace.config reader deletion. Add a start-of-init guard using the Core native project-scope loader so an existing ecf32806/native scope is idempotent and does not create per-repo ghosts, while a multi-repo checkout with no native scope refuses clearly instead of silently falling back to single-root or /tmp. Remove stale Alembic config output fields core.dir, core.constitution, and watch.* while keeping core.subRepoDir, core.subRepoUrl, guard, and Alembic ai config. Do not delete AlembicCore reader/definition blocks, do not modify AlembicPlugin, do not perform ghost hygiene, vendor refresh, push, release, or P4 Core deletion.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-plan-space-membership-scoping-2026-06-29.md §12.P4 G-3, §12.R, §12.M, §12.Z",
+  "createdAt": "2026-06-29T07:25:45.196Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-alembic-init-detect-or-refuse-predelete-t1",
+      "taskPackageId": "p4-alembic-init-detect-or-refuse-predelete-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read parent AGENTS.md, state root/task package/envelope, Design §12.P4 G-3/§12.R/§12.M/§12.Z, and Alembic/AGENTS.md; confirm currentWindow=Alembic. Implement only Alembic SetupService pre-delete guard: use loadProjectScopeForFolder(projectRoot) or equivalent Core native loader at init start; existing native scope => idempotent no-op with no new projects.json/project-scopes rows and no per-repo ghost; multi-repo shape with no scope => refuse with clear 'No native project scope ... run project-scope add <folder>' guidance, no sibling auto-scan, no /tmp/alembic-dev DB, no single-root scan. Remove stale generated config fields core.dir, core.constitution, watch.* from Alembic only; keep core.subRepoDir/subRepoUrl, guard, ai. Validation: Node>=22; npm run build/check or repo-equivalent; targeted SetupService tests/probes for ecf32806 idempotent under ALEMBIC_HOME sandbox and fresh two-repo fixture refusal; grep stale config fields absent; prove no Core reader deletion, no Plugin edits, no ghost deletion, no vendor/dist hand edits, no external AI/cold-start, no push. Commit locally on main and backfill commit hash, commands, raw evidence paths, risks, and next required Plugin/Core P4 tasks.",
+      "status": "pending",
+      "createdAt": "2026-06-29T07:25:45.196Z"
+    }
+  ]
+}
