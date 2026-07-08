@@ -643,7 +643,7 @@ service/index.ts ─▶ 【M1：仅文档说明它是 whole-engine barrel，非�
 **新增风险（critique 升级，需控制器/用户确认）：**
 
 - **RISK-1（C1，最高，阻塞性）— submodule re-pin 排序**：`vendor/AlembicCore` 是 gitlink（`AlembicPlugin` `90c2295`、`Alembic` `e809140`，`.gitmodules` 指 `github.com/GxFn/AlembicCore.git`）。Core 半边计划在 re-pin 前**不可 green-verify**。决策：每个 Core 批次落地序列 = Core commit → `npm run build:core`（重建 `dist`）→ `git -C vendor/AlembicCore checkout <core-commit>` + `git add vendor/AlembicCore`（Plugin 与主体两处同一逻辑步）→ 再跑消费方 `build:check`。**未把此排序写进每个 Core 行前，任何 Core hot/late-L2 行不可派发。**
-- **RISK-2 → 已转 IN-SCOPE（2026-06-28 用户决策"纳入本重构现在做"）— Core `cold-start`/`knowledge-rescan` → `project-index` 孪生折叠**：经定向深挖订正（见 §11.I + ledger 设计 `wakeflow-ledger/AlembicCore/alembic-coldstart-rescan-family-collapse-design-2026-06-28.md`），**Core 半边只持 intent+plan+(薄)presenter**（orchestration/step-list 在兄弟仓；Core `presentInternal*` 零生产消费=dead/test-only）→ **本需求 IN-SCOPE = Core intent+plan 折叠到 `workflows/project-index/`（mode full|incremental，INDEX 词汇 CG-B）**，安全（~60-70% 孪生 + 干净 mode 轴）。**留作 incremental-mode strategy 不强合**：rescan-only 分析脊（gap/audit/coverage/projector）+ 两 presenter 输出形。**R1 调和**：调用方经 barrel 按符号名 import→文件夹改名被 compat-alias shim 隐形吸收；**兄弟仓 orchestrator（`ColdStartWorkflow`）在 Core 折叠波只 re-point import**；`runProjectIndexWorkflow` 全 orchestrator 统一 → **已纳入 IN-SCOPE（用户 2026-06-28"并入一起处理"），作为 Core 折叠之后的接力波，设计见 §12.1**（Core 折叠先行→orchestrator 统一接力）。frozen 字面量（sourceTag/response.tool）不变。排 hot-zone（CG-3+realverify 后）。
+- **RISK-2 → 已转 IN-SCOPE（2026-06-28 用户决策"纳入本重构现在做"）— Core `cold-start`/`knowledge-rescan` → `project-index` 孪生折叠**：经定向深挖订正（见 §11.I），**Core 半边只持 intent+plan+(薄)presenter**（orchestration/step-list 在兄弟仓；Core `presentInternal*` 零生产消费=dead/test-only）→ **本需求 IN-SCOPE = Core intent+plan 折叠到 `workflows/project-index/`（mode full|incremental，INDEX 词汇 CG-B）**，安全（~60-70% 孪生 + 干净 mode 轴）。**留作 incremental-mode strategy 不强合**：rescan-only 分析脊（gap/audit/coverage/projector）+ 两 presenter 输出形。**R1 调和**：调用方经 barrel 按符号名 import→文件夹改名被 compat-alias shim 隐形吸收；**兄弟仓 orchestrator（`ColdStartWorkflow`）在 Core 折叠波只 re-point import**；`runProjectIndexWorkflow` 全 orchestrator 统一 → **已纳入 IN-SCOPE（用户 2026-06-28"并入一起处理"），作为 Core 折叠之后的接力波，设计见 §12.1**（Core 折叠先行→orchestrator 统一接力）。frozen 字面量（sourceTag/response.tool）不变。排 hot-zone（CG-3+realverify 后）。
 - **RISK-3（H1）— N-7 计数一次性重测**：实测 Core 166 / Plugin 83（原稿 162/79、约束块 195/96 均错）。late-L2 批次大小须按 166/83 + vendor `dist/*.d.ts` 类型面重估；若跨多文件 alias 不可一批落，拆为多 late-L2 子批。
 
 **CG-A/B/C 已决（2026-06-28 用户拍板）：**
@@ -664,8 +664,6 @@ service/index.ts ─▶ 【M1：仅文档说明它是 whole-engine barrel，非�
 ---
 
 ### §11.I cold-start/knowledge-rescan 孪生折叠设计（RISK-2 已转 IN-SCOPE，CG-B INDEX 词汇，2026-06-28）
-
-> 详细 grounded 设计（行为-diff/目标形/R1/分阶段/风险全 file:line）见 ledger `wakeflow-ledger/AlembicCore/alembic-coldstart-rescan-family-collapse-design-2026-06-28.md`。
 
 **0 范围订正（关键）**：原框架以为两家族在 Core 持完整 `intent→plan→step-list→presenter` 流水线——**错**。**Core 只持 intent+plan+(薄)presenter**；真正 orchestration/step-list 在兄弟仓（`Alembic/lib/workflows/{cold-start,knowledge-rescan}/*Workflow.ts` in-process + `AlembicPlugin/lib/recipe-generation/host-agent-workflows/{cold-start,knowledge-rescan}.ts` host-agent）。Core 自己的 `presentInternalColdStartResponse`(ColdStartPresenters.ts:140)/`presentInternalKnowledgeRescanResponse`(:71)/`buildInternalColdStartReport`(:62) **零生产消费**（仅 `test/ColdStartSelectionSummary.test.ts` 钉，daemon-removal 期遗留）→ Core 折叠目标更薄更安全。
 
