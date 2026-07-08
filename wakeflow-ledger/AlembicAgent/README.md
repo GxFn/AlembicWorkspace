@@ -1,8 +1,14 @@
 # AlembicAgent
 
-This directory stores project-specific coordination records for AlembicAgent.
+This directory stores durable **technical reference documentation** for AlembicAgent
+(e.g. the complete implementation / architecture deep-dive of the source repo).
 
 - Window responsibility: AlembicAgent work window
 - Source repository scope: `AlembicAgent`
 - Keep source code changes in the source repository.
-- Keep cross-window task records, backfills, acceptance notes, and handoff evidence here.
+- Keep only long-lived technical / architecture reference docs about this repo here.
+- Do NOT store requirement-advancing / process records here — task packages,
+  backfills, acceptance notes, handoff evidence, plans, designs, inventories,
+  findings, specs, and progress belong in the workspace ledger
+  (`wakeflow-ledger/workspace/archive/…`, `requirement-designs/`,
+  `goal-stage-confirmation/`, or `wakeflow-ledger/AlembicWorkspace/`).
