@@ -1,0 +1,97 @@
+{
+  "kind": "TestBoundaryCard",
+  "schemaVersion": 1,
+  "testId": "p4-final-panorama-real-dashboard-scope-test",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "targetWindow": "Test",
+  "status": "draft",
+  "createdAt": "2026-07-07T02:08:55.778Z",
+  "stateRevisionObserved": 28,
+  "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 and §12.R; accepted P0-P3 state-root evidence",
+  "boundaryGate": {
+    "question": "P4 real-machine gate: after accepted Core/Alembic/Dashboard P0-P3 changes, does the restored Panorama dashboard show AlembicWorkspace space-member data only, avoid BiliDili cross-space leakage, keep BiliDili's own dashboard behavior intact, and leave the rescan incremental chain working?",
+    "objectBoundary": "Real local projects only: AlembicWorkspace space/controlRoot as primary subject, BiliDili projectRoot as regression contrast, accepted local commits Core 73cb9a340a4044eed68977d5ddbc36491deda674 / Alembic 9ccca4b212cacf022a8d46fc13f92f666cd4376e / Dashboard a1070f2ab52dbea06e94511892e2876074a2af9c. P4 verifies runtime behavior and evidence; it does not edit source code or accept P5 UI fidelity.",
+    "controllerSelfChecks": [
+      "P0 accepted directAligned=false and CG-E downgrade contract; per-module recipeCount cannot be faked from files.",
+      "P1 Core accepted scope discovery guard + health/gaps rollup.",
+      "P2 Alembic accepted /panorama, /panorama/health, /panorama/gaps endpoint family and space-view aggregation.",
+      "P3 Dashboard accepted four-tab UI restore and P2 endpoint binding; local Dashboard check/build/test passed.",
+      "Known P3 residual: target browser saw backend 500s locally, so success-payload visual/data validation belongs to this P4 real-machine run."
+    ],
+    "realScenarioConditions": [
+      "Run against the real AlembicWorkspace space/controlRoot, not BiliDili as the primary subject and not a sandbox copy.",
+      "Use the local configured Alembic/Dashboard runtime for Codex-hosted testing; do not switch to another AI host or introduce external AI execution for this verification.",
+      "Use BiliDili only as the regression contrast for its own projectRoot dashboard and for proving no BiliDili entries leak into AlembicWorkspace Panorama.",
+      "If a rebuild/bootstrap/rescan is necessary, keep it scoped to the test workspaces and preserve raw logs/commands."
+    ],
+    "successMeans": [
+      "AlembicWorkspace Dashboard /panorama renders four tabs: overview, dependencies, graph, gaps.",
+      "Raw responses from /panorama, /panorama/health, and /panorama/gaps are captured and show projectScope/memberRoots scoped to AlembicWorkspace members only.",
+      "Overview statistics, health, and gaps are populated or explicitly degraded according to accepted CG-E; no file-count apportioning or fabricated per-module recipeCount is presented.",
+      "No BiliDili projectRoot/module/path/recipe entry appears in AlembicWorkspace Panorama raw responses or screenshots.",
+      "BiliDili's own projectRoot Dashboard still renders/returns its own panorama or documented empty/single-project shape without AlembicWorkspace leakage.",
+      "A real rescan run or narrowly justified equivalent proves the incremental chain still completes without snapshot-table deletion or forced full rebuild dependency."
+    ],
+    "failureMeans": [
+      "Any BiliDili entry appears in AlembicWorkspace panorama data or UI.",
+      "AlembicWorkspace panorama tabs render only static shell/error states when the backend should be available.",
+      "Endpoint data shape contradicts the accepted P2 contract or hides CG-E downgrade as fake module-level recipe counts.",
+      "BiliDili dashboard regresses or shows AlembicWorkspace data.",
+      "Rescan fails because this demand changed snapshot/rescan/discovery behavior.",
+      "Required raw endpoint responses, screenshots, or rescan logs are missing."
+    ],
+    "cannotConclude": [
+      "Do not conclude P5 old-UI fidelity; P5 is separate reference comparison.",
+      "Do not conclude production release readiness, push readiness, or tag readiness.",
+      "Do not use BiliDili alone as proof of space behavior because it is a single-project contrast.",
+      "Do not treat target prose without raw endpoint/screenshot/log evidence as acceptance."
+    ],
+    "stopConditions": [
+      "Wrong active project/controlRoot is detected before destructive or rebuild-like operations.",
+      "Required Alembic/Dashboard service cannot be started or endpoint credentials/config are missing.",
+      "Raw evidence shows cross-space leakage, fake apportioning, or rescan chain failure.",
+      "Any operation would require source edits, push/tag/release, or broad data-root cleanup outside the test boundary."
+    ]
+  },
+  "evidenceRequired": [
+    "Raw JSON or summarized raw payloads for /panorama, /panorama/health, /panorama/gaps under AlembicWorkspace.",
+    "Screenshots for AlembicWorkspace overview/dependencies/graph/gaps tabs.",
+    "A negative leakage check listing searched BiliDili identifiers/paths and showing absent from AlembicWorkspace responses/UI.",
+    "BiliDili own dashboard/endpoint contrast evidence.",
+    "Rescan command/status/log evidence showing incremental chain non-regression.",
+    "Explicit pass/fail conclusion for each of the three P4 gates."
+  ],
+  "allowedOperations": [
+    "Start/stop local Alembic/Dashboard services needed for verification.",
+    "Call the three panorama endpoints and related graph/dependency endpoints, saving bounded raw JSON summaries.",
+    "Capture screenshots for the four AlembicWorkspace tabs and BiliDili contrast.",
+    "Run a scoped rescan or equivalent accepted runtime verification and collect logs/status JSON.",
+    "Inspect local runtime logs, SQLite/read-only data, and generated artifacts needed to prove scope membership."
+  ],
+  "forbiddenOperations": [
+    "No source code edits or commits in Test.",
+    "No push/tag/release/version bump.",
+    "No branch/checkout/worktree/reset/rebase/cherry-pick for old panorama references.",
+    "No deletion of project_context_file_snapshots or bootstrap_snapshots.",
+    "No broad cleanup of real ~/.asd outside the explicitly tested workspace data roots.",
+    "No changing configured AI providers or executing non-Codex host agents."
+  ],
+  "suggestedTaskPackage": {
+    "targetWindow": "Test",
+    "targetTaskId": "p4-final-panorama-real-dashboard-scope-test",
+    "summary": "P4 real-machine gate: after accepted Core/Alembic/Dashboard P0-P3 changes, does the restored Panorama dashboard show AlembicWorkspace space-member data only, avoid BiliDili cross-space leakage, keep BiliDili's own dashboard behavior intact, and leave the rescan incremental chain working?",
+    "sourceRef": "test-cards/p4-final-panorama-real-dashboard-scope-test.json"
+  },
+  "allowedNextActions": [
+    "total-control-review-test-boundary",
+    "wakeflow-state add-task-package",
+    "wakeflow-delivery prepare-dispatch-from-state"
+  ],
+  "forbiddenConclusions": [
+    "test-card-is-dispatch",
+    "test-card-is-test-result",
+    "test-card-is-controller-acceptance",
+    "test-card-updates-wakeflow-state",
+    "test-result-closes-demand-without-controller-review"
+  ]
+}

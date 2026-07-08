@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root、Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、Test blocked evidence `tr-p4-final-panorama-ui-final-state-countercheck-rework-t1`、controller attribution `evidence/controller-review-p4-ui-countercheck-attribution-2026-07-07.md`，以及 Alembic/AGENTS.md。权威来源：P4 真机门要求 AlembicWorkspace panorama 四标签只显示本空间成员且无 BiliDili 串显；Test 已在 fresh clean-storage UI 最终态复现 Dependencies 标签 BiliDili 模块泄漏。控制器 live probes 进一步证明 AW 端口 `/api/v1/modules/dep-graph?level=module` 自身返回 `module:root:*:BiliDili` 节点，且 `/api/v1/projects` selectedProject 是 BiliDili；同时 `/api/v1/daemon/health` 和 panorama endpoints 仍是 AW scope。目标：修复 Alembic 主体后端/runtime scope-selection 链，让 AW dashboard 所用 modules dep-graph 和 projects selection 不再从 stale BiliDili 状态取数；Dashboard 不是首修对象。完成定义：1) 定位 `/api/v1/modules/dep-graph` 取数链（route/ModuleService/ProjectContext facts/service container/runtime project root）为何在 AW daemon projectRoot 下读出 BiliDili ProjectContext 节点。2) 定位 `/api/v1/projects` selectedProject/activeRuntimeProject 链为何在 AW dashboard URL/daemon 上把 BiliDili 作为 selected/top project。3) 最小修复 Alembic 主体：AW daemon `/api/v1/modules/dep-graph?level=module` 返回 AW-scoped graph（若无合法模块图则返回显式 AW-scoped empty/valid graph），不得返回 BiliDili ids/labels；AW daemon `/api/v1/projects` 不得让 stale BiliDili selectedProject 驱动 AW Header，BiliDili 自身 project/daemon 行为不回归。4) 保持已过 P4 行为不退化：panorama overview/health/gaps shape 不变，ProjectScope 5 members 不变，CG-E project-total-only 不伪造 per-module recipeCount，provider/rescan terminal proof 不回退，不删除 snapshot tables，不改 Dashboard/Core 源，除非有明确 Alembic 必需证据。5) 验证：targeted unit/probe 覆盖 current-project dep-graph binding 和 stale selectedProject 在 AW daemon 不泄漏；build:check 或仓库等价；可安全时用当前 AW runtime 或 fixture 复跑 curl/probe：AW `/modules/dep-graph` 无 BiliDili，AW `/projects` 不 selected BiliDili，BiliDili contrast 不回归。6) 本地 main commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、是否需要 Test 重新跑 P4、剩余风险/下一步。若判断需要 Dashboard API contract change，先返回 blocked 并写明精确契约，不要直接改 Dashboard。",
+  "status": "pending",
+  "sourceRef": "target-results/tr-p4-final-panorama-ui-final-state-countercheck-rework-t1.json; evidence/p4-final-panorama-ui-final-state-countercheck-rework-t1.md; evidence/p4-final-panorama-ui-final-state-countercheck-rework-t1/aw-ui-dependencies.json; evidence/p4-final-panorama-ui-final-state-countercheck-rework-t1/aw-ui-dependencies-visible.png; evidence/controller-review-p4-ui-countercheck-attribution-2026-07-07.md; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+  "designIntent": "Repair the P4 final scope leakage at the Alembic backend source: dep-graph and projects selection must be current runtime/project-scope bound before the final dashboard Test rerun.",
+  "createdAt": "2026-07-07T04:52:49.904Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-t1",
+      "taskPackageId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Repair Alembic backend/runtime scope-selection leakage shown by the P4 final UI countercheck: AW daemon modules dep-graph and projects selected state must bind to the current AW project/scope instead of stale BiliDili state.",
+      "status": "pending",
+      "createdAt": "2026-07-07T04:52:49.904Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

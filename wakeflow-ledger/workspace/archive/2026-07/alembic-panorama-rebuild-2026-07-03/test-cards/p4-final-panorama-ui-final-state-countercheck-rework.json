@@ -1,0 +1,80 @@
+{
+  "kind": "TestBoundaryCard",
+  "schemaVersion": 1,
+  "testId": "p4-final-panorama-ui-final-state-countercheck-rework",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "targetWindow": "Test",
+  "status": "draft",
+  "createdAt": "2026-07-07T04:35:51.033Z",
+  "stateRevisionObserved": 56,
+  "sourceRef": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/controller-review-p4-embedding-rerun-countercheck-2026-07-07.md",
+  "boundaryGate": {
+    "question": "在 BiliDili rescan/provider 证据已通过之后，AlembicWorkspace daemon 的 /panorama UI 用 fresh browser context/clean storage 打开并等待内容加载完成时，四个标签是否仍然只显示 AlembicWorkspace 空间成员且不出现 BiliDili？",
+    "objectBoundary": "真实 AlembicWorkspace daemon/dashboard UI final state on http://127.0.0.1:64506/panorama after prior BiliDili rescan; compare with same-time AW APIs and BiliDili contrast only as evidence, not as replacement for UI proof.",
+    "controllerSelfChecks": [
+      "控制器已复核 Test 原始证据：AW API 与 BiliDili rescan/provider 证据强，但 dependencies/graph Test 截图停在 spinner/header。",
+      "控制器 countercheck 记录到 AW API clean 但 AW /panorama UI header/dependencies/graph 出现 BiliDili 内容的冲突。"
+    ],
+    "realScenarioConditions": [
+      "使用真实 AlembicWorkspace 与 BiliDili 已运行服务；若服务需最小重启，记录端口和启动方式。",
+      "浏览器必须是 fresh context 或等价 clean storage，并在 overview/dependencies/graph/gaps 四标签内容加载完成后取证。",
+      "不得用 header、spinner、API clean 或未加载截图替代 UI final-state 证据。"
+    ],
+    "successMeans": [
+      "Fresh context 下 AlembicWorkspace 四标签 post-load UI 均无 BiliDili/非成员串显。",
+      "同一时刻 AW project-scope/panorama API 仍指向五成员空间，BiliDili contrast 不回归。",
+      "补证解释控制器 countercheck 为 stale browser/session/cache artifact，并给出 clean-context 证据。"
+    ],
+    "failureMeans": [
+      "Fresh context 仍复现 AW UI 出现 BiliDili header、modules、dependencies 或 graph 内容。",
+      "任一标签只能捕到 spinner/header，无法证明最终内容。",
+      "API clean 但 UI 串显，说明仍有 UI/session/runtime scope 问题，需回 blocked 带源路由建议。"
+    ],
+    "cannotConclude": [
+      "不能仅因 API clean 断言 UI clean。",
+      "不能把 provider/rescan 通过当成 P4 全部通过。",
+      "不能把 stale/session 假设当结论，除非 fresh context 证据支持。"
+    ],
+    "stopConditions": [
+      "发现真实 UI 串显复现。",
+      "无法建立 fresh context 或无法等待四标签内容完成加载。",
+      "服务端口/项目根与当前 state root 不一致。"
+    ]
+  },
+  "evidenceRequired": [
+    "四标签 overview/dependencies/graph/gaps post-load DOM/text JSON 与截图。",
+    "Fresh context/clean storage 的可复核说明。",
+    "同一时刻 AW project-scope/panorama API 摘要和 BiliDili contrast 摘要。",
+    "若失败：可复现 visible text、截图、API 对照、storage 状态、日志摘要、建议 owner。"
+  ],
+  "allowedOperations": [
+    "读取 state root、Test 原始证据、控制器 countercheck 证据。",
+    "使用 fresh browser context、清浏览器本地 storage/缓存或等价隔离上下文。",
+    "读取 AW/BiliDili API、dashboard DOM/text/screenshots、相关日志摘要。",
+    "最小重启已有 dashboard/daemon 服务以恢复测试环境，但必须记录。"
+  ],
+  "forbiddenOperations": [
+    "改代码或配置 provider。",
+    "删除真实项目 data root、预清理 recipe/SQLite、push/tag/release。",
+    "用 BiliDili 以外项目替代 Gate 2/3。",
+    "用 API clean、截图 header、spinner、或未加载 DOM 作为四标签验收。"
+  ],
+  "suggestedTaskPackage": {
+    "targetWindow": "Test",
+    "targetTaskId": "p4-final-panorama-ui-final-state-countercheck-rework",
+    "summary": "在 BiliDili rescan/provider 证据已通过之后，AlembicWorkspace daemon 的 /panorama UI 用 fresh browser context/clean storage 打开并等待内容加载完成时，四个标签是否仍然只显示 AlembicWorkspace 空间成员且不出现 BiliDili？",
+    "sourceRef": "test-cards/p4-final-panorama-ui-final-state-countercheck-rework.json"
+  },
+  "allowedNextActions": [
+    "total-control-review-test-boundary",
+    "wakeflow-state add-task-package",
+    "wakeflow-delivery prepare-dispatch-from-state"
+  ],
+  "forbiddenConclusions": [
+    "test-card-is-dispatch",
+    "test-card-is-test-result",
+    "test-card-is-controller-acceptance",
+    "test-card-updates-wakeflow-state",
+    "test-result-closes-demand-without-controller-review"
+  ]
+}

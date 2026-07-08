@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p0-core-module-id-alignment-characterization-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "P0 硬门：为 panorama rebuild 证明 coverage_ledger.moduleId 与 ProjectMap.module.id 是否真实对齐，并锁定 scope-fix controlRoot 边界事实。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3 §4 §5 F-C §7 CG-E §11 §12 P0; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md",
+  "designIntent": "P0 is an evidence gate before implementation: prove module-id alignment and scope boundary facts first so later Core/Main/Dashboard stages consume real data instead of inferred or fake per-module coverage.",
+  "createdAt": "2026-07-07T00:06:07.237Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p0-core-module-id-alignment-characterization-t1",
+      "taskPackageId": "p0-core-module-id-alignment-characterization-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "窗口身份：AlembicCore。先读 workspace AGENTS、active index/status、本 state root，以及 AlembicCore/AGENTS.md。权威来源是 Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3/§4/§5 F-C/§7 CG-E/§11/§12 P0 与 original plan。目标：给全景重建 P0 提供可复核原始证据，判断 coverage_ledger.moduleId ↔ ProjectMap.modules[].id 是否集合对齐；若对齐，说明后续可使用真实每模块 coverage/recipeCount；若不对齐，明确后续必须按 CG-E 如实降级为项目级展示，不得按文件数或其它代理分摊。并同时 characterization 吸收的 scope-fix 风险：controlRoot/AlembicWorkspace 空间发现边界与 no-scope 项目 discovery 字节不应改变。完成定义：1) 指出 ProjectMap module id 产生/读取的 Core 代码路径、coverage_ledger moduleId 写入/读取路径、二者现状关系；2) 在 ProjectMap 非空对象上给出 raw evidence（命令输出/测试输出/样本 JSON 或数据库查询摘要）证明 aligned=true 或 aligned=false，不能只用 BiliDili 空 ProjectMap；3) 若发现不对齐，给出最小修复/降级建议与受影响下游字段；4) 添加或运行能复现该结论的 focused characterization（优先测试/fixture/脚本输出），并运行 AlembicCore 可用的 targeted test/build check；5) 回填 commit hash、变更文件、命令、raw evidence、CG-E 结论、风险/下一步。非目标/硬约束：不实现 P1 rollup，不改 freeze 字面量，不删除 project_context_file_snapshots/bootstrap_snapshots，不触碰 rescan 增量判定链，不复活 DimensionAnalyzer/PanoramaService/PanoramaAggregator 等废弃引擎，不开分支、不 push；老全景代码如需参考只能 git show/git archive 读取式抽取，禁止 worktree/checkout/reset/rebase/branch。",
+      "status": "pending",
+      "createdAt": "2026-07-07T00:06:07.237Z"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root、Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、accepted Test blocked evidence `tr-p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1`，以及 Alembic/AGENTS.md。权威来源：P4 真机门要求 AlembicWorkspace panorama scope + BiliDili contrast + rescan 增量链不回归；当前 Test rerun 已证明 Gate 1/2 通过，且 Gate 3 rescan/job 终态证明本身通过（BiliDili job completed, progress 100%, totalToolCalls=53, displaySnapshot available, snapshot tables not deleted）。剩余 blocker 是 effective embedding provider 错配：BiliDili `/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/config.json` 含 `vector.localEmbedding.enabled=true`, endpoint `http://127.0.0.1:11434`, model `qwen3-embedding:0.6b`，但 restart/runtime evidence 只有 `ALEMBIC_AI_PROVIDER=deepseek` / `ALEMBIC_AI_MODEL=deepseek-v4-pro`，没有 `ALEMBIC_EMBED_PROVIDER/MODEL/BASE_URL`，rescan log 出现 `[deepseek] embed failed: deepseek API error: 404`。新 root-cause 假设：Alembic daemon/AI config runtime bridge 没有把 v2 config `vector.localEmbedding`（或等价 workspace local embedding config）投射到 effective embedding provider，导致 rescan embedding fallback 到 generation provider。目标：修复或明确阻塞该配置桥接，使 BiliDili scoped rescan 使用本地 Qwen/Ollama embedding 或在无法安全推断时给出 controller 可执行的配置迁移/repair 结论。完成定义：1) 现场定位 daemon 启动/AI env/settings/config 读取链、`WorkspaceSettingsStore`/`ProjectRuntimeControl`/AI route/`AiModule` dedicated embed provider 创建链，解释为何 BiliDili v2 `vector.localEmbedding` 没进入 effective env。2) 若是产品缺陷，最小修复：在 Alembic 主体及必要的 vendored Core pin 中正确把 config-local embedding 投射为 `ALEMBIC_EMBED_PROVIDER=ollama`, `ALEMBIC_EMBED_MODEL=qwen3-embedding:0.6b`, `ALEMBIC_EMBED_BASE_URL=http://127.0.0.1:11434` 或等价 effective provider；不得把 DeepSeek 当 embedding provider。3) 若判断 `vector.localEmbedding` 已废弃/不能自动迁移，返回阻塞证据和精确配置迁移命令/文件，不改 runtime 行为；不要静默放松 P4 provider 门。4) 添加 focused regression/probe 覆盖 BiliDili 形态：v2 config 有 localEmbedding 但 settings 无 embed fields 时，effective runtime/env/daemon health 或 AI module dedicated embed provider 可见本地 embedding；或阻塞路径给出清晰诊断。5) 保持 P4 已过部分不退化：panorama endpoint shape 不变，ProjectScope 隔离不退化，CG-E project-total-only 不伪造 per-module recipeCount，rescan terminal proof repair 不回退；不删除 `project_context_file_snapshots` / `bootstrap_snapshots`；不改 Dashboard/Core 源，除非 vendor repin 是 Alembic 主体必需且有证据。6) 验证：Alembic targeted tests covering AI config/embed bridge + rescan/job tests if touched、build:check、retired-symbol/import/ring guards、git diff --check、必要时 Alembic Guard；本地 main commit，不开分支、不 push/tag/release。7) 回填 commit hash、变更文件、命令输出、raw evidence、是否需要 Test 重新跑 P4、剩余风险/下一步。非目标：不执行 P4 final rerun（控制器派 Test），不做 P5 保真比对，不改 BiliDili 产品代码，不编辑 secrets。",
+  "status": "pending",
+  "sourceRef": "target-results/tr-p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1.json; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1.md; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1/restart-bilidili.json; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1/provider-evidence-lines.txt; /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/config.json; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+  "designIntent": "Repair the new P4 provider/embedding blocker: BiliDili has local Qwen embedding config but the Alembic daemon/rescan path effectively used DeepSeek embedding.",
+  "createdAt": "2026-07-07T03:53:37.785Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-alembic-embedding-config-runtime-bridge-repair-t1",
+      "taskPackageId": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Repair Alembic runtime embedding config bridge so the accepted P4 final Test blocker can rerun with BiliDili local Qwen/Ollama embedding instead of DeepSeek embedding fallback.",
+      "status": "pending",
+      "createdAt": "2026-07-07T03:53:37.785Z"
+    }
+  ]
+}

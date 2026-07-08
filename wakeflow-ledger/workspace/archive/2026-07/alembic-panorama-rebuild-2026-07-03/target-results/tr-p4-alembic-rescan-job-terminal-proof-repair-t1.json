@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-alembic-rescan-job-terminal-proof-repair-t1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "taskPackageId": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+  "dispatchGroup": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p4-alembic-rescan-job-terminal-proof-repair-t1",
+  "status": "completed",
+  "summary": "Alembic fixed the P4 rescan Gate 3 public evidence blocker. Diagnosis: normal jobs/rescan reuses a bootstrap-backed generate session, but runDaemonJob only attached the generate process-event bridge for bootstrap jobs, so real rescan runs could appear frozen at session-linked with zero public process evidence even while the Agent was active. Commit 15ab82b0e3fd467a23999c3006cfb042618ba903 attaches the bridge for rescan jobs too and accepts sessionId/id completion payloads, with a regression proving live rescan process events are retained and bootstrap:all-completed finalizes the rescan job. This target result is not P4 acceptance; controller should rerun/dispatch Test for the real terminal proof.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-alembic-rescan-job-terminal-proof-repair-t1.md",
+    "Alembic commit 15ab82b0e3fd467a23999c3006cfb042618ba903",
+    "Alembic/lib/daemon/jobs/DaemonJobRunner.ts",
+    "Alembic/test/unit/DaemonJobRunnerPlanGate.test.ts",
+    "Guard guard-public-mra2xupe-1"
+  ],
+  "verification": [
+    "npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/DaemonJobRunner.test.ts -> pass, 43 tests",
+    "npm run test:unit -- test/unit/JobsRoute.test.ts -> pass, 19 tests",
+    "post-commit npm run test:unit -- test/unit/DaemonJobRunnerPlanGate.test.ts test/unit/DaemonJobRunner.test.ts test/unit/JobsRoute.test.ts -> pass, 62 tests",
+    "npm run build:check -> pass",
+    "npm run lint:retired-symbols -> pass",
+    "npm run lint:repo-boundary -> pass",
+    "npm run lint:consumer-core-imports -> pass",
+    "npm run lint:ring-direction -> pass",
+    "npx biome check lib/daemon/jobs/DaemonJobRunner.ts test/unit/DaemonJobRunnerPlanGate.test.ts -> pass",
+    "git diff --check -> pass",
+    "Alembic Guard explicit files guard-public-mra2xupe-1 -> ok=true with warning-only existing long/complex function findings"
+  ],
+  "risks": [
+    "No final P4 rerun was executed by Alembic; Test remains controller-owned.",
+    "This fix exposes live rescan process evidence and all-completed finalization; it does not shorten real provider latency or fabricate terminal success.",
+    "If Test requires terminal completion instead of live progress proof, the previous five-minute cap was shorter than observed pipeline stage budgets (analyze 480s, produce 900s) and may need controller-approved terminal wait adjustment.",
+    "Guard reported warning-only historical complexity/length findings in DaemonJobRunner.ts; resolving them would be a broad runner refactor outside this narrow repair."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-alembic-rescan-job-terminal-proof-repair-p1__Alembic__p4-alembic-rescan-job-terminal-proof-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-rescan-job-terminal-proof-repair-p1__Alembic__p4-alembic-rescan-job-terminal-proof-repair-t1.json",
+    "deliveryRunId": "run-delivery-p4-alembic-rescan-job-terminal-proof-repair-p1__Alembic__p4-alembic-rescan-job-terminal-proof-repair-t1",
+    "dispatchGroup": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-rescan-job-terminal-proof-repair-p1__Alembic__p4-alembic-rescan-job-terminal-proof-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+    "stateRevision": 42,
+    "demandKey": "alembic-panorama-rebuild-2026-07-03",
+    "taskPackageId": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+    "targetTaskId": "p4-alembic-rescan-job-terminal-proof-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+    "resultId": "tr-p4-alembic-rescan-job-terminal-proof-repair-t1",
+    "createdAt": "2026-07-07T03:21:16.834Z"
+  },
+  "createdAt": "2026-07-07T03:21:16.834Z",
+  "stateRevisionObserved": 42,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

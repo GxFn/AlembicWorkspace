@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-dashboard-panorama-view-restore-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "P3 AlembicDashboard consumer：在已接受 P0/P1/P2 的基础上恢复老全景 UI。恢复 PanoramaView 4 标签 overview/dependencies/graph/gaps、overview/gaps 专属组件、14 角色标签、16 个 panorama.* 中英 i18n、Dashboard API getPanoramaOverview/getPanoramaHealth/getPanoramaGaps，并接入 Alembic P2 已恢复的 /panorama、/panorama/health、/panorama/gaps 响应；dependencies 标签内嵌现有 DepGraphView，graph 标签内嵌现有 KnowledgeGraphView，项目金字塔按 CG-A 折回全景。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §2.1 §3 §5 F-A/F-E §6 §7 CG-A/CG-D/CG-E §11 §12 P3; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md; accepted P0/P1/P2 state-root evidence including Alembic commit 9ccca4b212cacf022a8d46fc13f92f666cd4376e",
+  "designIntent": "P3 Dashboard consumer: faithfully restore the old Panorama UI surface while binding it to the newly accepted Alembic P2 endpoint family, without resurrecting old engines or fabricating coverage/recipe data.",
+  "createdAt": "2026-07-07T01:37:24.210Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-dashboard-panorama-view-restore-t1",
+      "taskPackageId": "p3-dashboard-panorama-view-restore-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "窗口身份：AlembicDashboard。先读 workspace AGENTS、active index/status、本 state root，以及 AlembicDashboard/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §2.1/§3/§5 F-A/F-E/§6/§7 CG-A/CG-D/CG-E/§11/§12 P3，original plan，以及已接受 P0/P1/P2 state-root 证据。目标：P3 Dashboard UI consumer。完成定义：1) 恢复老 Panorama 页面的一屏体验：4 标签 overview/dependencies/graph/gaps；overview 包含 6 卡统计、架构金字塔/层级模块列表、健康度条、gaps 摘要；gaps 标签展示 KnowledgeGap[]；dependencies 复用现有 DepGraphView；graph 复用现有 KnowledgeGraphView；独立项目金字塔入口按 CG-A 不再作为替代全景的主入口（如需保留导航必须不破坏全景老结构）。2) 恢复/新增 API 调用 getPanoramaOverview、getPanoramaHealth、getPanoramaGaps，类型与 Alembic P2 `lib/generated/dashboard-api-types.ts`/三端点响应对齐；不要写兼容假数据，不把 recipeCount 用 fileCount 分摊；per-module recipeCount 可为 null 并按后端 contract 可解释展示。3) 恢复 14 个角色标签映射和 16 个 `panorama.*` 中英 i18n key，文案以 scratchpad `panorama-reference/frontend/PanoramaView.tsx` 与只读 `git show 0e27445:src/...` 为参考；只允许读取式参考，不得 checkout/worktree/branch/reset/rebase/cherry-pick。4) 不改 Alembic/AlembicCore/BiliDili 后端，不删除 snapshot 表，不动 rescan 增量链，不复活 DimensionAnalyzer/PanoramaService/PanoramaAggregator，不添加 mock-only 空页面。5) 验证：运行 Dashboard build:dashboard 或仓库等价构建、api-types-drift/契约门、相关单测/组件测试；如项目有 lint/typecheck 一并跑；用代码/测试证据证明 overview/gaps/dependencies/graph 四标签可渲染且 API 函数指向 P2 三端点。6) 本地 main commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、残余风险/下一步。非目标：不做 P4 真机双向验收、不启动真实 AlembicWorkspace/BiliDili dashboard、不改后端接口、不发版。",
+      "status": "pending",
+      "createdAt": "2026-07-07T01:37:24.210Z"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p2-alembic-panorama-endpoints-space-view-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "P2 Alembic 主体 consumer：消费已接受的 Core P1 rollup 和 scope guard，恢复/接线 /panorama、/health、/gaps 三个全景端点，并把 controlRoot 空间视图按配置成员聚合，保持老 UI 所需响应形状与 CG-E 如实降级约束。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3 §5 F-C §7 CG-B/CG-C/CG-D/CG-E §11 §12 P2; accepted P0/P1 state-root evidence; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md",
+  "designIntent": "P2 main-body consumer: wire the old Panorama endpoint shapes to the new Core data sources and project-space member aggregation, using the P1 CoverageLedgerAdvisor rollup without reviving retired engines or faking per-module recipe counts.",
+  "createdAt": "2026-07-07T01:07:24.834Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p2-alembic-panorama-endpoints-space-view-t1",
+      "taskPackageId": "p2-alembic-panorama-endpoints-space-view-p1",
+      "targetWindow": "Alembic",
+      "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root，以及 Alembic/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3/§5 F-C/§7 CG-B/CG-C/CG-D/CG-E/§11/§12 P2，original plan，以及已接受 P0/P1 证据（Core commits 804745945c18c4e4aa8c54df3f3147e0f2727bc6 + 73cb9a340a4044eed68977d5ddbc36491deda674；Alembic P0 commits d28f39c8f4064b61e2f29d94baf3745187e60178 + ddf196b5a3c2a9edfcb0dabec50fb4f019707d70）。目标：P2 Alembic 主体 consumer。完成定义：1) scope-fix F-2：controlRoot/AlembicWorkspace 下按 ProjectScope 成员 folders 聚合空间视图，六个已有模块端点和本需求三全景端点共用同一 controlRoot→成员聚合边界；非成员/BiliDili/wakeflow-ledger 不得串入。无 scope 单仓行为保持不变。2) 恢复或接线 /panorama、/health、/gaps 三端点为老全景 UI 需要的响应形状，数据按 §3 新源映射：ProjectMap/project facts 提供架构族，coverage_ledger + DimensionRegistry + P1 buildCoverageLedgerPanoramaRollup 提供 dimensionCoverage/healthRadar/gaps；必要时通过 @alembic/core/host-agent-workflows 公共 facade 消费 Core P1 能力。3) 尊重 P0 CG-E/P1 约束：ProjectMap.module.id 与 coverage_ledger.moduleId directAligned=false；不得按 fileCount 或模块数伪造 per-module recipeCount。若能通过 module name/path/ownedFiles 规范化到 coverage target:<name>:<path> 轴则用真实覆盖；否则按项目级 totalRecipes 如实降级并让响应可解释。4) 不复活 DimensionAnalyzer/PanoramaService/PanoramaAggregator 等废弃引擎，不删除 project_context_file_snapshots/bootstrap_snapshots，不改 rescan 增量判定链，不改 Dashboard UI，不触碰 BiliDili。老全景参考只允许 git show/git archive 或 scratchpad 读取式对照，禁 checkout/worktree/branch/reset/rebase/cherry-pick。5) 添加 focused 单测：controlRoot 成员聚合、非成员拒绝、三端点响应形状、healthScore/avgCoupling/gap 派生、CG-E 降级/规范化路径、单仓非回归；运行 Alembic targeted tests、build:check 或等价检查、lint/retired-symbol gates、git diff --check、必要时 Alembic Guard。6) 本地 main commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、残余风险/下一步。非目标：不实现 AlembicDashboard UI；不重做 Core P1；不更改 freeze 字面量；不做 P4 真机验收。",
+      "status": "pending",
+      "createdAt": "2026-07-07T01:07:24.834Z"
+    }
+  ]
+}

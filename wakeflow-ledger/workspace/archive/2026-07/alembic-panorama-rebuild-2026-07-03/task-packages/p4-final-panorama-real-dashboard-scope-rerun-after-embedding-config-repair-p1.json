@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "Rerun final P4 real-machine panorama dashboard/scope/rescan gate after accepted Alembic embedding runtime bridge repair; verify scope isolation, BiliDili non-regression, and local Qwen/Ollama embedding runtime path instead of DeepSeek embedding fallback.",
+  "status": "pending",
+  "sourceRef": "accepted Alembic repair p4-alembic-embedding-config-runtime-bridge-repair-t1; decision evt-20260707040726-0052; Alembic commit 76358d9ddbdf3ab9c316718aa841367e4c6f79d5",
+  "designIntent": "Validate the accepted embedding bridge repair in the real P4 Test scenario without changing scope or relaxing the panorama/rescan gates.",
+  "createdAt": "2026-07-07T04:08:02.608Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-t1",
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1",
+      "targetWindow": "Test",
+      "summary": "继续总控派发：Test 窗口复跑 P4 最终真机门。前置已接受：Core P0/P1，Alembic P0/P2/P4 endpoint timeout repair/P4 rescan terminal proof repair/P4 embedding runtime bridge repair，Dashboard P3。最新 Alembic commit 76358d9ddbdf3ab9c316718aa841367e4c6f79d5 已让 AppRuntime.loadRuntimeSettings 把 BiliDili v2 .asd/config.json vector.localEmbedding 投影为 ALEMBIC_EMBED_PROVIDER=ollama、ALEMBIC_EMBED_MODEL=qwen3-embedding:0.6b、ALEMBIC_EMBED_BASE_URL=http://127.0.0.1:11434，且不覆盖显式 embed provider。目标：只复跑已定义的 P4 real-machine gate，不改代码、不预清理、不调整 provider。Gate 1：AlembicWorkspace 全景 dashboard/API 四标签显示本空间成员，不能出现 BiliDili/非成员串显。Gate 2：BiliDili 自身 projectRoot dashboard/API 不回归，不能出现 AlembicWorkspace 成员串显。Gate 3：在真实 BiliDili projectRoot 跑一次 scoped /api/v1/jobs/rescan，证明 job terminal completed、public job/events/display snapshot 可读、snapshot tables 未被删除/全量重建、rescan 增量链不回归。新增硬证据：daemon/rescan effective embedding provider 必须是本地 Qwen/Ollama（非 secret env 摘要即可），日志不得再出现 [deepseek] embed failed 或 DeepSeek embedding fallback；若仍走 DeepSeek embed，则 status=blocked 并回填 root-cause evidence。成功定义：三 gate 全绿且 embedding path 走本地 Qwen/Ollama。失败定义：任何 scope 串显、BiliDili 回归、rescan terminal 证据不足、snapshot 表破坏、或 embedding 仍走 DeepSeek。禁止：改代码、改配置 provider、push/tag/release、删除真实项目数据根、使用 BiliDili 以外项目替代 Gate 2/3、用 minNewRecipes 或配额增长代替 terminal/status/events/display 证据。",
+      "status": "pending",
+      "createdAt": "2026-07-07T04:08:02.608Z"
+    }
+  ]
+}

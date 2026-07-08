@@ -1,0 +1,588 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "title": "重建 Alembic Panorama 全景页面：忠实恢复老 4 标签 UI / 14 角色标签 / 16 个 panorama i18n；数据层接 ProjectMap、coverage_ledger、DimensionRegistry、knowledge_entries 新源；吸收 workspace scope-fix，P0 先证 module-id 对齐，P1 Core→P2 主体→P3 Dashboard→P4 真机→P5 保真比对，三仓 main 直提，push/tag/release 用户门。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "controllerWindow": "AlembicWorkspace",
+  "state": "archived",
+  "stateReason": "Archive completed alembic-panorama-rebuild-2026-07-03 after P0-P5 all accepted and complete_demand revision 73.",
+  "revision": 74,
+  "activeStageId": null,
+  "updatedAt": "2026-07-07T06:15:06.877Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p0-core-module-id-alignment-characterization-p1",
+      "summary": "P0 硬门：为 panorama rebuild 证明 coverage_ledger.moduleId 与 ProjectMap.module.id 是否真实对齐，并锁定 scope-fix controlRoot 边界事实。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3 §4 §5 F-C §7 CG-E §11 §12 P0; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md",
+      "designIntent": "P0 is an evidence gate before implementation: prove module-id alignment and scope boundary facts first so later Core/Main/Dashboard stages consume real data instead of inferred or fake per-module coverage.",
+      "createdAt": "2026-07-07T00:06:07.237Z"
+    },
+    {
+      "taskPackageId": "p0-alembic-cge-degrade-contract-p1",
+      "summary": "P0 主体消费侧：基于 Core 已接受的 directAligned=false 证据，锁定 Panorama per-module recipeCount 的 CG-E 降级契约与 scope-fix 边界，不进入 P2 端点实现。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3 §4 §5 F-C §6 §7 CG-E §11 §12 P0; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md; AlembicCore commit 804745945c18c4e4aa8c54df3f3147e0f2727bc6",
+      "designIntent": "P0 consumer-side gate: carry the accepted Core directAligned=false fact into Alembic main before any endpoint implementation, so P2 cannot accidentally fake per-module recipe counts or leak workspace members.",
+      "createdAt": "2026-07-07T00:24:29.946Z"
+    },
+    {
+      "taskPackageId": "p1-core-scope-guard-health-rollup-p1",
+      "summary": "P1 Core producer：落地 scope-fix F-1 controlRoot 发现护栏，并在 CoverageLedgerAdvisor 上新增 Panorama 健康/覆盖/gaps rollup 能力，供后续 Alembic 主体 P2 三端点消费。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3 §5 F-C §6 §7 CG-B CG-C §11 §12 P1; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md; accepted P0 Core/Alembic evidence in state root",
+      "designIntent": "P1 Core producer: keep discovery scoped for project spaces and add reusable CoverageLedgerAdvisor rollups so Alembic main can wire Panorama endpoints to real ledger/DimensionRegistry data in P2 without reviving retired engines or faking per-module recipe counts.",
+      "createdAt": "2026-07-07T00:45:11.275Z"
+    },
+    {
+      "taskPackageId": "p2-alembic-panorama-endpoints-space-view-p1",
+      "summary": "P2 Alembic 主体 consumer：消费已接受的 Core P1 rollup 和 scope guard，恢复/接线 /panorama、/health、/gaps 三个全景端点，并把 controlRoot 空间视图按配置成员聚合，保持老 UI 所需响应形状与 CG-E 如实降级约束。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3 §5 F-C §7 CG-B/CG-C/CG-D/CG-E §11 §12 P2; accepted P0/P1 state-root evidence; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md",
+      "designIntent": "P2 main-body consumer: wire the old Panorama endpoint shapes to the new Core data sources and project-space member aggregation, using the P1 CoverageLedgerAdvisor rollup without reviving retired engines or faking per-module recipe counts.",
+      "createdAt": "2026-07-07T01:07:24.834Z"
+    },
+    {
+      "taskPackageId": "p3-dashboard-panorama-view-restore-p1",
+      "summary": "P3 AlembicDashboard consumer：在已接受 P0/P1/P2 的基础上恢复老全景 UI。恢复 PanoramaView 4 标签 overview/dependencies/graph/gaps、overview/gaps 专属组件、14 角色标签、16 个 panorama.* 中英 i18n、Dashboard API getPanoramaOverview/getPanoramaHealth/getPanoramaGaps，并接入 Alembic P2 已恢复的 /panorama、/panorama/health、/panorama/gaps 响应；dependencies 标签内嵌现有 DepGraphView，graph 标签内嵌现有 KnowledgeGraphView，项目金字塔按 CG-A 折回全景。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §2.1 §3 §5 F-A/F-E §6 §7 CG-A/CG-D/CG-E §11 §12 P3; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md; accepted P0/P1/P2 state-root evidence including Alembic commit 9ccca4b212cacf022a8d46fc13f92f666cd4376e",
+      "designIntent": "P3 Dashboard consumer: faithfully restore the old Panorama UI surface while binding it to the newly accepted Alembic P2 endpoint family, without resurrecting old engines or fabricating coverage/recipe data.",
+      "createdAt": "2026-07-07T01:37:24.210Z"
+    },
+    {
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-test-p1",
+      "summary": "P4 Test real-machine gate for alembic-panorama-rebuild. Window identity: Test. First read workspace AGENTS, active index/status, this state root, the P4 test card `test-cards/p4-final-panorama-real-dashboard-scope-test.json`, and Test/AGENTS.md. Authority: Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 and §12.R plus accepted P0-P3 evidence. Objective: verify the restored Panorama dashboard on real local projects after accepted commits Core 73cb9a340a4044eed68977d5ddbc36491deda674, Alembic 9ccca4b212cacf022a8d46fc13f92f666cd4376e, and AlembicDashboard a1070f2ab52dbea06e94511892e2876074a2af9c. Required gates: (1) AlembicWorkspace Dashboard /panorama renders four tabs overview/dependencies/graph/gaps and raw /panorama, /panorama/health, /panorama/gaps responses show only AlembicWorkspace ProjectScope/member data; no BiliDili root/module/path/recipe leaks into raw data or screenshots. (2) BiliDili own projectRoot Dashboard/endpoint contrast does not regress and does not show AlembicWorkspace data. (3) One real scoped rescan or narrowly justified equivalent proves the incremental chain still completes and no snapshot-table/full-rebuild regression was introduced. Evidence required: raw bounded JSON or summaries for the three panorama endpoints, screenshots for all four AlembicWorkspace tabs, BiliDili contrast evidence, leakage check terms/results, rescan command/status/log evidence, and explicit pass/fail per gate. Constraints: Test must not edit source or commit; no push/tag/release/version bump; no checkout/worktree/branch/reset/rebase/cherry-pick; no deletion of project_context_file_snapshots/bootstrap_snapshots; no broad cleanup of real ~/.asd outside explicitly tested data roots; do not change configured AI providers or execute non-Codex host agents. If wrong active root/controlRoot, missing services/config, leakage, fake recipeCount apportioning, or rescan failure is observed, stop and return blocked evidence.",
+      "status": "accepted",
+      "sourceRef": "test-cards/p4-final-panorama-real-dashboard-scope-test.json; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+      "designIntent": "P4 real-machine gate: prove the restored Dashboard Panorama is scoped to AlembicWorkspace members, BiliDili remains isolated, and rescan incremental behavior is not regressed.",
+      "createdAt": "2026-07-07T02:09:13.493Z"
+    },
+    {
+      "taskPackageId": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+      "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root、Test P4 blocked evidence、以及 Alembic/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、已接受 P0-P3 证据、以及已接受的 Test blocked result `tr-p4-final-panorama-real-dashboard-scope-test-t1`。目标：修复真实 AlembicWorkspace 上 `/api/v1/panorama`, `/api/v1/panorama/health`, `/api/v1/panorama/gaps` 30s 超时/daemon 高 CPU 的 P4 Gate 1 blocker。Test 证据：accepted heads 已对齐；runtime rebuild 后 health/jobs/project-scope API 正常；ProjectScope 五成员 active；三个 panorama endpoint 均 curl exit 28 30s/0 bytes；Dashboard 只渲染四 tab shell；daemon CPU 115%；combined log 无 panorama error stack。控制器代码定位：`Alembic/lib/http/routes/panorama.ts` 每次请求调用 `buildProjectContextWorkflowFacts`，`maxFiles: 2000`，在真实 5 成员空间中现场多级 ProjectContext 构建，疑似无缓存/无预算/无 timeout 的阻塞路径。完成定义：1) 找到并修复 endpoint hang 根因，保证三条 panorama endpoint 在真实 AlembicWorkspace 规模或等价 fixture 下有界返回，而不是只把 curl timeout 调大。2) 保持 P2/P3 contract：三端点响应 shape 不变，Dashboard API types 不漂移，CG-E directAligned=false 时仍 project-total-only/recipeCount null，不按 fileCount 或模块数伪造 per-module recipeCount。3) 保持 ProjectScope 成员边界：AlembicWorkspace controlRoot 只聚合五个成员，非成员/BiliDili/wakeflow-ledger 不串入；无 scope 单仓不回归。4) 不复活旧 PanoramaService/DimensionAnalyzer/PanoramaAggregator，不删除 project_context_file_snapshots/bootstrap_snapshots，不动 rescan 增量判定链，不改 Dashboard UI，不改 Core，除非明确证明 Alembic 主体无法独立修复并回报 blocker。5) 添加 focused regression：至少覆盖大/多成员 ProjectScope 下 `loadPanoramaView` 或等价 endpoint builder 不重复无限现场重算、能复用缓存/轻量 facts/预算降级/超时保护并返回可解释数据；并覆盖三端点均共享同一有界构建路径。6) 运行 Alembic targeted tests including PanoramaRoute/PanoramaEndpointView、build:check 或仓库等价、retired-symbol scan、git diff --check、必要时 Alembic Guard。7) 本地 main commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、残余风险/下一步。非目标：不做 P4 rerun（控制器会派 Test）、不做 P5 UI fidelity comparison、不扩大到 BiliDili 数据修复。",
+      "status": "accepted",
+      "sourceRef": "target-results/tr-p4-final-panorama-real-dashboard-scope-test-t1.json; evidence/p4-final-panorama-real-dashboard-scope-test-t1.md; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+      "designIntent": "Repair P4 blocker in Alembic's Panorama endpoint build path so the real Dashboard can receive scoped Panorama data for final Test gates.",
+      "createdAt": "2026-07-07T02:30:02.636Z"
+    },
+    {
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-p1",
+      "summary": "P4 Test rerun after accepted Alembic endpoint timeout repair. Window identity: Test. First read workspace AGENTS, active index/status, this state root, the P4 test card `test-cards/p4-final-panorama-real-dashboard-scope-test.json`, the prior blocked Test evidence, accepted Alembic repair evidence, and Test/AGENTS.md. Authority: Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 and §12.R, accepted P0-P3 evidence, accepted Test blocker, and accepted Alembic repair commit 0f11298e77e44523a37e1b767ffa315bbe86ffe5. Objective: rerun the real-machine P4 Panorama gate after the endpoint repair. Required gates: (1) AlembicWorkspace Dashboard /panorama renders all four tabs overview/dependencies/graph/gaps and raw /api/v1/panorama, /api/v1/panorama/health, /api/v1/panorama/gaps return bounded successful responses with only AlembicWorkspace ProjectScope/member data; no BiliDili root/module/path/recipe leaks in raw data or screenshots. (2) BiliDili own projectRoot Dashboard/endpoint contrast does not regress and does not show AlembicWorkspace data. (3) One real scoped rescan or narrowly justified equivalent proves the incremental chain still completes and no snapshot-table/full-rebuild regression was introduced. Evidence required: command/runtime environment, accepted heads including Core 73cb9a340a4044eed68977d5ddbc36491deda674, Alembic 0f11298e77e44523a37e1b767ffa315bbe86ffe5, Dashboard a1070f2ab52dbea06e94511892e2876074a2af9c; raw bounded JSON or summarized payloads for the three panorama endpoints; screenshots or browser evidence for all four AlembicWorkspace tabs; BiliDili contrast evidence; leakage check terms/results; rescan command/status/log evidence; explicit PASS/BLOCKED per gate. Constraints: Test must not edit source or commit; no push/tag/release/version bump; no checkout/worktree/branch/reset/rebase/cherry-pick; no deletion of project_context_file_snapshots/bootstrap_snapshots; no broad cleanup of real ~/.asd outside explicitly tested data roots; do not change configured AI providers or execute non-Codex host agents. If wrong active root/controlRoot, missing services/config, leakage, fake recipeCount apportioning, endpoint timeout/high CPU, or rescan failure is observed, stop and return blocked evidence.",
+      "status": "accepted",
+      "sourceRef": "test-cards/p4-final-panorama-real-dashboard-scope-test.json; target-results/tr-p4-final-panorama-real-dashboard-scope-test-t1.json; evidence/p4-final-panorama-real-dashboard-scope-test-t1.md; evidence/p4-alembic-panorama-endpoint-timeout-repair-t1.md; Alembic commit 0f11298e77e44523a37e1b767ffa315bbe86ffe5",
+      "designIntent": "P4 real-machine gate: prove the repaired Dashboard Panorama is scoped to AlembicWorkspace members, BiliDili remains isolated, and rescan incremental behavior is not regressed.",
+      "createdAt": "2026-07-07T02:48:26.386Z"
+    },
+    {
+      "taskPackageId": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+      "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root、Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、accepted Test blocked evidence `tr-p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1`，以及 Alembic/AGENTS.md。权威来源：P4 真机门要求 AlembicWorkspace panorama scope + BiliDili contrast + rescan 增量链不回归；当前 Test rerun 已证明 Gate 1/2 通过，Gate 3 没有终态完成证明。原始证据：BiliDili real scoped POST `/api/v1/jobs/rescan` accepted job `rescan_mra29d1i_150c52b4`；jobs/status polls 60 次约 5 分钟持续 `running` / `architecture:filling`，progress totalToolCalls=0，events 只到 bootstrap session linked；Test 按清理取消。日志同时显示底层 Agent 确实执行到 analyze/produce、有 DeepSeek/tool calls，并在取消后记录 runtime success/0 candidates，说明问题可能是 job lifecycle/progress/terminal proof 语义、P4 test 等待策略，或 rescan completion path，而不是 panorama endpoint/UI 串显。目标：修复或澄清 P4 rescan incremental-chain proof 的阻塞，使控制器能重新派 Test 并获得可靠通过/失败证据。完成定义：1) 现场定位 `/api/v1/jobs/rescan`、JobStore/progress/display-snapshot、bootstrap session follow/finalize、rescan completion/cancel path，对照上述 evidence 解释为什么公共 job status 在真实 BiliDili scoped rescan 下没有及时进入 terminal completion proof。2) 若是产品缺陷，修复 Alembic runtime/job lifecycle/progress/completion path，使 scoped rescan 在无新增候选、0 candidates、长模型调用、或 cancellation 边界下都给出正确 terminal status/progress/summary，不靠 Test 降门；如需改 Test timeout/proof，必须用源码与日志证明原 Test 5 分钟/minNewRecipes=1 不是需求门本身，并给控制器可执行的新验收参数建议。3) 保持已接受 endpoint repair 与 panorama contracts：三 panorama endpoint shape 不变，ProjectScope 隔离不退化，CG-E directAligned=false 仍 project-total-only，不伪造 per-module recipeCount。4) 不删除 `project_context_file_snapshots` / `bootstrap_snapshots`，不动 Dashboard UI/Core，除非定位证明 Alembic 主体无法独立修复并回报 blocker；不复活旧 PanoramaService/DimensionAnalyzer/PanoramaAggregator；不改 AI provider。5) 加 focused regression 或可重复 local probe，覆盖 jobs rescan terminal/progress semantics 或等价 seam：至少能证明完成后 status/summary/toolCalls/candidates/cancel semantics 不再让 P4 只能看到 running/filling。6) 运行 Alembic targeted tests/build:check、retired-symbol/import guards、git diff --check、必要时 Alembic Guard；本地 main commit，不开分支、不 push/tag/release。7) 回填 commit hash、变更文件、命令输出、raw evidence、是否需要 Test 参数调整、剩余风险/下一步。非目标：不执行 P4 final rerun（控制器派 Test），不做 P5 保真比对，不扩大到 BiliDili 数据内容修复。",
+      "status": "accepted",
+      "sourceRef": "target-results/tr-p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1.json; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1.md; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1/bilidili-rescan-polls.json; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+      "designIntent": "Repair or formally disambiguate the P4 rescan incremental-chain proof blocker after panorama endpoint scope evidence passed.",
+      "createdAt": "2026-07-07T03:12:45.961Z"
+    },
+    {
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-p1",
+      "summary": "P4 final real-machine Panorama gate rerun after accepted Alembic rescan job evidence repair. Window identity: Test. First read workspace AGENTS, active index/status, this state root, `test-cards/p4-final-panorama-real-dashboard-scope-test.json`, Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §8/P4 and §12/P4/§12.R, prior P4 Test blocked results, accepted Alembic endpoint repair evidence, accepted Alembic rescan proof repair evidence, and Test/AGENTS.md. Authority: P4 gate requires (1) AlembicWorkspace dashboard panorama scoped to workspace members with no BiliDili leakage, (2) BiliDili own dashboard/API non-regression and no AlembicWorkspace leakage, (3) rescan incremental chain not regressed; evidence is raw endpoint responses, four-tab screenshots, BiliDili contrast, and rescan logs/job evidence. Accepted heads to verify before runtime: AlembicCore 73cb9a340a4044eed68977d5ddbc36491deda674; Alembic 15ab82b0e3fd467a23999c3006cfb042618ba903; AlembicDashboard a1070f2ab52dbea06e94511892e2876074a2af9c. Objective: rerun the P4 final real-machine gate after the rescan job public evidence repair. Required gates: Gate 1 AlembicWorkspace: start/reuse real AlembicWorkspace daemon in production mode, no test AI fallback, ProjectScope five members; `/api/v1/panorama`, `/api/v1/panorama/health`, `/api/v1/panorama/gaps` return bounded successful responses; Dashboard `/panorama` renders overview/dependencies/graph/gaps; raw/UI evidence contains AlembicWorkspace members only and no BiliDili root/module/path/recipe terms. Gate 2 BiliDili: start/reuse real BiliDili projectRoot daemon; same three panorama endpoints + four tabs are successful for BiliDili single-project scope; raw/UI evidence has no AlembicWorkspace ProjectScope id/member roots/names. Gate 3 rescan: run one real scoped BiliDili rescan through `/api/v1/jobs/rescan` using the configured providers (DeepSeek generation, local Qwen embedding; do not change providers). Capture submit response, status polls, jobs/events, display-snapshot, daemon log excerpts, and final status. Because accepted Alembic repair exposes live process events and finalizes via `bootstrap:all-completed`, Test must inspect jobs/events/display-snapshot during the run, not only aggregate status counters. Terminal success should be `completed` with retained `finalSession.summary` or equivalent final job summary plus visible rescan process evidence; created/new recipe count is not itself the P4 criterion, so do not require `minNewRecipes=1` as a pass condition unless the API needs it for request shape. Use a terminal wait budget aligned with observed runtime stage budgets (analyze 480s, produce 900s plus buffer; do not reuse the earlier five-minute cap as a terminal-failure proof). If the job fails, cancels, remains non-terminal after that budget, has no post-session-linked process evidence, uses wrong root/provider, deletes snapshot tables, or requires full rebuild/preclean outside the tested data roots, return blocked with raw evidence. Constraints: Test must not edit source or commit; no push/tag/release/version bump; no checkout/worktree/branch/reset/rebase/cherry-pick; no deletion of `project_context_file_snapshots` or `bootstrap_snapshots`; no broad cleanup of real ~/.asd outside explicitly tested workspace data roots; no provider changes; no Test-created product fixes. Required evidence: command/runtime environment, accepted heads, raw summarized JSON for endpoints, screenshots/browser text for all four AlembicWorkspace tabs and BiliDili tabs, leakage check patterns/results, rescan submit/status/events/display-snapshot/final summary/log excerpts, explicit PASS/BLOCKED per gate, final product repo `git status --short` checks. Non-goals: do not implement fixes; do not perform P5 reference fidelity comparison; do not alter Dashboard/Core/Alembic source.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §8/P4 §12/P4; test-cards/p4-final-panorama-real-dashboard-scope-test.json; target-results/tr-p4-alembic-rescan-job-terminal-proof-repair-t1.json; evidence/p4-alembic-rescan-job-terminal-proof-repair-t1.md; Alembic commit 15ab82b0e3fd467a23999c3006cfb042618ba903",
+      "designIntent": "Final P4 real-machine rerun after rescan job proof repair: prove scoped Panorama UI/API isolation and a real BiliDili rescan incremental chain with public job evidence and terminal summary.",
+      "createdAt": "2026-07-07T03:24:50.015Z"
+    },
+    {
+      "taskPackageId": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+      "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root、Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、accepted Test blocked evidence `tr-p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1`，以及 Alembic/AGENTS.md。权威来源：P4 真机门要求 AlembicWorkspace panorama scope + BiliDili contrast + rescan 增量链不回归；当前 Test rerun 已证明 Gate 1/2 通过，且 Gate 3 rescan/job 终态证明本身通过（BiliDili job completed, progress 100%, totalToolCalls=53, displaySnapshot available, snapshot tables not deleted）。剩余 blocker 是 effective embedding provider 错配：BiliDili `/Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/config.json` 含 `vector.localEmbedding.enabled=true`, endpoint `http://127.0.0.1:11434`, model `qwen3-embedding:0.6b`，但 restart/runtime evidence 只有 `ALEMBIC_AI_PROVIDER=deepseek` / `ALEMBIC_AI_MODEL=deepseek-v4-pro`，没有 `ALEMBIC_EMBED_PROVIDER/MODEL/BASE_URL`，rescan log 出现 `[deepseek] embed failed: deepseek API error: 404`。新 root-cause 假设：Alembic daemon/AI config runtime bridge 没有把 v2 config `vector.localEmbedding`（或等价 workspace local embedding config）投射到 effective embedding provider，导致 rescan embedding fallback 到 generation provider。目标：修复或明确阻塞该配置桥接，使 BiliDili scoped rescan 使用本地 Qwen/Ollama embedding 或在无法安全推断时给出 controller 可执行的配置迁移/repair 结论。完成定义：1) 现场定位 daemon 启动/AI env/settings/config 读取链、`WorkspaceSettingsStore`/`ProjectRuntimeControl`/AI route/`AiModule` dedicated embed provider 创建链，解释为何 BiliDili v2 `vector.localEmbedding` 没进入 effective env。2) 若是产品缺陷，最小修复：在 Alembic 主体及必要的 vendored Core pin 中正确把 config-local embedding 投射为 `ALEMBIC_EMBED_PROVIDER=ollama`, `ALEMBIC_EMBED_MODEL=qwen3-embedding:0.6b`, `ALEMBIC_EMBED_BASE_URL=http://127.0.0.1:11434` 或等价 effective provider；不得把 DeepSeek 当 embedding provider。3) 若判断 `vector.localEmbedding` 已废弃/不能自动迁移，返回阻塞证据和精确配置迁移命令/文件，不改 runtime 行为；不要静默放松 P4 provider 门。4) 添加 focused regression/probe 覆盖 BiliDili 形态：v2 config 有 localEmbedding 但 settings 无 embed fields 时，effective runtime/env/daemon health 或 AI module dedicated embed provider 可见本地 embedding；或阻塞路径给出清晰诊断。5) 保持 P4 已过部分不退化：panorama endpoint shape 不变，ProjectScope 隔离不退化，CG-E project-total-only 不伪造 per-module recipeCount，rescan terminal proof repair 不回退；不删除 `project_context_file_snapshots` / `bootstrap_snapshots`；不改 Dashboard/Core 源，除非 vendor repin 是 Alembic 主体必需且有证据。6) 验证：Alembic targeted tests covering AI config/embed bridge + rescan/job tests if touched、build:check、retired-symbol/import/ring guards、git diff --check、必要时 Alembic Guard；本地 main commit，不开分支、不 push/tag/release。7) 回填 commit hash、变更文件、命令输出、raw evidence、是否需要 Test 重新跑 P4、剩余风险/下一步。非目标：不执行 P4 final rerun（控制器派 Test），不做 P5 保真比对，不改 BiliDili 产品代码，不编辑 secrets。",
+      "status": "accepted",
+      "sourceRef": "target-results/tr-p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1.json; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1.md; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1/restart-bilidili.json; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1/provider-evidence-lines.txt; /Users/gaoxuefeng/.asd/workspaces/02a25032/.asd/config.json; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+      "designIntent": "Repair the new P4 provider/embedding blocker: BiliDili has local Qwen embedding config but the Alembic daemon/rescan path effectively used DeepSeek embedding.",
+      "createdAt": "2026-07-07T03:53:37.785Z"
+    },
+    {
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1",
+      "summary": "Rerun final P4 real-machine panorama dashboard/scope/rescan gate after accepted Alembic embedding runtime bridge repair; verify scope isolation, BiliDili non-regression, and local Qwen/Ollama embedding runtime path instead of DeepSeek embedding fallback.",
+      "status": "accepted",
+      "sourceRef": "accepted Alembic repair p4-alembic-embedding-config-runtime-bridge-repair-t1; decision evt-20260707040726-0052; Alembic commit 76358d9ddbdf3ab9c316718aa841367e4c6f79d5",
+      "designIntent": "Validate the accepted embedding bridge repair in the real P4 Test scenario without changing scope or relaxing the panorama/rescan gates.",
+      "createdAt": "2026-07-07T04:08:02.608Z"
+    },
+    {
+      "taskPackageId": "p4-final-panorama-ui-final-state-countercheck-rework-p1",
+      "summary": "Rework P4 final UI scope evidence after embedding/provider repair: Test must distinguish stale/session artifact from real AlembicWorkspace panorama UI scope leakage.",
+      "status": "accepted",
+      "sourceRef": "test-cards/p4-final-panorama-ui-final-state-countercheck-rework.json; evidence/controller-review-p4-embedding-rerun-countercheck-2026-07-07.md",
+      "designIntent": "补齐 P4 final dashboard scope gate 的 UI final-state 证据；区分 fresh-context clean vs 可复现 UI 串显。",
+      "createdAt": "2026-07-07T04:36:02.017Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+      "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root、Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、Test blocked evidence `tr-p4-final-panorama-ui-final-state-countercheck-rework-t1`、controller attribution `evidence/controller-review-p4-ui-countercheck-attribution-2026-07-07.md`，以及 Alembic/AGENTS.md。权威来源：P4 真机门要求 AlembicWorkspace panorama 四标签只显示本空间成员且无 BiliDili 串显；Test 已在 fresh clean-storage UI 最终态复现 Dependencies 标签 BiliDili 模块泄漏。控制器 live probes 进一步证明 AW 端口 `/api/v1/modules/dep-graph?level=module` 自身返回 `module:root:*:BiliDili` 节点，且 `/api/v1/projects` selectedProject 是 BiliDili；同时 `/api/v1/daemon/health` 和 panorama endpoints 仍是 AW scope。目标：修复 Alembic 主体后端/runtime scope-selection 链，让 AW dashboard 所用 modules dep-graph 和 projects selection 不再从 stale BiliDili 状态取数；Dashboard 不是首修对象。完成定义：1) 定位 `/api/v1/modules/dep-graph` 取数链（route/ModuleService/ProjectContext facts/service container/runtime project root）为何在 AW daemon projectRoot 下读出 BiliDili ProjectContext 节点。2) 定位 `/api/v1/projects` selectedProject/activeRuntimeProject 链为何在 AW dashboard URL/daemon 上把 BiliDili 作为 selected/top project。3) 最小修复 Alembic 主体：AW daemon `/api/v1/modules/dep-graph?level=module` 返回 AW-scoped graph（若无合法模块图则返回显式 AW-scoped empty/valid graph），不得返回 BiliDili ids/labels；AW daemon `/api/v1/projects` 不得让 stale BiliDili selectedProject 驱动 AW Header，BiliDili 自身 project/daemon 行为不回归。4) 保持已过 P4 行为不退化：panorama overview/health/gaps shape 不变，ProjectScope 5 members 不变，CG-E project-total-only 不伪造 per-module recipeCount，provider/rescan terminal proof 不回退，不删除 snapshot tables，不改 Dashboard/Core 源，除非有明确 Alembic 必需证据。5) 验证：targeted unit/probe 覆盖 current-project dep-graph binding 和 stale selectedProject 在 AW daemon 不泄漏；build:check 或仓库等价；可安全时用当前 AW runtime 或 fixture 复跑 curl/probe：AW `/modules/dep-graph` 无 BiliDili，AW `/projects` 不 selected BiliDili，BiliDili contrast 不回归。6) 本地 main commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、是否需要 Test 重新跑 P4、剩余风险/下一步。若判断需要 Dashboard API contract change，先返回 blocked 并写明精确契约，不要直接改 Dashboard。",
+      "status": "accepted",
+      "sourceRef": "target-results/tr-p4-final-panorama-ui-final-state-countercheck-rework-t1.json; evidence/p4-final-panorama-ui-final-state-countercheck-rework-t1.md; evidence/p4-final-panorama-ui-final-state-countercheck-rework-t1/aw-ui-dependencies.json; evidence/p4-final-panorama-ui-final-state-countercheck-rework-t1/aw-ui-dependencies-visible.png; evidence/controller-review-p4-ui-countercheck-attribution-2026-07-07.md; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+      "designIntent": "Repair the P4 final scope leakage at the Alembic backend source: dep-graph and projects selection must be current runtime/project-scope bound before the final dashboard Test rerun.",
+      "createdAt": "2026-07-07T04:52:49.904Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1",
+      "summary": "窗口身份：Test。先读 workspace AGENTS、active index/status、本 state root、Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、test-card `p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair.json`、Alembic 修复验收证据 `controller-review-p4-alembic-depgraph-scope-repair-acceptance-2026-07-07.md`、前次 UI blocker 归因证据 `controller-review-p4-ui-countercheck-attribution-2026-07-07.md`。权威来源：P4 真机双向验收要求 AlembicWorkspace dashboard 全景 4 标签只显示本空间成员且无 BiliDili，BiliDili 自身 dashboard 不回归，rescan 增量/provider 终态证明不回归。当前已接受 Alembic commit a5f8ff4d900b16abe5041c0d04b08e3f9db1ba7b，其修复 dep-graph ProjectScope 绑定和 stale selectedProject 读面绑定，但目标结果明确未重启真实 runtime 做最终 P4。目标：在真实 AlembicWorkspace + BiliDili 上复跑最终 P4 门，必须确保 daemon/runtime 运行 a5f8ff4 或 later local main 后再测。完成定义：1) 证明 AW daemon/runtime 已 rebuild/restart 到 a5f8ff4 或 later（commit/build/restart/log/health 证据）。2) fresh/clean browser context 打开 AW `/panorama`，等待 overview/dependencies/graph/gaps 四标签 post-load；采四标签可见截图 + DOM/text + storage proof。3) 采 AW 原始 API：daemon health、projects/current、project-scope folders、panorama/health/gaps、modules dep-graph(level=module)；判定无 BiliDili/02a25032/BiliDili module ids，Header/selectedProject 也不显示 stale BiliDili。4) 采 BiliDili contrast：自身 projectRoot/dataRoot/dashboard/API 仍 scoped 到 BiliDili，不泄漏 AW 成员。5) 运行或观察一次 BiliDili scoped rescan/provider terminal proof：job terminal completed/proof，effective embedding provider 为本地 Qwen/Ollama 而非 DeepSeek embedding fallback。6) 若全部通过，返回 completed，并附 raw JSON/log/screenshot/report paths；若任一门失败，返回 blocked，给出精确 failing API/tab/log/probe、是否 API clean but UI leaks、推荐 owner(Alembic/Dashboard/Test env)；不要 patch 产品代码。硬禁：不编辑产品源/测试/配置/secret，不删除 dataRoot，不 preclean 掩盖证据，不换 sandbox subject，不 push/tag/release，不放松 P4 门。",
+      "status": "accepted",
+      "sourceRef": "test-cards/p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair.json; target-results/tr-p4-alembic-panorama-depgraph-project-selection-scope-repair-t1-20260707051540-2ygr.json; evidence/controller-review-p4-alembic-depgraph-scope-repair-acceptance-2026-07-07.md; evidence/controller-review-p4-ui-countercheck-attribution-2026-07-07.md; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+      "designIntent": "Validate the final P4 real-machine panorama/dashboard/rescan gate after the accepted Alembic dep-graph and selected-project scope repair, without relaxing gates or patching product code.",
+      "createdAt": "2026-07-07T05:21:28.615Z"
+    },
+    {
+      "taskPackageId": "p5-dashboard-panorama-reference-fidelity-compare-p1",
+      "summary": "P5 Dashboard reference fidelity compare for alembic-panorama-rebuild. Authority: Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §8/P5 and §12/P5 plus original plan; prior P0-P4 accepted evidence proves data/source/runtime gates, but P5 still requires a reference comparison against the old Panorama UI. Objective: compare the current AlembicDashboard Panorama implementation against the read-only reference snapshot `scratchpad/panorama-reference/frontend/PanoramaView.tsx` (and, only if needed, `git show 0e27445:...` read-only) to confirm old UI fidelity: four tabs overview/dependencies/graph/gaps, overview 6-card stats, architecture pyramid/layer module list, health bar, gaps summary/panel, 14 role labels, and 16 `panorama.*` zh/en i18n keys. Complete definition: 1) produce a traceable per-tab/per-section comparison table listing old reference element, current implementation element/file, pass/deviation, and evidence line/path; 2) verify Dashboard API calls/types still bind to the accepted Alembic P2 endpoints and do not use mock-only compatibility data or fake per-module recipeCount; 3) verify `dependencies` embeds/uses the DepGraphView path and `graph` embeds/uses KnowledgeGraphView per CG-A; 4) verify no old deleted engines/services are resurrected in Dashboard code and no product source outside AlembicDashboard is touched; 5) run relevant Dashboard validation (build:dashboard or repository equivalent, typecheck/api drift/unit tests as available, git diff --check) and optionally a local UI screenshot/smoke if already available without changing providers/data roots; 6) return completed with raw evidence paths, commands, deviations if any, and a clear pass/fail conclusion. If material UI fidelity gaps remain, return blocked with exact missing section/key/label and recommended owner; do not patch backend/Core/Alembic or relax P4 gates. Hard constraints: main only, no push/tag/release/version bump, no checkout/worktree/branch/reset/rebase/cherry-pick; old code reference must be read-only via scratchpad/git show/git archive; do not edit Alembic/AlembicCore/BiliDili/Test/Design; do not delete snapshot tables or touch rescan incremental chain.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §8/P5 §12/P5; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md; scratchpad/panorama-reference/frontend/PanoramaView.tsx; accepted P0-P4 state-root evidence",
+      "designIntent": "P5 closes the original UI-completely-preserved principle by comparing the restored Dashboard surface against the old Panorama reference after data/runtime gates have passed.",
+      "createdAt": "2026-07-07T05:59:23.727Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p0-core-module-id-alignment-characterization-t1",
+      "taskPackageId": "p0-core-module-id-alignment-characterization-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "窗口身份：AlembicCore。先读 workspace AGENTS、active index/status、本 state root，以及 AlembicCore/AGENTS.md。权威来源是 Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3/§4/§5 F-C/§7 CG-E/§11/§12 P0 与 original plan。目标：给全景重建 P0 提供可复核原始证据，判断 coverage_ledger.moduleId ↔ ProjectMap.modules[].id 是否集合对齐；若对齐，说明后续可使用真实每模块 coverage/recipeCount；若不对齐，明确后续必须按 CG-E 如实降级为项目级展示，不得按文件数或其它代理分摊。并同时 characterization 吸收的 scope-fix 风险：controlRoot/AlembicWorkspace 空间发现边界与 no-scope 项目 discovery 字节不应改变。完成定义：1) 指出 ProjectMap module id 产生/读取的 Core 代码路径、coverage_ledger moduleId 写入/读取路径、二者现状关系；2) 在 ProjectMap 非空对象上给出 raw evidence（命令输出/测试输出/样本 JSON 或数据库查询摘要）证明 aligned=true 或 aligned=false，不能只用 BiliDili 空 ProjectMap；3) 若发现不对齐，给出最小修复/降级建议与受影响下游字段；4) 添加或运行能复现该结论的 focused characterization（优先测试/fixture/脚本输出），并运行 AlembicCore 可用的 targeted test/build check；5) 回填 commit hash、变更文件、命令、raw evidence、CG-E 结论、风险/下一步。非目标/硬约束：不实现 P1 rollup，不改 freeze 字面量，不删除 project_context_file_snapshots/bootstrap_snapshots，不触碰 rescan 增量判定链，不复活 DimensionAnalyzer/PanoramaService/PanoramaAggregator 等废弃引擎，不开分支、不 push；老全景代码如需参考只能 git show/git archive 读取式抽取，禁止 worktree/checkout/reset/rebase/branch。",
+      "status": "accepted",
+      "createdAt": "2026-07-07T00:06:07.237Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0-core-module-id-alignment-characterization-rework-p1__AlembicCore__p0-core-module-id-alignment-characterization-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-core-module-id-alignment-characterization-rework-p1__AlembicCore__p0-core-module-id-alignment-characterization-t1.json",
+        "deliveryRunId": "run-delivery-p0-core-module-id-alignment-characterization-rework-p1__AlembicCore__p0-core-module-id-alignment-characterization-t1",
+        "dispatchGroup": "p0-core-module-id-alignment-characterization-rework-p1",
+        "sentAt": "2026-07-07T00:18:45.891Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0-core-module-id-alignment-characterization-t1-20260707002141-26v8",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p0-alembic-cge-degrade-contract-t1",
+      "taskPackageId": "p0-alembic-cge-degrade-contract-p1",
+      "targetWindow": "Alembic",
+      "summary": "窗口身份：Alembic 主体。先读 workspace AGENTS、active index/status、本 state root，以及 Alembic/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3/§4/§5 F-C/§6/§7 CG-E/§11/§12 P0，original plan，以及已接受的 AlembicCore P0 证据（Core commit 804745945c18c4e4aa8c54df3f3147e0f2727bc6；state evidence evidence/p0-core-module-id-alignment-characterization-rework-t1.md）。控制器裁定：Core 已证明 `coverage_ledger.moduleId` 与 `ProjectMap.modules[].id` 直接不对齐；按用户硬门和 CG-E，本需求后续主体/Dashboard 不得把 per-module recipeCount 做 raw-id join，也不得按文件数或其它代理分摊造假；在未有新用户/Design 决策前，Panorama 对该字段必须如实降级为项目级 totalRecipes/项目级覆盖提示。目标：在 Alembic 主体消费侧完成 P0 合同锁定与证据回填。完成定义：1) 定位主体里 ProjectMap/RepoContext/coverage/knowledge 聚合入口、空间 controlRoot→成员聚合候选入口、未来 /panorama /health /gaps 应挂接的 seam；2) 证明当前主体没有已经存在的 raw-id per-module recipeCount join，或若有则修正为降级/拒绝；3) 用最小本地 main commit 落地一个真实 P2 会消费的契约/测试/辅助函数（优先现有测试模式；不要做空壳文档运动），明确 directAligned=false 时 per-module recipeCount 不生成假模块值而退到项目级；4) 覆盖 scope-fix P0 约束：controlRoot 场景必须走成员边界，非成员/BiliDili 不得被当成当前空间成员；本阶段只做 characterization/contract，不实现 P2 三端点；5) 运行 Alembic 主体 targeted tests/build:check 或仓库等价验证、git diff --check、必要时 Alembic Guard；6) 回填 commit hash、变更文件、命令输出、CG-E 消费侧结论、残余风险/下一步。硬约束：main 直提本地 commit，不开分支、不 push/tag/release；老全景参考只能 git show/git archive 读取，禁止 checkout/worktree/reset/rebase/branch/cherry-pick；不复活 PanoramaService/DimensionAnalyzer/PanoramaAggregator/RoleRefiner/CouplingAnalyzer/LayerInferrer，不建兼容层，不删快照表，不动 rescan 增量判定链，不触碰 BiliDili 目录。",
+      "status": "accepted",
+      "createdAt": "2026-07-07T00:24:29.946Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0-alembic-cge-degrade-contract-rework-p1__Alembic__p0-alembic-cge-degrade-contract-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-alembic-cge-degrade-contract-rework-p1__Alembic__p0-alembic-cge-degrade-contract-t1.json",
+        "deliveryRunId": "run-delivery-p0-alembic-cge-degrade-contract-rework-p1__Alembic__p0-alembic-cge-degrade-contract-t1",
+        "dispatchGroup": "p0-alembic-cge-degrade-contract-rework-p1",
+        "sentAt": "2026-07-07T00:37:30.133Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0-alembic-cge-degrade-contract-t1-rework",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p1-core-scope-guard-health-rollup-t1",
+      "taskPackageId": "p1-core-scope-guard-health-rollup-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "窗口身份：AlembicCore。先读 workspace AGENTS、active index/status、本 state root，以及 AlembicCore/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3/§5 F-C/§6/§7 CG-B/CG-C/§11/§12 P1，original plan，以及已接受 P0 证据（Core commit 804745945c18c4e4aa8c54df3f3147e0f2727bc6；Alembic commits d28f39c8f4064b61e2f29d94baf3745187e60178 + ddf196b5a3c2a9edfcb0dabec50fb4f019707d70）。目标：P1 Core producer。完成定义：1) scope-fix F-1：为 controlRoot/AlembicWorkspace 空间发现加护栏，确保无 scope 项目 discovery 字节不变；有 scope/controlRoot 时 discovery 仅按配置成员边界，不能串入 BiliDili/非成员；不删除 project_context_file_snapshots/bootstrap_snapshots，不改 rescan 增量判定链。2) 在已有 CoverageLedgerAdvisor 上新增轻量 deterministic rollup 能力，消费 coverage_ledger + DimensionRegistry，输出后续 Panorama 需要的 dimensionCoverage/healthRadar/gaps 所需 Core 数据形状；不要复活 DimensionAnalyzer/PanoramaService/PanoramaAggregator 等旧引擎，不做主体/Dashboard wiring。3) 尊重 P0 CG-E：ProjectMap.module.id 与 coverage_ledger.moduleId directAligned=false 已接受；P1 Core 可以提供覆盖账本 rollup，但不得宣称 raw ProjectMap id 可直接 per-module join，也不得按文件数假分摊 recipeCount。4) 添加 focused 单测/fixture：无 scope 字节/结构不变，controlRoot 成员边界拒非成员，rollup 使用 DimensionRegistry label/weight/suggestedTopics/relatedRoles 并把 empty/thin 映射为 missing/weak gaps；覆盖空账本/部分覆盖边界。5) 运行 AlembicCore targeted tests、build:check 或仓库等价检查、git diff --check、必要时 Alembic Guard。6) main 本地 commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、残余风险/下一步。非目标：不实现 Alembic 主体 /panorama,/health,/gaps；不改 Dashboard；不改 freeze 字面量；不触碰 BiliDili 目录；老全景参考只允许 git show/git archive 读取，不得 checkout/worktree/reset/rebase/branch/cherry-pick。",
+      "status": "accepted",
+      "createdAt": "2026-07-07T00:45:11.275Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-core-scope-guard-health-rollup-p1__AlembicCore__p1-core-scope-guard-health-rollup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-scope-guard-health-rollup-p1__AlembicCore__p1-core-scope-guard-health-rollup-t1.json",
+        "deliveryRunId": "run-delivery-p1-core-scope-guard-health-rollup-p1__AlembicCore__p1-core-scope-guard-health-rollup-t1",
+        "dispatchGroup": "p1-core-scope-guard-health-rollup-p1",
+        "sentAt": "2026-07-07T00:46:43.395Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-core-scope-guard-health-rollup-t1"
+    },
+    {
+      "targetTaskId": "p2-alembic-panorama-endpoints-space-view-t1",
+      "taskPackageId": "p2-alembic-panorama-endpoints-space-view-p1",
+      "targetWindow": "Alembic",
+      "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root，以及 Alembic/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3/§5 F-C/§7 CG-B/CG-C/CG-D/CG-E/§11/§12 P2，original plan，以及已接受 P0/P1 证据（Core commits 804745945c18c4e4aa8c54df3f3147e0f2727bc6 + 73cb9a340a4044eed68977d5ddbc36491deda674；Alembic P0 commits d28f39c8f4064b61e2f29d94baf3745187e60178 + ddf196b5a3c2a9edfcb0dabec50fb4f019707d70）。目标：P2 Alembic 主体 consumer。完成定义：1) scope-fix F-2：controlRoot/AlembicWorkspace 下按 ProjectScope 成员 folders 聚合空间视图，六个已有模块端点和本需求三全景端点共用同一 controlRoot→成员聚合边界；非成员/BiliDili/wakeflow-ledger 不得串入。无 scope 单仓行为保持不变。2) 恢复或接线 /panorama、/health、/gaps 三端点为老全景 UI 需要的响应形状，数据按 §3 新源映射：ProjectMap/project facts 提供架构族，coverage_ledger + DimensionRegistry + P1 buildCoverageLedgerPanoramaRollup 提供 dimensionCoverage/healthRadar/gaps；必要时通过 @alembic/core/host-agent-workflows 公共 facade 消费 Core P1 能力。3) 尊重 P0 CG-E/P1 约束：ProjectMap.module.id 与 coverage_ledger.moduleId directAligned=false；不得按 fileCount 或模块数伪造 per-module recipeCount。若能通过 module name/path/ownedFiles 规范化到 coverage target:<name>:<path> 轴则用真实覆盖；否则按项目级 totalRecipes 如实降级并让响应可解释。4) 不复活 DimensionAnalyzer/PanoramaService/PanoramaAggregator 等废弃引擎，不删除 project_context_file_snapshots/bootstrap_snapshots，不改 rescan 增量判定链，不改 Dashboard UI，不触碰 BiliDili。老全景参考只允许 git show/git archive 或 scratchpad 读取式对照，禁 checkout/worktree/branch/reset/rebase/cherry-pick。5) 添加 focused 单测：controlRoot 成员聚合、非成员拒绝、三端点响应形状、healthScore/avgCoupling/gap 派生、CG-E 降级/规范化路径、单仓非回归；运行 Alembic targeted tests、build:check 或等价检查、lint/retired-symbol gates、git diff --check、必要时 Alembic Guard。6) 本地 main commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、残余风险/下一步。非目标：不实现 AlembicDashboard UI；不重做 Core P1；不更改 freeze 字面量；不做 P4 真机验收。",
+      "status": "accepted",
+      "createdAt": "2026-07-07T01:07:24.834Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-alembic-panorama-endpoints-space-view-p1__Alembic__p2-alembic-panorama-endpoints-space-view-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-alembic-panorama-endpoints-space-view-p1__Alembic__p2-alembic-panorama-endpoints-space-view-t1.json",
+        "deliveryRunId": "run-delivery-p2-alembic-panorama-endpoints-space-view-p1__Alembic__p2-alembic-panorama-endpoints-space-view-t1",
+        "dispatchGroup": "p2-alembic-panorama-endpoints-space-view-p1",
+        "sentAt": "2026-07-07T01:07:56.579Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-alembic-panorama-endpoints-space-view-t1"
+    },
+    {
+      "targetTaskId": "p3-dashboard-panorama-view-restore-t1",
+      "taskPackageId": "p3-dashboard-panorama-view-restore-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "窗口身份：AlembicDashboard。先读 workspace AGENTS、active index/status、本 state root，以及 AlembicDashboard/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §2.1/§3/§5 F-A/F-E/§6/§7 CG-A/CG-D/CG-E/§11/§12 P3，original plan，以及已接受 P0/P1/P2 state-root 证据。目标：P3 Dashboard UI consumer。完成定义：1) 恢复老 Panorama 页面的一屏体验：4 标签 overview/dependencies/graph/gaps；overview 包含 6 卡统计、架构金字塔/层级模块列表、健康度条、gaps 摘要；gaps 标签展示 KnowledgeGap[]；dependencies 复用现有 DepGraphView；graph 复用现有 KnowledgeGraphView；独立项目金字塔入口按 CG-A 不再作为替代全景的主入口（如需保留导航必须不破坏全景老结构）。2) 恢复/新增 API 调用 getPanoramaOverview、getPanoramaHealth、getPanoramaGaps，类型与 Alembic P2 `lib/generated/dashboard-api-types.ts`/三端点响应对齐；不要写兼容假数据，不把 recipeCount 用 fileCount 分摊；per-module recipeCount 可为 null 并按后端 contract 可解释展示。3) 恢复 14 个角色标签映射和 16 个 `panorama.*` 中英 i18n key，文案以 scratchpad `panorama-reference/frontend/PanoramaView.tsx` 与只读 `git show 0e27445:src/...` 为参考；只允许读取式参考，不得 checkout/worktree/branch/reset/rebase/cherry-pick。4) 不改 Alembic/AlembicCore/BiliDili 后端，不删除 snapshot 表，不动 rescan 增量链，不复活 DimensionAnalyzer/PanoramaService/PanoramaAggregator，不添加 mock-only 空页面。5) 验证：运行 Dashboard build:dashboard 或仓库等价构建、api-types-drift/契约门、相关单测/组件测试；如项目有 lint/typecheck 一并跑；用代码/测试证据证明 overview/gaps/dependencies/graph 四标签可渲染且 API 函数指向 P2 三端点。6) 本地 main commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、残余风险/下一步。非目标：不做 P4 真机双向验收、不启动真实 AlembicWorkspace/BiliDili dashboard、不改后端接口、不发版。",
+      "status": "accepted",
+      "createdAt": "2026-07-07T01:37:24.210Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-dashboard-panorama-view-restore-p1__AlembicDashboard__p3-dashboard-panorama-view-restore-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-dashboard-panorama-view-restore-p1__AlembicDashboard__p3-dashboard-panorama-view-restore-t1.json",
+        "deliveryRunId": "run-delivery-p3-dashboard-panorama-view-restore-p1__AlembicDashboard__p3-dashboard-panorama-view-restore-t1",
+        "dispatchGroup": "p3-dashboard-panorama-view-restore-p1",
+        "sentAt": "2026-07-07T01:37:55.411Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-dashboard-panorama-view-restore-t1"
+    },
+    {
+      "targetTaskId": "p4-final-panorama-real-dashboard-scope-test-t1",
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-test-p1",
+      "targetWindow": "Test",
+      "summary": "Execute P4 real-machine Panorama scope/nonregression test and return raw evidence with pass/fail gates.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T02:09:13.493Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-panorama-real-dashboard-scope-test-p1__Test__p4-final-panorama-real-dashboard-scope-test-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-panorama-real-dashboard-scope-test-p1__Test__p4-final-panorama-real-dashboard-scope-test-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-panorama-real-dashboard-scope-test-p1__Test__p4-final-panorama-real-dashboard-scope-test-t1",
+        "dispatchGroup": "p4-final-panorama-real-dashboard-scope-test-p1",
+        "sentAt": "2026-07-07T02:09:55.619Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-panorama-real-dashboard-scope-test-t1"
+    },
+    {
+      "targetTaskId": "p4-alembic-panorama-endpoint-timeout-repair-t1",
+      "taskPackageId": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Repair Alembic Panorama endpoint timeout/high-CPU blocker found by P4 real-machine Test.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T02:30:02.636Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-alembic-panorama-endpoint-timeout-repair-p1__Alembic__p4-alembic-panorama-endpoint-timeout-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-panorama-endpoint-timeout-repair-p1__Alembic__p4-alembic-panorama-endpoint-timeout-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-alembic-panorama-endpoint-timeout-repair-p1__Alembic__p4-alembic-panorama-endpoint-timeout-repair-t1",
+        "dispatchGroup": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+        "sentAt": "2026-07-07T02:31:47.813Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-alembic-panorama-endpoint-timeout-repair-t1"
+    },
+    {
+      "targetTaskId": "p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1",
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-p1",
+      "targetWindow": "Test",
+      "summary": "Rerun P4 real-machine Panorama scope/nonregression test after accepted Alembic endpoint timeout repair.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T02:48:26.386Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1",
+        "dispatchGroup": "p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-p1",
+        "sentAt": "2026-07-07T02:49:04.991Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1"
+    },
+    {
+      "targetTaskId": "p4-alembic-rescan-job-terminal-proof-repair-t1",
+      "taskPackageId": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Fix Alembic jobs/rescan terminal proof/progress semantics for P4 real BiliDili scoped rescan, or provide source-backed Test proof adjustment.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T03:12:45.961Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-alembic-rescan-job-terminal-proof-repair-p1__Alembic__p4-alembic-rescan-job-terminal-proof-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-rescan-job-terminal-proof-repair-p1__Alembic__p4-alembic-rescan-job-terminal-proof-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-alembic-rescan-job-terminal-proof-repair-p1__Alembic__p4-alembic-rescan-job-terminal-proof-repair-t1",
+        "dispatchGroup": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+        "sentAt": "2026-07-07T03:13:24.844Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-alembic-rescan-job-terminal-proof-repair-t1"
+    },
+    {
+      "targetTaskId": "p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1",
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-p1",
+      "targetWindow": "Test",
+      "summary": "Rerun final P4 panorama real-machine gate after Alembic rescan proof repair; verify Gate 1/2 scope isolation and Gate 3 terminal rescan evidence.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T03:24:50.015Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1",
+        "dispatchGroup": "p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-p1",
+        "sentAt": "2026-07-07T03:25:23.383Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1"
+    },
+    {
+      "targetTaskId": "p4-alembic-embedding-config-runtime-bridge-repair-t1",
+      "taskPackageId": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Repair Alembic runtime embedding config bridge so the accepted P4 final Test blocker can rerun with BiliDili local Qwen/Ollama embedding instead of DeepSeek embedding fallback.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T03:53:37.785Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-alembic-embedding-config-runtime-bridge-repair-p1__Alembic__p4-alembic-embedding-config-runtime-bridge-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-embedding-config-runtime-bridge-repair-p1__Alembic__p4-alembic-embedding-config-runtime-bridge-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-alembic-embedding-config-runtime-bridge-repair-p1__Alembic__p4-alembic-embedding-config-runtime-bridge-repair-t1",
+        "dispatchGroup": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+        "sentAt": "2026-07-07T03:54:03.569Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-alembic-embedding-config-runtime-bridge-repair-t1"
+    },
+    {
+      "targetTaskId": "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-t1",
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1",
+      "targetWindow": "Test",
+      "summary": "继续总控派发：Test 窗口复跑 P4 最终真机门。前置已接受：Core P0/P1，Alembic P0/P2/P4 endpoint timeout repair/P4 rescan terminal proof repair/P4 embedding runtime bridge repair，Dashboard P3。最新 Alembic commit 76358d9ddbdf3ab9c316718aa841367e4c6f79d5 已让 AppRuntime.loadRuntimeSettings 把 BiliDili v2 .asd/config.json vector.localEmbedding 投影为 ALEMBIC_EMBED_PROVIDER=ollama、ALEMBIC_EMBED_MODEL=qwen3-embedding:0.6b、ALEMBIC_EMBED_BASE_URL=http://127.0.0.1:11434，且不覆盖显式 embed provider。目标：只复跑已定义的 P4 real-machine gate，不改代码、不预清理、不调整 provider。Gate 1：AlembicWorkspace 全景 dashboard/API 四标签显示本空间成员，不能出现 BiliDili/非成员串显。Gate 2：BiliDili 自身 projectRoot dashboard/API 不回归，不能出现 AlembicWorkspace 成员串显。Gate 3：在真实 BiliDili projectRoot 跑一次 scoped /api/v1/jobs/rescan，证明 job terminal completed、public job/events/display snapshot 可读、snapshot tables 未被删除/全量重建、rescan 增量链不回归。新增硬证据：daemon/rescan effective embedding provider 必须是本地 Qwen/Ollama（非 secret env 摘要即可），日志不得再出现 [deepseek] embed failed 或 DeepSeek embedding fallback；若仍走 DeepSeek embed，则 status=blocked 并回填 root-cause evidence。成功定义：三 gate 全绿且 embedding path 走本地 Qwen/Ollama。失败定义：任何 scope 串显、BiliDili 回归、rescan terminal 证据不足、snapshot 表破坏、或 embedding 仍走 DeepSeek。禁止：改代码、改配置 provider、push/tag/release、删除真实项目数据根、使用 BiliDili 以外项目替代 Gate 2/3、用 minNewRecipes 或配额增长代替 terminal/status/events/display 证据。",
+      "status": "accepted",
+      "createdAt": "2026-07-07T04:08:02.608Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-t1",
+        "dispatchGroup": "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1",
+        "sentAt": "2026-07-07T04:09:06.679Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-t1"
+    },
+    {
+      "targetTaskId": "p4-final-panorama-ui-final-state-countercheck-rework-t1",
+      "taskPackageId": "p4-final-panorama-ui-final-state-countercheck-rework-p1",
+      "targetWindow": "Test",
+      "summary": "继续总控派发：Test 窗口只做 P4 final UI scope rework 补证。先读 state root、原 Test 证据、test-cards/p4-final-panorama-ui-final-state-countercheck-rework.json、以及 controller countercheck evidence。前置判断：上一轮 API、BiliDili rescan terminal、provider bridge/Qwen-Ollama 证据可作为输入，但 P4 不能接受，因为 AlembicWorkspace dependencies/graph 证据只到 spinner/header，且控制器随后在 AW daemon 端口复核到 API clean 但 /panorama UI 出现 BiliDili header/dependencies/graph 内容。目标：用 fresh browser context 或等价 clean storage 打开真实 AlembicWorkspace http://127.0.0.1:64506/panorama，等待 overview/dependencies/graph/gaps 四标签 post-load 后取 DOM/text JSON 与截图，证明四标签均无 BiliDili/非成员串显；同时记录同一时刻 AW project-scope/panorama API 摘要与 BiliDili contrast 摘要。若 fresh context 干净：status=completed，说明控制器 countercheck 是 stale browser/session/cache artifact，并附 clean-context 证据。若 fresh context 复现串显、任一标签只能捕到 spinner/header、或 API clean/UI 串显仍存在：status=blocked，附 visible text、截图、API 对照、storage 状态、相关日志摘要、建议 owner/source route。禁止：改代码、改 provider 配置、push/tag/release、删除真实项目 data root、预清理 recipe/SQLite、用 API clean 或 spinner/header 当 UI 证明、顺手派/做产品修复。",
+      "status": "accepted",
+      "createdAt": "2026-07-07T04:36:02.017Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-panorama-ui-final-state-countercheck-rework-p1__Test__p4-final-panorama-ui-final-state-countercheck-rework-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-panorama-ui-final-state-countercheck-rework-p1__Test__p4-final-panorama-ui-final-state-countercheck-rework-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-panorama-ui-final-state-countercheck-rework-p1__Test__p4-final-panorama-ui-final-state-countercheck-rework-t1",
+        "dispatchGroup": "p4-final-panorama-ui-final-state-countercheck-rework-p1",
+        "sentAt": "2026-07-07T04:36:39.219Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-panorama-ui-final-state-countercheck-rework-t1"
+    },
+    {
+      "targetTaskId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-t1",
+      "taskPackageId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Repair Alembic backend/runtime scope-selection leakage shown by the P4 final UI countercheck: AW daemon modules dep-graph and projects selected state must bind to the current AW project/scope instead of stale BiliDili state.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T04:52:49.904Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-alembic-panorama-depgraph-project-selection-scope-repair-p1__Alembic__p4-alembic-panorama-depgraph-project-selection-scope-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-panorama-depgraph-project-selection-scope-repair-p1__Alembic__p4-alembic-panorama-depgraph-project-selection-scope-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-alembic-panorama-depgraph-project-selection-scope-repair-p1__Alembic__p4-alembic-panorama-depgraph-project-selection-scope-repair-t1",
+        "dispatchGroup": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+        "sentAt": "2026-07-07T04:53:40.235Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-alembic-panorama-depgraph-project-selection-scope-repair-t1-20260707051540-2ygr"
+    },
+    {
+      "targetTaskId": "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-t1",
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1",
+      "targetWindow": "Test",
+      "summary": "Run the real final P4 panorama gate after accepted Alembic dep-graph/project-selection repair: AW four tabs clean, BiliDili contrast clean, and rescan/provider terminal proof green on a runtime built from a5f8ff4 or later.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T05:21:28.615Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1__Test__p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-t1",
+        "dispatchGroup": "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1",
+        "sentAt": "2026-07-07T05:22:14.381Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-t1"
+    },
+    {
+      "targetTaskId": "p5-dashboard-panorama-reference-fidelity-compare-t1",
+      "taskPackageId": "p5-dashboard-panorama-reference-fidelity-compare-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "Compare current AlembicDashboard Panorama UI against the old read-only Panorama reference and return P5 fidelity evidence.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T05:59:23.727Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-dashboard-panorama-reference-fidelity-compare-p1__AlembicDashboard__p5-dashboard-panorama-reference-fidelity-compare-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-dashboard-panorama-reference-fidelity-compare-p1__AlembicDashboard__p5-dashboard-panorama-reference-fidelity-compare-t1.json",
+        "deliveryRunId": "run-delivery-p5-dashboard-panorama-reference-fidelity-compare-p1__AlembicDashboard__p5-dashboard-panorama-reference-fidelity-compare-t1",
+        "dispatchGroup": "p5-dashboard-panorama-reference-fidelity-compare-p1",
+        "sentAt": "2026-07-07T06:00:01.314Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-dashboard-panorama-reference-fidelity-compare-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p0-core-module-id-alignment-characterization-p1",
+        "p1-core-scope-guard-health-rollup-p1"
+      ],
+      "targetTaskIds": [
+        "p0-core-module-id-alignment-characterization-t1",
+        "p1-core-scope-guard-health-rollup-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p0-alembic-cge-degrade-contract-p1",
+        "p2-alembic-panorama-endpoints-space-view-p1",
+        "p4-alembic-panorama-endpoint-timeout-repair-p1",
+        "p4-alembic-rescan-job-terminal-proof-repair-p1",
+        "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+        "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p0-alembic-cge-degrade-contract-t1",
+        "p2-alembic-panorama-endpoints-space-view-t1",
+        "p4-alembic-panorama-endpoint-timeout-repair-t1",
+        "p4-alembic-rescan-job-terminal-proof-repair-t1",
+        "p4-alembic-embedding-config-runtime-bridge-repair-t1",
+        "p4-alembic-panorama-depgraph-project-selection-scope-repair-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicDashboard",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p3-dashboard-panorama-view-restore-p1",
+        "p5-dashboard-panorama-reference-fidelity-compare-p1"
+      ],
+      "targetTaskIds": [
+        "p3-dashboard-panorama-view-restore-t1",
+        "p5-dashboard-panorama-reference-fidelity-compare-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p4-final-panorama-real-dashboard-scope-test-p1",
+        "p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-p1",
+        "p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-p1",
+        "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-p1",
+        "p4-final-panorama-ui-final-state-countercheck-rework-p1",
+        "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1"
+      ],
+      "targetTaskIds": [
+        "p4-final-panorama-real-dashboard-scope-test-t1",
+        "p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1",
+        "p4-final-panorama-real-dashboard-scope-rerun-after-rescan-proof-repair-t1",
+        "p4-final-panorama-real-dashboard-scope-rerun-after-embedding-config-repair-t1",
+        "p4-final-panorama-ui-final-state-countercheck-rework-t1",
+        "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p5-dashboard-panorama-reference-fidelity-compare-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-07-07T00:04:02.521Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p5-dashboard-panorama-reference-fidelity-compare-p1__AlembicDashboard__p5-dashboard-panorama-reference-fidelity-compare-t1",
+    "lastDeliveryRunId": "run-delivery-p5-dashboard-panorama-reference-fidelity-compare-p1__AlembicDashboard__p5-dashboard-panorama-reference-fidelity-compare-t1",
+    "lastDispatchGroup": "p5-dashboard-panorama-reference-fidelity-compare-p1",
+    "lastTargetTaskId": "p5-dashboard-panorama-reference-fidelity-compare-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-07-07T06:00:01.317Z"
+  }
+}

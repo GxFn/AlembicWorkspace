@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-alembic-panorama-depgraph-project-selection-scope-repair-t1-20260707051540-2ygr",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "taskPackageId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+  "dispatchGroup": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-t1",
+  "status": "completed",
+  "summary": "Alembic backend/runtime repair completed in commit a5f8ff4d900b16abe5041c0d04b08e3f9db1ba7b. /api/v1/modules/dep-graph now uses registered ProjectScope member folders for the AlembicWorkspace control root instead of ambient ProjectContext repo/map discovery, so AW graph projects Alembic/AlembicAgent/AlembicCore/AlembicDashboard/AlembicPlugin and excludes BiliDili. ProjectRuntimeControl read snapshots now bind stale selectedProject views to the current daemon project when no trusted active runtime exists, without mutating runtime-control state; ready current daemons become active, stale current daemons remain selected but not active. BiliDili module graph behavior remains intact in contrast probe.",
+  "evidenceRefs": [
+    "Alembic commit a5f8ff4d900b16abe5041c0d04b08e3f9db1ba7b",
+    "Alembic/lib/project-facts/ProjectContextConsumerFacts.ts",
+    "Alembic/lib/daemon/runtime/ProjectRuntimeControl.ts",
+    "Alembic/test/unit/ProjectContextConsumerFacts.test.ts",
+    "Alembic/test/unit/ProjectRuntimeControl.test.ts",
+    "Alembic Guard guard-public-mra71tbz-4"
+  ],
+  "verification": [
+    "npx vitest run --config vitest.unit.config.ts test/unit/ProjectContextConsumerFacts.test.ts test/unit/ProjectRuntimeControl.test.ts — passed, 14 tests",
+    "npm run build:check — passed",
+    "npm run build — passed",
+    "npm run lint — passed with 5 existing noExplicitAny warnings outside touched files",
+    "npm run lint:repo-boundary — passed",
+    "npm run lint:consumer-core-imports — passed",
+    "npm run lint:retired-symbols — passed",
+    "npm run lint:ring-direction — passed",
+    "npm run check:space-edges — passed",
+    "npm run lint:naming — passed",
+    "npm run lint:doctrine — passed",
+    "npm run check:shared-asset-drift — passed",
+    "git diff --check — passed",
+    "alembic_code_guard files lib/project-facts/ProjectContextConsumerFacts.ts lib/daemon/runtime/ProjectRuntimeControl.ts test/unit/ProjectContextConsumerFacts.test.ts test/unit/ProjectRuntimeControl.test.ts — passed, 0 violations",
+    "dist probe — AW ModuleService labels Alembic,AlembicAgent,AlembicCore,AlembicDashboard,AlembicPlugin and containsBiliDili=false; BiliDili contrast returns Account, AOXFoundationKit, AOXNetworkKit, AOXPlayer, AOXUIKit, Following, Home, LiveChat, Networking, PaginationKit, Profile, ServiceKit, VideoFeed, VideoPlay, WebSocket and containsBiliDili=true",
+    "dist probe — AW ProjectRuntimeControl selected=AlembicWorkspace, selectedIsBiliDili=false, active=null while persisted stateSelectedRoot remains BiliDili"
+  ],
+  "risks": [
+    "Final Dashboard/Test countercheck still needs to run against daemon/runtime built from commit a5f8ff4d900b16abe5041c0d04b08e3f9db1ba7b.",
+    "Local live daemon was not restarted during this task; after npm run build its existing process reports stale runtime, so runtime probe validated selected binding in stale-current-daemon read mode and unit tests cover ready active binding.",
+    "npm run lint:layer-contract still fails on pre-existing lib/http/routes/panorama.ts -> project-facts imports; this task did not add that edge or change layer-contract governance."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-alembic-panorama-depgraph-project-selection-scope-repair-p1__Alembic__p4-alembic-panorama-depgraph-project-selection-scope-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-panorama-depgraph-project-selection-scope-repair-p1__Alembic__p4-alembic-panorama-depgraph-project-selection-scope-repair-t1.json",
+    "deliveryRunId": "run-delivery-p4-alembic-panorama-depgraph-project-selection-scope-repair-p1__Alembic__p4-alembic-panorama-depgraph-project-selection-scope-repair-t1",
+    "dispatchGroup": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-panorama-depgraph-project-selection-scope-repair-p1__Alembic__p4-alembic-panorama-depgraph-project-selection-scope-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+    "stateRevision": 62,
+    "demandKey": "alembic-panorama-rebuild-2026-07-03",
+    "taskPackageId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+    "targetTaskId": "p4-alembic-panorama-depgraph-project-selection-scope-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p4-alembic-panorama-depgraph-project-selection-scope-repair-p1",
+    "resultId": "tr-p4-alembic-panorama-depgraph-project-selection-scope-repair-t1-20260707051540-2ygr",
+    "createdAt": "2026-07-07T05:15:40.058Z"
+  },
+  "createdAt": "2026-07-07T05:15:40.058Z",
+  "stateRevisionObserved": 62,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-final-panorama-real-dashboard-scope-test-t1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "taskPackageId": "p4-final-panorama-real-dashboard-scope-test-p1",
+  "dispatchGroup": "p4-final-panorama-real-dashboard-scope-test-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+  "targetWindow": "Test",
+  "targetTaskId": "p4-final-panorama-real-dashboard-scope-test-t1",
+  "status": "blocked",
+  "summary": "P4 real-machine Panorama test blocked at Gate 1. Accepted Core/Alembic/Dashboard heads matched the task package and AlembicWorkspace runtime was rebuilt/restarted at http://127.0.0.1:60200. Daemon health and jobs API were healthy, ProjectScope had 5 active AlembicWorkspace folders, and the Dashboard /panorama page rendered the four tab controls. However GET /api/v1/panorama, /api/v1/panorama/health, and /api/v1/panorama/gaps each timed out after 30s with 0 bytes after restart, and the daemon showed high CPU after the attempts. UI remained a shell with no Panorama data body. Per P4 stop condition, BiliDili contrast and rescan were not executed.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1.md",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-environment.json",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-project-scope-folders.json",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-pre-restart-panorama-not-found.json",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-pre-restart-panorama-health-not-found.json",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-pre-restart-panorama-gaps-not-found.json",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-panorama-endpoint-timeouts.json",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-panorama-ui-initial.png",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-panorama-ui-visible.json",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-panorama-ui-console.json",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-daemon-ps-after-panorama-timeout.txt",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-combined-log-tail.txt",
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-final-panorama-real-dashboard-scope-test-t1/alembicworkspace-error-log-tail.txt"
+  ],
+  "verification": [
+    "git rev-parse HEAD in AlembicCore matched 73cb9a340a4044eed68977d5ddbc36491deda674",
+    "git rev-parse HEAD in Alembic matched 9ccca4b212cacf022a8d46fc13f92f666cd4376e",
+    "git rev-parse HEAD in AlembicDashboard matched a1070f2ab52dbea06e94511892e2876074a2af9c",
+    "node Test/scripts/restart-alembic.mjs --project /Users/gaoxuefeng/Documents/AlembicWorkspace --json --wait 30000 --no-ai-fallback rebuilt/dev-linked accepted heads and started dashboard http://127.0.0.1:60200",
+    "node Test/scripts/verify-test-environment.mjs --url http://127.0.0.1:60200 --json --no-expect-test-mode reported ready",
+    "curl /api/v1/daemon/health returned AlembicWorkspace projectRoot/dataRoot/projectScopeId identity",
+    "curl /api/v1/project-scope/folders returned five active AlembicWorkspace member folders",
+    "curl /api/v1/panorama, /panorama/health, and /panorama/gaps after restart each timed out after 30s with 0 bytes",
+    "Codex in-app browser screenshot/evaluate captured /panorama shell with four tab controls and no data body"
+  ],
+  "risks": [
+    "BiliDili contrast was not executed because Gate 1 stop condition blocked the test before contrast/rescan expansion.",
+    "Scoped rescan or equivalent incremental-chain proof was not executed because Panorama endpoint timeout/high CPU blocked the primary gate.",
+    "Preclean during restart stopped existing Alembic daemon processes and cleaned Alembic runtime logs, but did not edit product source; product worktrees remained clean after dev-link/build."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-final-panorama-real-dashboard-scope-test-p1__Test__p4-final-panorama-real-dashboard-scope-test-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-panorama-real-dashboard-scope-test-p1__Test__p4-final-panorama-real-dashboard-scope-test-t1.json",
+    "deliveryRunId": "run-delivery-p4-final-panorama-real-dashboard-scope-test-p1__Test__p4-final-panorama-real-dashboard-scope-test-t1",
+    "dispatchGroup": "p4-final-panorama-real-dashboard-scope-test-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-panorama-real-dashboard-scope-test-p1__Test__p4-final-panorama-real-dashboard-scope-test-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+    "stateRevision": 30,
+    "demandKey": "alembic-panorama-rebuild-2026-07-03",
+    "taskPackageId": "p4-final-panorama-real-dashboard-scope-test-p1",
+    "targetTaskId": "p4-final-panorama-real-dashboard-scope-test-t1",
+    "targetWindow": "Test",
+    "dispatchGroup": "p4-final-panorama-real-dashboard-scope-test-p1",
+    "resultId": "tr-p4-final-panorama-real-dashboard-scope-test-t1",
+    "createdAt": "2026-07-07T02:26:27.741Z"
+  },
+  "createdAt": "2026-07-07T02:26:27.741Z",
+  "stateRevisionObserved": 30,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,5 +1,7 @@
 # 需求设计 — Dashboard 整体空间串显修复(空间成员边界 + 空间视图语义)
 
+> ⚠️ **已被吸收(2026-07-03)**:用户决定把本修复并入更大的全景页面重建需求 `alembic-panorama-rebuild-2026-07-03`(见 [alembic-panorama-rebuild-2026-07-03.md](alembic-panorama-rebuild-2026-07-03.md) §5 F-C)。本设计的全部内容(β-2 分层 / 六端点空间视图 / CG-1~4 + D-1~3)作为空间修复子部分继承到那份需求。本文档保留为技术底稿;板上 `pending-claim` 行应在全景重建 deliver 时被取代。**不要再单独认领本需求。**
+
 - Design Key: `alembic-dashboard-workspace-scope-fix-2026-07-02`
 - 版本: **v2**(2026-07-03 Design 深化重设计;v1 为 2026-07-02 初稿)
 - 状态: v2 设计完成,待用户确认(v1 的 CG-1~4 已拍且 v2 保持;v2 新增 D-1~D-3 细则决策待过目)

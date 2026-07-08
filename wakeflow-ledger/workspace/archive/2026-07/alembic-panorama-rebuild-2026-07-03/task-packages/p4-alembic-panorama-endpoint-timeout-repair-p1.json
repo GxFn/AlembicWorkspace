@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root、Test P4 blocked evidence、以及 Alembic/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、已接受 P0-P3 证据、以及已接受的 Test blocked result `tr-p4-final-panorama-real-dashboard-scope-test-t1`。目标：修复真实 AlembicWorkspace 上 `/api/v1/panorama`, `/api/v1/panorama/health`, `/api/v1/panorama/gaps` 30s 超时/daemon 高 CPU 的 P4 Gate 1 blocker。Test 证据：accepted heads 已对齐；runtime rebuild 后 health/jobs/project-scope API 正常；ProjectScope 五成员 active；三个 panorama endpoint 均 curl exit 28 30s/0 bytes；Dashboard 只渲染四 tab shell；daemon CPU 115%；combined log 无 panorama error stack。控制器代码定位：`Alembic/lib/http/routes/panorama.ts` 每次请求调用 `buildProjectContextWorkflowFacts`，`maxFiles: 2000`，在真实 5 成员空间中现场多级 ProjectContext 构建，疑似无缓存/无预算/无 timeout 的阻塞路径。完成定义：1) 找到并修复 endpoint hang 根因，保证三条 panorama endpoint 在真实 AlembicWorkspace 规模或等价 fixture 下有界返回，而不是只把 curl timeout 调大。2) 保持 P2/P3 contract：三端点响应 shape 不变，Dashboard API types 不漂移，CG-E directAligned=false 时仍 project-total-only/recipeCount null，不按 fileCount 或模块数伪造 per-module recipeCount。3) 保持 ProjectScope 成员边界：AlembicWorkspace controlRoot 只聚合五个成员，非成员/BiliDili/wakeflow-ledger 不串入；无 scope 单仓不回归。4) 不复活旧 PanoramaService/DimensionAnalyzer/PanoramaAggregator，不删除 project_context_file_snapshots/bootstrap_snapshots，不动 rescan 增量判定链，不改 Dashboard UI，不改 Core，除非明确证明 Alembic 主体无法独立修复并回报 blocker。5) 添加 focused regression：至少覆盖大/多成员 ProjectScope 下 `loadPanoramaView` 或等价 endpoint builder 不重复无限现场重算、能复用缓存/轻量 facts/预算降级/超时保护并返回可解释数据；并覆盖三端点均共享同一有界构建路径。6) 运行 Alembic targeted tests including PanoramaRoute/PanoramaEndpointView、build:check 或仓库等价、retired-symbol scan、git diff --check、必要时 Alembic Guard。7) 本地 main commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、残余风险/下一步。非目标：不做 P4 rerun（控制器会派 Test）、不做 P5 UI fidelity comparison、不扩大到 BiliDili 数据修复。",
+  "status": "pending",
+  "sourceRef": "target-results/tr-p4-final-panorama-real-dashboard-scope-test-t1.json; evidence/p4-final-panorama-real-dashboard-scope-test-t1.md; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+  "designIntent": "Repair P4 blocker in Alembic's Panorama endpoint build path so the real Dashboard can receive scoped Panorama data for final Test gates.",
+  "createdAt": "2026-07-07T02:30:02.636Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-alembic-panorama-endpoint-timeout-repair-t1",
+      "taskPackageId": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Repair Alembic Panorama endpoint timeout/high-CPU blocker found by P4 real-machine Test.",
+      "status": "pending",
+      "createdAt": "2026-07-07T02:30:02.636Z"
+    }
+  ]
+}

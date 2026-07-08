@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p0-alembic-cge-degrade-contract-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "P0 主体消费侧：基于 Core 已接受的 directAligned=false 证据，锁定 Panorama per-module recipeCount 的 CG-E 降级契约与 scope-fix 边界，不进入 P2 端点实现。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3 §4 §5 F-C §6 §7 CG-E §11 §12 P0; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md; AlembicCore commit 804745945c18c4e4aa8c54df3f3147e0f2727bc6",
+  "designIntent": "P0 consumer-side gate: carry the accepted Core directAligned=false fact into Alembic main before any endpoint implementation, so P2 cannot accidentally fake per-module recipe counts or leak workspace members.",
+  "createdAt": "2026-07-07T00:24:29.946Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p0-alembic-cge-degrade-contract-t1",
+      "taskPackageId": "p0-alembic-cge-degrade-contract-p1",
+      "targetWindow": "Alembic",
+      "summary": "窗口身份：Alembic 主体。先读 workspace AGENTS、active index/status、本 state root，以及 Alembic/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3/§4/§5 F-C/§6/§7 CG-E/§11/§12 P0，original plan，以及已接受的 AlembicCore P0 证据（Core commit 804745945c18c4e4aa8c54df3f3147e0f2727bc6；state evidence evidence/p0-core-module-id-alignment-characterization-rework-t1.md）。控制器裁定：Core 已证明 `coverage_ledger.moduleId` 与 `ProjectMap.modules[].id` 直接不对齐；按用户硬门和 CG-E，本需求后续主体/Dashboard 不得把 per-module recipeCount 做 raw-id join，也不得按文件数或其它代理分摊造假；在未有新用户/Design 决策前，Panorama 对该字段必须如实降级为项目级 totalRecipes/项目级覆盖提示。目标：在 Alembic 主体消费侧完成 P0 合同锁定与证据回填。完成定义：1) 定位主体里 ProjectMap/RepoContext/coverage/knowledge 聚合入口、空间 controlRoot→成员聚合候选入口、未来 /panorama /health /gaps 应挂接的 seam；2) 证明当前主体没有已经存在的 raw-id per-module recipeCount join，或若有则修正为降级/拒绝；3) 用最小本地 main commit 落地一个真实 P2 会消费的契约/测试/辅助函数（优先现有测试模式；不要做空壳文档运动），明确 directAligned=false 时 per-module recipeCount 不生成假模块值而退到项目级；4) 覆盖 scope-fix P0 约束：controlRoot 场景必须走成员边界，非成员/BiliDili 不得被当成当前空间成员；本阶段只做 characterization/contract，不实现 P2 三端点；5) 运行 Alembic 主体 targeted tests/build:check 或仓库等价验证、git diff --check、必要时 Alembic Guard；6) 回填 commit hash、变更文件、命令输出、CG-E 消费侧结论、残余风险/下一步。硬约束：main 直提本地 commit，不开分支、不 push/tag/release；老全景参考只能 git show/git archive 读取，禁止 checkout/worktree/reset/rebase/branch/cherry-pick；不复活 PanoramaService/DimensionAnalyzer/PanoramaAggregator/RoleRefiner/CouplingAnalyzer/LayerInferrer，不建兼容层，不删快照表，不动 rescan 增量判定链，不触碰 BiliDili 目录。",
+      "status": "pending",
+      "createdAt": "2026-07-07T00:24:29.946Z"
+    }
+  ]
+}

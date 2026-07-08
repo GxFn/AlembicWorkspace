@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "窗口身份：Alembic。先读 workspace AGENTS、active index/status、本 state root、Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、accepted Test blocked evidence `tr-p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1`，以及 Alembic/AGENTS.md。权威来源：P4 真机门要求 AlembicWorkspace panorama scope + BiliDili contrast + rescan 增量链不回归；当前 Test rerun 已证明 Gate 1/2 通过，Gate 3 没有终态完成证明。原始证据：BiliDili real scoped POST `/api/v1/jobs/rescan` accepted job `rescan_mra29d1i_150c52b4`；jobs/status polls 60 次约 5 分钟持续 `running` / `architecture:filling`，progress totalToolCalls=0，events 只到 bootstrap session linked；Test 按清理取消。日志同时显示底层 Agent 确实执行到 analyze/produce、有 DeepSeek/tool calls，并在取消后记录 runtime success/0 candidates，说明问题可能是 job lifecycle/progress/terminal proof 语义、P4 test 等待策略，或 rescan completion path，而不是 panorama endpoint/UI 串显。目标：修复或澄清 P4 rescan incremental-chain proof 的阻塞，使控制器能重新派 Test 并获得可靠通过/失败证据。完成定义：1) 现场定位 `/api/v1/jobs/rescan`、JobStore/progress/display-snapshot、bootstrap session follow/finalize、rescan completion/cancel path，对照上述 evidence 解释为什么公共 job status 在真实 BiliDili scoped rescan 下没有及时进入 terminal completion proof。2) 若是产品缺陷，修复 Alembic runtime/job lifecycle/progress/completion path，使 scoped rescan 在无新增候选、0 candidates、长模型调用、或 cancellation 边界下都给出正确 terminal status/progress/summary，不靠 Test 降门；如需改 Test timeout/proof，必须用源码与日志证明原 Test 5 分钟/minNewRecipes=1 不是需求门本身，并给控制器可执行的新验收参数建议。3) 保持已接受 endpoint repair 与 panorama contracts：三 panorama endpoint shape 不变，ProjectScope 隔离不退化，CG-E directAligned=false 仍 project-total-only，不伪造 per-module recipeCount。4) 不删除 `project_context_file_snapshots` / `bootstrap_snapshots`，不动 Dashboard UI/Core，除非定位证明 Alembic 主体无法独立修复并回报 blocker；不复活旧 PanoramaService/DimensionAnalyzer/PanoramaAggregator；不改 AI provider。5) 加 focused regression 或可重复 local probe，覆盖 jobs rescan terminal/progress semantics 或等价 seam：至少能证明完成后 status/summary/toolCalls/candidates/cancel semantics 不再让 P4 只能看到 running/filling。6) 运行 Alembic targeted tests/build:check、retired-symbol/import guards、git diff --check、必要时 Alembic Guard；本地 main commit，不开分支、不 push/tag/release。7) 回填 commit hash、变更文件、命令输出、raw evidence、是否需要 Test 参数调整、剩余风险/下一步。非目标：不执行 P4 final rerun（控制器派 Test），不做 P5 保真比对，不扩大到 BiliDili 数据内容修复。",
+  "status": "pending",
+  "sourceRef": "target-results/tr-p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1.json; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1.md; evidence/p4-final-panorama-real-dashboard-scope-rerun-after-endpoint-repair-t1/bilidili-rescan-polls.json; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+  "designIntent": "Repair or formally disambiguate the P4 rescan incremental-chain proof blocker after panorama endpoint scope evidence passed.",
+  "createdAt": "2026-07-07T03:12:45.961Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-alembic-rescan-job-terminal-proof-repair-t1",
+      "taskPackageId": "p4-alembic-rescan-job-terminal-proof-repair-p1",
+      "targetWindow": "Alembic",
+      "summary": "Fix Alembic jobs/rescan terminal proof/progress semantics for P4 real BiliDili scoped rescan, or provide source-backed Test proof adjustment.",
+      "status": "pending",
+      "createdAt": "2026-07-07T03:12:45.961Z"
+    }
+  ]
+}

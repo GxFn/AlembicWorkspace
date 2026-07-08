@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-alembic-panorama-endpoint-timeout-repair-t1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "taskPackageId": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+  "dispatchGroup": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p4-alembic-panorama-endpoint-timeout-repair-t1",
+  "status": "completed",
+  "summary": "Repaired the Alembic Panorama endpoint timeout path on local main commit 0f11298e77e44523a37e1b767ffa315bbe86ffe5. The route no longer calls full buildProjectContextWorkflowFacts per request; it uses a bounded lightweight PanoramaEndpointFacts builder scoped to ProjectScope members, keeps coverage_ledger/knowledge count and CG-E degradation through buildPanoramaEndpointView, and shares a 15s/in-flight cache across /panorama, /panorama/health, and /panorama/gaps. Real AlembicWorkspace smoke over the five members completed in 48ms with fileCount=750/moduleCount=5 under maxFiles=800. No Dashboard/Core/BiliDili/rescan/snapshot/retired-engine/push/tag/release changes.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-alembic-panorama-endpoint-timeout-repair-t1.md",
+    "Alembic commit 0f11298e77e44523a37e1b767ffa315bbe86ffe5"
+  ],
+  "verification": [
+    "npm run test -- --run test/unit/PanoramaEndpointFacts.test.ts test/unit/PanoramaRoute.test.ts test/unit/PanoramaEndpointView.test.ts test/unit/PanoramaSurfaceDeletes.test.ts test/unit/PanoramaCgeContract.test.ts test/unit/AlembicProviderContracts.test.ts test/unit/DashboardApiTypesDrift.test.ts test/unit/ProjectScopeAnalysis.test.ts test/unit/ProjectContextWorkflowFacts.test.ts — passed: 9 files, 46 tests",
+    "npm run build:check — passed",
+    "npm run build:self — passed",
+    "npm run lint:retired-symbols — passed: no retired symbols found",
+    "npm run lint:repo-boundary — passed",
+    "npm run lint:consumer-core-imports — passed: scanned 378 files and 469 @alembic/core imports",
+    "npx biome check lib/http/routes/panorama.ts lib/project-facts/PanoramaEndpointFacts.ts test/unit/PanoramaRoute.test.ts test/unit/PanoramaEndpointFacts.test.ts — passed",
+    "git diff --check and git diff --check HEAD~1 HEAD — passed",
+    "Alembic Guard guard-public-mra1nqd8-1 — 4 files checked, 0 violations",
+    "Read-only real AlembicWorkspace smoke: maxFiles=800, elapsedMs=48, fileCount=750, moduleCount=5, modules Alembic/AlembicCore/AlembicPlugin/AlembicDashboard/AlembicAgent"
+  ],
+  "risks": [
+    "P4 real Dashboard/Test rerun was not executed by this target; controller should redispatch Test to verify endpoints/UI contrast/rescan after accepting this repair.",
+    "Lightweight endpoint facts intentionally use member-folder modules and zero dependency cycles/coupling instead of full ProjectContext facts; coverage health/gaps and recipe counts still come from coverage_ledger/knowledge repositories, and CG-E mismatch continues to degrade to project-total-only with recipeCount null.",
+    "Alembic main is ahead of origin/main by local commit(s); push remains user-gated."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-alembic-panorama-endpoint-timeout-repair-p1__Alembic__p4-alembic-panorama-endpoint-timeout-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-panorama-endpoint-timeout-repair-p1__Alembic__p4-alembic-panorama-endpoint-timeout-repair-t1.json",
+    "deliveryRunId": "run-delivery-p4-alembic-panorama-endpoint-timeout-repair-p1__Alembic__p4-alembic-panorama-endpoint-timeout-repair-t1",
+    "dispatchGroup": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-panorama-endpoint-timeout-repair-p1__Alembic__p4-alembic-panorama-endpoint-timeout-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+    "stateRevision": 34,
+    "demandKey": "alembic-panorama-rebuild-2026-07-03",
+    "taskPackageId": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+    "targetTaskId": "p4-alembic-panorama-endpoint-timeout-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p4-alembic-panorama-endpoint-timeout-repair-p1",
+    "resultId": "tr-p4-alembic-panorama-endpoint-timeout-repair-t1",
+    "createdAt": "2026-07-07T02:44:00.825Z"
+  },
+  "createdAt": "2026-07-07T02:44:00.825Z",
+  "stateRevisionObserved": 34,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

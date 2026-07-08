@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p1-core-scope-guard-health-rollup-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "P1 Core producer：落地 scope-fix F-1 controlRoot 发现护栏，并在 CoverageLedgerAdvisor 上新增 Panorama 健康/覆盖/gaps rollup 能力，供后续 Alembic 主体 P2 三端点消费。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3 §5 F-C §6 §7 CG-B CG-C §11 §12 P1; Design/docs/current/alembic-panorama-rebuild-original-plan-2026-07-03.md; accepted P0 Core/Alembic evidence in state root",
+  "designIntent": "P1 Core producer: keep discovery scoped for project spaces and add reusable CoverageLedgerAdvisor rollups so Alembic main can wire Panorama endpoints to real ledger/DimensionRegistry data in P2 without reviving retired engines or faking per-module recipe counts.",
+  "createdAt": "2026-07-07T00:45:11.275Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p1-core-scope-guard-health-rollup-t1",
+      "taskPackageId": "p1-core-scope-guard-health-rollup-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "窗口身份：AlembicCore。先读 workspace AGENTS、active index/status、本 state root，以及 AlembicCore/AGENTS.md。权威来源：Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §3/§5 F-C/§6/§7 CG-B/CG-C/§11/§12 P1，original plan，以及已接受 P0 证据（Core commit 804745945c18c4e4aa8c54df3f3147e0f2727bc6；Alembic commits d28f39c8f4064b61e2f29d94baf3745187e60178 + ddf196b5a3c2a9edfcb0dabec50fb4f019707d70）。目标：P1 Core producer。完成定义：1) scope-fix F-1：为 controlRoot/AlembicWorkspace 空间发现加护栏，确保无 scope 项目 discovery 字节不变；有 scope/controlRoot 时 discovery 仅按配置成员边界，不能串入 BiliDili/非成员；不删除 project_context_file_snapshots/bootstrap_snapshots，不改 rescan 增量判定链。2) 在已有 CoverageLedgerAdvisor 上新增轻量 deterministic rollup 能力，消费 coverage_ledger + DimensionRegistry，输出后续 Panorama 需要的 dimensionCoverage/healthRadar/gaps 所需 Core 数据形状；不要复活 DimensionAnalyzer/PanoramaService/PanoramaAggregator 等旧引擎，不做主体/Dashboard wiring。3) 尊重 P0 CG-E：ProjectMap.module.id 与 coverage_ledger.moduleId directAligned=false 已接受；P1 Core 可以提供覆盖账本 rollup，但不得宣称 raw ProjectMap id 可直接 per-module join，也不得按文件数假分摊 recipeCount。4) 添加 focused 单测/fixture：无 scope 字节/结构不变，controlRoot 成员边界拒非成员，rollup 使用 DimensionRegistry label/weight/suggestedTopics/relatedRoles 并把 empty/thin 映射为 missing/weak gaps；覆盖空账本/部分覆盖边界。5) 运行 AlembicCore targeted tests、build:check 或仓库等价检查、git diff --check、必要时 Alembic Guard。6) main 本地 commit，不开分支、不 push/tag/release；回填 commit hash、变更文件、命令输出、raw evidence、残余风险/下一步。非目标：不实现 Alembic 主体 /panorama,/health,/gaps；不改 Dashboard；不改 freeze 字面量；不触碰 BiliDili 目录；老全景参考只允许 git show/git archive 读取，不得 checkout/worktree/reset/rebase/branch/cherry-pick。",
+      "status": "pending",
+      "createdAt": "2026-07-07T00:45:11.275Z"
+    }
+  ]
+}

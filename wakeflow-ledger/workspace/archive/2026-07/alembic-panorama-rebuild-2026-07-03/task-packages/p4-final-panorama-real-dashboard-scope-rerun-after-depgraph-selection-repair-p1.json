@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "summary": "窗口身份：Test。先读 workspace AGENTS、active index/status、本 state root、Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4/§12.R、test-card `p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair.json`、Alembic 修复验收证据 `controller-review-p4-alembic-depgraph-scope-repair-acceptance-2026-07-07.md`、前次 UI blocker 归因证据 `controller-review-p4-ui-countercheck-attribution-2026-07-07.md`。权威来源：P4 真机双向验收要求 AlembicWorkspace dashboard 全景 4 标签只显示本空间成员且无 BiliDili，BiliDili 自身 dashboard 不回归，rescan 增量/provider 终态证明不回归。当前已接受 Alembic commit a5f8ff4d900b16abe5041c0d04b08e3f9db1ba7b，其修复 dep-graph ProjectScope 绑定和 stale selectedProject 读面绑定，但目标结果明确未重启真实 runtime 做最终 P4。目标：在真实 AlembicWorkspace + BiliDili 上复跑最终 P4 门，必须确保 daemon/runtime 运行 a5f8ff4 或 later local main 后再测。完成定义：1) 证明 AW daemon/runtime 已 rebuild/restart 到 a5f8ff4 或 later（commit/build/restart/log/health 证据）。2) fresh/clean browser context 打开 AW `/panorama`，等待 overview/dependencies/graph/gaps 四标签 post-load；采四标签可见截图 + DOM/text + storage proof。3) 采 AW 原始 API：daemon health、projects/current、project-scope folders、panorama/health/gaps、modules dep-graph(level=module)；判定无 BiliDili/02a25032/BiliDili module ids，Header/selectedProject 也不显示 stale BiliDili。4) 采 BiliDili contrast：自身 projectRoot/dataRoot/dashboard/API 仍 scoped 到 BiliDili，不泄漏 AW 成员。5) 运行或观察一次 BiliDili scoped rescan/provider terminal proof：job terminal completed/proof，effective embedding provider 为本地 Qwen/Ollama 而非 DeepSeek embedding fallback。6) 若全部通过，返回 completed，并附 raw JSON/log/screenshot/report paths；若任一门失败，返回 blocked，给出精确 failing API/tab/log/probe、是否 API clean but UI leaks、推荐 owner(Alembic/Dashboard/Test env)；不要 patch 产品代码。硬禁：不编辑产品源/测试/配置/secret，不删除 dataRoot，不 preclean 掩盖证据，不换 sandbox subject，不 push/tag/release，不放松 P4 门。",
+  "status": "pending",
+  "sourceRef": "test-cards/p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair.json; target-results/tr-p4-alembic-panorama-depgraph-project-selection-scope-repair-t1-20260707051540-2ygr.json; evidence/controller-review-p4-alembic-depgraph-scope-repair-acceptance-2026-07-07.md; evidence/controller-review-p4-ui-countercheck-attribution-2026-07-07.md; Design/docs/current/alembic-panorama-rebuild-2026-07-03.md §12/P4 §12.R",
+  "designIntent": "Validate the final P4 real-machine panorama/dashboard/rescan gate after the accepted Alembic dep-graph and selected-project scope repair, without relaxing gates or patching product code.",
+  "createdAt": "2026-07-07T05:21:28.615Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-t1",
+      "taskPackageId": "p4-final-panorama-real-dashboard-scope-rerun-after-depgraph-selection-repair-p1",
+      "targetWindow": "Test",
+      "summary": "Run the real final P4 panorama gate after accepted Alembic dep-graph/project-selection repair: AW four tabs clean, BiliDili contrast clean, and rescan/provider terminal proof green on a runtime built from a5f8ff4 or later.",
+      "status": "pending",
+      "createdAt": "2026-07-07T05:21:28.615Z"
+    }
+  ]
+}

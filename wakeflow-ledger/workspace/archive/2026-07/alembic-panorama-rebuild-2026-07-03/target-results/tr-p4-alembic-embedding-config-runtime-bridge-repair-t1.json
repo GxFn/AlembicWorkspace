@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-alembic-embedding-config-runtime-bridge-repair-t1",
+  "demandKey": "alembic-panorama-rebuild-2026-07-03",
+  "taskPackageId": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+  "dispatchGroup": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p4-alembic-embedding-config-runtime-bridge-repair-t1",
+  "status": "completed",
+  "summary": "Alembic repaired the daemon runtime bridge for v2 vector.localEmbedding. AppRuntime.loadRuntimeSettings now projects the selected workspace's .asd/config.json vector.localEmbedding into ALEMBIC_EMBED_PROVIDER=ollama, ALEMBIC_EMBED_MODEL, and ALEMBIC_EMBED_BASE_URL before AiModule.createEmbedProvider runs, while preserving explicit embed provider precedence. Commit 76358d9ddbdf3ab9c316718aa841367e4c6f79d5. No Dashboard, BiliDili, or sibling AlembicCore source edits were made.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03/evidence/p4-alembic-embedding-config-runtime-bridge-repair-t1.md"
+  ],
+  "verification": [
+    "npx vitest run --config vitest.unit.config.ts test/unit/BootstrapRuntimeSettings.test.ts: PASS (3 tests), including post-commit rerun.",
+    "npm run build:check: PASS (using local AlembicCore source ../AlembicCore).",
+    "npm run lint:retired-symbols: PASS; npm run lint:repo-boundary: PASS; npm run lint:consumer-core-imports: PASS; npm run lint:ring-direction: PASS.",
+    "npx biome check lib/Bootstrap.ts test/unit/BootstrapRuntimeSettings.test.ts: PASS; npx biome check test/unit/BootstrapRuntimeSettings.test.ts: PASS.",
+    "npm run lint: PASS exit code 0 with existing warnings outside touched files.",
+    "git diff --check: PASS.",
+    "Alembic Guard guard-public-mra4gcdi-1: PASS, 2 explicit files checked, 0 violations."
+  ],
+  "risks": [
+    "P4 final real-machine BiliDili dashboard/rescan gate was not rerun by Alembic target; controller/Test should decide rerun.",
+    "Bridge intentionally skips v2 localEmbedding when ALEMBIC_EMBED_PROVIDER is already explicit to avoid mixing provider/model/base-url sources.",
+    "The mapping assumes v2 vector.localEmbedding denotes the local Ollama embed lane; Agent OllamaProvider already normalizes bare Ollama endpoints to /v1."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-alembic-embedding-config-runtime-bridge-repair-p1__Alembic__p4-alembic-embedding-config-runtime-bridge-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-embedding-config-runtime-bridge-repair-p1__Alembic__p4-alembic-embedding-config-runtime-bridge-repair-t1.json",
+    "deliveryRunId": "run-delivery-p4-alembic-embedding-config-runtime-bridge-repair-p1__Alembic__p4-alembic-embedding-config-runtime-bridge-repair-t1",
+    "dispatchGroup": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-alembic-embedding-config-runtime-bridge-repair-p1__Alembic__p4-alembic-embedding-config-runtime-bridge-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-panorama-rebuild-2026-07-03",
+    "stateRevision": 50,
+    "demandKey": "alembic-panorama-rebuild-2026-07-03",
+    "taskPackageId": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+    "targetTaskId": "p4-alembic-embedding-config-runtime-bridge-repair-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p4-alembic-embedding-config-runtime-bridge-repair-p1",
+    "resultId": "tr-p4-alembic-embedding-config-runtime-bridge-repair-t1",
+    "createdAt": "2026-07-07T04:03:50.418Z"
+  },
+  "createdAt": "2026-07-07T04:03:50.418Z",
+  "stateRevisionObserved": 50,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}
