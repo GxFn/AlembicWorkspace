@@ -28,6 +28,7 @@ archive files.
 
 | Record | Entry | Description |
 | --- | --- | --- |
+| **Demand chain ledger（权威总账）** | [demand-chain-ledger.md](demand-chain-ledger.md) | **Start here for the past development chain**: one row per archived demand — date, conclusion, archive link, design source — organized by wave (Wave 0 → E), with the pre-06-18 compacted history kept as rollup groups. The rollup rows below remain as the historical group entries the ledger links to. |
 | AFAPI 08-12 completed demands | archive/2026-06/afapi-completed-demands/ | Demand-level completion summary for AFAPI 08-12, including final revisions, controller conclusions, and evidence maps. |
 | Current demand rollup, 2026-06-13 | archive/2026-06/current-demand-rollup/current-demand-rollup-2026-06-13.md | Workspace-wide demand census after the R-group closeout: 103 completed state roots, release publish held for user trigger, old CKG3 superseded by CKG3R, interface parent intake superseded by D0-D32. |
 | Alembic redundancy & stale-logic cleanup RC0-RC7 | ../requirement-designs/alembic-redundancy-stale-logic-cleanup/final-acceptance-archive-2026-06-12.md | Eight-demand cleanup sequence completed 2026-06-12: five-repo final gate sweep green + strict drift gate both sides, Dashboard zero code diff, all audit items dispositioned (audit doc §9), seven structural-debt design candidates decided (RC6 register) as future demands. |

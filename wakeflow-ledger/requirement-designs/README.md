@@ -208,3 +208,20 @@ Use one subdirectory per substantial demand:
 - `templates/original-plan-template.md`
 - `templates/requirement-design-template.md`
 - `templates/goal-stage-confirmation-template.md`
+
+## Design Index（设计目录索引，2026-07-09 补建）
+
+Forward links from each design directory to the demand(s) that executed it. Demands whose design
+material travelled inside the archived state root are marked `in-archive` in the
+[demand chain ledger](../workspace/demand-chain-ledger.md) and have no directory here.
+
+| Design directory | Executed by / status |
+| --- | --- |
+| [alembic-0.3.0-release-wave](alembic-0.3.0-release-wave/) | Executed → [demand 2026-06-13](../workspace/archive/2026-06/alembic-0.3.0-release-wave-2026-06-13/)（publish HELD, 用户门） |
+| [alembic-plugin-claude-code-host-support](alembic-plugin-claude-code-host-support/) | Executed → [dual-host refactor 2026-06-19](../workspace/archive/2026-06/alembic-plugin-dual-host-architecture-refactor-2026-06-19/) |
+| [plugin-agent-facing-public-api-redesign](plugin-agent-facing-public-api-redesign/) | Executed → AFAPI 08–12 rollup（[archive](../workspace/archive/2026-06/afapi-completed-demands/)）；AFAPI 01–07 上游完成未重建 |
+| [alembic-redundancy-stale-logic-cleanup](alembic-redundancy-stale-logic-cleanup/) | Executed → RC0–RC7（终验收档在目录内 final-acceptance-archive-2026-06-12.md） |
+| [alembic-core-comprehensive-optimization](alembic-core-comprehensive-optimization/) | Executed → CO0–CO5（终验收档在目录内 final-acceptance-archive-2026-06-12.md） |
+| [alembic-recipe-evolution-gpt55-fabrication-audit](alembic-recipe-evolution-gpt55-fabrication-audit/) | Historical audit（仅证据，不作执行根；关联 no-guess correction 链见总账 Wave A） |
+| 其余 18 个目录 | 早期（≤06-18 压缩史）设计/研究材料或未单独执行的规划；与总账按名关联，引用前按 no-guess 纪律核对目录内文档现状 |
+
