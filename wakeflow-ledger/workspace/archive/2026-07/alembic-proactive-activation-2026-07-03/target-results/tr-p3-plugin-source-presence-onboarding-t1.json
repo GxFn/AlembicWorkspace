@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-plugin-source-presence-onboarding-t1",
+  "demandKey": "alembic-proactive-activation-2026-07-03",
+  "taskPackageId": "p3-plugin-source-presence-onboarding-p1",
+  "dispatchGroup": "p3-plugin-source-presence-onboarding-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-proactive-activation-2026-07-03",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p3-plugin-source-presence-onboarding-t1",
+  "status": "completed",
+  "summary": "Implemented P3 source-presence onboarding in AlembicPlugin. Status now runs a bounded SourcePresenceProbe only for uninitialized workspaces, includes sourcePresence in onboarding, keeps empty and ghost-empty needs_init quiet, and adds a host-visible post-init alembic_bootstrap recommendation only when source files are detected. The recommendation uses startsDaemon=false and no bootstrap/job side effects; needs_bootstrap and other four-tool/onboarding contracts remain unchanged. Committed as e7dda4f Add source-aware status onboarding.",
+  "evidenceRefs": [
+    "task-packages/p3-plugin-source-presence-onboarding-p1.json",
+    "AlembicPlugin commit e7dda4f Add source-aware status onboarding",
+    "AlembicPlugin/lib/host-runtime/status/SourcePresenceProbe.ts",
+    "AlembicPlugin/lib/host-runtime/status/StatusService.ts",
+    "AlembicPlugin/test/unit/SourcePresenceProbe.test.ts",
+    "AlembicPlugin/test/unit/CodexStatusService.test.ts",
+    "AlembicPlugin/test/unit/HostMcpServer.test.ts",
+    "alembic_code_guard guard-public-mrag3hm1-8"
+  ],
+  "verification": [
+    "npx vitest run --config vitest.unit.config.ts test/unit/SourcePresenceProbe.test.ts test/unit/CodexStatusService.test.ts test/unit/HostMcpServer.test.ts — PASS (60 tests)",
+    "npm run check — PASS (19 pre-existing Biome warnings remain, no errors)",
+    "npm run build:check — PASS (Core build used ../AlembicCore @ 783b9f52aaa83767f4564ac8489cdfaf445bab35; tsc --noEmit passed)",
+    "npx vitest run test/integration/ZodToMcpSchema.test.ts — PASS (19 tests)",
+    "git diff --check — PASS",
+    "alembic_code_guard guard-public-mrag3hm1-8 — PASS, 5 explicit files, 0 violations"
+  ],
+  "risks": [
+    "Source presence is intentionally a bounded status hint, not a full source index; it stops at sourceFileLimit and maxDepth.",
+    "The scan extension/exclusion list mirrors ModuleService semantics locally because no public shared scan contract is exposed in this task; P4 can centralize this if a stable module scan contract is introduced.",
+    "P4 next recommendation: verify real host-visible onboarding rendering in an installed plugin for sourceful Ghost, empty Ghost, and sourceful Standard needs_init states."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-plugin-source-presence-onboarding-p1__AlembicPlugin__p3-plugin-source-presence-onboarding-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-source-presence-onboarding-p1__AlembicPlugin__p3-plugin-source-presence-onboarding-t1.json",
+    "deliveryRunId": "run-delivery-p3-plugin-source-presence-onboarding-p1__AlembicPlugin__p3-plugin-source-presence-onboarding-t1",
+    "dispatchGroup": "p3-plugin-source-presence-onboarding-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-source-presence-onboarding-p1__AlembicPlugin__p3-plugin-source-presence-onboarding-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-proactive-activation-2026-07-03",
+    "stateRevision": 32,
+    "demandKey": "alembic-proactive-activation-2026-07-03",
+    "taskPackageId": "p3-plugin-source-presence-onboarding-p1",
+    "targetTaskId": "p3-plugin-source-presence-onboarding-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p3-plugin-source-presence-onboarding-p1",
+    "resultId": "tr-p3-plugin-source-presence-onboarding-t1",
+    "createdAt": "2026-07-07T09:28:54.112Z"
+  },
+  "createdAt": "2026-07-07T09:28:54.112Z",
+  "stateRevisionObserved": 32,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-proactive-activation-2026-07-03",
+  "title": "推进 Alembic 激活链主动化：安装引导、冷启动建议、四工具 prime/search/recipe_map/graph 主动消费、双宿主加载与使用测量闭环；按 Design §10.6 P0-P4 严格阶段验收。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "claude-code",
+  "controllerWindow": "AlembicWorkspace",
+  "state": "archived",
+  "stateReason": "Administrative legacy closure 2026-07-09; workspace resets for fresh demand development.",
+  "revision": 41,
+  "activeStageId": null,
+  "updatedAt": "2026-07-09T23:12:10.227Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p0-plugin-cc-skill-discovery-usage-baseline-p1",
+      "summary": "P0 evidence gate for proactive activation: verify Claude Code project skill discovery path, implement/expose WS-1 session per-tool usage measurement, and capture true-machine baseline for prime/search/recipe_map/graph usage before proactive wording changes.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.1 §10.2 §10.6; external sources: Claude Code skills docs and Agent Skills specification",
+      "designIntent": "P0-A decides cc skill path before WS-2; WS-1 measurement must quantify baseline before active wording/guidance changes.",
+      "createdAt": "2026-07-07T06:47:43.368Z"
+    },
+    {
+      "taskPackageId": "p1-plugin-consumption-wording-guidance-p1",
+      "summary": "P1 WS-4 proactive consumption wording and guidance: update three knowledge-tool descriptions with when-to-use/user-intent keywords, add prime-to-search routing, and add guidance/stagedProtocol consumption loop while preserving four-tool output schemas and non-goal text.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.4 §10.6 §11 B-1; P0 accepted tc-20260707072436-0005",
+      "designIntent": "P1 makes existing knowledge tools more likely to be selected by hosts by adding when-to-use keywords and a prime→search/map/graph consumption loop, without changing tool semantics, schemas, output contracts, or lifecycle behavior.",
+      "createdAt": "2026-07-07T07:25:46.883Z"
+    },
+    {
+      "taskPackageId": "p1b-core-managed-block-pathguard-p1",
+      "summary": "P1b WS-5 Core foundation: add Alembic managed-block utility and PathGuard project-root writable-file allowlist hook for host context files.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.5 §10.6; P1 accepted at tc-20260707074358-0009.",
+      "designIntent": "P1b starts with Core producer work so Plugin/host consumers can later write short host context managed blocks safely without bypassing PathGuard or duplicating marker logic.",
+      "createdAt": "2026-07-07T07:44:45.435Z"
+    },
+    {
+      "taskPackageId": "p1b-plugin-managed-block-refresh-wiring-p1",
+      "summary": "P1b WS-5 Plugin consumer wiring: consume Core managed-block utility and PathGuard root-file allowlist to write/remove host context guidance blocks from refreshKnowledgeSkills.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.5 §10.6 §10.7; Core producer accepted at tc-20260707080952-0013 / commit 783b9f52aaa83767f4564ac8489cdfaf445bab35.",
+      "designIntent": "P1b continues from accepted Core producer work into Plugin refreshKnowledgeSkills so standard non-ghost projects get a tiny host-visible managed guidance pointer while empty/ghost projects remain silent and user content outside the managed block is preserved.",
+      "createdAt": "2026-07-07T08:10:44.177Z"
+    },
+    {
+      "taskPackageId": "p1b-alembic-host-guidance-pathguard-config-p1",
+      "summary": "P1b WS-5 Alembic main consumer check/config: verify and, if needed, wire Alembic main's PathGuard/runtime configuration for host context managed guidance writes after accepted Core + Plugin WS-5 work.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.0 §10.5 §10.6; accepted Core tc-20260707080952-0013 / commit 783b9f52aaa83767f4564ac8489cdfaf445bab35; accepted Plugin tc-20260707082929-0017 / commit 33f2954901723abf85214abcae0cebaabb4cb1d4.",
+      "designIntent": "The requirement scope explicitly includes Alembic main for WS-5 pathGuard configure expansion. This package keeps that boundary narrow: prove whether main has a real WS-5 consumer path, and implement only the minimal PathGuard/managed-block configuration if the main source owns such a consumer.",
+      "createdAt": "2026-07-07T08:30:39.966Z"
+    },
+    {
+      "taskPackageId": "p2-plugin-host-aware-skill-export-p1",
+      "summary": "P2 WS-2 host-aware project skill export for AlembicPlugin: use the accepted P0 finding that Claude Code project skills load from .claude/skills while Codex remains .agents/skills, then route project-skill export and write-prefix authorization through the host adapter without changing public tool contracts.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.2 §10.6; controller review evidence p0-plugin-cc-skill-discovery-usage-baseline; accepted P1/P1b Plugin/Core/Alembic reviews.",
+      "designIntent": "Implement the recommended architecture path: L3 HostAdapter.projectSkillRoot(projectRoot), Codex path byte-stable, Claude Code path from P0 proof, and PathGuard prefix coupling updated with the same host-aware root.",
+      "createdAt": "2026-07-07T08:38:51.572Z"
+    },
+    {
+      "taskPackageId": "p2b-plugin-cold-start-skill-auto-sync-p1",
+      "summary": "P2b WS-6: cold-start final completion automatically refreshes project knowledge skills and host guidance once, so accepted WS-2 host-aware skill export and WS-5 managed block become available without manual alembic_project_skill refresh.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.7 / §10.6 P2b",
+      "designIntent": "Wire the dimension-completion finalizer tail to refreshKnowledgeSkills only on final full completion, after WS-2/WS-5 are accepted.",
+      "createdAt": "2026-07-07T08:55:17.989Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-source-presence-onboarding-p1",
+      "summary": "P3 WS-3: add source-presence probing and needs_init onboarding split so host-visible status recommends alembic_bootstrap only for uninitialized projects that actually contain source code, without auto-running cold-start.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.3 / §10.6 P3",
+      "designIntent": "Implement SourcePresenceProbe and strengthen StatusService needs_init onboarding while preserving empty-project restraint and not touching main SetupService.",
+      "createdAt": "2026-07-07T09:13:15.387Z"
+    },
+    {
+      "taskPackageId": "p4-final-dual-host-proactive-activation-realtest-p1",
+      "summary": "P4 final real-machine dual-host acceptance gate for alembic-proactive-activation: verify the full installed activation chain across Codex and Claude Code after P0-P3 are accepted, including managed host guidance loading, project skill visibility, proactive prime/search/recipe_map/graph usage, usage-count lift, empty/ghost restraint, KB-delete cleanup, and four-tool contract non-regression.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §7 / §10.6 P4",
+      "designIntent": "Run true Codex and Claude Code host-session validation; this is acceptance evidence only, not product implementation or repair.",
+      "createdAt": "2026-07-07T09:35:31.820Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p0-plugin-cc-skill-discovery-usage-baseline-t1",
+      "taskPackageId": "p0-plugin-cc-skill-discovery-usage-baseline-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, active state root, AlembicPlugin AGENTS/rules, and Design §10.1/§10.2/§10.6. Use the controller-confirmed external-doc finding that Claude Code project skills live under `.claude/skills/<skill-name>/SKILL.md` and auto-discover from starting dir/parents/nested dirs; still run a real probe proving loaded-into-LLM behavior, not just files generated. Implement only WS-1 measurement first if needed: session-level `usage.byTool` counts/lastCalledAt via embedded handler path, no persistent telemetry, no four-tool output contract changes. Return raw evidence: official-doc/probe result, code diff commits, status JSON showing usage counts baseline, contract tests/build commands, risks, and exact next gate decision for WS-2 host-aware export.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T06:47:43.368Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p0-plugin-cc-skill-discovery-usage-baseline-p1__AlembicPlugin__p0-plugin-cc-skill-discovery-usage-baseline-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p0-plugin-cc-skill-discovery-usage-baseline-p1__AlembicPlugin__p0-plugin-cc-skill-discovery-usage-baseline-t1.json",
+        "deliveryRunId": "run-delivery-p0-plugin-cc-skill-discovery-usage-baseline-p1__AlembicPlugin__p0-plugin-cc-skill-discovery-usage-baseline-t1",
+        "dispatchGroup": "p0-plugin-cc-skill-discovery-usage-baseline-p1",
+        "sentAt": "2026-07-07T06:54:59.741Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p0-plugin-cc-skill-discovery-usage-baseline-t1"
+    },
+    {
+      "targetTaskId": "p1-plugin-consumption-wording-guidance-t1",
+      "taskPackageId": "p1-plugin-consumption-wording-guidance-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, active state root, AlembicPlugin AGENTS/rules, and Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.4 §10.6 §11 B-1. Implement only WS-4: update search/recipe_map/graph description first sentence with scenario/intent keywords while preserving capability enumerations and Non-goal sections byte-for-byte; do not change prime description except the prime output routing. In agent-public-tools prime result, put alembic_search first in recommendedTools and add a first recommended search query without touching top-level nextActions or schemas. Add guidance consumption-loop line and stagedProtocol prime-consumption branch. Return raw evidence: commit hash, exact changed files/lines, description snapshot before/after or contract snapshot, tests proving zodToMcpSchema/four-tool contracts unchanged, guidance/stagedProtocol assertions, build/check results, guard result, risks, and confirmation that WS-2/WS-5/WS-6 were not touched.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T07:25:46.883Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-plugin-consumption-wording-guidance-p1__AlembicPlugin__p1-plugin-consumption-wording-guidance-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-consumption-wording-guidance-p1__AlembicPlugin__p1-plugin-consumption-wording-guidance-t1.json",
+        "deliveryRunId": "run-delivery-p1-plugin-consumption-wording-guidance-p1__AlembicPlugin__p1-plugin-consumption-wording-guidance-t1",
+        "dispatchGroup": "p1-plugin-consumption-wording-guidance-p1",
+        "sentAt": "2026-07-07T07:28:00.548Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-plugin-consumption-wording-guidance-t1"
+    },
+    {
+      "targetTaskId": "p1b-core-managed-block-pathguard-t1",
+      "taskPackageId": "p1b-core-managed-block-pathguard-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Read AGENTS.md, the state root, and Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.5/§10.6 before editing. Implement only the Core side of WS-5: a reusable managed-block utility that can upsert and remove an Alembic-managed guidance block without touching bytes outside the begin/end markers, plus a PathGuard root-file allowlist hook such as addProjectWritableFile(name) so consumers can explicitly permit CLAUDE.md or AGENTS.md without weakening other root-file protection. Do not edit AlembicPlugin or Alembic main in this task; do not wire refreshKnowledgeSkills here; do not change freeze/string values outside the new managed-block markers. Acceptance evidence: raw file list and commit hash; unit tests proving idempotent upsert, replacement, append, remove no-op, remove preserving surrounding content, malformed/nested marker handling if applicable, and PathGuard still rejects unrelated root files while allowing only configured names; build/check commands; risks and next consumer contract for Plugin.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T07:44:45.435Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1b-core-managed-block-pathguard-p1__AlembicCore__p1b-core-managed-block-pathguard-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1b-core-managed-block-pathguard-p1__AlembicCore__p1b-core-managed-block-pathguard-t1.json",
+        "deliveryRunId": "run-delivery-p1b-core-managed-block-pathguard-p1__AlembicCore__p1b-core-managed-block-pathguard-t1",
+        "dispatchGroup": "p1b-core-managed-block-pathguard-p1",
+        "sentAt": "2026-07-07T07:45:29.066Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1b-core-managed-block-pathguard-t1"
+    },
+    {
+      "targetTaskId": "p1b-plugin-managed-block-refresh-wiring-t1",
+      "taskPackageId": "p1b-plugin-managed-block-refresh-wiring-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, the state root, Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.5/§10.6/§10.7, and accepted Core evidence for p1b-core-managed-block-pathguard-t1 before editing. Implement only the AlembicPlugin side of WS-5: in ProjectSkillService.refreshKnowledgeSkills, when hasKnowledgeBase is true and standard non-ghost host guidance is enabled, choose the host file by resolved plugin host (claude-code => CLAUDE.md, codex => AGENTS.md), call pathGuard.addProjectWritableFile for that one root file, then use @alembic/core/io upsertAlembicManagedBlock to write a short Alembic managed guidance pointer. When hasKnowledgeBase is false or skills are removed, call removeAlembicManagedBlock for the same host file without unlinking the user file. Preserve ghost-mode silence for project-root writes, empty/no-KB project restraint, opt-in/default decisions from the design, existing skill export behavior, and four-tool output contracts. The pointer body must stay short and include a concrete consumption example plus wording that the knowledge is grounded in THIS project's own code. Do not edit Alembic main or AlembicCore in this task, do not implement WS-6 cold-start auto-sync yet, and do not run real host validation here. Acceptance evidence: commit hash and file list; tests for idempotent no-duplicate block, preserving user content, ghost/no-KB silence, KB deletion removes block, correct per-host file selection with the other host file untouched, malformed marker surfacing, and pathGuard allowing only the selected root host file; targeted build/check and contract tests; next consumer contract for Alembic main if needed.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T08:10:44.177Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1b-plugin-managed-block-refresh-wiring-p1__AlembicPlugin__p1b-plugin-managed-block-refresh-wiring-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1b-plugin-managed-block-refresh-wiring-p1__AlembicPlugin__p1b-plugin-managed-block-refresh-wiring-t1.json",
+        "deliveryRunId": "run-delivery-p1b-plugin-managed-block-refresh-wiring-p1__AlembicPlugin__p1b-plugin-managed-block-refresh-wiring-t1",
+        "dispatchGroup": "p1b-plugin-managed-block-refresh-wiring-p1",
+        "sentAt": "2026-07-07T08:11:07.514Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1b-plugin-managed-block-refresh-wiring-t1"
+    },
+    {
+      "targetTaskId": "p1b-alembic-host-guidance-pathguard-config-t1",
+      "taskPackageId": "p1b-alembic-host-guidance-pathguard-config-p1",
+      "targetWindow": "Alembic",
+      "summary": "Read AGENTS.md, the state root, Alembic/AGENTS.md, Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.0/§10.5/§10.6, and the accepted Core + Plugin controller review evidence before editing. Implement only the Alembic main side of WS-5 if a real main consumer exists: inspect AppRuntime/Bootstrap PathGuard configuration and the in-process project-skill/cold-start delivery path, then add the minimal pathGuard.addProjectWritableFile-style configuration or Core managed-block consumption needed so main-owned code can safely write/remove only the selected host context file (codex => AGENTS.md, claude-code => CLAUDE.md) without weakening unrelated root-file protection. Do not duplicate Plugin ProjectSkillService, do not edit AlembicPlugin or AlembicCore, do not implement WS-2 host-aware skill export, WS-3 onboarding, or WS-6 cold-start auto-sync. If Alembic main has no WS-5 host-guidance write surface after the accepted Plugin implementation, return completed with no-commit evidence naming the searched entrypoints and why no code change is needed. Acceptance evidence: commit hash or explicit no-commit reason; file/line review of PathGuard configuration and any main-owned skill-delivery/cold-start consumer; tests/build/check proving no root-file guard weakening; risks and exact next-phase recommendation.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T08:30:39.966Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1b-alembic-host-guidance-pathguard-config-p1__Alembic__p1b-alembic-host-guidance-pathguard-config-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1b-alembic-host-guidance-pathguard-config-p1__Alembic__p1b-alembic-host-guidance-pathguard-config-t1.json",
+        "deliveryRunId": "run-delivery-p1b-alembic-host-guidance-pathguard-config-p1__Alembic__p1b-alembic-host-guidance-pathguard-config-t1",
+        "dispatchGroup": "p1b-alembic-host-guidance-pathguard-config-p1",
+        "sentAt": "2026-07-07T08:31:18.370Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1b-alembic-host-guidance-pathguard-config-t1"
+    },
+    {
+      "targetTaskId": "p2-plugin-host-aware-skill-export-t1",
+      "taskPackageId": "p2-plugin-host-aware-skill-export-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, the state root, AlembicPlugin/AGENTS.md, Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.2/§10.6, and controller evidence for P0/P1/P1b before editing. Implement only P2 WS-2 host-aware project skill export: add or extend the L3 host adapter contract so projectSkillRoot(projectRoot) returns Codex .agents/skills unchanged and Claude Code .claude/skills per the accepted P0 proof; make getProjectSkillRoot and all ProjectSkillDelivery/ProjectSkillService export sites delegate to that adapter instead of hard-coding .agents/skills; update the coupled PathGuard project write prefix from the same host-aware root so Claude Code export is not blocked. Preserve public receipt field names such as codexSkillRoot if frozen by Core contracts, but set their values to the real host-specific root. Keep host-name branching inside the host-adapter layer; do not implement WS-6 cold-start auto-sync, WS-3 onboarding, or further wording/managed-block changes. Acceptance evidence: commit hash and file list; tests proving Codex export path and generated bytes stay unchanged, Claude Code resolves/exports to .claude/skills, both ProjectSkillDelivery and ProjectSkillService paths use the adapter, PathGuard allows the selected host skill prefix and rejects unrelated prefixes, four-tool/MCP output contracts stay unchanged, build/check pass, and risks/next-phase recommendation for P2b.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T08:38:51.572Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-plugin-host-aware-skill-export-p1__AlembicPlugin__p2-plugin-host-aware-skill-export-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-host-aware-skill-export-p1__AlembicPlugin__p2-plugin-host-aware-skill-export-t1.json",
+        "deliveryRunId": "run-delivery-p2-plugin-host-aware-skill-export-p1__AlembicPlugin__p2-plugin-host-aware-skill-export-t1",
+        "dispatchGroup": "p2-plugin-host-aware-skill-export-p1",
+        "sentAt": "2026-07-07T08:39:24.110Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-plugin-host-aware-skill-export-t1"
+    },
+    {
+      "targetTaskId": "p2b-plugin-cold-start-skill-auto-sync-t1",
+      "taskPackageId": "p2b-plugin-cold-start-skill-auto-sync-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, the active state root, AlembicPlugin/AGENTS.md, Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.7/§10.6, and controller evidence accepting P1b WS-5 and P2 WS-2 before editing. Implement only P2b WS-6: in dimension-completion.ts applyDimensionCompletionSideEffects tail, after persistence/broadcast side effects, automatically call ProjectSkillService.refreshKnowledgeSkills exactly once when full dimension completion reaches the final isComplete state. Do not run cold-start automatically; do not trigger on partial/per-dimension updates; do not implement WS-3 onboarding or P4 real-host validation. The call must use the existing refreshKnowledgeSkills path so host-aware skill export (.agents/skills for Codex, .claude/skills for Claude Code) and WS-5 managed AGENTS.md/CLAUDE.md block behavior are reused; preserve hasKnowledgeBase gating, ghost/root-file silence, empty/no-KB restraint, and four-tool output contracts. Acceptance evidence: commit hash and files; tests proving final completion triggers one refresh, partial/per-dim does not, rerun is idempotent/no duplicate block or skill rewrite loop, ghost/no-KB remains silent, Codex/Claude host-aware roots are still honored through the refresh path, output contract/schema tests unchanged, build/check pass, and risks/next-phase recommendation for WS-3/P4.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T08:55:17.989Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2b-plugin-cold-start-skill-auto-sync-p1__AlembicPlugin__p2b-plugin-cold-start-skill-auto-sync-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2b-plugin-cold-start-skill-auto-sync-p1__AlembicPlugin__p2b-plugin-cold-start-skill-auto-sync-t1.json",
+        "deliveryRunId": "run-delivery-p2b-plugin-cold-start-skill-auto-sync-p1__AlembicPlugin__p2b-plugin-cold-start-skill-auto-sync-t1",
+        "dispatchGroup": "p2b-plugin-cold-start-skill-auto-sync-p1",
+        "sentAt": "2026-07-07T08:55:47.261Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2b-plugin-cold-start-skill-auto-sync-t1"
+    },
+    {
+      "targetTaskId": "p3-plugin-source-presence-onboarding-t1",
+      "taskPackageId": "p3-plugin-source-presence-onboarding-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, active state root, AlembicPlugin/AGENTS.md, Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.3/§10.6, and accepted P0-P2b controller evidence before editing. Implement only P3 WS-3 in AlembicPlugin: add a status SourcePresenceProbe that reuses ModuleService source-extension/exclusion/count semantics as closely as the current code allows, with maxDepth and early stop around 25 and readdir failures caught; thread sourcePresence through StatusService onboarding only when knowledge is not initialized; in needs_init, split by hasSource so sourceful uninitialized projects surface a host-visible alembic_bootstrap recommendation/primaryAction reason that explicitly says init enables cold-start guidance but does not run it, while empty projects and ghost-empty projects stay quiet with a note. Ghost with source is not fully silent because this path returns onboarding data, not project-root writes. Do not edit Alembic main SetupService, do not auto-run bootstrap/cold-start or create jobs, do not change WS-4/WS-5/WS-6/P4 behavior, and keep four-tool output contracts unchanged. Acceptance evidence: commit hash and files; tests for sourceful needs_init bootstrap recommendation, empty directory no bootstrap recommendation, ghost-empty quiet, ghost+source still suggests, no .asd/jobs created in any state, needs_bootstrap branch not regressed, probe exclusions/depth/early-stop/read-error behavior as practical; targeted unit/schema tests, build/check, git diff --check, Alembic Guard, risks and next recommendation for P4 real host validation.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T09:13:15.387Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-source-presence-onboarding-p1__AlembicPlugin__p3-plugin-source-presence-onboarding-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-source-presence-onboarding-p1__AlembicPlugin__p3-plugin-source-presence-onboarding-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-source-presence-onboarding-p1__AlembicPlugin__p3-plugin-source-presence-onboarding-t1",
+        "dispatchGroup": "p3-plugin-source-presence-onboarding-p1",
+        "sentAt": "2026-07-07T09:14:41.143Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-source-presence-onboarding-t1"
+    },
+    {
+      "targetTaskId": "p4-final-dual-host-proactive-activation-realtest-t1",
+      "taskPackageId": "p4-final-dual-host-proactive-activation-realtest-p1",
+      "targetWindow": "Test",
+      "summary": "Read AGENTS.md, active state root, Test rules, and Design/docs/current/alembic-proactive-activation-2026-07-03.md §7/§10.6 before executing. This is P4 real-machine verification only; do not edit product code. Use the accepted P0-P3 controller evidence as preconditions: P0 usage baseline + Claude Code .claude/skills proof, P1 consumption wording/guidance, P1b WS-5 managed AGENTS.md/CLAUDE.md block, P2 host-aware skill export, P2b cold-start final refreshKnowledgeSkills auto-sync, and P3 source-presence onboarding. On a real non-empty project, perform installed-flow validation in both hosts (Codex and Claude Code): run/observe cold-start through completion, then prove without manual refresh that the correct host context file is written (Codex AGENTS.md, Claude Code CLAUDE.md), contains only the Alembic managed block, preserves user content, and is actually loaded into the host LLM context; verify per-project skills are visible/loaded where the host supports them, with Claude Code using .claude/skills per P0; exercise an 'edit code' and a 'answer project question' scenario and capture the host calling alembic_prime then alembic_search and/or alembic_recipe_map/alembic_graph; compare session usage.byTool counts against the P0 baseline and show an increase for the knowledge tools; verify empty project and ghost-mode projects stay quiet (no CLAUDE.md/AGENTS.md write, no unsolicited prime, no bootstrap harassment); verify KB deletion/removal path removes the managed block without deleting the user file; verify four-tool output contract/schema is unchanged and no automatic cold-start is triggered beyond the explicit tested flow. Protect real ~/.asd: use the configured real test workspace/sandbox policy from Test rules and report exact roots touched. If blocked, return the first precise blocker with raw logs/screenshots/status JSON, not a guessed product fix. Acceptance evidence required: host-session transcripts or screenshots proving LLM context load, generated context file paths and before/after snippets, skill path evidence, tool-call sequence logs, status usage JSON baseline vs after, empty/ghost quiet evidence, KB-delete cleanup evidence, contract/schema command output, and pass/block conclusion.",
+      "status": "accepted",
+      "createdAt": "2026-07-07T09:35:31.820Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-final-dual-host-proactive-activation-realtest-p1__Test__p4-final-dual-host-proactive-activation-realtest-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-final-dual-host-proactive-activation-realtest-p1__Test__p4-final-dual-host-proactive-activation-realtest-t1.json",
+        "deliveryRunId": "run-delivery-p4-final-dual-host-proactive-activation-realtest-p1__Test__p4-final-dual-host-proactive-activation-realtest-t1",
+        "dispatchGroup": "p4-final-dual-host-proactive-activation-realtest-p1",
+        "sentAt": "2026-07-07T09:36:09.383Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-final-dual-host-proactive-activation-realtest-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p0-plugin-cc-skill-discovery-usage-baseline-p1",
+        "p1-plugin-consumption-wording-guidance-p1",
+        "p1b-plugin-managed-block-refresh-wiring-p1",
+        "p2-plugin-host-aware-skill-export-p1",
+        "p2b-plugin-cold-start-skill-auto-sync-p1",
+        "p3-plugin-source-presence-onboarding-p1"
+      ],
+      "targetTaskIds": [
+        "p0-plugin-cc-skill-discovery-usage-baseline-t1",
+        "p1-plugin-consumption-wording-guidance-t1",
+        "p1b-plugin-managed-block-refresh-wiring-t1",
+        "p2-plugin-host-aware-skill-export-t1",
+        "p2b-plugin-cold-start-skill-auto-sync-t1",
+        "p3-plugin-source-presence-onboarding-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1b-core-managed-block-pathguard-p1"
+      ],
+      "targetTaskIds": [
+        "p1b-core-managed-block-pathguard-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1b-alembic-host-guidance-pathguard-config-p1"
+      ],
+      "targetTaskIds": [
+        "p1b-alembic-host-guidance-pathguard-config-t1"
+      ]
+    },
+    {
+      "windowName": "Test",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p4-final-dual-host-proactive-activation-realtest-p1"
+      ],
+      "targetTaskIds": [
+        "p4-final-dual-host-proactive-activation-realtest-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [],
+    "blockedResultIds": [
+      "tr-p4-final-dual-host-proactive-activation-realtest-t1"
+    ],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-07-07T07:44:31.003Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p4-final-dual-host-proactive-activation-realtest-p1__Test__p4-final-dual-host-proactive-activation-realtest-t1",
+    "lastDeliveryRunId": "run-delivery-p4-final-dual-host-proactive-activation-realtest-p1__Test__p4-final-dual-host-proactive-activation-realtest-t1",
+    "lastDispatchGroup": "p4-final-dual-host-proactive-activation-realtest-p1",
+    "lastTargetTaskId": "p4-final-dual-host-proactive-activation-realtest-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-07-07T09:36:09.386Z"
+  }
+}

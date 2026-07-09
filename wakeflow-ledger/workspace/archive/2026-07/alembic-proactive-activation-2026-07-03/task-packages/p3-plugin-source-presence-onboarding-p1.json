@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-plugin-source-presence-onboarding-p1",
+  "demandKey": "alembic-proactive-activation-2026-07-03",
+  "summary": "P3 WS-3: add source-presence probing and needs_init onboarding split so host-visible status recommends alembic_bootstrap only for uninitialized projects that actually contain source code, without auto-running cold-start.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.3 / §10.6 P3",
+  "designIntent": "Implement SourcePresenceProbe and strengthen StatusService needs_init onboarding while preserving empty-project restraint and not touching main SetupService.",
+  "createdAt": "2026-07-07T09:13:15.387Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-plugin-source-presence-onboarding-t1",
+      "taskPackageId": "p3-plugin-source-presence-onboarding-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, active state root, AlembicPlugin/AGENTS.md, Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.3/§10.6, and accepted P0-P2b controller evidence before editing. Implement only P3 WS-3 in AlembicPlugin: add a status SourcePresenceProbe that reuses ModuleService source-extension/exclusion/count semantics as closely as the current code allows, with maxDepth and early stop around 25 and readdir failures caught; thread sourcePresence through StatusService onboarding only when knowledge is not initialized; in needs_init, split by hasSource so sourceful uninitialized projects surface a host-visible alembic_bootstrap recommendation/primaryAction reason that explicitly says init enables cold-start guidance but does not run it, while empty projects and ghost-empty projects stay quiet with a note. Ghost with source is not fully silent because this path returns onboarding data, not project-root writes. Do not edit Alembic main SetupService, do not auto-run bootstrap/cold-start or create jobs, do not change WS-4/WS-5/WS-6/P4 behavior, and keep four-tool output contracts unchanged. Acceptance evidence: commit hash and files; tests for sourceful needs_init bootstrap recommendation, empty directory no bootstrap recommendation, ghost-empty quiet, ghost+source still suggests, no .asd/jobs created in any state, needs_bootstrap branch not regressed, probe exclusions/depth/early-stop/read-error behavior as practical; targeted unit/schema tests, build/check, git diff --check, Alembic Guard, risks and next recommendation for P4 real host validation.",
+      "status": "pending",
+      "createdAt": "2026-07-07T09:13:15.387Z"
+    }
+  ]
+}

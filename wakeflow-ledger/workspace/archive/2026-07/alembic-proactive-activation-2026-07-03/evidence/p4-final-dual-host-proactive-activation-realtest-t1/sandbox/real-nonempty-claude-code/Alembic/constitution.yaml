@@ -1,0 +1,19 @@
+# Alembic Entrypoint Safety Policy
+version: "4.0"
+effective_date: "2026-06-13"
+
+# This file is a compatibility policy document for operation-level safeguards.
+# It is not a central authorization authority and does not define runtime roles.
+rules:
+  - id: "destructive_confirm"
+    description: "Destructive writes require confirmed: true at their HTTP entrypoint"
+    check: "destructive_needs_confirmation"
+  - id: "content_required"
+    description: "Create/update entrypoints validate non-empty content with route schemas"
+    check: "creation_needs_content"
+  - id: "ai_no_direct_recipe"
+    description: "AI-produced changes are preview/apply flows; apply entrypoints own confirmation"
+    check: "ai_cannot_approve_recipe"
+  - id: "batch_authorized"
+    description: "Batch writes require confirmed: true at their HTTP entrypoint"
+    check: "batch_needs_authorization"

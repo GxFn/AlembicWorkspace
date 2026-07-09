@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1b-alembic-host-guidance-pathguard-config-t1",
+  "demandKey": "alembic-proactive-activation-2026-07-03",
+  "taskPackageId": "p1b-alembic-host-guidance-pathguard-config-p1",
+  "dispatchGroup": "p1b-alembic-host-guidance-pathguard-config-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-proactive-activation-2026-07-03",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p1b-alembic-host-guidance-pathguard-config-t1",
+  "status": "completed",
+  "summary": "Completed Alembic main P1b WS-5 host-guidance PathGuard consumer check with no code change. Main has no real host-context managed guidance write/remove surface after accepted Core + Plugin WS-5: Plugin ProjectSkillService owns refreshKnowledgeSkills and host guidance block writes; Alembic main only configures generic PathGuard and generates project skill files/receipts with runtime export pending. Leaving AppRuntime.configurePathGuard unchanged preserves default root-file protection for AGENTS.md/CLAUDE.md until a main-owned consumer exists.",
+  "evidenceRefs": [
+    "Alembic/lib/Bootstrap.ts",
+    "Alembic/lib/recipe-pipeline/generate/skill-delivery/SkillCompletionCapability.ts",
+    "Alembic/lib/recipe-pipeline/generate/skill-delivery/SkillConsumer.ts",
+    "Alembic/test/unit/WorkflowSkillCompletionCapability.test.ts",
+    ".wakeflow-active/current/alembic-proactive-activation-2026-07-03/evidence/controller-review-p1b-core-managed-block-pathguard-2026-07-07.md",
+    ".wakeflow-active/current/alembic-proactive-activation-2026-07-03/evidence/controller-review-p1b-plugin-managed-block-refresh-wiring-2026-07-07.md",
+    "No Alembic commit: no main-owned WS-5 host guidance consumer exists, and widening root-file allowlist without a consumer would weaken protection."
+  ],
+  "verification": [
+    "Static search: rg refreshKnowledgeSkills/ProjectSkillService/upsertAlembicManagedBlock/removeAlembicManagedBlock/ALEMBIC_MANAGED/HOST_GUIDANCE/AGENTS.md/CLAUDE.md/addProjectWritableFile under Alembic lib/bin/config/scripts/test (excluding vendor) returned only shared-asset documentation strings, no main consumer code.",
+    "File review: AppRuntime.configurePathGuard currently configures projectRoot/packageRoot/knowledgeBaseDir and extraProjectWritableFiles ['.env']; it does not add AGENTS.md or CLAUDE.md.",
+    "File review: SkillCompletionCapability writes generated project skills to project skills directories and marks runtimeExport.status='pending'; it does not write host context files or managed guidance blocks.",
+    "PathGuard probe: default configuration allowed .env, rejected AGENTS.md, CLAUDE.md, and nested/AGENTS.md; addProjectWritableFile('AGENTS.md') allowed only AGENTS.md and rejected nested/CLAUDE.md, proving Core hook is narrow when a consumer actually calls it.",
+    "npx vitest run --config vitest.unit.config.ts test/unit/WorkflowSkillCompletionCapability.test.ts — passed, 1 file / 2 tests.",
+    "npm run build:check — passed with local AlembicCore source ../AlembicCore.",
+    "git diff --check — passed with no output.",
+    "git status --short --branch — clean main...origin/main."
+  ],
+  "risks": [
+    "P2/P2b/WS-6 remain later phases: host-aware skill export and cold-start auto-sync are not implemented in Alembic main by this no-commit check.",
+    "If a future Alembic main-owned host-guidance writer is introduced, it must call pathGuard.addProjectWritableFile for exactly the selected host file immediately before Core managed-block upsert/remove and add tests proving the other root file remains blocked.",
+    "True host-session validation that Codex/Claude Code load the managed block remains P4/Test scope, not this Alembic main consumer check."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1b-alembic-host-guidance-pathguard-config-p1__Alembic__p1b-alembic-host-guidance-pathguard-config-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1b-alembic-host-guidance-pathguard-config-p1__Alembic__p1b-alembic-host-guidance-pathguard-config-t1.json",
+    "deliveryRunId": "run-delivery-p1b-alembic-host-guidance-pathguard-config-p1__Alembic__p1b-alembic-host-guidance-pathguard-config-t1",
+    "dispatchGroup": "p1b-alembic-host-guidance-pathguard-config-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1b-alembic-host-guidance-pathguard-config-p1__Alembic__p1b-alembic-host-guidance-pathguard-config-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-proactive-activation-2026-07-03",
+    "stateRevision": 20,
+    "demandKey": "alembic-proactive-activation-2026-07-03",
+    "taskPackageId": "p1b-alembic-host-guidance-pathguard-config-p1",
+    "targetTaskId": "p1b-alembic-host-guidance-pathguard-config-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p1b-alembic-host-guidance-pathguard-config-p1",
+    "resultId": "tr-p1b-alembic-host-guidance-pathguard-config-t1",
+    "createdAt": "2026-07-07T08:34:21.669Z"
+  },
+  "createdAt": "2026-07-07T08:34:21.669Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

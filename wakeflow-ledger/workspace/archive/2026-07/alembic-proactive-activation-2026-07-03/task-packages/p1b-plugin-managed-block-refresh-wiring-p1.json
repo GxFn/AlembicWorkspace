@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p1b-plugin-managed-block-refresh-wiring-p1",
+  "demandKey": "alembic-proactive-activation-2026-07-03",
+  "summary": "P1b WS-5 Plugin consumer wiring: consume Core managed-block utility and PathGuard root-file allowlist to write/remove host context guidance blocks from refreshKnowledgeSkills.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.5 §10.6 §10.7; Core producer accepted at tc-20260707080952-0013 / commit 783b9f52aaa83767f4564ac8489cdfaf445bab35.",
+  "designIntent": "P1b continues from accepted Core producer work into Plugin refreshKnowledgeSkills so standard non-ghost projects get a tiny host-visible managed guidance pointer while empty/ghost projects remain silent and user content outside the managed block is preserved.",
+  "createdAt": "2026-07-07T08:10:44.177Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p1b-plugin-managed-block-refresh-wiring-t1",
+      "taskPackageId": "p1b-plugin-managed-block-refresh-wiring-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, the state root, Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.5/§10.6/§10.7, and accepted Core evidence for p1b-core-managed-block-pathguard-t1 before editing. Implement only the AlembicPlugin side of WS-5: in ProjectSkillService.refreshKnowledgeSkills, when hasKnowledgeBase is true and standard non-ghost host guidance is enabled, choose the host file by resolved plugin host (claude-code => CLAUDE.md, codex => AGENTS.md), call pathGuard.addProjectWritableFile for that one root file, then use @alembic/core/io upsertAlembicManagedBlock to write a short Alembic managed guidance pointer. When hasKnowledgeBase is false or skills are removed, call removeAlembicManagedBlock for the same host file without unlinking the user file. Preserve ghost-mode silence for project-root writes, empty/no-KB project restraint, opt-in/default decisions from the design, existing skill export behavior, and four-tool output contracts. The pointer body must stay short and include a concrete consumption example plus wording that the knowledge is grounded in THIS project's own code. Do not edit Alembic main or AlembicCore in this task, do not implement WS-6 cold-start auto-sync yet, and do not run real host validation here. Acceptance evidence: commit hash and file list; tests for idempotent no-duplicate block, preserving user content, ghost/no-KB silence, KB deletion removes block, correct per-host file selection with the other host file untouched, malformed marker surfacing, and pathGuard allowing only the selected root host file; targeted build/check and contract tests; next consumer contract for Alembic main if needed.",
+      "status": "pending",
+      "createdAt": "2026-07-07T08:10:44.177Z"
+    }
+  ]
+}

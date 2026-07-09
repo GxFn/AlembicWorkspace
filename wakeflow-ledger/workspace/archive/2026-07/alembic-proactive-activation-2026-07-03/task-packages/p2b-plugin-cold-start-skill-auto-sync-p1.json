@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p2b-plugin-cold-start-skill-auto-sync-p1",
+  "demandKey": "alembic-proactive-activation-2026-07-03",
+  "summary": "P2b WS-6: cold-start final completion automatically refreshes project knowledge skills and host guidance once, so accepted WS-2 host-aware skill export and WS-5 managed block become available without manual alembic_project_skill refresh.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.7 / §10.6 P2b",
+  "designIntent": "Wire the dimension-completion finalizer tail to refreshKnowledgeSkills only on final full completion, after WS-2/WS-5 are accepted.",
+  "createdAt": "2026-07-07T08:55:17.989Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p2b-plugin-cold-start-skill-auto-sync-t1",
+      "taskPackageId": "p2b-plugin-cold-start-skill-auto-sync-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Read AGENTS.md, the active state root, AlembicPlugin/AGENTS.md, Design/docs/current/alembic-proactive-activation-2026-07-03.md §10.7/§10.6, and controller evidence accepting P1b WS-5 and P2 WS-2 before editing. Implement only P2b WS-6: in dimension-completion.ts applyDimensionCompletionSideEffects tail, after persistence/broadcast side effects, automatically call ProjectSkillService.refreshKnowledgeSkills exactly once when full dimension completion reaches the final isComplete state. Do not run cold-start automatically; do not trigger on partial/per-dimension updates; do not implement WS-3 onboarding or P4 real-host validation. The call must use the existing refreshKnowledgeSkills path so host-aware skill export (.agents/skills for Codex, .claude/skills for Claude Code) and WS-5 managed AGENTS.md/CLAUDE.md block behavior are reused; preserve hasKnowledgeBase gating, ghost/root-file silence, empty/no-KB restraint, and four-tool output contracts. Acceptance evidence: commit hash and files; tests proving final completion triggers one refresh, partial/per-dim does not, rerun is idempotent/no duplicate block or skill rewrite loop, ghost/no-KB remains silent, Codex/Claude host-aware roots are still honored through the refresh path, output contract/schema tests unchanged, build/check pass, and risks/next-phase recommendation for WS-3/P4.",
+      "status": "pending",
+      "createdAt": "2026-07-07T08:55:17.989Z"
+    }
+  ]
+}

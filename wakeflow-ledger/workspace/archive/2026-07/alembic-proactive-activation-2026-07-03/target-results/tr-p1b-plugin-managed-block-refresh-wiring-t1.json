@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1b-plugin-managed-block-refresh-wiring-t1",
+  "demandKey": "alembic-proactive-activation-2026-07-03",
+  "taskPackageId": "p1b-plugin-managed-block-refresh-wiring-p1",
+  "dispatchGroup": "p1b-plugin-managed-block-refresh-wiring-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-proactive-activation-2026-07-03",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p1b-plugin-managed-block-refresh-wiring-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin implemented P1b WS-5 Plugin consumer wiring. ProjectSkillService.refreshKnowledgeSkills now maintains a short Alembic managed-guidance block in the selected standard-mode host context file (codex => AGENTS.md, claude-code => CLAUDE.md) using @alembic/core/io upsert/remove helpers and pathGuard.addProjectWritableFile for only the selected root file. Standard projects with local knowledge upsert the block; no-KB or disabled host guidance removes only the managed block without unlinking user files; ghost/external dataRoot projects stay silent for project-root host guidance. Generated knowledge skill body now includes the concrete prime -> search -> map/graph example and the 'grounded in THIS project's own code' trust wording. Public tool/schema/effects descriptions were updated for the new declared write surface. Commit: 33f2954901723abf85214abcae0cebaabb4cb1d4.",
+  "evidenceRefs": [
+    "commit 33f2954901723abf85214abcae0cebaabb4cb1d4",
+    "AlembicPlugin/lib/service/skills/ProjectSkillService.ts",
+    "AlembicPlugin/test/unit/ProjectSkillService.test.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/tools.ts",
+    "AlembicPlugin/lib/shared/schemas/mcp-tools.ts",
+    "AlembicPlugin/docs/declared-effects.md",
+    "alembic_code_guard guard-public-mradrdx1-1"
+  ],
+  "verification": [
+    "npx vitest run --config vitest.unit.config.ts test/unit/ProjectSkillService.test.ts — passed, 12 tests",
+    "npx vitest run --config vitest.unit.config.ts test/unit/ProjectSkillService.test.ts test/unit/McpToolSchemaHonesty.test.ts test/unit/CodexToolPolicy.test.ts — passed, 26 tests",
+    "npx vitest run test/integration/ZodToMcpSchema.test.ts — passed, 19 tests",
+    "npm run build:check — passed, Core build used ../AlembicCore @ 783b9f52aaa83767f4564ac8489cdfaf445bab35",
+    "npm run check — passed; existing Biome warnings remain in unrelated files but exit code 0",
+    "git diff --check — passed",
+    "alembic_code_guard guard-public-mradrdx1-1 — passed, 5 explicit files, 0 violations"
+  ],
+  "risks": [
+    "No real Codex/Claude Code host-session validation was run in this target per task instruction; P4/Test remains responsible for true-machine host context loading.",
+    "WS-6 cold-start auto-sync was not implemented; this task only wires refreshKnowledgeSkills behavior.",
+    "An extra exploratory run of test/integration/ZodSchemas.test.ts still fails in an unrelated RescanInput fixture expecting controller-authorized rescan without planSelection; ZodToMcpSchema contract for this change passed."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1b-plugin-managed-block-refresh-wiring-p1__AlembicPlugin__p1b-plugin-managed-block-refresh-wiring-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1b-plugin-managed-block-refresh-wiring-p1__AlembicPlugin__p1b-plugin-managed-block-refresh-wiring-t1.json",
+    "deliveryRunId": "run-delivery-p1b-plugin-managed-block-refresh-wiring-p1__AlembicPlugin__p1b-plugin-managed-block-refresh-wiring-t1",
+    "dispatchGroup": "p1b-plugin-managed-block-refresh-wiring-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1b-plugin-managed-block-refresh-wiring-p1__AlembicPlugin__p1b-plugin-managed-block-refresh-wiring-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-proactive-activation-2026-07-03",
+    "stateRevision": 16,
+    "demandKey": "alembic-proactive-activation-2026-07-03",
+    "taskPackageId": "p1b-plugin-managed-block-refresh-wiring-p1",
+    "targetTaskId": "p1b-plugin-managed-block-refresh-wiring-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p1b-plugin-managed-block-refresh-wiring-p1",
+    "resultId": "tr-p1b-plugin-managed-block-refresh-wiring-t1",
+    "createdAt": "2026-07-07T08:22:54.268Z"
+  },
+  "createdAt": "2026-07-07T08:22:54.268Z",
+  "stateRevisionObserved": 16,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}

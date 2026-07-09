@@ -24,11 +24,12 @@ gitignored、仅本机审计）。
 
 ---
 
-## Wave E — Panorama 重建（2026-07）
+## Wave E — Panorama 重建与遗留收口（2026-07）
 
 | 完成 | Demand | rev | 结论 | 设计来源 |
 | --- | --- | --- | --- | --- |
 | 07-07 | [alembic-panorama-rebuild-2026-07-03](archive/2026-07/alembic-panorama-rebuild-2026-07-03/) | 74 | 重建 Alembic Panorama 全景页面：忠实恢复老 4 标签 UI / 14 角色标签 / 16 panel。首个带完整归档 spine（archive-summary + provenance）的需求 | in-archive |
+| 07-09 | [alembic-proactive-activation-2026-07-03](archive/2026-07/alembic-proactive-activation-2026-07-03/) | 41 | 双宿主主动激活链（CC skill 发现/消费/managed-block/冷启动同步/接入引导）：P0–P3 共 8 包逐一验收；P4 双宿主真机验收**未执行**，按用户 2026-07-09 遗留整理决定记诚实 blocked 终态并 accept-blocked 行政性收口。残余风险在终态结果上（回归需新需求重跑 P4 场景） | [design/current](../../Design/docs/current/alembic-proactive-activation-2026-07-03.md) |
 
 ## Wave D — 收尾与保真借鉴（2026-06-29 ~ 06-30）
 

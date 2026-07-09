@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-host-aware-skill-export-t1",
+  "demandKey": "alembic-proactive-activation-2026-07-03",
+  "taskPackageId": "p2-plugin-host-aware-skill-export-p1",
+  "dispatchGroup": "p2-plugin-host-aware-skill-export-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-proactive-activation-2026-07-03",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-host-aware-skill-export-t1",
+  "status": "completed",
+  "summary": "P2 WS-2 completed in AlembicPlugin commit dc85c94dc74e815f8cb0374a3c88c7b2bcb3a321. HostAdapter now exposes projectSkillRoot(projectRoot); Codex resolves unchanged to .agents/skills and Claude Code resolves to .claude/skills. ProjectSkillDelivery and ProjectSkillService delegate runtime root selection through getProjectSkillRoot/HostAdapter, receipts keep codexSkillRoot field names while values point to the selected host root, and PathGuard write authorization is coupled to the selected host skill root. Public schema/tool descriptions were updated for host-aware wording without changing schema fields.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-proactive-activation-2026-07-03/task-packages/p2-plugin-host-aware-skill-export-p1.json",
+    "AlembicPlugin/lib/host-runtime/host-adapter/HostAdapter.ts",
+    "AlembicPlugin/lib/host-runtime/host-adapter/CodexHostAdapter.ts",
+    "AlembicPlugin/lib/host-runtime/host-adapter/ClaudeCodeHostAdapter.ts",
+    "AlembicPlugin/lib/service/skills/ProjectSkillDelivery.ts",
+    "AlembicPlugin/lib/service/skills/ProjectSkillService.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/tools.ts",
+    "AlembicPlugin/lib/shared/schemas/mcp-tools.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/PluginToolSurfaceCatalog.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/handlers/skill.ts",
+    "AlembicPlugin/scripts/lint-layer-boundary.mjs",
+    "AlembicPlugin/docs/declared-effects.md",
+    "AlembicPlugin/test/unit/ClaudeCodeHostAdapter.test.ts",
+    "AlembicPlugin/test/unit/ProjectSkillDelivery.test.ts",
+    "AlembicPlugin/test/unit/ProjectSkillService.test.ts"
+  ],
+  "verification": [
+    "npx vitest run --config vitest.unit.config.ts test/unit/ClaudeCodeHostAdapter.test.ts test/unit/ProjectSkillDelivery.test.ts test/unit/ProjectSkillService.test.ts test/unit/McpToolSchemaHonesty.test.ts test/unit/CodexToolPolicy.test.ts test/unit/KnowledgeContextPublicSurfaceGuidance.test.ts => PASS, 6 files, 42 tests",
+    "npx vitest run test/integration/ZodToMcpSchema.test.ts => PASS, 1 file, 19 tests",
+    "npm run build:check => PASS; Core build used ../AlembicCore @ 783b9f52aaa83767f4564ac8489cdfaf445bab35",
+    "npm run check => PASS; existing unrelated Biome warnings remain, exit 0",
+    "git diff --check => PASS",
+    "alembic_code_guard files scope => PASS guard-public-mraenz0m-3, 14 files checked, 0 violations"
+  ],
+  "risks": [
+    "P2b/WS-6 cold-start auto-sync remains the next phase; this task intentionally did not wire automatic refreshKnowledgeSkills after cold-start completion.",
+    "P4 real Codex and Claude Code host-session validation remains later acceptance; this task covered unit/schema/build/check/Guard evidence only."
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-host-aware-skill-export-p1__AlembicPlugin__p2-plugin-host-aware-skill-export-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-host-aware-skill-export-p1__AlembicPlugin__p2-plugin-host-aware-skill-export-t1.json",
+    "deliveryRunId": "run-delivery-p2-plugin-host-aware-skill-export-p1__AlembicPlugin__p2-plugin-host-aware-skill-export-t1",
+    "dispatchGroup": "p2-plugin-host-aware-skill-export-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-host-aware-skill-export-p1__AlembicPlugin__p2-plugin-host-aware-skill-export-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "/Users/gaoxuefeng/Documents/AlembicWorkspace",
+    "stateRoot": ".wakeflow-active/current/alembic-proactive-activation-2026-07-03",
+    "stateRevision": 24,
+    "demandKey": "alembic-proactive-activation-2026-07-03",
+    "taskPackageId": "p2-plugin-host-aware-skill-export-p1",
+    "targetTaskId": "p2-plugin-host-aware-skill-export-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-host-aware-skill-export-p1",
+    "resultId": "tr-p2-plugin-host-aware-skill-export-t1",
+    "createdAt": "2026-07-07T08:48:55.591Z"
+  },
+  "createdAt": "2026-07-07T08:48:55.591Z",
+  "stateRevisionObserved": 24,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ]
+}
