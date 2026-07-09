@@ -117,3 +117,7 @@ flaky:
 A good strategy names the exact question, risk, chosen layer, evidence, success
 meaning, failure meaning, invalid conclusion, and stop condition. It fails if it
 just says "run tests" or expands beyond the controller's test boundary.
+
+## Challenge path dependency before executing
+
+Before committing to a test approach, ask: is this chosen because it fits THIS demand's risk, or because it is what was done last time? Path-dependent reuse is the common way a wrong test approach slips in. The approach should come from the Design-stage testing decision (recorded as the test card's `strategySource`); if it is improvised, say so and justify it against the risk. Prefer the lowest test level that proves the behavior; escalate to real-scenario only when user-visible or environment evidence is required.

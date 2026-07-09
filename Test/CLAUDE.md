@@ -147,3 +147,7 @@ the configured active `Test` surface.
 - Historical reports are point-in-time evidence. Do not reuse old localhost
   URLs, pids, ports, cache markers, file mtimes, or runtime state as current
   configuration.
+
+## Skill Boundary (execution-craft rollout)
+
+Test uses ONLY its own Test skills (test-strategy, debugging-and-triage, regression-design, evidence-review, progressive-chain-validation). It does NOT use Design skills or the development window's `wakeflow-target-craft`. The test approach is decided at Design (the test card's `strategySource`); before executing, challenge whether the approach fits THIS demand's risk — do not reuse an approach just because it was used last time (path dependency). A card without `strategySource` is flagged as an improvised approach.

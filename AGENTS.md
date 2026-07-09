@@ -246,18 +246,11 @@ definition, local code, docs, tests, and release path before decomposing work.
   requirement design and current state root; when the confirmed demand plan is
   complete, stop, and mark any work outside the confirmed design as pending decision.
 
-The operator's stop-card, confirmation-gate, and decision-checklist discipline lives
-in the installed workspace's own `AGENTS.md` (its preserved local rules), not in this
-reusable file. This file keeps Wakeflow's roles, process, and posture.
-
 ## Role Map
 
 - The controller workspace owns cross-repository goal intake, planning,
   dispatch, acceptance, boundaries, TODO routing, templates, and collaboration
   rules. It does not implement managed products.
-- The controller window is the workspace brain, not a dispatch table. For a new
-  request, analyze the feature, user scenario, completion definition, local
-  code, docs, tests, builds, and release paths before decomposing work.
 - Design clarifies requirements, compares options, exposes risks, redesigns
   non-bug outcome mismatches, and prepares signals or handoff candidates.
   Design does not dispatch implementation, accept work, edit product code, or
@@ -298,11 +291,12 @@ implementation churn until Design returns a complete adjustment plan.
 ## Auto-Claim Boundary
 
 The controller may auto-claim (init) a demand without a fresh user prompt ONLY from a
-Design-set `controller-claimable` handoff row via `wakeflow_claim_next`: only Design
-can set that typed status, it carries every ready-row invariant plus design-key
-provenance, and it is init-only — dispatch and acceptance still require their own
-evidence and confirmation. A free-text TODO row cannot drive auto-claim. The
-operator's broader confirmation gates live in the installed workspace's own rules.
+global TODO row that Design delivered with Auto Claim = yes, via `wakeflow_claim_next`:
+that immutable delivery property is set once at `wakeflow_deliver` time and, for a
+requirement, requires a linked Original Plan + Requirement Design, so it carries the
+ready-row invariants plus design-key provenance. It is init-only — dispatch and
+acceptance still require their own evidence and confirmation. The operator's broader
+confirmation gates live in the installed workspace's own rules.
 
 ## Testing And Acceptance
 
@@ -391,6 +385,11 @@ live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-delive
   `wakeflow-ledger/`. Product source/tests/docs commit in their own repos.
 - Long-term documents must not contain user absolute paths, API keys, tokens, or
   private information. Use lowercase kebab-case names and execution dates.
+- `wakeflow_view` (scope `storage`) is the local-storage map — every tree with
+  class/size/age plus legacy, unknown, and aging preserved entries; in-place
+  READMEs (seeded by `wakeflow-storage seed-readmes`) explain each tier next
+  to the data. The only sanctioned manual-rescue move is `wakeflow-storage
+  preserve`; unknown trees route to the user and are never auto-deleted.
 - First installation runs discovery and waits for user confirmation before
   writing scope. Placement, index, and archive detail live in
   `installed Wakeflow skill wakeflow-governance/references/wakeflow-ledgers.md`.
@@ -402,6 +401,25 @@ live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-delive
   state root and decides research, Test cards, packages, phase confirmation, or
   execution. When valid implementation still misses the target in a non-bug way,
   route a Design redesign (product windows do not guess the new solution).
+- Design's exit gate closes BEFORE first implementation dispatch, at the
+  demand's scale (full gate for a requirement; lighter for bug/supplement):
+  requirement design reconciled against real code facts, a landing plan
+  (per-window breakdown + designIntent), non-goals, every open user question
+  answered and recorded, and the Test decision — including a user-confirmed
+  Test Environment Spec whenever real-scenario Test will be needed. A goal
+  without these is Design work, not execution work.
+- Test only tests: the controller selects the confirmed environment for each
+  test card (from the Design-stage spec) and sends it in the card; Test never
+  chooses environments, invents config values, or fixes product code. A missing
+  input at any stage is routed to its owner (Design / user / bounded
+  investigation), never guessed — the full S0→S6 route and per-stage gates live
+  in `installed Wakeflow skill wakeflow-governance/references/stage-route-map.md`.
+- Parallelism exists ONLY at the demand level, as demand pods: up to
+  `maxActiveDemands` (default 2) demands run side by side, each with its OWN
+  controller (stamped into the state root so returns route home) and window
+  set, mutually unaware. Within a demand each repo = one window = one combined
+  task package. Branch merge-back is human-reviewed and decentralized;
+  claiming past capacity fails closed.
 - Supplemental requirements must not reverse original decisions, non-goals, or
   forbidden shortcuts, and must not split into placeholder / empty-adapter /
   type-only stages without a named consumer and targeted validation.
@@ -442,8 +460,8 @@ forbidden paths, or automation manuals in `AGENTS.md`.
 - `AGENTS.md` keeps Wakeflow identity, role boundaries, the controller posture, the
   dispatch/wave/acceptance process, repository protection, and validation
   requirements. The operator's stop-card, confirmation-gate, and decision-checklist
-  discipline lives in this workspace's own preserved local rules (the Personal
-  Operating Constraints above), not in the reusable Wakeflow block.
+  discipline lives in the installed workspace's own `AGENTS.md` (its preserved local
+  rules), not in this reusable file.
 - Skills and references keep operation steps, command order, templates,
   examples, troubleshooting, and script details.
 
@@ -476,6 +494,11 @@ Reference map:
 - `installed Wakeflow template wakeflow-template-bundle.json`: bundled starter workspace,
   Design/Test support surfaces, and Test-window progressive chain validation
   assets that Wakeflow expands during setup.
+
+The controller uses ONLY `wakeflow-controller` and `wakeflow-governance`; it does NOT use the
+Design/Test window skills or the development window's `wakeflow-target-craft`. The controller is
+the acceptance authority and does not write product code — code craft belongs to the windows it
+dispatches.
 
 Hard boundaries stay here. Operational details live in skills.
 

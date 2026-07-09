@@ -140,3 +140,7 @@ The design is good when a controller can decide phase order, affected windows,
 producer/consumer dependencies, validation strategy, and user-confirmation needs
 without guessing. It fails if it reads like a feature wish list, omits testing
 decisions, or cannot be traced back to user goals and evidence.
+
+## Required output: testing decision
+
+Every requirement design MUST include an explicit testing decision — what validation proves the requirement, and whether a real-scenario Test is needed (and if so, its Test Environment Spec). This is a required output, not optional prose: a demand created without a recorded testing decision surfaces a reminder at create-demand. "Run tests" is not a testing decision; name the risk, the evidence, and the environment.

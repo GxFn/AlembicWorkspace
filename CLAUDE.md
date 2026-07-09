@@ -375,10 +375,23 @@ Details live in `installed Wakeflow skill wakeflow-governance/references/testing
   delivery is controller-started unless the plan and envelope authorize an
   exception. Old claim/finish/chain-next/start-plan/resume-plan routes are
   retired.
+- Within one demand each repository runs exactly ONE window with ONE combined
+  task package (the window self-sequences its items); a window is never
+  dispatched two simultaneous tasks inside the same demand. Isolation worktree
+  windows (`<repo>__<id>`) exist for cross-demand isolation only; their
+  surviving branches land on the pending-merges ledger, and merge-back is
+  human-reviewed and decentralized — no controller merges them.
+- Parallelism exists ONLY at the demand level, as demand pods: up to
+  `maxActiveDemands` (default 2) demands run side by side, each in its own pod
+  (own controller stamped into the state root, own isolation worktrees, own
+  Test, own tmux session), mutually unaware. Branch merge-back is
+  human-reviewed and decentralized; claiming past capacity fails closed.
 
 Deliveries go to a tmux-resident interactive `claude` window via the
-`wakeflow-claude-host.mjs send` helper (shared per-window lock, `readback.paneTail`
-evidence); Claude Code desktop windows are not an automation transport. Envelope
+`wakeflow-claude-host.mjs` helper — one-step `deliver --delivery-file
+<envelope>` as the primary transport, low-level `send --window --prompt-file`
+for custom prompts (shared per-window lock, `readback.paneTail` evidence);
+Claude Code desktop windows are not an automation transport. Envelope
 fields, the host-helper send/launch/recovery mechanics, keep-live, and review
 flow live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-delivery.md`,
 `installed Wakeflow skill wakeflow-controller/`, and `installed Wakeflow skill wakeflow-target/`.
@@ -392,6 +405,11 @@ flow live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-d
   `wakeflow-ledger/`. Product source/tests/docs commit in their own repos.
 - Long-term documents must not contain user absolute paths, API keys, tokens, or
   private information. Use lowercase kebab-case names and execution dates.
+- `wakeflow_view` (scope `storage`) is the local-storage map — every tree with
+  class/size/age plus legacy, unknown, and aging preserved entries; in-place
+  READMEs (seeded by `wakeflow-storage seed-readmes`) explain each tier next
+  to the data. The only sanctioned manual-rescue move is `wakeflow-storage
+  preserve`; unknown trees route to the user and are never auto-deleted.
 - First installation runs discovery and waits for user confirmation before
   writing scope. Placement, index, and archive detail live in
   `installed Wakeflow skill wakeflow-governance/references/wakeflow-ledgers.md`.
@@ -403,6 +421,19 @@ flow live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-d
   state root and decides research, Test cards, packages, phase confirmation, or
   execution. When valid implementation still misses the target in a non-bug way,
   route a Design redesign (product windows do not guess the new solution).
+- Design's exit gate closes BEFORE first implementation dispatch, at the
+  demand's scale (full gate for a requirement; lighter for bug/supplement):
+  requirement design reconciled against real code facts, a landing plan (per-window
+  breakdown + designIntent), non-goals, every open user question answered and
+  recorded, and the Test decision — including a user-confirmed Test Environment
+  Spec whenever real-scenario Test will be needed. A goal without these is
+  Design work, not execution work.
+- Test only tests: the controller selects the confirmed environment for each
+  test card (from the Design-stage spec) and sends it in the card; Test never
+  chooses environments, invents config values, or fixes product code. A missing
+  input at any stage is routed to its owner (Design / user / bounded
+  investigation), never guessed — the full S0→S6 route and per-stage gates live
+  in `installed Wakeflow skill wakeflow-governance/references/stage-route-map.md`.
 - Supplemental requirements must not reverse original decisions, non-goals, or
   forbidden shortcuts, and must not split into placeholder / empty-adapter /
   type-only stages without a named consumer and targeted validation.
@@ -477,6 +508,11 @@ Reference map:
 - `installed Wakeflow template wakeflow-template-bundle.json`: bundled starter workspace,
   Design/Test support surfaces, and Test-window progressive chain validation
   assets that Wakeflow expands during setup.
+
+The controller uses ONLY `wakeflow-controller` and `wakeflow-governance`; it does NOT use the
+Design/Test window skills or the development window's `wakeflow-target-craft`. The controller is
+the acceptance authority and does not write product code — code craft belongs to the windows it
+dispatches.
 
 Hard boundaries stay here. Operational details live in skills.
 

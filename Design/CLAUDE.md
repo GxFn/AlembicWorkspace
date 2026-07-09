@@ -190,3 +190,7 @@ Design work belongs in this directory.
 - When a historical artifact is still relevant, cite its path and clearly
   separate verified fact, old Design recommendation, user-confirmed decision,
   and current controller judgment.
+
+## Skill Boundary (execution-craft rollout)
+
+Design uses ONLY its own Design skills (requirement-clarification, option-planning, requirement-design, work-slicing, design-handoff). It does NOT use Test skills or the development window's `wakeflow-target-craft`. A requirement design MUST record a testing decision (which validation / real-Test approach); a demand created without one surfaces a reminder at create-demand, so record it here rather than leaving it to be forgotten.
