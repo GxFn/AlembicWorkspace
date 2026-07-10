@@ -62,15 +62,18 @@
 - 完成定义:检索命中能透出逐条 drifted 信号且不误删;search/prime 锚点输出对称。
 - **决策项**:✅ 用户已确认实施。落地:Core `_supplementDetails` 携带 per-ref 状态→聚合 `driftedSourceRefs`+item 级 `sourceRefStatus`;`_applyRanking` drifted×0.85 降权;Plugin `projectKnowledgeItem` 输出保留 sourceRefs+sourceStatus+driftedSourceRefs(与 prime 对称)。更正一处既有过宽不变量(禁 search 输出含 `sourceRefs`→改为只禁 prime 材料对象)。**实施中发现**:桥表 `findActiveByRecipeIds` 早已带 status 且已含 drifted(G-C-2 桥表侧其实通了),断点纯在 SearchEngine 把非 stale 锚点塌成扁平 `string[]` 丢弃 status——比设计预想更集中;`AlembicSearchOutput.items` 是 `z.record` 松散透传,无需改 schema。
 
-**P2|生成后落锚(段一)**
-- 触点:submit 成功写 reasoning.sources 的同点,同步 upsert recipe_source_refs.contentFp(Agent→Core 桥,或 Core sync 侧)。
-- 验证:提交后立即 reconcile 应"无漂移"(锚已在);改文件后 reconcile 才标 drifted。
-- 完成定义:真空窗消除,提交即有可复检锚。
+**P2|生成后落锚(段一)—— ✅ 已收口(Core 19ae7f6),但性质是"补测试锁定"而非"实现"**
+- **实施中发现 G-C-3 被高估**:`#insertSourceRef`(SourceRefReconciler.ts:478)首建源锚时**已立即算 region 指纹作基线**,且 submit 后 `refreshCreatedRecipeFreshness`→`reconcileRecipeSourceRefs` **同步**跑——真空窗只是 gateway.create 到该刷新之间的毫秒级、期间无代码变更。锚在提交时即落,不是"靠事后 reconcile 补"。
+- 真实缺口=**该不变量无回归护栏**。补:新建 recipe(无既有行,走 insert 路径)reconcile 后 contentFp=提交态指纹;反证改文件后才判 drifted(真空窗可证已闭)。
+- 完成定义:达成(不变量锁定,未来重构不能静默重开真空窗)。
 
-**P3|漂移精判 + git show 封装(段二)**
-- 触点:Core git 层新增 `readFileAtCommit`;reconciler drifted 分支细分自动修 range vs 升 proposal。
-- 验证:行号漂移用例自动修 range(不升 proposal);内容实变用例升 proposal。
-- 完成定义:drifted 误报下降,人工/proposal 负担降低。
+**P3|漂移精判 + git show 封装(段二)—— ✅ 已实现(Core 19ae7f6,observe-first)**
+- 触点:`shared/gitBlob.readFileAtCommit`(git show 安全封装)+ `service/knowledge/driftClassifier.classifyRegionDrift`(纯函数,line-shift/content-change/unresolved)+ SourceRefReconciler 可选注入 gitReader+baselineCommit。
+- **纪律偏差(有意)**:设计原写"行号漂移自动修 range"。实施采 **observe-first**:drifted 精判只记进 report(driftLineShift/driftContentChange)+日志,**不自动改 status/sourceRefs**。理由:①自动改承重锚点跨切(reasoning.sources 需同步)且有风险;②baselineCommit-for-contentFp 无精确追踪(当前用调用方传入的基线),先在真实 run 里验证分类准确率再谈自动修——对齐系统"确定性标记+概率性消解+人工终裁"哲学。**自动修 range 明确列为后续项(P3-b)**。
+- 验证:classifier 四态 + git 封装真临时仓 + reconciler observe-only 计数;缺 gitReader/baselineCommit 时行为字节不变。
+- 完成定义:分类能力就位可被维护环消费;误报下降的实证依赖真实 run(未来接入 commit 驱动路径的 baseline 时点亮)。
+
+**P3-b(登记,后续)|自动修 range**:分类在真实 run 验证准确后,line-shift 自动修 sourceRefs 行号(类比 renamed 修复),同步更新 reasoning.sources。需先有 P3 分类的真实准确率数据。
 
 **P4(登记)|G-C-5 淘汰生效 + G-C-6 复核透源**:独立需求,不在本设计实施范围。
 
