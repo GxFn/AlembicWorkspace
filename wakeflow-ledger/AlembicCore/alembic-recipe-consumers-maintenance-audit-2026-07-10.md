@@ -88,3 +88,44 @@ drifted→update 提案端到端走查(Dashboard 审批→执行→重锚→drif
 - 白名单家族计数更新:**6 处**(Core fileFlow/fileSymbols/moduleLayers/
   sourceGraph-indexer-exclusions + Plugin graph flow-extensions),全部收敛到
   parserLanguage/COMMON_EXCLUDE 双单源。
+
+## P-B/P-C/P-E 落地(2026-07-11 凌晨,连续推进)
+
+**P-B 落锚 parity ✅**(Core dfc802a + 主体 655fce1 + Plugin 205ab8c):
+- 主体挖掘钩子 _populateSourceRefsForEntry 插入时同步算 region 指纹(16 条 NULL 实证根治);
+- ContentPatcher 注入 projectRoot,update 提案执行后 refs 立即落锚(第三处无 fp 写点);
+- 指纹三件套(computeSourceRegionFingerprint/parseSourceLineRange/stripSourceRangeSuffix)
+  经 ./knowledge 门面导出。InProcessFileChangeHandler 的 stale 标记点语义正确不动。
+
+**P-C reconcile 接 P3 ✅**(主体 655fce1):
+- 新增 sustain/driftBaseline.ts:统一演化 checkpoint(git_diff_checkpoints 双宿主同表)
+  作精判基线,scope 口径与 Plugin 声明一致(登记下沉 Core 单源);
+- sourceRefReconciler 单例+IncrementalRescanWorkflow 注入 gitReader;
+  SourceRefSyncConsumer 与 rescan 的 reconcile 传 baselineCommit。
+
+**P-E 提案环走查 → 抓到维护环致命缺陷并修复 ✅**(Core 52570eb):
+- 时间线证据:15:07:24 CoverageClassifier 产 30 个 drifted→update 提案(observing),
+  15:07:56 被 rescan 起始 sweep 的 checkAndExecute 兜底循环送进 evaluateUpdate 的
+  hasUsage 闸批量 auto-reject('no usage during observation')——**出生 32 秒处决**;
+  库中 51 条历史提案全由同机制拒,提案人审环从未运转过(Dashboard 队列恒空根因)。
+- 根因:信号驱动改造(U5 #8)后兜底循环自称'对长期 observing 兜底'却从不检查时长,
+  观察窗口(EvolutionPolicy 24h/72h/7d)形同虚设。
+- 修:兜底循环按 assessRisk→observationWindow 检查 proposedAt,窗口未满 skipped
+  留 observing;信号路径本就 fail-silent 不受影响;人工 executeOne 不拦。
+  回归:新鲜提案活过 sweep(14 测绿,旧 13 测兼容)。
+- 登记决策项:①人工 executeOne 仍受 hasUsage 闸(人审通过被机器拒);
+  ②drifted 来源 update 是否豁免 hasUsage(修复漂移 vs 使用率语义混闸)。
+- 下次 rescan 产的提案将存活 24h+ 进入人审;60 条 drifted refs 仍在,环可再触发。
+
+## ⚠️ DB 损坏事故与恢复(2026-07-11 00:5x)
+
+- 现象:daemon 重启失败 SQLITE_CORRUPT('database disk image is malformed'),
+  integrity_check 直接报错,.recover 仅出 2704 行(不全)。
+- 恢复:23:52 的 .backup() 忠实副本(integrity ok,75 entries/337 refs/51 proposals)
+  回填;坏库三件留存 scratchpad db-incident/ 取证。丢失窗口仅两项机械可重建:
+  source_graph 自愈(下次挖掘准备段按新排除表自动 1588→~180)与 Plugin checkpoint
+  推进(下次 guard 自动)。恢复后服务 ready,60 active/24 drifted 标注/图 38n58e 全在。
+- 根因嫌疑(未定罪):P-D 期间多个 headless host-mcp 进程与 daemon 并发读写同一
+  WAL 库,且探针进程 child.kill() 可能斩于写事务中。**流程改进(硬规则)**:
+  headless 真库验收必须 daemon 停机窗口内进行或改只读;探针进程用优雅关闭
+  (stdin end + 等待退出)代替 kill;高风险操作前先 .backup()。
