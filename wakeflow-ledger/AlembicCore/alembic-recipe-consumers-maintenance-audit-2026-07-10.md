@@ -73,3 +73,18 @@ push/发版等用户门不动。
 
 P-B 主体落锚 parity → P-C 主体 reconcile 接 P3(gitReader/baseline)→ P-E 30 个
 drifted→update 提案端到端走查(Dashboard 审批→执行→重锚→drifted 清零)。
+
+## 补充:alembic_graph 进矩阵(2026-07-11,用户指认漏项)
+
+- **space/module** ✅:20 节点/40 关系,AOX* targets 带真路径(吃到 D2 红利)。
+- **file-symbols** ✅:11 个 Swift 符号(AppCoordinator/window/...)——fileSymbols
+  白名单修复在 MCP 面端到端验证通过。
+- **file-flow** 🐛→✅ **D6 已修**(Core 59dc046 + Plugin b98923e):对
+  AppCoordinator.swift 恒 0 节点(partial),Core 直探同文件 9 imports。两因:
+  ①PROJECT_CONTEXT_FLOW_SOURCE_EXTENSIONS 是**第 6 份 JS-only 白名单**(.swift 在
+  目标选择层丢弃)→ 接 Core 解析语言单源(经 ./project-context 门面新导出);
+  ②边构建对模块名导入整条丢弃 → 按 Track1 语义 join 既有 target 节点。
+  真机:0→8 节点/7 条 imports 边,partial→ready。
+- 白名单家族计数更新:**6 处**(Core fileFlow/fileSymbols/moduleLayers/
+  sourceGraph-indexer-exclusions + Plugin graph flow-extensions),全部收敛到
+  parserLanguage/COMMON_EXCLUDE 双单源。
