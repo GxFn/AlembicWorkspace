@@ -41,7 +41,7 @@
 
 1. **judge 引用区间校验过严**:5/5 裁决 `invalidCitation` 被判无效(设计如此:无效即 void),但 judge 文本内容质量良好(2 reject 均带具体反证,如"字段是 ok 不是 success")。校验器对 judge 的 citedLines 格式适配待修;在修复前 precision(judge) 数字仅供方向参考。
 2. **submitRepairs 双侧空 {}**:HEAD 有 9 次 knowledge 提交仍零修复计数。可能=draft 天然干净(机制上成立:证据扩展已确定性化),也可能=计数经生产入口的归并管道未贯通。**P2-1 裁撤修复层前必须先证伪"假零"**(E2E 或加量真跑确认计数管道)。
-3. Harness 无 `--model` 旗标,只能评 autoDetect 默认档(v4-flash);评估生产实际模型档需补旗标。
+3. ~~Harness 无 `--model` 旗标~~ ✅ 已补(--model/--judge-model,须显式成对 --provider;AlembicAgent 当日 commit)。
 4. 单 fixture、每侧 n=1:做趋势门槛(如 CI 尺)前需扩 golden set 与重复次数取区间。
 
 ### 5.1 增补(2026-07-10 当日离线根修,AlembicAgent 350da7c + 78df116)
