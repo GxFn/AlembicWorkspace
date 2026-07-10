@@ -73,7 +73,7 @@
 - 验证:classifier 四态 + git 封装真临时仓 + reconciler observe-only 计数;缺 gitReader/baselineCommit 时行为字节不变。
 - 完成定义:分类能力就位可被维护环消费;误报下降的实证依赖真实 run(未来接入 commit 驱动路径的 baseline 时点亮)。
 
-**P3-b(登记,后续)|自动修 range**:分类在真实 run 验证准确后,line-shift 自动修 sourceRefs 行号(类比 renamed 修复),同步更新 reasoning.sources。需先有 P3 分类的真实准确率数据。
+**P3-b(登记,后续)|自动修 range**:分类在真实 run 验证准确后,line-shift 自动修 sourceRefs 行号(类比 renamed 修复),同步更新 reasoning.sources。需先有 P3 分类的真实准确率数据。**生产接线已完成(Plugin 5c7728b)**:DI 注入 gitReader=readFileAtCommit,rescan reconcile 从本 scope durable checkpoint 取 baselineCommit(rebuild 先于 checkpoint 推进,读到的即漂移前 commit)——下次真实 rescan 起 driftLineShift/driftContentChange 开始积累。**复审补强(Core d0bbbd4)**:baselineCommit 从实例态改参数链(DI 单例+MCP 并发竞态)。
 
 **P4(登记)|G-C-5 淘汰生效 + G-C-6 复核透源**:独立需求,不在本设计实施范围。
 

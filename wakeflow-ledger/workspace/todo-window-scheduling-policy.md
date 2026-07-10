@@ -36,9 +36,13 @@ Send a window only when it has executable work within its responsibility and no
 unresolved upstream dependency. Keep blocked, observing, completed, and no-task
 windows visible in coverage tables without sending prompts.
 
-Parallel work is allowed when it:
+Windows advance in parallel only as the demand model allows: within one
+demand each repository runs exactly ONE window with ONE combined task
+package (more work for a repo arrives as the NEXT package after review,
+never as a parallel dispatch), and additional demands run as their own
+pods on their own worktree sets. Send a ready window its package when it:
 
-- has no file or module conflict with the mainline;
+- has no file or module conflict with its working tree's mainline;
 - does not guess an upstream contract;
 - can be validated independently;
 - closes a real TODO or prepares a real validation path.
