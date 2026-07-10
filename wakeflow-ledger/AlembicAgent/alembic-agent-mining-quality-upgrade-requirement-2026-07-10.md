@@ -305,8 +305,10 @@ P0 与 P1 全部落地,AlembicAgent main 六个 commit(均在 commit 时全仓 c
 2. **deepseek-reasoner 声明修正**:注册表已声明 toolChoice.allowed=false 而旧 V4 正则漏判;现按声明数据判 forcedToolChoiceUnsupported=true(数据先于名字)。这是唯一一处行为差异,方向是修正而非回归。
 3. **PCV 记录字段保名**:`deepseekV4ToolChoiceMode` 按 §14.4 爆炸半径注意②保留字段名仅换判定来源(下游投影兼容),源码处加 `provider-name-ok` 标记走门禁白名单。
 
-### 16.2 当前阻塞门(P2 前置,均为用户输入)
+### 16.2 门 0 完成 + 当前阻塞门
 
-- **门 0 基线**:`npm run build && ALEMBIC_DEEPSEEK_API_KEY=… npm run eval:mining -- --judge`(<¥10 手动跑;基线用 `git checkout 65be28f`,delta 用 HEAD)——产 P1 前后对比与 P2-1 修复层裁撤依据。
+**门 0 已完成(2026-07-10 用户提供临时 key 真跑)**:基线报告 v1 = `alembic-agent-mining-quality-gate0-baseline-report-2026-07-10.md`。权威对照(同尺):基线 0 候选/degraded 弃置 vs HEAD 5 候选/recall 100%/15 迭代一次过门/terminal 17→2。过程发现并已修 harness 覆盖缺陷(直呼 profile 绕过生产入口,AlembicAgent 2c4a582);两项待修观察(judge 引用校验过严致全裁决 void、submitRepairs 零样本需证伪假零)登记在报告 §5。
+
+- ~~门 0 基线~~ ✅ 完成(见上);P2-1 裁撤依据仍不足——修复计数零样本,先证伪假零(报告 §5-2)再积累量。
 - **校准语料**:staging 复核队列人工标记导出 JSON → `npm run eval:judge-calibration -- --input <export.json>`——P2-2 晋级门(≥80% 一致 ∧ ≥30 样本 ∧ 无自偏签名,不达标 critic 留离线)。
 - 六个 commit 未 push(用户 push 门)。
