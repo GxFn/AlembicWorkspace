@@ -145,6 +145,17 @@ drifted→update 提案端到端走查(Dashboard 审批→执行→重锚→drif
   内置集查重收敛为 2 条独有(IUO 属性/Timer target 循环引用;as!/try!/main.sync
   内置已有,双报删除)。真机:resolve(BiliDili)=swift-ios/2 规则;HTTP guard 对
   探针代码双命中。**扩规则前先对照内置集查重(教训)**。
-- **决策④ source_graph eval 对照后进 briefing ✅ 方向锁定,执行工单登记**:
-  preparation.sourceGraphResult 字段已备;snapshot 组装深链接线+eval:mining A/B
-  为下一工单(不深夜硬凿)。
+- **决策④ source_graph eval 对照后进 briefing ✅ 注入面已落地(默认关)**
+  (Core c19a7eb/主体 a5fd70c,2026-07-11):考察 snapshot 组装深链后改走
+  evidence starters(与 depGraphData 同一 AI prompt 证据面,链路浅且已验证)。
+  - Core:EvidenceStarterOpts 增可选 sourceGraphResult;sourceGraphInventory
+    starter 只路由结构/架构/命名类维度,symbols=0 不产出,data 只带
+    files/symbols/edges 计数(明细留检索工具,预算纪律)。单测 4 条锁契约。
+  - 主体:AiDimensionSessionRunner 为唯一分叉点——`ALEMBIC_SOURCE_GRAPH_EVIDENCE=1`
+    才把 preparation.sourceGraphResult 传给 builder(开启打日志);默认关传 null,
+    生产 prompt 零变化。DimensionRuntimeBuilder 纯透传不读 env。
+  - **A/B 对照待用户择机**(烧 token,不自动跑):同维度(建议 architecture-patterns)
+    两轮 BiliDili rescan,一轮默认、一轮 `ALEMBIC_SOURCE_GRAPH_EVIDENCE=1 alembic
+    rescan …`,对比候选的结构断言接地率;正收益再决定常开(届时删开关改默认注入)。
+  - 验证:Core `npm run check` exit 0(新测 4/4);主体 `build:check` exit 0+
+    runtime builder/session runner 单测 8/8。
