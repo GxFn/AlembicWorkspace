@@ -62,3 +62,24 @@ packs=[react] rules=7;easybox fixture(ObjC)→packs=[](正确)。
 - Plugin:`build:check` exit 0 + test/unit 156 files/1735 tests;dist 已重建。
 - 主体:`build:check` exit 0(Node 22)+ Guard 四测试文件 103 tests;dist 已重建。
 - 提交:Core 623fa8c,Plugin 239c261,主体 ea02d9c(均未 push,推送归用户门)。
+
+## 追加(同日晚):模块依赖图接线(用户问"easybox 项目还能分析模块依赖关系么")
+
+深挖发现第三个消费断层:各 Discoverer 的 `getDependencyGraph()`(SPM target deps/
+easybox boxspec `s.dependency`/Boxfile 层级/宿主 contains)一直有真实现,但主体图
+API(Dashboard `/api/v1/modules`、WikiGenerator)的 edges **硬编码 []**
+(ProjectContextConsumerFacts.ts),挖掘管线 `depGraphData` 类型即 `null`
+(AiDimensionPreparation.ts)——解析能力从诞生起没到过任何用户可见面。
+
+接线(Core 9ad18bc + 主体 5b829aa):
+- domain 新增 RepoDependencyGraph{Node,Edge,Summary},RepoContext 增量字段
+  dependencyGraph;repo.ts 读取选中 Discoverer 的图(归一化+800/3000 防御上限+
+  失败降级 retryable)。
+- 主体 projectContextDependencyGraph 消费真边+补声明图独有节点,
+  dependencySummary 增 declaredEdgeCount/declaredEdgeSource;图缺席回落空边。
+
+真机:easybox fixture nodes=6/edges=3(FeedModule→NetKit depends_on+DemoApp
+contains);BiliDili nodes=35/edges=52(RxSwift/Kingfisher 外部+AOX* 内部)。
+验证:Core check exit 0(1617 tests);主体 build:check+20 guard/facts/wiki tests 绿。
+登记不盲改:挖掘管线 depGraphData 接入(AI 管线行为变更)与 CodeEntityGraph 的
+spm 图消费(source_graph 族孤儿)需独立决策。
