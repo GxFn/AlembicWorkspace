@@ -129,3 +129,22 @@ drifted→update 提案端到端走查(Dashboard 审批→执行→重锚→drif
   WAL 库,且探针进程 child.kill() 可能斩于写事务中。**流程改进(硬规则)**:
   headless 真库验收必须 daemon 停机窗口内进行或改只读;探针进程用优雅关闭
   (stdin end + 等待退出)代替 kill;高风险操作前先 .backup()。
+
+## 四项决策裁定与落地(2026-07-11,用户全按推荐)
+
+- **决策① hasUsage 闸双豁免 ✅ 已落地**(Core 3250809):人工 executeOne=人审终审
+  (manual 旗标穿线,update 免 hasUsage/deprecate 免 decayScore 复核);drifted 修复型
+  update(evidence 带 sourceStatus:'drifted')走新 evaluateDriftRepair(免 hasUsage,
+  FP 护栏保留)。回归 2 测。至此提案环三层修齐:窗口闸(52570eb)+双豁免——下次
+  rescan 的漂移提案将活过观察期且可被人审/自动执行。
+- **决策② getExtraDimensions 暂不接入 ✅**:并入 swift-ios 包立项(包内已定义 2 个
+  维度贡献,TierScheduler 消费登记待接)。
+- **决策③ swift-ios 包立项(小步) ✅ 已落地**(Core 3250809+d0c5a80):仅语言条件
+  {swift,objectivec};前置=detectFrameworks 补 Apple 生态(Package.swift/Podfile/
+  Cartfile→语言检出,此前 Swift 项目三空集使包永不激活)。首批规则真机复核后与
+  内置集查重收敛为 2 条独有(IUO 属性/Timer target 循环引用;as!/try!/main.sync
+  内置已有,双报删除)。真机:resolve(BiliDili)=swift-ios/2 规则;HTTP guard 对
+  探针代码双命中。**扩规则前先对照内置集查重(教训)**。
+- **决策④ source_graph eval 对照后进 briefing ✅ 方向锁定,执行工单登记**:
+  preparation.sourceGraphResult 字段已备;snapshot 组装深链接线+eval:mining A/B
+  为下一工单(不深夜硬凿)。
