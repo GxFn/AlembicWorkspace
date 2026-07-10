@@ -46,3 +46,27 @@
 ## 建议执行序
 
 Track 1 先行(可与日常修复同批);Track 2 走 Design→confirm→独立 demand。
+
+## 执行记录(同日,用户授权"Track2 也统一设计然后实现")
+
+**Track 1 已落地(Core f3b5091)**:rollup 文件级解析落空后按模块名 join(精确名/
+`Name/File.h` 首段;相对路径与 @scope 不命中,JS 系不变;自引用不产自环)。
+真机:BiliDili internal-edges 0→11;单测 3 例。
+
+**Track 2 已落地(Core d97ce66 + 主体 e0e872b),设计定案**:
+- 决策 1(触发/旗标):不加旗标,挖掘准备段直接走 catchUpOnStartup(幂等:无快照
+  全量/stale 增量/fresh noop)——消费面已存在且失败降级 null 不阻断;耗时打
+  durationMs 日志,真机耗时不可接受再补旗标。
+- 决策 2(预算):沿用 Indexer 内建(512KB 文件上限/256KB 解析上限/扩展名白名单/
+  ignore 目录)。
+- 决策 3(语言):本期 files 全语言入库(freshness 底座,.swift 含);实体/边仅
+  JS 系——PARSABLE_EXTENSIONS 为自研提取器边界,Swift 实体需接 AstAnalyzer,
+  登记 **Track2-b**(非白名单一行修,是解析器映射工作)。
+- 决策 4(消费):observe-first——本期只建库+durableTables 观测日志;进维度
+  prompt/briefing snapshot 槽位与 knowledge 富化(CodeEntityGraph)后置;
+  Plugin 宿主 parity 后置。
+- 出口:SourceGraphLifecycleService 经 ROOT 门面(SD-5 先例;此前连 service
+  门面都未导出)。回归:真临时 sqlite 全量→noop→增量(durableTables 断言)。
+
+验证:Core check exit 0(1622 tests);主体 tsc+unit 1036 绿;双 dist 已重建。
+BiliDili 四表将在下次挖掘/rescan 时真实填充(files 全量+JS 系实体)。
