@@ -89,3 +89,20 @@ BiliDili 四表将在下次挖掘/rescan 时真实填充(files 全量+JS 系实�
   补锚(16 条新 refs 暂无 fp;Plugin submit 链是 at-submit 种子)——主体 insert
   路径补 seed 属独立小修;P3 精判(gitReader/baseline)主体 reconcile 亦未接
   (Plugin rebuild 链已接),同归 parity 项。
+
+## Track2-b 落地(2026-07-11,用户 push 后续推)
+
+**非 JS 语言经 AstAnalyzer 出实体 ✅**(Core ae9451d):parseFile 对 AST 支持语言
+(parserLanguage 单源判定)走 parseAstFile——classes/protocols/methods/properties
+映射为与正则版同型的 SourceSymbolNode(消费方零改动);Swift 模块名导入不产伪
+file 边(imports 证据留待模块名 join 立项);maxParseBytes 同闸,AST 失败 failed
+降级 files 行保留。
+
+**真机(daemon 停机窗口+优雅退出,遵事故硬规则)**:catchUp built-incremental
+2.7s,files 212(旧污染已清)、**symbols 0→2285**(全 Swift 实体);
+AppCoordinator.swift 抽样=module+AppCoordinator/TabBarLoginGuard[class]+
+start/configureRouterProviders/presentLoginThenSwitch[function],行级真实。
+回归:catchUp Swift fixture+degraded 会计(unsupported 样本 Swift→ruby)。
+
+剩余(登记):决策④工单(snapshot 槽位+eval:mining A/B,现在实体有料);
+Plugin 宿主 catchUp parity;driftBaseline scope 下沉 Core;D4/D5;CodeEntityGraph。
