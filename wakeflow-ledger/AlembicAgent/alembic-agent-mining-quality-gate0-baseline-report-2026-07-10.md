@@ -37,16 +37,21 @@
 - HEAD:0 候选但 **abandoned=1(`handlers(retry_exhausted)`)**——F2 一等化在真机成立;session 峰值 90%,未再爆预算。
 - 两跑对照证实:P1-A 的观测修复在旁路链路上也生效;产出能力的翻盘(§3)则需要生产入口的 contextMap 参与。
 
-## 5. 待修观察项(登记,不改变本报告结论)
+## 5. 待修观察项(§5-1/§5-2 已当日根修,见 §5.1 增补)
 
 1. **judge 引用区间校验过严**:5/5 裁决 `invalidCitation` 被判无效(设计如此:无效即 void),但 judge 文本内容质量良好(2 reject 均带具体反证,如"字段是 ok 不是 success")。校验器对 judge 的 citedLines 格式适配待修;在修复前 precision(judge) 数字仅供方向参考。
 2. **submitRepairs 双侧空 {}**:HEAD 有 9 次 knowledge 提交仍零修复计数。可能=draft 天然干净(机制上成立:证据扩展已确定性化),也可能=计数经生产入口的归并管道未贯通。**P2-1 裁撤修复层前必须先证伪"假零"**(E2E 或加量真跑确认计数管道)。
 3. Harness 无 `--model` 旗标,只能评 autoDetect 默认档(v4-flash);评估生产实际模型档需补旗标。
 4. 单 fixture、每侧 n=1:做趋势门槛(如 CI 尺)前需扩 golden set 与重复次数取区间。
 
+### 5.1 增补(2026-07-10 当日离线根修,AlembicAgent 350da7c + 78df116)
+
+- **§5-2 假零证实并根修(350da7c)**:真跑日志证明修复层触发而计数恒空。根因=handler 拿到的 ctx.runtime 是 ToolExecutionPipeline 每次工具调用现造的一次性投影对象,写上去即弃。**爆炸半径远超观测面**——同根因静默失效的还有:style waiver 每会话上限 5(每次从 0 起算,形同虚设)与 F3 拒绝止损(ts-js-module 900s 烧穿事故的护栏,3/12 档位从未触发过)。修=三族计数迁移到 sharedState._sessionCounters 嵌套盒(跨调用稳定+对阶段浅拷贝免疫),strategy 入口预建、收尾投影从盒读;新增生产入口 E2E 用例锁链,真实链探针复验 evidence_sanitized:1 落地。
+- **§5-1 judge 校验器根修(78df116)**:切片头以 file:start-end 展示而校验正则只认单行 file:N——校验器与自己的展示格式打架。修=接受单行与区间(区间须完整落在单一切片内,反捏造性质不变)+prompt 显式声明两种格式+scoreFixture 排除 invalidCitation 裁决(与校准同口径)。**门0 五条真实裁决离线回放:5/5 有效(修复前 0/5)**——judge 引用全是诚实的;precision(judge)=40%(2 uphold/5)追溯性成为有效口径。
+
 ## 6. 成本与 P2 门状态
 
 - 4 跑合计约 1.26M 输入(高缓存命中)+ 77k 输出 tokens,成本远低于 ¥10 授权上限。
 - **门 0:已完成**(本报告)。P1 前后对比在案,此后改动按需求 §4 附对比。
-- **P2-1**:裁撤依据仍不足——当前修复计数为零样本(见 §5-2),需先证伪假零再积累量。
+- **P2-1**:假零已证实为管道断裂并根修(§5.1)——自下次真跑起 repair-hit-rate 可真实积累;裁撤仍需量(单 fixture n=1 不足以判死修复层)。
 - **P2-2**:晋级门未动——校准需用户导出 staging 人工标记(`npm run eval:judge-calibration -- --input <export.json>`,≥80% 一致 ∧ ≥30 样本 ∧ 无自偏)。
