@@ -28,7 +28,7 @@ Plugin handlers,b32a8e5/40fa3d5);**活体测试待做**(本会话 cc-host 进程
 
 1. **P-A 主体 HTTP 漂移标注**(F1):list/detail 输出补 sourceStatus(按 refs 聚合:
    active/drifted)+详情带 sourceRefs(path/status/contentFp 有无);Dashboard 提案
-   审批的知识卡即见漂移。小改(routes/knowledge.ts 投影层),不动契约语义。
+   审批的知识卡即见漂移。小改(routes/knowledge.ts 投影层),不动契约语义。**✅ 已落地+真机验证(主体 commit 见 git log):detail drifted+3 段明细/list 24÷60 标注。**
 2. **P-B 主体落锚 parity**(F2):主体候选创建链 insert refs 时同步 seed contentFp
    (对齐 Plugin `#insertSourceRef`);回归=rescan 后新 refs anchored=100%。
 3. **P-C 主体 reconcile 接 P3**(F3):KnowledgeRescanWorkflow 的 reconcile 传
