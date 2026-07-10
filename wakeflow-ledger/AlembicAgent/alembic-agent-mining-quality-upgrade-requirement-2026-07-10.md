@@ -232,7 +232,81 @@ P0-4(repair 计量) ──产 裁撤依据──▶ P2-1
 - Auto Claim 建议:P0 可 yes(纯增量、无跨仓、完成定义可机验);P1 建议 no(需 P0 基线报告在手才能写对比验证);P2 建议 no(P2-2 有校准晋级门的实证依赖)。
 - P3 三项按 D5 进 backlog 登记(仅登记不排期)。
 
-## 14. 调研与证据引用
+## 14. 修订记录 R1(2026-07-10)：P0 完成 + 实施发现驱动的 P1 重构
+
+### 14.1 P0 完成状态(直推执行,commit 2ba1944 + 65be28f,全仓 check exit0/62 文件 466 测试)
+
+- P0-1 ✅ 全真链 E2E 入 CI(`test/mining-e2e-pipeline.test.ts` 三案例:healthy created / EVIDENCE_STALE 负例 / weak→abandoned)。
+- P0-2 ✅ `npm run eval:mining` harness + golden set v1(隔离:临时 fixture/dataRoot/内存 gateway)。
+- P0-3 ✅ Judge(隔离+refute-first+judge 引用区间机械校验)+ `computeJudgeCalibration` 晋级门 + `eval:judge-calibration` CLI。
+- P0-4 ✅ `phases._pipelineOutcome` + `abandonedModules/abandonedDimensions` + submit 9 修复层命中计数。
+- ⏳ 门 0(用户):Tier-B 基线报告 v1(需 key,<¥10)——`npm run build && ALEMBIC_DEEPSEEK_API_KEY=… npm run eval:mining -- --judge`;校准跑需 staging 人工标记导出。
+
+### 14.2 实施发现(F1-F4,真跑才暴露;全部转化为 P1-A)
+
+- **F1 证据通道压力瓦解**:`ContextWindow.getToolResultQuota()` 压力阶梯(≥0.95 档 maxChars=400)+ head+tail 截断会把 `[evidence]` 尾注整段吞掉→模型引用不到台账→findings unverified→产出坍缩。E2E 里的窄 evidence.search 解法仍是 prompt-only。**确定性修法**:`limitToolResult`(或 AgentRuntime 格式化点)标注感知——截断后把 `[evidence]` 尾注(~200 字)重挂回尾部。
+- **F2 第三静默归零形态**:analysis_retry 耗尽→break→`completed + 0 候选`,不在 degrade 族、无原因留痕(PipelineStrategy `#processGate` 重试耗尽分支)。修法:同点写 `_pipelineOutcome`(action='retry_exhausted')。
+- **F3 单读无 file 条目**:`EvidenceCapture.normalizeDrafts` 只认批量 read 的 `structuredContent.files[]`;单 path read 落无 file 条目→unverified 折价。修法:fallback 分支从 `call.args.params.path` 补 file。
+- **F4 装配契约隐式**:`container.get('capabilityCatalog')` 缺席→toolSchemaCount=0→toolChoice=none,工具面静默死亡零诊断。修法:reactLoop 初始化对"capabilities 非空但 schemas=0"打 warn 诊断事件(不改行为)。
+
+### 14.3 P1 重构:拆 P1-A / P1-B(取代原 §5 的单一 P1)
+
+**P1-A 证据通道与观测补全**(新增;确定性小修、全 provider 生效、harness 可量前后差):
+- 范围:F1 标注感知截断、F2 retry_exhausted 一等化、F3 单读 file 归属、F4 装配诊断。
+- 验证:各项单测 + E2E 扩展(F1 加"压力档下标注存活"用例;F2 弱案例变体断言 retry_exhausted);完成定义 = 全仓 check 绿 + harness 复跑 findings-verified 率/候选 yield 对基线不降、F1 场景可证改善。
+- 顺序约束:**门 0 基线先跑**(改动前对照),P1-A 后复跑出 delta。
+
+**P1-B 确定性依赖上下文 + provider 中立内核**(原 §5 P1-1~P1-4 全保留,内容不变):ModuleContextAssembler / 预算按模块规模+目录拆分 / ProviderQuirkProfile+grep 边界门 / 中立覆盖度门(删 graph-retry 死码)。P1-A 是其地基(图谱注入的输出同样受益于抗截断通道)。
+
+**P2/P3 不变**;P3 候选池追加:真实快照评估(D2 pinned commit)排在校准语料积累后。
+
+### 14.4 P1-B-3 迁移清单(2026-07-10 subagent 盘点,真分支远少于 175 处字面量)
+
+**真控制流分支只有 10 处,收敛为 5 个 quirk 轴**;其余是注释(24)/命名(≈10)/manifest 记录:
+
+| 分支 | 位置 | quirk 轴 |
+|---|---|---|
+| #1 根谓词 isDeepSeekV4AnalyzeFirstBurn(regex+phase 门) | ProviderToolChoicePolicy.ts:83 | analyzeGroundingGuardEligible(phase 部分留内核,provider 部分查表) |
+| #2/#3/#5/#6/#9 keepToolSchemasVisible/observe-mode/抑制例外/PCV 证据形状 | PTCP:35,57;AgentRuntime:966-983,1214-1217;PcvNodeEvidenceRecorder:395-420 | forcedToolChoiceUnsupported(**已可从 registry 导出**:`parameterConstraints.toolChoice.allowed===false`,deepseek.ts:33,54 已有) |
+| #4 isToolSchemaHarmful(deepseek-v4∥gemini) | AgentRuntime:964-965 | dropToolSchemasWhenToolChoiceNone(双 provider,显式字段) |
+| #7 接地策略文案附加句 | AnalyzeGroundingGuard:34-37 | groundingPolicyProviderNote(string∥null,字面量移进 src/ai) |
+| #8 invalid-no-evidence 拦截门 | AnalyzeGroundingGuard:50 | analyzeGroundingGuardEligible |
+| #10 call_deepseek_compat_ 前缀分类 | AgentRuntime:2650 | usesTextToolCallCompat(前缀常量+matcher 移到 src/ai 与 deepseekToolCallCompat.ts 同宿) |
+
+**设计**:ModelDef 加 `quirks?: QuirkProfile`(5 字段),`getModelRegistry().get(modelRef)?.quirks` 单点消费;reasoning-content passback 已有 `reasoning.requiresContentPassback` 覆盖,无需内核分支。**注意的爆炸半径**:①三个 provider 名导出函数(observeDeepSeekV4ToolChoiceMode/allowsDeepSeekV4ToolCalls/isDeepSeekV4AnalyzeFirstBurn)有跨文件消费方,改名需同步;②PCV 证据字段 `deepseekV4ToolChoiceMode` 是**记录形状**(下游投影可能消费),改名前须扫 Core/Plugin 读面——或保留字段名仅换判定来源(观测面兼容优先);③三个 mode 字符串常量移进 src/ai。grep 边界门按"分支模式"设计,注释/历史命名走白名单或随迁移逐步清零。
+
+### 14.5 产消依赖(修订后)
+
+```
+门0 基线(用户) ──对照──▶ P1-A(F1-F4) ──复跑 delta──▶ P1-B ──▶ P2(critic 晋级仍以校准为门)
+```
+
+## 15. 调研与证据引用
 
 - 业界:arxiv 2512.12117(citation-grounded code comprehension)、2509.16112(CodeRAG)、2412.05579(LLM-as-judge 综述)、2506.11102(agent 评估综述)、2405.06682(自反思局限)、2511.13646(Live-SWE)、2601.08773(AST vs LLM KG)、Sourcegraph Cody 文档。
 - 内部:`wakeflow-ledger/AlembicAgent/alembic-agent-implementation-complete-2026-07-01.md`(设计权威);2026-07-10 真实代码审计(本文件 §1 锚点);既有闭环:staging 复核期、primeAlignment 回流、evolution 硬门。
+
+## 16. 执行记录(2026-07-10,用户授权直推)
+
+P0 与 P1 全部落地,AlembicAgent main 六个 commit(均在 commit 时全仓 check exit0;终态 64 测试文件/487 测试):
+
+| 阶段 | commit | 内容 |
+|---|---|---|
+| P0(度量) | 2ba1944 | `phases._pipelineOutcome` 一等 abandoned 结局 + submit 9 修复层命中计数 + 全真链 mining E2E 进 CI |
+| P0(评估) | 65be28f | `eval:mining` harness + golden set v1 + 独立 judge(refute-first+引用机械校验)+ `computeJudgeCalibration` 晋级门 |
+| P1-A | d66a7e7 | F1 标注感知截断(EVIDENCE_TAIL_RE 摘挂回,cap 800)/ F2 retry_exhausted 一等化 / F3 单读 file 归属 / F4 装配空 schema 诊断 |
+| P1-B-1/2/4 | f8ce4ce | ModuleContextAssembler(模块图谱进 guide)/ computeModuleAnalystBudget(18/26/34/40)/ splitOversizedModule(>60 目录装箱)/ applyModuleCoverageGate 取代已删 applyGraphRetryGate;`./prompts` 公共签名重生成 |
+| P1-B-3 切片1 | eeb893f | `src/ai/registry/ModelQuirks.ts` 单一查询面(5 字段档案)+ PTCP/AnalyzeGroundingGuard/PcvNodeEvidenceRecorder 改为查表 |
+| P1-B-3 切片2 | e960eea | AgentRuntime 消费 quirks(schema 隐藏/文本兼容 call 来源分类)+ 导出改名同步消费方 + `scripts/lint-provider-neutral-kernel.mjs` 中立门进 `npm run check` |
+
+### 16.1 相对 §14.4 设计的三处有意偏差(实现时决策,均已在源码头注声明)
+
+1. **解析器而非 ModelDef 新字段**:未加 `quirks?:` 声明字段,改为 `resolveModelQuirks()` 从既有注册表数据导出(`parameterConstraints.toolChoice.allowed===false` 即 forced 轴单源),未注册 ref 回退旧内核逐字同款名字正则——避免第二数据源漂移,语义保真。
+2. **deepseek-reasoner 声明修正**:注册表已声明 toolChoice.allowed=false 而旧 V4 正则漏判;现按声明数据判 forcedToolChoiceUnsupported=true(数据先于名字)。这是唯一一处行为差异,方向是修正而非回归。
+3. **PCV 记录字段保名**:`deepseekV4ToolChoiceMode` 按 §14.4 爆炸半径注意②保留字段名仅换判定来源(下游投影兼容),源码处加 `provider-name-ok` 标记走门禁白名单。
+
+### 16.2 当前阻塞门(P2 前置,均为用户输入)
+
+- **门 0 基线**:`npm run build && ALEMBIC_DEEPSEEK_API_KEY=… npm run eval:mining -- --judge`(<¥10 手动跑;基线用 `git checkout 65be28f`,delta 用 HEAD)——产 P1 前后对比与 P2-1 修复层裁撤依据。
+- **校准语料**:staging 复核队列人工标记导出 JSON → `npm run eval:judge-calibration -- --input <export.json>`——P2-2 晋级门(≥80% 一致 ∧ ≥30 样本 ∧ 无自偏签名,不达标 critic 留离线)。
+- 六个 commit 未 push(用户 push 门)。
