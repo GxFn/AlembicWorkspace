@@ -44,3 +44,32 @@ Plugin handlers,b32a8e5/40fa3d5);**活体测试待做**(本会话 cc-host 进程
 
 评分/门路由改动须 eval:mining 验证;主体/Plugin 双宿主 parity 是验收线;
 push/发版等用户门不动。
+
+## P-D 五工具活体矩阵结果(2026-07-11,headless host-mcp @ BiliDili)
+
+方法:ALEMBIC_PROJECT_DIR=BiliDili 拉起 dist/bin/host-mcp.js,真实 stdio JSON-RPC
+(MCP 行分隔),structuredContent 取证。逐工具:
+
+- **alembic_search** 🐛→✅ **D1 已修**(Core 8e70217):top-5 被同一 Recipe 垄断
+  (1 主命中+4 条 recipe_region_* 当独立条目,且 region 条目无漂移标注)。根因=
+  三处向量映射不解析 region 向量(metadata.recipeId/id 前缀)+RRF 路径漏去重。
+  修=#resolveVectorEntryId 单源+RRF 补 keep-best。真机复验 top-3 三条不同 Recipe,
+  漂移标注保留(a5f6e50b drifted)。
+- **alembic_recipe_map** 🐛→✅ **D2 已修**(Plugin cc03c17):75 条恒 0 mounts。
+  三因:space 区域只收 project/package(真实锚 target/module 被排除)+localPackages
+  不进图+target 节点 path 硬编码 'package.json'。真机复验 mounts 0→50,rollups 按
+  target 分桶。遗留 D2-b:同路径双节点/rollup 重复行(观察,不阻塞)。
+- **alembic_prime** ✅:严格 facet 契约(必填 taskAction+requirementGoal+至少一个
+  locator facet;不认识 query)。合法参数下 status=ready,4 accepted items。
+  可用性观察:探针连弹 3 次校验错误,description 引导值得复核(登记 D5:prime
+  接受项以 detailRefs 交付,drift 对称在 ref 明细层,待细查)。
+- **alembic_code_guard** ✅(带疑点 D4):violationCount=0 对三行强解包+后台改 UI
+  Swift 代码——BiliDili KB 的 recipes 无 guard 规则型条目,内置 swift 规则未覆盖
+  该形态,判"正确的空";但 G2 的 appliedRules 摘要在 cc 面缺席(null),登记待查。
+- **alembic_status** ✅:ok/daemon/knowledge 面正常。
+- 附:CodexStatusService 全套件偶发失败=测试污染(单跑 12/12,stash 前后一致),登记。
+
+## 剩余执行序(P-B/P-C/P-E 未动)
+
+P-B 主体落锚 parity → P-C 主体 reconcile 接 P3(gitReader/baseline)→ P-E 30 个
+drifted→update 提案端到端走查(Dashboard 审批→执行→重锚→drifted 清零)。
