@@ -60,7 +60,7 @@
 - 触点:`RecipeSourceRefRepository.findActiveByRecipeIds`(放开 drifted 并带 status)、`SearchEngine.ts:1078-1119`(附 status)、`search.ts:1796 projectKnowledgeItem`(输出保留 sourceRefs+sourceStatus)、`AlembicSearchOutput` schema 加字段、排序层 drifted 降权。
 - 验证:单测(drifted 命中被返回且带标记、active 优先序)、E2E(reconcile 标 drifted → 检索命中带 sourceStatus)。
 - 完成定义:检索命中能透出逐条 drifted 信号且不误删;search/prime 锚点输出对称。
-- **决策项**:✅ 用户已确认实施。落地:Core  携带 per-ref 状态→聚合 driftedSourceRefs+item 级 sourceRefStatus; drifted×0.85 降权;Plugin  输出保留 sourceRefs+sourceStatus+driftedSourceRefs(与 prime 对称)。更正一处既有过宽不变量(禁 search 输出含 sourceRefs→改为只禁 prime 材料对象)。发现桥表  早已带 status 且已含 drifted——断点纯在 SearchEngine 塌平丢弃 status。
+- **决策项**:✅ 用户已确认实施。落地:Core `_supplementDetails` 携带 per-ref 状态→聚合 `driftedSourceRefs`+item 级 `sourceRefStatus`;`_applyRanking` drifted×0.85 降权;Plugin `projectKnowledgeItem` 输出保留 sourceRefs+sourceStatus+driftedSourceRefs(与 prime 对称)。更正一处既有过宽不变量(禁 search 输出含 `sourceRefs`→改为只禁 prime 材料对象)。**实施中发现**:桥表 `findActiveByRecipeIds` 早已带 status 且已含 drifted(G-C-2 桥表侧其实通了),断点纯在 SearchEngine 把非 stale 锚点塌成扁平 `string[]` 丢弃 status——比设计预想更集中;`AlembicSearchOutput.items` 是 `z.record` 松散透传,无需改 schema。
 
 **P2|生成后落锚(段一)**
 - 触点:submit 成功写 reasoning.sources 的同点,同步 upsert recipe_source_refs.contentFp(Agent→Core 桥,或 Core sync 侧)。
