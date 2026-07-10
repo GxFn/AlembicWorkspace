@@ -187,7 +187,7 @@ P0-4(repair 计量) ──产 裁撤依据──▶ P2-1
 
 ## 8. P3 候选(本需求非目标,仅登记方向)
 
-- **增量挖掘 checkpoint**:per-project(module×dimension×commit)断点,rescan 驱动只挖变更模块。消费方=coldstart/rescan 流(Core 协同),独立需求。
+- **增量挖掘 checkpoint**(2026-07-10 R2 重定义,依据=成熟度重评 G-C):高价值半段是**知识失效传播**——已入库条目的 file:line sources 在 commit 触发下重哈希,失效即标记待复核(复用台账机制;参照 Copilot Memory JIT 重验+使用驱动过期 / Swimm 锚点绑定+CI 失效)。per-project(module×dimension×commit)断点式增量重挖为其后半段。消费方=coldstart/rescan 流(Core 协同),独立需求。
 - **依赖簇分块**:超大模块按调用图聚簇拆 child(P1-2 只做目录拆分)。
 - **运行时证据道**:测试执行/运行时行为作为证据来源——**触碰 terminal read-only 安全姿态,必须独立安全决策**,不得随本需求夹带。
 
@@ -304,6 +304,10 @@ P0 与 P1 全部落地,AlembicAgent main 六个 commit(均在 commit 时全仓 c
 1. **解析器而非 ModelDef 新字段**:未加 `quirks?:` 声明字段,改为 `resolveModelQuirks()` 从既有注册表数据导出(`parameterConstraints.toolChoice.allowed===false` 即 forced 轴单源),未注册 ref 回退旧内核逐字同款名字正则——避免第二数据源漂移,语义保真。
 2. **deepseek-reasoner 声明修正**:注册表已声明 toolChoice.allowed=false 而旧 V4 正则漏判;现按声明数据判 forcedToolChoiceUnsupported=true(数据先于名字)。这是唯一一处行为差异,方向是修正而非回归。
 3. **PCV 记录字段保名**:`deepseekV4ToolChoiceMode` 按 §14.4 爆炸半径注意②保留字段名仅换判定来源(下游投影兼容),源码处加 `provider-name-ok` 标记走门禁白名单。
+
+### 16.1a 成熟度重评与 G-B 修订(2026-07-10)
+
+三路联网调研(~100 一手来源)完成业界对照,结论固化于 `alembic-agent-mining-maturity-reassessment-2026-07-10.md`(分维度判定+六个业界设计参照+缺口 G-A~G-E)。当日落地:**G-B 校准口径修订(AlembicAgent 7fa216b)**——晋级门在 ≥80% 一致 ∧ ≥30 样本 ∧ 无自偏之上增加 Cohen's kappa ≥0.6 ∧ 负类召回 ≥0.6(人工负例 ≥5,全正语料判语料不合格),防类不均衡下"全判通过"靠裸一致率过门。**校准语料要求相应更新:≥30 条且其中人工负例(narrow/trivial/reject)≥5 条。**P2-2 前置门语义不变,判据更稳。
 
 ### 16.2 门 0 完成 + 当前阻塞门
 
