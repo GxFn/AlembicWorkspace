@@ -70,3 +70,22 @@ Track 1 先行(可与日常修复同批);Track 2 走 Design→confirm→独立 d
 
 验证:Core check exit 0(1622 tests);主体 tsc+unit 1036 绿;双 dist 已重建。
 BiliDili 四表将在下次挖掘/rescan 时真实填充(files 全量+JS 系实体)。
+
+## 真机验收(同日夜,BiliDili rescan,DeepSeek deepseek-v4-pro)
+
+- 触发:POST /api/v1/jobs/rescan(dimensions=[performance-optimization]),859s 完成,
+  7 候选 0 错误(in=354k/out=50k tokens)。
+- ✅ 准备段双观测首现:`dependency graph loaded: nodes=38 edges=58 source=spm`;
+  `source graph built-full: files=1408 symbols=1855 durationMs=3524`。
+- ✅ Dashboard `/api/v1/modules/dep-graph`:38 节点/58 边(此前恒 0 边)。
+- 🐛→✅ 验收抓到新缺陷:首量 87% 文件来自 `.build`(索引器私有排除表漏 '.build',
+  ReDoS 同源入口)。修=对齐 COMMON_SOURCE_SCAN_EXCLUDE_DIRS(Core a2c31f0);
+  忠实副本+真库 catchUp 自愈双验:built-incremental 250ms,files 1408→180、
+  污染 symbols 1855→0(全来自 .build 第三方 JS,清除正确)。
+- ✅ G-C 链首次真实触发:BiliDili 今日有真实代码改动(NetworkModule/Package.swift/
+  AOX*),reconciler 判 60 refs drifted,CoverageClassifier 产 30 个 drifted→update
+  提案——知识失效传播闭环在生产第一次跑通。
+- 📌 登记 parity 跟进:主体挖掘管线新建 refs 的 contentFp 依赖下一次 reconcile
+  补锚(16 条新 refs 暂无 fp;Plugin submit 链是 at-submit 种子)——主体 insert
+  路径补 seed 属独立小修;P3 精判(gitReader/baseline)主体 reconcile 亦未接
+  (Plugin rebuild 链已接),同归 parity 项。
