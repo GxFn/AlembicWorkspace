@@ -159,3 +159,32 @@ drifted→update 提案端到端走查(Dashboard 审批→执行→重锚→drif
     rescan …`,对比候选的结构断言接地率;正收益再决定常开(届时删开关改默认注入)。
   - 验证:Core `npm run check` exit 0(新测 4/4);主体 `build:check` exit 0+
     runtime builder/session runner 单测 8/8。
+
+## 登记项清扫批(2026-07-11 下午,决策④后连续推进)
+
+- **scope 口径下沉 Core 单源 ✅**(Core 6a3cdae/Plugin e74056a/主体 2ef7818):
+  buildGitDiffCheckpointScope 落 GitDiffCheckpointService.ts(sustain/evolution
+  门面具名导出);Plugin 删 buildPluginGitDiffCheckpointScope(三调用点转消费,
+  sweep 无残留),主体 driftBaseline 转消费。双宿主读写 git_diff_checkpoints
+  自此结构性同键。回归测锁缺省/trim/空白串三形态。
+- **D4 appliedRules cc 面缺席 ✅ 已修**(Plugin ca93880):根因=G2 正面清单只接了
+  guardReview(review 模式),矩阵探针走的 guardCheck(内联 code)与 guardAuditFiles
+  两模式均缺。修=两模式按语言集合枚举 engine.getRules 同源装配面;公开投影层
+  原样透传无需改。新测 2/2+guard 邻接套件 61/61。
+- **D5 prime detailRefs 层 drift 对称 ✅ 已修**(Core 6b60bcd+Plugin 7f893a4):
+  根因实锤=slimSearchResult 瘦身投影丢弃 G-C P1 的 sourceRefStatus/
+  driftedSourceRefs——prime 全链漂移盲,同一 Recipe 走 search 带 drifted 标注,
+  走 prime 以无标记 trusted 证据交付 file:line。修=slim 透传(Core)+accepted
+  item 带 sourceRefStatus+evidenceRefs 逐条 drifted 标记+trusted-to-use 回执
+  重核提醒+紧凑公开面 schema/builder 同步(.strict() 教训)。**不改信任分层/
+  分数**(漂移≠错误,采信交宿主现场)。
+- **source_graph Plugin 宿主 catchUp parity 🔒 判定=按依赖顺序后置**:代码事实=
+  插件面今日零 source_graph durable 表消费者;自然消费点是 Core
+  MissionBriefingBuilder.ts:1104 的 buildEvidenceStarters(插件 briefing 路径),
+  而该点被决策④刻意闸住待 A/B。现在接 catchUp=无消费者的空连接+每会话 2-3s
+  启动开销。正确顺序:A/B 正收益→常开时,MissionBriefingBuilder 增
+  sourceGraphResult 参数+插件准备段接 catchUp 一并落地。
+- 本批后剩余登记项均为观察/外部门:D2-b 同路径双节点(观察)、CodeEntityGraph
+  spm 消费(待决策)、getExtraDimensions 消费(随决策② iOS 包立项)、
+  CodexStatusService 测试污染(登记)、P-E 端到端末段(等下次 rescan+24h 观察窗+
+  Dashboard 人审)、prime description 引导复核(观察)。
