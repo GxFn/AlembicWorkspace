@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-plugin-guard-request-dataroot-isolation-t1",
+  "demandKey": "alembic-guard-cross-project-recovery-2026-07-12",
+  "taskPackageId": "p1-plugin-guard-request-dataroot-isolation-p1",
+  "dispatchGroup": "p1-plugin-guard-request-dataroot-isolation-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-guard-cross-project-recovery-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p1-plugin-guard-request-dataroot-isolation-t1",
+  "status": "completed",
+  "summary": "Fixed Code Guard cross-project persistence by replacing opportunistic maintenance's process-global ServiceContainer with a short-lived repository/service graph bound to the current request ProjectRuntime physical database. Guard checkpoint/proposal/freshness/effect writes are request-scoped; requested-project status ignores foreign checkpoint rows; auxiliary maintenance/effect failures preserve the Guard verdict while becoming explicit degraded diagnostics. Committed RED test 9cddf8d103e875d29418469be2cb5d87bd238e18 and implementation e4b64c25be0258bb5e0734abded8e982628794ac.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/host-runtime/mcp/host/opportunistic-evolution-presenter.ts",
+    "AlembicPlugin/lib/repository/guard/RequestScopedGuardMaintenance.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/host/code-guard-auxiliary-failure.ts",
+    "AlembicPlugin/lib/repository/skills/ProjectSkillKnowledgeRepository.ts",
+    "AlembicPlugin/test/unit/GuardRequestDataRootIsolation.test.ts",
+    "AlembicPlugin/test/unit/McpEntrypointEffects.test.ts",
+    "AlembicPlugin/test/unit/CodexKnowledgeState.test.ts"
+  ],
+  "verification": [
+    "RED: npm run test:unit -- test/unit/GuardRequestDataRootIsolation.test.ts => 3/3 failed on the global-container implementation before the fix.",
+    "GREEN focused: GuardRequestDataRootIsolation + HostMcpServer + RetrievalCheckpointDiagnostics + AgentPublicToolsContract + McpEntrypointEffects + PluginOpportunisticEvolution + GitDiffCheckpoint + CodexKnowledgeState + AgentPublicToolsActive => 9 files, 146/146 passed.",
+    "Incremental final: typecheck passed; Guard/MCP/status subset => 3 files, 26/26 passed.",
+    "npm run check => passed (typecheck, lint and all boundary/drift/doctrine/naming/retired/ring gates).",
+    "npm run build => passed using AlembicCore f4275572282a24c45af282a2ef7b435108f74fdd.",
+    "Detached dual-root HostMcpServer probe: sequential and Promise.all Guard calls against isolated Workspace/BiliDili git+SQLite fixtures => four ready results, one own root/HEAD checkpoint per database, foreignRootOrCommitCount=0; fixtures deleted.",
+    "npm run verify:plugin-distribution => passed; npm run verify:codex-plugin => passed; npm run verify:codex-runtime-package => isolated npm install and entrypoint probe passed.",
+    "git status --short => clean at e4b64c25be0258bb5e0734abded8e982628794ac."
+  ],
+  "risks": [
+    "Live Workspace/BiliDili knowledge databases were intentionally never opened or mutated; controller-owned backup/repair/rescan and live recovery validation remain outside this task.",
+    "No remote push or live Actions run was performed because this Wakeflow package authorizes Plugin-local implementation, commit, and detached verification only."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "HostMcpServer carried request ProjectScope identity into Guard, but opportunistic-evolution-presenter obtained checkpoint and evolution repositories from process-global getServiceContainer(). This coupled request root A to the globally selected database B and allowed foreign project_root/commit rows to be persisted.",
+      "verify": "Review opportunistic-evolution-presenter.ts diff: getServiceContainer is removed and runCommitDrivenMaintenance plus its handler share one request-bound container."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/GuardRequestDataRootIsolation.test.ts",
+      "verify": "RED 3/3 before fix; GREEN 4/4 after fix, including sequential, concurrent, malformed auxiliary failure, and blocked-status preservation."
+    },
+    {
+      "kind": "runtime-probe",
+      "value": "Detached HostMcpServer dual-root probe returned statuses [ready,ready,ready,ready], one own root/HEAD checkpoint in each database, foreignRootOrCommitCount=0.",
+      "verify": "Ran node .tmp/alembic-guard-dual-root-probe.mjs after npm run build; temporary projects and databases were deleted in finally."
+    },
+    {
+      "kind": "data-root-isolation",
+      "ref": "AlembicPlugin/lib/repository/guard/RequestScopedGuardMaintenance.ts",
+      "verify": "Physical database is confined under request dataRoot before open; each call constructs and closes its own repositories, ProposalGateway, freshness service, and signal bus; no global container/environment/cwd route remains."
+    },
+    {
+      "kind": "commit",
+      "commit": "e4b64c25be0258bb5e0734abded8e982628794ac",
+      "verify": "Implementation commit; prerequisite RED commit is 9cddf8d103e875d29418469be2cb5d87bd238e18."
+    },
+    {
+      "kind": "self-review",
+      "value": "Two-stage review found and fixed terminal-status regression risk: auxiliary errors only promote ready to degraded; existing degraded/blocked/failed results retain their original status/reason while receiving diagnostics. Re-scanned changed chain for global/selected/active/env/cwd fallbacks and found none.",
+      "verify": "Final typecheck and 26-test increment passed; full focused suite 146/146 passed."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Trace identity chain, capture clean baseline, land RED reproduction commit, replace global storage seam minimally, close status/failure projection gaps, run focused/full/build/distribution/detached probes, then two-stage review and commit."
+    },
+    {
+      "kind": "repro",
+      "value": "Before fix, the first requested database had no checkpoint while the globally bound second database received both project roots; malformed request DB was bypassed and outer Guard remained ready. The RED test recorded all three failures."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Only AlembicPlugin source/tests changed. No AlembicCore, live knowledge roots, controller state beyond TargetResultEnvelope, or cross-repository files were modified."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-plugin-guard-request-dataroot-isolation-p1__AlembicPlugin__p1-plugin-guard-request-dataroot-isolation-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-guard-request-dataroot-isolation-p1__AlembicPlugin__p1-plugin-guard-request-dataroot-isolation-t1.json",
+    "deliveryRunId": "run-delivery-p1-plugin-guard-request-dataroot-isolation-p1__AlembicPlugin__p1-plugin-guard-request-dataroot-isolation-t1",
+    "dispatchGroup": "p1-plugin-guard-request-dataroot-isolation-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-guard-request-dataroot-isolation-p1__AlembicPlugin__p1-plugin-guard-request-dataroot-isolation-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-guard-cross-project-recovery-2026-07-12",
+    "stateRevision": 4,
+    "demandKey": "alembic-guard-cross-project-recovery-2026-07-12",
+    "taskPackageId": "p1-plugin-guard-request-dataroot-isolation-p1",
+    "targetTaskId": "p1-plugin-guard-request-dataroot-isolation-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p1-plugin-guard-request-dataroot-isolation-p1",
+    "resultId": "tr-p1-plugin-guard-request-dataroot-isolation-t1",
+    "createdAt": "2026-07-12T04:21:23.221Z"
+  },
+  "createdAt": "2026-07-12T04:21:23.221Z",
+  "stateRevisionObserved": 4,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

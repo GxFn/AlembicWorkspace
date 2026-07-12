@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-guard-cross-project-recovery-2026-07-12",
+  "title": "Alembic Guard 跨项目写入修复与真实知识库恢复",
+  "interfaceLanguage": "zh",
+  "goal": "修复 alembic_code_guard 在显式 projectRoot 双项目调用中把 Workspace checkpoint 写入 BiliDili data root、隐藏辅助维护失败并污染 status 投影的问题；在代码修复后安全恢复 BiliDili 知识库完整性、分别 rescan 两个真实项目，并由总控直接重跑五工具确认结果有价值且无跨项目泄漏。",
+  "completionDefinition": "1) AlembicPlugin 的 Guard/commit-driven evolution/checkpoint 全链使用请求级 ProjectScope/dataRoot，顺序与并发双根调用均无 foreign project_root/commit；2) auxiliary maintenance 失败公开降级，不能藏在 outer ready/passed 下；3) Plugin focused/full/build/distribution 与 detached dual-root probe 通过并提交；4) BiliDili live knowledge root 先停写与完整备份，再以可审计恢复副本通过 integrity/FK/count/lifecycle/source-ref gates 后原子替换，移除本轮外来 Workspace checkpoint，不丢可恢复的 BiliDili knowledge；5) AlembicWorkspace 与 BiliDili 分别通过 supported rescan 得到各自完整 current revision posture；6) 总控在现有两个真实项目上直接多轮调用 Search/Graph/Recipe Map/Prime/Code Guard，重复结果稳定、知识与当前源码一致、Guard 无跨根写入，BiliDili database quick_check/integrity_check 为 ok；7) 不修改 BiliDili 产品源码，不派发 Test，不创建额外测试环境，不把旧损坏数据库直接覆盖而无备份。",
+  "createdAt": "2026-07-12T03:55:22.178Z",
+  "source": {
+    "kind": "wakeflow-state-init",
+    "trackedTemplates": "templates/wakeflow-state-machine",
+    "generatedStateRoot": ".wakeflow-active/current/alembic-guard-cross-project-recovery-2026-07-12"
+  },
+  "executionPlacement": {
+    "mode": "main",
+    "podId": null
+  }
+}

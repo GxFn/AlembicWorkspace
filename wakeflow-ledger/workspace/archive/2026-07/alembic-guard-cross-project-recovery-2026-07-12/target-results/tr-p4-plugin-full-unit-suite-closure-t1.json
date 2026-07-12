@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-plugin-full-unit-suite-closure-t1",
+  "demandKey": "alembic-guard-cross-project-recovery-2026-07-12",
+  "taskPackageId": "p4-plugin-full-unit-suite-closure-p1",
+  "dispatchGroup": "p4-plugin-full-unit-suite-closure-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-guard-cross-project-recovery-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p4-plugin-full-unit-suite-closure-t1",
+  "status": "completed",
+  "summary": "Closed the AlembicPlugin full-unit-suite gate without production-code changes: corrected nine obsolete test contracts, aligned ProposalExecutor mocks with current Core interfaces, strengthened replacement-edge coverage, and capped the still-parallel unit worker pool at two to remove Git/SQLite/filesystem contention. Exact full unit suite and all required build/package/plugin gates pass.",
+  "evidenceRefs": [
+    "AlembicPlugin/test/unit/ProposalExecutor.test.ts",
+    "AlembicPlugin/test/unit/HostAgentSessionLease.test.ts",
+    "AlembicPlugin/test/codex-scenarios/cold-start/bootstrap-missing-ai.json",
+    "AlembicPlugin/vitest.unit.config.ts"
+  ],
+  "verification": [
+    "npx vitest run --config vitest.unit.config.ts test/unit/ProposalExecutor.test.ts test/unit/HostAgentSessionLease.test.ts test/unit/CodexSessionScenarioRunner.test.ts --reporter=dot -> 3 files, 41 tests passed",
+    "npx vitest run --config vitest.unit.config.ts test/unit/GuardRequestDataRootIsolation.test.ts test/unit/HostMcpServer.test.ts test/unit/PlanDrivenGenerationGate.test.ts test/unit/ProjectGraphTool.test.ts test/unit/RetrievalCheckpointDiagnostics.test.ts test/unit/NativeProjectScopeRuntimeWiring.test.ts --reporter=dot -> 6 files, 97 tests passed",
+    "npm run test:unit -> 163 files, 1816 tests passed in 116.50s",
+    "npm run check -> passed (typecheck and all lint/boundary/drift gates)",
+    "npm run build -> passed; Core source f4275572282a24c45af282a2ef7b435108f74fdd",
+    "npm run verify:codex-runtime-package -> passed; npm-install and entrypoint probe passed",
+    "npm run verify:plugin-distribution -> passed for alembic-runtime@0.3.0",
+    "npm run verify:codex-plugin -> passed for alembic-runtime@0.3.0 via ./bin/alembic-start.mjs",
+    "git diff --check -> passed; post-commit worktree clean"
+  ],
+  "risks": [
+    "Unit suite now uses at most two file workers, trading some wall-clock speed for deterministic headroom while retaining parallel execution and the existing 10-second per-test gate.",
+    "No AlembicPlugin production code or AlembicCore code changed; all nine stable mismatches were classified as obsolete fixtures/contracts."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "Five ProposalExecutor failures were mature-window fixture drift (3d vs the intentional 7d deprecate window); three session failures used obsolete target:App:src instead of runtime canonical target:src:src; the bootstrap-missing-ai scenario incorrectly expected a locator write despite never calling alembic_init; suite-only timeouts were default-worker Git/SQLite/APFS contention.",
+      "verify": "Baseline targeted run reproduced 9 failures; baseline exact full run reproduced 6 current suite-only timeouts across 5 files, while affected files passed in reduced-concurrency probes."
+    },
+    {
+      "kind": "failure-map",
+      "value": "ProposalExecutor 5 -> observation-window fixture; HostAgentSessionLease 3 -> canonical module-axis fixture; Codex scenario 1 -> init-only locator persistence contract; parallel timeout class -> unit worker-pool contention, including Guard, Plan, Graph/Host/Retrieval and NativeProjectScope manifestations.",
+      "verify": "Each mismatch was traced to its current Core/Plugin call chain before editing; no production rollback was made."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/ProposalExecutor.test.ts",
+      "verify": "Targeted stable regressions: 41/41; contention stress set: 97/97."
+    },
+    {
+      "kind": "full-suite",
+      "value": "npm run test:unit: 163 files passed, 1816 tests passed, duration 116.50s.",
+      "verify": "Exact task-authorized command completed with exit code 0 and unchanged 10,000ms test/hook timeouts."
+    },
+    {
+      "kind": "commit",
+      "commit": "c2a07d31be4fda4fcaff1161cc952b45c3480927",
+      "verify": "git show --stat reports exactly four Plugin files, 20 insertions and 8 deletions; post-commit worktree is clean."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 requirements review found no production/Core behavior needing rollback and no out-of-scope file. Stage 2 quality review confirmed current applyProposal/upsertEdge mocks, a stronger replacement-edge assertion, retained file parallelism, unchanged 10s gates, clean diff, and all verification commands green.",
+      "verify": "git diff --check and npm run check passed before commit."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduce/classify stable failures; correct only obsolete fixtures; reproduce/classify suite contention; cap worker pool without serializing or raising timeout; run targeted, full, build, and package gates; self-review and commit."
+    },
+    {
+      "kind": "test-stability",
+      "value": "Empirical 4-worker stress still timed out RetrievalCheckpointDiagnostics; 2-worker stress passed 97/97 and exact 163-file suite passed 1816/1816 while retaining parallel file execution."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Only three test/fixture files and vitest.unit.config.ts changed; no lib/, Core, Wakeflow, timeout, skip, or assertion weakening."
+    },
+    {
+      "kind": "core-ownership-boundary",
+      "value": "Core observation-window and locator-confinement behavior were treated as authoritative and preserved; no Core-owned defect remained."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-plugin-full-unit-suite-closure-p1__AlembicPlugin__p4-plugin-full-unit-suite-closure-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-full-unit-suite-closure-p1__AlembicPlugin__p4-plugin-full-unit-suite-closure-t1.json",
+    "deliveryRunId": "run-delivery-p4-plugin-full-unit-suite-closure-p1__AlembicPlugin__p4-plugin-full-unit-suite-closure-t1",
+    "dispatchGroup": "p4-plugin-full-unit-suite-closure-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-full-unit-suite-closure-p1__AlembicPlugin__p4-plugin-full-unit-suite-closure-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-guard-cross-project-recovery-2026-07-12",
+    "stateRevision": 13,
+    "demandKey": "alembic-guard-cross-project-recovery-2026-07-12",
+    "taskPackageId": "p4-plugin-full-unit-suite-closure-p1",
+    "targetTaskId": "p4-plugin-full-unit-suite-closure-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p4-plugin-full-unit-suite-closure-p1",
+    "resultId": "tr-p4-plugin-full-unit-suite-closure-t1",
+    "createdAt": "2026-07-12T06:18:56.816Z"
+  },
+  "createdAt": "2026-07-12T06:18:56.816Z",
+  "stateRevisionObserved": 13,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}
