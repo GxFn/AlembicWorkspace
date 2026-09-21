@@ -3,8 +3,8 @@
 These skills are Wakeflow-adapted Design capabilities. They digest mature
 external skill patterns into Design-window responsibilities while preserving
 the original method strength: clarify requirements with the user, compare
-options, draft controller-intake-ready designs, propose vertical slices, and
-hand off evidence.
+options, draft controller-intake-ready designs, redesign non-bug outcome
+mismatches, propose vertical slices, and hand off evidence.
 
 Design skills do not dispatch implementation, mutate controller state, accept
 work, or edit product code unless a controller state root explicitly authorizes
@@ -22,8 +22,8 @@ Before selecting a skill, do a skill-fit check:
 - If the user only needs a direct answer, status readout, or small explanation,
   do not invoke a Design skill.
 - If the user needs clarification, route comparison, requirement design,
-  candidate slicing, or controller handoff packaging, name the smallest matching
-  skill and why it applies.
+  outcome redesign, candidate slicing, or controller handoff packaging, name
+  the smallest matching skill and why it applies.
 - If a skill is only possibly useful, recommend it as the next method and
   explain the tradeoff; do not silently turn the conversation into document
   production.
@@ -57,7 +57,8 @@ of saying only that documents exist.
   - Interactive output: option comparison, risks, interfaces, validation routes,
     recommendation, and confirmation questions.
 - `requirement-design/SKILL.md`
-  - Purpose: write a controller-intake-ready requirement design.
+  - Purpose: write a controller-intake-ready requirement design, including a
+    revised plan when a non-bug outcome mismatch needs real adjustment.
   - Sources: `to-prd`, agile product owner patterns, planning-with-files, and
     requirement-quality standards.
   - Interactive output: problem, goals, non-goals, user stories, implementation

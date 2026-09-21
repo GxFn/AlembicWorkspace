@@ -20,13 +20,14 @@ This section is maintained by the Wakeflow runtime installer. It records this wi
 3. Then read `.wakeflow-active/index.md` and `.wakeflow-active/current/workspace-current-status.md`.
 4. If there is a current plan, task package, or direct-thread delivery, execute only the content under `.wakeflow-active/current` explicitly assigned to `AlembicWorkspace`.
 5. Goals, scope, forbidden actions, validation commands, and backfill fields come from the current plan, task package, and repository rules. Prompts are only wakeup entrypoints, not the full task specification.
+6. If a keyword, familiar command, script hint, or urgency is pulling you into action before a safe operation, recovery boundary, and one-sentence plan are clear, stop and report the blocker.
 
 ### Direct Thread Dispatch Minimum Gate
 
 - Direct-thread delivery is the normal work transport. It does not change this window responsibility or expand task scope. Specific work comes from the dispatch packet, current plan, and repository rules.
-- Delivery prompts carry only a few dynamic variables and a skill pointer. Do not treat the prompt as a full command manual. State-machine routes need only visible `currentWindow` / `taskId` / `stateRoot` / optional `dispatchGroup`. Machine fields such as `controllerWindow`, `returnPolicy`, `humanContextRef`, and `stateRevision` are read from the state root, dispatch group, and delivery envelope. Stop and report if `stateRoot` is missing or variables conflict.
+- Delivery prompts carry one bounded task-focus sentence, navigation/freshness variables (`currentWindow`, `taskId`, `taskPackageId`, `stateRoot`, `stateRevision`, optional `dispatchGroup`), and skill pointers. Do not treat the prompt as a full command manual. The visible `stateRevision` identifies the dispatch snapshot in the packet/envelope; the later delivery-sent event may legitimately advance the live state root. Machine fields such as `controllerWindow`, `returnPolicy`, and `humanContextRef` are read from the state root, dispatch group, and delivery envelope. When an implementation package carries `acceptanceAnchors`, map each anchor to a RED test/probe before coding; an untestable or conflicting anchor is `needs-review`, not permission to invent scope. Stop and report if `stateRoot` is missing or identities conflict.
 - This window only handles dispatch packets for `AlembicWorkspace` and returns `TargetResultEnvelope`. Do not claim, accept, or process other window tasks.
-- Child windows do not create target-to-target next-hop delivery by default. Evidence repair, redispatch, and next phases are decided by controller review. If delivery has `returnRoute=controller` and `review-results` shows that `DispatchGroup.returnPolicy` allows a callback, create exactly one controller-return envelope with `build-controller-return`, returning by default to the original controller named by `DispatchGroup.controllerWindow`. Then complete the real direct-thread send, readback, and `record-delivery-run`. A controller return is complete only when a `DirectThreadDeliveryRun` exists with `status=sent` and `readback.ok=true`. The full group snapshot stays in the controller-return envelope; the visible prompt shows only non-empty exceptional targets and must not treat one target backfill as whole-group completion.
+- Child windows do not create target-to-target next-hop delivery by default. Review-input repair, redispatch, and next phases are decided by controller review. If delivery has `returnRoute=controller` and `review-results` shows that `DispatchGroup.returnPolicy` allows a callback, create exactly one controller-return envelope per callback scope and `resultVersionKey` with `build-controller-return`, returning by default to the original controller named by `DispatchGroup.controllerWindow`. A legal superseding target result creates a new result version and therefore requires a new controller-return. A transport retry for the same result version is allowed only when the host proves `rejected-before-send`; reuse its existing envelope. `accepted`, `ambiguous`, or readback-pending transport is never resent. Then complete the real direct-thread send, exactly one bounded read-only observation, and `record-delivery-run` with explicit transport/readback fields. A controller return is complete only when a `DirectThreadDeliveryRun` records `status=sent`, `transportStatus=accepted`, and `readback.status=confirmed`; accepted transport with pending/unavailable readback is `sent-unconfirmed`, not controller reachability. The full group snapshot stays in the controller-return envelope; the visible prompt shows only non-empty exceptional targets and must not treat one target backfill as whole-group completion.
 - Non-Test windows must not create, process, or verify Test delivery unless both the current plan and delivery envelope explicitly authorize it.
 - Thread ids may only be written to Wakeflow local runtime. Do not write them to tracked documents, backfill text, or GitHub.
 
@@ -48,18 +49,23 @@ Wakeflow root block should stay reusable across installed workspaces.
   and explicit user decisions. Do not treat sibling tooling, history, ledger,
   scratch, or Wakeflow source directories as work windows just because they
   appear next to product repositories.
-- When editing `Wakeflow/`, treat it as the reusable Wakeflow capability source
-  repository, not as an Alembic product repository.
-- `Wakeflow/` tracks only reusable capability assets: `AGENTS.md`, README,
-  scripts, templates, skills, schemas, plugin support files, and starter
-  documents.
-- Do not add product repositories, Design, Test, or real test projects to
-  `Wakeflow/` as tracked directories, submodules, or gitlinks.
-- Wakeflow scripts must be repo-neutral, parameterized, secret-free, free of
-  user absolute paths, and network-independent unless explicitly justified.
-- Skills in `Wakeflow/skills/` are reusable assets. Installing or syncing a
-  skill must name its consumer and destination.
-- Only the controller commits Wakeflow capability changes after review.
+- Wakeflow capability source is maintained outside this workspace and is not an
+  Alembic product window. Do not infer a managed `Wakeflow/` child repository
+  from plugin installation paths or cached skills.
+- Reusable Wakeflow scripts, templates, skills, schemas, and plugin support
+  files belong to the Wakeflow source repository. This workspace consumes the
+  installed MCP/Skill surface and must not copy those assets into product repos.
+- Do not add product repositories, Design, Test, or real test projects to the
+  Wakeflow source repository as tracked directories, submodules, or gitlinks.
+- Only the Wakeflow source controller commits reusable capability changes after
+  review; AlembicWorkspace changes remain workspace-specific.
+
+## Git Workflow
+
+The user requires main-only development for the Alembic repositories. Work and
+commit directly in each existing primary checkout on `main`; do not create a
+development branch or isolated development worktree unless the user explicitly
+requests one. Preserve existing uncommitted work when switching or integrating.
 
 ## Personal Operating Constraints
 
@@ -217,7 +223,7 @@ omitted the blocker.
 <!-- wakeflow:root-agents:start -->
 # AlembicWorkspace Agent Instructions
 
-> Wakeflow is installed as a Codex plugin for this workspace. Use Wakeflow MCP tools for setup, status, state roots, delivery, review, archive, next-work scans, and verification. Do not call installed runtime scripts directly or infer their Node parameters; if a required Wakeflow MCP tool is unavailable, stop and report that the Wakeflow plugin surface must be reloaded or reinstalled.
+> Wakeflow is installed as a Codex plugin for this workspace. Use Wakeflow MCP tools for setup, status, state roots, delivery, review, archive, next-work scans, and verification. Do not call installed runtime scripts directly or infer their Node parameters; if a required Wakeflow MCP tool is unavailable, stop and report that the Wakeflow plugin surface must be reloaded or reinstalled. After a local reinstall or update, fully restart the Codex App before resuming; creating another task in the same App process may still inherit the stale or missing MCP surface.
 
 > This file is generated by the installed Wakeflow plugin and is the parent workspace Codex entrypoint. Do not maintain it by hand long term. Refresh it with the Wakeflow MCP sync/initialize tools after changing plugin source rules.
 
@@ -235,9 +241,10 @@ actionable is a hard stop until the safe operation and the explicit one-sentence
 step are clear. For a new request, analyze the feature, user scenario, completion
 definition, local code, docs, tests, and release path before decomposing work.
 
-- Machine envelopes are evidence-first: read the named state root, skill, dispatch
-  group, task package, and evidence documents before acting; missing or conflicting
-  references stop the work as missing evidence, pending decision, or blocked.
+- Machine envelopes are context-first: read the named state root, skill,
+  dispatch group, task package, and referenced review materials before acting;
+  missing or conflicting references stop the work as missing review input,
+  pending decision, or blocked.
 - On entering a managed workspace, read `AGENTS.md`, `.wakeflow-active/index.md`, and
   `.wakeflow-active/current/workspace-current-status.md`, then continue from the
   current controller document. Reading status is orientation, not permission to edit
@@ -255,9 +262,12 @@ definition, local code, docs, tests, and release path before decomposing work.
   non-bug outcome mismatches, and prepares signals or handoff candidates.
   Design does not dispatch implementation, accept work, edit product code, or
   mutate controller state.
-- Test handles real-scenario verification that the controller or product
-  repository cannot safely reproduce alone. Test is not a default
-  implementation queue; product defects return to the owning source repository.
+- Test starts only after total control has completed its own validation for the
+  current scope and accepted every active required non-Test target (with valid
+  superseded lineage excluded). It explores
+  confirmed real environments for boundary problems and hidden bugs that the
+  controller or product repository cannot safely reproduce alone. Test does
+  not own functional correctness, completion, or product fixes.
 - Product windows are repositories listed in `wakeflow.config.json` or local
   override. Each owns its source, tests, commits, evidence, and backfill.
 - Wakeflow owns reusable controller runtime, plugin packaging, AGENTS
@@ -267,12 +277,12 @@ definition, local code, docs, tests, and release path before decomposing work.
 - `host agent` means the external host capability, currently Codex. Do not
   confuse it with any managed product's internal agent.
 - Codex subagents may assist controller and child windows with bounded parallel
-  code search, log triage, test localization, and evidence summarization. Their
-  output is advisory evidence; it never transfers dispatch, acceptance,
+  code search, log triage, test localization, and input summarization. Their
+  output is advisory review input; it never transfers dispatch, acceptance,
   state-machine writes, repository ownership, or user-confirmation authority.
 
 Do not move responsibilities between repositories to make boundaries look tidy.
-Boundary changes require a real caller, replacement entrypoint, and evidence.
+Boundary changes require a real caller, replacement entrypoint, and independent validation.
 Browse official or authoritative sources when current platform rules, external
 standards, release behavior, protocols, security, or best practices matter.
 Local code facts still win over generic advice.
@@ -292,26 +302,43 @@ implementation churn until Design returns a complete adjustment plan.
 
 The controller may auto-claim (init) a demand without a fresh user prompt ONLY from a
 global TODO row that Design delivered with Auto Claim = yes, via `wakeflow_claim_next`:
-that immutable delivery property is set once at `wakeflow_deliver` time and, for a
-requirement, requires a linked Original Plan + Requirement Design, so it carries the
-ready-row invariants plus design-key provenance. It is init-only — dispatch and
+that immutable delivery property is set once at `wakeflow_deliver` time. Every
+delivered type must already carry its complete proportional `demandAuthority`;
+Auto Claim does not reduce that readiness contract. It is init-only — dispatch and
 acceptance still require their own evidence and confirmation. The operator's broader
 confirmation gates live in the installed workspace's own rules.
+Auto Claim is mainline-only: while mainline is busy or unavailable it waits
+without creating a demand, Pod, thread, or worktree.
 
 ## Testing And Acceptance
 
+- **No Test dispatch while total control's current validation scope is
+  unfinished.** Every active/open non-Test target must already be `accepted`;
+  canonical `superseded` replacement history is not an open target. The Test
+  card's existing `controllerSelfChecks` records
+  what total control verified and why a real scenario remains necessary.
+  Test-only reproduction/environment diagnostics remain valid. Test output
+  cannot complete unfinished controller validation or become the quality owner.
 - The controller self-validates anything that does not need a real project:
   Wakeflow script tests, document checks, state-machine checks, targeted units,
   probes, runtime JSON/log review, and lightweight integration checks.
 - Do not hand known script, code, document, or state-machine defects to Test for
   rediscovery.
-- Use Test only for real projects, cold-start/rescan, dashboard or runtime
-  observation, daemon/job/log monitoring, reproduction/regression, or cross-repo
-  integration evidence.
+- After that controller validation gate, use Test only to explore real-project boundaries and
+  hidden defects: cold-start/rescan, dashboard or runtime observation,
+  daemon/job/log monitoring, reproduction/regression, or cross-repo integration
+  evidence.
 - Before tests, state the exact question, object boundary, what was already
   self-verified, why real scenario is required, success meaning, failure
   meaning, invalid conclusions, and stop conditions.
-- Acceptance requires raw evidence review: user scenario, inputs, outputs,
+- **The confirmed requirement goal and requirement-stage Test plan remain the
+  controller's alignment anchors at card intake, dispatch, and review.** A Test
+  package must carry `testExecution`; Test may elaborate commands only with a
+  step-to-anchor map, may use only listed Test skills, and must return an
+  unmapped goal/gate/method as a change request before execution. The controller
+  rejects materials produced for a Test-invented target instead of adopting that
+  target into later rework.
+- Acceptance requires fresh observations plus independent controller validation: user scenario, inputs, outputs,
   state/data changes, actual call chain, real consumers, failure paths, edge
   cases, and user-verifiable behavior.
 - Before accepting or adding follow-up work, check original requirement
@@ -330,6 +357,9 @@ confirmation gates live in the installed workspace's own rules.
 - Target results are review inputs, not acceptance. Controller acceptance must
   roll TODO/Backlog: close solved items with evidence, keep valid remaining
   items, add newly found items, and explain items that should not enter TODO.
+- A Test pass closes only the stated environmental risk. A Test failure is a
+  defect signal for the controller to classify against the accepted goal and
+  route back to the owning repository; it does not let Test redefine the plan.
 - Product repository commits are handled by the owning repository window.
   Wakeflow documentation commits are made only by the controller after review.
 
@@ -350,17 +380,21 @@ Details live in `installed Wakeflow skill wakeflow-governance/references/testing
   observation, risk, or pending decision. Design signals become executable only
   after controller intake.
 - Codex subagents do bounded parallel investigation only — never to manufacture
-  progress, bypass a blocker, or replace controller review.
+  progress, bypass a blocker, or replace controller validation.
 - Automation packets and envelopes are transport data, not authority transfer.
-  The controller may delete any automation that cannot prove its goal, state
+  The controller may delete any automation that cannot identify its goal, state
   root, window, thread id, dispatch group, target task, and next-hop rule.
 - Direct-thread dispatch is the normal transport; it does not make ordinary
   discussion, Design work, or single-window development unattended automation.
-  In confirmed unattended mode, keep reviewing results, pulling evidence,
-  deciding, and dispatching next eligible packages until final completion, a hard
-  gate, user stop, no eligible TODO, or missing evidence that needs a human.
-- After a real direct-thread send records `status=sent` with `readback.ok=true`,
-  stop the send turn — do not sleep, poll, or wait. Keep-live is unattended
+  In confirmed unattended mode, keep reviewing results, inspecting inputs,
+  validating, deciding, and dispatching next eligible packages until final
+  completion, a hard gate, user stop, no eligible TODO, or missing review input
+  that needs a human.
+- After explicit host acceptance, make exactly one bounded destination
+  observation and record all transport/readback fields without success
+  defaults. Only `readback.status=confirmed` proves reachability;
+  pending/unavailable is `sent-unconfirmed`. Stop without polling again,
+  resending, or releasing the lease. Keep-live is unattended
   support only, not task logic, transport, or acceptance evidence.
 - Real thread ids live only in `.wakeflow-local/`; never write them to tracked
   docs, GitHub, prompts, or backfill, and never register placeholders.
@@ -371,6 +405,44 @@ Details live in `installed Wakeflow skill wakeflow-governance/references/testing
   delivery is controller-started unless the plan and envelope authorize an
   exception. Old claim/finish/chain-next/start-plan/resume-plan routes are
   retired.
+- Every newly authored full-context implementation task package must carry at
+  least one controller-authored `acceptanceAnchor` derived from confirmed
+  requirement authority. Research/documentation packages may omit anchors;
+  legacy packages remain read-only compatibility input. Before
+  coding, the target maps every `{id,claim,probe,expected}` anchor to a RED
+  test/probe; an untestable or conflicting anchor returns `needs-review`.
+  Neither the controller nor target invents missing requirement scope through
+  an anchor.
+- Within one demand each repository runs exactly ONE window with ONE combined
+  task package (the window self-sequences its items); a window is never
+  dispatched two simultaneous tasks inside the same demand. Host-created Pod
+  product windows (`<repo>__<pod>`) exist only for explicitly authorized
+  cross-demand isolation. Their integration disposition is human-reviewed; no
+  controller merges or removes their worktrees.
+- The mainline fleet is the default execution surface. A busy mainline waits;
+  missing/unhealthy required identity returns `mainline-unavailable` before
+  demand/TODO mutation and is repaired. It never silently creates an isolated
+  demand.
+- A demand pod exists only after an explicit user-authority anchor selects it.
+  Wakeflow sets no numeric pod admission limit. Each pod owns independent
+  `Controller__<pod>`, `Design__<pod>`, `Test__<pod>`, and product sessions.
+  Wakeflow plans, binds, verifies, and logically closes them. The current
+  public Pod lifecycle never creates, removes, or adopts a Git worktree or
+  branch; those actions belong to the Codex host.
+- Codex creates every pod product thread from the exact saved repository
+  project with `environment.type=worktree`; Controller/Design/Test are distinct
+  local control-project threads. Journal each create by launch correlation; a
+  temporary `clientThreadId` is pending search/recovery evidence only and can
+  never enter the registry. Freeze Pod Design with
+  `wakeflow_pod_plan action=design-request`. The current implementation freezes exactly one Pod
+  Design request/handoff generation; that sole request may be `initial-design`,
+  `supplement`, or `redesign`. A different second generation must stop as an
+  unsupported capability rather than overwrite it or fall back to mainline Design. A pod reaches `control-ready` only
+  after all three control receipts bind, and `execution-ready` only after its
+  matching Design handoff and every required product receipt bind. Pod Test
+  dispatch additionally requires validated `direct-multi-root` access to every
+  active product binding; unsupported access stays blocked without fallback.
+  Logical close and Codex physical worktree cleanup are separate facts.
 
 Delivery-envelope fields, host-thread send mechanics, keep-live, and review flow
 live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-delivery.md`,
@@ -388,8 +460,9 @@ live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-delive
 - `wakeflow_view` (scope `storage`) is the local-storage map — every tree with
   class/size/age plus legacy, unknown, and aging preserved entries; in-place
   READMEs (seeded by `wakeflow-storage seed-readmes`) explain each tier next
-  to the data. The only sanctioned manual-rescue move is `wakeflow-storage
-  preserve`; unknown trees route to the user and are never auto-deleted.
+  to the data. The only sanctioned installed-workspace rescue move is
+  `wakeflow_storage_preserve` (dry-run first, then `apply: true`); unknown
+  trees route to the user and are never auto-deleted.
 - First installation runs discovery and waits for user confirmation before
   writing scope. Placement, index, and archive detail live in
   `installed Wakeflow skill wakeflow-governance/references/wakeflow-ledgers.md`.
@@ -414,12 +487,6 @@ live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-delive
   input at any stage is routed to its owner (Design / user / bounded
   investigation), never guessed — the full S0→S6 route and per-stage gates live
   in `installed Wakeflow skill wakeflow-governance/references/stage-route-map.md`.
-- Parallelism exists ONLY at the demand level, as demand pods: up to
-  `maxActiveDemands` (default 2) demands run side by side, each with its OWN
-  controller (stamped into the state root so returns route home) and window
-  set, mutually unaware. Within a demand each repo = one window = one combined
-  task package. Branch merge-back is human-reviewed and decentralized;
-  claiming past capacity fails closed.
 - Supplemental requirements must not reverse original decisions, non-goals, or
   forbidden shortcuts, and must not split into placeholder / empty-adapter /
   type-only stages without a named consumer and targeted validation.
@@ -446,11 +513,13 @@ live in `installed Wakeflow skill wakeflow-governance/references/wakeflow-delive
 
 ## Standard Dispatch Prompt
 
-A dispatch prompt is a compact wakeup envelope: it navigates (read parent
-`AGENTS.md`, the active index, the current controller doc, and the target
-repository `AGENTS.md`; state window/repository identity; claim only the assigned
-task; backfill evidence/boundaries/risks/next-steps when done) while the state
-root, task package, and skills define the work. The copyable template lives in
+A dispatch prompt is a bounded, priority-ordered briefing: objective; at most
+two completion focuses; one priority context; one critical boundary; up to
+four acceptance-anchor ids/claims; ordered navigation to the task package,
+original requirement entry, workspace/repository instructions, current state
+root, and derived Skills; then identity, return, and trace fields. The task
+package owns complete context and boundaries, requirement documents own
+original background, and Skills own execution procedure. The copyable template lives in
 `installed Wakeflow skill wakeflow-governance/references/window-dispatch.md`. Do not put
 wave-specific window lists, blocked/observing decisions, validation commands,
 forbidden paths, or automation manuals in `AGENTS.md`.

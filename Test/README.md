@@ -11,10 +11,11 @@ Use this directory when the user does not have an external Test repository.
 - Test-owned scripts: `scripts/`
 - Script wrappers: `package.json`
 - Test skill map: `skills/README.md`
-- Test skills are evidence methods first. Use them proactively to plan
-  validation, triage failures, design regressions, review evidence, run
+- Test skills are validation methods first. Use them proactively to plan
+  validation, triage failures, design regressions, check Test's own evidence, run
   Alembic real-route probes, and handle long-chain validation before recording
-  backfill.
+  backfill. Product-diff and target-result review, independent validation, and
+  acceptance belong to the controller.
 - Testing operation policy: `docs/testing-operation-policy.md`
 - Legacy AlembicTest map: `docs/legacy-alembic-test-map.md`
 - Test handoff template: `templates/test-handoff-template.md`

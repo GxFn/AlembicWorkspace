@@ -2,7 +2,7 @@
 
 Use this directory when the user does not have an external Design repository.
 
-- Handoff board: `.wakeflow-active/current/design-handoff-board.md`
+- Historical/advisory handoff index: `docs/current/workspace-handoff-board.md`
 - Local rules: `AGENTS.md`
 - Documentation index: `docs/index.md`
 - Current Design work: `docs/current/`
@@ -11,9 +11,9 @@ Use this directory when the user does not have an external Design repository.
 - Templates: `templates/original-plan-template.md`, `templates/requirement-design-template.md`, `templates/workspace-signal-template.md`, and `templates/workspace-handoff-template.md`
 - Design skill map: `skills/README.md`
 - Design skills are conversational methods first. Use them to clarify,
-  compare, draft, slice, and prepare handoff recommendations with the user
-  before writing tracked documents.
-- Discovery and intake are performed by the controller through the Wakeflow MCP
-  surface. Design does not run plugin-cache runtime scripts or update intake
-  state directly.
+  compare, draft, redesign non-bug outcome mismatches, slice, and prepare
+  handoff recommendations with the user before writing tracked documents.
+- Discovery and intake are performed through the Wakeflow MCP surface. Design
+  may append one ready item with `wakeflow_deliver`; it does not maintain TODO
+  status, create state roots, or run plugin-cache runtime scripts.
 - Do not call plugin-cache runtime scripts from this Design support directory.

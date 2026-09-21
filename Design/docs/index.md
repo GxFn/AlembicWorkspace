@@ -14,7 +14,7 @@ This index is the map for the built-in Wakeflow Design surface.
 | Type | Document | Purpose |
 | --- | --- | --- |
 | Current area | [current/README.md](current/README.md) | Explains where active plans, designs, signals, and handoff drafts live. |
-| Handoff board | [current/workspace-handoff-board.md](current/workspace-handoff-board.md) | Local Design board for completed design handoffs. |
+| Handoff board | [current/workspace-handoff-board.md](current/workspace-handoff-board.md) | Historical/advisory index of completed Design handoffs; not runtime intake authority. |
 
 ## Templates
 

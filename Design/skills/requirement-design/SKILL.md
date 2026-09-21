@@ -1,6 +1,6 @@
 ---
 name: requirement-design
-description: Use in a Wakeflow Design window to turn a clarified and confirmed requirement into a controller-intake-ready requirement design with user stories, decisions, tests, non-goals, and acceptance criteria.
+description: Use in a Wakeflow Design window to turn a clarified and confirmed requirement, or a non-bug outcome mismatch that needs redesign, into a controller-intake-ready requirement design with user stories, decisions, tests, non-goals, and acceptance criteria.
 ---
 
 # Requirement Design
@@ -28,6 +28,8 @@ Use this skill only when at least one of these is true:
 
 - the user has confirmed the clarified requirement;
 - the controller asked Design for a requirement design;
+- the controller or user says the implementation is not buggy but the effect is
+  still wrong and needs a real adjustment plan;
 - a Design handoff has enough evidence to draft a candidate and clearly mark
   open decisions.
 
@@ -57,14 +59,19 @@ justified, state what will be written and why before editing.
 2. Respect domain language.
    - Use existing glossary or code vocabulary.
    - Call out conflicts between user language and code/docs.
-3. Sketch testing seams before writing the final design.
+3. For outcome redesign, classify the mismatch before proposing work.
+   - What effect was observed?
+   - Why is this not a simple product-code bug or missing evidence?
+   - Which point-fix loop should stop?
+   - What new behavior or architecture target should replace it?
+4. Sketch testing seams before writing the final design.
    - Prefer existing public seams.
    - Use the highest seam that proves observable behavior.
    - If a new seam is needed, justify it.
-4. Draft the design as a controller artifact in the conversation.
+5. Draft the design as a controller artifact in the conversation.
    - Write a tracked requirement-design document only after explicit
      user/controller confirmation.
-5. Mark confirmation status.
+6. Mark confirmation status.
    - `confirmed`
    - `candidate`
    - `needs-user-decision`
@@ -89,6 +96,8 @@ justified, state what will be written and why before editing.
 
 ## Implementation decisions
 
+## Outcome gap or redesign trigger
+
 ## Testing decisions
 
 ## Acceptance criteria
@@ -110,11 +119,18 @@ justified, state what will be written and why before editing.
 - `Implementation decisions` may name modules, interfaces, contracts, schema or
   state changes, but avoid brittle file-path inventories unless the path itself
   is part of the decision.
+- `Outcome gap or redesign trigger` is required when the work comes from a
+  non-bug result mismatch; it must state observed effect, intended effect, why
+  product redispatch would be churn, and the real adjustment strategy.
 - `Testing decisions` must state what makes a good test for this requirement,
   which seam should be used, and which prior tests or patterns are relevant.
 - `Acceptance criteria` must be binary or evidence-backed.
 - `Controller intake notes` must state whether Design thinks this is ready for
-  task-package planning, user confirmation, option planning, or stop.
+  task-package planning, user confirmation, option planning, or stop. When this
+  design corrects a demand already in progress (the controller chose a
+  `redesign` review decision and parked it), name the original demand or state
+  root here so the controller resumes that parked demand with
+  `add-task-package`, not a new one.
 
 ## Allowed Outputs
 
@@ -143,4 +159,10 @@ decisions, or cannot be traced back to user goals and evidence.
 
 ## Required output: testing decision
 
-Every requirement design MUST include an explicit testing decision — what validation proves the requirement, and whether a real-scenario Test is needed (and if so, its Test Environment Spec). This is a required output, not optional prose: a demand created without a recorded testing decision surfaces a reminder at create-demand. "Run tests" is not a testing decision; name the risk, the evidence, and the environment.
+Every requirement design MUST include an explicit testing decision — what validation proves the
+requirement, and whether a real-scenario Test is needed (and if so, its Test Environment Spec).
+This is part of the proportional authority input, not optional prose: Design must refuse
+incomplete input before delivery. `wakeflow_deliver` checks the TODO row and CAS, not full
+authority. If TaskPackages will be needed, the controller includes complete authority in the
+initial `wakeflow_create_demand` publication; public v3 has no later authority-promotion
+operation. "Run tests" is not a testing decision; name the risk, evidence, and environment.

@@ -25,6 +25,8 @@ keeps execution, acceptance, TODO routing, and archive authority.
 - Interactively recommend and apply the relevant Design skill before writing a
   tracked Design artifact.
 - Draft original plans, requirement designs, workspace signals, and handoffs.
+- Redesign non-bug outcome mismatches when current implementation evidence is
+  valid but the effect still misses the user goal.
 - Compare architecture options and tradeoffs.
 - Identify code-research requests for Wakeflow or source windows.
 - Identify whether discussion should return as a bug signal, TODO candidate,
@@ -42,6 +44,8 @@ keeps execution, acceptance, TODO routing, and archive authority.
 - Requirement designs must include user scenario, full functional loop, inputs,
   outputs, state changes, producer, consumer, failure path, repository boundary,
   validation strategy, and completion definition.
+- Outcome redesigns must name the observed effect, why it is not a simple bug,
+  the intended effect, rejected point-fix loops, and the adjustment strategy.
 - Non-trivial designs must compare viable approaches and record why rejected
   options were not chosen before recommending an implementation route.
 - Complex demands must explicitly state whether code-fact research is needed.
@@ -63,14 +67,16 @@ keeps execution, acceptance, TODO routing, and archive authority.
 - **Signal**: bug signal, TODO candidate, research request, user decision,
   current-mainline risk, or lightweight recommendation.
 - **Handoff**: complete requirement design or plan transfer.
-- **Handoff board**: the discoverable list of ready Design entries.
-- **State-root intake**: Wakeflow attaches accepted board entries and linked
-  documents to `intake/*.json`. Intake is not a TODO, task package, or dispatch.
+- **Historical handoff board**: an advisory index of past Design entries, not
+  runtime intake authority.
+- **Controller delivery**: `wakeflow_deliver` appends one immutable ready item
+  to the Global TODO. The controller claims it and owns later state transitions.
 
 Every handoff should include title, goal, design status, final completion
 definition, evidence, open questions, confirmed decisions, suggested windows,
 approach tradeoffs, phase candidates, validation needs, non-goals, rollout or
-compatibility notes, and forbidden shortcuts.
+compatibility notes, forbidden shortcuts, and any non-bug outcome mismatch that
+requires redesign instead of implementation churn.
 
 Handoffs are packaging, not discovery. If clarification, option comparison, or
 requirement design is missing, use or recommend the upstream Design skill before

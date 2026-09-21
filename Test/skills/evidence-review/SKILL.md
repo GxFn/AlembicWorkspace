@@ -1,113 +1,74 @@
 ---
 name: evidence-review
-description: Use in a Wakeflow Test window to review target evidence, diffs, reports, runtime logs, or validation output and return blockers, missing evidence, residual risk, and a controller-ready interpretation.
+description: Use when a Wakeflow Test window is preparing its own evidence and result for recording.
 ---
 
-# Evidence Review
+# Test Self-Evidence Review
 
-Review whether evidence is strong enough for controller judgment. Test may
-assess evidence and risk; the controller still owns acceptance, rework, archive,
-and next dispatch.
+The existing `evidence-review` skill name is retained for local routing. It
+means self-review of Test-produced evidence, not product or target review.
+
+**REVIEW ONLY TEST'S OWN EVIDENCE FOR ITS ASSIGNED CARD AND PACKAGE.**
+Violating the letter of this rule is violating its spirit.
+
+**REQUIRED:** read the installed
+`wakeflow-test/references/self-evidence-review.md`. `wakeflow-target` owns exact
+result recording and return transport. The controller owns product-diff and
+target-result review, implementation completeness, and acceptance.
 
 ## Source Skills Used
 
-- `code-reviewer`: intent first, then correctness, safety, maintainability,
-  performance, tests, large-diff triage, and actionable must/nice-to-have
-  findings.
-- `senior-qa`: confidence per unit effort, risky journeys, test layer choices,
-  and release evidence.
-- Google code review practices and SRE evidence discipline: distinguish
-  user-visible symptoms, internal causes, and verification artifacts.
-
-## Wakeflow Role
-
-Use this skill when the controller asks Test to inspect:
-
-- target result envelope evidence;
-- product diff or patch;
-- test report, runtime JSON, log, screenshot, probe, or trace;
-- release/smoke result;
-- claimed validation coverage.
+- Evidence discipline from `code-reviewer` and `senior-qa`: evidence before
+  claims, reproducibility, limitations, and residual risk.
+- SRE symptom/cause separation: distinguish observation, causal inference,
+  command output, and conclusions the evidence cannot support.
 
 ## Workflow
 
-1. Understand intent.
-   - What user/system behavior was supposed to change?
-   - Which task package or test card defines the boundary?
-   - Which conclusion is forbidden?
-2. Inventory evidence.
-   - Commits or diff refs.
-   - Commands and output.
-   - Reports/logs/screenshots/runtime JSON.
-   - Test names and pass/fail status.
-   - Worktree cleanliness when relevant.
-3. Review highest-risk surfaces first.
-   - Entrypoints.
-   - Data writes.
-   - Auth/security/privacy.
-   - Cross-repository contracts.
-   - Runtime or daemon boundaries.
-4. Judge evidence by category.
-   - Correctness and edge cases.
-   - Safety and data handling.
-   - Maintainability and interface fit.
-   - Performance or operational risk.
-   - Test adequacy and flakiness.
-5. Separate findings.
-   - Blocker: prevents controller acceptance.
-   - Missing evidence: cannot conclude.
-   - Residual risk: acceptable only if controller/user agrees.
-   - Follow-up: should be tracked but need not block.
-6. Return a controller-ready interpretation.
+1. Restate the frozen controller question, TestCard, and approved plan.
+2. Inventory Test's commands, reports, logs, screenshots, probes, environment
+   references, outcomes, and retry/flake facts.
+3. Check exact `test-step` mappings: zero-based `planIndex`, byte-matching
+   `approvedPlan` step, and one declared evidence locator per `ref`. A completed
+   result covers every approved step exactly once and in order; partial results
+   remain exact and honest.
+4. Check reproducibility, resolving portable references, redaction, missing
+   evidence, contradictions, and invalid conclusions. Exclude secrets, private
+   handles, raw local absolute paths, and unbounded logs.
+5. Choose result readiness; do not recommend product acceptance.
 
 ## Review Format
 
 ```markdown
-## Evidence Review
+## Self-Evidence Review
 
-- Intent:
-- Boundary:
-- Evidence reviewed:
-- Major blockers:
-- Missing evidence:
-- Minor issues:
-- Residual risks:
-- Test plan assessment:
+- Controller question and approved plan:
+- Test-produced evidence inventory:
+- Test-step mapping check:
+- Reproducibility and portability/redaction check:
+- Contradictions, flakiness, or missing evidence:
 - Invalid conclusions:
-- Recommended controller decision:
+- Residual risks:
+- Result readiness:
 ```
 
-Recommended controller decision must be one of:
-
-- `acceptable-evidence`
-- `needs-rework`
-- `missing-evidence`
-- `blocked`
-- `needs-user-decision`
-- `out-of-scope`
-
-## Actionable Finding Standard
-
-Each blocker must state:
-
-- what is wrong;
-- why it matters;
-- where the evidence is;
-- what kind of repair or additional evidence would resolve it;
-- whether it blocks acceptance or is a follow-up.
+| Result readiness | Meaning |
+| --- | --- |
+| `ready-to-record-completed` | The Test result contract is complete. |
+| `ready-to-record-blocked` | A concrete external blocker stopped approved work. |
+| `ready-to-record-needs-review` | Scope, authority, mapping, or evidence needs controller judgment. |
 
 ## Forbidden Outputs
 
-- No final acceptance.
-- No product decision.
-- No product code edit unless explicitly authorized.
-- No TODO mutation.
-- No dispatch or controller-return envelope creation.
-- No "looks good" without reviewed evidence.
+- No product-completion review, acceptance recommendation, or product decision.
+- No product source, test, configuration, or documentation edits. Only explicitly
+  approved Test-owned `harnesses/` or `fixtures/` changes may support a mapped
+  step; this self-review grants no write permission.
+- No TODO/controller-state mutation or dispatch. Return transport follows
+  `wakeflow-target` and the current envelope, not this method.
 
 ## Quality Bar
 
-The review is useful when the controller can decide accept, rework, wait,
-block, or ask the user without rereading every artifact. It fails if it merely
-summarizes target prose, ignores raw evidence, or treats successful command
-output as full acceptance.
+Test's result must be honest, reproducible, and reviewable. A passing command is
+one observation; the controller independently validates returned evidence before
+any acceptance, rework, or routing decision.

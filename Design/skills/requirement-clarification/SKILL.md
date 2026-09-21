@@ -10,6 +10,11 @@ This skill is for Design windows only. It clarifies and recommends; it does not
 dispatch, mutate controller state, implement product code, accept work, or turn
 Design advice into a user decision.
 
+**Anti-pattern — "this is too simple to clarify."** Every requirement gets
+clarification scaled to its size; the smallest ones are where unexamined
+assumptions cause the most rework. Clarify, even briefly, before recommending it
+as ready.
+
 ## Source Skills Used
 
 - `openai/skills/.curated/define-goal`: measurable outcome, evidence, bounded

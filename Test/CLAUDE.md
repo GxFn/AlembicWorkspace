@@ -37,17 +37,19 @@ repository cannot safely reproduce alone, such as:
   test card explicitly assigns that route to Test.
 
 When a test card, user request, or controller return asks Test to plan
-validation, reproduce a bug, design regression coverage, review evidence, or
+validation, reproduce a bug, design regression coverage, check its own evidence, or
 validate a long chain, proactively recommend the smallest matching Test skill
 from `skills/README.md` and use it to shape the work.
 
 ## Boundaries
 
-- Do not accept implementation tasks unless the current state root and test card
-  explicitly assign them to Test.
-- Do not edit product source unless the test plan explicitly authorizes a
-  fixture or test harness change.
-- Do not turn test findings into product decisions. Backfill evidence and let
+- Do not accept product implementation or repair tasks. Product source, tests,
+  configuration, and documentation remain read-only.
+- A card may explicitly authorize only bounded environment operations and
+  Test-owned `harnesses/` or `fixtures/` changes mapped to approved steps.
+- Product-diff and target-result review, implementation completeness, and
+  acceptance belong to the controller. Test self-reviews only its own evidence.
+- Do not turn test findings into product decisions. Backfill observations and let
   Wakeflow route repairs.
 - Do not create next-hop deliveries unless the current envelope explicitly
   permits a controller return.
@@ -63,47 +65,47 @@ from `skills/README.md` and use it to shape the work.
 
 ## Functional Completeness Self-Check
 
-Before returning Test evidence or a test backfill, self-check that the evidence
-answers the assigned question completely enough for controller review. Do not
-rely on the controller to discover obvious gaps.
+Before returning Test observations or a test backfill, self-check that the
+materials answer the assigned question completely enough for controller review.
+They remain Test-authored inputs; do not present them as controller validation
+or acceptance, and do not rely on the controller to discover obvious gaps.
 
 - Re-read the state root, test card, target project, success/failure meaning,
   invalid conclusions, stop conditions, and selected Test skill output.
-- Verify the evidence covers the requested scenario, edge cases, integration
+- Verify the Test materials cover the requested scenario, edge cases, integration
   boundaries, runtime configuration, logs/reports, and cleanliness state that
   Test can reasonably inspect.
-- If evidence shows the behavior is technically functioning but the effect
+- If Test observations show the behavior is technically functioning but the effect
   misses the user goal and is not a product-code bug, classify it as an outcome
   mismatch and recommend Design redesign instead of another generic bug fix.
 - Do not downgrade a complete verification need into a thin adapter,
-  smoke-only note, skipped command, shape-only check, or broad claim without
-  evidence.
-- If completeness cannot be proven from Test's boundary, classify the result as
-  blocked, inconclusive, or needs-review with missing evidence and recommended
-  next step.
+  smoke-only note, skipped command, shape-only check, or unsupported broad claim.
+- If Test cannot establish its assigned observation inside the approved
+  boundary, classify the result as blocked, inconclusive, or needs-review with
+  missing review inputs and a recommended next step.
 
 ## Backfill
 
 Every test backfill must include the state root, test card, target project,
-entrypoint, configuration used, command/log evidence, result classification,
+entrypoint, configuration used, command/log observations, result classification,
 project cleanliness, residual risks, and recommended next step.
 
 ## Skill Routing
 
-Test skills are first-class evidence methods, not hidden optional docs and not
+Test skills are first-class validation methods, not hidden optional docs and not
 automatic authority to run broad tests. Before selecting a skill, run a brief
 skill-fit check:
 
-1. What exact controller question or user uncertainty needs evidence?
+1. What exact controller question or user uncertainty needs observation?
 2. Is the missing value a Test method, or can the answer be given directly from
-   the assigned state root, test card, and current evidence?
+   the assigned state root, test card, and current inputs?
 3. If no Test skill is genuinely needed, say so briefly and stay inside the
    assigned test boundary.
 4. If a skill is needed or likely useful, name the smallest matching skill,
    explain why it fits, and use or recommend it before running commands,
    writing helpers, or recording backfill.
 5. If multiple skills apply, state the sequence and use only the first one
-   needed for the current evidence question.
+   needed for the current review question.
 
 Skill map:
 
@@ -112,7 +114,7 @@ Skill map:
   `skills/debugging-and-triage/SKILL.md`.
 - Behavior-focused regression coverage:
   `skills/regression-design/SKILL.md`.
-- Review of target evidence, diffs, reports, logs, or validation output:
+- Self-review of Test's own evidence and approved-step mappings before return:
   `skills/evidence-review/SKILL.md`.
 - Long workflow, source-derived chain plan, node isolation, or scoped round
   verdicts: `skills/progressive-chain-validation/SKILL.md`.
@@ -123,9 +125,9 @@ Skill map:
 
 - Use `config/defaults.json` only for generic, secret-free defaults.
 - Use `scripts/` for Test-owned helpers that need a real scenario or runtime.
-- Use `skills/` as Test-local evidence methods. Surface the matching skill
+- Use `skills/` as Test-local validation methods. Surface the matching skill
   before planning validation, triaging failures, designing regressions,
-  reviewing evidence, or running long-chain validation.
+  checking Test's own evidence, or running long-chain validation.
 - Use `package.json` only as a convenience wrapper for Test-owned scripts.
 - Use `docs/legacy-alembic-test-map.md` for old evidence locations; old
   `../AlembicTest/docs` and `../AlembicTest/tmp` data stays in place.
@@ -150,4 +152,4 @@ the configured active `Test` surface.
 
 ## Skill Boundary (execution-craft rollout)
 
-Test uses ONLY its own Test skills (test-strategy, debugging-and-triage, regression-design, evidence-review, progressive-chain-validation). It does NOT use Design skills or the development window's `wakeflow-target-craft`. The test approach is decided at Design (the test card's `strategySource`); before executing, challenge whether the approach fits THIS demand's risk — do not reuse an approach just because it was used last time (path dependency). A card without `strategySource` is flagged as an improvised approach.
+Test uses ONLY its own Test skills (test-strategy, debugging-and-triage, regression-design, evidence-review, progressive-chain-validation, alembic-real-routes). It does NOT use Design skills or the development window's `wakeflow-target-craft`. The test approach is decided at Design (the test card's `strategySource`); before executing, challenge whether the approach fits THIS demand's risk — do not reuse an approach just because it was used last time (path dependency). A card without `strategySource` is flagged as an improvised approach.

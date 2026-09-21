@@ -1,28 +1,29 @@
 # Test Skills
 
 These skills are Wakeflow-adapted Test-window capabilities. They turn mature QA,
-debugging, TDD, and review practices into evidence-producing workflows for
-controller review.
+debugging, TDD, and review practices into review-input-producing workflows.
+Their output supports controller review; it is never machine-verified proof or acceptance.
 
 Test skills do not accept product work, dispatch new windows, mutate controller
-state, or take over product implementation unless a controller state root
-explicitly authorizes it.
+state, or take over product implementation. Product repositories remain
+read-only; a card may authorize only bounded environment operations and mapped
+Test-owned `harnesses/` or `fixtures/` changes.
 
 ## How To Use These Skills
 
 Use these skills proactively while Test is executing an assigned test card or
-answering a controller evidence question:
+answering its frozen controller question:
 
 - If the work involves validation planning, reproduction, triage, regression
-  design, evidence review, long-chain validation, or an Alembic real-route
+  design, self-evidence review, long-chain validation, or an Alembic real-route
   probe, name the smallest matching skill and explain why it helps before
   running commands or recording backfill.
 - If a skill is only possibly useful, recommend it as the next method and ask
   only for the missing scope decision that would change the test boundary.
-- If the current evidence question is straightforward and a skill would add no
+- If the current review question is straightforward and a skill would add no
   value, say that briefly and proceed inside the assigned boundary.
 - Do not blend several skills into one vague pass. Use them in sequence and stop
-  when the current evidence question is answered.
+  when the current review question is answered.
 
 ## Installed Skills
 
@@ -46,12 +47,13 @@ answering a controller evidence question:
   - Output: protected behavior, public seam, fail-before/pass-after signal,
     first tracer bullet, fixtures, risks, and owner.
 - `evidence-review/SKILL.md`
-  - Purpose: review target result evidence, diffs, reports, logs, or validation
-    outputs for controller judgment.
-  - Sources: `code-reviewer`, `senior-qa`, Google code review practice, and
-    SRE evidence discipline.
-  - Output: blockers, missing evidence, minor issues, residual risks, test plan
-    assessment, invalid conclusions, and recommended controller decision.
+  - Purpose: check Test's own evidence and approved-step mappings before
+    recording its result; product-diff and target-result review stay with the
+    controller.
+  - Sources: evidence discipline from `code-reviewer` and `senior-qa`, and
+    SRE symptom/cause separation.
+  - Output: mapping, reproducibility, portability/redaction, missing evidence,
+    residual risks, invalid conclusions, and Test result readiness.
 - `progressive-chain-validation/SKILL.md`
   - Purpose: generate and execute source-derived long-chain validation plans
     one node at a time, with isolated fixtures, safe write boundaries,
@@ -74,6 +76,7 @@ answering a controller evidence question:
 
 ## Quality Standard
 
-Test output must answer a controller question with reviewable evidence. It is
+Test output must answer a controller question with reviewable inputs. It is
 not enough to say that tests passed. Every result must distinguish success,
-failure, invalid conclusion, missing evidence, and residual risk.
+failure, invalid conclusion, missing review inputs, and residual risk; the
+controller still performs independent validation before acceptance.

@@ -56,7 +56,8 @@ current controller state.
 - Do not mutate Wakeflow current status, TODOs, state roots, test cards, or test
   exchange projections.
 - Do not write bug/TODO/requirement signals directly into the workspace Global
-  TODO.
+  TODO by hand; `wakeflow_deliver` is the one sanctioned append-only write for
+  a ready Design item.
 - Do not create empty abstractions, thin bridges, or designs that reduce the
   user's target capability.
 - Do not treat a non-bug outcome mismatch as product rework until Design has a
@@ -107,8 +108,8 @@ Before selecting a specific skill, run a brief skill-fit check:
 
 Default to chat first: interpret the demand, ask only scope-changing questions,
 compare options, recommend a route, or draft a candidate section in the
-conversation. Do not create or update tracked Design documents, handoff board
-rows, or workspace intake artifacts unless the user/controller explicitly asks
+conversation. Do not create or update tracked Design documents or deliver to
+the controller TODO board unless the user/controller explicitly asks
 for a document or handoff, confirms that the proposed content should be
 recorded, or a controller state root assigns a write deliverable.
 
@@ -154,17 +155,17 @@ or recommend the missing upstream skill first.
 - Bug/TODO/research signal: create a lightweight signal from
   `templates/workspace-signal-template.md`.
 - Handoff: use `design-handoff` only after the upstream skill outputs or facts
-  exist. Create a handoff from `templates/workspace-handoff-template.md` and
-  register it in `docs/current/workspace-handoff-board.md` only after explicit
-  user/controller confirmation, unless the current workspace config points
-  Design handoff intake to a different board.
+  exist. Optionally draft a handoff from
+  `templates/workspace-handoff-template.md`, then deliver the ready item to the
+  controller Global TODO with `wakeflow_deliver` after explicit
+  user/controller confirmation.
 - Ongoing discussion sequence: use a `*-discussion-sequence-YYYY-MM-DD.md`
   note only to preserve active decision order and user rulings. It is not a
   formal handoff and is not executable controller scope.
 
-Each plan, signal, design, and handoff board entry must have a stable
+Each plan, signal, design, and delivery must have a stable
 `Design Key` in lowercase kebab-case form `<readable-topic>-YYYY-MM-DD`. The
-board `ID` and controller `demandKey` must match the design key exactly.
+delivered TODO `ID` and controller `demandKey` must match the design key exactly.
 
 ## Local Surfaces
 
@@ -193,4 +194,9 @@ Design work belongs in this directory.
 
 ## Skill Boundary (execution-craft rollout)
 
-Design uses ONLY its own Design skills (requirement-clarification, option-planning, requirement-design, work-slicing, design-handoff). It does NOT use Test skills or the development window's `wakeflow-target-craft`. A requirement design MUST record a testing decision (which validation / real-Test approach); a demand created without one surfaces a reminder at create-demand, so record it here rather than leaving it to be forgotten.
+Design uses ONLY its own Design skills (requirement-clarification, option-planning,
+requirement-design, work-slicing, design-handoff). It does NOT use Test skills or the
+development window's `wakeflow-target-craft`. A requirement design MUST record a testing
+decision (which validation / real-Test approach) as part of its proportional
+`demandAuthority`. Design delivery is refused while that authority is incomplete; a
+controller-authored draft may wait for it, but cannot begin implementation without it.

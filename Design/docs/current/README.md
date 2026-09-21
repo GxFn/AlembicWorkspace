@@ -44,6 +44,7 @@ controller decision.
 结构图与词表（`alembic-w3..w7-*-structure-map`、`alembic-s4-bootstrap-symbol-map`、
 `alembic-workspace-survey-raw` / `-optimization-backlog` / `-unification-plan`）、
 `wakeflow-controller-master-loop*`、`wakeflow-parallel-dev-intent-drift`、
-`workspace-handoff-board.md`（交接板,按板面状态为准）。
+`workspace-handoff-board.md`（历史/辅助索引，不是运行时 intake 权威；当前入口以
+`wakeflow_deliver` 写入的 Global TODO 与 controller state root 为准）。
 
 > 新需求开发起步时,只需要看第 2 类(候选)与第 3 类(参考);第 1 类一律经总账回看。
