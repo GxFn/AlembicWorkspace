@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i6-agent-iterative-analysis-rootcause2-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Cold-start root-cause repair, upstream Agent control loop. Start only from clean AlembicAgent HEAD b2888aab463ae996341f9eeaba6d2bf91a6a11c0 and read the requirement design sections 11.2 and the strict stage/fixpoint rules. Repair the strict production pipeline so Analyst exploration is a real bounded iterative epoch loop rather than one analyze call followed by an immediate fixpoint. Extend the strict runtime/stage contract so each analysis epoch can observe the latest append-only fact population and schedule, return only typed outcomes, and request an analysis_retry when accepted exploration/counterquery obligations were enrolled and executed. In PipelineStrategy, permit only the strict typed retry emitted by the strict fixpoint gate, rerun the analyze stage, enforce an explicit epoch/obligation bound, and fail closed on untyped retry, non-progress, exhausted budget, unenrolled query execution, or any Producer-side tool request. Preserve the existing StrictAnalysisExpansionPortV1 append-only enrollment and validateStrictStageToolCallsV1 authority; do not create a parallel ad-hoc loop in Main and do not weaken Producer tool prohibition. Make prompt/input construction revision-aware so a retried Analyst sees updated facts, terminal outcomes and outstanding obligations. Add focused tests for two-or-more epochs, counterquery discovery, stable fixpoint termination, retry bound exhaustion, non-progress rejection, unenrolled tool failure, and Producer tool denial, plus existing non-strict pipeline compatibility. Do not edit Alembic, AlembicCore, AlembicPlugin or Dashboard. Produce one clean AlembicAgent commit. Backfill changed files, commit hash, exact commands/output, exported contract/API names and the downstream Main integration recipe. This package is authorized by the user's explicit decision to skip Design and have the controller perform direct root-cause repair; it must preserve the confirmed completion definition.",
+  "status": "pending",
+  "sourceRef": "wakeflow-ledger/AlembicWorkspace/Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "test",
+        "verify": "command-output"
+      },
+      {
+        "kind": "diff-review",
+        "verify": "changed-files-and-control-flow"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "multi-epoch-fixpoint-and-bounds"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "failure-path-review"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-26T13:00:35.479Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i6-agent-iterative-analysis-rootcause2-t1",
+      "taskPackageId": "i3-i6-agent-iterative-analysis-rootcause2-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Make Agent's strict Analyst stage a real bounded multi-epoch fixpoint loop with typed retry and append-only fact revisions.",
+      "status": "pending",
+      "createdAt": "2026-07-26T13:00:35.479Z"
+    }
+  ]
+}

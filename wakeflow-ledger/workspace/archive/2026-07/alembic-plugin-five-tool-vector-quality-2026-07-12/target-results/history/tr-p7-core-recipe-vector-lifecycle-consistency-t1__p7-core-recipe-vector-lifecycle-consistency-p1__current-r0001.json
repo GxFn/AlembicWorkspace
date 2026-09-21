@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p7-core-recipe-vector-lifecycle-consistency-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p7-core-recipe-vector-lifecycle-consistency-p1",
+  "dispatchGroup": "p7-core-recipe-vector-lifecycle-consistency-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p7-core-recipe-vector-lifecycle-consistency-t1",
+  "status": "completed",
+  "summary": "Core Recipe 向量生命周期一致性已闭环：显式 subset/authoritative corpus、595 absent-region 清理、内容替换先写后删、delete/deprecate 双族删除、update/publish/reactivate 双族刷新、direct sync 可等待 authoritative reconciliation、region orphan reconcile 与 queued/in-flight shutdown drain。提交 77dafb3 + 627fd7d。",
+  "evidenceRefs": [
+    "AlembicCore commit 77dafb3 (RED tests)",
+    "AlembicCore commit 627fd7d (implementation)",
+    "test/RecipeRegionVectorIndex.test.ts",
+    "test/SyncCoordinator.test.ts",
+    "test/KnowledgeProductizationLifecycle.test.ts",
+    "test/KnowledgeFileWriter.test.ts"
+  ],
+  "verification": [
+    "npm run build => PASS",
+    "npm run build:check => PASS",
+    "npm run lint:public-api-boundary => PASS",
+    "npm run lint && npm run lint:naming && npm run lint:retired-symbols => PASS",
+    "npm test => PASS: 177 files, 1664 tests",
+    "Focused lifecycle/vector suite => PASS: 5 files, 100 tests",
+    "npm run check => expected inherited FAIL only at src/infrastructure/vector/ASTChunker.ts:32; file blob remained 6e88dab655821ed72e9389a7c274b87d07fbecde"
+  ],
+  "risks": [
+    "Dependent Plugin package must pass the complete nonDeprecatedRecipeIds authority set across batches and inject/await KnowledgeVectorMaintenance; Core deliberately does not alter Plugin callers in this producer task.",
+    "Repository-wide npm run check remains blocked by the pre-existing ASTChunker.ts:32 doctrine violation; P7 did not modify that file."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "removeStale only compared current-batch Recipe ids, so batched full builds never pruned regions belonging to recipes absent from the corpus; lifecycle and direct-sync paths separately bypassed region maintenance, and destroy cleared queued work.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Baseline -> RED authority/replacement/lifecycle/reconcile/shutdown tests -> authoritative index repair -> lifecycle/event drain -> direct-sync reconciliation port -> focused/full verification -> two-stage review.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "change-scope",
+      "value": "Changed only AlembicCore vector/knowledge lifecycle services, public type facades, and directly related tests; no Plugin, query-time mutation, live DB/vector data, Search, Prime, Graph, Guard, host selection, or Git gate changes.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "tests",
+      "ref": "Focused P7 suites: RecipeRegionVectorIndex, SyncCoordinator, KnowledgeProductizationLifecycle, KnowledgeFileWriter, FailureSemanticsCO3; 100 passed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "full-suite",
+      "ref": "npm test: 177 test files / 1664 tests passed; npm run build passed; lint/public API gates passed. npm run check reaches inherited ASTChunker doctrine failure only.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "commit",
+      "commit": "627fd7d64457c425605493e974dba9211f889098",
+      "value": "RED commit 77dafb3; implementation commit 627fd7d.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 verified all six package behaviors and forbidden boundaries. Stage 2 reviewed replacement ordering, authority fail-closed semantics, event payload DB truth, drain races, direct-SQL observability, public exports, diff scope, and inherited gate isolation; no P7 defects remained.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "real-orphan-count-proof",
+      "value": "Isolated fixture seeded 75 entry vectors plus 595 region vectors across 72 absent recipe ids; authoritative maintenance removed exactly 595 and retained all 75 entry ids."
+    },
+    {
+      "kind": "authoritative-vs-subset-proof",
+      "value": "Default/empty subset removes nothing unrelated; explicit authoritative empty corpus prunes all regions; a batch id missing from declared authority fails closed before mutation."
+    },
+    {
+      "kind": "lifecycle-vector-closure-proof",
+      "value": "Tests prove delete/deprecate remove entry_* plus matching recipe_region_* only, while live lifecycle transitions regenerate both families from full current entry payload."
+    },
+    {
+      "kind": "shutdown-flush-proof",
+      "value": "Tests prove destroy awaits queued removal and flush drains a second removal enqueued while the first is in flight."
+    },
+    {
+      "kind": "read-only-real-data-proof",
+      "value": "Target validation used mocks, temporary directories, and temporary SQLite databases only; no BiliDili or AlembicWorkspace live knowledge/vector data was mutated."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p7-core-recipe-vector-lifecycle-consistency-p1__AlembicCore__p7-core-recipe-vector-lifecycle-consistency-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-core-recipe-vector-lifecycle-consistency-p1__AlembicCore__p7-core-recipe-vector-lifecycle-consistency-t1.json",
+    "deliveryRunId": "run-delivery-p7-core-recipe-vector-lifecycle-consistency-p1__AlembicCore__p7-core-recipe-vector-lifecycle-consistency-t1",
+    "dispatchGroup": "p7-core-recipe-vector-lifecycle-consistency-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-core-recipe-vector-lifecycle-consistency-p1__AlembicCore__p7-core-recipe-vector-lifecycle-consistency-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 38,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p7-core-recipe-vector-lifecycle-consistency-p1",
+    "targetTaskId": "p7-core-recipe-vector-lifecycle-consistency-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p7-core-recipe-vector-lifecycle-consistency-p1",
+    "resultId": "tr-p7-core-recipe-vector-lifecycle-consistency-t1",
+    "createdAt": "2026-07-13T00:53:22.991Z"
+  },
+  "createdAt": "2026-07-13T00:53:22.991Z",
+  "stateRevisionObserved": 38,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

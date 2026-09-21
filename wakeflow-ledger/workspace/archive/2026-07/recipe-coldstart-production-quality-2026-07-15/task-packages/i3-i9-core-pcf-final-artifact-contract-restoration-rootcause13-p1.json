@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Repair the final-artifact PC-F contract drift on exact accepted AlembicCore@c0a6633d. The controller's v5 rebuild proved that exactly one frozen row changed: dist/projectContextFoundation.js no longer matches PCFBaselineReceipt because Core@96655b9 added createProjectContextFileRef to the project-context-foundation aggregator, and Alembic@602be240 now consumes that route. In AlembicCore only, expose createProjectContextFileRef from the existing @alembic/core/project-context public facade, remove only the later project-context-foundation re-export, and update the public boundary/tests needed for that deliberate route. After build, the five PCFBaselineReceipt files must recompute exactly to sha256:4d3ecdc70227cd3cc613c9df26ca04107a6327aec7eebc5eae3a5856c614f008; @alembic/core/project-context must import the function through the built package and project-context-foundation must return to its frozen export surface. Preserve all accepted production/V5 cross-harvest semantics and package exports, do not modify Agent/Main/Plugin/Test/Wakeflow, and return one clean Core commit with parent/tree, diff, focused baseline/public-import/V5 regressions, full repository check, Guard, risks and the exact downstream interface for the subsequent Main import migration. It is expected that current Main remains a pending consumer until a separate post-acceptance Alembic package; do not patch it or claim the final artifact gate complete.",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/controller-runtime-artifact-manifest/pcf-final-artifact-drift-diagnosis.json",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "one clean AlembicCore commit with exact parent/commit/tree and no sibling changes"
+      },
+      {
+        "kind": "repro",
+        "verify": "show the pre-fix five-file PC-F hash b2a8e3f4... and the single changed projectContextFoundation.js row"
+      },
+      {
+        "kind": "regression",
+        "verify": "after build, recompute the exact five-file PC-F manifest hash as 4d3ecdc7... and prove the other four rows remain unchanged"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "built @alembic/core/project-context exports createProjectContextFileRef; frozen project-context-foundation surface is restored; production/V5 public exports stay intact"
+      },
+      {
+        "kind": "tests",
+        "verify": "targeted PC-F/public-import/strict-production tests plus full repository check pass, with any unchanged pre-existing failure explicitly proven"
+      },
+      {
+        "kind": "verification",
+        "verify": "Alembic Guard and git diff --check on exact changed files"
+      },
+      {
+        "kind": "two-stage-self-review",
+        "verify": "first compare against the task/PC-F authority, then review correctness, public compatibility, fail-closed behavior and scope"
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "explain why export-route repair closes the final artifact gate without weakening the baseline or duplicating the helper"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "negative-tests"
+      },
+      {
+        "kind": "execution-plan"
+      },
+      {
+        "kind": "change-scope"
+      }
+    ]
+  },
+  "createdAt": "2026-07-28T23:25:41.753Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1",
+      "taskPackageId": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Restore the frozen PC-F foundation contract by moving the later file-ref helper export to the existing project-context facade, while preserving the accepted production/V5 implementation and returning the exact public interface for the ordered Main consumer migration.",
+      "status": "pending",
+      "createdAt": "2026-07-28T23:25:41.753Z"
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-retrieval-vector-projectcontext-integration-t1",
+  "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "taskPackageId": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+  "dispatchGroup": "p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-retrieval-vector-projectcontext-integration-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin rework2 completed at commit cbcda68722daf14fd35ef688a98c40db9f4ba420 on parent 490e3dad555df9d4b5d97f8c0e8433321089d866. The progressive ProjectContext protocol now publishes immutable ordered repository-outcome deltas with explicit progress/success/error/cancelled semantics; full-space Graph page 1 waits for at least one deterministic repository outcome while later repositories remain unsettled; stable-key cursor pages reconstruct the terminal one-shot graph exactly once; and a terminal producer error after partial publication is broadcast as the exact error to every waiter and live cursor while sessions, continuations, fact chunks, and temp directories are proactively cleaned. Rework1 source revalidation, narrow fingerprint, child abort/settle, Search/Prime reader-only behavior, exact Core 7ccddf2372ddaeac2dbcfc1f651157d753709cd7 binding, and Guard coverage remain preserved. Final real-project acceptance remains controller-owned and is not claimed.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/host-runtime/mcp/handlers/structure.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/project/ProjectGraphProvider.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/session/ProjectContextBuildSessionManager.ts",
+    "AlembicPlugin/test/unit/ProjectContextBuildSession.test.ts",
+    "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+    "AlembicPlugin/test/unit/RecipeMapTool.test.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/host/read-only-search-executor.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/host/read-only-hnsw-vector-reader.ts",
+    "AlembicPlugin/lib/service/task/PrimeSearchPipeline.ts",
+    "AlembicPlugin/test/unit/SearchPrimeCandidateParity.test.ts",
+    "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+    "AlembicPlugin/test/integration/ZodSchemas.test.ts",
+    "AlembicPlugin/test/integration/ZodToMcpSchema.test.ts",
+    "AlembicPlugin/dist/.build-manifest.json"
+  ],
+  "verification": [
+    "RED: terminal-boom regression initially observed fulfilled progressive waiters instead of rejection; full-space public Graph probe initially observed attempted=0/project-only first page",
+    "GREEN: npx vitest run test/unit/ProjectContextBuildSession.test.ts test/unit/ProjectGraphTool.test.ts test/unit/RecipeMapTool.test.ts test/unit/mcp-hang-guards.test.ts test/integration/ZodSchemas.test.ts test/integration/ZodToMcpSchema.test.ts — 6 files, 159 tests passed",
+    "npm run test:unit — 145 files, 1574 tests passed",
+    "npm run check — passed; only 15 repository-established script no-console warnings",
+    "npm run build:check and npm run build — passed against exact AlembicCore 7ccddf2372ddaeac2dbcfc1f651157d753709cd7",
+    "npm run verify:codex-runtime-package — passed after final commit; 1353 files, no file dependencies, forbidden old shape rejected, isolated npm install and entrypoint probe passed",
+    "npm run verify:plugin-distribution — passed after final commit",
+    "npm run verify:codex-plugin — passed after final commit",
+    "npm run smoke:codex-plugin — runtime package boundary, startup runtime, install, shell bootstrap, and stdio passed after final commit",
+    "git diff --check, cached diff check, git show --check, and final git status — passed; tree clean",
+    "dist/.build-manifest.json binds Plugin cbcda68722daf14fd35ef688a98c40db9f4ba420 and Core 7ccddf2372ddaeac2dbcfc1f651157d753709cd7",
+    "dist/bin/host-mcp.js SHA256 e2ff192fb524532e90ee8ff2902c71dca13342fca22944da19f133f76ea48a0c",
+    "Alembic Guard guard-public-mriw0syj-5 covered 5/5 changed files with 0 errors and 65 attributed warnings"
+  ],
+  "risks": [
+    "Cold broad-scope fact fingerprinting and temp fact spooling still use synchronous filesystem operations; narrow file/symbol scopes remain confined, reads are bounded/cached/cancellable, temp storage is owner-only, and all terminal paths are covered by cleanup regressions.",
+    "Terminal cursor error tombstones are intentionally process-local and TTL-bounded; they preserve the exact producer error for an unread live cursor without retaining session/temp data.",
+    "Alembic Guard reports 65 warnings: repository-established sync-I/O and test-fixture patterns, three promise-syntax warnings whose rejection paths are explicitly observed/awaited, and one unchanged normalizeProjectGraphInput complexity warning; it reports zero errors.",
+    "Final real BiliDili/AlembicWorkspace behavior and downstream acceptance remain with the controller."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "cbcda68722daf14fd35ef688a98c40db9f4ba420",
+      "verify": "git show --check, exact five-file stat, clean status; parent 490e3dad555df9d4b5d97f8c0e8433321089d866 and exact Core 7ccddf2372ddaeac2dbcfc1f651157d753709cd7"
+    },
+    {
+      "kind": "tests",
+      "value": "Focused plus schema 159 tests, full unit 1574 tests, static/type/build/package/distribution/plugin/smoke gates all passed",
+      "verify": "raw command summaries recorded in verification"
+    },
+    {
+      "kind": "reader-only-proof",
+      "ref": "AlembicPlugin/lib/host-runtime/mcp/host/read-only-hnsw-vector-reader.ts",
+      "verify": "Accepted Search/Prime reader-only implementation remains byte-unchanged from parent 490e3dad and full regressions pass"
+    },
+    {
+      "kind": "retrieval-parity-proof",
+      "ref": "AlembicPlugin/test/unit/SearchPrimeCandidateParity.test.ts",
+      "verify": "Accepted eight-query ordered candidate parity remains unchanged and full unit suite passes"
+    },
+    {
+      "kind": "build-session-proof",
+      "ref": "AlembicPlugin/test/unit/ProjectContextBuildSession.test.ts",
+      "verify": "Ordered immutable deltas, shared root/scope facts, source invalidation, narrow fingerprint confinement, exact terminal error broadcast, and zero-temp cleanup pass"
+    },
+    {
+      "kind": "continuation-proof",
+      "ref": "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+      "verify": "pageSize=1 first page has attempted>=1 and attempted<requested with repo ref; all stable keys reconstruct final one-shot output exactly once with no duplicates"
+    },
+    {
+      "kind": "cancellation-cleanup-proof",
+      "ref": "AlembicPlugin/test/unit/ProjectContextBuildSession.test.ts",
+      "verify": "terminal-boom rejects all progressive waiters and unread live cursor with the same Error object; active sessions/continuations and temp root are zero; prior child deadline abort/settle regressions pass"
+    },
+    {
+      "kind": "self-review",
+      "value": "Requirement review covered every rework2 controller point and preserved rework1/Search/Prime/Core scope. Quality review checked event ordering, terminal precedence, exact error identity, deterministic repo prefix application, stable-key dedup/reconstruction, cursor confinement/TTL, ref-count cancellation, temp cleanup, bounded performance, and five-file scope.",
+      "verify": "manual full diff review, rg contract scan, 5/5 Guard guard-public-mriw0syj-5, and all final gates"
+    },
+    {
+      "kind": "baseline",
+      "commit": "490e3dad555df9d4b5d97f8c0e8433321089d866",
+      "verify": "Rework2 started from the controller-reviewed rework1 commit; exact Core input remains 7ccddf2372ddaeac2dbcfc1f651157d753709cd7"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduce both root defects; add RED regressions; replace mutable whole snapshot/settled boolean with event queue plus terminal union; publish deterministic repo deltas; prove cleanup/reconstruction; run two-stage review and full gates",
+      "verify": "completed in dependency order without scope expansion"
+    },
+    {
+      "kind": "repro",
+      "value": "Controller probes and local RED tests proved project-only attempted=0 first page and terminal-boom incorrectly returning last partial as settled success",
+      "verify": "developer-progress rework2 verdict and pre-fix regression failures"
+    },
+    {
+      "kind": "red",
+      "value": "terminal-boom test failed because progressive results fulfilled; full-space Graph first-page probe failed because repoCoverage.attempted was 0; proactive cleanup test then exposed an active continuation leak",
+      "verify": "each regression subsequently passed on final commit"
+    },
+    {
+      "kind": "green",
+      "value": "First page waits for deterministic repo outcome, exact ordered deltas reconstruct terminal output, terminal error wins over partial and cleans all state; all focused/full/static/package gates pass",
+      "verify": "final command results"
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicPlugin/test/unit/ProjectContextBuildSession.test.ts",
+      "verify": "Covers synchronous multi-delta ordering, terminal error identity across waiters/cursor, and proactive zero-temp cleanup"
+    },
+    {
+      "kind": "change-scope",
+      "value": "Exactly three AlembicPlugin implementation files and two unit tests changed; no Search/Prime implementation, Core, Test, real project, Wakeflow source, vendor, release, or cross-window change",
+      "verify": "git show --stat and clean status"
+    },
+    {
+      "kind": "typecheck",
+      "value": "TypeScript noEmit and final compilation passed",
+      "verify": "npm run check, npm run build:check, npm run build"
+    },
+    {
+      "kind": "lint",
+      "value": "Repository boundary, layer/scope, doctrine, naming, retired-symbol, ring-direction, shared-asset and cross-shell checks passed",
+      "verify": "npm run check; 15 non-blocking script console warnings only"
+    },
+    {
+      "kind": "verification",
+      "value": "Final manifest binds Plugin cbcda68722daf14fd35ef688a98c40db9f4ba420 to Core 7ccddf2372ddaeac2dbcfc1f651157d753709cd7; public entry SHA256 e2ff192f...; package install and stdio smoke pass",
+      "verify": "dist/.build-manifest.json, shasum, runtime/package/plugin/smoke commands"
+    },
+    {
+      "kind": "runtime-package-entry-proof",
+      "ref": "AlembicPlugin/dist/.build-manifest.json",
+      "verify": "Manifest points at final Plugin/Core commits; runtime tarball has 1353 files, no file dependencies, and entrypoint passes"
+    },
+    {
+      "kind": "compatibility-proof",
+      "value": "Runtime package rejects forbidden old shape, installs in isolation, verifies plugin distribution/entry, and starts via shell/stdin-stdout paths",
+      "verify": "verify:codex-runtime-package, verify:plugin-distribution, verify:codex-plugin, smoke:codex-plugin"
+    },
+    {
+      "kind": "zero-write-fingerprint",
+      "ref": "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+      "verify": "Accepted Search/Prime zero-write fingerprint proof remains unchanged; progressive Graph writes only owner-only OS temp artifacts and all terminal paths clean them"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1.json",
+    "deliveryRunId": "run-delivery-p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "dispatchGroup": "p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+    "stateRevision": 14,
+    "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+    "taskPackageId": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+    "targetTaskId": "p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1",
+    "resultId": "tr-p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "createdAt": "2026-07-13T07:29:00.032Z"
+  },
+  "createdAt": "2026-07-13T07:29:00.032Z",
+  "stateRevisionObserved": 14,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 3,
+  "supersedes": {
+    "resultId": "tr-p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "dispatchGroup": "p2-plugin-retrieval-vector-projectcontext-integration-rework1-p1",
+    "historyFile": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13/target-results/history/tr-p2-plugin-retrieval-vector-projectcontext-integration-t1__p2-plugin-retrieval-vector-projectcontext-integration-rework1-p1__current-r0002.json"
+  }
+}

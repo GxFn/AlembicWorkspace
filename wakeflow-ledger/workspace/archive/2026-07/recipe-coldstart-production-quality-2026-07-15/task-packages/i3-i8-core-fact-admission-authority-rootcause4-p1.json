@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i8-core-fact-admission-authority-rootcause4-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Cold-start root-cause repair, upstream Core authority. Start only from clean AlembicCore HEAD d4de7edd6bbfaeb36a01b3cc243ba1617c001f65 and read the requirement design sections 11.2, 11.6, 12.4. Implement reusable deterministic contracts and execution authority needed by Main: (1) a strict frozen-fact backend registry/executor over certified frozen inputs, using the existing AST/grammar, ProjectContext/source graph and config-parser capabilities instead of generic regex; every declared loaded backend must be executable or fail closed, witnesses must bind the actual inspected frozen file/revision, and no hidden truncation is allowed; (2) a typed, non-writing strict admitCandidate path with immutable AdmissionReceipt that reuses validation/dedup/similarity/consolidation logic but never writes proposals or final knowledge and fails closed on advisor/backend failure; bind the receipt to candidate content, G1 receipt, private-corpus revision and inspected accepted corpus; (3) strict persistence verification requiring a matching G1 + Admission + G2 fingerprint/receipt chain before deterministic create/recovery; preserve existing non-strict create() compatibility; (4) one canonical strict snapshot-id validator/parser shared by Main and Plugin, accepting the base content-addressed id and the documented repaired UUID-suffix form while rejecting malformed or path-unsafe variants. Add focused unit/integration tests for real backend execution, unavailable-backend failure, no truncation/conservation, admission no-write and fail-closed behavior, receipt mismatch rejection, legacy create compatibility, and snapshot-id valid/invalid variants. Do not edit Alembic, AlembicAgent, AlembicPlugin or Dashboard. Produce one clean AlembicCore commit. Backfill changed files, commit hash, exact commands/output, contract/API names, migration/compatibility notes, and any consumer risks. This package is authorized by the user's explicit decision to skip Design and have the controller perform direct root-cause repair; it is not permission to change the confirmed requirement or weaken gates.",
+  "status": "pending",
+  "sourceRef": "wakeflow-ledger/AlembicWorkspace/Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "test",
+        "verify": "command-output"
+      },
+      {
+        "kind": "diff-review",
+        "verify": "changed-files-and-contracts"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "real-backend-and-no-write-admission"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "compatibility-review"
+      },
+      {
+        "kind": "failure-path-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-26T13:00:20.620Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i8-core-fact-admission-authority-rootcause4-t1",
+      "taskPackageId": "i3-i8-core-fact-admission-authority-rootcause4-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Build Core's real fact-execution, strict admission/persistence authority, and shared snapshot-id contract so downstream Main/Plugin can reconnect the production chain.",
+      "status": "pending",
+      "createdAt": "2026-07-26T13:00:20.620Z"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p8-plugin-recipe-vector-maintenance-integration-p1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "summary": "Phase P8 Plugin consumer integration for the accepted Core Recipe vector lifecycle producer.\n\nUpstream:\n- Consume AlembicCore commit 627fd7d64457c425605493e974dba9211f889098 through the existing local @alembic/core dependency.\n- Core now provides explicit subset vs authoritative-corpus Recipe-region maintenance, lifecycle/delete closure for entry+region vectors, region-orphan reconcile counts, an awaited KnowledgeVectorMaintenance boundary for direct KnowledgeSync writes, and async VectorService.destroy() draining.\n\nRequired Plugin behavior:\n1. In buildRecipeSemanticRegionVectors, obtain the complete non-deprecated Recipe corpus once. When batching syncRecipeSemanticRegions, pass the SAME complete nonDeprecatedRecipeIds authority set to every batch through Core maintenanceScope. Never infer authority from a batch. Empty authoritative corpus must be representable and must prune regions only when this path genuinely owns the full corpus.\n2. Inject a real KnowledgeVectorMaintenance implementation into every production KnowledgeSyncService construction that can mutate Recipe rows. After direct file→DB create/update/deprecate work, syncAll must await one canonical authoritative vector maintenance operation built from current DB truth. Reuse the existing Plugin region build/refresh orchestration where appropriate; do not duplicate a second maintenance algorithm.\n3. Ensure normal create/update/lifecycle/delete event wiring uses the accepted Core full-entry payload behavior and remains initialized. Do not add query-time mutation, state gates, Git gates, host-selection coupling, Alembic-main coupling or daemon dependencies.\n4. Update Plugin shutdown so VectorService.destroy() is awaited BEFORE database close and any vector-store final flush/destroy ordering remains safe. Audit all Plugin callers affected by Core's void→Promise destroy contract.\n5. Preserve replacement safety: if embedding is unavailable or replacement generation fails, live old chunks are not deleted. Surface honest bounded diagnostics; no silent success for an unconfigured maintenance port after direct DB mutations.\n6. Add an isolated data-root integration proof reproducing the real shape: 75 live entry vectors plus 595 recipe_region vectors for 72 absent Recipe IDs. Run the real Plugin authoritative maintenance caller and prove exactly 595 stale regions removed, all 75 entry vectors and current live regions retained, a second run is idempotent, and subset refresh cannot delete unrelated regions.\n7. Do not mutate BiliDili or AlembicWorkspace live DB/WAL/vector/config. Controller will separately decide whether/when to repair the existing real index; this package proves the production path on copies/temp fixtures only.\n\nValidation:\n- Focused Plugin tests for region-vector batching, KnowledgeSyncService DI/direct orphan deprecation, lifecycle/delete/update integration, shutdown ordering/drain, and isolated 75/595 repair.\n- Full Plugin unit suite, check, build, runtime-package/distribution/Codex-plugin verification.\n- Commit the Plugin diff and return exact Core provenance, files/symbols, fixture counts, public/diagnostic output, command summaries and two-stage self-review.\n- No Test window. Completion means code prevents the known orphan-production paths; it does not authorize live knowledge cleanup or demand completion without controller verification.",
+  "status": "pending",
+  "sourceRef": "Accepted Core P7 commit 627fd7d plus controller review evidence; user command 2026-07-13 to fix Recipe production maintenance logic.",
+  "designIntent": "让 Plugin 的真实 bootstrap/rescan/sync/shutdown 调用链消费 Core 的显式权威维护契约；不增加查询门禁，也不通过查询过滤掩盖生产问题。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-probe",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "core-provenance-proof"
+      },
+      {
+        "kind": "authoritative-batch-proof"
+      },
+      {
+        "kind": "direct-sync-maintenance-proof"
+      },
+      {
+        "kind": "shutdown-drain-proof"
+      },
+      {
+        "kind": "isolated-595-orphan-repair-proof"
+      },
+      {
+        "kind": "real-data-no-write-proof"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T00:59:12.934Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p8-plugin-recipe-vector-maintenance-integration-t1",
+      "taskPackageId": "p8-plugin-recipe-vector-maintenance-integration-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "接入已验收 Core Recipe 向量生命周期能力：完整权威 ID 跨批传递、直写维护端口注入、关闭等待排空，并用隔离数据根证明不再产生孤儿区域向量。",
+      "status": "pending",
+      "createdAt": "2026-07-13T00:59:12.934Z"
+    }
+  ]
+}

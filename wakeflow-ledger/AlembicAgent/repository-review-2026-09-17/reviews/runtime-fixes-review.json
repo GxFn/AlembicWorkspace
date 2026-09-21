@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-17",
+  "scope": "对root当前修复的ToolRouter scheduler、runtime/service lifecycle、hook、policy接线和coordinator做有界只读复审；未改产品代码或测试。",
+  "reviewedFiles": [
+    "src/tools/runtime/router.ts",
+    "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+    "src/agent/runtime/AgentRuntime.ts",
+    "src/agent/runtime/ExitController.ts",
+    "src/agent/runtime/HookSystem.ts",
+    "src/agent/service/AgentService.ts",
+    "src/agent/service/AgentRunContracts.ts",
+    "src/agent/profiles/AgentProfileCompiler.ts",
+    "src/agent/policies/PolicyEngine.ts",
+    "src/agent/policies/SafetyPolicy.ts",
+    "src/agent/runtime/ToolExecutionPipeline.ts",
+    "src/agent/coordination/AgentRunCoordinator.ts",
+    "src/agent/strategies/PipelineStrategy.ts",
+    "src/agent/runtime/forcedSummary.ts"
+  ],
+  "reviewedTests": [
+    "test/tool-v2-contract.test.ts (scheduler新增用例及取消旧用例调整)",
+    "test/agent-lifecycle.test.ts (全文)",
+    "test/hook-system.test.ts (新增diff)",
+    "test/runtime-efficiency.test.ts (policy gate与直呼桥相关diff)",
+    "test/agent-surface-floor.test.ts (profile/coordinator相关diff)",
+    "test/pipeline-outcome-abandoned.test.ts (取消相关diff)"
+  ],
+  "findings": [
+    {
+      "severity": "P1",
+      "id": "FIXES-R01",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "line": 637,
+      "classification": "newly-exposed-regression",
+      "issue": "新增runtimeSafetyGate激活了SafetyPolicy错误的相对路径基准：合法project-relative工具路径按宿主cwd判断而非runtime.projectRoot。",
+      "repro": "源码probe：fileScope=/tmp/review-project，validateToolCall(code,{action:read,params:{path:src/a.ts}})被拒；改为/tmp/review-project/src/a.ts则允许。真实宿主cwd与被分析projectRoot常不同。",
+      "suggestion": "在runtime策略边界按runtime.projectRoot归一化工具路径后校验，同时保留绝对scope/路径语义；加cwd不同于projectRoot的合法读取和越界拒绝测试。",
+      "validated": "source-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "FIXES-R02",
+      "path": "src/agent/service/AgentService.ts",
+      "line": 240,
+      "classification": "original-defect-not-fully-fixed",
+      "issue": "provider连续失败后Runtime的正常错误文本仍被Service归类success。",
+      "repro": "源码probe：非空“AI服务暂时不可用”reply + aiErrorCount=2 + ai_error warnings（无cancelReason）→success；这是Runtime #handleAiError的真实2-strike路径。",
+      "suggestion": "Runtime输出明确终止原因/状态，Service优先消费；不能粗暴把任何aiErrorCount>0当失败，因为成功重试也保留历史错误。新增终止错误和成功恢复两组测试。",
+      "validated": "source-probe-and-real-runtime-branch"
+    },
+    {
+      "severity": "P1",
+      "id": "FIXES-R03",
+      "path": "src/agent/service/AgentService.ts",
+      "line": 242,
+      "classification": "new-classification-bug",
+      "issue": "泛化abort_signal优先于timedOutStages，把真实stage硬timeout分类成用户取消。",
+      "repro": "源码probe：cancelReason=abort_signal且timedOutStages=[analyze]→aborted。Pipeline硬timeout确实先abort在途provider，Runtime因此记录abort_signal，随后Pipeline记录timedOutStages。",
+      "suggestion": "用可追溯的AbortController.reason/terminal reason区别timeout与用户取消；至少明确timeout证据优先于无类型的abort_signal。",
+      "validated": "source-probe-and-timeout-control-flow"
+    },
+    {
+      "severity": "P1",
+      "id": "FIXES-R04",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "line": 369,
+      "classification": "cancellation-race-not-fully-fixed",
+      "issue": "取消后provider仍resolve或forcedSummary吞取消回退时，Runtime只改state/event而不写终止诊断，Service仍报success并可能发迟到回复。",
+      "repro": "源码probe：state.phase=aborted、非空迟到reply、空诊断→Service.success。Runtime provider await后无abort复查；forcedSummary catch仍把AbortError合成普通摘要。",
+      "suggestion": "execute完成分支基于本run controller的终止原因统一写明确status/diagnostic并阻止迟到回复；强制摘要执行期间取消不可降级为成功。补deferred provider在abort后resolve、summary期间取消。",
+      "validated": "source-probe-plus-control-flow"
+    },
+    {
+      "severity": "P2",
+      "id": "FIXES-R05",
+      "path": "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+      "line": 154,
+      "classification": "original-defect-not-fully-fixed",
+      "issue": "scheduler正确拒绝prestart/queued取消，但adapter仍把所有!ok映射status=error，取消的公共aborted分支未兑现。",
+      "repro": "router新增取消返回fail；adapter #toEnvelope用status:result.ok?success:error且无取消语义检查。新增测试只断router.ok/error，不断adapter.status。",
+      "suggestion": "保留执行中partial结果语义，同时为未执行的明确取消传递aborted状态；补adapter级预先取消与排队取消。",
+      "validated": "full-source-control-flow"
+    },
+    {
+      "severity": "P2",
+      "id": "FIXES-R06",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "line": 1417,
+      "classification": "new-async-wait-window",
+      "issue": "tool hook改await后，从进入hook到返回期间可以发生取消；返回true后未再次检查signal就调用宿主toolRouter。",
+      "repro": "异步before hook等待deferred，等待期间parent abort，随后hook resolve(true)；当前#processToolCalls只在hook之前检查signal，之后直接pipeline。内置router会再挡一次，但公开宿主router不应依赖其额外实现才能避免取消后启动。",
+      "suggestion": "await hook后在调用pipeline前重新检查ctx.abortSignal，记录取消并结束；用只记录调用的host router覆盖此竞态。",
+      "validated": "control-flow-inspection"
+    }
+  ],
+  "verifiedFixes": [
+    {
+      "area": "scheduler",
+      "result": "通过只读源码探针：exclusive等待活动read形成屏障，后来的其他read不能穿越；取消排队exclusive后后续read立即恢复；handler抛错后队列释放；slot获准后handler前取消仍释放计数，最终active为空。",
+      "notes": "未发现常规队列路径死锁；single等待中的FIFO公平性可后续评估，不作为本轮必须新增功能。"
+    },
+    {
+      "area": "iteration",
+      "result": "ExitController把Policy输入改为已完成轮数，修复BudgetPolicy maxIterations=1零调用；新增lifecycle测试使用真实Policy而非空stub是有效覆盖。"
+    },
+    {
+      "area": "policy compiler and terminal blacklist",
+      "result": "safety配置透传与params.command归一化逻辑符合当前契约；新增profile和runtime gate测试分别覆盖声明与实际host调用前拒绝。"
+    },
+    {
+      "area": "coordinator",
+      "result": "按原始child对象保存并还原原顺序，内置partitioner每项生成新对象，修复tier排序归错结果；完整非success优先级覆盖timeout/blocked。未见内置消费者新增回归。"
+    },
+    {
+      "area": "hook",
+      "result": "改await emit并消费false兑现了公开阻断能力；emitSync捕获native Promise rejection避免常见async观察者未处理拒绝。"
+    }
+  ],
+  "testAdvice": [
+    "将scheduler源码probe中的exclusive屏障取消、handler异常释放、获准后handler前取消加入一条紧凑回归即可；不用重复每个工具动作的happy path。",
+    "新增Service lifecycle覆盖terminal provider failure与恢复成功的区别，不只验证预先写好的diagnostics fixture。",
+    "profile安全测试应包含正例：cwd不同而project-relative读取合法；当前新增测试只验证拒绝路径。",
+    "取消用例应至少包含协作provider reject和非协作/迟到provider resolve；当前新增case只覆盖前者。"
+  ],
+  "probesRun": [
+    "scheduler-exclusive-barrier-cancel-error-release-prehandler-abort",
+    "service-terminal-ai-error-classification",
+    "service-stage-timeout-abort-precedence",
+    "service-aborted-state-late-reply",
+    "policy-relative-project-path"
+  ],
+  "testRuns": [],
+  "limitations": [
+    "未运行完整或targeted Vitest；父任务已在推进RED/GREEN，避免并行测试相互影响。",
+    "未审查root本轮仍修改中的prompt/evidence/memory业务实现，仅读取与本次生命周期/权限关联的边界。",
+    "本报告针对复审时的工作区快照；root之后可能已修复部分项。"
+  ]
+}

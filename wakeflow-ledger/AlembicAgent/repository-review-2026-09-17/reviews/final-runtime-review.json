@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-18",
+  "scope": "共享toolOutcomes及Tracker/Gates/EvolutionRun/QualityPolicy/forcedSummary/submitDedup接线，与最新Runtime取消/权限修复的有界复审。",
+  "reviewMode": "当前完整helper、关键消费分支与diff，复用此前全文阅读上下文；无产品编辑。",
+  "checked": [
+    {
+      "path": "src/agent/utils/toolOutcomes.ts",
+      "sha256": "13eaff9dbd46b254514070d98939260d6f12485ca7370297e7b3251b6b736cc2"
+    },
+    {
+      "path": "src/agent/context/ExplorationTracker.ts",
+      "sha256": "6af5fe6a6fe6b5241fe851898dd39f73b11cb417f412884a7560ab91ae974c8f"
+    },
+    {
+      "path": "src/agent/evaluation/gateEvaluators.ts",
+      "sha256": "41616dd9a0747e12964a593c1e1c55e1b42e1defedc824c198a6b437d1359bb2"
+    },
+    {
+      "path": "src/agent/runs/evolution/EvolutionAgentRun.ts",
+      "sha256": "82424e20275ed5e50379f7d73620c270a9207079f43328a349a53a8dfb352b7c"
+    },
+    {
+      "path": "src/agent/policies/QualityGatePolicy.ts",
+      "sha256": "76ffc0cb0912c4e130d6b2b0dc0c49826f4073ad875abe3d03437967211e951a"
+    },
+    {
+      "path": "src/agent/runtime/forcedSummary.ts",
+      "sha256": "48ed13485558e5dd67b313e944224be1239173d2ec12cf7e0920402d6808a2bf"
+    },
+    {
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "sha256": "49fbf784abb657604df8a583a5a9ac6838dd972e765138072aa8a0beb79c8147"
+    },
+    {
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "sha256": "5a16d2e59d899db85c16066bdf557cfe783df873f0911ed1e103c9c607f6d2ae"
+    },
+    {
+      "path": "src/agent/service/AgentService.ts",
+      "sha256": "e57b5dbd1535040ca6d9854b9bb31075b21cd778dc203ba7a25d61a3672e26f2"
+    },
+    {
+      "path": "src/agent/strategies/PipelineStrategy.ts",
+      "sha256": "bcf7f7d5142ee8177bc5a1d8d40ffebffee8d32aee080cadc824efb262c9d557"
+    },
+    {
+      "path": "src/agent/policies/PolicyEngine.ts",
+      "sha256": "306daeebe81e1523e46c7552d920afd7bf6bcf361e4d6188903d2e9bb7f216a9"
+    },
+    {
+      "path": "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+      "sha256": "2453a5eeb6af952311c9fea93277708fc0f9209f58bcdfe117fdb8e5a10869da"
+    },
+    {
+      "path": "test/agent-lifecycle.test.ts",
+      "sha256": "5618c87f5b1a2c2389898cc220fed4f185d56475bd98b6c7ce9be3009fbf05d9"
+    },
+    {
+      "path": "test/ExplorationStrategies.test.ts",
+      "sha256": "ef4c36be62981bd6759cf3b7eebe5ddbce2cfd8bcc964a7ca9a02afd4bc348f6"
+    },
+    {
+      "path": "test/agent-surface-floor.test.ts",
+      "sha256": "18b4c336e4c4c185493993c4e92fbda47deac528da34ef7de4bd1f792012730a"
+    },
+    {
+      "path": "test/runtime-efficiency.test.ts",
+      "sha256": "7814899da772cb7f6f69bee25326525c9d47cd9659ae48b9d7ecf6f8c492d586"
+    }
+  ],
+  "findings": [
+    {
+      "severity": "P1",
+      "id": "FINAL-RUNTIME-01",
+      "path": "src/agent/service/AgentService.ts",
+      "line": 242,
+      "issue": "成功fast-retry仍被历史timedOutStages判为timeout，最终业务状态与管线完成结果相反。",
+      "repro": "运行真实PipelineStrategy/DiagnosticsCollector源码，第一produce永久挂起，由压缩至1ms的mock hard timer触发timeout；retryBudget第二次调用返回recovered。实际calls=2、pipeline.outcome=completed、reply=recovered、timedOutStages=[produce]，AgentService仍返回timeout。",
+      "suggestion": "区分历史attempt诊断与最终终止原因；成功retry应标明已恢复而非删除审计历史。不要简单以任意旧timeout/abort_signal或任何aiErrorCount决定最终状态。保留真正terminal timeout优先于传播abort的用例，并新增恢复正例。",
+      "validated": "actual-source-pipeline-and-service-mock-timer-probe",
+      "classification": "new-status-regression"
+    },
+    {
+      "severity": "P2",
+      "id": "FINAL-RUNTIME-02",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "line": 976,
+      "issue": "trackerSignal只在envelope.ok===false时传信封，丢失失败status的权威性，与共享normalizer和submitDedup的结果不一致。",
+      "repro": "actual helper对 {envelope:{ok:true,status:blocked,structuredContent:created},result:created} 判persisted=false；actual trackerSignal只传created，tracker使用同一helper却得到true。timeout/needs-confirmation状态有同问题。",
+      "suggestion": "中间件依据完整envelope和meta.blocked统一判定是否成功后再给Tracker投影；共享normalizer既然明确status失败优先，桥接层不能先丢该信息。",
+      "validated": "actual-helper-and-middleware-source-probe",
+      "classification": "wiring-failure-precedence-gap"
+    },
+    {
+      "severity": "P2",
+      "id": "FINAL-RUNTIME-03",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "line": 1015,
+      "issue": "submitDedup忽略metadata.blocked，已知被中间件拦截的调用仍可被正向payload登记为真实提交。",
+      "repro": "actual submitDedup.after(call,created,ctx,{blocked:true})仍把t加入submittedTitles、设置meta.isSubmit=true，并把producerSubmitLedger.createdCount写成1。可在公开可组合middleware链的短路result中出现。",
+      "suggestion": "在提交登记前以meta.blocked为最高失败依据；同样审查Tracker接线，避免状态拒绝被payload提升。只需局部守卫，不必重构工具系统。",
+      "validated": "actual-middleware-source-probe",
+      "classification": "metadata-failure-precedence-gap"
+    },
+    {
+      "severity": "P2",
+      "id": "FINAL-RUNTIME-04",
+      "path": "src/agent/evaluation/gateEvaluators.ts",
+      "line": 299,
+      "issue": "Producer gate保留旧窄ToolCallRecord类型，与新normalizer需要的args/action/id/lifecycle/envelope不一致。",
+      "repro": "基于实际接口声明的无落盘TypeScript probe：正常created对象的内联调用被拒，diagnostic=\"id does not exist in type {status?:string;reason?:string}\"；args/envelope也未声明。现有测试先把数组赋值到变量而规避excess-property检查。",
+      "suggestion": "将门控输入接到共享最小observation输入类型/readonly unknown[]，或补全当前消费形状；不要保留只允许status/reason却依赖其它字段的类型壳。",
+      "validated": "in-memory-typescript-signature-probe",
+      "classification": "type-contract-mismatch"
+    }
+  ],
+  "verified": [
+    {
+      "area": "toolOutcomes business semantics",
+      "result": "created+非空id+pending/staging才计persisted；knowledge查询、duplicate/rejected/null不计提交。外层envelope或任意已展开wrapper的明确失败压过created payload。"
+    },
+    {
+      "area": "evolution semantics",
+      "result": "真实Core ProposalGateway结果分支已核对：proposal-created/upgraded→proposal，immediately-executed→deprecated，verified→verified；outcome=skipped会压过兼容evolution_proposed status并返回null。六类actual-helper探针符合该规则。"
+    },
+    {
+      "area": "public compatibility",
+      "result": "Evolution公开collectEvolutionDecisionIds入口仍保留；新helper仍识别旧独立工具名和兼容status，不因src内部收敛删除公开入口。门控输入类型缺口单列。"
+    },
+    {
+      "area": "latest cancellation fixes",
+      "result": "主provider await后取消复查、execute最终根据本run signal重写取消reply/diagnostics、abort事件去重、hook await后取消检查均已接入。adapter预先/排队取消可返回aborted；之前报告的迟到成功与hook窗口缺口已关闭。"
+    },
+    {
+      "area": "latest permission fixes",
+      "result": "runtimeSafetyGate先按runtime.projectRoot归一化代码路径再调用PolicyEngine，声明式SafetyPolicy约束与当前params.command检查均接入；Evolution命令白名单在宿主router前检查。"
+    },
+    {
+      "area": "forced summary and quality policy",
+      "result": "forcedSummary解包当前嵌套params并统一仅计persisted submissions；QualityPolicy不再用knowledge.search/detail跳过文件证据门。"
+    }
+  ],
+  "probesRun": [
+    "normalizer-success-and-four-failure-wrapper-shapes",
+    "tracker-status-failure-precedence",
+    "submitDedup-blocked-metadata-precedence",
+    "pipeline-timeout-then-successful-fast-retry-through-AgentService",
+    "evolution-six-canonical-outcome-branches",
+    "in-memory-TypeScript-gate-signature"
+  ],
+  "testsRun": [],
+  "limitations": [
+    "没有运行完整或targeted Vitest，避免和root最终check竞争；源码探针仅用mock/provider-free路径且不写产品文件。",
+    "没有扩大到新架构重构、公开接口删除或相邻仓变更。",
+    "报告代表所列sha256快照；root可能已在收到即时反馈后修改。"
+  ]
+}

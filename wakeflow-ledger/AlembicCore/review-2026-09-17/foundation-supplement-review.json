@@ -1,0 +1,479 @@
+[
+  {
+    "file": "src/daemon/RuntimeContracts.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 427,
+    "reviewedRanges": [
+      [
+        1,
+        427
+      ]
+    ],
+    "role": {
+      "summary": "运行时health、能力声明和项目身份DTO的创建/宽容归一化；共享固定API路径及route/monitor枚举。",
+      "symbols": [
+        "createAlembicRuntimeProjectIdentity",
+        "createAlembicRuntimeCapabilities",
+        "createAlembicRuntimeHealthData",
+        "summarizeAlembicRuntimeCapabilities",
+        "summarizeAlembicRuntimeProjectIdentity"
+      ],
+      "consumers": [
+        "../Alembic/lib/http/routes/daemon.ts",
+        "src/daemon/ResidentServiceContracts.ts"
+      ]
+    },
+    "constraints": [
+      "保持ghost-registry→ghost默认推导、null未知能力、不替外层创建daemon/provider。",
+      "explicit API route/version/endpoint常量是已消费的公共协议，不因包含api-ai/dashboard字样删除。"
+    ],
+    "findings": [],
+    "disposition": "retain-public-contract",
+    "tests": {
+      "related": [
+        "test/RuntimeContracts.test.ts"
+      ],
+      "probeLogs": [],
+      "productTestsExecuted": false
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。"
+    ]
+  },
+  {
+    "file": "src/daemon/JobProcessEventContracts.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 422,
+    "reviewedRanges": [
+      [
+        1,
+        422
+      ]
+    ],
+    "role": {
+      "summary": "进程事件公开schema、旧parentId输入兼容、sourceClass/display/retention默认值、developer投影与artifact refs归一化。",
+      "symbols": [
+        "createJobProcessEvent",
+        "normalizeJobProcessEvent",
+        "createJobProcessDeveloperView",
+        "createJobProcessEventEndpointCapability",
+        "isJobProcessEventDeveloperVisible"
+      ],
+      "consumers": [
+        "../Alembic/lib/daemon/observability/JobProcessEventRecorder.ts",
+        "src/daemon/JobDisplaySnapshotContracts.ts",
+        "../Alembic/lib/infrastructure/realtime/RealtimeService.ts"
+      ]
+    },
+    "constraints": [
+      "developer-facing才可见；summary-only content=null；secret/raw-provider/hidden-reasoning默认transient。",
+      "缺失sourceClass的历史输入默认developer-facing；显式未知sourceClass也走默认属待兼容审查疑点，未扩大成确认漏洞。"
+    ],
+    "findings": [],
+    "disposition": "retain-legacy-normalization",
+    "tests": {
+      "related": [
+        "test/JobProcessEventContracts.test.ts"
+      ],
+      "probeLogs": [],
+      "productTestsExecuted": false
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。"
+    ]
+  },
+  {
+    "file": "src/daemon/JobDisplaySnapshotContracts.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 546,
+    "reviewedRanges": [
+      [
+        1,
+        546
+      ]
+    ],
+    "role": {
+      "summary": "事件/LLM IO/证据/截断资料的可序列化展示快照，manifest与SHA256校验和构建/核验。",
+      "symbols": [
+        "createJobDisplaySnapshot",
+        "collectJobDisplaySnapshotLlmIoEntries",
+        "computeJobDisplaySnapshotChecksum",
+        "validateJobDisplaySnapshot"
+      ],
+      "consumers": [
+        "../Alembic/lib/daemon/observability/JobDisplaySnapshotStore.ts",
+        "../Alembic/lib/http/routes/jobs.ts",
+        "../AlembicDashboard/src/components/Views/JobsView.tsx"
+      ]
+    },
+    "constraints": [
+      "snapshot是展示/重启读回契约，不含宿主执行器。",
+      "snapshot/events、developerViews、llmIo目的不同；修显示边界不得擅自删内部审计事件。"
+    ],
+    "findings": [
+      {
+        "id": "FS-DISPLAY-POLICY",
+        "severity": "P2",
+        "line": 367,
+        "status": "needs-semantics-review-not-approved",
+        "summary": "probe仅证明timeline与LLM投影内容不同，尚未证明displayPolicy约束整个snapshot；文档和外层测试无明确全域规则，Root要求不修改。",
+        "evidence": "foundation-supplement-red.log"
+      },
+      {
+        "id": "FS-SNAPSHOT-JSON-HASH",
+        "severity": "P2",
+        "line": 529,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "stableStringify对undefined数组元素输出空槽，JSON持久化变null；同一快照真实文件写读后checksum失配。",
+        "evidence": "foundation-supplement-red.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "related": [
+        "test/JobDisplaySnapshotContracts.test.ts"
+      ],
+      "probeLogs": [
+        "foundation-supplement-red.log"
+      ],
+      "productTestsExecuted": true
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。",
+      "Root随后明确授权这条已复现问题的最小修复；正式回归位于既有测试，公开接口保留。"
+    ]
+  },
+  {
+    "file": "src/daemon/ProjectRuntimeContracts.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 1050,
+    "reviewedRanges": [
+      [
+        1,
+        1050
+      ]
+    ],
+    "role": {
+      "summary": "项目控制状态/目标二选一/身份/readiness/failure DTO，字段归属和失败分类表的一致性校验与摘要。",
+      "symbols": [
+        "isProjectRuntimeTarget",
+        "createProjectRuntimeIdentityContract",
+        "summarizeProjectRuntimeScopeReadiness",
+        "validateProjectRuntimeFieldTaxonomy",
+        "validateProjectRuntimeFailureReasonTaxonomy"
+      ],
+      "consumers": [
+        "../Alembic/lib/daemon/runtime/ProjectRuntimeControl.ts",
+        "../Alembic/lib/daemon/runtime/ProjectRuntimeSourceOfTruth.ts",
+        "../Alembic/lib/http/routes/projects.ts"
+      ]
+    },
+    "constraints": [
+      "默认仅project-identity必需；可选不可用使degraded，显式必需不可用使blocked。",
+      "控制路径与消费身份分开；provider可用性只有输入状态，无Core provider实现。"
+    ],
+    "findings": [],
+    "disposition": "retain-ordered-contract-tables",
+    "tests": {
+      "related": [
+        "test/ProjectRuntimeContracts.test.ts"
+      ],
+      "probeLogs": [],
+      "productTestsExecuted": false
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。"
+    ]
+  },
+  {
+    "file": "src/daemon/ResidentServiceContracts.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 668,
+    "reviewedRanges": [
+      [
+        1,
+        668
+      ]
+    ],
+    "role": {
+      "summary": "resident capability逐feature owner/route归一化、可用性摘要和成功/不可用结果；区分api-ai与host-agent-recoverable job家族。",
+      "symbols": [
+        "createAlembicResidentCapabilities",
+        "normalizeAlembicResidentServiceStatus",
+        "summarizeAlembicResidentServiceStatus",
+        "classifyAlembicResidentJobFeature",
+        "resolveAlembicResidentFeatureOwner"
+      ],
+      "consumers": [
+        "../Alembic/lib/http/routes/daemon.ts",
+        "src/daemon/index.ts"
+      ]
+    },
+    "constraints": [
+      "每个feature的owner可不同于整体route owner；api-ai归Alembic、host-agent任务归Plugin是兼容路由事实。",
+      "unknown能力按unavailable；path只保留diagnosticPaths，不能替代scope身份。"
+    ],
+    "findings": [],
+    "disposition": "retain-public-adapter-contract",
+    "tests": {
+      "related": [
+        "test/ResidentServiceContracts.test.ts"
+      ],
+      "probeLogs": [],
+      "productTestsExecuted": false
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。"
+    ]
+  },
+  {
+    "file": "src/shared/ProjectScope.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 973,
+    "reviewedRanges": [
+      [
+        1,
+        973
+      ]
+    ],
+    "role": {
+      "summary": "Ghost-only多目录scope/registry读解析、目录匹配、canonical源码身份与qualified/单目录relative引用索引。",
+      "symbols": [
+        "createProjectDescriptor",
+        "addProjectScopeFolder",
+        "resolveProjectScopeForFolder",
+        "createCanonicalSourceIdentity",
+        "buildProjectScopeSourceRefIndex",
+        "loadProjectScopeForFolder"
+      ],
+      "consumers": [
+        "../Alembic/lib/project-scope/ProjectScopeRegistry.ts",
+        "../AlembicPlugin/lib/shared/project-scope-runtime.ts",
+        "../Alembic/lib/project-facts/ProjectContextWorkflowFacts.ts",
+        "src/service/knowledge/SourceRefReconciler.ts",
+        "src/shared/WorkspaceResolver.ts"
+      ]
+    },
+    "constraints": [
+      "controlRoot不能列入source folders；new scope只准Ghost。相对来源路径仅单folder回退，避免多folder猜测。",
+      "registry损坏返回空/resolve失败null是现有读宽容行为；存储写入属外层。"
+    ],
+    "findings": [
+      {
+        "id": "FS-SCOPE-QUALIFIED-COLLISION",
+        "severity": "P1",
+        "line": 526,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "两不同folder同displayName且同relativePath时qualifiedPath相同；Map.set后者覆盖，含混来源被解析到任一目录。",
+        "evidence": [
+          "foundation-scope-main-red-2.log",
+          "foundation-scope-main-green.log",
+          "foundation-scope-main-range-red.log",
+          "foundation-scope-main-range-green.log",
+          "foundation-scope-core-green.log"
+        ]
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "related": [
+        "test/ProjectScopeContracts.test.ts",
+        "test/ProjectScopeRegistryLoader.test.ts"
+      ],
+      "probeLogs": [
+        "foundation-supplement-language-scope-red.log"
+      ],
+      "productTestsExecuted": true
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。",
+      "Root追加批准Main必要adapter和真实factory/rescan接线；身份provider按调用快照、异常blocked并保留bridge状态。"
+    ]
+  },
+  {
+    "file": "src/shared/LanguageService.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 949,
+    "reviewedRanges": [
+      [
+        1,
+        949
+      ]
+    ],
+    "role": {
+      "summary": "规范语言扩展名/别名/显示名/已知语言、按扩展名统计profile、按构建marker/Discoverer侦测生态、测试路径判定。",
+      "symbols": [
+        "LanguageService"
+      ],
+      "consumers": [
+        "src/domain/knowledge/UnifiedValidator.ts",
+        "src/infrastructure/vector/ASTChunker.ts",
+        "src/infrastructure/vector/IndexingPipeline.ts",
+        "src/shared/recipeTokens.ts",
+        "../Alembic/lib/project-facts/ProjectContextConsumerFacts.ts",
+        "../AlembicPlugin/lib/host-runtime/mcp/handlers/guard.ts"
+      ]
+    },
+    "constraints": [
+      ".h默认Objective-C、node混其他生态时排除JS/TS是已注明启发式，不自行收紧/改语言默认。",
+      "detectPrimary/All的5行聚合重复可提私有纯helper，但必须保留零/负值与并列顺序；数据表集合顺序不可盲目统一。",
+      "Object.freeze(Set)不阻止.add是JS事实，公开getter文档不可变比实现强；未找到现役变更Set消费者，暂不扩大修复。"
+    ],
+    "findings": [],
+    "disposition": "retain-central-language-data",
+    "tests": {
+      "related": [
+        "test/LanguageServiceDetect.test.ts"
+      ],
+      "probeLogs": [],
+      "productTestsExecuted": false
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。"
+    ]
+  },
+  {
+    "file": "src/shared/LanguageProfiles.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 1050,
+    "reviewedRanges": [
+      [
+        1,
+        1050
+      ]
+    ],
+    "role": {
+      "summary": "8语言族import/角色/库/目录数据，派生合并缓存、根类型排除和质量评分合法语言集合。",
+      "symbols": [
+        "LanguageProfiles",
+        "ImportPattern",
+        "RolePattern",
+        "ModuleRole",
+        "LanguageFamily"
+      ],
+      "consumers": [
+        "src/service/project-context/architectureIntelligence/architectureIntelligence.ts",
+        "src/service/knowledge/validation/quality/QualityScorer.ts",
+        "src/repository/knowledge/KnowledgeEdgeRepository.ts",
+        "src/shared/index.ts"
+      ]
+    },
+    "constraints": [
+      "语言映射和分析知识职责不同，不与LanguageService硬合并；家族表和已发布getter保留。",
+      "importPatterns已公开但当前workspace生产源码无直接调用，不能编造它正在驱动AST解析；其通配import bug列兼容入口低优先。"
+    ],
+    "findings": [
+      {
+        "id": "FS-JVM-WILDCARD",
+        "severity": "P3",
+        "line": 215,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "合法import com.example.api.*被正则捕获末尾dot，split空段在长度检查前访问s[0].toLowerCase，公开extract调用抛TypeError。",
+        "evidence": "foundation-supplement-language-scope-red.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "related": [],
+      "probeLogs": [
+        "foundation-supplement-language-scope-red.log"
+      ],
+      "productTestsExecuted": true
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。",
+      "Root随后明确授权这条已复现问题的最小修复；正式回归位于既有测试，公开接口保留。"
+    ]
+  },
+  {
+    "file": "src/repository/memory/MemoryRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 441,
+    "reviewedRanges": [
+      [
+        1,
+        441
+      ]
+    ],
+    "role": {
+      "summary": "semantic_memories完整CRUD、访问计数、过期过滤/词法相似度、遗忘衰减、容量淘汰与统计；embedding独立sidecar。",
+      "symbols": [
+        "MemoryRepositoryImpl"
+      ],
+      "consumers": [
+        "src/repositories.ts",
+        "src/memory.ts",
+        "../Alembic/lib/injection/modules/InfraModule.ts",
+        "../AlembicPlugin/lib/injection/modules/InfraModule.ts"
+      ]
+    },
+    "constraints": [
+      "重要度1..10、正文500字、ISO日期、候选最近50条、淘汰importance/accessCount/updatedAt顺序为现存行为。",
+      "未找到当前host MemoryStore业务层；仓储仍包导出+两host真实注册，不能单凭没有方法调用就删除。"
+    ],
+    "findings": [],
+    "disposition": "retain-public-repository",
+    "tests": {
+      "related": [
+        "test/PublicDatabaseRepositoryEntrypoints.test.ts",
+        "test/PublicResidualReadinessEntrypoints.test.ts"
+      ],
+      "probeLogs": [],
+      "productTestsExecuted": false
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。"
+    ]
+  },
+  {
+    "file": "src/repository/source-graph/SourceGraphRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "lines": 962,
+    "reviewedRanges": [
+      [
+        1,
+        962
+      ]
+    ],
+    "role": {
+      "summary": "独立source graph generation/files/symbols/edges SQLite持久化、重建/清理、边方向/文件查询、完整性/统计freshness投影。",
+      "symbols": [
+        "SourceGraphRepositoryImpl"
+      ],
+      "consumers": [
+        "src/service/source-graph/SourceGraphService.ts",
+        "src/service/source-graph/SourceGraphIndexer.ts",
+        "src/service/source-graph/SourceGraphQueryService.ts",
+        "src/service/source-graph/SourceGraphLifecycle.ts"
+      ]
+    },
+    "constraints": [
+      "replace先做domain预校验但DB多步不是事务；已确认真实插入错误破坏旧generation。",
+      "查询默认50/上限500、source图独立于knowledge_edges、stats通过真实行重算，不能合并为旧图仓储。"
+    ],
+    "findings": [
+      {
+        "id": "FS-SOURCEGRAPH-PARTIAL-REPLACE",
+        "severity": "P1",
+        "line": 153,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "replaceGeneration在createGeneration/DELETE后逐项await写入；第2file真实SQLite trigger ABORT后旧图丢失，新第1file残留，snapshot预先写成新状态。",
+        "evidence": "foundation-supplement-red.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "related": [
+        "test/SourceGraphRepository.test.ts"
+      ],
+      "probeLogs": [
+        "foundation-supplement-red.log"
+      ],
+      "productTestsExecuted": true
+    },
+    "notes": [
+      "已全文人工阅读实现/类型/数据表；本补充任务未修改产品代码、未运行全量测试。",
+      "Root随后明确授权这条已复现问题的最小修复；正式回归位于既有测试，公开接口保留。"
+    ]
+  }
+]

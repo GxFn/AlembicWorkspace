@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p1-core-recipe-retrieval-production-generation-p1",
+  "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework2-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1-core-recipe-retrieval-production-generation-t1",
+  "status": "completed",
+  "summary": "Rework2 completed in AlembicCore commit 0918831f25aca263f0fd1948d4d27004742b83c1 (parent 154e5ed9f5440573dbada12ae2707d9bb5a5c4a3). RecipeProductionPort now requires and runtime-validates exactly cold-start, incremental, module-scan, or knowledge-submit; rejects missing/unknown capabilities and batch-import/unknown public sources before persistence; preserves admitted capability plus normalized source in result evidence; and leaves internal Gateway batch-import behavior unchanged. Retrieval readiness and projection now share one meaningless-concept classifier, with stable placeholder/default-only hard violations and meaningful phrase preservation. The real SQLite persistence/projection/publish consumer now uses the legal module-scan Port route and asserts capability evidence. No generation, reconcile, query-time, outer-repository, Graph, ranking, or Test changes.",
+  "evidenceRefs": [
+    "commit:0918831f25aca263f0fd1948d4d27004742b83c1",
+    "parent:154e5ed9f5440573dbada12ae2707d9bb5a5c4a3",
+    "AlembicCore/src/service/knowledge/RecipeProductionGateway.ts",
+    "AlembicCore/src/service/knowledge/RecipeRetrieval.ts",
+    "AlembicCore/src/knowledge.ts",
+    "AlembicCore/test/unit/RecipeProductionGateway.test.ts",
+    "AlembicCore/test/RecipeRetrievalProduction.test.ts",
+    "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md"
+  ],
+  "verification": [
+    "RED Port: test/unit/RecipeProductionGateway.test.ts failed 7 admission/evidence cases before implementation (four legal capability evidence cases plus missing, invalid, batch-import rejection).",
+    "GREEN Port: npx vitest run test/unit/RecipeProductionGateway.test.ts => 39/39 passed; later focused set includes unknown-source guard and totals 214 tests.",
+    "RED classifier: test/RecipeRetrievalProduction.test.ts failed because placeholder concepts left readiness ready=true.",
+    "GREEN classifier/real consumer: npx vitest run test/RecipeRetrievalProduction.test.ts test/unit/RecipeProductionGateway.test.ts test/PublicKnowledgeEntrypoints.test.ts => 3 files / 60 tests passed.",
+    "Controller-equivalent focused suite: 8 files / 214 tests passed.",
+    "npm run test: 184 files / 1730 tests passed.",
+    "npm run build:check passed; npm run build passed; npm run lint passed (746 files).",
+    "CoreDeliveryBoundary/CoreToolSystemBoundary/CoreCodexBoundary/CorePackage: 4 files / 22 tests passed.",
+    "npm run check passed build, public API boundary (59 exact entrypoints), layer contract, consumer imports, scope resolution, public smoke, output budgets, and space edges, then stopped only at inherited Doctrine violation src/infrastructure/vector/ASTChunker.ts:32.",
+    "npm run lint:naming passed (656 files); npm run lint:retired-symbols passed; git diff --exit-code 154e5ed9 -- src/infrastructure/vector/ASTChunker.ts passed; git diff --check passed; final worktree clean."
+  ],
+  "risks": [
+    "Repository-wide npm run check remains non-zero solely because the pre-existing Doctrine violation at src/infrastructure/vector/ASTChunker.ts:32 is unchanged from parent 154e5ed9.",
+    "Outer Agent/Plugin/Alembic producer adapters must supply one of the four required capability values when their separately dispatched phases consume the public Port; no outer repository was modified here."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "0918831f25aca263f0fd1948d4d27004742b83c1",
+      "parent": "154e5ed9f5440573dbada12ae2707d9bb5a5c4a3",
+      "verify": "artifact-present"
+    },
+    {
+      "kind": "tests",
+      "value": "Focused 8/214; full 184/1730; boundaries 4/22; build:check/build/lint and all post-Doctrine gates passed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 requirement review traced all four legal capabilities, every rejection case, result evidence, real persistence/publish, and full placeholder/default matrix. Stage 2 reviewed runtime failure-before-write ordering, public exports, Gateway batch-import compatibility, deterministic diagnostics, query-time immutability, scope, performance, and maintainability; no unresolved in-scope defect found.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "Recurring-problem re-derivation: the Port exposed two independent authority axes (optional capability and unconstrained Gateway source), so batch-import could bypass the four-capability contract; the root fix makes capability required/runtime-admitted and source runtime-validated while keeping internal Gateway import separate. Readiness/projector drift came from duplicated placeholder and default-only predicates; the root fix replaces them with one classifier consumed by both paths."
+    },
+    {
+      "kind": "red-green-note",
+      "value": "Port RED showed 7 failures: missing result evidence and no rejection for missing/invalid/batch-import. GREEN passed 39/39. Classifier RED showed placeholder-native profile remained ready; GREEN passed exact 9 persisted placeholders, 3 defaults, and meaningful token-containing phrases."
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Five AlembicCore files only: Port types/runtime admission/result evidence, knowledge subpath exports, shared retrieval classifier, unit tests, and real persistence test. No vector generation/reconcile/query writer or outer-repository change."
+    },
+    {
+      "kind": "compatibility-review",
+      "value": "Existing internal RecipeProductionGateway.create contract and CreateRecipeResult remain unchanged, including batch-import; only public RecipeProductionPort callers now must classify one of the confirmed four capabilities. Evidence is additive on RecipeProductionResult. Existing default-only violation code remains stable."
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean parent 154e5ed9; controller-equivalent baseline 8 files/205 tests and build:check passed before edits."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Root-cause derivation -> clean baseline -> Port RED/GREEN -> native placeholder RED/GREEN -> two-stage review -> focused/full/boundary/build/lint/check gates -> commit -> envelope."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-core-recipe-retrieval-production-generation-rework2-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-recipe-retrieval-production-generation-rework2-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1.json",
+    "deliveryRunId": "run-p1-core-recipe-retrieval-production-generation-rework2-p1-readback1",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework2-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-recipe-retrieval-production-generation-rework2-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 10,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p1-core-recipe-retrieval-production-generation-p1",
+    "targetTaskId": "p1-core-recipe-retrieval-production-generation-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework2-p1",
+    "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+    "createdAt": "2026-07-13T12:36:51.552Z"
+  },
+  "createdAt": "2026-07-13T12:36:51.552Z",
+  "stateRevisionObserved": 10,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 4,
+  "supersedes": {
+    "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework1-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p1-core-recipe-retrieval-production-generation-t1__p1-core-recipe-retrieval-production-generation-rework1-p1__current-r0003.json"
+  }
+}

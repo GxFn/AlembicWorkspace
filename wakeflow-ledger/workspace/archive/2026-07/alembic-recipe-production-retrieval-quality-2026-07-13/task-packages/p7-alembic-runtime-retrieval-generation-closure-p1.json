@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "在 Alembic 当前干净提交 671ab051e0a2797cc8d915caf510f0118e546533 上完成 P5 的根因级收口，只修改 Alembic，并消费已验证 AlembicCore 5106e8a9f47a12a52614d77cb5e3908462a4a49c（file:../AlembicCore）。已知缺陷与完成定义：1) GatewayActionRegistry 仍把 candidate:create / recipe:create 注册到 KnowledgeService.create；必须从真实注册表和对外能力中退役/拒绝写入，不能只做 regex 静态测试，需用真实 action lookup+invoke 证明未注册或 typed zero-write，且四类受支持生产能力保持可用。2) GenerationRoutingVectorStore 在没有 verified active generation 时过滤 legacy base entry_*，导致启动 plan-only 后 dense recall 消失；必须保证 active pointer 尚不存在/无 verified generation 时 legacy base 向量仍可查询，verified active 切换后才隔离旧 Recipe 表示并避免 base/generation 双重竞争，覆盖 searchVector/searchByFilter/query/hybridSearch/get/list 等实际读面。3) 将 Core 5106e8a 的 retrievalProfile update 接入 Alembic HTTP PATCH：UpdateKnowledgeBody/schema/route 必须接受 profile-only 和 mixed patch，保留未知扩展字段与未编辑 Recipe/lifecycle，经 Core 前置结构/schema 校验，真实 PATCH→Core update→Markdown/SQLite→GET round-trip 无损；非法/unsupported schema 在任何写入、audit/event 前 typed reject；不得自动 publish。4) recipe-vector-active.json.lock 必须具备中断/崩溃后的可恢复语义：stale lock 可基于明确 owner/token/timestamp/进程存活或等价可审计规则回收，活跃 foreign lock/CAS 仍不得覆盖；失败保持旧 active generation 可查询，不得永久锁死。5) 保持原任务其它已正确能力：POST /knowledge typed zero-write、AiScan caller replacement、dry-run/shadow/verify/switch/rollback、query-time zero-write、真实知识库零修改。先添加能在旧实现上失败的语义测试，再修真实调用链；运行 focused、full test、build:check/build、npm run check、lint/boundary/drift，提交单一 Alembic commit。不要修改 Core/Plugin/Agent/Dashboard/Test/真实数据，不要创建新生产入口或 provider/rank/readiness 门禁。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "完成已确认的 Alembic 主程序唯一生产链与 generation 运维收口；消费已验收 Core retrievalProfile update，删除仍存活的 create 旁路，并保证迁移前 legacy 查询连续、activation lock 可恢复。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "提供基于 Alembic 671ab051 的单一干净提交、parent、范围 diff 与 clean status；Core 只作为 file dependency 消费。"
+      },
+      {
+        "kind": "tests",
+        "verify": "提供旧实现 RED 与新实现 GREEN：真实 Gateway action lookup/invoke 零写；无 active/有 verified active 的完整读面；profile-only/mixed/invalid PATCH 全链无损/零写；stale lock recovery 与 live foreign lock/CAS；再跑 full Alembic gates。"
+      },
+      {
+        "kind": "self-review",
+        "verify": "逐项回应四个控制器缺陷，证明没有 regex-only 假阳性、没有迁移前召回断层、没有 lifecycle/auto-publish/provider gate、没有真实数据写入或外仓改动。"
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "解释四个缺陷为何穿过原测试及真实修复点；本任务已达到 recurring-problem 阈值，禁止再做表面 point-fix。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green"
+      },
+      {
+        "kind": "compatibility"
+      },
+      {
+        "kind": "scope-diff"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T18:48:03.952Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p7-alembic-runtime-retrieval-generation-closure-t1",
+      "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-p1",
+      "targetWindow": "Alembic",
+      "summary": "修复 Alembic P5 的四个已证实缺陷：真实 Gateway create 旁路、无 active generation 的 legacy 召回断层、retrievalProfile PATCH 丢失，以及 activation lock 崩溃后永久锁；只改 Alembic 并用语义级 RED/GREEN 和全量门禁证明。",
+      "status": "pending",
+      "createdAt": "2026-07-13T18:48:03.952Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

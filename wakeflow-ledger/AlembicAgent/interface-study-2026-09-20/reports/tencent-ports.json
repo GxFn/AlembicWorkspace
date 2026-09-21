@@ -1,0 +1,794 @@
+{
+  "title": "Tencent MemoryProxy/MemoryCore 适配与接口研究",
+  "date": "2026-09-20",
+  "scope": {
+    "tencent": {
+      "root": "TencentDB-Agent-Memory",
+      "head": "06414ac10766b9bd61e4a69f3cf0ea414afb6d4f"
+    },
+    "alembic": {
+      "root": "AlembicAgent",
+      "head": "69ee567624bc119bf05edcc739d890056e297c9c"
+    },
+    "focus": "真实adapter、统一请求/响应、runner/provider/tool注册、上下文DI和composition入口；补前轮hook研究，不重复其pipeline拆分结论。",
+    "sourceChanges": false,
+    "testChanges": false,
+    "adjacentChanges": false,
+    "serviceStarted": false,
+    "networkCalls": false,
+    "realApiCalls": false,
+    "commitCreated": false,
+    "localExecution": "仅两份无运行时依赖的协议adapter在内存转译后做parse→serialize纯数据probe；未加载服务入口、provider SDK或执行文件工具。",
+    "noCommitReason": "只读研究产物；root负责官方联网资料与后续实施决定。",
+    "priorStudy": {
+      "path": "AlembicAgent/tmp/layering-2026-09-19/middleware-research.json",
+      "line": 1
+    },
+    "limitations": "未做腾讯项目全仓审计或运行服务测试；缺陷明确区分已运行纯codec probe与源码调用关系证明。不把private integrations缺席误报成所有模式不可用。"
+  },
+  "conclusions": [
+    "最值得借鉴的是窄HostAdapter/runner factory、协议与客户端行为分轴、绑定可信身份的每调用工具集、明确的composition依赖选择，以及同接口观测decorator。",
+    "腾讯若干接口只在声明上统一：OpenClaw runner未完整投递LLMRunParams；RuntimeContext实际主要用于dataDir；TdaiCore会直接覆盖注入的runner factory。不能仅凭接口/README认定依赖倒置已闭合。",
+    "Alembic已有ToolCallRequest/ToolResultEnvelope、ModelRegistry/LLMGateway/Transport、单源TOOL_REGISTRY和ToolContextFactory。整理应围绕这些既有入口，不新增一套Host/Tool/Provider框架。",
+    "协议适配必须可验证地保留模型原生字段。腾讯两个纯round-trip probe出现信息丢失，说明抽象统一与无损兼容是两个独立验收条件。",
+    "任何缺端口/取消/部分写入/提案与已提交事实都继续使用Alembic现有结构化结果；不照搬no-runner→空候选或字符串JSON错误。"
+  ],
+  "actualCallChains": [
+    {
+      "name": "MemoryCore standalone composition",
+      "flow": "TdaiGateway.constructor → new StandaloneHostAdapter → new TdaiCore → hostAdapter.getLogger/getRuntimeContext().dataDir/getLLMRunnerFactory → wirePipelineRunners → MetricTrackingRunnerFactory → standalone runner → AI SDK",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/server.ts",
+          "line": 331
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/standalone/host-adapter.ts",
+          "line": 38
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/tdai-core.ts",
+          "line": 224
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/tdai-core.ts",
+          "line": 671
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/report/metric-tracking-runner.ts",
+          "line": 358
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/standalone/llm-runner.ts",
+          "line": 283
+        }
+      ],
+      "qualification": "factory有真实执行路径；但core内shouldOverrideRunnerFactory会重新构建具体Standalone实现，不能说core完全只依赖抽象。"
+    },
+    {
+      "name": "MemoryCore OpenClaw composition",
+      "flow": "MemoryCore/index.register → OpenClawHostAdapter(api.runtime.agent) → TdaiCore → OpenClawLLMRunnerFactory → CleanContextRunner →宿主embedded agent",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/index.ts",
+          "line": 281
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/openclaw/host-adapter.ts",
+          "line": 48
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/openclaw/llm-runner.ts",
+          "line": 86
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/openclaw/llm-runner.ts",
+          "line": 43
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/utils/clean-context-runner.ts",
+          "line": 345
+        }
+      ],
+      "qualification": "宿主SDK依赖集中到adapter/runner是优点；当前wrapper只转发部分参数，tools/外部abort/trace身份未完整接通。"
+    },
+    {
+      "name": "可信身份绑定的skill工具执行",
+      "flow": "SkillExtractor.extract → createSkillTools({core,user_id,team_id,agent_id,task_id,auditSink}) → runner.run({tools,enableTools:true}) → StandaloneLLMRunner选择caller tools → tool.execute调用SkillCore →成功才push auditSink",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/skill/skill-extractor.ts",
+          "line": 223
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/skill/skill-extractor.ts",
+          "line": 235
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/skill/skill-tools.ts",
+          "line": 55
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/skill/skill-tools.ts",
+          "line": 114
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/standalone/llm-runner.ts",
+          "line": 313
+        }
+      ],
+      "qualification": "LLM只提供业务参数，身份由closure捕获；这个约束比把user/team作为任意tool参数更明确。OpenClaw wrapper对per-call tools的支持不能由同一接口名推定。"
+    },
+    {
+      "name": "MemoryProxy client/protocol分轴",
+      "flow": "URL前缀agentSource → resolveAgentAdapter选择请求分类/真实用户文本提取；handler → getInjectionPipeline(config) → protocol adapter.parse → AgentContext + agentProfile → hooks → adapter.serialize → upstream body",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/agent-adapters/index.ts",
+          "line": 25
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/agent-adapters/types.ts",
+          "line": 27
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+          "line": 410
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 80
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/interface.ts",
+          "line": 12
+        }
+      ],
+      "qualification": "AgentAdapter处理客户端行为，不负责HTTP协议转换；ProtocolAdapter处理wire格式，不应决定客户端副作用权限。"
+    },
+    {
+      "name": "MemoryCore HTTP统一边界",
+      "flow": "Gateway组成模块extra route tables + deps → handleV2Route鉴权/隔离 →按routeTable分发 → handler.safeParse → success/error envelope → classifyError安全投影",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/server.ts",
+          "line": 1011
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+          "line": 401
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+          "line": 434
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+          "line": 633
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+          "line": 664
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-schemas.ts",
+          "line": 399
+        }
+      ],
+      "qualification": "逻辑模块可独立组装；但mergedDeps和extra handler的unknown/cast没有自动证明完整端口，HTTP envelope也不是LLM工具结果的替代。"
+    },
+    {
+      "name": "可选部署依赖",
+      "flow": "Gateway.start →动态加载integrations factory → service模式缺依赖即失败 → standalone模式明确使用LocalConfigSource +NoopQuotaReporter → InstanceConfigProvider/QuotaManager",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/server.ts",
+          "line": 1730
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/abstractions/types.ts",
+          "line": 24
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/abstractions/types.ts",
+          "line": 63
+        }
+      ],
+      "qualification": "当前checkout没有private integrations/factory源码；源码已明确service fail-fast与standalone fallback，不能把standalone可启动当service依赖已接通。"
+    }
+  ],
+  "applicablePatterns": [
+    {
+      "id": "TP-1",
+      "priority": 1,
+      "title": "用消费者真正需要的窄端口整理宿主DI，factory只组装",
+      "tencentImplementation": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+          "line": 179
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+          "line": 217
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+          "line": 238
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/standalone/host-adapter.ts",
+          "line": 38
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/openclaw/host-adapter.ts",
+          "line": 40
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/tdai-core.ts",
+          "line": 224
+        }
+      ],
+      "benefit": "Host SDK、模型执行机制与logger取得方式有明确owner；业务调用run，不直接绑定宿主API。factory可注入受控替身。",
+      "alembicCurrent": [
+        {
+          "path": "AlembicAgent/src/agent/service/AgentRuntimeBuilder.ts",
+          "line": 20
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/adapter/ToolRouterAdapter.ts",
+          "line": 21
+        },
+        {
+          "path": "AlembicAgent/src/tools/kernel/registry.ts",
+          "line": 93
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts",
+          "line": 34
+        }
+      ],
+      "concreteLanding": "优先把AgentRuntimeBuilderOptions里aiProvider/toolRouter与ToolContext重服务的unknown收敛为实际消费方法的结构端口（采用Pick/consumer-owned小interface，不把私有字段的具体class当接口）。继续由现有ToolContextFactoryContract/AgentRuntimeBuilder注入；知识写口复用公开Core RecipeProductionPort/对应管理port，核对宿主方法后显式接线。",
+      "doNotCopy": [
+        "不新增另一个万能HostAdapter容器替换全部既有context。",
+        "不把Core service/仓储/CLI/插件壳搬入Agent。",
+        "腾讯core内部Standalone factory override是反向依赖/注入失效的反例；factory选择应留在Alembic组装层。",
+        "腾讯RuntimeContext的空session/default_user不是严格任务身份的可用默认authority。"
+      ],
+      "validation": [
+        "两种宿主port实现驱动同一真实AgentService/ToolRouter链，成功/异常/缺方法均可验证。",
+        "编译现有public consumer与宿主接入fixture，不能靠as never掩盖新增接口缺方法。",
+        "缺知识管理能力继续port-unavailable，禁止以repo.update冒充生命周期service。",
+        "同一builder的并发runs身份隔离，sharedState/ledger/Set在同一run内保持原引用。"
+      ]
+    },
+    {
+      "id": "TP-2",
+      "priority": 1,
+      "title": "客户端行为与协议codec分开，统一数据面必须通过无损合同",
+      "tencentImplementation": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/agent-adapters/types.ts",
+          "line": 27
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/agent-adapters/index.ts",
+          "line": 25
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+          "line": 134
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/openai.ts",
+          "line": 24
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/anthropic.ts",
+          "line": 23
+        }
+      ],
+      "benefit": "parse→中性context→serialize让注入逻辑不重复处理两套wire格式；requestParams保留非messages/tools的原字段，client profile独立选择。",
+      "alembicCurrent": [
+        {
+          "path": "AlembicAgent/src/ai/AiProvider.ts",
+          "line": 60
+        },
+        {
+          "path": "AlembicAgent/src/ai/gateway/LLMGateway.ts",
+          "line": 44
+        },
+        {
+          "path": "AlembicAgent/src/ai/transport/LLMTransport.ts",
+          "line": 108
+        },
+        {
+          "path": "AlembicAgent/src/agent/profiles/AgentProfileCompiler.ts",
+          "line": 150
+        }
+      ],
+      "concreteLanding": "坚持profile/actionSpace属于Agent、provider/native协议属于transport。可把AiProvider/GatewayRequest/TransportRequest的共同调用选项用明确Pick或小type复用，保留各层专属modelRef/model/config字段与现有方法名；转换仍集中Gateway→transport，未知/原生协议内容有显式保留位置。",
+      "doNotCopy": [
+        "不把Tencent ContextBlock.content:string当无损统一消息模型。",
+        "不把Tencent客户端URL分类搬进本仓Agent runtime；宿主路由仍属于交付层。",
+        "OpenAI-only StandaloneFactory会丢provider/model前缀；Alembic已有Claude/Google/DeepSeek等真实transport，不能压平。"
+      ],
+      "validation": [
+        "保持reasoning_content、thoughtSignature、tool_call_id、cache_control、未知多模态块与工具JSON语义；协议往返测试应检查原生字段。",
+        "chat/chatWithTools/structured输出全部转发同一abort/budget/model选项，跨adapter做字段一致性表征。",
+        "不支持的能力显式报告或由ModelRegistry约束，不能通过实现函数签名静默忽略。",
+        "保留现有provider-facades/transport-protocols/LLMGateway测试及公开签名。"
+      ]
+    },
+    {
+      "id": "TP-3",
+      "priority": 1,
+      "title": "工具定义单源，可信身份和服务绑定在执行上下文",
+      "tencentImplementation": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/skill/skill-tools.ts",
+          "line": 35
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/skill/skill-tools.ts",
+          "line": 55
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/skill/skill-extractor.ts",
+          "line": 223
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/registry.ts",
+          "line": 11
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+          "line": 410
+        }
+      ],
+      "benefit": "每次createSkillTools把user/team/agent及服务实例绑定进closure；LLM schema只暴露业务参数。读scope与写audit字段明确分开，成功持久化后才登记auditSink。",
+      "alembicCurrent": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/registry.ts",
+          "line": 727
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/registry.ts",
+          "line": 870
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts",
+          "line": 83
+        },
+        {
+          "path": "AlembicAgent/src/tools/kernel/request.ts",
+          "line": 18
+        },
+        {
+          "path": "AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+          "line": 60
+        },
+        {
+          "path": "AlembicAgent/src/tools/catalog/UnifiedToolCatalog.ts",
+          "line": 153
+        }
+      ],
+      "concreteLanding": "继续以TOOL_REGISTRY/ToolDefinition为元数据单源，从同一定义派生provider schema、权限投影和真实handler。将actor/source/账本与Core ports在contextFactory/runtimeBridge中绑定，并让handler消费最小可信context；逐步减少同一服务在service locator/getter/unknown字段中的多份声明。",
+      "doNotCopy": [
+        "不能允许任意caller工具dict替换Alembic权限链；实际可调用工具必须与profile/actionSpace/当前policy取交集。",
+        "不要新建另一套registry；Alembic已具备duplicate-id拒绝和静态schema派生。",
+        "不要照搬JSON.stringify({error})结果，保持结构化ToolResultEnvelope。",
+        "不要复制腾讯本地文件sandbox实现；其startsWith目录检查不足，Alembic使用现有真实路径/权限边界。"
+      ],
+      "validation": [
+        "注册/schema/dispatch一一对应，无声明了却无handler的成功占位。",
+        "模型不能通过args改写actor、scope或提交身份。",
+        "两个并发run的工具context互不污染，同run的会话计数盒及证据账本引用不变。",
+        "权限拒绝、预取消、缓存短路与host失败仍经过原ToolExecutionPipeline；真实成功才提交记账。"
+      ]
+    },
+    {
+      "id": "TP-4",
+      "priority": 2,
+      "title": "composition根选择能力集合，并区分required与optional依赖",
+      "tencentImplementation": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/server.ts",
+          "line": 1730
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/abstractions/types.ts",
+          "line": 24
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/abstractions/types.ts",
+          "line": 63
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/server.ts",
+          "line": 1011
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+          "line": 401
+        }
+      ],
+      "benefit": "部署相关配置/配额实现只在启动边界选择；service必要依赖缺席失败，standalone允许明确替代。HTTP模块表在composition处合并，不在每个handler散落构造。",
+      "alembicCurrent": [
+        {
+          "path": "AlembicAgent/src/agent/service/AgentRuntimeBuilder.ts",
+          "line": 72
+        },
+        {
+          "path": "AlembicAgent/src/agent/service/AgentService.ts",
+          "line": 33
+        },
+        {
+          "path": "AlembicAgent/src/agent/service/SystemRunContextFactory.ts",
+          "line": 22
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/adapter/ToolRouterAdapter.ts",
+          "line": 75
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 72
+        }
+      ],
+      "concreteLanding": "在现有builder/context factory明确哪些port为本profile必需、哪些观测扩展可选；只在composition完成真实依赖选择，runtime/handler按窄port执行。保持profile compiler与StageFactory原入口，不向协议/业务层添加隐式工厂。",
+      "doNotCopy": [
+        "腾讯extraRoutes mergedDeps的unknown/cast不能证明能力齐备，Alembic不能用类型断言替代method/contract验收。",
+        "无runner返回[]只适合明确禁用的优化任务，不适合strict生产或需要持久化事实的阶段。",
+        "不复制Tencent巨大HTTP server或新部署/存储框架。",
+        "可选requestPrepare桥的null访问与in-place fallback说明注释承诺还须调用路径验证。"
+      ],
+      "validation": [
+        "必需port缺失在任何模型/写入前给出具体诊断；可选observer缺席保持既有业务返回。",
+        "至少一个真实组装fixture证明每个启用能力可达；不是只给空interface。",
+        "并发首次构造只初始化一次、失败允许受控重试，dispose不泄漏timer/listener/连接。",
+        "新子层遵守现有fileBoundaries，不反向导入composition/facade。"
+      ]
+    },
+    {
+      "id": "TP-5",
+      "priority": 2,
+      "title": "观测可用同接口decorator，执行结果与usage必须逐调用返回",
+      "tencentImplementation": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/report/metric-tracking-runner.ts",
+          "line": 179
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/report/metric-tracking-runner.ts",
+          "line": 200
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/report/metric-tracking-runner.ts",
+          "line": 358
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+          "line": 283
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+          "line": 332
+        }
+      ],
+      "benefit": "factory decorator在一处包装runner，观测失败不改变成功返回；业务异常保持传播。RecallResult明确error/partial，HTTP层统一request_id/error投影。",
+      "alembicCurrent": [
+        {
+          "path": "AlembicAgent/src/ai/transport/LLMTransport.ts",
+          "line": 135
+        },
+        {
+          "path": "AlembicAgent/src/ai/gateway/LLMGateway.ts",
+          "line": 157
+        },
+        {
+          "path": "AlembicAgent/src/tools/kernel/result.ts",
+          "line": 8
+        },
+        {
+          "path": "AlembicAgent/src/agent/service/AgentRunContracts.ts",
+          "line": 201
+        },
+        {
+          "path": "AlembicAgent/src/shared/operation.ts",
+          "line": 15
+        }
+      ],
+      "concreteLanding": "若整理usage/trace接口，围绕现有TransportResponse、ChatWithToolsResult、ToolResultEnvelope和AgentRunResult建立局部decorator/回调类型；必要上下文参数一次投影，保留callId/runId以及原错误/取消/部分结果。异步trace上下文只辅助观测，不作权限依据。",
+      "doNotCopy": [
+        "不改成LLMRunner.run():Promise<string>后再通过lastUsage补数据；共享runner并发会失去请求与usage绑定证明。",
+        "不照搬‘抛错就不记usage’作为预算政策，已消耗token/超时尝试要沿现有诊断记录。",
+        "observer best-effort只能用于观测，不能吞安全门、证据采集或真实提交失败。",
+        "不引入Kafka/COS/配额收费实现，也不把Core的HTTPcode当Alembic业务outcome。"
+      ],
+      "validation": [
+        "并发两次调用按各自callId精确关联usage与结果；不得读取可被另一请求覆盖的实例lastUsage。",
+        "observer抛错不改变已确认结果；执行抛错不变成空文本成功。",
+        "取消/超时/部分持久化仍使用原状态和readback事实，晚到结果不能重开终态。",
+        "保留LLMGateway、reliability、agent-lifecycle、runtime-efficiency的实际入口测试。"
+      ]
+    }
+  ],
+  "tencentDefectsAndLimits": [
+    {
+      "id": "T-LIMIT-01",
+      "classification": "源码可证的adapter字段丢失",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+          "line": 65
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+          "line": 112
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/openclaw/llm-runner.ts",
+          "line": 43
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/utils/clean-context-runner.ts",
+          "line": 345
+        }
+      ],
+      "finding": "OpenClawLLMRunner.run只转prompt/systemPrompt/taskId/timeout/maxTokens/workspace/instance；公共LLMRunParams的abortSignal、tools、enableTools、maxIterations、storage和trace身份未完整传递。Standalone实现却消费这些字段。",
+      "impact": "同一LLMRunner类型不能证明adapter可互换；具体部署是否走该OpenClaw路径取决于TdaiCore override配置。本轮未启动宿主验证。",
+      "lesson": "在Alembic收窄接口时同时验字段行为，而不是只统一TS签名。"
+    },
+    {
+      "id": "T-LIMIT-02",
+      "classification": "纯codec实际probe已复现",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/openai.ts",
+          "line": 128
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/openai.ts",
+          "line": 237
+        }
+      ],
+      "finding": "未知content part被parse为custom JSON字符串，serialize却输出type:'custom'壳而非原始block。",
+      "probe": {
+        "input": {
+          "type": "input_audio",
+          "input_audio": {
+            "data": "fixture",
+            "format": "wav"
+          }
+        },
+        "output": {
+          "type": "custom",
+          "content": "{\"type\":\"input_audio\",\"input_audio\":{\"data\":\"fixture\",\"format\":\"wav\"}}",
+          "original_type": "input_audio"
+        }
+      },
+      "lesson": "统一消息表示必须有无损opaque分支；不能靠metadata.original_type就视为兼容。"
+    },
+    {
+      "id": "T-LIMIT-03",
+      "classification": "纯codec实际probe已复现",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/anthropic.ts",
+          "line": 108
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/anthropic.ts",
+          "line": 198
+        }
+      ],
+      "finding": "单个system text block被serializeSystemMessage压成string，丢掉该block的cache_control。",
+      "probe": {
+        "inputSystem": [
+          {
+            "type": "text",
+            "text": "fixed system",
+            "cache_control": {
+              "type": "ephemeral"
+            }
+          }
+        ],
+        "outputSystem": "fixed system"
+      },
+      "lesson": "不能只测普通文本相等，还要验协议缓存/签名/工具关联元数据。"
+    },
+    {
+      "id": "T-LIMIT-04",
+      "classification": "源码调用关系证明，未运行服务",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/request-prepare-adapter.ts",
+          "line": 54
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/request-prepare-adapter.ts",
+          "line": 234
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/handler.ts",
+          "line": 1403
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryProxy/src/anthropicHandler.ts",
+          "line": 1336
+        }
+      ],
+      "finding": "可选包加载失败时_mod保持null；请求路径在stageOptions存在时先访问_mod.prepareUpstreamRequest，且在try外；两个handler无isRequestPrepareActive保护地调用。‘配置了stage但包缺席’不满足注释的no-op承诺。",
+      "extra": "同一桥把body/messages直接交扩展原地修改；扩展先改后抛时catch只返回null，不回滚body，‘失败请求不变’也不能由此代码保证。",
+      "lesson": "必要/可选依赖与无副作用fallback要由实际代码/反例证明；不可用于Alembic安全门禁的fail-open模板。"
+    },
+    {
+      "id": "T-LIMIT-05",
+      "classification": "源码可证的边界检查不足，未执行文件操作",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/standalone/llm-runner.ts",
+          "line": 118
+        }
+      ],
+      "finding": "resolveSandboxedPath仅startsWith(root)，缺目录分隔边界和realpath/symlink约束；例如root='/tmp/job'时'/tmp/job-other/x'仍通过字符串前缀。",
+      "lesson": "只借鉴每调用工具绑定，不复制该sandbox；Alembic已有受保护路径/真实路径校验。"
+    },
+    {
+      "id": "T-LIMIT-06",
+      "classification": "声明与真实composition不完全一致",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+          "line": 41
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/tdai-core.ts",
+          "line": 224
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/tdai-core.ts",
+          "line": 665
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/tdai-core.ts",
+          "line": 1063
+        }
+      ],
+      "finding": "RuntimeContext在已查主链仅被TdaiCore读取dataDir，session/user另有各调用参数；core还直接依赖StandaloneLLMRunnerFactory并覆盖host factory。不是完全贯彻声明中的单一identity/host-neutral原则。",
+      "lesson": "Alembic应整理真实调用中的身份与port，不新增没有消费者的context DTO。"
+    },
+    {
+      "id": "T-LIMIT-07",
+      "classification": "结果合同的并发/能力风险，未运行SDK",
+      "refs": [
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+          "line": 190
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/standalone/llm-runner.ts",
+          "line": 267
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/standalone/llm-runner.ts",
+          "line": 388
+        },
+        {
+          "path": "TencentDB-Agent-Memory/MemoryCore/src/core/report/metric-tracking-runner.ts",
+          "line": 221
+        }
+      ],
+      "finding": "runner只返回string，精确usage经实例lastUsage侧信道交decorator；接口不提供每调用绑定。失败路径不reset/不report，OpenClaw无精确usage时估算。这不足以替代Alembic现有结构化结果。",
+      "lesson": "保留逐调用response.usage；不把共享可变字段当并发安全结果载体。"
+    }
+  ],
+  "existingAlembicStrengthsToKeep": [
+    {
+      "ref": {
+        "path": "AlembicAgent/src/ai/gateway/LLMGateway.ts",
+        "line": 120
+      },
+      "point": "模型解析、参数守卫、transport、reliability与响应归一已有明确真实调用链；不重建第二factory/router。"
+    },
+    {
+      "ref": {
+        "path": "AlembicAgent/src/ai/transport/LLMTransport.ts",
+        "line": 135
+      },
+      "point": "TransportResponse携text/functionCalls/usage/reasoning/finishReason，优于只返string。"
+    },
+    {
+      "ref": {
+        "path": "AlembicAgent/src/tools/kernel/request.ts",
+        "line": 18
+      },
+      "point": "ToolCallRequest显式actor/source/surface/abort/runtime，宿主身份不靠LLM参数。"
+    },
+    {
+      "ref": {
+        "path": "AlembicAgent/src/tools/kernel/result.ts",
+        "line": 8
+      },
+      "point": "成功、partial、blocked、aborted、timeout分开；trust/artifacts/diagnostics也有合同。"
+    },
+    {
+      "ref": {
+        "path": "AlembicAgent/src/tools/runtime/registry.ts",
+        "line": 727
+      },
+      "point": "工具动作/参数/风险/并发已有单源，schema可派生。"
+    },
+    {
+      "ref": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts",
+        "line": 34
+      },
+      "point": "Core生产port类型已复用；管理修复明确端口不可用与已写入事实，不能倒退为空壳/no-op。"
+    }
+  ],
+  "suggestedFirstWork": {
+    "recommended": "先选TP-1 + TP-2的有界接口整理：列出实际adapter参数转发表，把Builder/handler目前unknown/重复声明收敛到已有消费者port和共同选项type；保持所有执行路径/公开名/返回结构。",
+    "subsequent": "再考虑TP-3的context绑定与registry投影去重，最后才是TP-4/TP-5的composition/observer收口。",
+    "nonGoals": [
+      "不新增HTTP server或宿主SDK集成",
+      "不迁移腾讯存储/配额/向量/工作流实现",
+      "不新增持久化框架",
+      "不改变Core权威或已提交/提案的成功判定",
+      "不据此删除兼容API或扩大跨仓修改授权"
+    ]
+  },
+  "verification": {
+    "gitHeadsVerified": true,
+    "tencentWorkingTreeObservedClean": true,
+    "sourceOnly": true,
+    "pureCodecProbes": [
+      {
+        "case": "OpenAI unknown content block round-trip",
+        "result": "changed to custom wrapper"
+      },
+      {
+        "case": "Anthropic one-system-block cache control round-trip",
+        "result": "cache_control lost"
+      }
+    ],
+    "noServiceTestClaim": "没有启动Tencent MemoryProxy/MemoryCore服务、没有发provider请求、没有调用存储工具。官方规范/互联网引用由root研究，这里只报告指定本地HEAD的实现。",
+    "localFileRefsChecked": 108,
+    "missingOrOutOfRangeRefs": 0
+  },
+  "nextStep": "由root结合官方资料决定有界实施范围；本报告仅提供具体实现证据和验收条件，不直接授权改宿主或邻仓。",
+  "keySourceSnapshots": [
+    {
+      "path": "TencentDB-Agent-Memory/MemoryCore/src/core/types.ts",
+      "sha256": "1ec3b531661e7e63371242c053c38a9dbb5f9aa70148c40f227f541cf841ef4d"
+    },
+    {
+      "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/openclaw/llm-runner.ts",
+      "sha256": "290828ea9966d06d97c1bd50ab386fae991b0f953f81c151e90c5889c137622e"
+    },
+    {
+      "path": "TencentDB-Agent-Memory/MemoryCore/src/adapters/standalone/llm-runner.ts",
+      "sha256": "a38cfd57676b4d0cb62b5591b15d432c1e535ee84da528e16795786193b1648f"
+    },
+    {
+      "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/openai.ts",
+      "sha256": "b4402d14a1d151435b74e1d9acda25cf8a0d57117058cdb7389b5aa2d6f475d8"
+    },
+    {
+      "path": "TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/anthropic.ts",
+      "sha256": "33af7be9819466ca49750ae5354c086df9052710457d661bb39531dd01115fa9"
+    },
+    {
+      "path": "TencentDB-Agent-Memory/MemoryProxy/src/request-prepare-adapter.ts",
+      "sha256": "4bdd89cd45b4fadad50bff8aad368b2e27156beaae8b8ee85a79fd9463dd0286"
+    },
+    {
+      "path": "AlembicAgent/src/agent/service/AgentRuntimeBuilder.ts",
+      "sha256": "ccf44f0f8d7c6a64ff90c67224b334e81e776efa7fd64fe952ce0c58063b2a74"
+    },
+    {
+      "path": "AlembicAgent/src/ai/gateway/LLMGateway.ts",
+      "sha256": "102f455b0125539d90f0e31bd9d134af81ca31eea0d7d09ee8b6d5a448356f93"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+  "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p13-core-canonical-retrieval-stability-refill-t1",
+  "status": "completed",
+  "summary": "AlembicCore commit 0fff37dbbb8bd311bc99b455bbc9a22431b063bb replaces candidate-count early stop with bounded truth-aware RRF Top-K stability proof. The real q2 shape is RED at window 32/rank 8 and GREEN after refill/rank 1 without query/data/weight/budget special cases. Core tests and public boundaries pass; the copy-only BiliDili probe used the exact Plugin-linked Core, all eight reads used the vector route, and protected live roots remained byte/fingerprint identical. The runtime report also honestly exposes stable-order changes for q7 (target final rank 11, outside public Top-8) and q8 (rank 4): target RRF itself is unchanged while later Recipes gain missing-lane evidence, so preserving the old ranks in Core would violate this task's stability contract. Those quality outcomes belong to the already-authorized Recipe production optimization/controller decision, not a Core query-specific patch. This result does not claim final public MCP acceptance.",
+  "evidenceRefs": [
+    "AlembicCore commit 0fff37dbbb8bd311bc99b455bbc9a22431b063bb (parent 5106e8a9f47a12a52614d77cb5e3908462a4a49c)",
+    "src/service/search/KnowledgeRetrieval.ts: KnowledgeRetrievalPolicy.retrieve + hasStableTopKRanking",
+    "test/KnowledgeRetrievalPolicy.test.ts: q2 refill and stability/exhaustion/budget/truth/abort matrix",
+    "/private/tmp/alembic-p13-copy-only-eight-query.json (sha256 cc066813e57abbcd36c767f12cfecd324e2b46d915543de5158bc7ec12561af8)"
+  ],
+  "verification": [
+    "Focused RED before repair: npx vitest run test/KnowledgeRetrievalPolicy.test.ts => expected windows [32,64], received [32], 1 failed/5 passed.",
+    "Focused GREEN: npx vitest run test/KnowledgeRetrievalPolicy.test.ts => 11/11 passed.",
+    "Related retrieval/vector/Search/Prime seams: 6 files, 133/133 passed.",
+    "Full npm run test after formatting: 184 files, 1749/1749 passed.",
+    "npm run build:check passed; npm run build passed; npm run lint passed.",
+    "Core boundary suite: 4 files, 22/22 passed.",
+    "lint:public-api-boundary, lint:layer-contract, lint:consumer-core-imports, lint:scope-resolution, smoke:public-api, output budgets, space edges, naming and retired-symbol checks passed.",
+    "npm run check reached the inherited Doctrine failure at src/infrastructure/vector/ASTChunker.ts:32; git diff against exact parent proves that file is unchanged.",
+    "Copy-only probe: target ranks [1,1,1,1,1,2,outside Top-8,4]; q2 public refill window 32->64->128 and rank 8->1; all vector routes ready; protected live roots before/after equal."
+  ],
+  "risks": [
+    "The real stable ranking changes q7 from prior rank 2 to final rank 11 and q8 from prior rank 1 to rank 4 because newly collected Recipes gain valid missing-lane contributions; this is preserved evidence for Recipe production/profile quality optimization and controller decision, not authorization for a Core special case.",
+    "Requests whose Top-K cannot be proven stable may now refill to the existing 256 budget; the real fixture completed around 230-320 ms per public Search under cached loopback embeddings, so downstream fresh-process integration should retain latency evidence.",
+    "The stability proof assumes each dense/sparse topK retrieval is a ranked prefix, matching the existing reader/retriever contract; approximate HNSW behavior remains bounded by the unchanged candidate budget.",
+    "The repository-wide npm run check remains red on the inherited ASTChunker Doctrine violation outside this diff."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "0fff37dbbb8bd311bc99b455bbc9a22431b063bb",
+      "verify": "git log -1 shows exact parent 5106e8a9f47a12a52614d77cb5e3908462a4a49c; git status --porcelain is empty"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "Window 32 already projected >=topK live Recipes, so the old count gate stopped even though neither lane was exhausted. Raw dense rank 42 for q2 was therefore absent; after truth aggregation it becomes unique-live dense rank 7 in the live copy and combines with sparse rank 3. Stability now uses next truth-projected unique-live lane ranks to upper-bound every later candidate's missing lane and a wholly unseen Recipe, and stops only when each Top-K prefix endpoint strictly beats all challengers.",
+      "verify": "source trace covers HybridCandidateRetriever.collect -> KnowledgeTruthProjector.project/authoritative ranks -> RRF -> KnowledgeRetrievalPolicy stop"
+    },
+    {
+      "kind": "red-green",
+      "value": "The same q2-shaped Core fixture was first observed failing with windows received [32] versus expected [32,64] and then passed after the repair, placing the target within Top3 with denseRank 6/sparseRank 3.",
+      "verify": "focused before/after output retained in target verification; final file has 11/11 tests"
+    },
+    {
+      "kind": "tests",
+      "value": "Focused 11/11; related 133/133; full 1749/1749; boundary 22/22; build/lint/public surface gates pass. Only inherited Doctrine ASTChunker.ts:32 fails npm run check and is unchanged.",
+      "verify": "commands and raw counts listed in verification"
+    },
+    {
+      "kind": "real-probe",
+      "ref": "/private/tmp/alembic-p13-copy-only-eight-query.json",
+      "verify": "sha256 cc066813e57abbcd36c767f12cfecd324e2b46d915543de5158bc7ec12561af8; exact qwen fixture; per-request stable copies; raw ranks/similarities/RRF/region evidence; protected roots equal"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 compliance: only Core policy/tests changed; no public interface, budget, alpha/rrfK, query, UUID, title, synonym, provider, Plugin, data or write-path changes. Stage 2 quality: strict upper bounds cover current/unseen candidates, ties remain unstable, exhausted lanes contribute zero, truth filtering and duplicate aggregation precede ranks, AbortSignal propagates, runtime cost is bounded, and the q7/q8 ranking changes are reported rather than hidden.",
+      "verify": "git diff, full gates, copy-only report and clean status reviewed separately"
+    },
+    {
+      "kind": "scope-diff",
+      "value": "2 files: KnowledgeRetrievalPolicy stop/diagnostic plus private hasStableTopKRanking; six new policy tests. 404 insertions, 2 deletions."
+    },
+    {
+      "kind": "runtime-provenance",
+      "value": "Plugin bdcb3de1d6aa35732a141cbd699b4007b6bbafa6 node_modules/@alembic/core resolves to this AlembicCore checkout; qwen3-embedding:0.6b fixtures request 82b61dde... and response 2bc2e477...; executeReadOnlySearch copied live DB/WAL/config/vector before readonly SQLite/query_only and read-only HNSW access."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p13-core-canonical-retrieval-stability-refill-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p13-core-canonical-retrieval-stability-refill-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1.json",
+    "deliveryRunId": "run-delivery-p13-core-canonical-retrieval-stability-refill-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1",
+    "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p13-core-canonical-retrieval-stability-refill-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 81,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+    "targetTaskId": "p13-core-canonical-retrieval-stability-refill-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-p1",
+    "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+    "createdAt": "2026-07-13T23:32:02.953Z"
+  },
+  "createdAt": "2026-07-13T23:32:02.953Z",
+  "stateRevisionObserved": 81,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

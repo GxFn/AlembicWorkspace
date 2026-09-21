@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i7-i8-alembic-main-public-serving-bundle-rootcause1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "执行 I7→I8 Alembic Main public-serving physical handoff root-cause combined package。基线必须为干净的 Alembic@bee8272f9ef2f959829577d38f27447a492e75e7/tree c255770449cf4a9c68227f67730861a2db1d3801，并通过 workspace file dependency 精确消费已接受 AlembicCore@d4de7edd6bbfaeb36a01b3cc243ba1617c001f65。总控已接受 Plugin blocker：当前 Main 只把 PublicKnowledgeRoute bytes 写到 caller-authorized `publicRoutePath`，而 exact DB/Recipe/config/vector data、FinalCoverageBindingReceipt、ServingSnapshotValidationReceipt 和 ServingSnapshotManifest 仍留在 private revision/checkpoint；Plugin 因此没有合法 public artifact。本包必须关闭这条真实生产链路，不能只补类型、fixture 或报告。\n\n完成链路：1) strict init/reset 在 approved data root 内安装并读回 Core exact StrictPublicationMarkerV1，固定路径 `.asd/context/recipe-publications/marker.json`；marker 绑定 accepted projectIdentityHash + migrationBundleHash，使用 durable temp-write/file fsync/atomic rename/parent fsync/readback，且 provider/model config 内容与 hash 不变。enrolled strict + marker 缺失/损坏/不匹配 fail closed，不回退 legacy。2) 移除 strict publication 对 caller-selected `publicRoutePath` 的 authority；从 accepted dataRoot 固定推导 `.asd/context/recipe-publications/active.json` 和 `snapshots/<snapshotId>/`，严格验证 snapshotId、realpath/no-symlink/confinement，禁止任意 path override。3) 从 latest sealed PrivateCorpusRevisionHandle 组装真实 serving snapshot：`snapshots/<snapshotId>/data/` 包含 exact checkpointed SQLite、允许的 serving config artifact（遵守 sanitized/no-secret 与生产 config 不变约束）、Recipe files、所选 vector generation/store/manifest 和服务所需 refs/coverage；只复制 content-ready→ACTIVE 后的 exact serving set。所有写入完成后 WAL checkpoint、FK/integrity、逐文件 canonical manifest/hash、写 candidate-data-manifest，再把 data subtree seal；G4 后不得修改 data，seal 后失败使用新 snapshotId。4) 在 snapshot append-only metadata 区持久化并读回 exact FinalCoverageBindingReceipt、ServingSnapshotValidationReceipt、Core ServingSnapshotManifest（`manifest.json`）以及它们引用的 G3/G4/data/vector/source lineage；固定消费者可推导的文件名，Core manifest 本身不得混入 path/private fields。Recipe Map 后续必须能读取 exact final coverage，而不是从 Graph 重建。5) 只有真实 data+metadata bundle 全部存在且哈希、marker、source-vector、reconciliation、vector generation 再验证通过，才在同一 operation lock→route lock 顺序内执行 compare-null CAS；`active.json` 只含 Core PublicKnowledgeRouteV1，无 path/Recipe/ref/coverage/sparse IDs。rename-succeeded/receipt-missing 只按 exact canonical route bytes 恢复；semantic-only equality 冲突。公共 consumer 仅凭 accepted dataRoot + fixed marker/route + snapshotId 即能定位 bundle，不需要 private checkpoint/revision、run evidence 或 Main internal API。\n\n强边界：Main 仍是 strict journal、final reconciliation、serving manifest、physical publication 和 public CAS 唯一 owner；不得新增 AlembicPlugin 依赖、正式 MCP handler/schema 副本、EmbeddedToolExecutor/ToolExecutionContext、CandidatePublicationHandle、candidate/public reader、private snapshot resolver、pre-CAS 五工具或 cross-repo oracle transport；不得把 `runCandidateFiveToolOracle` 冒充五工具，不得新增平台/service；Graph 与 Plugin 正式 resolver 不在本包实现。不得修改 Core/Plugin/Agent/Design/Test/Wakeflow/vendor/gitlink/cache；不得真实运行 MR5/SP/Alembic/BiliDili T5/T6。\n\n验证与完成定义：先用现有集成测试/物理产物证明 RED（route 可写而 public snapshot/marker/receipts 不存在），再在现有 strict orchestrator/finalizer/journal/reset-authority 单链内最小实现。focused tests 必须实际检查 canonical marker、fixed paths、snapshot DB/Recipe/vector/metadata 文件、逐项哈希与 route→snapshot 可解析性；覆盖 marker missing/corrupt/mismatch、route/path traversal与symlink、data/manifest/final-coverage/validation/vector tamper before CAS、route remains null、post-seal mutation rejection/new snapshot、compare-null conflict、rename crash recovery、private checkpoint 删除后 public bundle 仍完整可解析。保留 ResidentServiceBoundary，扫描 Main→Plugin/MCP/candidate reader/path override 为零。运行 Core d4de build与 exact import probe、Main build:check/build、focused unit/integration、完整 Main suite、lint、repo-boundary、shared-asset drift、git diff --check；回填原始 physical artifact tree/JSON/hash probe。仓库窗口提交一个新的干净 Alembic commit，回填 parent/commit/tree、changed files/symbols、RED/GREEN、命令摘要、两阶段自审、风险与 Plugin consumer handoff。完成后只返回总控；下一步由总控验收后重新派发 Plugin I8，不自行启动 Plugin 或 Test。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§8.1-8.4,13.1,14.1-14.5,15.1-15.4,18.3-18.6; Design/docs/current/recipe-coldstart-production-quality-original-plan-2026-07-15.md lines 63-68; accepted Core@d4de7edd6bbfaeb36a01b3cc243ba1617c001f65; accepted Main@bee8272f9ef2f959829577d38f27447a492e75e7; accepted blocked Plugin result tr-i8-alembic-plugin-public-serving-compatibility-redesign1-t1 revision 2; controller decisions evt-20260716142727-0112 and evt-20260716144735-0116",
+  "designIntent": "在现有 Main strict orchestrator/finalizer/journal 单链中，把 sealed private result 物理固化为 fixed-namespace tool-neutral public bundle，再做 exact compare-null CAS；不引入 Plugin/MCP 运行时门禁或新的平台层。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "exact-core-artifact",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "public-bundle-runtime-probe",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "marker-cas-negative-tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "boundary-scan",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "baseline"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "change-scope"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T14:49:14.601Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i7-i8-alembic-main-public-serving-bundle-rootcause1-t1",
+      "taskPackageId": "i7-i8-alembic-main-public-serving-bundle-rootcause1-p1",
+      "targetWindow": "Alembic",
+      "summary": "把 Main 现有 private finalization 真正物理发布为 fixed-namespace immutable serving bundle、strict marker、exact receipts/manifest 和 compare-null active route；无 Plugin/MCP/candidate reader 依赖，提交单一 Main commit。",
+      "status": "pending",
+      "createdAt": "2026-07-16T14:49:14.601Z"
+    }
+  ]
+}

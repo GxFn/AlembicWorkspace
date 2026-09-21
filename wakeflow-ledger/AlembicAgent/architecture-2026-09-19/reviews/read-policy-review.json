@@ -1,0 +1,149 @@
+{
+  "scope": "Bounded read-only M1/M2 review: read policy, memory prompt assembly, coordinator request budgets, retrieval/toPrompt, Analyst/preset wiring, session projection and token helpers",
+  "baseCommit": "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05",
+  "status": "3 concrete findings; root owns patches and RED/GREEN",
+  "files": [
+    {
+      "path": "src/agent/memory/MemoryReadPolicy.ts",
+      "sha256": "c8d1022de19b4930397c2dc5d6fe7c16e626fdcbdf4aa748c8adaf9e41893567",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "src/agent/memory/MemoryPrompt.ts",
+      "sha256": "ef1fc8f8a668e7de087f62e269cee689f0112774006819880341981fbda180ac",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "sha256": "39ac2070b0b35ce8f64ae874670719542ce076c65b78a1b8dda097965cbb263a",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "src/agent/memory/MemoryRetriever.ts",
+      "sha256": "9bde0409429a3e5ce65aa61d60f6ec2a984f8c142d87ce621918d4c5c759bab5",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "src/agent/memory/SessionStore.ts",
+      "sha256": "a428e9dd9fc8f401e5085404422cbc8286410b1531af902e8cf5902b310a3dfb",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "src/agent/prompts/insightAnalyst.ts",
+      "sha256": "7b1f3215e09e59f8677b2d3cb9421ed4b58fe3fd6af3afb768b4ac5056d33a12",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "src/agent/profiles/presets/insightPreset.ts",
+      "sha256": "d5b96c33f1c7df393f8d1b3ee155bf05c94d750f73d956ec3c78a8685a9b1a04",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "src/shared/tokenUtils.ts",
+      "sha256": "b00ec45bfd517c309f2ee39808a2ac1bf5b9d98b8d90d08f9c3cc08315622f58",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "test/memory-context.test.ts",
+      "sha256": "b102d636755d7695e09e77f8de9b541e7ae144ff5dd7ff045c59f8bc73a50d4f",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    },
+    {
+      "path": "test/llm-input-layering.test.ts",
+      "sha256": "597f8675d0926c8c9710e547e652acb7ad6cecba91f3f7e11c7d9cc23fa6e8bc",
+      "reviewLevel": "new modules and current relevant diff/call paths; tests reviewed at targeted cases"
+    }
+  ],
+  "findings": [
+    {
+      "id": "MR-01",
+      "severity": "P2",
+      "path": "src/agent/memory/MemoryPrompt.ts",
+      "line": 58,
+      "relatedPaths": [
+        "src/agent/memory/MemoryReadPolicy.ts:37"
+      ],
+      "issue": "timeoutMs=NaN或deadlineAt=NaN会生成NaN截止时间，readMemoryValue最终不创建任何timeout timer，破坏有界等待。",
+      "repro": "readPersistentMemorySection({toPromptSection:()=>new Promise(()=>{})},{timeoutMs:NaN,tokenBudget:100,abortSignal})。模块setTimeout instrumentation显示scheduledInternalTimers=[]；只有外部abort后才结束。",
+      "why": "MemoryReadPolicy对requested NaN有默认处理，但MemoryPrompt已提前算出deadlineAt=NaN；Math.min(default,NaN)=NaN，Number.isFinite(timeoutMs)为false。",
+      "suggestion": "在做deadline算术前统一验证timeout/deadline；NaN使用默认或返回invalid，不得隐式变成无限等待。可以保留明确Infinity的既定语义。",
+      "test": "fake clock覆盖timeoutMs NaN及deadlineAt NaN，挂起port仍按默认/拒绝策略结束且timer/listener清零。"
+    },
+    {
+      "id": "MR-02",
+      "severity": "P2",
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "line": 325,
+      "relatedPaths": [
+        "src/agent/memory/MemoryCoordinator.ts:219",
+        "src/agent/memory/MemoryCoordinator.ts:299"
+      ],
+      "issue": "组合buildMemoryPrompt没有持有整个请求的total/allocation快照；等待persistent期间全局configure/allocateBudget会改变该请求的动态配额和最终上限。",
+      "repro": "初始total100，scope a调用buildMemoryPrompt({scopeId:a,mode:analyst})并挂起persistent；调用allocateBudget(producer,1000)，再resolve旧persistent。working被传450，输出estimateTokens455，超过请求初始100。",
+      "why": "allocateBudget清#promptBudgets；动态阶段从新的#totalBudget重算，最终truncate也读新的全局total。现有反序scope测试只保持全局total不变，未覆盖此路径。",
+      "suggestion": "同一次组合装配持有局部total/allocation/surplus到结束；全局新配置只影响后续请求，或显式取消旧请求，不能混用两个配置版本。保留现有公开string facade。",
+      "test": "挂起PM期间调大/调小预算，原请求按照起始快照完成，后续请求按新预算；并行scope仍互不串线。"
+    },
+    {
+      "id": "MR-03",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "line": 456,
+      "relatedPaths": [
+        "src/agent/memory/SessionStore.ts:483"
+      ],
+      "issue": "相关性排序遗漏workingMemoryDistilled.keyFindings，而投影渲染会在report.findings为空时使用它；有效的旧/蒸馏报告因得分0继续被早期无关报告挤掉。",
+      "repro": "先store noise长analysisText，再store target仅workingMemoryDistilled.keyFindings=[{finding:rare-key transactional boundary,importance:9}]；focusKeywords=[rare-key],budget100。投影先###noise，最终不含rare-key。",
+      "suggestion": "排序与渲染复用同一个effectiveFindings选择规则（report.findings非空，否则distilled）；不要引入新存储或检索框架。",
+      "test": "关键词只在distilled findings中、早期noise长文本、小预算时，target finding先进入projection。"
+    }
+  ],
+  "verified": [
+    {
+      "case": "有限嵌套deadline",
+      "evidence": "readPersistentMemorySection(timeout20)包住内部readMemoryValue(hanging)；内部预留截止时间返回lexical fallback，外部拿到该文本。",
+      "result": "passed"
+    },
+    {
+      "case": "timer cleanup",
+      "evidence": "对当前模块setTimeout/clearTimeout做局部instrumentation；快速成功、有限嵌套timeout和NaN例外的外部abort结束后timer余额均0。",
+      "result": "passed for tested paths"
+    },
+    {
+      "case": "取消后的迟到embedding",
+      "evidence": "当前Retriever+in-memory store stub：挂起embedding，外部abort后resultCount0；随后resolve旧embedding，[touchAccess]仍0。",
+      "result": "passed"
+    },
+    {
+      "case": "旧one-argument embeddingFn",
+      "evidence": "async(text)=>[1,0]仍返回1条召回结果，touchAccess1次；不要求旧宿主消费新增options。",
+      "result": "passed"
+    },
+    {
+      "case": "旧Episodic端口",
+      "evidence": "buildAnalystPrompt给buildContextForDimension第二参数仍传string[]；legacy history与单独reflection都保留。",
+      "result": "passed"
+    },
+    {
+      "case": "三层token投影",
+      "evidence": "projectMemorySection在外部port忽略预算时再次裁剪；shared truncate包含footer并按codepoint保留Unicode；MemoryRetriever仅touch实际注入项。",
+      "result": "source/test review accepted; request reconfigure exception listed MR-02"
+    },
+    {
+      "case": "preset接线",
+      "evidence": "insightPreset把ctx.abortSignal/memoryReadTimeoutMs/memoryTokenBudget和旁路diagnostic传给buildAnalystPrompt；PipelineStrategy构造prompt时透传strategyContext。",
+      "result": "source review accepted"
+    },
+    {
+      "case": "M3 boundary",
+      "evidence": "没有审查并行中的embedding sidecar内容版本、backfill失败重试和get匹配更改；本报告只覆盖retrieve/toPrompt及读取策略快照。",
+      "result": "out of scope as assigned"
+    }
+  ],
+  "validationMethod": "Current-source TypeScript transpiled in memory with dependency stubs; fake memory rows and no network/SQLite. No product files changed, no heavy check started. Timers use small bounded local probes, never real API.",
+  "scopeNotes": [
+    "No new framework or cross-repository request.",
+    "Global runtime/controller acceptance remains root-owned.",
+    "Retriever backfill/sidecar may change after this snapshot under parallel M3; do not apply these findings to unreviewed later content."
+  ]
+}

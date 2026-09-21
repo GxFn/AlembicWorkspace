@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-agent-recipe-production-profile-adapter-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p2-agent-recipe-production-profile-adapter-p1",
+  "dispatchGroup": "p2-agent-recipe-production-profile-adapter-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p2-agent-recipe-production-profile-adapter-t1",
+  "status": "completed",
+  "summary": "Rework1 completed in AlembicAgent commit cc85887c0cd88fd5d004c2d1f965eec0d8747caa (parent 5a6d8a1dd3f82ec7d5df4d392fbc931ecff81df3). (1) knowledge.manage approve/publish now fail closed unless the Core RecipeProductionPort is present, preflight Core readiness, mutate only through port.publish, never call knowledgeRepo approve/publish, and preserve structured readiness/error evidence; real Core integration proves invalid readiness leaves lifecycle unchanged. (2) retrieval-profile provenance is prepared independently from coreCode admission: field-only and project-local exact documentation evidence can ground profiles, while coreCode remains restricted to matching non-document, non-whole-file bounded evidence; rejected code is removed and surfaced as codeEvidence without manufacturing retrieval.profile.missing. (3) Producer system/V1/V2/shared prompts now consistently classify coreCode as optional and documentation as profile-only evidence. Existing createOrStage capability=knowledge-submit path, no mechanical code replacement, and public Core import/provider boundaries are preserved.",
+  "evidenceRefs": [
+    "commit:cc85887c0cd88fd5d004c2d1f965eec0d8747caa",
+    "parent:5a6d8a1dd3f82ec7d5df4d392fbc931ecff81df3",
+    "core-baseline:b711ea10aa5c67d1d75a58a18c0d56623e26c290",
+    "src/tools/runtime/handlers/knowledge.ts",
+    "src/tools/runtime/handlers/recipeProductionAdapter.ts",
+    "src/tools/runtime/recipeProductionContract.ts",
+    "src/agent/prompts/insightProducer.ts",
+    "src/agent/runtime/ToolExecutionPipeline.ts",
+    "test/recipe-production-profile-adapter.test.ts",
+    "test/llm-input-layering.test.ts"
+  ],
+  "verification": [
+    "RED: expanded focused integration suite failed 18 tests before implementation, covering repository bypass, profile/code coupling, and prompt contradiction.",
+    "npx vitest run test/recipe-production-profile-adapter.test.ts test/llm-input-layering.test.ts -> 2 files passed, 46 tests passed.",
+    "npm run check -> exit 0; 65 test files passed, 519 tests passed; build/type, import/public/Core/space/layer/doctrine/naming/provider boundaries, public signatures, validation floor, and retired-symbol checks passed.",
+    "npx biome check <7 changed files> -> checked 7 files, no fixes; full lint retains 19 pre-existing non-blocking warnings outside this change.",
+    "git diff --check -> clean before commit; post-commit Agent worktree clean; commit parent exact.",
+    "AlembicCore worktree clean at b711ea10aa5c67d1d75a58a18c0d56623e26c290."
+  ],
+  "risks": [
+    "Intentional compatibility tightening: legacy hosts that expose only knowledgeRepo approve/publish now fail closed for active transitions until recipeGateway is wired; non-active repository operations are unchanged.",
+    "Full repository Biome check reports 19 pre-existing warnings; the seven changed files are warning-free."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "cc85887c0cd88fd5d004c2d1f965eec0d8747caa",
+      "verify": "Agent HEAD is cc85887; HEAD^ is required parent 5a6d8a1; worktree clean."
+    },
+    {
+      "kind": "tests",
+      "ref": "npm run check",
+      "verify": "Exit 0; 65 test files and 519 tests passed, with every repository boundary check green."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 matched each controller finding to code plus direct/fake/real-Core tests. Stage 2 checked safety, fail-closed compatibility, project-root/realpath/range containment, prompt consistency, unchanged non-active operations, and cross-repo cleanliness.",
+      "verify": "No repo.approve/repo.publish bypass remains in knowledge.ts; no generated prompt contains the old required-coreCode or omit-coreCode/profile wording; changed-file Biome and diff checks are clean."
+    },
+    {
+      "kind": "red-green-note",
+      "value": "Expanded focused suite produced 18 failures before implementation; the same affected adapter/prompt suite passes 46/46 after the repair.",
+      "verify": "Targeted Vitest rerun exit 0."
+    },
+    {
+      "kind": "test-first",
+      "value": "Regression tests were written and observed failing before implementation for all three controller findings.",
+      "verify": "Initial focused RED 13 failures, expanded real-Core RED 18 failures."
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Only seven AlembicAgent implementation/test files changed; no AlembicCore or other repository change.",
+      "verify": "Commit stat: 7 files; Agent/Core post-commit worktrees clean."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Runtime active transitions, profile/code adapter, structured submit ledger/result evidence, prompt contracts, and focused regression/integration tests only.",
+      "verify": "git show --stat cc85887."
+    },
+    {
+      "kind": "compatibility-review",
+      "value": "Active approve/publish intentionally require the Core production port and fail closed without it; reject/update/score/validate retain repository paths; createOrStage/public Core imports/provider-neutral contracts remain unchanged.",
+      "verify": "Full npm run check boundary and regression gates passed."
+    },
+    {
+      "kind": "repro",
+      "ref": "test/recipe-production-profile-adapter.test.ts",
+      "verify": "Covers controller repoPublish=1/portPublish=0 bypass, docs/field-only profile null coupling, invalid lifecycle, and Core publish TOCTOU exception evidence."
+    },
+    {
+      "kind": "regression",
+      "ref": "test/llm-input-layering.test.ts",
+      "verify": "Asserts required/optional grouping, documentation profile eligibility, documentation code ineligibility, and absence of contradictory generated wording."
+    },
+    {
+      "kind": "baseline",
+      "value": "Agent 5a6d8a1 clean; Core b711ea1 clean; baseline targeted suite 54/54 before rework.",
+      "verify": "Recorded before RED changes."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Read reason -> clean baseline -> RED tests -> minimal repair -> targeted/full verification -> two-stage review -> single follow-up commit -> superseding result.",
+      "verify": "All plan stages completed in order."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-agent-recipe-production-profile-adapter-rework1-p1__AlembicAgent__p2-agent-recipe-production-profile-adapter-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-agent-recipe-production-profile-adapter-rework1-p1__AlembicAgent__p2-agent-recipe-production-profile-adapter-t1.json",
+    "deliveryRunId": "run-p2-agent-recipe-production-profile-adapter-rework1-p1-readback1",
+    "dispatchGroup": "p2-agent-recipe-production-profile-adapter-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-agent-recipe-production-profile-adapter-rework1-p1__AlembicAgent__p2-agent-recipe-production-profile-adapter-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 20,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p2-agent-recipe-production-profile-adapter-p1",
+    "targetTaskId": "p2-agent-recipe-production-profile-adapter-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p2-agent-recipe-production-profile-adapter-rework1-p1",
+    "resultId": "tr-p2-agent-recipe-production-profile-adapter-t1",
+    "createdAt": "2026-07-13T14:28:16.737Z"
+  },
+  "createdAt": "2026-07-13T14:28:16.737Z",
+  "stateRevisionObserved": 20,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-p2-agent-recipe-production-profile-adapter-t1",
+    "dispatchGroup": "p2-agent-recipe-production-profile-adapter-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p2-agent-recipe-production-profile-adapter-t1__p2-agent-recipe-production-profile-adapter-p1__current-r0001.json"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "summary": "Implement and commit one AlembicPlugin quality closure for the five knowledge tools.\n\nRequired fixes:\n- Change local embedding from explicit opt-in to default local-first auto-detection. `resolveLocalEmbeddingConfig` and newly generated Plugin config must default enabled; explicit `ALEMBIC_LOCAL_EMBEDDING_ENABLED=0`, config `enabled:false`, or `laneOrder:keyword-only` remains authoritative. Do not package/download a model or call cloud providers. Probe the existing default local Ollama endpoint/model with a bounded timeout; unavailable service/model must immediately and honestly fall back to keyword.\n- Replace public `alembic_search` search-operation table-list/all-token filtering with the already-created request-scoped read-only SearchEngine. Honor `mode=auto|keyword|semantic`, query, filters and budget/limit; keep get/expand bounded through the read-only repository. Project identity and read-only snapshot confinement stay intact. Output must distinguish real semantic/vector use, keyword fallback, zero match, and unavailable vector lane without leaking internal/raw provider data.\n- Carry actual SearchEngine route evidence through PrimeSearchPipeline and build Prime diagnostics from it. Delete the false rule that equates empty regionEvidence with unavailable vector; retain semantic-region evidence as a separate signal if useful.\n- Improve Plugin ProjectGraphProvider ranking: normalize CamelCase/specific identifiers, reward multi-term coverage/rare or specific term matches, and prevent one common term such as `request` from filling the top results ahead of HostMcpServer/ProjectLocationService matches. Do not turn Graph into semantic knowledge search or claim source-of-truth.\n- Deduplicate Recipe Map diagnostics for equivalent path anchors such as `:330` and `:330-330`; add a bounded nextAction explaining source-ref reconciliation/rescan when unresolved/stale refs exist. Query remains read-only and must not repair live knowledge.\n- Preserve Guard semantics, exact graph/file queries, Recipe Map conservation counts, all public schema/output projection gates, request-scoped roots, no-KB truthful results, no revision/host/admin/intent gates, and no main/resident/daemon coupling.\n\nRequired evidence and validation:\n- RED/GREEN tests proving current public semantic Search zero-result bug despite underlying vector success, then public success through SearchEngine.\n- Tests for config absent => auto-detect enabled; explicit disable => no probe/keyword; Ollama absent/model absent => bounded keyword degrade; Ollama available => vector.\n- Prime vector-used and keyword-fallback diagnostic tests based on real route evidence.\n- Graph ranking fixture with HostMcpServer/ProjectLocationService/request terms and Recipe Map duplicate diagnostic fixture.\n- Read-only snapshot/WAL/index hash or fingerprint proof before/after.\n- Focused tests, full `npm run test:unit`, `npm run check`, `npm run build`, `npm run verify:codex-runtime-package`, `npm run verify:plugin-distribution`, `npm run verify:codex-plugin`, and canonical local reload on exact final commit.\n- Return final commit, touched files/symbols, representative public JSON for both roots/modes, route diagnostics, no-write proof, two-stage self-review, and any honest residual limits. No Test dispatch.",
+  "status": "pending",
+  "sourceRef": "User command on 2026-07-12 plus controller raw evidence: both roots have valid 1024d HNSW indexes; local Ollama qwen3-embedding:0.6b is reachable; BiliDili underlying SearchEngine selected lane=ollama and returned the two expected Recipes, while public alembic_search(mode=semantic) returned zero because handlers/search.ts bypasses SearchEngine; Workspace default selected lane=keyword because localEmbedding default is false; Prime hard-codes regionEvidence=[]; broad Graph common-token ranking displaced specific identifiers; Recipe Map emitted duplicate unresolved-ref diagnostics.",
+  "designIntent": "Repair the already-proven Plugin retrieval chain rather than adding another policy layer: use the existing request-scoped snapshot and Core SearchEngine/vector APIs, make local Ollama auto-detection the default with honest fallback, and improve public evidence/ranking while preserving read-only project isolation.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-probe",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "vector-default-proof"
+      },
+      {
+        "kind": "public-search-route-proof"
+      },
+      {
+        "kind": "prime-diagnostic-proof"
+      },
+      {
+        "kind": "graph-ranking-proof"
+      },
+      {
+        "kind": "recipe-map-diagnostic-proof"
+      },
+      {
+        "kind": "read-only-no-write-proof"
+      },
+      {
+        "kind": "public-json-samples"
+      }
+    ]
+  },
+  "createdAt": "2026-07-12T12:51:02.023Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p1-plugin-five-tool-vector-quality-t1",
+      "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Implement and commit one AlembicPlugin quality closure for the five knowledge tools.\n\nRequired fixes:\n- Change local embedding from explicit opt-in to default local-first auto-detection. `resolveLocalEmbeddingConfig` and newly generated Plugin config must default enabled; explicit `ALEMBIC_LOCAL_EMBEDDING_ENABLED=0`, config `enabled:false`, or `laneOrder:keyword-only` remains authoritative. Do not package/download a model or call cloud providers. Probe the existing default local Ollama endpoint/model with a bounded timeout; unavailable service/model must immediately and honestly fall back to keyword.\n- Replace public `alembic_search` search-operation table-list/all-token filtering with the already-created request-scoped read-only SearchEngine. Honor `mode=auto|keyword|semantic`, query, filters and budget/limit; keep get/expand bounded through the read-only repository. Project identity and read-only snapshot confinement stay intact. Output must distinguish real semantic/vector use, keyword fallback, zero match, and unavailable vector lane without leaking internal/raw provider data.\n- Carry actual SearchEngine route evidence through PrimeSearchPipeline and build Prime diagnostics from it. Delete the false rule that equates empty regionEvidence with unavailable vector; retain semantic-region evidence as a separate signal if useful.\n- Improve Plugin ProjectGraphProvider ranking: normalize CamelCase/specific identifiers, reward multi-term coverage/rare or specific term matches, and prevent one common term such as `request` from filling the top results ahead of HostMcpServer/ProjectLocationService matches. Do not turn Graph into semantic knowledge search or claim source-of-truth.\n- Deduplicate Recipe Map diagnostics for equivalent path anchors such as `:330` and `:330-330`; add a bounded nextAction explaining source-ref reconciliation/rescan when unresolved/stale refs exist. Query remains read-only and must not repair live knowledge.\n- Preserve Guard semantics, exact graph/file queries, Recipe Map conservation counts, all public schema/output projection gates, request-scoped roots, no-KB truthful results, no revision/host/admin/intent gates, and no main/resident/daemon coupling.\n\nRequired evidence and validation:\n- RED/GREEN tests proving current public semantic Search zero-result bug despite underlying vector success, then public success through SearchEngine.\n- Tests for config absent => auto-detect enabled; explicit disable => no probe/keyword; Ollama absent/model absent => bounded keyword degrade; Ollama available => vector.\n- Prime vector-used and keyword-fallback diagnostic tests based on real route evidence.\n- Graph ranking fixture with HostMcpServer/ProjectLocationService/request terms and Recipe Map duplicate diagnostic fixture.\n- Read-only snapshot/WAL/index hash or fingerprint proof before/after.\n- Focused tests, full `npm run test:unit`, `npm run check`, `npm run build`, `npm run verify:codex-runtime-package`, `npm run verify:plugin-distribution`, `npm run verify:codex-plugin`, and canonical local reload on exact final commit.\n- Return final commit, touched files/symbols, representative public JSON for both roots/modes, route diagnostics, no-write proof, two-stage self-review, and any honest residual limits. No Test dispatch.",
+      "status": "pending",
+      "createdAt": "2026-07-12T12:51:02.023Z"
+    }
+  ]
+}

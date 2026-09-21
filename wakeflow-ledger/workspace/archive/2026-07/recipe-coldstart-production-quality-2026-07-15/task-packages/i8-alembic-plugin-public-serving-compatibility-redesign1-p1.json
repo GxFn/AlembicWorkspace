@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i8-alembic-plugin-public-serving-compatibility-redesign1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "执行 I8 AlembicPlugin public-serving compatibility combined package。基线必须为干净的 AlembicPlugin@aba8c511be2a0de812fb8e9976062090fe49998d/tree 692dfa44f2b9b8cead5adde2755cc6396b75a643，并精确加载已接受 AlembicCore@5ad2e0a04d27000a27927acc4de0d83418b2420a 与 Alembic@bee8272f9ef2f959829577d38f27447a492e75e7 的 serving contracts/artifacts；不得猜字段或复制合同。\n\n完成条件：1) Plugin 继续唯一拥有正式 Search、Graph、Recipe Map、Prime、Guard handlers/schemas；以 versioned serving fixtures 贯通普通 public resolver，验证 schema、handler、route 和 vector compatibility。2) route 指向已发布 snapshot 时，四个知识工具只读 CAS 后 pointed snapshot；Recipe Map 读取 exact FinalCoverageBindingReceipt，并把账目守恒与项目/知识覆盖结论分开；vector 只使用 pointed generation。3) Graph 始终 request-scoped live-source、Recipe-free，不读取候选或 pointed Recipe corpus；只允许携带 publication provenance，且 route-null 时仍正常工作。4) route-null/无 public pointer 时四个知识工具必须 typed unavailable/fail closed，不得回退旧库、候选库、默认路径或混合 session；Graph 不受该隔离影响。5) fixture 和负向回归必须覆盖 exact artifact/hash/version mismatch、stale route、route-null、跨 generation 混读、Map coverage binding 不匹配、vector mismatch，并经正式 handler 入口而非复制 handler 逻辑。\n\n强禁止：不得访问 run-private candidate；不得新增 CandidatePublicationHandle、candidate reader/path override/cross-repo oracle transport；不得依赖或导入 Alembic Main，调用 producer/private runtime，或把 Plugin 五工具变成 pre-CAS gate；不得修改 Core/Main/Agent/Test/Wakeflow、vendor/gitlink/cache；不得运行真实项目冷启动或 T5/T6 正式矩阵。本包只关闭 I8 fixture-level public compatibility，真实 MR5/SP/Alembic/BiliDili 五工具矩阵仍由 CAS 后 T6 Test 完成。\n\n验证与交付：先证明现有缺口/RED，再实现最小改动；运行 build/check、focused public resolver/handler/schema/route/vector tests、unit/integration、plugin distribution/runtime-package/smoke 边界门禁和 git diff --check。只提交一个干净 AlembicPlugin commit；回填 parent/commit/tree、changed files/symbols、exact loaded artifact hashes、RED/GREEN、原始命令摘要、两阶段自审、风险与剩余 Test 边界。完成后只返回总控评审，不自行启动 Test。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§15-16, 18.4, 18.6；accepted AlembicCore@5ad2e0a04d27000a27927acc4de0d83418b2420a、Alembic@bee8272f9ef2f959829577d38f27447a492e75e7、AlembicPlugin@aba8c511be2a0de812fb8e9976062090fe49998d",
+  "designIntent": "Keep Plugin as the sole owner of formal Search/Graph/Recipe Map/Prime/Guard handlers and prove public-serving compatibility with exact accepted artifacts plus versioned fixtures, without introducing any producer-to-Plugin runtime gate.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "exact-artifact-compatibility",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "public-five-handler-fixture-tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "route-null-isolation",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "boundary-scan",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "baseline"
+      },
+      {
+        "kind": "execution-plan"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "change-scope"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T14:04:56.527Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i8-alembic-plugin-public-serving-compatibility-redesign1-t1",
+      "taskPackageId": "i8-alembic-plugin-public-serving-compatibility-redesign1-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "完成 I8 公共 serving 兼容性：用 exact accepted artifacts 和 versioned fixtures 验证正式五个 MCP handler/schema/resolver；无 private candidate 访问，提交单一 Plugin commit 与可复验证据。",
+      "status": "pending",
+      "createdAt": "2026-07-16T14:04:56.527Z"
+    }
+  ]
+}

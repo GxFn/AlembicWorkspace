@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i7-core-production-contracts-rootcause2-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "对 recurringProblem 的 I3-I7 Core producer-contract lineage 做根因二次收敛，不再补 marker/调用方约定。基线为 AlembicCore@868d9070bc8907c5be691ca4024f3ed4aa1da371；保留该提交已正确实现的 canonical-root 活动 connection 登记、marker-before-close、普通 root/next revision 隔离，以及此前全部 post-PCF/PC-F 合同。\n\n新根因证据：`ACTIVE_DATABASE_CONNECTIONS_BY_ROOT` 按 DatabaseConnection 对象登记，但公开 `connect()` 可在同一对象上连续调用；第二次调用覆盖 `this.db`，第一次返回的 native SQLite handle 不再可达于登记对象。replace/revoke 后第二个 handle 关闭，首个 handle 的 `SELECT 1` 仍返回 `{value:1}`。这证明旧 revision in-process read/write=0 仍未成立。\n\n完成合同：\n1. 在现有 DatabaseConnection 单源生命周期内建立可证明不变量：一个 DatabaseConnection 同时最多拥有一个活动 native SQLite handle。推荐最小实现是在已有活动 handle 未经 `close()` 释放时，重复 `connect()` 以稳定错误 fail closed；若选择逐 native handle 登记，必须同样简洁并证明不存在不可达 handle。不得新建 store/service/DB manager。\n2. `connect()` 的失败路径不能覆盖、遗失或隐式泄漏既有 handle；`close()` 必须保持幂等并清理 root registry。正常 connect→close 后如既有公共语义允许，可再次 connect；明确测试并保持一致。不得破坏 openAlembicDatabase、普通项目或 migration 现有行为。\n3. 新增同一 public boundary 回归：对 old revision 的同一 DatabaseConnection 连续 connect 两次时，第二次必须在产生第二个 native handle 前失败（或所有 native handles 均被登记）；随后 replace 后第一个 handle read/write 都失败。继续覆盖不同 DatabaseConnection 的预开 bypass、registered runtime、post-revoke open、next revision、ordinary root。\n4. 给出 root-cause-note，明确为什么对象级登记不足、选定生命周期方案为何覆盖所有进程内入口，以及边界只承诺进程内活动 handle；跨进程后续 open 仍由 durable marker 阻止，不声称强杀外部进程已持有的 SQLite handle。\n5. 仅修改 AlembicCore 必需源码与测试，单一干净提交。复验 focused、post-PCF、PC-F、build:check、完整 Core tests、consumer/public API、git diff --check；保留既有 ASTChunker doctrine 基线归因。回填 parent/commit/tree、同场景 RED/GREEN、changed symbols、两阶段自审和剩余风险。\n\n禁止修改其他仓库、Wakeflow/Design/Test/ledger、真实 Ghost 数据、LLM/prompt/SOP、Main orchestration、Plugin serving 或发布面；禁止通过隐藏 resolver、删除公共入口、只改测试或继续堆 revocation marker 规避根因。完成后仅返回 controller 复验。",
+  "status": "pending",
+  "sourceRef": "controller decision evt-20260716054355-0068; i3-i7-core-production-contracts-rework1-p1; AlembicCore@868d9070bc8907c5be691ca4024f3ed4aa1da371; AlembicCore/src/infrastructure/database/DatabaseConnection.ts; AlembicCore/src/infrastructure/database/openAlembicDatabase.ts",
+  "designIntent": "把终态撤销建立在 DatabaseConnection 的单活动 native-handle 生命周期不变量上，使 root registry 不可能因对象内 handle 覆盖而漏记；复用现有数据库与 marker 边界，不增加平台层。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "single-clean-core-rootcause-commit-on-868d9070"
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "object-registry-native-handle-lifecycle-proof"
+      },
+      {
+        "kind": "negative-tests",
+        "verify": "same-connection-double-connect-no-second-live-handle-and-old-read-write-zero"
+      },
+      {
+        "kind": "tests",
+        "verify": "focused-full-build-check-consumer-and-git-diff-check-rerunnable"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "separate-connection-bypass-next-revision-ordinary-root-and-pcf-regression"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "self-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T05:44:31.925Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i7-core-production-contracts-rootcause2-t1",
+      "taskPackageId": "i3-i7-core-production-contracts-rootcause2-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "以 DatabaseConnection 单活动 native-handle 生命周期不变量关闭双 connect 遗失 handle 的旧 revision 绕过，并回归两类 public-entry bypass；不再做 marker point-fix。",
+      "status": "pending",
+      "createdAt": "2026-07-16T05:44:31.925Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

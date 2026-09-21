@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i1-i2-core-foundation-authority-v2-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "AlembicCore authority-v2 最小返工，基线必须为干净的 e86aca85997b48e0d9180e98722746d1e2e239d8。\n\n只修一个根因：公开 V1 captureCertifiedProjectFacts 当前会因对象额外携带 projectScope/requestMatrix 而进入 strict-v2，但未验证 ProjectScopeCaptureBindingV1，导致 accepted root A 与实际 sourceRoot B 不一致仍可取得 pcf-readiness-v2=passed。\n\n完成条件：\n1. V1 与 V2 入口分叉显式且不可结构嗅探绕过；所有 strict-v2 执行必须先验证完整 scope binding，并从 binding 派生 repositories/projectMode/request plans/projections。\n2. 固化 controller A/B probe：accepted root 有 eligible file、shadow root 为空；调用 V1+额外 V2 字段或任何等价旁路必须 fail closed，不能生成 V2 artifact。合法 V2 正常通过，纯 V1 兼容行为不变。\n3. 检查导出入口和内部共享实现，避免新增第二套 capture/store/readiness；不修改既有 authority-v2 其他合同。\n4. 重跑 build:check、Foundation focused suite、完整 npm test、边界 gates 和双模式 fresh-process audit；审计基于提交后干净工作树，报告继续明确 global PC-F pending。\n5. 只提交 AlembicCore 一个干净修复 commit并回填 parent/commit/tree、RED/GREEN、原始命令摘要、审计路径/hash与剩余风险。\n\n禁止触碰 Alembic/AlembicPlugin/AlembicAgent/Dashboard/Test、I3+、Ghost/data root、第二 store/parser/registry/Plan 平台。",
+  "status": "pending",
+  "sourceRef": "controller decision evt-20260715172218-0024; authority-v2 task i1-i2-core-foundation-authority-v2-t1; Design Requirement §§4.1-4.2, 7, 18.0-18.1, 23",
+  "designIntent": "把 strict-v2 改为唯一显式受校验入口，V1 保持纯兼容；用 A/B runtime-root 反例证明任何结构嗅探或 source-root substitution 都无法获得 V2 readiness。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T17:22:43.157Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i1-i2-core-foundation-authority-v2-rework1-t1",
+      "taskPackageId": "i1-i2-core-foundation-authority-v2-rework1-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "关闭 strict-v2 入口旁路：任何 V2 capture 必须验证 scope runtime binding；V1 公共入口不得靠额外字段升级为 V2。",
+      "status": "pending",
+      "createdAt": "2026-07-15T17:22:43.157Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

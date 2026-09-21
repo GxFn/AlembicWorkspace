@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Repair the root cause in the strict-test failure terminal/audit contract: it is currently stage-blind. Define a deterministic stage-to-authority matrix for every STRICT_TEST_FAILED stage. Early preflight failures must be creatable, validatable, and reportable using only authority that exists at that moment, without requiring later confirmation/projection or a successfully completed preflight receipt when it cannot yet exist. Stages after confirmation/projection must require their exact non-null predecessor hashes and matching contexts; reject null, mismatched, missing, or temporally post-failure substitute receipts. Make failure audit/report composition stage-aware instead of forcing the successful completion context shape. Preserve the five repaired completion tamper gates, exact 26-state/full-lineage validators, strict-production/legacy testMode hashes, public entrypoints, and Core-only boundary. Add controller-equivalent causal regression probes plus full validation.",
+  "status": "pending",
+  "sourceRef": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/i3-i10-core-strict-test-profile-foundation-rework1-controller-review.md",
+  "designIntent": "Preserve the repaired completion validators and strict-production behavior, and make STRICT_TEST_FAILED receipts/audits causally stage-aware: bind exactly the predecessor authorities that existed at the failure stage, never successful future receipts or missing already-required lineage.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "A new AlembicCore-owned commit after 933920fa214c1ba04787244f073145bcc48e929c contains only the assigned strict-test failure authority/validator/test work."
+      },
+      {
+        "kind": "tests",
+        "verify": "Focused tests prove pre-confirmation failure validation/reporting without future contexts, post-projection failure rejection when confirmation/projection lineage is null/missing/mismatched, causal timestamp ordering, and preservation of the five prior semantic-forgery regressions; full Core tests pass."
+      },
+      {
+        "kind": "build",
+        "verify": "AlembicCore build/type/public API/boundary/layer/consumer import/lint checks pass."
+      },
+      {
+        "kind": "implementation",
+        "verify": "Reviewable source defines and enforces an explicit stage-to-required-authority matrix for failure creation, validation, and audit/report composition, including preflight-stage authority without manufacturing successful confirmation/projection receipts."
+      },
+      {
+        "kind": "causal-probe",
+        "verify": "Executable controller-equivalent probes reject post-failure/future substitute contexts and late-stage null predecessor hashes while accepting a causally valid early-stage failure with only then-existing authority."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "guard"
+      },
+      {
+        "kind": "risk-analysis"
+      },
+      {
+        "kind": "root-cause-note"
+      }
+    ]
+  },
+  "createdAt": "2026-07-30T06:06:59.981Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1",
+      "taskPackageId": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Implement and prove stage-aware STRICT_TEST_FAILED causal authority and audit semantics; preserve all prior completion validator fixes and strict-production.",
+      "status": "pending",
+      "createdAt": "2026-07-30T06:06:59.981Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

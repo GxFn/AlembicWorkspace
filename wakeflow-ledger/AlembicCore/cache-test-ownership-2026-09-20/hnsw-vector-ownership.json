@@ -1,0 +1,2883 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-20T09:19:21.334Z",
+  "status": "advisory-read-only",
+  "snapshots": {
+    "core": {
+      "head": "c1f6d7760a5fe0549420b72babea39b4f9c02e3d",
+      "file": "../../../AlembicCore/test/HnswVector.test.ts",
+      "sha256": "6095c8be5b6bce7a12e3b5a9f6098cf3538f09d2f891faf898b75b5094d12939"
+    },
+    "plugin": {
+      "head": "11f8d47476fb09b52977242b3ab5a1fa413e4226",
+      "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+      "sha256": "a537dc73c7f87e02d8e8efcdb1b3fae5691a3f6934761e2882049954130570c9"
+    }
+  },
+  "summary": {
+    "groups": 21,
+    "pluginTestDeclarations": 91,
+    "coreTestDeclarations": 105,
+    "coreExpandedCasesByStaticEachRows": 110,
+    "exactPluginCallbackTokenMatches": 85,
+    "manualNonidenticalMappings": 6,
+    "pluginExclusiveHostAssertionsInComparedFile": 0,
+    "pluginBehaviorCoveredInCoreMainFile": 90,
+    "pluginBehaviorCoveredInOtherCoreFile": 1,
+    "testsRun": false
+  },
+  "imports": {
+    "core": [
+      {
+        "line": 1,
+        "source": "node:fs"
+      },
+      {
+        "line": 2,
+        "source": "node:module"
+      },
+      {
+        "line": 3,
+        "source": "node:os"
+      },
+      {
+        "line": 4,
+        "source": "node:path"
+      },
+      {
+        "line": 20,
+        "source": "../src/infrastructure/vector/HnswIndex.js"
+      },
+      {
+        "line": 26,
+        "source": "../src/infrastructure/vector/ScalarQuantizer.js"
+      },
+      {
+        "line": 29,
+        "source": "../src/infrastructure/vector/BinaryPersistence.js"
+      },
+      {
+        "line": 32,
+        "source": "../src/infrastructure/vector/HnswVectorAdapter.js"
+      },
+      {
+        "line": 35,
+        "source": "../src/infrastructure/vector/VectorMigration.js"
+      },
+      {
+        "line": 38,
+        "source": "../src/infrastructure/vector/BatchEmbedder.js"
+      },
+      {
+        "line": 41,
+        "source": "../src/service/search/HybridRetriever.js"
+      },
+      {
+        "line": 44,
+        "source": "../src/infrastructure/vector/JsonVectorAdapter.js"
+      },
+      {
+        "line": 47,
+        "source": "../src/infrastructure/vector/Chunker.js"
+      },
+      {
+        "line": 52,
+        "source": "../src/infrastructure/vector/ASTChunker.js"
+      },
+      {
+        "line": 55,
+        "source": "../src/infrastructure/vector/IndexingPipeline.js"
+      },
+      {
+        "line": 58,
+        "source": "../src/infrastructure/vector/AsyncPersistence.js"
+      }
+    ],
+    "plugin": [
+      {
+        "line": 1,
+        "source": "node:fs"
+      },
+      {
+        "line": 2,
+        "source": "node:os"
+      },
+      {
+        "line": 3,
+        "source": "node:path"
+      },
+      {
+        "line": 19,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 25,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 28,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 31,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 34,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 37,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 40,
+        "source": "@alembic/core/search"
+      },
+      {
+        "line": 43,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 46,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 51,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 54,
+        "source": "@alembic/core/vector"
+      },
+      {
+        "line": 57,
+        "source": "@alembic/core/vector"
+      }
+    ],
+    "packageResolution": "Plugin uses @alembic/core/vector and /search, package.json file:../AlembicCore with node_modules symlink to Core. Core package exports resolve these subpaths to dist/*.js; Vitest alembic-dev condition has no corresponding Core export override. No Plugin host module imported by HnswVector.test.ts."
+  },
+  "helpers": {
+    "randomVector": "Exact callback token match; Math.random()-0.5 then L2 normalization; shared by quality/quantizer/scale fixtures.",
+    "tempDirs": "All per-describe fs/os/path setup/cleanup hooks token-match the same Core group.",
+    "runtime": "Plugin test/setup.ts owns worker ALEMBIC_HOME sandbox; this is runner isolation, not an assertion in HnswVector.test.ts."
+  },
+  "groups": [
+    {
+      "group": "HnswIndex",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 81,
+        "testDeclarations": 9
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 82,
+        "testDeclarations": 9,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "纯ANN索引算法",
+      "actualCoverage": "9个callback完全一致：add/search的首两ID及距离、单点/空索引、删除排除、同ID更新、序列化回读、500×32d自命中、stats、批量size。",
+      "limitsAndDifferences": "randomVector来自Math.random并L2归一化；相同helper。规模/召回归Core单源，避免双仓随机重复。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "should add and search points",
+          "pluginLine": 82,
+          "pluginEndLine": 94,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "should add and search points",
+          "coreLine": 83,
+          "coreEndLine": 95,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 90,
+              "source": "expect(results).toHaveLength(2)"
+            },
+            {
+              "line": 91,
+              "source": "expect(results[0].id).toBe('a')"
+            },
+            {
+              "line": 92,
+              "source": "expect(results[0].dist).toBeCloseTo(0, 3)"
+            },
+            {
+              "line": 93,
+              "source": "expect(results[1].id).toBe('b')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should handle single point",
+          "pluginLine": 96,
+          "pluginEndLine": 102,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should handle single point",
+          "coreLine": 97,
+          "coreEndLine": 103,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 100,
+              "source": "expect(results).toHaveLength(1)"
+            },
+            {
+              "line": 101,
+              "source": "expect(results[0].id).toBe('only')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should return empty for empty index",
+          "pluginLine": 104,
+          "pluginEndLine": 108,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should return empty for empty index",
+          "coreLine": 105,
+          "coreEndLine": 109,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 107,
+              "source": "expect(results).toHaveLength(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should remove points",
+          "pluginLine": 110,
+          "pluginEndLine": 119,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should remove points",
+          "coreLine": 111,
+          "coreEndLine": 120,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 118,
+              "source": "expect(results.every((r) => r.id !== 'a')).toBe(true)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should update point (addPoint with existing id)",
+          "pluginLine": 121,
+          "pluginEndLine": 131,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should update point (addPoint with existing id)",
+          "coreLine": 122,
+          "coreEndLine": 132,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 130,
+              "source": "expect(results[0].id).toBe('a')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should serialize and deserialize",
+          "pluginLine": 133,
+          "pluginEndLine": 145,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should serialize and deserialize",
+          "coreLine": 134,
+          "coreEndLine": 146,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 143,
+              "source": "expect(results).toHaveLength(2)"
+            },
+            {
+              "line": 144,
+              "source": "expect(results[0].id).toBe('a')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should handle moderate scale (500 vectors, 32d)",
+          "pluginLine": 147,
+          "pluginEndLine": 163,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should handle moderate scale (500 vectors, 32d)",
+          "coreLine": 148,
+          "coreEndLine": 164,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 161,
+              "source": "expect(results[0].id).toBe('v0')"
+            },
+            {
+              "line": 162,
+              "source": "expect(results[0].dist).toBeCloseTo(0, 4)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should provide stats",
+          "pluginLine": 165,
+          "pluginEndLine": 174,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should provide stats",
+          "coreLine": 166,
+          "coreEndLine": 175,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 172,
+              "source": "expect(stats.totalNodes).toBe(3)"
+            },
+            {
+              "line": 173,
+              "source": "expect(stats.deletedSlots).toBe(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "addPoints batch should work",
+          "pluginLine": 176,
+          "pluginEndLine": 183,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "addPoints batch should work",
+          "coreLine": 177,
+          "coreEndLine": 184,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 182,
+              "source": "expect(index.size).toBe(2)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "MinHeap",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 189,
+        "testDeclarations": 1
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 190,
+        "testDeclarations": 1,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "堆算法",
+      "actualCoverage": "同一入堆序列，逐次pop距离1/2/5/8和最终size=0。",
+      "limitsAndDifferences": "无宿主依赖。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "should pop smallest first",
+          "pluginLine": 190,
+          "pluginEndLine": 202,
+          "assertionCount": 5,
+          "match": "exact-token-body",
+          "coreTitle": "should pop smallest first",
+          "coreLine": 191,
+          "coreEndLine": 203,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 197,
+              "source": "expect(heap.pop().dist).toBe(1)"
+            },
+            {
+              "line": 198,
+              "source": "expect(heap.pop().dist).toBe(2)"
+            },
+            {
+              "line": 199,
+              "source": "expect(heap.pop().dist).toBe(5)"
+            },
+            {
+              "line": 200,
+              "source": "expect(heap.pop().dist).toBe(8)"
+            },
+            {
+              "line": 201,
+              "source": "expect(heap.size).toBe(0)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "MaxHeap",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 205,
+        "testDeclarations": 2
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 206,
+        "testDeclarations": 2,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "堆算法",
+      "actualCoverage": "pop最大8/5、peek=2；toSortedArray距离[1,2,3]。",
+      "limitsAndDifferences": "无宿主依赖。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "should pop largest first",
+          "pluginLine": 206,
+          "pluginEndLine": 216,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "should pop largest first",
+          "coreLine": 207,
+          "coreEndLine": 217,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 213,
+              "source": "expect(heap.pop().dist).toBe(8)"
+            },
+            {
+              "line": 214,
+              "source": "expect(heap.pop().dist).toBe(5)"
+            },
+            {
+              "line": 215,
+              "source": "expect(heap.peek().dist).toBe(2)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "toSortedArray returns ascending order",
+          "pluginLine": 218,
+          "pluginEndLine": 225,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "toSortedArray returns ascending order",
+          "coreLine": 219,
+          "coreEndLine": 226,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 224,
+              "source": "expect(sorted.map((s) => s.dist)).toEqual([1, 2, 3])"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "cosineDistance",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 231,
+        "testDeclarations": 3
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 232,
+        "testDeclarations": 3,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "纯距离计算",
+      "actualCoverage": "同向distance≈0、正交≈1、空数组和null返回1。",
+      "limitsAndDifferences": "不是provider或插件适配测试。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "identical vectors have distance 0",
+          "pluginLine": 232,
+          "pluginEndLine": 234,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "identical vectors have distance 0",
+          "coreLine": 233,
+          "coreEndLine": 235,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 233,
+              "source": "expect(cosineDistance([1, 0, 0], [1, 0, 0])).toBeCloseTo(0, 5)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "orthogonal vectors have distance 1",
+          "pluginLine": 236,
+          "pluginEndLine": 238,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "orthogonal vectors have distance 1",
+          "coreLine": 237,
+          "coreEndLine": 239,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 237,
+              "source": "expect(cosineDistance([1, 0, 0], [0, 1, 0])).toBeCloseTo(1, 5)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "handles empty/null inputs",
+          "pluginLine": 240,
+          "pluginEndLine": 243,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "handles empty/null inputs",
+          "coreLine": 241,
+          "coreEndLine": 244,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 241,
+              "source": "expect(cosineDistance([], [1])).toBe(1)"
+            },
+            {
+              "line": 242,
+              "source": "expect(cosineDistance(null, [1])).toBe(1)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "ScalarQuantizer",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 249,
+        "testDeclarations": 5
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 250,
+        "testDeclarations": 5,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "量化算法",
+      "actualCoverage": "train状态、Uint8Array/Float32Array类型、每维误差<0.1、量化距离、序列化、未训练报错、batch长度。",
+      "limitsAndDifferences": "5个callback完全一致；随机训练fixture相同。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "should train and encode/decode with low error",
+          "pluginLine": 250,
+          "pluginEndLine": 272,
+          "assertionCount": 5,
+          "match": "exact-token-body",
+          "coreTitle": "should train and encode/decode with low error",
+          "coreLine": 251,
+          "coreEndLine": 273,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 257,
+              "source": "expect(sq.trained).toBe(true)"
+            },
+            {
+              "line": 262,
+              "source": "expect(encoded).toBeInstanceOf(Uint8Array)"
+            },
+            {
+              "line": 263,
+              "source": "expect(encoded.length).toBe(dim)"
+            },
+            {
+              "line": 266,
+              "source": "expect(decoded).toBeInstanceOf(Float32Array)"
+            },
+            {
+              "line": 270,
+              "source": "expect(Math.abs(decoded[i] - original[i])).toBeLessThan(0.1)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should compute distance in quantized space",
+          "pluginLine": 274,
+          "pluginEndLine": 290,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should compute distance in quantized space",
+          "coreLine": 275,
+          "coreEndLine": 291,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 288,
+              "source": "expect(sq.distance(a, b)).toBe(0)"
+            },
+            {
+              "line": 289,
+              "source": "expect(sq.distance(a, c)).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should serialize and deserialize",
+          "pluginLine": 292,
+          "pluginEndLine": 306,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "should serialize and deserialize",
+          "coreLine": 293,
+          "coreEndLine": 307,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 301,
+              "source": "expect(restored.trained).toBe(true)"
+            },
+            {
+              "line": 302,
+              "source": "expect(restored.dimension).toBe(4)"
+            },
+            {
+              "line": 305,
+              "source": "expect(encoded).toBeInstanceOf(Uint8Array)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should throw if not trained",
+          "pluginLine": 308,
+          "pluginEndLine": 311,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should throw if not trained",
+          "coreLine": 309,
+          "coreEndLine": 312,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 310,
+              "source": "expect(() => sq.encode([1, 2, 3, 4])).toThrow('not trained')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "encodeBatch should work",
+          "pluginLine": 313,
+          "pluginEndLine": 325,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "encodeBatch should work",
+          "coreLine": 314,
+          "coreEndLine": 326,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 323,
+              "source": "expect(batch).toHaveLength(2)"
+            },
+            {
+              "line": 324,
+              "source": "expect(batch[0]).toBeInstanceOf(Uint8Array)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "BinaryPersistence",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 331,
+        "testDeclarations": 5
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 332,
+        "testDeclarations": 6,
+        "plannedDestination": "../../../AlembicCore/test/VectorPersistence.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "二进制文件格式",
+      "actualCoverage": "文件存在/格式有效、dimension/node ID、metadata/content回读、quantizer维度、空索引、坏文件、图连接恢复。",
+      "limitsAndDifferences": "插件7条基本roundtrip断言在Core保留；Core追加普通JSON字节片段及save/saveAsync的__proto__完整性。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 334,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'asd-bp-'));\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 337,
+          "body": "() => {\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "should encode and decode index without quantizer",
+          "pluginLine": 341,
+          "pluginEndLine": 367,
+          "assertionCount": 7,
+          "match": "same-title-different-body",
+          "coreTitle": "should encode and decode index without quantizer",
+          "coreLine": 342,
+          "coreEndLine": 373,
+          "semanticMatch": "Core-assertion-superset",
+          "assertions": [
+            {
+              "line": 358,
+              "source": "expect(fs.existsSync(filePath)).toBe(true)"
+            },
+            {
+              "line": 359,
+              "source": "expect(BinaryPersistence.isValid(filePath)).toBe(true)"
+            },
+            {
+              "line": 362,
+              "source": "expect(loaded.dimension).toBe(3)"
+            },
+            {
+              "line": 363,
+              "source": "expect(loaded.indexData.nodes).toHaveLength(2)"
+            },
+            {
+              "line": 364,
+              "source": "expect(loaded.indexData.nodes[0].id).toBe('doc1')"
+            },
+            {
+              "line": 365,
+              "source": "expect(loaded.metadata.get('doc1')).toEqual({ type: 'recipe', language: 'swift' })"
+            },
+            {
+              "line": 366,
+              "source": "expect(loaded.contents.get('doc2')).toBe('Foo bar')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should encode and decode with quantizer",
+          "pluginLine": 369,
+          "pluginEndLine": 391,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should encode and decode with quantizer",
+          "coreLine": 397,
+          "coreEndLine": 419,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 389,
+              "source": "expect(loaded.quantizerData).not.toBeNull()"
+            },
+            {
+              "line": 390,
+              "source": "expect(loaded.quantizerData.dimension).toBe(4)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should handle empty index",
+          "pluginLine": 393,
+          "pluginEndLine": 405,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should handle empty index",
+          "coreLine": 421,
+          "coreEndLine": 433,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 404,
+              "source": "expect(loaded.indexData.nodes).toHaveLength(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should detect invalid files",
+          "pluginLine": 407,
+          "pluginEndLine": 412,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should detect invalid files",
+          "coreLine": 435,
+          "coreEndLine": 440,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 410,
+              "source": "expect(BinaryPersistence.isValid(badFile)).toBe(false)"
+            },
+            {
+              "line": 411,
+              "source": "expect(BinaryPersistence.isValid(path.join(tmpDir, 'nonexist.asvec'))).toBe(false)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should roundtrip graph connections",
+          "pluginLine": 414,
+          "pluginEndLine": 433,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should roundtrip graph connections",
+          "coreLine": 442,
+          "coreEndLine": 461,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 432,
+              "source": "expect(results[0].id).toBe('a')"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "HnswVectorAdapter",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 439,
+        "testDeclarations": 9
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 467,
+        "testDeclarations": 11,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core存储CRUD/查询/持久化",
+      "actualCoverage": "upsert/search ID与分数、getById正文/元数据、remove/listIds、batch/query别名、hybrid、clear、stats、flush+initSync重启、metadata filter。",
+      "limitsAndDifferences": "9个插件callback及组hooks完全相同；Core另有空vector清旧ANN和非WAL并发snapshot更新/删除回归。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 443,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'asd-hnsw-'));\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 446,
+          "body": "() => {\n    if (store && typeof store.destroy === 'function') {\n      store.destroy();\n    }\n    store = null;\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "should upsert and search",
+          "pluginLine": 454,
+          "pluginEndLine": 475,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "should upsert and search",
+          "coreLine": 482,
+          "coreEndLine": 503,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 472,
+              "source": "expect(results).toHaveLength(2)"
+            },
+            {
+              "line": 473,
+              "source": "expect(results[0].item.id).toBe('doc-1')"
+            },
+            {
+              "line": 474,
+              "source": "expect(results[0].score).toBeCloseTo(1.0, 2)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should support getById",
+          "pluginLine": 477,
+          "pluginEndLine": 495,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "should support getById",
+          "coreLine": 505,
+          "coreEndLine": 523,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 489,
+              "source": "expect(item).not.toBeNull()"
+            },
+            {
+              "line": 490,
+              "source": "expect(item.content).toBe('test content')"
+            },
+            {
+              "line": 491,
+              "source": "expect(item.metadata.lang).toBe('js')"
+            },
+            {
+              "line": 494,
+              "source": "expect(missing).toBeNull()"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should support remove",
+          "pluginLine": 497,
+          "pluginEndLine": 510,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should support remove",
+          "coreLine": 525,
+          "coreEndLine": 538,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 506,
+              "source": "expect(item).toBeNull()"
+            },
+            {
+              "line": 509,
+              "source": "expect(ids).toEqual(['b'])"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should support batchUpsert",
+          "pluginLine": 512,
+          "pluginEndLine": 526,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "should support batchUpsert",
+          "coreLine": 540,
+          "coreEndLine": 554,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 523,
+              "source": "expect(results).toHaveLength(2)"
+            },
+            {
+              "line": 524,
+              "source": "expect(results[0].id).toBe('a')"
+            },
+            {
+              "line": 525,
+              "source": "expect(results[0].similarity).toBeCloseTo(1.0, 2)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should support hybridSearch",
+          "pluginLine": 528,
+          "pluginEndLine": 550,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should support hybridSearch",
+          "coreLine": 556,
+          "coreEndLine": 578,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 548,
+              "source": "expect(results.length).toBeGreaterThan(0)"
+            },
+            {
+              "line": 549,
+              "source": "expect(results[0].item.id).toBe('x')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should support clear",
+          "pluginLine": 552,
+          "pluginEndLine": 561,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should support clear",
+          "coreLine": 580,
+          "coreEndLine": 589,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 560,
+              "source": "expect(ids).toHaveLength(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should provide stats",
+          "pluginLine": 563,
+          "pluginEndLine": 573,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should provide stats",
+          "coreLine": 591,
+          "coreEndLine": 601,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 571,
+              "source": "expect(stats.count).toBe(2)"
+            },
+            {
+              "line": 572,
+              "source": "expect(stats.hasVectors).toBe(1)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should persist and reload via flush + initSync",
+          "pluginLine": 575,
+          "pluginEndLine": 596,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "should persist and reload via flush + initSync",
+          "coreLine": 650,
+          "coreEndLine": 671,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 591,
+              "source": "expect(item).not.toBeNull()"
+            },
+            {
+              "line": 592,
+              "source": "expect(item.content).toBe('hello')"
+            },
+            {
+              "line": 595,
+              "source": "expect(results[0].item.id).toBe('doc-1')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should support filter in searchVector",
+          "pluginLine": 598,
+          "pluginEndLine": 626,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should support filter in searchVector",
+          "coreLine": 748,
+          "coreEndLine": 776,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 624,
+              "source": "expect(results.every((r) => r.item.metadata.type === 'recipe')).toBe(true)"
+            },
+            {
+              "line": 625,
+              "source": "expect(results).toHaveLength(2)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "VectorMigration",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 632,
+        "testDeclarations": 4
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 782,
+        "testDeclarations": 4,
+        "plannedDestination": "../../../AlembicCore/test/VectorPersistence.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core迁移协议",
+      "actualCoverage": "new/binary/migrated分类、JSON条目导入、.json.bak存在、needsMigration标志。",
+      "limitsAndDifferences": "临时.asd/context/index夹具及hooks一致，不经过Plugin KnowledgeModule。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 636,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'asd-mig-'));\n    indexDir = path.join(tmpDir, '.asd', 'context', 'index');\n    fs.mkdirSync(indexDir, { recursive: true });\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 641,
+          "body": "() => {\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "should detect new installation",
+          "pluginLine": 645,
+          "pluginEndLine": 649,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should detect new installation",
+          "coreLine": 795,
+          "coreEndLine": 799,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 648,
+              "source": "expect(result).toBe('new')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should detect existing binary index",
+          "pluginLine": 651,
+          "pluginEndLine": 664,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should detect existing binary index",
+          "coreLine": 801,
+          "coreEndLine": 814,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 663,
+              "source": "expect(result).toBe('binary')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should migrate from JSON to HNSW",
+          "pluginLine": 666,
+          "pluginEndLine": 686,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "should migrate from JSON to HNSW",
+          "coreLine": 816,
+          "coreEndLine": 836,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 677,
+              "source": "expect(result).toBe('migrated')"
+            },
+            {
+              "line": 681,
+              "source": "expect(ids).toContain('item-1')"
+            },
+            {
+              "line": 682,
+              "source": "expect(ids).toContain('item-2')"
+            },
+            {
+              "line": 685,
+              "source": "expect(fs.existsSync(path.join(indexDir, 'vector_index.json.bak'))).toBe(true)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "needsMigration should detect correctly",
+          "pluginLine": 688,
+          "pluginEndLine": 693,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "needsMigration should detect correctly",
+          "coreLine": 838,
+          "coreEndLine": 843,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 689,
+              "source": "expect(VectorMigration.needsMigration(indexDir)).toBe(false)"
+            },
+            {
+              "line": 692,
+              "source": "expect(VectorMigration.needsMigration(indexDir)).toBe(true)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "BatchEmbedder",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 699,
+        "testDeclarations": 3
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 849,
+        "testDeclarations": 2,
+        "plannedDestination": "../../../AlembicCore/test/VectorPipeline.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core embedding兼容/批量调度",
+      "actualCoverage": "mock embed返回ID→向量Map、进度回调、null provider空Map；插件独有标题的serial fallback仅断言size=2。",
+      "limitsAndDifferences": "fallback行为转由Core test/EmbeddingPort.test.ts:122现有BatchEmbedder入口验证：精确Map entries与脱敏日志；插件_callCount未断言，不提供独有host证据。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "should batch embed with mock provider",
+          "pluginLine": 700,
+          "pluginEndLine": 726,
+          "assertionCount": 6,
+          "match": "exact-token-body",
+          "coreTitle": "should batch embed with mock provider",
+          "coreLine": 850,
+          "coreEndLine": 876,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 720,
+              "source": "expect(results.size).toBe(3)"
+            },
+            {
+              "line": 721,
+              "source": "expect(results.has('a')).toBe(true)"
+            },
+            {
+              "line": 722,
+              "source": "expect(results.has('b')).toBe(true)"
+            },
+            {
+              "line": 723,
+              "source": "expect(results.has('c')).toBe(true)"
+            },
+            {
+              "line": 724,
+              "source": "expect(results.get('a')).toHaveLength(3)"
+            },
+            {
+              "line": 725,
+              "source": "expect(progressCalls).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should return empty map without provider",
+          "pluginLine": 728,
+          "pluginEndLine": 732,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should return empty map without provider",
+          "coreLine": 878,
+          "coreEndLine": 882,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 731,
+              "source": "expect(results.size).toBe(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should fallback to serial on batch failure",
+          "pluginLine": 734,
+          "pluginEndLine": 753,
+          "assertionCount": 1,
+          "match": "no-same-title-or-body",
+          "semanticMatch": "covered-by-other-Core-file",
+          "coreFile": "../../../AlembicCore/test/EmbeddingPort.test.ts",
+          "coreLine": 122,
+          "coreEvidence": "new BatchEmbedder({embed}).embedAll -> exact two entries after rejected batch; warning redaction also asserted",
+          "assertions": [
+            {
+              "line": 752,
+              "source": "expect(results.size).toBe(2)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "HybridRetriever",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 759,
+        "testDeclarations": 5
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 888,
+        "testDeclarations": 7,
+        "plannedDestination": "../../../AlembicCore/test/SearchRanking.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "纯RRF融合",
+      "actualCoverage": "双路ID与正分、单路顺序、topK、默认单路原始分数0.5/61及score=rrfScore。",
+      "limitsAndDifferences": "3个callback相同；Core topK改断言具体5项顺序，新增defaults精确分数、严格完整evidence/payload。插件精确默认分数已由Core:921覆盖，不需新迁移。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "should fuse dense and sparse results via RRF",
+          "pluginLine": 760,
+          "pluginEndLine": 788,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "should fuse dense and sparse results via RRF",
+          "coreLine": 941,
+          "coreEndLine": 969,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 778,
+              "source": "expect(ids).toContain('a')"
+            },
+            {
+              "line": 779,
+              "source": "expect(ids).toContain('b')"
+            },
+            {
+              "line": 786,
+              "source": "expect(aScore).toBeGreaterThan(0)"
+            },
+            {
+              "line": 787,
+              "source": "expect(bScore).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should work with only dense results",
+          "pluginLine": 790,
+          "pluginEndLine": 804,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should work with only dense results",
+          "coreLine": 971,
+          "coreEndLine": 985,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 802,
+              "source": "expect(fused).toHaveLength(2)"
+            },
+            {
+              "line": 803,
+              "source": "expect(fused[0].id).toBe('x')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should work with only sparse results",
+          "pluginLine": 806,
+          "pluginEndLine": 820,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should work with only sparse results",
+          "coreLine": 987,
+          "coreEndLine": 1001,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 818,
+              "source": "expect(fused).toHaveLength(2)"
+            },
+            {
+              "line": 819,
+              "source": "expect(fused[0].id).toBe('a')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should respect topK limit",
+          "pluginLine": 822,
+          "pluginEndLine": 832,
+          "assertionCount": 1,
+          "match": "same-title-different-body",
+          "coreTitle": "should respect topK limit",
+          "coreLine": 1003,
+          "coreEndLine": 1013,
+          "semanticMatch": "Core-assertion-superset",
+          "assertions": [
+            {
+              "line": 831,
+              "source": "expect(fused).toHaveLength(5)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should preserve raw RRF contributions without page-local max normalization",
+          "pluginLine": 834,
+          "pluginEndLine": 849,
+          "assertionCount": 4,
+          "match": "no-same-title-or-body",
+          "semanticMatch": "covered-by-Core-combined-existing-assertions",
+          "coreFile": "../../../AlembicCore/test/HnswVector.test.ts",
+          "coreLines": [
+            889,
+            921,
+            1015
+          ],
+          "coreEvidence": "exact default scores 0.5*(1/61), score/rrfScore in strict evidence object, nonnegative/range assertions",
+          "assertions": [
+            {
+              "line": 843,
+              "source": "expect(item.score).toBeGreaterThanOrEqual(0)"
+            },
+            {
+              "line": 844,
+              "source": "expect(item.score).toBeLessThanOrEqual(1)"
+            },
+            {
+              "line": 847,
+              "source": "expect(fused[0].score).toBeCloseTo(0.5 / 61, 8)"
+            },
+            {
+              "line": 848,
+              "source": "expect(fused[0].score).toBe(fused[0].rrfScore)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "HNSW Recall Quality",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 855,
+        "testDeclarations": 1
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1035,
+        "testDeclarations": 1,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "ANN质量",
+      "actualCoverage": "200个32d随机向量、10个随机query，以暴力cosine top10为真值，平均Recall@10>0.9。",
+      "limitsAndDifferences": "callback完全一致；不是宿主路径。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "Recall@10 should be > 0.9 for 200 vectors 32d",
+          "pluginLine": 856,
+          "pluginEndLine": 899,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "Recall@10 should be > 0.9 for 200 vectors 32d",
+          "coreLine": 1036,
+          "coreEndLine": 1079,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 898,
+              "source": "expect(avgRecall).toBeGreaterThan(0.9)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Chunker v2",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 905,
+        "testDeclarations": 8
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1085,
+        "testDeclarations": 8,
+        "plannedDestination": "../../../AlembicCore/test/VectorPipeline.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core分块策略",
+      "actualCoverage": "whole原文、Markdown sectionTitle、fixed totalChunks、空值、unknown语言fallback、useAST=false无nodeType。",
+      "limitsAndDifferences": "8个callback相同；overlap用例实际仅检查两段截取长度和>0，不证明重叠字节；auto AST用例仅断言非空，可由fallback满足。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "auto: short content → whole strategy",
+          "pluginLine": 906,
+          "pluginEndLine": 911,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "auto: short content → whole strategy",
+          "coreLine": 1086,
+          "coreEndLine": 1091,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 908,
+              "source": "expect(result).toHaveLength(1)"
+            },
+            {
+              "line": 909,
+              "source": "expect(result[0].metadata.chunkStrategy).toBe('whole')"
+            },
+            {
+              "line": 910,
+              "source": "expect(result[0].content).toBe('Hello world')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "auto: markdown with headings → section strategy",
+          "pluginLine": 913,
+          "pluginEndLine": 924,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "auto: markdown with headings → section strategy",
+          "coreLine": 1093,
+          "coreEndLine": 1104,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 920,
+              "source": "expect(result.length).toBeGreaterThan(1)"
+            },
+            {
+              "line": 923,
+              "source": "expect(withTitles.length).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "auto: long plain text without headings → fixed strategy",
+          "pluginLine": 926,
+          "pluginEndLine": 934,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "auto: long plain text without headings → fixed strategy",
+          "coreLine": 1106,
+          "coreEndLine": 1114,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 929,
+              "source": "expect(result.length).toBeGreaterThan(1)"
+            },
+            {
+              "line": 932,
+              "source": "expect(c.metadata.totalChunks).toBe(result.length)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "explicit strategy: fixed with overlap",
+          "pluginLine": 936,
+          "pluginEndLine": 950,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "explicit strategy: fixed with overlap",
+          "coreLine": 1116,
+          "coreEndLine": 1130,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 939,
+              "source": "expect(result.length).toBeGreaterThan(1)"
+            },
+            {
+              "line": 948,
+              "source": "expect(firstEnd.length + secondStart.length).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "empty content returns empty array",
+          "pluginLine": 952,
+          "pluginEndLine": 956,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "empty content returns empty array",
+          "coreLine": 1132,
+          "coreEndLine": 1136,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 953,
+              "source": "expect(chunk('', {})).toEqual([])"
+            },
+            {
+              "line": 954,
+              "source": "expect(chunk('   ', {})).toEqual([])"
+            },
+            {
+              "line": 955,
+              "source": "expect(chunk(null, {})).toEqual([])"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "explicit ast strategy: falls back to fixed when language unsupported",
+          "pluginLine": 958,
+          "pluginEndLine": 970,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "explicit ast strategy: falls back to fixed when language unsupported",
+          "coreLine": 1138,
+          "coreEndLine": 1150,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 966,
+              "source": "expect(result.length).toBeGreaterThan(1)"
+            },
+            {
+              "line": 968,
+              "source": "expect(c.metadata.totalChunks).toBe(result.length)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "auto: code language routes to ast if available",
+          "pluginLine": 972,
+          "pluginEndLine": 978,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "auto: code language routes to ast if available",
+          "coreLine": 1152,
+          "coreEndLine": 1158,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 977,
+              "source": "expect(result.length).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "auto: useAST=false bypasses AST even for code files",
+          "pluginLine": 980,
+          "pluginEndLine": 989,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "auto: useAST=false bypasses AST even for code files",
+          "coreLine": 1160,
+          "coreEndLine": 1169,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 984,
+              "source": "expect(result.length).toBeGreaterThan(1)"
+            },
+            {
+              "line": 987,
+              "source": "expect(c.metadata.nodeType).toBeUndefined()"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "ASTChunker",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 995,
+        "testDeclarations": 1
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1175,
+        "testDeclarations": 1,
+        "plannedDestination": "../../../AlembicCore/test/VectorPipeline.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core能力探测",
+      "actualCoverage": "JS/Python返回boolean、未知语言false。",
+      "limitsAndDifferences": "不加载真实grammar验证；Core IndexingPipeline另有真实AST初始化与chunkStrategy断言。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "isASTChunkerAvailable returns boolean",
+          "pluginLine": 996,
+          "pluginEndLine": 1000,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "isASTChunkerAvailable returns boolean",
+          "coreLine": 1176,
+          "coreEndLine": 1180,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 997,
+              "source": "expect(typeof isASTChunkerAvailable('javascript')).toBe('boolean')"
+            },
+            {
+              "line": 998,
+              "source": "expect(typeof isASTChunkerAvailable('python')).toBe('boolean')"
+            },
+            {
+              "line": 999,
+              "source": "expect(isASTChunkerAvailable('nonexistent_language')).toBe(false)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "BinaryPersistence Validation",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 1006,
+        "testDeclarations": 4
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1186,
+        "testDeclarations": 4,
+        "plannedDestination": "../../../AlembicCore/test/VectorPersistence.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core格式验证",
+      "actualCoverage": "超大level可encode/decode且节点数/维度正确、garbage/不存在false、有效文件true。",
+      "limitsAndDifferences": "level>255标题实际没有断言反序列化level==255；两仓同样如此，不把标题当覆盖。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 1009,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'asd-bp-'));\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 1013,
+          "body": "() => {\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "should clamp level > 255 to 255",
+          "pluginLine": 1017,
+          "pluginEndLine": 1030,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "should clamp level > 255 to 255",
+          "coreLine": 1197,
+          "coreEndLine": 1210,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1024,
+              "source": "expect(encoded).toBeInstanceOf(Buffer)"
+            },
+            {
+              "line": 1028,
+              "source": "expect(decoded.indexData.nodes).toHaveLength(2)"
+            },
+            {
+              "line": 1029,
+              "source": "expect(decoded.dimension).toBe(3)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "isValid returns false for garbage data",
+          "pluginLine": 1032,
+          "pluginEndLine": 1036,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "isValid returns false for garbage data",
+          "coreLine": 1212,
+          "coreEndLine": 1216,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1035,
+              "source": "expect(BinaryPersistence.isValid(garbagePath)).toBe(false)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "isValid returns false for nonexistent file",
+          "pluginLine": 1038,
+          "pluginEndLine": 1040,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "isValid returns false for nonexistent file",
+          "coreLine": 1218,
+          "coreEndLine": 1220,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1039,
+              "source": "expect(BinaryPersistence.isValid(path.join(tmpDir, 'nope.asvec'))).toBe(false)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "isValid returns true for valid encoded data",
+          "pluginLine": 1042,
+          "pluginEndLine": 1049,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "isValid returns true for valid encoded data",
+          "coreLine": 1222,
+          "coreEndLine": 1229,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1048,
+              "source": "expect(BinaryPersistence.isValid(validPath)).toBe(true)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "VectorMigration corruption handling",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 1055,
+        "testDeclarations": 5
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1235,
+        "testDeclarations": 5,
+        "plannedDestination": "../../../AlembicCore/test/VectorPersistence.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core迁移容错",
+      "actualCoverage": "损坏.asvec+可用JSON→migrated且upserted ID、valid binary、empty new、needsMigration组合。",
+      "limitsAndDifferences": "通过mock batchUpsert记录迁移结果；不经过插件host wiring。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 1058,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'asd-migration-'));\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 1062,
+          "body": "() => {\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "should fallthrough to json when .asvec is corrupted",
+          "pluginLine": 1066,
+          "pluginEndLine": 1087,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "should fallthrough to json when .asvec is corrupted",
+          "coreLine": 1246,
+          "coreEndLine": 1267,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1084,
+              "source": "expect(result).toBe('migrated')"
+            },
+            {
+              "line": 1085,
+              "source": "expect(upserted.length).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1086,
+              "source": "expect(upserted[0].id).toBe('test1')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should return binary for valid .asvec",
+          "pluginLine": 1089,
+          "pluginEndLine": 1099,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should return binary for valid .asvec",
+          "coreLine": 1269,
+          "coreEndLine": 1279,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1098,
+              "source": "expect(result).toBe('binary')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should return new when nothing exists",
+          "pluginLine": 1101,
+          "pluginEndLine": 1104,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should return new when nothing exists",
+          "coreLine": 1281,
+          "coreEndLine": 1284,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1103,
+              "source": "expect(result).toBe('new')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "needsMigration returns true for json-only",
+          "pluginLine": 1106,
+          "pluginEndLine": 1110,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "needsMigration returns true for json-only",
+          "coreLine": 1286,
+          "coreEndLine": 1290,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1109,
+              "source": "expect(VectorMigration.needsMigration(tmpDir)).toBe(true)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "needsMigration returns false when asvec exists",
+          "pluginLine": 1112,
+          "pluginEndLine": 1116,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "needsMigration returns false when asvec exists",
+          "coreLine": 1292,
+          "coreEndLine": 1296,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1115,
+              "source": "expect(VectorMigration.needsMigration(tmpDir)).toBe(false)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "IndexingPipeline v2",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 1122,
+        "testDeclarations": 4
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1302,
+        "testDeclarations": 9,
+        "plannedDestination": "../../../AlembicCore/test/VectorPipeline.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core扫描/分块/embedding编排",
+      "actualCoverage": "constructor可构造；真实临时recipes/test.md，Map-backed fake vector store；无provider不embed，有provider每item.vector固定[.1,.2,.3]，二次扫描skipped且upserted=0。",
+      "limitsAndDifferences": "4个callback相同；mockAiProvider为本地函数，无真实Plugin provider selection；Core还有AST、路径ID碰撞、删除归属、IO失败保留及provider解除回归。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 1125,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'asd-pipeline-'));\n    // Create a recipes dir with a test file\n    const recipesDir = path.join(tmpDir, 'recipes');\n    fs.mkdirSync(recipesDir, { recursive: true });\n    fs.writeFileSync(path.join(recipesDir, 'test.md'), '# Test\\nHello world');\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 1133,
+          "body": "() => {\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "should accept chunking options in constructor",
+          "pluginLine": 1137,
+          "pluginEndLine": 1144,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should accept chunking options in constructor",
+          "coreLine": 1317,
+          "coreEndLine": 1324,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1143,
+              "source": "expect(pipeline).toBeDefined()"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should scan files and chunk without embed",
+          "pluginLine": 1146,
+          "pluginEndLine": 1172,
+          "assertionCount": 5,
+          "match": "exact-token-body",
+          "coreTitle": "should scan files and chunk without embed",
+          "coreLine": 1515,
+          "coreEndLine": 1541,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1167,
+              "source": "expect(stats.scanned).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1168,
+              "source": "expect(stats.chunked).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1169,
+              "source": "expect(stats.upserted).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1170,
+              "source": "expect(stats.embedded).toBe(0)"
+            },
+            {
+              "line": 1171,
+              "source": "expect(store.size).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should use BatchEmbedder when aiProvider is set",
+          "pluginLine": 1174,
+          "pluginEndLine": 1209,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should use BatchEmbedder when aiProvider is set",
+          "coreLine": 1543,
+          "coreEndLine": 1578,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1204,
+              "source": "expect(stats.embedded).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1207,
+              "source": "expect(item.vector).toEqual([0.1, 0.2, 0.3])"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should skip unchanged files on incremental run",
+          "pluginLine": 1211,
+          "pluginEndLine": 1239,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "should skip unchanged files on incremental run",
+          "coreLine": 1616,
+          "coreEndLine": 1644,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1232,
+              "source": "expect(stats1.upserted).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1233,
+              "source": "expect(stats1.skipped).toBe(0)"
+            },
+            {
+              "line": 1237,
+              "source": "expect(stats2.skipped).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1238,
+              "source": "expect(stats2.upserted).toBe(0)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "HnswIndex randomLevel safety",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 1245,
+        "testDeclarations": 1
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1650,
+        "testDeclarations": 1,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core ANN随机层保护",
+      "actualCoverage": "插入100点完成，size=100，搜索结果1..5个。",
+      "limitsAndDifferences": "不直接断言node.level有限，仅通过运行完成/结果存在约束；同一callback。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "should not produce Infinity level after many insertions",
+          "pluginLine": 1246,
+          "pluginEndLine": 1258,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "should not produce Infinity level after many insertions",
+          "coreLine": 1651,
+          "coreEndLine": 1663,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1253,
+              "source": "expect(index.size).toBe(100)"
+            },
+            {
+              "line": 1256,
+              "source": "expect(results.length).toBeLessThanOrEqual(5)"
+            },
+            {
+              "line": 1257,
+              "source": "expect(results.length).toBeGreaterThan(0)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "SQ8 2-pass search",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 1264,
+        "testDeclarations": 6
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1669,
+        "testDeclarations": 6,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core ANN量化检索",
+      "actualCoverage": "带quantizer搜索结果数量/ID/距离区间、与exact搜索自命中、qvector类型/引用、serialize排除qvector。",
+      "limitsAndDifferences": "6个callback相同；标题restore qvectors用例实际quantize:none且重启后只断言20个ID，不能当量化恢复内容覆盖。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [],
+      "tests": [
+        {
+          "pluginTitle": "searchKnn should accept quantizedQuery + quantizer options",
+          "pluginLine": 1267,
+          "pluginEndLine": 1298,
+          "assertionCount": 6,
+          "match": "exact-token-body",
+          "coreTitle": "searchKnn should accept quantizedQuery + quantizer options",
+          "coreLine": 1672,
+          "coreEndLine": 1703,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1288,
+              "source": "expect(results.length).toBeLessThanOrEqual(5)"
+            },
+            {
+              "line": 1289,
+              "source": "expect(results.length).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1292,
+              "source": "expect(r.id).toBeDefined()"
+            },
+            {
+              "line": 1293,
+              "source": "expect(typeof r.dist).toBe('number')"
+            },
+            {
+              "line": 1295,
+              "source": "expect(r.dist).toBeGreaterThanOrEqual(0)"
+            },
+            {
+              "line": 1296,
+              "source": "expect(r.dist).toBeLessThanOrEqual(2)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "2-pass should produce same top-1 as exact search for similar vectors",
+          "pluginLine": 1300,
+          "pluginEndLine": 1328,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "2-pass should produce same top-1 as exact search for similar vectors",
+          "coreLine": 1705,
+          "coreEndLine": 1733,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1324,
+              "source": "expect(results2Pass[0].id).toBe('target')"
+            },
+            {
+              "line": 1325,
+              "source": "expect(resultsExact[0].id).toBe('target')"
+            },
+            {
+              "line": 1327,
+              "source": "expect(results2Pass[0].dist).toBeCloseTo(0, 5)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "setQuantizedVectors should populate qvector on all nodes",
+          "pluginLine": 1330,
+          "pluginEndLine": 1354,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "setQuantizedVectors should populate qvector on all nodes",
+          "coreLine": 1735,
+          "coreEndLine": 1759,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1339,
+              "source": "expect(node.qvector).toBeNull()"
+            },
+            {
+              "line": 1350,
+              "source": "expect(node.qvector).toBeInstanceOf(Uint8Array)"
+            },
+            {
+              "line": 1351,
+              "source": "expect(node.qvector.length).toBe(DIM)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "addPoint with qvector option should store it on the node",
+          "pluginLine": 1356,
+          "pluginEndLine": 1364,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "addPoint with qvector option should store it on the node",
+          "coreLine": 1761,
+          "coreEndLine": 1769,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1363,
+              "source": "expect(node.qvector).toBe(fakeQvec)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "serialize should NOT include qvector (reconstructed from quantizer)",
+          "pluginLine": 1366,
+          "pluginEndLine": 1383,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "serialize should NOT include qvector (reconstructed from quantizer)",
+          "coreLine": 1771,
+          "coreEndLine": 1788,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1377,
+              "source": "expect(node.qvector).toBeUndefined()"
+            },
+            {
+              "line": 1378,
+              "source": "expect(node).toHaveProperty('id')"
+            },
+            {
+              "line": 1379,
+              "source": "expect(node).toHaveProperty('vector')"
+            },
+            {
+              "line": 1380,
+              "source": "expect(node).toHaveProperty('level')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "HnswVectorAdapter should restore qvectors after loading with quantizer",
+          "pluginLine": 1385,
+          "pluginEndLine": 1426,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "HnswVectorAdapter should restore qvectors after loading with quantizer",
+          "coreLine": 1790,
+          "coreEndLine": 1831,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1422,
+              "source": "expect(ids.length).toBe(20)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "RRF hybridSearch",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 1432,
+        "testDeclarations": 5
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1837,
+        "testDeclarations": 5,
+        "plannedDestination": "../../../AlembicCore/test/HnswVector.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core HNSW混合查询公开shape",
+      "actualCoverage": "混合top1、dense-only、sparse-only、alpha0/1、score/vectorScore/keywordScore/item属性存在。",
+      "limitsAndDifferences": "前4个callback相同；Core兼容shape用例增加sparse-only完整toStrictEqual与rrfK=0；旧custom rrfK标题实际只改alpha。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 1436,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hnsw-rrf-'));\n    store = new HnswVectorAdapter(tmpDir, {\n      M: 4,\n      efConstruct: 32,\n      efSearch: 32,\n      walEnabled: false,\n    });\n    store.initSync();\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 1447,
+          "body": "() => {\n    store.destroy();\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "should return results with RRF fusion scores",
+          "pluginLine": 1452,
+          "pluginEndLine": 1472,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "should return results with RRF fusion scores",
+          "coreLine": 1857,
+          "coreEndLine": 1877,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1466,
+              "source": "expect(results.length).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1468,
+              "source": "expect(results[0].item.id).toBe('a')"
+            },
+            {
+              "line": 1470,
+              "source": "expect(results[0].score).toBeLessThanOrEqual(1)"
+            },
+            {
+              "line": 1471,
+              "source": "expect(results[0].score).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should work with only vector results (no keyword match)",
+          "pluginLine": 1474,
+          "pluginEndLine": 1484,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should work with only vector results (no keyword match)",
+          "coreLine": 1879,
+          "coreEndLine": 1889,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1482,
+              "source": "expect(results.length).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1483,
+              "source": "expect(results[0].item.id).toBe('a')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should work with only keyword results (no vector)",
+          "pluginLine": 1486,
+          "pluginEndLine": 1495,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should work with only keyword results (no vector)",
+          "coreLine": 1891,
+          "coreEndLine": 1900,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1493,
+              "source": "expect(results.length).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1494,
+              "source": "expect(results[0].item.id).toBe('a')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should accept custom rrfK and alpha options",
+          "pluginLine": 1497,
+          "pluginEndLine": 1510,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should accept custom rrfK and alpha options",
+          "coreLine": 1902,
+          "coreEndLine": 1915,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1505,
+              "source": "expect(resultsVectorOnly[0].item.id).toBe('b')"
+            },
+            {
+              "line": 1509,
+              "source": "expect(resultsKeywordOnly.length).toBeGreaterThan(0)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "RRF score has vectorScore and keywordScore fields for compat",
+          "pluginLine": 1512,
+          "pluginEndLine": 1520,
+          "assertionCount": 4,
+          "match": "same-title-different-body",
+          "coreTitle": "RRF score has vectorScore and keywordScore fields for compat",
+          "coreLine": 1917,
+          "coreEndLine": 1938,
+          "semanticMatch": "Core-assertion-superset",
+          "assertions": [
+            {
+              "line": 1516,
+              "source": "expect(results[0]).toHaveProperty('score')"
+            },
+            {
+              "line": 1517,
+              "source": "expect(results[0]).toHaveProperty('vectorScore')"
+            },
+            {
+              "line": 1518,
+              "source": "expect(results[0]).toHaveProperty('keywordScore')"
+            },
+            {
+              "line": 1519,
+              "source": "expect(results[0]).toHaveProperty('item')"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "AsyncPersistence",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 1526,
+        "testDeclarations": 6
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 1944,
+        "testDeclarations": 9,
+        "plannedDestination": "../../../AlembicCore/test/VectorPersistence.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core WAL协议",
+      "actualCoverage": "CRC稳定/8位、NDJSON+CRC格式、合法重放序列和pending、坏CRC跳过、flush确认并删WAL、disabled不落盘。",
+      "limitsAndDifferences": "恢复用例9条断言等价；Core另有await期间append批次保留、二次flush等待、失败timer重试。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 1529,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'wal-'));\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 1533,
+          "body": "() => {\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "crc32 should produce consistent checksums",
+          "pluginLine": 1537,
+          "pluginEndLine": 1544,
+          "assertionCount": 3,
+          "match": "exact-token-body",
+          "coreTitle": "crc32 should produce consistent checksums",
+          "coreLine": 1955,
+          "coreEndLine": 1962,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1541,
+              "source": "expect(hash1).toBe(hash2)"
+            },
+            {
+              "line": 1542,
+              "source": "expect(hash1).not.toBe(hash3)"
+            },
+            {
+              "line": 1543,
+              "source": "expect(hash1).toHaveLength(8)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should append WAL entries to disk",
+          "pluginLine": 1546,
+          "pluginEndLine": 1582,
+          "assertionCount": 6,
+          "match": "exact-token-body",
+          "coreTitle": "should append WAL entries to disk",
+          "coreLine": 1964,
+          "coreEndLine": 2000,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1559,
+              "source": "expect(wal.pendingCount).toBe(2)"
+            },
+            {
+              "line": 1563,
+              "source": "expect(fs.existsSync(walPath)).toBe(true)"
+            },
+            {
+              "line": 1568,
+              "source": "expect(lines.length).toBe(2)"
+            },
+            {
+              "line": 1573,
+              "source": "expect(tabIdx).toBeGreaterThan(0)"
+            },
+            {
+              "line": 1576,
+              "source": "expect(crc32(json)).toBe(checksum)"
+            },
+            {
+              "line": 1578,
+              "source": "expect(() => JSON.parse(json)).not.toThrow()"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "recover should retain replayed WAL entries until the snapshot succeeds",
+          "pluginLine": 1584,
+          "pluginEndLine": 1620,
+          "assertionCount": 9,
+          "match": "no-same-title-or-body",
+          "semanticMatch": "equivalent-setup-operation-and-nine-assertions",
+          "coreFile": "../../../AlembicCore/test/HnswVector.test.ts",
+          "coreLine": 2002,
+          "assertions": [
+            {
+              "line": 1606,
+              "source": "expect(result.replayed).toBe(2)"
+            },
+            {
+              "line": 1607,
+              "source": "expect(result.skipped).toBe(0)"
+            },
+            {
+              "line": 1608,
+              "source": "expect(replayed).toHaveLength(2)"
+            },
+            {
+              "line": 1609,
+              "source": "expect(replayed[0].t).toBe(WAL_OP.UPSERT)"
+            },
+            {
+              "line": 1610,
+              "source": "expect(replayed[0].id).toBe('doc1')"
+            },
+            {
+              "line": 1611,
+              "source": "expect(replayed[1].t).toBe(WAL_OP.REMOVE)"
+            },
+            {
+              "line": 1614,
+              "source": "expect(fs.existsSync(walPath)).toBe(true)"
+            },
+            {
+              "line": 1615,
+              "source": "expect(wal.pendingCount).toBe(2)"
+            },
+            {
+              "line": 1617,
+              "source": "expect(fs.existsSync(walPath)).toBe(false)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "recover should skip corrupted WAL entries",
+          "pluginLine": 1622,
+          "pluginEndLine": 1655,
+          "assertionCount": 5,
+          "match": "exact-token-body",
+          "coreTitle": "recover should skip corrupted WAL entries",
+          "coreLine": 2040,
+          "coreEndLine": 2073,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1648,
+              "source": "expect(result.replayed).toBe(2)"
+            },
+            {
+              "line": 1649,
+              "source": "expect(result.skipped).toBe(1)"
+            },
+            {
+              "line": 1650,
+              "source": "expect(replayed).toHaveLength(2)"
+            },
+            {
+              "line": 1651,
+              "source": "expect(replayed[0].id).toBe('ok')"
+            },
+            {
+              "line": 1652,
+              "source": "expect(replayed[1].id).toBe('ok2')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "flush should call onPersist and clear WAL",
+          "pluginLine": 1657,
+          "pluginEndLine": 1684,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "flush should call onPersist and clear WAL",
+          "coreLine": 2075,
+          "coreEndLine": 2102,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1674,
+              "source": "expect(wal.pendingCount).toBe(2)"
+            },
+            {
+              "line": 1678,
+              "source": "expect(persistCalled).toBe(1)"
+            },
+            {
+              "line": 1679,
+              "source": "expect(wal.pendingCount).toBe(0)"
+            },
+            {
+              "line": 1681,
+              "source": "expect(fs.existsSync(wal.walPath)).toBe(false)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should not create WAL entries when disabled",
+          "pluginLine": 1686,
+          "pluginEndLine": 1700,
+          "assertionCount": 2,
+          "match": "exact-token-body",
+          "coreTitle": "should not create WAL entries when disabled",
+          "coreLine": 2215,
+          "coreEndLine": 2229,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1696,
+              "source": "expect(wal.pendingCount).toBe(0)"
+            },
+            {
+              "line": 1697,
+              "source": "expect(fs.existsSync(wal.walPath)).toBe(false)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "HnswVectorAdapter WAL integration",
+      "plugin": {
+        "file": "../../../AlembicPlugin/test/unit/HnswVector.test.ts",
+        "line": 1706,
+        "testDeclarations": 4
+      },
+      "core": {
+        "file": "../../../AlembicCore/test/HnswVector.test.ts",
+        "line": 2235,
+        "testDeclarations": 6,
+        "plannedDestination": "../../../AlembicCore/test/VectorPersistence.test.ts"
+      },
+      "reviewDepth": "per-describe-semantic-assertions-and-fixtures-plus-token-body-comparison",
+      "role": "Core存储与WAL集成",
+      "actualCoverage": "WAL开关文件存在性、重启后IDs/search恢复、remove后仅b。",
+      "limitsAndDifferences": "4个callback相同；所谓crash使用destroy()，Core实现会同步写快照，故只证明该关闭/重启路径；Core另有真实落盘故障/WAL保留恢复回归。",
+      "owner": "AlembicCore",
+      "disposition": "replace duplicated plugin algorithm cases with thin package consumption coverage; preserve genuine host tests elsewhere",
+      "hooks": [
+        {
+          "kind": "beforeEach",
+          "line": 1709,
+          "body": "() => {\n    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hnsw-wal-'));\n  }",
+          "exactCoreCallback": true
+        },
+        {
+          "kind": "afterEach",
+          "line": 1713,
+          "body": "() => {\n    fs.rmSync(tmpDir, { recursive: true, force: true });\n  }",
+          "exactCoreCallback": true
+        }
+      ],
+      "tests": [
+        {
+          "pluginTitle": "should create WAL file when walEnabled=true",
+          "pluginLine": 1717,
+          "pluginEndLine": 1735,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should create WAL file when walEnabled=true",
+          "coreLine": 2317,
+          "coreEndLine": 2335,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1732,
+              "source": "expect(fs.existsSync(walPath)).toBe(true)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should NOT create WAL file when walEnabled=false",
+          "pluginLine": 1737,
+          "pluginEndLine": 1750,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should NOT create WAL file when walEnabled=false",
+          "coreLine": 2337,
+          "coreEndLine": 2350,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1747,
+              "source": "expect(fs.existsSync(walPath)).toBe(false)"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should recover WAL on restart after crash",
+          "pluginLine": 1752,
+          "pluginEndLine": 1798,
+          "assertionCount": 4,
+          "match": "exact-token-body",
+          "coreTitle": "should recover WAL on restart after crash",
+          "coreLine": 2352,
+          "coreEndLine": 2398,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1775,
+              "source": "expect(fs.existsSync(walPath)).toBe(true)"
+            },
+            {
+              "line": 1790,
+              "source": "expect(ids.sort()).toEqual(['a', 'b', 'c'])"
+            },
+            {
+              "line": 1794,
+              "source": "expect(results.length).toBe(3)"
+            },
+            {
+              "line": 1795,
+              "source": "expect(results[0].item.id).toBe('c')"
+            }
+          ]
+        },
+        {
+          "pluginTitle": "should handle WAL with remove operations",
+          "pluginLine": 1800,
+          "pluginEndLine": 1831,
+          "assertionCount": 1,
+          "match": "exact-token-body",
+          "coreTitle": "should handle WAL with remove operations",
+          "coreLine": 2400,
+          "coreEndLine": 2431,
+          "semanticMatch": "exact-callback-token-body",
+          "assertions": [
+            {
+              "line": 1828,
+              "source": "expect(ids).toEqual(['b'])"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pluginMinimum": {
+    "replacementForComparedFile": [
+      {
+        "kind": "real-package-consumption-chain",
+        "suggestion": "根据根线程本轮设计，将两项薄package保障合并为真实@alembic/core/vector与/search→IndexingPipeline→HNSW持久化/重开→混检返回契约；断言真实源文件metadata与查询结果shape，不重复底层ANN/SQ8/CRC/排序矩阵。"
+      }
+    ],
+    "retainExistingHostCoverage": [
+      {
+        "file": "../../../AlembicPlugin/test/unit/KnowledgeModuleRuntimeRoot.test.ts",
+        "line": 40,
+        "reason": "真实KnowledgeModule.register+ServiceContainer.get(vectorStore)，验证excluded source root不产生.asd，重定向runtime root产生index并记录warning。"
+      },
+      {
+        "file": "../../../AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+        "line": 266,
+        "additionalLine": 301,
+        "reason": "真实VectorModule factory装配：本地provider availability；offline仍通过EventBus knowledge:deleted调用注入的Recipe truth remover。"
+      },
+      {
+        "file": "../../../AlembicPlugin/test/unit/KnowledgeVectorMaintenanceWiring.test.ts",
+        "line": 19,
+        "reason": "真实InfraModule.register获取KnowledgeSyncService，gate确认syncAll等待注入generation维护，检查完成报告。"
+      },
+      {
+        "file": "../../../AlembicPlugin/test/unit/ServiceContainerShutdown.test.ts",
+        "line": 7,
+        "reason": "真实McpServer.shutdown/ServiceContainer顺序：await vector service drain→store flush→store destroy→database shutdown。"
+      },
+      {
+        "file": "../../../AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+        "line": 374,
+        "reason": "真实host generation wrapper：已验证active路由、legacy隐藏、CAS、rollback、跨store删除与错误传播；此文件不属于HnswVector重复算法清理范围。"
+      }
+    ],
+    "notAnInstructionToDeleteOtherHostTests": true
+  },
+  "baselinePinned": "c1f6d7760a5fe0549420b72babea39b4f9c02e3d"
+}

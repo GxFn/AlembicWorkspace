@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i9-alembic-main-external-setup-recovery-rootcause1-p1",
+  "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause3",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i9-alembic-main-external-setup-recovery-rootcause1-t1",
+  "status": "needs-review",
+  "summary": "Root-cause re-derivation confirmed the controller's two supervisor order defects, then found a deeper accepted-contract contradiction that prevents a safe in-scope product patch. The current authority signs an exact whole-root pre-reset observation while a real daemon is live; the required graceful quiesce later deletes daemon control files and checkpoints/closes SQLite, so the child must fail exact observation revalidation before snapshot. A one-stage run-bound IPC handoff cannot satisfy both the fixed lock/header→quiesce→snapshot order and exact restore authority. The incomplete handoff draft was removed; Alembic remains clean at 43306622 with no product changes. This round needs controller/Design review of a two-stage quiesced-observation receipt and action-specific old-writer lifecycle before implementation can safely resume.",
+  "evidenceRefs": [
+    "Alembic/lib/daemon/runtime/DaemonSupervisor.ts",
+    "Alembic/bin/daemon-server.ts",
+    "Alembic/lib/Bootstrap.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+    "Alembic/test/unit/DaemonSupervisor.test.ts",
+    "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+    "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md",
+    ".wakeflow-local/wakeflow-delivery/dispatch-packets/dg-i9-alembic-main-external-setup-recovery-rootcause3__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json"
+  ],
+  "verification": [
+    "Real-writer RED before any product edit: npx vitest run test/unit/DaemonSupervisor.test.ts produced 4 intended failures out of 18—strict execute/recover/complete were swallowed by ordinary ready, and restart killed the live writer before child authority.",
+    "Source chain: DaemonSupervisor.start currently returns existing.ready before strict classification and otherwise terminates the existing PID before spawning; daemon-server shutdown removes .asd/daemon.json and .asd/daemon.pid, then AppRuntime.shutdown checkpoints WAL and closes the DB.",
+    "Exact-observation chain: createStrictPreResetObservation hashes the complete target root; initializeStrictExternalSetupTarget recreates it after external lease/header setup and rejects any canonical mismatch.",
+    "Built dist probe changed only daemon.json/daemon.pid and produced rootTreeChanged=true plus observationChanged=true, with distinct before/after canonical hashes.",
+    "Clean-baseline verification after removing the draft: focused DaemonSupervisor + StrictExternalSetupRecovery suite passed 2 files / 26 tests; git status is empty; HEAD/tree remain 43306622a06e2782381aa1aa257681f1f7aa8781 / 13cd8b3c6b1eb80d035750989c849cda53c80a9d.",
+    "Alembic Code Guard was attempted on the four owning source files and failed only because the plugin emitted an unrecognized _meta key."
+  ],
+  "risks": [
+    "No product commit was created: a minimal one-stage handoff would deterministically violate the existing exact pre-reset observation after legitimate daemon shutdown.",
+    "Controller/Design must define whether the accepted authority becomes two-stage, which quiesce-induced target changes are authorized, whether volatile daemon control files belong in snapshot/restore, and how execute/recover/complete resume or replace the old writer.",
+    "Alembic project Prime/work/Guard remain degraded because the installed MCP response contains a rejected _meta key; raw source, executable RED/probe evidence, focused tests, and clean Git state were used instead."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "clean-baseline",
+      "commit": "43306622a06e2782381aa1aa257681f1f7aa8781",
+      "verify": "HEAD tree 13cd8b3c6b1eb80d035750989c849cda53c80a9d; worktree clean before investigation and after removing the incomplete handoff draft."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduce ready-writer dispatch order, derive the smallest run-bound IPC handoff, then reject it unless graceful writer quiescence preserves the currently signed whole-root observation.",
+      "verify": "The investigation stopped at the first deeper contract contradiction before product implementation."
+    },
+    {
+      "kind": "test-first",
+      "ref": "Alembic/test/unit/DaemonSupervisor.test.ts",
+      "verify": "Temporary real-OS-writer RED produced 4 intended failures: restart=false execute did not spawn, recover/complete returned ordinary ready, and restart=true killed the writer before child authority. The temporary tests were removed after the deeper contract blocker was proven."
+    },
+    {
+      "kind": "repro",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+      "verify": "A built-artifact probe created an exact pre-reset observation, removed only .asd/daemon.json and .asd/daemon.pid as the real shutdown handler does, and observed rootTreeChanged=true and observationChanged=true (before sha256:1d0538383c2cb2c75e99a21618b986d18c6d920857ea45a7eb7ec2e13353695f; after sha256:c8878d8228984c1ac7c9bb5cbbbc2f9e44e726c8d31f019c76edf0e079600884)."
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The controller-identified order bug is real, but the current rebuild authority contract makes its proposed one-stage repair unsafe. StrictSetupAuthorityReceiptV1 signs a preResetObservation whose rootTreeHash includes every target file. The replacement child must re-create that exact observation after the existing writer is quiesced. Real daemon quiescence deletes daemon.json/daemon.pid and performs a WAL checkpoint/close, so a graceful quiesce necessarily changes the signed root before snapshot. Moving termination behind a run-bound authority message therefore only shifts the failure to STRICT_SETUP_PRE_RESET_OBSERVATION_MISMATCH. SIGSTOP/SIGKILL or ignoring the hash cannot prove SQLite transaction/lock safety or exact recovery. A controller/Design decision is required for a two-stage contract: external authority + lease + durable header, authenticated graceful quiesce, then a durable quiesced-observation receipt bound to the original authority and explicitly governed volatile/control-file and execute/recover/complete resume semantics."
+    },
+    {
+      "kind": "verification",
+      "value": "npx vitest run test/unit/DaemonSupervisor.test.ts test/unit/StrictExternalSetupRecovery.test.ts",
+      "verify": "After removing the incomplete draft, 2 files / 26 tests passed on the exact clean baseline."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 checked the dispatch objective against the fixed R0 order and exact-observation recovery guarantees. Stage 2 rejected one-stage IPC, premature graceful termination, strong-signal freezing, stale control-file snapshotting, and hash exclusion as either deterministically failing or outside the accepted safety contract."
+    },
+    {
+      "kind": "change-scope",
+      "value": "No product or test files remain changed; no AlembicCore, AlembicAgent, AlembicPlugin, Test, Design, Wakeflow, vendor, or Ghost root was modified."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i9-alembic-main-external-setup-recovery-rootcause3__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i9-alembic-main-external-setup-recovery-rootcause3__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i9-alembic-main-external-setup-recovery-rootcause3__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause3",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i9-alembic-main-external-setup-recovery-rootcause3__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 152,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i9-alembic-main-external-setup-recovery-rootcause1-p1",
+    "targetTaskId": "i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause3",
+    "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "createdAt": "2026-07-16T23:11:36.678Z"
+  },
+  "createdAt": "2026-07-16T23:11:36.678Z",
+  "stateRevisionObserved": 152,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 4,
+  "supersedes": {
+    "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause2",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i9-alembic-main-external-setup-recovery-rootcause1-t1__dg-i9-alembic-main-external-setup-recovery-rootcause2__current-r0003.json"
+  }
+}

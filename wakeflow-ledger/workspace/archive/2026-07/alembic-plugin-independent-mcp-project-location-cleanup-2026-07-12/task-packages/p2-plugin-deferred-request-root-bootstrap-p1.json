@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p2-plugin-deferred-request-root-bootstrap-p1",
+  "demandKey": "alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+  "summary": "Fix the verified in-scope MCP startup defect discovered by controller-owned local refresh. The installed cache was successfully rewritten to the accepted local build, but `npm run dev:codex-plugin:reload -- --project-root <workspace-root>` failed its fresh-process probe with `MCP error -32000: Connection closed`. Direct raw reproduction from the installed plugin-cache cwd exits before MCP connect with `Codex MCP Server failed to start: Project root points inside the Codex plugin cache.` Root cause: `HostMcpServer` resolves and rejects a default project root in its constructor/startup before any tool request exists, so a valid explicit per-call `projectRoot` can never be received. This violates the confirmed architecture that Plugin MCP identity belongs to the current call and must not depend on Alembic main or the plugin installation cwd.\n\nRequired behavior:\n- The MCP process must start, initialize and list its static tools when launched from the installed plugin cache cwd, without treating that cache as project identity or persistence location.\n- A tool call carrying explicit `projectRoot` must create/use a request-scoped runtime resolved only through `ProjectLocationService` and return that root's projectId/dataRoot/databasePath; the bootstrap server context must not reject or override it first.\n- If a call omits `projectRoot`, use a valid current host workspace candidate only when one exists. If none exists or the only candidate is the plugin cache/package root, return a truthful tool-level project-root-required error rather than killing the MCP process, selecting Alembic main state, falling back across projects, initializing data, or writing into the plugin cache.\n- Preserve the accepted static catalog, five public tool semantics, centralized physical confinement, destructive-write confirmation, Recipe-internal Git maintenance and all previously removed coupling boundaries.\n- Fix the fresh probe error reporting so child MCP stderr is retained when startup fails, if needed to keep the failure diagnosable; do not add process lifecycle management.\n\nValidation:\n- Add a subprocess/MCP regression that starts from a cache-shaped cwd with no trusted workspace env, connects/lists tools, then calls `alembic_status` with an explicit temporary/request root and proves request identity/storage use that root and never the cache.\n- Add omitted-root coverage proving the process remains alive and returns a tool-native project-root-required result rather than connection close.\n- Re-run `npm run dev:codex-plugin:reload -- --project-root <workspace-root>`; it must report ok=true and a fresh `alembic_status` readback from the rewritten installed cache.\n- Run focused tests, `npm run test:unit`, `npm run check`, `npm run build`, `npm run verify:codex-runtime-package`, `npm run verify:plugin-distribution`, and `npm run verify:codex-plugin` on the exact final commit.\n- Return exact raw hashes, clean worktrees, startup stderr before/after evidence, reload report path/summary and representative explicit-root JSON. No Test dispatch.",
+  "status": "pending",
+  "sourceRef": "User-confirmed AlembicPlugin independence completion definition; controller raw refresh evidence on 2026-07-12: cache rewrite succeeded but fresh-process probe failed, with direct cache-cwd reproduction `Codex MCP Server failed to start: Project root points inside the Codex plugin cache.`",
+  "designIntent": "Defer project identity from MCP process startup to each tool request: the transport and static catalog may start without a project, while every actual operation resolves its explicit or valid host-workspace root through the single ProjectLocationService.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-probe",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "startup-before-after"
+      },
+      {
+        "kind": "explicit-root-json"
+      },
+      {
+        "kind": "omitted-root-transport-survival"
+      },
+      {
+        "kind": "reload-report"
+      }
+    ]
+  },
+  "createdAt": "2026-07-12T12:04:34.229Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p2-plugin-deferred-request-root-bootstrap-t1",
+      "taskPackageId": "p2-plugin-deferred-request-root-bootstrap-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Implement and commit the deferred request-root MCP bootstrap fix so the installed-cache process can start before project identity exists, explicit per-call roots work, omitted roots fail at tool level without closing transport, and the real local reload probe passes.",
+      "status": "pending",
+      "createdAt": "2026-07-12T12:04:34.229Z"
+    }
+  ]
+}

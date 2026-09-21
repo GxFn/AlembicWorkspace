@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1",
+  "dispatchGroup": "i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1",
+  "status": "completed",
+  "summary": "AlembicCore rootcause8 closed in commit d0d33e49cab732ec541bcfc3fb35447b6e2ad58d on exact parent 9d8384cb9a1a991b581879d9663ec273fab32423. Added durable V3 semantic-review attestation: host-agent-workflows owns reviewer/evidence-store/private-key production, production only verifies a Main-pinned policy and consumes serialized envelopes. Exact prompt/load/invocation/output/decision plus frozen Evidence Ledger/blob/ref/fact load receipts are signed; strict authority persists execution/attestation/policy hashes and retains zero G1→Admission→corpus closure.",
+  "evidenceRefs": [
+    "commit:d0d33e49cab732ec541bcfc3fb35447b6e2ad58d",
+    "parent:9d8384cb9a1a991b581879d9663ec273fab32423",
+    "tree:2fd596d4867f72413fac6de066c75cd724c7dd60",
+    "guard:guard-public-ms3fyxv6-12",
+    "finish:finish-public-ms3g0oh1-3"
+  ],
+  "verification": [
+    "npm run build:check — passed",
+    "npm run build — passed",
+    "focused strict semantic/production/fact/Core boundary matrix — 8 files, 68 tests passed",
+    "npm run test — 193 files passed, 1 fixture helper skipped; 1901 tests passed, 1 skipped",
+    "npm run lint — 782 files checked, passed",
+    "npm run smoke:public-api — 61 exact public entrypoints imported",
+    "public API/layer/consumer/scope/retired/naming checks — passed",
+    "built-package Main/host facade negative probe — passed",
+    "git diff HEAD^..HEAD --check — passed",
+    "Alembic Guard guard-public-ms3fyxv6-12 — 8 files, 0 violations"
+  ],
+  "risks": [
+    "AlembicAgent must protect the Ed25519 private key, connect the V3 host contract to the real reviewer and authoritative Evidence Ledger store/load path, and emit attestations; Core contract fixtures do not claim a real model ran.",
+    "Alembic Main must pin SemanticDispositionReviewTrustPolicyV3 from durable trusted configuration outside task payloads, persist attestation JSON, and invoke the verifier after restart.",
+    "V1 remains migration-only. V2 WeakMap machinery is package-internal for V3 construction, absent from stable facades, and rejected by unified strict authority."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "d0d33e49cab732ec541bcfc3fb35447b6e2ad58d",
+      "verify": "One clean Core commit on exact parent 9d8384cb9a1a991b581879d9663ec273fab32423; tree 2fd596d4867f72413fac6de066c75cd724c7dd60; eight Core files only."
+    },
+    {
+      "kind": "command",
+      "ref": "validation:rootcause8-final",
+      "verify": "build:check/build, focused 68/68, full 1901 passed plus one fixture-only skip, lint/public/boundary/diff gates passed."
+    },
+    {
+      "kind": "contract-fixture",
+      "ref": "AlembicCore/test/StrictDispositionReviewExecutionAuthority.test.ts",
+      "verify": "Signs and rehydrates prompt, reviewer load, invocation/raw output/decision, workflow/evaluator runs and frozen-store receipts; strict receipt binds execution/attestation/policy hashes; zero chain passes."
+    },
+    {
+      "kind": "negative-probe",
+      "ref": "AlembicCore/test/StrictDispositionReviewExecutionAuthority.test.ts",
+      "verify": "Together with AlembicCore/test/DurableSemanticDispositionFreshProcess.test.ts and AlembicCore/test/CorePackage.test.ts: fresh child import verifies approved JSON; memory-only V2, alternate-key self-hash, and graph-without-store-receipt fail; facades expose no V2 mint/assert/consumer."
+    },
+    {
+      "kind": "boundary",
+      "ref": "AlembicCore/src/production.ts",
+      "verify": "Together with AlembicCore/src/host-agent-workflows.ts: producer contract uses the already-authorized host workflow facade; Main production only verifies/consumes. Core Delivery/Tool/Codex boundaries pass; no provider or outer-repository edits."
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The prior production export let a Main-shaped caller register any invoke callback and return locally constructed pass JSON; canonical hashes proved only internal consistency, while the live WeakMap registration made that fake execution look authoritative. WeakMap object identity cannot serialize or survive fresh import. Likewise, the old EvidenceEntry/snapshot/ProjectContextRef/witness/FactQuery constructors checked only cross-field consistency, so a caller could fabricate the whole graph without provenance. The smallest durable root is a Main-pinned policy with an Ed25519 public key, approved reviewer-load hash and evidence-store id/config hash. The host Agent alone holds the private key, performs real reviewer invocation and authoritative store loads, and signs the complete execution and load receipts; Main only rehydrates/verifies. Node's standard Ed25519 is used specifically because detached cross-process authenticity is required. Core implements no provider and claims no real model execution. Agent owns key custody/real adapters/attestation production; Main owns pinned-policy loading, persistence and verification."
+    },
+    {
+      "kind": "guard",
+      "ref": "guard-public-ms3fyxv6-12",
+      "verify": "Eight files, zero violations."
+    },
+    {
+      "kind": "compatibility",
+      "ref": "commit:d0d33e49cab732ec541bcfc3fb35447b6e2ad58d",
+      "verify": "V1 migration helpers remain; zero/fact/fixpoint/finalization/CAS and full suite pass; V2 unsafe runtime functions are absent from stable facades."
+    },
+    {
+      "kind": "self-review",
+      "ref": "review:severity-pass",
+      "verify": "No P0/P1/P2 residual found; boundary review removed an initially attempted forbidden Agent package route and used host-agent-workflows instead."
+    },
+    {
+      "kind": "test-first",
+      "ref": "red:rootcause8-public-and-strict",
+      "verify": "Captured facade-missing RED and unified-authority V3 RED before implementation; both became green."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1__AlembicCore__i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1__AlembicCore__i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1__AlembicCore__i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1",
+    "dispatchGroup": "i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1__AlembicCore__i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 248,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1",
+    "targetTaskId": "i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1",
+    "resultId": "tr-i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1",
+    "createdAt": "2026-07-27T16:31:57.771Z"
+  },
+  "createdAt": "2026-07-27T16:31:57.771Z",
+  "stateRevisionObserved": 248,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1",
+    "dispatchGroup": "i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i3-i9-core-durable-agent-evidence-trust-root-rootcause8-t1__i3-i9-core-durable-agent-evidence-trust-root-rootcause8-p1__current-r0001.json"
+  }
+}

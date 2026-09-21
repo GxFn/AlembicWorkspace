@@ -1,0 +1,1145 @@
+[
+  {
+    "file": "src/core/enhancement/AndroidEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Android lifecycle/Compose维度与AST特征",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        104
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 104,
+      "sha256": "99db7b7de5cf6ae3cc53fcb71660658f892873ec2daf3b7a734c63a115cec785",
+      "baselineSha256": "99db7b7de5cf6ae3cc53fcb71660658f892873ec2daf3b7a734c63a115cec785",
+      "changedSinceInventory": false,
+      "functionCount": 4,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Android lifecycle/Compose维度与AST特征",
+      "keyFunctions": [
+        "conditions",
+        "getExtraDimensions",
+        "detectPatterns"
+      ],
+      "notes": [
+        "conditions要求kotlin/java且android；两tier2 dual维度带skillMeta。detectPatterns按superclass识别ViewModel/Activity/Fragment、class annotations识别Hilt/Composable并附置信度；没有额外Guard规则或预处理override。class级Composable并不覆盖全部函数Compose场景，不能当完整Compose分析器。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:99db7b7de5cf6ae3cc53fcb71660658f892873ec2daf3b7a734c63a115cec785",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/DjangoEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Django/DRF模型、API和Signal增强包",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        245
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 245,
+      "sha256": "d3739a7a2261bc20e7c82531f0890e26a3f9b447e54b5c18fc0cbf6cfc65f984",
+      "baselineSha256": "d3739a7a2261bc20e7c82531f0890e26a3f9b447e54b5c18fc0cbf6cfc65f984",
+      "changedSinceInventory": false,
+      "functionCount": 6,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": [
+        {
+          "name": "detectPatterns",
+          "line": 122,
+          "lines": 121
+        }
+      ]
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Django/DRF模型、API和Signal增强包",
+      "keyFunctions": [
+        "getExtraDimensions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "python+django匹配，3个tier2 dual维度；4条Guard关注N+1/raw SQL/null CharField/model __str__。AST按Model/View/Serializer/BaseCommand/Middleware/Admin继承和receiver/Celery decorators及生态imports产模式。Guard是whole-file regex启发式，__str__ regex末端含literal Z、是否漏EOF为待限定用例观察，本轮未扩修。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:d3739a7a2261bc20e7c82531f0890e26a3f9b447e54b5c18fc0cbf6cfc65f984",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/EnhancementPack.ts",
+    "reviewDepth": "manual-full",
+    "role": "增强包运行接口和窄AST输入结构",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        160
+      ]
+    ],
+    "consumers": [
+      "src/core/enhancement/AndroidEnhancement.ts",
+      "src/core/enhancement/DjangoEnhancement.ts",
+      "src/core/enhancement/EnhancementRegistry.ts",
+      "src/core/enhancement/FastAPIEnhancement.ts",
+      "src/core/enhancement/GoGrpcEnhancement.ts",
+      "src/core/enhancement/GoWebEnhancement.ts",
+      "src/core/enhancement/LangChainEnhancement.ts",
+      "src/core/enhancement/MLEnhancement.ts",
+      "src/core/enhancement/NextjsEnhancement.ts",
+      "src/core/enhancement/NodeServerEnhancement.ts",
+      "src/core/enhancement/ReactEnhancement.ts",
+      "src/core/enhancement/RustTokioEnhancement.ts",
+      "src/core/enhancement/RustWebEnhancement.ts",
+      "src/core/enhancement/SpringEnhancement.ts",
+      "src/core/enhancement/SwiftIOSEnhancement.ts",
+      "src/core/enhancement/VueEnhancement.ts",
+      "src/core/enhancement/index.ts",
+      "src/service/guard/EnhancementGuardRules.ts"
+    ],
+    "imports": [],
+    "sourceScan": {
+      "lines": 160,
+      "sha256": "b91ac0eba542a591e21576cfab38bf1247c15777cdc23aa04e9dbfa1661f229a",
+      "baselineSha256": "b91ac0eba542a591e21576cfab38bf1247c15777cdc23aa04e9dbfa1661f229a",
+      "changedSinceInventory": false,
+      "functionCount": 5,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "增强包运行接口和窄AST输入结构",
+      "keyFunctions": [
+        "id/conditions",
+        "getExtraDimensions/getGuardRules",
+        "detectPatterns/preprocessFile"
+      ],
+      "notes": [
+        "定义AST method/class/protocol/pattern输入、dimension/GuardRule输出，id/conditions必须子类实现；其他能力默认空/null表明可选。规则是RegExp+语言scope，SFC预处理返回content/lang，reference skill只路径。子类pack是可运行确定性能力集合，不是新增模型/工具执行系统。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:b91ac0eba542a591e21576cfab38bf1247c15777cdc23aa04e9dbfa1661f229a",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/FastAPIEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "FastAPI路由、中间件与ORM模式指导",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        219
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 219,
+      "sha256": "54e70c3930b87dfb71f2b175f9090f2d7aa48dd7e7e04f71e078b4d3ab80ca2a",
+      "baselineSha256": "54e70c3930b87dfb71f2b175f9090f2d7aa48dd7e7e04f71e078b4d3ab80ca2a",
+      "changedSinceInventory": false,
+      "functionCount": 5,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "FastAPI路由、中间件与ORM模式指导",
+      "keyFunctions": [
+        "conditions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "python+fastapi激活3维度、4规则；识别Pydantic BaseModel/BaseSettings、路由decorator、get_*依赖函数、SQLAlchemy基类、Exception和生态import。阻塞async/no-response-model等regex没有完整函数控制流上下文，作为告警线索保留；不把名称置信度当真实DB/安全验证。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:54e70c3930b87dfb71f2b175f9090f2d7aa48dd7e7e04f71e078b4d3ab80ca2a",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/GoGrpcEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Go gRPC服务与interceptor增强",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        159
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 159,
+      "sha256": "2a59b1f1c8c71acd31f5823dd82c17451fed4d3e4ea1e9ff6deeb3982f6b4561",
+      "baselineSha256": "2a59b1f1c8c71acd31f5823dd82c17451fed4d3e4ea1e9ff6deeb3982f6b4561",
+      "changedSinceInventory": false,
+      "functionCount": 6,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Go gRPC服务与interceptor增强",
+      "keyFunctions": [
+        "conditions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "go+grpc，2维度/2规则；结构体嵌入UnimplementedServer、Server字段数、生成接口、导出interceptor函数与pb imports给不同confidence。规则提示的是规范线索，Unimplemented匹配本身不是缺少嵌入的判定；Registry启用依赖detectFrameworks单行require修复。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:2a59b1f1c8c71acd31f5823dd82c17451fed4d3e4ea1e9ff6deeb3982f6b4561",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/GoWebEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Go HTTP多框架handler/router增强",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        206
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 206,
+      "sha256": "96b8929585523dd6da7b23245b0853fc0da6439fdf1f63797b403dcf8da78f2a",
+      "baselineSha256": "96b8929585523dd6da7b23245b0853fc0da6439fdf1f63797b403dcf8da78f2a",
+      "changedSinceInventory": false,
+      "functionCount": 3,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": [
+        {
+          "name": "detectPatterns",
+          "line": 91,
+          "lines": 113
+        }
+      ]
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Go HTTP多框架handler/router增强",
+      "keyFunctions": [
+        "getExtraDimensions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "go+gin/echo/fiber/chi/gorilla/beego，2维度/3规则。AST结构体名称、ServeHTTP协议、导出receiver CRUD方法、package级middleware、Engine/Router核心和goroutine pattern分类；param/isClassMethod输入来自语言plugin，不在此重复解析源语法。Guard regex是文件线索不能证明handler内panic控制。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:96b8929585523dd6da7b23245b0853fc0da6439fdf1f63797b403dcf8da78f2a",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/LangChainEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Python LangChain/RAG应用代码的确定性识别",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        236
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 236,
+      "sha256": "0e5f0167fe4930b9ca2df83359e840af902e538d9569adfb96366b06e37b1421",
+      "baselineSha256": "0e5f0167fe4930b9ca2df83359e840af902e538d9569adfb96366b06e37b1421",
+      "changedSinceInventory": false,
+      "functionCount": 5,
+      "anyTokenLines": [],
+      "catchLines": [
+        94
+      ],
+      "longFunctions": [
+        {
+          "name": "detectPatterns",
+          "line": 118,
+          "lines": 116
+        }
+      ]
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Python LangChain/RAG应用代码的确定性识别",
+      "keyFunctions": [
+        "conditions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "python+langchain激活chain/RAG/prompt三维和4规则，消费Runnable/BaseTool/BaseRetriever继承、@tool、setup/graph节点名、callbacks/output parser及生态imports。只分析用户源码结构并给指导，不调用LLM、不管理API Key、不实现Core Agent/tool runtime；按关键词误把它移出Core会删真实能力。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:0e5f0167fe4930b9ca2df83359e840af902e538d9569adfb96366b06e37b1421",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/MLEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Python ML模型/训练/data管道模式识别",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        271
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 271,
+      "sha256": "c7ba0884f4e9d828b2b719e54cf706da327ddfabc79e481076d4f6d5a19c4ab4",
+      "baselineSha256": "c7ba0884f4e9d828b2b719e54cf706da327ddfabc79e481076d4f6d5a19c4ab4",
+      "changedSinceInventory": false,
+      "functionCount": 4,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": [
+        {
+          "name": "detectPatterns",
+          "line": 130,
+          "lines": 139
+        }
+      ]
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Python ML模型/训练/data管道模式识别",
+      "keyFunctions": [
+        "getExtraDimensions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "python+ml，3维度/5规则；按nn.Module/Dataset/HF/Lightning继承、train/evaluate/forward命名及生态imports生成模式。没有训练/模型下载/网络副作用；no_grad/zero_grad正则是需人工复核的文本提示，不等同autograd执行证明。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:c7ba0884f4e9d828b2b719e54cf706da327ddfabc79e481076d4f6d5a19c4ab4",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/NextjsEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Next App Router/Server Actions/数据读取增强",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        232
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 232,
+      "sha256": "d6bcb8cd624d353cbd2d7cb2711ee875ccea2226c7144c6b38a86c308d76cae2",
+      "baselineSha256": "d6bcb8cd624d353cbd2d7cb2711ee875ccea2226c7144c6b38a86c308d76cae2",
+      "changedSinceInventory": false,
+      "functionCount": 4,
+      "anyTokenLines": [
+        48
+      ],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Next App Router/Server Actions/数据读取增强",
+      "keyFunctions": [
+        "getExtraDimensions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "nextjs框架条件、3维度、5规则；按导出Page/Layout/default、metadata/static params、async action命名、HTTP method exports/middleware和next imports给模式。规则关注client/server指令与浏览器API/metadata/cache，是文本范围启发式而非RSC编译语义；保留原版本文案和告警严重度，未自动扩大规则。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:d6bcb8cd624d353cbd2d7cb2711ee875ccea2226c7144c6b38a86c308d76cae2",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/NodeServerEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Node HTTP/Nest DI/请求校验增强包",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        267
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 267,
+      "sha256": "f0bd65625a5412771631c53f0abb3377f58ea052e6680ebcd454230ae9f1f419",
+      "baselineSha256": "f0bd65625a5412771631c53f0abb3377f58ea052e6680ebcd454230ae9f1f419",
+      "changedSinceInventory": false,
+      "functionCount": 7,
+      "anyTokenLines": [
+        115,
+        121
+      ],
+      "catchLines": [
+        101,
+        103
+      ],
+      "longFunctions": [
+        {
+          "name": "detectPatterns",
+          "line": 136,
+          "lines": 129
+        }
+      ]
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Node HTTP/Nest DI/请求校验增强包",
+      "keyFunctions": [
+        "getExtraDimensions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "JS/TS并node-server或nestjs；3维中间件/DI/validation，6规则覆盖同步IO、error handler、Promise、循环DI、response DTO与硬编码secret。detectPatterns按3参函数、Nest decorators/interfaces、async exported plugin和DTO名字分类。规则名字/提示与正向匹配的语义需用具体Guard案例判断，未借此次清单bug重写这些启发式。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:f0bd65625a5412771631c53f0abb3377f58ea052e6680ebcd454230ae9f1f419",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/ReactEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "React Hooks、组件和RSC/状态模式增强",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        254
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 254,
+      "sha256": "8d77167db0c5d5d68338b95995fc7731798b85e1d1d861711c2cf8ad6b907948",
+      "baselineSha256": "8d77167db0c5d5d68338b95995fc7731798b85e1d1d861711c2cf8ad6b907948",
+      "changedSinceInventory": false,
+      "functionCount": 4,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "React Hooks、组件和RSC/状态模式增强",
+      "keyFunctions": [
+        "conditions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "JS/TS+react/nextjs，4维度、7规则；AST识别useX/withX、provider/context类、大写函数组件、ErrorBoundary生命周期、useStore和生态imports。regex以file scope检查Hooks/cleanup/render setState/deps/directives，不能替代React ESLint或证明执行上下文；保留置信度与现rule IDs。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:8d77167db0c5d5d68338b95995fc7731798b85e1d1d861711c2cf8ad6b907948",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/RustTokioEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Rust异步运行时/任务与channel增强",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        237
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 237,
+      "sha256": "ea096cb9ca96220f197371b91157df1ec43a45ed88b4e957dbf7499e10ced107",
+      "baselineSha256": "ea096cb9ca96220f197371b91157df1ec43a45ed88b4e957dbf7499e10ced107",
+      "changedSinceInventory": false,
+      "functionCount": 4,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": [
+        {
+          "name": "detectPatterns",
+          "line": 110,
+          "lines": 125
+        }
+      ]
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Rust异步运行时/任务与channel增强",
+      "keyFunctions": [
+        "conditions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "rust+tokio/async-std，两维度4规则；统计async、main、worker/channel结构体、Future/Stream/Service/Layer trait impl、imports与基础async-heavy/unsafe pattern。检测是已有AST摘要消费，不执行Runtime；std mutex/blocking/spawn等规则在file级无法精确证明await上下文，scope限制需调用方过滤。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:ea096cb9ca96220f197371b91157df1ec43a45ed88b4e957dbf7499e10ced107",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/RustWebEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Rust Web handler/state/extractor增强",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        266
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 266,
+      "sha256": "5f3db584c9db9bdd90af82d3bb43208f30a1c28e5e325b942eb964f4ccc3a71d",
+      "baselineSha256": "5f3db584c9db9bdd90af82d3bb43208f30a1c28e5e325b942eb964f4ccc3a71d",
+      "changedSinceInventory": false,
+      "functionCount": 5,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": [
+        {
+          "name": "detectPatterns",
+          "line": 98,
+          "lines": 166
+        }
+      ]
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Rust Web handler/state/extractor增强",
+      "keyFunctions": [
+        "getExtraDimensions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "rust+actix-web/axum/rocket/warp，两维度3规则；async函数命名、State/Error/Middleware/DTO结构体、serde derives与framework imports给可复核线索。多关键词检测可能重叠是one-to-many模式视角，不可简单按相近循环合并去重；保持rule IDs/置信度。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:5f3db584c9db9bdd90af82d3bb43208f30a1c28e5e325b942eb964f4ccc3a71d",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/SpringEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "JVM Spring DI与REST增强",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        116
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 116,
+      "sha256": "99a621dafa9511a42614b88c9619d232c3b8bb093695f4c900e2554870010147",
+      "baselineSha256": "99a621dafa9511a42614b88c9619d232c3b8bb093695f4c900e2554870010147",
+      "changedSinceInventory": false,
+      "functionCount": 8,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "JVM Spring DI与REST增强",
+      "keyFunctions": [
+        "conditions",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "java/kotlin+spring，两tier2 dual维度和单Autowire字段注入建议；按@RestController/@Service/@Repository/@Entity/@Configuration class annotations输出模式。没有host runtime/HTTP server构造，保留小而真实的detector职责。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:99a621dafa9511a42614b88c9619d232c3b8bb093695f4c900e2554870010147",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/SwiftIOSEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Swift/iOS小规模增强规则与分析指导",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        95
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 95,
+      "sha256": "843042459c49a6d3e6860f8ecb31c9492330bc6fb9327c4cbca272ecdfee4109",
+      "baselineSha256": "843042459c49a6d3e6860f8ecb31c9492330bc6fb9327c4cbca272ecdfee4109",
+      "changedSinceInventory": false,
+      "functionCount": 3,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Swift/iOS小规模增强规则与分析指导",
+      "keyFunctions": [
+        "conditions",
+        "getExtraDimensions",
+        "getGuardRules"
+      ],
+      "notes": [
+        "仅语言条件swift/objectivec，无framework要求；两个tier2生命周期/并发维度。Guard只保留内置没有的IUO属性/Timer self target，两条显式swift规则避免与内置force cast/try/main sync双报。detectPatterns首期明确空列表，维度接线注释待接不自动变新需求。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:843042459c49a6d3e6860f8ecb31c9492330bc6fb9327c4cbca272ecdfee4109",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/VueEnhancement.ts",
+    "reviewDepth": "manual-full",
+    "role": "Vue/Nuxt分析模式与SFC脚本预处理",
+    "findings": [],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [],
+      "transitiveCoverageNotExhaustivelyMapped": true,
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        243
+      ]
+    ],
+    "consumers": [],
+    "imports": [
+      {
+        "specifier": "./EnhancementPack.js",
+        "target": "src/core/enhancement/EnhancementPack.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 243,
+      "sha256": "2c056f586f7f10c39fa3fbb983b16a2c373a253460b2b08c6526dec178b08625",
+      "baselineSha256": "2c056f586f7f10c39fa3fbb983b16a2c373a253460b2b08c6526dec178b08625",
+      "changedSinceInventory": false,
+      "functionCount": 5,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "Vue/Nuxt分析模式与SFC脚本预处理",
+      "keyFunctions": [
+        "preprocessFile",
+        "getGuardRules",
+        "detectPatterns"
+      ],
+      "notes": [
+        "3维度、6规则；preprocessFile仅.vue，优先script setup后普通script，返回TS/JS内容，其他格式null。AST识别composable/store/router guards/install/import。静态注意toRefs被reactive-destructure正则一并匹配、lowercase名称却和camelCase beforeRouteEnter/Update比较，以及SFC属性顺序/单引号未全覆盖；未做新probe或扩产品修改，详列后续输入覆盖风险。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:2c056f586f7f10c39fa3fbb983b16a2c373a253460b2b08c6526dec178b08625",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  },
+  {
+    "file": "src/core/enhancement/detectFrameworks.ts",
+    "reviewDepth": "manual-full",
+    "role": "只读清单识别并生产匹配增强包的语言/框架坐标",
+    "findings": [
+      {
+        "id": "ENH-001",
+        "severity": "P2",
+        "status": "source-red-green",
+        "summary": "合法单行go require漏框架，已保持原descriptor语义兼容。",
+        "fix": {
+          "red": "enhancement-single-require-red",
+          "green": "enhancement-single-require-green",
+          "status": "pending-parent-review"
+        }
+      },
+      {
+        "id": "ENH-002",
+        "severity": "P2",
+        "status": "source-red-green",
+        "summary": "非object package JSON根阻断后续生态；现诊断跳过并保留有效Python识别。",
+        "fix": {
+          "red": "enhancement-manifest-shape-red",
+          "green": "enhancement-manifest-shape-green",
+          "status": "pending-parent-review"
+        }
+      }
+    ],
+    "disposition": [
+      "retain existing public behavior; no unapproved cleanup"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/unit/DetectFrameworks.test.ts"
+      ],
+      "realPublicConsumerRegression": "resolveEnhancementGuardRulesForProject with actual temporary manifests",
+      "latestGreen": "enhancement-manifest-shape-green",
+      "testCount": 17,
+      "companionSuite": "test/EnhancementGuardRules.test.ts"
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        331
+      ]
+    ],
+    "consumers": [
+      "src/enhancement.ts",
+      "src/service/guard/EnhancementGuardRules.ts",
+      "test/unit/DetectFrameworks.test.ts"
+    ],
+    "imports": [
+      {
+        "specifier": "node:fs/promises",
+        "target": null,
+        "typeOnly": false
+      },
+      {
+        "specifier": "node:path",
+        "target": null,
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 316,
+      "sha256": "9f651274158b6c18b5fdf3869a294f3de5301be12965138ff0f1c99289e88d27",
+      "baselineSha256": "9f651274158b6c18b5fdf3869a294f3de5301be12965138ff0f1c99289e88d27",
+      "changedSinceInventory": false,
+      "functionCount": 11,
+      "anyTokenLines": [],
+      "catchLines": [
+        109,
+        305,
+        313
+      ],
+      "longFunctions": []
+    },
+    "reviewNote": "本补充review实际人工阅读全文，核心函数与具体边界见semanticReview；仅显式回归声明GREEN，不把阅读等同全行为验证。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "enhancement-supplement",
+      "role": "只读清单识别并生产匹配增强包的语言/框架坐标",
+      "keyFunctions": [
+        "detectProjectFrameworks",
+        "detectNodeEcosystem",
+        "detectGoEcosystem",
+        "readManifest"
+      ],
+      "notes": [
+        "依次读取Node/Python/Go/Rust/JVM/Apple清单，逐文件限256KiB且不下载，结果Set排序。package deps/devDeps映射、Python引号/requirements/poetry键、Go module/version、Cargo依赖section、JVM依赖文本和Apple marker各有适用边界。修复合法单行require漏框架及非object JSON根形状阻断后续生态；坏形状warn诊断不猜JS，manifest数组形状/排序保持。"
+      ],
+      "preserveReason": "所有pack由enhancement/index动态注册，Guard按语言/框架真实消费getGuardRules。getExtraDimensions/pack.detectPatterns/Vue preprocessFile在本workspace三个活跃源扫描未找到调用（AstAnalyzer只提供可注入preprocess seam），不将方法存在冒称已接线；公开Core兼容合同未获删除授权。",
+      "boundaries": [
+        "无provider/API key/宿主tool执行；只确定性数据与AST摘要/清单解析。"
+      ],
+      "reviewedDigest": "sha256:bb895b91b17caf9ced55ea94274b580eca9faaa10684f9edfa22857036797385",
+      "verifiedConsumers": [
+        "src/core/enhancement/index.ts:42",
+        "src/service/guard/EnhancementGuardRules.ts:97"
+      ]
+    }
+  }
+]

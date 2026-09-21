@@ -1,0 +1,257 @@
+{
+  "title": "知识管理修复独立复核",
+  "date": "2026-09-20",
+  "baseline": "56900c5",
+  "status": "review-complete; confirmed-bypass-fixed",
+  "scope": {
+    "files": [
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+      "AlembicAgent/src/tools/runtime/registry.ts",
+      "AlembicAgent/test/recipe-production-profile-adapter.test.ts"
+    ],
+    "finalInputLocation": "纯校验已从本轮临时managementInput.ts并入既有input.ts；原临时文件删除，保持更少模块。",
+    "sourceEditsByReviewer": false,
+    "testEditsByReviewer": false,
+    "adjacentEdits": false,
+    "commitCreated": false,
+    "coreReferenceBoundary": "只读当前管理动作直接使用的Core知识仓储/实体、KnowledgeService.update字段策略、StagingManager与EvolutionPolicy、公开sustain类型和DivergenceError；未扩相邻产品。",
+    "noCommitReason": "provider_context/root负责修复、验证和统一提交；本代理仅复核与记录。"
+  },
+  "findings": [
+    {
+      "id": "MIR-01",
+      "severity": "P2",
+      "status": "fixed-and-independently-verified",
+      "issue": "update的八字段黑名单未覆盖真实Core原始仓储的其他管理状态：stagingDeadline可改grace时序，stats整包可清除已有stagingReview.fail。",
+      "reproduction": [
+        {
+          "data": {
+            "lifecycle": "[explicit undefined]"
+          },
+          "observed": {
+            "ok": false,
+            "writes": 0,
+            "lifecycle": "staging",
+            "deadline": 4102444800000,
+            "review": "fail"
+          }
+        },
+        {
+          "data": {
+            "status": "active",
+            "state": "active",
+            "published_at": 1,
+            "lifecycle_history": []
+          },
+          "observed": {
+            "ok": true,
+            "writes": 1,
+            "lifecycle": "staging",
+            "deadline": 4102444800000,
+            "review": "fail"
+          },
+          "classification": "未产生生命周期别名旁路"
+        },
+        {
+          "data": {
+            "stagingDeadline": 1
+          },
+          "observed": {
+            "ok": true,
+            "writes": 1,
+            "lifecycle": "staging",
+            "deadline": 1,
+            "review": "fail"
+          },
+          "classification": "确认越过普通内容编辑边界"
+        },
+        {
+          "data": {
+            "stats": {}
+          },
+          "observed": {
+            "ok": true,
+            "writes": 1,
+            "lifecycle": "staging",
+            "deadline": 4102444800000,
+            "review": null
+          },
+          "classification": "确认清除失败复核"
+        }
+      ],
+      "probeMethod": "真实当前knowledge.handle→management→实际Core KnowledgeRepositoryImpl.update/KnowledgeEntry.fromJSON；只替代Drizzle写口和findById为进程内存适配，避免真实数据库/知识文件写入。未复刻merge代码。",
+      "coreReadScope": "仅该动作直接使用的Core repository/entity、KnowledgeService.update允许字段、StagingManager grace/review消费者、公开sustain types/Error类型。",
+      "agreedResolution": "root授权以Agent update明确内容字段allowlist对齐CoreService UPDATABLE，拒绝所有非许可自有字段；不是新增Core状态机或管理服务。provider_context实现，reviewer不改源码。",
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+      "initialLine": 9,
+      "resolutionStatus": "validateManagementInput改为28内容字段allowlist，对齐CoreService UPDATABLE；Reflect.ownKeys按字段存在性整体拒绝所有未许可字段，包括undefined。",
+      "currentLine": 76,
+      "fix": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+        "allowlistLine": 10,
+        "validationLine": 76,
+        "fieldsCount": 28,
+        "coreComparison": "AST逐项比较相同顺序、无缺项、无额外字段；不复制Core值对象/事务/生命周期语义。"
+      },
+      "regressions": [
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "name": "rejects $label before the actual Core merge and preserves the complete input",
+          "cases": [
+            "stagingDeadline",
+            "stats",
+            "futureSystemState:undefined"
+          ],
+          "assertions": "每个非法字段与description同时提交，整笔0写入；deadline/fail review/description全部保留，调用方data未修改。",
+          "line": 253
+        },
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "name": "applies permitted content edits through the actual Core merge without mutating input",
+          "assertions": "冻结输入title/description经真实Core合并正常写入；既有lifecycle、deadline与fail review不变。",
+          "line": 286
+        }
+      ]
+    }
+  ],
+  "completedChecks": [
+    {
+      "boundary": "id/data与数值输入",
+      "source": "input.ts validateManagementInput",
+      "result": "id必须非空string；data显式提供时必须object。score仅finite，不新增0..100等Core未声明范围。confidence显式两位置都要求finite0..1，缺席才沿用旧默认0.7/0.9；0与1保留。review-queue limit正safe integer，缺席保持Core默认。"
+    },
+    {
+      "boundary": "STATE_DIVERGENCE与普通异常",
+      "source": "management.ts managementFailure",
+      "result": "Core code/details原对象保留；STATE_DIVERGENCE或fileOpsCompleted>0投影partial/readback。已进入publish的一般异常为unknown，未开始readiness失败为not-started；不再伪称已回滚。"
+    },
+    {
+      "boundary": "readiness门",
+      "source": "management.ts handleActiveTransition",
+      "result": "仍先Core evaluateReadiness再publish；false时不写。取消只读等待及时返回；已确认发布在取消后保留真实回执并附degraded诊断。"
+    },
+    {
+      "boundary": "review-queue与review",
+      "source": "management.ts handleManage",
+      "result": "queue使用shared runOperation结束取消等待并忽略迟到结果；recordReview一旦启动等待Core布尔回执，true保留recorded:true，false保持未记录失败。两者服务异常均归一ToolResult。"
+    },
+    {
+      "boundary": "缺宿主方法",
+      "source": "management.ts unavailableManagementPort",
+      "result": "按每个需要的method检查function，返回明确port-unavailable/code/port/method；不通过repo别名伪造reject/score/validate等能力。class原型方法仍可用，调用保留原receiver。"
+    },
+    {
+      "boundary": "skipped与兼容结果",
+      "source": "management.ts evolutionStatus",
+      "result": "Core skipped返回evolution_skipped/deprecation_skipped和reason，保留outcome；不伪造proposalId。proposal-created/upgraded/immediately-executed/verified原映射保留。现有toolOutcomes以Core outcome优先，不会把skipped提升为提案成功。"
+    },
+    {
+      "boundary": "动作接通与API",
+      "source": "registry.ts → knowledge.handle → handleManage",
+      "result": "approve/publish→recipeGateway，review/review-queue→stagingManager，evolve/deprecate/skip_evolution→proposalGateway，reject/update/score/validate→对应宿主方法；未删除action，也没有成功占位实现。3个结果/过渡helper仍private，Core类型从公开sustain派生。"
+    },
+    {
+      "boundary": "真实Core合并与别名",
+      "source": "只读in-memory实际Core repository probe",
+      "result": "own lifecycle:undefined已拒绝且0写入；status/state/published_at/lifecycle_history经当前Core合并不会改变lifecycle。确认的遗漏为stagingDeadline与stats，见MIR-01。"
+    },
+    {
+      "boundary": "update管理状态旁路最终闭环",
+      "source": "input.ts:10/76",
+      "result": "未知/系统自有字段整体拒绝，不删字段、不部分更新；显式undefined同样拒绝。原始仓储实际合并路径已验3个拒绝/1个正常更新。"
+    }
+  ],
+  "actionMap": [
+    {
+      "action": "approve/publish",
+      "port": "recipeGateway.evaluateReadiness → recipeGateway.publish",
+      "failureBoundary": "写前阻断 vs 已发写入unknown/partial"
+    },
+    {
+      "action": "review-queue",
+      "port": "stagingManager.listReviewQueue",
+      "failureBoundary": "只读取消/异常；不需要id"
+    },
+    {
+      "action": "review",
+      "port": "stagingManager.recordReview",
+      "failureBoundary": "保留真实boolean receipt与Core divergence"
+    },
+    {
+      "action": "evolve/deprecate/skip_evolution",
+      "port": "proposalGateway.submit",
+      "failureBoundary": "Core outcome决定proposal/执行/skipped；Agent只投影"
+    },
+    {
+      "action": "reject/update/score/validate",
+      "port": "knowledgeRepo同名已提供方法",
+      "failureBoundary": "方法缺席明确不可用，不猜测Core等价服务"
+    }
+  ],
+  "verification": [
+    {
+      "command": "Node22 vitest run test/recipe-production-profile-adapter.test.ts -t 'knowledge management boundaries'",
+      "result": "修复遗漏前现有47 passed / 48 skipped",
+      "log": "AlembicAgent/tmp/strict-management-2026-09-20/management-independent-focused.log"
+    },
+    {
+      "command": "只读源码内存加载实际knowledge.handle；实际Core KnowledgeRepositoryImpl.update/KnowledgeEntry实体合并与序列化，Drizzle为仅内存执行适配",
+      "result": "复现MIR-01两条遗漏；同时确认显式undefined已挡住与legacy字段别名无生命周期旁路。"
+    },
+    {
+      "command": "Node22 vitest run test/recipe-production-profile-adapter.test.ts -t 'knowledge management boundaries'",
+      "result": "最终51 passed / 48 skipped（含4个真实Core合并回归）",
+      "log": "AlembicAgent/tmp/strict-management-2026-09-20/management-independent-final.log"
+    },
+    {
+      "command": "TypeScript AST读取Agent MANAGEMENT_EDITABLE_FIELDS与Core KnowledgeService.UPDATABLE数组逐项比较",
+      "result": "两侧均28项，顺序完全相等，无新增/缺失字段。"
+    }
+  ],
+  "necessaryCompatibility": [
+    "字段允许不等于Core管理服务接线；正常编辑的scope/profile/值对象语义继续由Core服务负责，本轮不复制。",
+    "本仓不能凭类型声明让原始Core repository拥有不存在的reject/score/validate方法；缺端口继续明确不可用，宿主adapter需要独立接线授权。",
+    "无取消端口的写入已开始后不声称已回滚，保留真实回执或unknown/partial与读回要求。",
+    "不将Core skipped变成异常重试，也不把其兼容status计成成功proposal。"
+  ],
+  "nextStep": "root执行既定全仓门禁与统一提交；本报告冻结，不再扩管理/宿主范围。",
+  "verdict": "发现1项真实Core合并管理状态旁路，已由provider_context按root授权白名单闭合；当前无未闭合P1/P2。",
+  "privateHelpers": [
+    {
+      "name": "unavailableManagementPort",
+      "line": 72,
+      "private": true
+    },
+    {
+      "name": "managementFailure",
+      "line": 99,
+      "private": true
+    },
+    {
+      "name": "handleActiveTransition",
+      "line": 153,
+      "private": true
+    }
+  ],
+  "deletedTemporaryModuleAbsent": true,
+  "snapshots": [
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+      "sha256": "14a9f663d1531d0d8f2c9bee1d7e9618ad3289200ee7f2e2f0aa201f4a2ceb2d"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+      "sha256": "631bca7adb12b691ca12aa1e4ea946114e28160ccea82783bd0d21a21c1a43a2"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/registry.ts",
+      "sha256": "84771e4f92ea1d98f48464d8bed4f5488297e56ca7165e95b47a57be5961589c"
+    },
+    {
+      "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+      "sha256": "7d21c317f3ab5f2b6b1fac46df44be893ba65c6f6506a8a148b33c2d155210a0"
+    }
+  ],
+  "stillOpenP1P2": []
+}

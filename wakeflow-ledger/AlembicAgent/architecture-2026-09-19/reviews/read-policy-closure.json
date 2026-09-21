@@ -1,0 +1,98 @@
+{
+  "scope": "Closure only for MR-01/MR-02/MR-03 in read-policy-review.json",
+  "status": "all three findings closed in observed working tree",
+  "counts": {
+    "fixed": 3,
+    "still-open": 0
+  },
+  "closures": [
+    {
+      "id": "MR-01",
+      "disposition": "fixed",
+      "implementation": [
+        {
+          "path": "src/agent/memory/MemoryReadPolicy.ts",
+          "line": 26
+        },
+        {
+          "path": "src/agent/memory/MemoryPrompt.ts",
+          "line": 91
+        }
+      ],
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 306
+      },
+      "independentEvidence": "当前源码内存转译，timeout scheduler stub记录NaN/NaN调用实际安排5000ms timer；触发后content为空、pendingTimers=0。"
+    },
+    {
+      "id": "MR-02",
+      "disposition": "fixed",
+      "implementation": [
+        {
+          "path": "src/agent/memory/MemoryCoordinator.ts",
+          "line": 273
+        },
+        {
+          "path": "src/agent/memory/MemoryCoordinator.ts",
+          "line": 363
+        }
+      ],
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 285
+      },
+      "independentEvidence": "复用原复现：起始budget100，等待persistent期间改global1000；当前组合输出estimateTokens100（原455），同一snapshot和起始total贯穿静态、动态及最终裁剪。"
+    },
+    {
+      "id": "MR-03",
+      "disposition": "fixed",
+      "implementation": [
+        {
+          "path": "src/agent/memory/SessionStore.ts",
+          "line": 448
+        }
+      ],
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 504
+      },
+      "independentEvidence": "原noise长报告+target仅distilled finding+100token复现，当前target排在noise前并保留rare-key transactional boundary。"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "sha256": "69725e780a923a9f76b72703ef2e0b619c2d47f2d2519bccd82d67de5895ef52"
+    },
+    {
+      "path": "src/agent/memory/MemoryPrompt.ts",
+      "sha256": "028532611a566ffaf9926f14c2c8461777c9f88876e1c5402e2e54ac86c10652"
+    },
+    {
+      "path": "src/agent/memory/MemoryReadPolicy.ts",
+      "sha256": "ca9dde5e82539b64fad6a7ff6670bebae45f8c38cd98ad63ca4eb9e935899ee2"
+    },
+    {
+      "path": "src/agent/memory/SessionStore.ts",
+      "sha256": "3b58c55227d235f133b97168460b1b8252febe3f43b95834429c61aa31d55e9c"
+    }
+  ],
+  "knownLimitations": [
+    {
+      "topic": "embedding model switch with unchanged vector dimension",
+      "boundary": "Changing to a different embedding model with the same dimension still requires the host to clear/rebuild sidecar embeddings; dimension and content fingerprints alone cannot identify model semantics.",
+      "disposition": "retained-with-reason; explicit host lifecycle responsibility, not claimed solved by M1/M2."
+    },
+    {
+      "topic": "legacy one-argument embeddingFn cancellation",
+      "boundary": "Old callbacks remain compatible and may ignore the optional AbortSignal. The Agent bounds its wait and discards late results; it cannot claim cancellation of the underlying HTTP/compute owned by an old callback.",
+      "disposition": "retained-with-reason; explicit compatibility boundary."
+    }
+  ],
+  "validation": {
+    "independent": "Read-only current implementation + new test inspection; three small in-memory mock probes. NaN timeout uses accelerated scheduler stub while checking requested5000ms and cleanup. No realAPI, nativeDB, heavycheck or product edit.",
+    "rootReported": "Parent reports targeted memory/Analyst 86 cases green and full check65files766tests green; final logs/docs check remains in parent. These are parent-reported, not rerun here."
+  },
+  "previousReport": "tmp/architecture-2026-09-19/read-policy-review.json"
+}

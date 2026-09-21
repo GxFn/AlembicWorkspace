@@ -1,0 +1,230 @@
+{
+  "task": "Main embedding/index rebuild interface consolidation",
+  "authority": "Direct user work delegated by root; no Wakeflow state/dispatch; no commit requested for this subtask",
+  "baseline": {
+    "main": "615e4c47b37a74dc13b84afebae5eafafb3b8615",
+    "core": "516e05ac11210505eb7fa2d36e87e270391ecdfa"
+  },
+  "status": "frozen-awaiting-root-aggregate-validation",
+  "sourceChanges": [
+    "Dashboard delegates a single explicit {clear, force} to Core fullBuild or legacy pipeline.run; Core owns clear ordering. Removed manual clear, duplicate projection and BuildResultLike structural interface.",
+    "ServiceMap declares the actually registered GenerationRoutingVectorStore. Both Profiled wrappers use the same typed store supplied to the Core implementation; removed independent gate callbacks and DI instanceof/duck checks.",
+    "ProfiledVectorService pre-embedding fallback and GenerationRoutingVectorStore use-point validation remain separate. Recipe generation rebuild/rollback/confirmation and fixed embedding provider are untouched."
+  ],
+  "tests": [
+    {
+      "file": "test/unit/CommandsFileRoutesAo3.test.ts",
+      "change": "Preserved both host branches and all four missing/legacy-port negative cases; expanded positive cases for default clear and explicit false. Real HTTP parameter RED precedes source change."
+    },
+    {
+      "file": "test/integration/IndexingPipeline.test.ts",
+      "change": "Preserved all 17 test names. Replaced only invalid hash-only incremental fixture with real JsonVectorAdapter first write, unchanged second run (zero embed/upsert), then changed-content reindex."
+    },
+    {
+      "file": "test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "change": "Preserved all assertions and 24 cases. Storage-unavailable fault is now injected at the actual store profile method; model mismatch still uses real generation mismatch. Both fallback reasons, zero remote queries and recovery query remain verified."
+    },
+    {
+      "file": "test/unit/EmbeddingIsolation.test.ts",
+      "change": "Unmodified; all 8 cases passed including fixed resource identities, query/document purpose, actual native generation activation, explicit re-embedding, no LLM fallback."
+    }
+  ],
+  "consumerScan": {
+    "ProfiledVectorService": [
+      "lib/injection/modules/VectorModule.ts:43",
+      "test/unit/RecipeVectorGenerationRuntime.test.ts:62"
+    ],
+    "ProfiledIndexingPipeline": [
+      "lib/injection/modules/KnowledgeRetrievalModule.ts:91 (private class)"
+    ],
+    "DashboardHandlers": [
+      "lib/http/utils/dashboard-operation.ts:54 (sole composition caller)"
+    ],
+    "preservedIndependentGenerationConsumers": [
+      "lib/http/routes/commands.ts:51-102",
+      "lib/service/vector/RecipeVectorGenerationConsumer.ts",
+      "lib/recipe-pipeline/generate/strict/StrictPrivateCorpusRuntime.ts:1723"
+    ]
+  },
+  "coreEvidence": [
+    {
+      "file": "AlembicCore/src/service/vector/VectorService.ts:192",
+      "claim": "fullBuild already accepts and forwards clear/force to IndexingPipeline.run"
+    },
+    {
+      "file": "AlembicCore/test/VectorService.test.ts:158",
+      "claim": "Existing test explicitly verifies clear forwarding"
+    },
+    {
+      "file": "AlembicCore/src/infrastructure/vector/IndexingPipeline.ts:188",
+      "claim": "Persisted rows need sourcePath and ownership/verified legacy metadata"
+    },
+    {
+      "file": "AlembicCore/src/infrastructure/vector/IndexingPipeline.ts:244",
+      "claim": "Incremental skip requires complete owned chunk set; sourceHash alone is not sufficient"
+    },
+    {
+      "file": "AlembicCore/test/VectorPipeline.test.ts:523",
+      "claim": "Existing genuine first-write/second-run incremental coverage"
+    },
+    {
+      "file": "AlembicCore/test/EmbeddingPort.test.ts:56",
+      "claim": "Existing explicit query/doc and honest legacy adapter coverage"
+    },
+    {
+      "file": "AlembicCore/test/RecipeVectorGeneration.test.ts:219",
+      "claim": "Core owns verified generation build/activation/rollback; Main storage/routing tests remain necessary"
+    }
+  ],
+  "commands": {
+    "environment": "Node 22 from sibling Agent tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/.bin placed before PATH; no network/model request",
+    "baseline": "node node_modules/vitest/vitest.mjs run test/unit/CommandsFileRoutesAo3.test.ts test/integration/IndexingPipeline.test.ts test/unit/RecipeVectorGenerationRuntime.test.ts test/unit/EmbeddingIsolation.test.ts --maxWorkers=2",
+    "redAndGreen": "node node_modules/vitest/vitest.mjs run test/unit/CommandsFileRoutesAo3.test.ts --maxWorkers=1",
+    "fixture": "node node_modules/vitest/vitest.mjs run test/integration/IndexingPipeline.test.ts --maxWorkers=1",
+    "typedStore": "node node_modules/vitest/vitest.mjs run test/unit/RecipeVectorGenerationRuntime.test.ts test/unit/EmbeddingIsolation.test.ts --maxWorkers=2",
+    "scopedFinal": "node node_modules/vitest/vitest.mjs run test/unit/CommandsFileRoutesAo3.test.ts test/integration/IndexingPipeline.test.ts test/unit/RecipeVectorGenerationRuntime.test.ts test/unit/EmbeddingIsolation.test.ts test/unit/RecipeGenerationCommands.test.ts test/unit/RecipeVectorGenerationConsumer.test.ts test/unit/ModuleScanExistingIdClosure.test.ts --maxWorkers=2",
+    "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
+    "lint": "node node_modules/@biomejs/biome/bin/biome check lib/injection/ServiceMap.ts lib/injection/modules/KnowledgeRetrievalModule.ts lib/injection/modules/VectorModule.ts lib/service/vector/ProfiledVectorService.ts lib/tools/adapters/DashboardOperations.ts test/integration/IndexingPipeline.test.ts test/unit/CommandsFileRoutesAo3.test.ts test/unit/RecipeVectorGenerationRuntime.test.ts",
+    "boundaries": [
+      "node scripts/lint-layer-contract.mjs",
+      "node scripts/lint-repo-boundary.mjs",
+      "node scripts/core-source-command.mjs lint-consumer-imports",
+      "git diff --check"
+    ]
+  },
+  "verification": [
+    {
+      "kind": "baseline",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/embedding-rebuild-baseline.log",
+      "digest": "sha256:6d8766df77ab580b85087a05917c060c18ad04986a5dbfbdc84a893edbd7ad8d",
+      "exitCode": 1,
+      "result": "4 files: 56 passed, 1 known legacy incremental fixture failure"
+    },
+    {
+      "kind": "dashboard-parameter-red",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/dashboard-rebuild-red.log",
+      "digest": "sha256:1c821ad961dfc0026598dcde4a9ff7f2965b9aabf3fa5ff27513e7f0b2b47615",
+      "exitCode": 1,
+      "result": "2 expected failures: manual clear and missing clear option; 8 passed"
+    },
+    {
+      "kind": "dashboard-parameter-green",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/dashboard-rebuild-green.log",
+      "digest": "sha256:aa612dbca8c326a4674fe80420a8bf4177a433c01155341f1a386d725313ca88",
+      "exitCode": 0,
+      "result": "10 passed"
+    },
+    {
+      "kind": "incremental-fixture-green",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/indexing-fixture-green.log",
+      "digest": "sha256:b7f9a7b2e71eeeb90abb2fdc75b2277be79e3aa5cea547a3b7c85f93424fd385",
+      "exitCode": 0,
+      "result": "17 passed"
+    },
+    {
+      "kind": "typed-store-green",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/typed-vector-store-green.log",
+      "digest": "sha256:b6680b854d834b8e73b5e3322b0c4a3ee27186c2fc4bcc76d06109f3148ed7b5",
+      "exitCode": 0,
+      "result": "32 passed"
+    },
+    {
+      "kind": "typecheck",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/embedding-rebuild-types.log",
+      "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0,
+      "result": "tsc --noEmit passed"
+    },
+    {
+      "kind": "lint-intermediate",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/embedding-rebuild-lint.log",
+      "digest": "sha256:8665c0c851eddef951d5c7abcf1ccd192ec6827fdda4d1f87ac58770527aef0e",
+      "exitCode": 1,
+      "result": "1 formatter line-wrap failure fixed; 5 existing any warnings"
+    },
+    {
+      "kind": "lint-final",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/embedding-rebuild-lint-green.log",
+      "digest": "sha256:47e401a490fe2cd30fb6ad55f66002e83b77cc18f5336d3e0ee6f65c357bf1dd",
+      "exitCode": 0,
+      "result": "8 files passed; 5 existing any warnings retained"
+    },
+    {
+      "kind": "scoped-final",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/embedding-rebuild-scoped-green.log",
+      "digest": "sha256:4a64843e8c38a883cced60c85ad49ad3705f4a9ee777669200bccb307fbde9f6",
+      "exitCode": 0,
+      "result": "7 files, 72 tests passed"
+    },
+    {
+      "kind": "layer-boundary",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/embedding-rebuild-layer.log",
+      "digest": "sha256:6df0ee155d5627c85a787c6c5a8081c462d2bb8a21d774bf685db9f3de3158e8",
+      "exitCode": 0,
+      "result": "passed"
+    },
+    {
+      "kind": "repository-boundary",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/embedding-rebuild-repo-boundary.log",
+      "digest": "sha256:ff196aea1ea934e0067ad5ff6d16ea7d2c2ff9c08ea2da22e75f3d83f4919103",
+      "exitCode": 0,
+      "result": "passed"
+    },
+    {
+      "kind": "core-import-boundary",
+      "ref": "../../../Alembic/tmp/legacy-interface-cleanup-2026-09-21/embedding-rebuild-core-boundary.log",
+      "digest": "sha256:cd3a564f11e8f39f638604d84cefe4e9587fafff99731f8e2632eeda1a0236cc",
+      "exitCode": 0,
+      "result": "passed; Core source read-only"
+    }
+  ],
+  "diff": {
+    "ref": "embedding-rebuild.diff",
+    "digest": "sha256:b2cd3b1643a1cc6dae5f6b26d26b8b02433a0eaa475c7b03afbde31adfe46c9c"
+  },
+  "frozenFiles": [
+    {
+      "path": "lib/injection/ServiceMap.ts",
+      "digest": "sha256:a01a4c605c66c0a62a47f6fea955a0286a01c19703ef5c0d39cb85975445c340"
+    },
+    {
+      "path": "lib/injection/modules/KnowledgeRetrievalModule.ts",
+      "digest": "sha256:fcf57e3120c11782a11285c06b37c56baa46788765a85f1e7645368cccd81efa"
+    },
+    {
+      "path": "lib/injection/modules/VectorModule.ts",
+      "digest": "sha256:bf1c968cf5574a4efad66ced0fdbae9f3880494866c7beaae5a22ce0b1b89a9e"
+    },
+    {
+      "path": "lib/service/vector/ProfiledVectorService.ts",
+      "digest": "sha256:c02eeb9ac6b43632fee0b91bcab96d109d09795f9fcd71c81e052bc4538e0b29"
+    },
+    {
+      "path": "lib/tools/adapters/DashboardOperations.ts",
+      "digest": "sha256:fdd77d88ed3d7030d32b9c01a2b0002cd936a1f5f07001ada6af03ebb0cab26f"
+    },
+    {
+      "path": "test/integration/IndexingPipeline.test.ts",
+      "digest": "sha256:9d9baa784156ae52603f599c46785722d0e0268ef74a9ab5b7a48d90473d2e4e"
+    },
+    {
+      "path": "test/unit/CommandsFileRoutesAo3.test.ts",
+      "digest": "sha256:3136befeae1926ab6ff953d0530e74f720d7f9680c06468143407de8853039bc"
+    },
+    {
+      "path": "test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "digest": "sha256:2c3fbea51b5d98e432078b049310632890c2259950982c3721ed8b2a563f6cae"
+    }
+  ],
+  "selfReview": {
+    "stage1": "All authorized behavior preserved. Source changes limited to five Main files and three existing tests; no Core, rules, configuration, model service, V1/V2 surface or unrelated root-owned files changed.",
+    "stage2": "No new P0/P1/P2 identified. Typed store removes possible divergence between separately resolved gate and actual Core store. All meaningful profile/fallback/recovery assertions retained. Tests have no skip/only/exclusion or budget changes.",
+    "netProductLines": -52,
+    "remainingWarnings": "Five pre-existing as-any warnings in untouched cases of integration IndexingPipeline.test.ts; not hidden or suppressed.",
+    "limits": "No full check/build run by this subtask to avoid shared dependency build races; root owns ordered Agent check then Main build:self/check. No actual model or user data used."
+  },
+  "commit": {
+    "disposition": "not-committed",
+    "reason": "Root explicitly requested no subtask commit; final aggregate verification and commits are root-owned"
+  }
+}

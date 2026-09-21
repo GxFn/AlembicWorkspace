@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "title": "AlembicPlugin 五工具向量默认能力与检索质量修复",
+  "interfaceLanguage": "zh",
+  "sourceRevision": 3,
+  "sourceEventId": "evt-20260712125102-0003",
+  "progressDoc": "developer-progress.md",
+  "unifiedStatus": {
+    "demand": "alembic-plugin-five-tool-vector-quality-2026-07-12 - AlembicPlugin 五工具向量默认能力与检索质量修复",
+    "mainState": "planned",
+    "stage": "无",
+    "currentTaskPackages": "p1-plugin-five-tool-vector-quality-p1(pending)",
+    "windows": "AlembicPlugin(pending)",
+    "blockers": "无",
+    "nextAction": "prepare-dispatch-from-state, add-task-package, wakeflow-render-progress",
+    "review": "无",
+    "automation": "未启用",
+    "userDecisionsNeeded": "无",
+    "lastUpdated": "2026-07-12T12:51:02.093Z"
+  },
+  "slices": {
+    "windows": [
+      {
+        "windowName": "AlembicPlugin",
+        "windowState": "pending",
+        "taskPackageIds": [
+          "p1-plugin-five-tool-vector-quality-p1"
+        ],
+        "targetTaskIds": [
+          "p1-plugin-five-tool-vector-quality-t1"
+        ]
+      }
+    ],
+    "taskPackages": [
+      {
+        "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+        "status": "pending",
+        "summary": "Implement and commit one AlembicPlugin quality closure for the five knowledge tools.\n\nRequired fixes:\n- Change local embedding from explicit opt-in to default local-first auto-detection. `resolveLocalEmbeddingConfig` and newly generated Plugin config must default enabled; explicit `ALEMBIC_LOCAL_EMBEDDING_ENABLED=0`, config `enabled:false`, or `laneOrder:keyword-only` remains authoritative. Do not package/download a model or call cloud providers. Probe the existing default local Ollama endpoint/model with a bounded timeout; unavailable service/model must immediately and honestly fall back to keyword.\n- Replace public `alembic_search` search-operation table-list/all-token filtering with the already-created request-scoped read-only SearchEngine. Honor `mode=auto|keyword|semantic`, query, filters and budget/limit; keep get/expand bounded through the read-only repository. Project identity and read-only snapshot confinement stay intact. Output must distinguish real semantic/vector use, keyword fallback, zero match, and unavailable vector lane without leaking internal/raw provider data.\n- Carry actual SearchEngine route evidence through PrimeSearchPipeline and build Prime diagnostics from it. Delete the false rule that equates empty regionEvidence with unavailable vector; retain semantic-region evidence as a separate signal if useful.\n- Improve Plugin ProjectGraphProvider ranking: normalize CamelCase/specific identifiers, reward multi-term coverage/rare or specific term matches, and prevent one common term such as `request` from filling the top results ahead of HostMcpServer/ProjectLocationService matches. Do not turn Graph into semantic knowledge search or claim source-of-truth.\n- Deduplicate Recipe Map diagnostics for equivalent path anchors such as `:330` and `:330-330`; add a bounded nextAction explaining source-ref reconciliation/rescan when unresolved/stale refs exist. Query remains read-only and must not repair live knowledge.\n- Preserve Guard semantics, exact graph/file queries, Recipe Map conservation counts, all public schema/output projection gates, request-scoped roots, no-KB truthful results, no revision/host/admin/intent gates, and no main/resident/daemon coupling.\n\nRequired evidence and validation:\n- RED/GREEN tests proving current public semantic Search zero-result bug despite underlying vector success, then public success through SearchEngine.\n- Tests for config absent => auto-detect enabled; explicit disable => no probe/keyword; Ollama absent/model absent => bounded keyword degrade; Ollama available => vector.\n- Prime vector-used and keyword-fallback diagnostic tests based on real route evidence.\n- Graph ranking fixture with HostMcpServer/ProjectLocationService/request terms and Recipe Map duplicate diagnostic fixture.\n- Read-only snapshot/WAL/index hash or fingerprint proof before/after.\n- Focused tests, full `npm run test:unit`, `npm run check`, `npm run build`, `npm run verify:codex-runtime-package`, `npm run verify:plugin-distribution`, `npm run verify:codex-plugin`, and canonical local reload on exact final commit.\n- Return final commit, touched files/symbols, representative public JSON for both roots/modes, route diagnostics, no-write proof, two-stage self-review, and any honest residual limits. No Test dispatch."
+      }
+    ],
+    "targetTasks": [
+      {
+        "targetTaskId": "p1-plugin-five-tool-vector-quality-t1",
+        "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+        "targetWindow": "AlembicPlugin",
+        "status": "pending",
+        "reviewDecision": null,
+        "counts": null
+      }
+    ],
+    "blockers": [],
+    "decisionsRequired": []
+  }
+}

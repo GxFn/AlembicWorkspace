@@ -1,0 +1,1503 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-17",
+  "scope": [
+    "src/agent/runtime",
+    "src/agent/service",
+    "src/agent/profiles",
+    "src/agent/policies",
+    "src/agent/strategies",
+    "src/agent/coordination",
+    "src/agent/tasks",
+    "src/agent/index.ts",
+    "src/index.ts"
+  ],
+  "sourceFileCount": 65,
+  "reviewBoundary": "65个tracked源码与指定7份测试均在本轮全文审阅；不修改产品代码/测试；仅写本报告。未新增相邻仓审查或接管Wakeflow。",
+  "files": [
+    {
+      "path": "src/agent/coordination/AgentRunCoordinator.ts",
+      "role": "按 profile 的 partitioner/tier/concurrency 运行子任务，处理懒加载输入、回调与结果合并。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-008",
+        "RUNTIME-009"
+      ],
+      "consumers": [
+        "src/agent/service/AgentService.ts",
+        "src/agent/service/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/policies/BudgetPolicy.ts",
+      "role": "轮次、时间、会话 token 的策略限制及 runtime budget 配置。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-004"
+      ],
+      "consumers": [
+        "src/agent/policies/PolicyEngine.ts",
+        "src/agent/policies/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/policies/Policy.ts",
+      "role": "执行前/中/后与配置处理的策略基类契约。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/policies/BudgetPolicy.ts",
+        "src/agent/policies/PolicyEngine.ts",
+        "src/agent/policies/QualityGatePolicy.ts",
+        "src/agent/policies/SafetyPolicy.ts",
+        "src/agent/policies/index.ts",
+        "src/agent/runtime/ExitController.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/policies/PolicyEngine.ts",
+      "role": "组合策略并提供 budget 与工具安全校验入口。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-006"
+      ],
+      "consumers": [
+        "src/agent/policies/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/policies/QualityGatePolicy.ts",
+      "role": "执行后证据长度、文件引用、工具调用数量与自定义质量提示。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-018"
+      ],
+      "consumers": [
+        "src/agent/policies/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/policies/SafetyPolicy.ts",
+      "role": "发送者、文件范围、命令黑名单和需要审批工具的策略。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/policies/PolicyEngine.ts",
+        "src/agent/policies/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/policies/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/profiles/AgentProfileCompiler.ts",
+        "src/agent/profiles/presets/chatPreset.ts",
+        "src/agent/profiles/presets/evolutionPreset.ts",
+        "src/agent/profiles/presets/insightPreset.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/AgentRuntimeTypes.ts",
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "src/agent/service/AgentRuntimeBuilder.ts",
+        "test/agent-surface-floor.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/profiles/AgentProfileCompiler.ts",
+      "role": "将可序列化 profile/ref/override 编译成 preset、stage、policy、actionSpace 与并发计划。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-005"
+      ],
+      "consumers": [
+        "src/agent/profiles/index.ts",
+        "src/agent/service/AgentService.ts",
+        "src/agent/service/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/AgentProfileRegistry.ts",
+      "role": "内置与自定义 profile 注册、查找及禁止函数/Set/Map 的序列化检查。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/AgentProfileCompiler.ts",
+        "src/agent/profiles/index.ts",
+        "src/agent/service/AgentService.ts",
+        "src/agent/service/index.ts",
+        "test/plan-agent-run.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/plan-agent-run.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/profiles/AgentStageFactoryRegistry.ts",
+      "role": "scan/relation/generate/strict stage 工厂；组合动态分析预算与终端提示。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/AgentProfileCompiler.ts",
+        "src/agent/profiles/index.ts",
+        "src/agent/service/AgentService.ts",
+        "src/agent/service/index.ts",
+        "test/generate-analyze-budget.test.ts",
+        "test/strict-iterative-analysis.test.ts",
+        "test/strict-production-chain.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/generate-analyze-budget.test.ts",
+        "test/strict-iterative-analysis.test.ts",
+        "test/strict-production-chain.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/profiles/definitions/evolution.profile.ts",
+      "role": "可序列化业务profile定义；声明技能、strategy工厂、预算/并发或strict投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/definitions/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/definitions/generate.profile.ts",
+      "role": "可序列化业务profile定义；声明技能、strategy工厂、预算/并发或strict投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/definitions/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/definitions/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/AgentProfileRegistry.ts",
+        "src/agent/profiles/index.ts",
+        "test/module-mining-agent-run.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/module-mining-agent-run.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/profiles/definitions/module-mining/ScopedModuleMiningProfile.ts",
+      "role": "可序列化业务profile定义；声明技能、strategy工厂、预算/并发或strict投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/definitions/index.ts",
+        "test/module-mining-agent-run.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/module-mining-agent-run.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/profiles/definitions/plan.profile.ts",
+      "role": "可序列化业务profile定义；声明技能、strategy工厂、预算/并发或strict投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/definitions/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/definitions/relation.profile.ts",
+      "role": "可序列化业务profile定义；声明技能、strategy工厂、预算/并发或strict投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/definitions/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/definitions/scan.profile.ts",
+      "role": "可序列化业务profile定义；声明技能、strategy工厂、预算/并发或strict投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/definitions/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/definitions/signal.profile.ts",
+      "role": "可序列化业务profile定义；声明技能、strategy工厂、预算/并发或strict投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/definitions/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/definitions/translation.profile.ts",
+      "role": "可序列化业务profile定义；声明技能、strategy工厂、预算/并发或strict投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/definitions/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "test/agent-surface-floor.test.ts",
+        "test/feishu-remote-removal.test.ts",
+        "test/remaining-host-contract.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/agent-surface-floor.test.ts",
+        "test/feishu-remote-removal.test.ts",
+        "test/remaining-host-contract.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/profiles/presets/chatPreset.ts",
+      "role": "对话运行时默认块：conversation+analysis、Single、Budget与memory。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/presets/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/presets/evolutionPreset.ts",
+      "role": "知识进化运行时默认块及decision-only retry提示。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/presets/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/presets/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/profiles/AgentStageFactoryRegistry.ts",
+        "src/agent/profiles/index.ts",
+        "src/agent/service/AgentRuntimeBuilder.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/presets/insightPreset.ts",
+      "role": "analyze→quality_gate→produce→rejection_gate及独立预算/提示。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/presets/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/profiles/presets/types.ts",
+      "role": "preset工厂与可执行strategy配置结构。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/profiles/presets/chatPreset.ts",
+        "src/agent/profiles/presets/evolutionPreset.ts",
+        "src/agent/profiles/presets/index.ts",
+        "src/agent/profiles/presets/insightPreset.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/AgentEventBus.ts",
+      "role": "进程内语义事件、订阅与公开 request/reply API。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-010"
+      ],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts",
+        "src/agent/strategies/FanOutStrategy.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "test/feishu-remote-removal.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/feishu-remote-removal.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/AgentInterfaceContract.ts",
+      "role": "公共结果分支、Core failure taxonomy 投影和契约静态一致性校验。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/runtime/index.ts",
+        "test/agent-dcr-retirements.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/agent-dcr-retirements.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/AgentMessage.ts",
+      "role": "HTTP/CLI/MCP/internal 消息与回复 callback 的统一输入信封。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts",
+        "src/agent/service/AgentRunContracts.ts",
+        "src/agent/service/AgentService.ts",
+        "src/agent/strategies/FanOutStrategy.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/agent/strategies/SingleStrategy.ts",
+        "src/agent/strategies/Strategy.ts",
+        "test/evidence-recording-phase-chain.test.ts",
+        "test/feishu-remote-removal.test.ts",
+        "test/pipeline-outcome-abandoned.test.ts",
+        "test/strict-iterative-analysis.test.ts",
+        "test/strict-production-chain.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/evidence-recording-phase-chain.test.ts",
+        "test/feishu-remote-removal.test.ts",
+        "test/pipeline-outcome-abandoned.test.ts",
+        "test/strict-iterative-analysis.test.ts",
+        "test/strict-production-chain.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "role": "执行入口、ReAct 主循环、工具调用、预算、信号、过程事件与最终结果。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-001",
+        "RUNTIME-014",
+        "RUNTIME-017"
+      ],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "src/agent/runtime/index.ts",
+        "src/agent/service/AgentRuntimeBuilder.ts",
+        "test/AgentRuntime.test.ts",
+        "test/evidence-recording-phase-chain.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/AgentRuntime.test.ts",
+        "test/evidence-recording-phase-chain.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/AgentRuntimeBoundary.ts",
+      "role": "包公开入口和 Agent/Core/Host 的责任边界数据。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/runtime/AgentInterfaceContract.ts",
+        "src/agent/runtime/index.ts",
+        "test/agent-dcr-retirements.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/agent-dcr-retirements.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/AgentRuntimeResponsibility.ts",
+      "role": "运行时分解 seam、术语、feature flag 与模型/API边界元数据。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntimeBoundary.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/AgentRuntimeTypes.ts",
+      "role": "运行时输入、LLM响应、工具记录、诊断与结果的类型契约。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/evaluation/StrictProductionFixtureEvaluation.ts",
+        "src/agent/runs/evolution/EvolutionAgentRun.ts",
+        "src/agent/runs/scan/ScanAgentRun.ts",
+        "src/agent/runs/scan/ScanRunProjection.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/DiagnosticsCollector.ts",
+        "src/agent/runtime/HookSystem.ts",
+        "src/agent/runtime/index.ts",
+        "src/agent/service/AgentRunContracts.ts",
+        "test/mining-e2e-pipeline.test.ts",
+        "test/scan-run-projection.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/mining-e2e-pipeline.test.ts",
+        "test/scan-run-projection.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/AgentState.ts",
+      "role": "带历史、guard/action 与 EventEmitter 的状态机。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "state是execute外的实例字段；重复execute后safeTransition不能从completed重新start。需明确Runtime是否可复用/并发，再决定新增重置或拒并发；不借清理裁掉接口。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/AnalyzeGroundingGuard.ts",
+      "role": "显式 guard 模式下构建 grounding 政策与 analyze 文本轮阻断决策。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/LLMInputAssembly.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/BudgetController.ts",
+      "role": "上下文压缩触发、L4 冷却、token 使用计量及工具输出预算。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-007"
+      ],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "maxSessionTokens config声明未由BudgetController消费；token硬停由Policy/ExitController承担，不能孤立补成另一套预算权威。#tracker/#forcedSummarize部分字段未使用，公开summary语义先核查后清理。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/DiagnosticsCollector.ts",
+      "role": "统一诊断/效率计数、聚合、序列化及去重调用信封记录。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/evaluation/DurableSemanticReviewRuntime.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/index.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "test/durable-semantic-review-runtime.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/durable-semantic-review-runtime.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/ExitController.ts",
+      "role": "实际使用 pre-iteration 退出检查；另含尚未接入主循环的 post-* 公共检查器。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "checkAfterLLM/checkAfterAiError/checkAfterToolCalls/checkAfterTextResponse/checkToolChoiceViolation在src没有调用，而Runtime保留同职责分支；这是可清理重复路径候选，但该类公开导出，删除方法须先确认外部兼容，不列为本轮必修。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/HookSystem.ts",
+      "role": "有顺序/once/错误诊断的同步与异步 hook，含可阻断工具执行事件。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-019"
+      ],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "agent:exit有默认桥接但主循环未emit；不要为凑事件覆盖凭空加新流程，结合状态修复明确event contract。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/LLMInputAssembly.ts",
+      "role": "组装 identity/stage/tool/task/evidence/runtime layer，并压缩重复输入与提交历史。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/LLMInputMeasurement.ts",
+        "src/agent/runtime/PcvNodeEvidenceRecorder.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "模型控制文本的子串去重有语义损失风险，但本轮只报已确认measurement双计；不擅自改grounding默认off或升级证据门。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/LLMInputMeasurement.ts",
+      "role": "provider 输入与分节 token估算、重复文本度量。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-015"
+      ],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/LLMResultType.ts",
+      "role": "LLM循环 continue 控制结果及公开枚举。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/LoopContext.ts",
+      "role": "一次 reactLoop 的依赖、状态、预算、证据、累计token与结果投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/AnalyzeGroundingGuard.ts",
+        "src/agent/runtime/ExitController.ts",
+        "src/agent/runtime/LLMInputAssembly.ts",
+        "src/agent/runtime/PcvNodeEvidenceRecorder.ts",
+        "src/agent/runtime/ProviderToolChoicePolicy.ts",
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/MessageAdapter.ts",
+      "role": "ContextWindow 与裸消息数组的统一适配接口。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/PcvNodeEvidenceRecorder.ts",
+      "role": "观察运行节点/输入/工具/发现/quality gate/source ref 证据并供宿主审计投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/evaluation/gateEvaluators.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/AnalyzeGroundingGuard.ts",
+        "src/agent/runtime/LLMInputAssembly.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "保持observe-only；本轮不把sourceRef诊断/分类变成新的质量门。复制/命名辅助函数较多，未证实可删除的实际消费路径。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/ProviderToolChoicePolicy.ts",
+      "role": "ModelQuirks 驱动的工具可见性/toolChoice provider 兼容策略，与 grounding guard 解耦。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/AnalyzeGroundingGuard.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/SystemPromptBuilder.ts",
+      "role": "persona、预加载文件清单、capability context、语言与轮次预算提示组装。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/SystemRunContext.ts",
+      "role": "规范构建和投影 scope/ActiveContext/trace/sharedState，维护同scope关联。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/index.ts",
+        "src/agent/service/AgentRunContracts.ts",
+        "src/agent/service/SystemRunContextFactory.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "test/mining-e2e-pipeline.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/mining-e2e-pipeline.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "role": "action权限/阶段门、参数大小、重复缓存、实际router执行、证据与提交记账中间件。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-011",
+        "RUNTIME-012",
+        "RUNTIME-013"
+      ],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts",
+        "test/EvidenceCapture.test.ts",
+        "test/EvidenceToolAndQuota.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/EvidenceCapture.test.ts",
+        "test/EvidenceToolAndQuota.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/runtime/finalAnswer.ts",
+      "role": "清除响应中的显式Final Answer前缀、memory标记与部分系统nudge噪声。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/forcedSummary.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/forcedSummary.ts",
+      "role": "无最终文本时生成受限Markdown/dimensionDigest及失败时本地摘要。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-016"
+      ],
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/runtime/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "test/AgentRuntime.test.ts",
+        "test/BudgetController.test.ts",
+        "test/ExplorationStrategies.test.ts",
+        "test/contract-surface.test.ts",
+        "test/evidence-recording-phase-chain.test.ts",
+        "test/hook-system.test.ts",
+        "test/llm-input-layering.test.ts",
+        "test/pcv-observe-only-baseline.characterization.test.ts",
+        "test/pcv-observe-only-five-scenario.acceptance.test.ts",
+        "test/runtime-efficiency.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/AgentRuntime.test.ts",
+        "test/BudgetController.test.ts",
+        "test/ExplorationStrategies.test.ts",
+        "test/contract-surface.test.ts",
+        "test/evidence-recording-phase-chain.test.ts",
+        "test/hook-system.test.ts",
+        "test/llm-input-layering.test.ts",
+        "test/pcv-observe-only-baseline.characterization.test.ts",
+        "test/pcv-observe-only-five-scenario.acceptance.test.ts",
+        "test/runtime-efficiency.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/service/AgentRunContracts.ts",
+      "role": "AgentService/profile/run/runtime 的公开契约。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/coordination/AgentRunCoordinator.ts",
+        "src/agent/profiles/AgentProfileCompiler.ts",
+        "src/agent/profiles/AgentProfileRegistry.ts",
+        "src/agent/profiles/definitions/evolution.profile.ts",
+        "src/agent/profiles/definitions/generate.profile.ts",
+        "src/agent/profiles/definitions/index.ts",
+        "src/agent/profiles/definitions/module-mining/ScopedModuleMiningProfile.ts",
+        "src/agent/profiles/definitions/plan.profile.ts",
+        "src/agent/profiles/definitions/relation.profile.ts",
+        "src/agent/profiles/definitions/scan.profile.ts",
+        "src/agent/profiles/definitions/signal.profile.ts",
+        "src/agent/profiles/definitions/translation.profile.ts",
+        "src/agent/runs/module-mining/ScopedModuleMiningAgentRun.ts",
+        "src/agent/runs/relation/RelationAgentRun.ts",
+        "src/agent/runs/scan/ScanAgentRun.ts",
+        "src/agent/runs/scan/ScanRunProjection.ts",
+        "src/agent/service/AgentRuntimeBuilder.ts",
+        "src/agent/service/AgentService.ts",
+        "src/agent/service/index.ts",
+        "test/agent-surface-floor.test.ts",
+        "test/mining-e2e-pipeline.test.ts",
+        "test/module-context-assembler.test.ts",
+        "test/module-mining-agent-run.test.ts",
+        "test/pipeline-outcome-abandoned.test.ts",
+        "test/plan-agent-run.test.ts",
+        "test/scan-run-production-integration.test.ts",
+        "test/scan-run-projection.test.ts",
+        "test/strict-production-chain.test.ts"
+      ],
+      "cleanup": "abortPolicy声明stop-new/cancel-running/finish-tier但coordinator完全不读；shouldAbort仅coordination轮询，单run不消费。恢复完整策略语义涉及契约选择，列后续决策而非擅自扩scope。",
+      "tests": [
+        "test/agent-surface-floor.test.ts",
+        "test/mining-e2e-pipeline.test.ts",
+        "test/module-context-assembler.test.ts",
+        "test/module-mining-agent-run.test.ts",
+        "test/pipeline-outcome-abandoned.test.ts",
+        "test/plan-agent-run.test.ts",
+        "test/scan-run-production-integration.test.ts",
+        "test/scan-run-projection.test.ts",
+        "test/strict-production-chain.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/service/AgentRuntimeBuilder.ts",
+      "role": "编译profile/preset与宿主依赖组装成真实Runtime。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/service/AgentService.ts",
+        "src/agent/service/index.ts",
+        "test/mining-e2e-pipeline.test.ts",
+        "test/module-mining-agent-run.test.ts",
+        "test/plan-agent-run.test.ts"
+      ],
+      "cleanup": "外部host实际消费；保留DI边界。RuntimeConfig的toolRegistry名义类型比builder最小duck接口宽，可内部精简但不能裁公开功能。",
+      "tests": [
+        "test/mining-e2e-pipeline.test.ts",
+        "test/module-mining-agent-run.test.ts",
+        "test/plan-agent-run.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/service/AgentService.ts",
+      "role": "对外run入口，编译profile、协调child或执行Runtime并映射结果。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-002",
+        "RUNTIME-003"
+      ],
+      "consumers": [
+        "src/agent/runs/evolution/EvolutionAgentRun.ts",
+        "src/agent/runs/module-mining/ScopedModuleMiningAgentRun.ts",
+        "src/agent/runs/plan/PlanAgentRun.ts",
+        "src/agent/runs/relation/RelationAgentRun.ts",
+        "src/agent/runs/scan/ScanAgentRun.ts",
+        "src/agent/runs/translation/TranslationAgentRun.ts",
+        "src/agent/service/index.ts",
+        "test/mining-e2e-pipeline.test.ts",
+        "test/module-context-assembler.test.ts",
+        "test/module-mining-agent-run.test.ts",
+        "test/pipeline-outcome-abandoned.test.ts",
+        "test/plan-agent-run.test.ts",
+        "test/scan-run-production-integration.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/mining-e2e-pipeline.test.ts",
+        "test/module-context-assembler.test.ts",
+        "test/module-mining-agent-run.test.ts",
+        "test/pipeline-outcome-abandoned.test.ts",
+        "test/plan-agent-run.test.ts",
+        "test/scan-run-production-integration.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/service/SystemRunContextFactory.ts",
+      "role": "为system运行创建ContextWindow/MemoryCoordinator/scope/tracker。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/runs/scan/ScanAgentRun.ts",
+        "src/agent/service/index.ts",
+        "test/scan-run-production-integration.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/scan-run-production-integration.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/service/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/tasks/AgentTaskHandlers.ts",
+        "test/agent-surface-floor.test.ts",
+        "test/contract-surface.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/agent-surface-floor.test.ts",
+        "test/contract-surface.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/strategies/FanOutStrategy.ts",
+      "role": "直接Strategy级tier并行执行，复用Runtime并合并item结果。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/strategies/index.ts"
+      ],
+      "cleanup": "与AgentRunCoordinator是不同公开入口；共用Runtime会共享统计/state，需独立明确并发语义，不能仅按重复名字删除其中之一。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/strategies/PipelineStrategy.ts",
+      "role": "stage执行与timeout、gate retry/degrade/strict失败及阶段状态隔离。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [
+        "RUNTIME-020"
+      ],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/profiles/presets/index.ts",
+        "test/evidence-recording-phase-chain.test.ts",
+        "test/pipeline-outcome-abandoned.test.ts",
+        "test/strict-iterative-analysis.test.ts",
+        "test/strict-production-chain.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/evidence-recording-phase-chain.test.ts",
+        "test/pipeline-outcome-abandoned.test.ts",
+        "test/strict-iterative-analysis.test.ts",
+        "test/strict-production-chain.test.ts"
+      ]
+    },
+    {
+      "path": "src/agent/strategies/SingleStrategy.ts",
+      "role": "单阶段委托 reactLoop。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/strategies/FanOutStrategy.ts",
+        "src/agent/strategies/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/strategies/Strategy.ts",
+      "role": "StrategyRuntime、StrategyResult、FanOutItem及策略基类契约。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/strategies/FanOutStrategy.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/agent/strategies/SingleStrategy.ts",
+        "src/agent/strategies/index.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/strategies/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/profiles/presets/index.ts",
+        "src/agent/runtime/AgentRuntimeTypes.ts",
+        "src/agent/service/AgentRuntimeBuilder.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/tasks/AgentTaskHandlers.ts",
+      "role": "宿主task接口的查重/关系发现/enrich/quality/guard编排；依赖宿主工具invoke入口。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "src/agent/tasks/index.ts"
+      ],
+      "cleanup": "仍消费宿主提供的旧named tools，不能按内置registry找不到就删除；taskFullEnrich仅一批20是现有宿主协议面，扩大批处理属于范围决策。",
+      "tests": []
+    },
+    {
+      "path": "src/agent/tasks/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "test/agent-surface-floor.test.ts",
+        "test/remaining-host-contract.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/agent-surface-floor.test.ts",
+        "test/remaining-host-contract.test.ts"
+      ]
+    },
+    {
+      "path": "src/index.ts",
+      "role": "公开或内部barrel；逐行审阅re-export，保留稳定消费边界。",
+      "reviewed": true,
+      "reviewMode": "full-source-read-this-round",
+      "findings": [],
+      "consumers": [
+        "test/agent-interface-contract.test.ts",
+        "test/ai-provider.test.ts",
+        "test/index.test.ts",
+        "test/memory-context.test.ts",
+        "test/runtime-efficiency.test.ts",
+        "test/tool-system.test.ts"
+      ],
+      "cleanup": "未发现有证据可直接删除的职责；声明式profile/barrel与公开接口按现有消费者保留。",
+      "tests": [
+        "test/agent-interface-contract.test.ts",
+        "test/ai-provider.test.ts",
+        "test/index.test.ts",
+        "test/memory-context.test.ts",
+        "test/runtime-efficiency.test.ts",
+        "test/tool-system.test.ts"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "P1",
+      "id": "RUNTIME-001",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "line": 1939,
+      "issue": "abort() 只改状态/发事件，无法取消execute中的局部AbortController，在途provider/tool继续运行。",
+      "repro": "挂起chatWithTools直到收到signal；调用runtime.abort()，signal仍未aborted，while只检查ctx.abortSignal不检查state。",
+      "suggestion": "保存本次run的controller并由abort触发；执行结束清理引用；保持parent abort和timeout原因。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-002",
+      "path": "src/agent/service/AgentService.ts",
+      "line": 98,
+      "issue": "正常返回仅按reply非空判success，取消、policy拒绝、strict失败、fallback错误文本被误报成功。",
+      "repro": "实际源码probe：runtime返回非空[run stopped: abort_signal]及diagnostics.cancelReason，service.status=success。Runtime取消后仍发AGENT_COMPLETED。",
+      "suggestion": "优先传播明确的结构化status/outcome、state和diagnostics，统一成功/blocked/aborted/timeout/error，不能解析自然语言作为唯一真相。",
+      "scope": "existing-defect",
+      "validation": "source-transpile-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-003",
+      "path": "src/agent/service/AgentService.ts",
+      "line": 187,
+      "issue": "execution.timeoutMs 在buildRuntimeOptions完全丢弃，公开运行时选项也无对应字段。",
+      "repro": "实际源码probe传timeoutMs=1，runtime收到opts不含timeoutMs且budgetOverride=null；execute只采用Policy超时。",
+      "suggestion": "端到端传递单次run超时并在Runtime落实；与policy/stage预算组合为明确上限，父run不能对子任务重复重置总时限。",
+      "scope": "existing-defect",
+      "validation": "source-transpile-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-004",
+      "path": "src/agent/policies/BudgetPolicy.ts",
+      "line": 68,
+      "issue": "非tracker首轮iteration先加到1，Policy用>=maxIterations提前终止；translation-json配置1会零模型调用。",
+      "repro": "实际源码probe new BudgetPolicy({maxIterations:1}).validateDuring({iteration:1,startTime:now})返回stop；reactLoop每轮先递增再检查。",
+      "suggestion": "统一检查输入为已完成轮次或改当前轮次比较；补真实BudgetPolicy的1轮/多轮Runtime集成，现有stub没有Policy所以没捕获。",
+      "scope": "existing-defect",
+      "validation": "source-transpile-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-005",
+      "path": "src/agent/profiles/AgentProfileCompiler.ts",
+      "line": 194,
+      "issue": "声明式SafetyPolicy编译时所有约束字段丢失。",
+      "repro": "profile.policies=[{type:safety,fileScope:...,allowedSenders:...,requireApprovalFor:...}]只new SafetyPolicy()。",
+      "suggestion": "与budget分支一样去掉type后透传安全配置，补profile声明到实际拒绝的行为测试。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-006",
+      "path": "src/agent/policies/PolicyEngine.ts",
+      "line": 78,
+      "issue": "工具安全策略仅识别terminal args.bin旧形态，当前action/params.command不触发自定义命令黑名单。",
+      "repro": "validateToolCall(terminal,{action:exec,params:{command:自定义禁用命令}})跳过checkCommand。",
+      "suggestion": "先归一化当前和保留旧调用形态，再执行同一SafetyPolicy；同时核对真实pipeline/adapter确实调用validator。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P2",
+      "id": "RUNTIME-007",
+      "path": "src/agent/runtime/BudgetController.ts",
+      "line": 416,
+      "issue": "无ContextWindow的工具配额返回值与内部remaining状态不一致。",
+      "repro": "源码probe getToolBudget(1)宣称6000/15，紧接remaining实际400/0；分支未重置累计字符。",
+      "suggestion": "不论是否有ContextWindow统一初始化本轮状态，再返回预算；补无ContextWindow多轮额度测试。",
+      "scope": "existing-defect",
+      "validation": "source-transpile-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-008",
+      "path": "src/agent/coordination/AgentRunCoordinator.ts",
+      "line": 104,
+      "issue": "按tier排序执行后的结果数组与原输入顺序不一致，merger按下标将结果归错dim/module。",
+      "repro": "源码probe输入a-tier2,b-tier1，dimensionResults.a.runId=b、b.runId=a。",
+      "suggestion": "为child保留原位置或稳定identity，返回原顺序后映射；包含剩余aborted子任务。",
+      "scope": "existing-defect",
+      "validation": "source-transpile-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-009",
+      "path": "src/agent/coordination/AgentRunCoordinator.ts",
+      "line": 290,
+      "issue": "parent合并只识别error/aborted，timeout和blocked均提升为success。",
+      "repro": "源码probe两个child均timeout，parent.status=success。",
+      "suggestion": "按完整AgentRunStatus明确非成功优先级，保留child diagnostics/结果，不以非空父reply替代状态。",
+      "scope": "existing-defect",
+      "validation": "source-transpile-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-010",
+      "path": "src/agent/runtime/AgentEventBus.ts",
+      "line": 123,
+      "issue": "request发布的请求自身因同correlationId被当作reply，未响应也立即成功。",
+      "repro": "源码probe无任何订阅bus.request(ping,{value:1},{timeout:20})立即返回type=ping,pending=0。",
+      "suggestion": "pending记录requestType并排除请求事件，或显式响应区分；补无人响应timeout和正常response测试。",
+      "scope": "existing-defect",
+      "validation": "source-transpile-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-011",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "line": 97,
+      "issue": "直呼note_finding桥接丢弃schema公开的所有深度槽，RECORD阶段无法保存深度发现。",
+      "repro": "AgentRuntime direct schema包含DEPTH_SLOT_PROPS；toExecutableToolCall只保留五个基础字段，handler看不到designIntent/boundaries/failureModes/tradeoffs。",
+      "suggestion": "按深度槽单源key白名单透传可选字段；回归覆盖真实pipeline→handler→scratchpad而非只直调handler。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-012",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "line": 793,
+      "issue": "Producer阶段gate未允许evidence.get/search，阻断capability已声明的证据自救通道。",
+      "repro": "GenerateProduce.allowedTools含evidence，进入tracker PRODUCE后producerSubmitOnlyGate仍返回blocked。",
+      "suggestion": "加入既有EVIDENCE_READ_ACTIONS白名单并更新错误提示，保持SUMMARIZE全面禁工具。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-013",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "line": 846,
+      "issue": "可变状态读取被默认session缓存永久短路，绕开真实重读与写前新鲜度恢复。",
+      "repro": "code.read→外部改同文件→相同read默认session key命中旧值，handler不执行；memory.save后recall或submit后meta.review同理。",
+      "suggestion": "仅复用有可信不可变snapshot或revision的结果；动态store读取不缓存/更新revision；写后失效必须同时考虑外部变更。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-014",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "line": 1412,
+      "issue": "公开可阻断tool:execute:before hook被Runtime用emitSync调用，false返回值完全无效。",
+      "repro": "注册hook返回false，Runtime仍进入toolPipeline.execute。",
+      "suggestion": "此事件await emit并消费blocked verdict，输出规范工具拒绝及诊断；其他纯观察hook保持原路径。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P2",
+      "id": "RUNTIME-015",
+      "path": "src/agent/runtime/LLMInputMeasurement.ts",
+      "line": 85,
+      "issue": "provider预算估计把system/runtime sections重复计入，导致未超预算的请求被误拒。",
+      "repro": "源码probe仅400字符systemPrompt，实际估100token，但estimatedTokens=201；sections.identity再次加入measuredText。",
+      "suggestion": "实际payload总量只算system+providerMessages+tools一次；sectionMeasurements/重复分析保持独立。",
+      "scope": "existing-defect",
+      "validation": "source-transpile-probe"
+    },
+    {
+      "severity": "P2",
+      "id": "RUNTIME-016",
+      "path": "src/agent/runtime/forcedSummary.ts",
+      "line": 101,
+      "issue": "强制摘要仍消费旧扁平参数并将所有knowledge调用计为已提交候选。",
+      "repro": "真实code args={action:read,params:{path:src/a.ts}}无法提取文件；knowledge.search也增加candidateCount且title=untitled。",
+      "suggestion": "统一解包args.params及path/filePath兼容，只以成功knowledge.submit结果计候选；scan finalize同样修正计数。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-017",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "line": 1644,
+      "issue": "两条强制摘要provider调用未传abortSignal，取消/timeout后摘要HTTP仍继续。",
+      "repro": "非tracker末轮直接chatWithTools无signal；finalize→produceForcedSummary契约也没有signal，只在调用前检查一次。",
+      "suggestion": "将signal穿透两个summary路径并处理执行期间取消，不把取消降级为正常摘要成功。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P2",
+      "id": "RUNTIME-018",
+      "path": "src/agent/policies/QualityGatePolicy.ts",
+      "line": 41,
+      "issue": "任何knowledge查询都被当成submit，从而跳过文件证据数量门。",
+      "repro": "只有knowledge.search且reply无文件ref、足够长度/调用数时hasSubmitCalls=true，minFileRefs不检查。",
+      "suggestion": "检查action=submit及成功/created语义；空reply也不应跳过minEvidenceLength的失败判断。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P2",
+      "id": "RUNTIME-019",
+      "path": "src/agent/runtime/HookSystem.ts",
+      "line": 197,
+      "issue": "emitSync调用async观察者但不处理其rejected Promise，可能产生unhandled rejection。",
+      "repro": "hooks.on(after, async()=>{throw Error});emitSync只try同步调用，catch接不到异步拒绝。",
+      "suggestion": "同步分发对thenable附加reject处理并记录HOOK_HANDLER_FAILED；不能让观察者失败改变主任务结果。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    },
+    {
+      "severity": "P1",
+      "id": "RUNTIME-020",
+      "path": "src/agent/strategies/PipelineStrategy.ts",
+      "line": 342,
+      "issue": "Pipeline循环不检查父取消，已取消stage正常返回停止文本后仍运行后续gate/promptBuilder/stage。",
+      "repro": "传已aborted parent signal，首个reactLoop可返回[run stopped]，for循环仍进入后续gate evaluator与生产stage；service最终还可能success。",
+      "suggestion": "每次stage/gate前后检查共享signal，终止后续阶段并返回明确aborted；不要在取消后触发retry/forced summary。",
+      "scope": "existing-defect",
+      "validation": "full-source-control-flow"
+    }
+  ],
+  "nonRequiredScopeDecisions": [
+    {
+      "file": "ExitController.ts",
+      "note": "checkAfterLLM/checkAfterAiError/checkAfterToolCalls/checkAfterTextResponse/checkToolChoiceViolation在src没有调用，而Runtime保留同职责分支；这是可清理重复路径候选，但该类公开导出，删除方法须先确认外部兼容，不列为本轮必修。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "AgentRunContracts.ts",
+      "note": "abortPolicy声明stop-new/cancel-running/finish-tier但coordinator完全不读；shouldAbort仅coordination轮询，单run不消费。恢复完整策略语义涉及契约选择，列后续决策而非擅自扩scope。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "AgentState.ts",
+      "note": "state是execute外的实例字段；重复execute后safeTransition不能从completed重新start。需明确Runtime是否可复用/并发，再决定新增重置或拒并发；不借清理裁掉接口。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "HookSystem.ts",
+      "note": "agent:exit有默认桥接但主循环未emit；不要为凑事件覆盖凭空加新流程，结合状态修复明确event contract。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "BudgetController.ts",
+      "note": "maxSessionTokens config声明未由BudgetController消费；token硬停由Policy/ExitController承担，不能孤立补成另一套预算权威。#tracker/#forcedSummarize部分字段未使用，公开summary语义先核查后清理。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "LLMInputAssembly.ts",
+      "note": "模型控制文本的子串去重有语义损失风险，但本轮只报已确认measurement双计；不擅自改grounding默认off或升级证据门。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "PcvNodeEvidenceRecorder.ts",
+      "note": "保持observe-only；本轮不把sourceRef诊断/分类变成新的质量门。复制/命名辅助函数较多，未证实可删除的实际消费路径。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "AgentTaskHandlers.ts",
+      "note": "仍消费宿主提供的旧named tools，不能按内置registry找不到就删除；taskFullEnrich仅一批20是现有宿主协议面，扩大批处理属于范围决策。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "FanOutStrategy.ts",
+      "note": "与AgentRunCoordinator是不同公开入口；共用Runtime会共享统计/state，需独立明确并发语义，不能仅按重复名字删除其中之一。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    },
+    {
+      "file": "AgentRuntimeBuilder.ts",
+      "note": "外部host实际消费；保留DI边界。RuntimeConfig的toolRegistry名义类型比builder最小duck接口宽，可内部精简但不能裁公开功能。",
+      "scope": "inspection-suggestion-or-public-contract-decision; not automatic implementation authority"
+    }
+  ],
+  "testReview": {
+    "files": [
+      {
+        "path": "test/AgentRuntime.test.ts",
+        "reviewed": true,
+        "reviewMode": "full-source-read"
+      },
+      {
+        "path": "test/BudgetController.test.ts",
+        "reviewed": true,
+        "reviewMode": "full-source-read"
+      },
+      {
+        "path": "test/generate-analyze-budget.test.ts",
+        "reviewed": true,
+        "reviewMode": "full-source-read"
+      },
+      {
+        "path": "test/hook-system.test.ts",
+        "reviewed": true,
+        "reviewMode": "full-source-read"
+      },
+      {
+        "path": "test/pcv-observe-only-baseline.characterization.test.ts",
+        "reviewed": true,
+        "reviewMode": "full-source-read"
+      },
+      {
+        "path": "test/pcv-observe-only-five-scenario.acceptance.test.ts",
+        "reviewed": true,
+        "reviewMode": "full-source-read"
+      },
+      {
+        "path": "test/runtime-efficiency.test.ts",
+        "reviewed": true,
+        "reviewMode": "full-source-read"
+      }
+    ],
+    "testsRun": [],
+    "probes": [
+      "event-request-self-reply",
+      "no-context-tool-budget",
+      "first-iteration-budget",
+      "coordinator-tier-identity-and-status",
+      "input-measurement-double-count",
+      "service-status-and-timeout-options"
+    ]
+  },
+  "testSimplifications": [
+    {
+      "paths": [
+        "test/AgentRuntime.test.ts",
+        "test/pcv-observe-only-baseline.characterization.test.ts",
+        "test/pcv-observe-only-five-scenario.acceptance.test.ts"
+      ],
+      "issue": "三份重复DeepSeek first-burn/guard/none suppression的provider、tracker、envelope setup和同场景执行。",
+      "suggestion": "合并到一套table驱动PCV runtime场景；保留provider收到policy与metadata观察两个不同断言面，去重复跑同一fixture。"
+    },
+    {
+      "paths": [
+        "test/pcv-observe-only-baseline.characterization.test.ts"
+      ],
+      "issue": "CP2/CP3与AP4分开多次重跑相同off/guard fixture，仅各检查其中几项；AP4最后一项重覆CP4-off。",
+      "suggestion": "同一off/guard执行结果一次性验证可见schema、实际工具、rollback、classification与enforcement marker；纯assembly CP1可保留小单测。"
+    },
+    {
+      "paths": [
+        "test/AgentRuntime.test.ts"
+      ],
+      "issue": "绝大多数用空PolicyEngine且直接reactLoop；无法覆盖实际服务编译BudgetPolicy后maxIterations1零调用、execute.abort和最终Service status。",
+      "suggestion": "保留过程事件/脱敏接线测试，新增少量Service→Builder→真实BudgetPolicy→Runtime场景覆盖真实缺口，避免继续堆对空policy stub的断言。"
+    },
+    {
+      "paths": [
+        "test/BudgetController.test.ts"
+      ],
+      "issue": "只覆盖L4开关/冷却，没有无ContextWindow工具预算状态。",
+      "suggestion": "增加一条多轮无context配额断言即可；已有L4失败与取消case语义不同，不删。"
+    },
+    {
+      "paths": [
+        "test/hook-system.test.ts"
+      ],
+      "issue": "只单测emit和emitSync错误记录，缺Runtime消费false的执行拦截验证。",
+      "suggestion": "增加一个Runtime真实执行边界拦截回归及emitSync async rejection归档；两种错误case可以表驱动但不要移除异步错误保护。"
+    },
+    {
+      "paths": [
+        "test/runtime-efficiency.test.ts"
+      ],
+      "issue": "缓存正例全部带_projectSnapshotId，没覆盖生产默认session+可变文件/内存状态，因而未捕获假新鲜缓存。",
+      "suggestion": "保留可信snapshot重复读正例；补无snapshot实际读取变化/写入后变化，避免将禁用一切缓存当修复。"
+    },
+    {
+      "paths": [
+        "test/generate-analyze-budget.test.ts"
+      ],
+      "issue": "三项分别覆盖动态override/非法fallback/produce隔离，属于必要独立边界，没有明显可删重复。",
+      "suggestion": "保留，可用it.each压缩非法输入列表，非必做。"
+    }
+  ],
+  "notes": [
+    "所有findings为修复前的既有代码缺陷；父任务可能已并行修复，需以最终diff与RED/GREEN结果更新处理状态。",
+    "公开接口不因本仓缺消费直接删除；此前已确认Alembic真实host消费。",
+    "PCV observe-only默认不改变；扩展完整abortPolicy/Runtime并发复用策略等列为需范围决策的建议。"
+  ]
+}

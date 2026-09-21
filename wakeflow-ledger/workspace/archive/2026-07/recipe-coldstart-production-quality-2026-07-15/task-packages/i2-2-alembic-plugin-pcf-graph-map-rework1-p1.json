@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i2-2-alembic-plugin-pcf-graph-map-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "执行 AlembicPlugin I2.2 rework1，基线必须为干净的 AlembicPlugin@729cf3b8066e69462157dab9242a392469975512/tree d0320ad2a368fa123f0c3215c9d452d69cda874b，并继续加载已接受 AlembicCore@4a3e8bab3fc7aa05ef7b680593599634422513aa。只修 PC-F3/PC-F4 当前验收根因，不进入 I3+、publication/five-tool serving、R0+ 或 Test。\n\n首要根因：空库实际顺序先执行 Plan/ProjectContext analysis，后创建 HostAgent session；现有 strict 分支只会 reopen 已存在 carrier，而 Plugin 没有实际 artifact/carrier producer，所以首轮 Plan/cold-start 必然走 collectPlanProjectContext/direct ProjectContext。PluginStrictCounters 也只初始化为 0，未观测实际旁路。当前 runtime 证据同时显示 MR5 60s timeout、SP 仅 1 repo且无 carrier/root+4/第五 receipt，全部不可接受。\n\n最小修复合同：\n1. 在现有 Plugin prepare→Plan draft/confirm→cold-start→HostAgent session 路径上，用 Core 已接受的 Foundation 公共 API 单次 capture/put/reopen 并持久化 carrier；不能复制 Main 实现、创建第二 store/collector/registry，不能 pre-reset facts 或 double capture。空库首轮 Plan、generation、dependency graph、module coverage、dimension-completion 必须真实共享 artifactId/sourceVectorHash/facts/binding；base certification 不回写。\n2. strict run 不得在 carrier 缺失时降级；legacy/manual 分支只能由明确非 strict 入口到达。对 collectPlanProjectContext、direct ProjectContext/raw FS/synthetic scope、cap、empty-axis/Core passthrough 做实际入口可观测计数或等价可复核 trace，不能把常量 0 当证据。\n3. 实际 dimension-completion 产生并持久化第五 receipt；fresh manager/新进程重开后仍存在。>24 轴守恒，missing/stale axis、receipt或持久化失败在副作用前 fail closed。knowledge-rescan 使用同一 artifact 或以真实 reachability 给 typed N/A。\n4. SP 必须由独立 scope manifest得到 root + AOXFoundationKit/AOXNetworkKit/AOXPlayer/AOXUIKit 四包，精确对账 repoId+relativeRoot+revision；.gitmodules 仅 live probe。MR5 与 SP 的 Graph/Map 均在有 carrier 的实际加载入口完成 terminal receipt，Graph Recipe-free、required error/duplicate/script-as-repo=0，Map 仅称 mount accounting complete且在无 final receipt 时 projectCoverageStatus 不得 complete，并证明分页逐类型守恒。\n5. 新增一个实际 empty-start loaded-entrypoint/fresh-process 回归，不接受手工 fixture 预塞 carrier代替生产入口；同时保留 focused >24/missing-axis/mutation/Graph/Map 测试。重新生成只读 runtime/audit JSON，所有必需 invariant 为 true；超时、partial、unavailable 或缺 root+4 都是失败。\n6. 运行 build:check、focused tests、check、test:unit、integration/full、build、smoke/verify plugin/distribution/runtime-package；verify:codex-session若仍不存在则提供真实等价 Codex session/load probe，而不是只写 N/A。提交一个新的干净 Plugin rework commit，回填 parent/commit/tree、原始命令输出、loaded hashes、actual entrypoint trace、runtime JSON SHA-256和两阶段自审。",
+  "status": "pending",
+  "sourceRef": "controller rework tc-20260715223137-0047; original I2.2 package; Design Requirement §§7.1–7.3, 18.0",
+  "designIntent": "复用 Core Foundation 和现有 Plugin HostAgent/Plan 入口，补齐真正 producer-to-consumer carrier handshake；保留 Graph live/Recipe-free 与 Map 语义，不新建平台。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T22:32:32.415Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i2-2-alembic-plugin-pcf-graph-map-rework1-t1",
+      "taskPackageId": "i2-2-alembic-plugin-pcf-graph-map-rework1-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "修复 Plugin 空库首轮 strict PC-F 实际入口断链，并以 MR5/SP 有 carrier 的终态 Graph/Map、root+4 与第五 receipt 证据通过 I2.2；不扩展到后续阶段。",
+      "status": "pending",
+      "createdAt": "2026-07-15T22:32:32.415Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

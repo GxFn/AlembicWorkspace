@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i7-core-production-contracts-rootcause2-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i7-core-production-contracts-rootcause2-p1",
+  "dispatchGroup": "dg-i3-i7-core-production-contracts-rootcause2",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i7-core-production-contracts-rootcause2-t1",
+  "status": "completed",
+  "summary": "在 AlembicCore@868d9070 上完成 DatabaseConnection native-handle 生命周期根因修复。公开 connect() 在已有 db 或 root registration 时于任何路径/native open 前稳定拒绝 ALEMBIC_DATABASE_ALREADY_CONNECTED；首次连接以局部 native handle 完成 WAL/foreign-key/busy-timeout、Drizzle 与 root registry 后才原子发布对象状态，中途失败立即关闭局部 handle。由此每个 DatabaseConnection 同时最多一个活动 native handle，对象 registry 与可撤销 handle 一一对应。公开 double-connect RED/GREEN 证明第二次连接不再产生句柄、失败后首句柄仍可用、replace 后首句柄预编译 read/write 均失败；显式 close 后可 reconnect。不同连接 bypass、registered runtime、post-revoke open、next revision、ordinary root 及全部 PC-F/post-PCF 合同保持。",
+  "evidenceRefs": [
+    "AlembicCore commit 6b6341f05332a1d15f79c19a0251d41b962b71d1",
+    "AlembicCore tree 84c094ee01052c91df5c9e94a50862dc61652f15",
+    "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+    "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+    "AlembicCore/scripts/smoke-public-api.mjs",
+    "AlembicCore/config/public-api-boundary.json",
+    "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json"
+  ],
+  "verification": [
+    "RED: public same-object DatabaseConnection.connect() resolved a second native Database instead of rejecting; controller-equivalent test failed at the rejects assertion",
+    "GREEN targeted: double-connect, separate public bypass, close-to-reconnect — 3 tests passed",
+    "focused persistence/database — 2 files / 15 tests passed",
+    "post-PCF focused — 7 files / 51 tests passed",
+    "PC-F regression — 15 files / 130 tests passed",
+    "npm run build:check — passed",
+    "npm test final — 190 files / 1849 tests passed",
+    "consumer imports — AlembicAgent 72 refs/0 issues; Alembic 497/0; AlembicPlugin 456/0",
+    "public API boundary — 67 classified, 60 exact, 7 wildcard; smoke imported 60 exact entrypoints",
+    "Biome, naming, retired-symbols, git diff --check — passed",
+    "npm run check — reached lint:doctrine; only unchanged pre-existing ASTChunker.ts:32 baseline, baseline/current blob both 6e88dab655821ed72e9389a7c274b87d07fbecde",
+    "PCFBaselineReceipt SHA-256 unchanged: ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6",
+    "post-commit worktree clean"
+  ],
+  "risks": [
+    "The lifecycle proof is the task-authorized in-process authority boundary. The durable revoked-root marker blocks future opens across processes, but this change does not claim to terminate a native SQLite handle already owned by another process.",
+    "npm run check retains the unchanged out-of-scope ASTChunker doctrine baseline; this root-cause commit neither touches nor waives it.",
+    "This result closes only the Core rootcause2 package; controller review must not infer downstream Agent/Main orchestration, Plugin serving, or whole-demand completion."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "6b6341f05332a1d15f79c19a0251d41b962b71d1",
+      "value": "parent=868d9070bc8907c5be691ca4024f3ed4aa1da371 tree=84c094ee01052c91df5c9e94a50862dc61652f15 files=2 insertions=110 deletions=16",
+      "verify": "single-clean-core-rootcause-commit-on-868d9070"
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+      "value": "Object-level registry was insufficient because one DatabaseConnection could create multiple native SQLite handles while this.db retained only the last one. The fix establishes a one-object/one-active-native-handle invariant, rejects repeated connect before mutation, atomically publishes successful initialization, and closes failed local handles. Every in-process public entry is now either a separate registered object or the single handle of one registered object.",
+      "verify": "object-registry-native-handle-lifecycle-proof"
+    },
+    {
+      "kind": "negative-tests",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "Same public DatabaseConnection double-connect rejects before a second handle, leaves the first prepared read usable until replace, then replace makes its prepared read/write fail. Existing separate-connection public bypass and registered/post-open cases remain covered.",
+      "verify": "same-connection-double-connect-no-second-live-handle-and-old-read-write-zero"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "targeted=3; focused=2 files/15; post-PCF=7 files/51; PC-F=15 files/130; full=190 files/1849; build and diff checks passed",
+      "verify": "focused-full-build-check-consumer-and-git-diff-check-rerunnable"
+    },
+    {
+      "kind": "compatibility",
+      "ref": "AlembicCore/scripts/smoke-public-api.mjs",
+      "value": "Explicit close allows same-object reconnect; distinct-connection bypass remains revoked; next revision and ordinary root stay writable; public 60-entry smoke and Agent/Main/Plugin consumer import gates pass; PCF receipt hash unchanged.",
+      "verify": "separate-connection-bypass-next-revision-ordinary-root-and-pcf-regression"
+    },
+    {
+      "kind": "baseline",
+      "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json",
+      "value": "HEAD=868d9070; clean worktree; focused 2 files/13 tests and build:check passed; receipt SHA-256 unchanged.",
+      "verify": "rootcause2-prechange-baseline"
+    },
+    {
+      "kind": "repro",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "Before the fix, the same public DatabaseConnection returned a second Database; connection.close then reached only the second handle while the first remained independently open.",
+      "verify": "controller-black-box-double-connect-reproduced"
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "Fail-before/pass-after regression covers rejection before second native open, first-handle preservation on failure, replace read/write zero, explicit close/reconnect, and previous separate-object revocation paths.",
+      "verify": "same-scenario-red-green"
+    },
+    {
+      "kind": "test-first",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "The public double-connect regression ran RED before the DatabaseConnection guard/atomic-publication implementation, then GREEN on the same command.",
+      "verify": "red-before-green-in-one-required-clean-commit"
+    },
+    {
+      "kind": "change-scope",
+      "ref": "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+      "value": "Only DatabaseConnection lifecycle and ProductionPersistence regression changed; no exports, second manager/store, cross-repo files, ledgers, prompts, orchestration, serving, or publication.",
+      "verify": "designIntent-confined"
+    },
+    {
+      "kind": "typecheck",
+      "ref": "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+      "value": "npm run build:check passed after final implementation.",
+      "verify": "tsc-no-emit"
+    },
+    {
+      "kind": "lint",
+      "ref": "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+      "value": "Biome, naming, retired-symbols, public/layer/scope/output/space gates passed; doctrine only unchanged ASTChunker baseline.",
+      "verify": "final-rootcause-diff-lint"
+    },
+    {
+      "kind": "self-review",
+      "value": "Rework response: agree that object registration without a single-handle invariant left an unreachable native handle. Stage 1 verified all five rootcause2 clauses and preserved prior marker/root compatibility. Stage 2 found no blocker/high/medium issue; checked pre-mutation rejection, first-handle preservation, atomic publish/failure cleanup, registry equality, synchronous no-race behavior, idempotent close/reconnect, public-field tamper resistance via private registration guard, diagnostic privacy, consumers, and process-boundary honesty.",
+      "verify": "point-by-point-rootcause-response-and-two-stage-review"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i3-i7-core-production-contracts-rootcause2__AlembicCore__i3-i7-core-production-contracts-rootcause2-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-core-production-contracts-rootcause2__AlembicCore__i3-i7-core-production-contracts-rootcause2-t1.json",
+    "deliveryRunId": "run-delivery-dg-i3-i7-core-production-contracts-rootcause2__AlembicCore__i3-i7-core-production-contracts-rootcause2-t1",
+    "dispatchGroup": "dg-i3-i7-core-production-contracts-rootcause2",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-core-production-contracts-rootcause2__AlembicCore__i3-i7-core-production-contracts-rootcause2-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 70,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i7-core-production-contracts-rootcause2-p1",
+    "targetTaskId": "i3-i7-core-production-contracts-rootcause2-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "dg-i3-i7-core-production-contracts-rootcause2",
+    "resultId": "tr-i3-i7-core-production-contracts-rootcause2-t1",
+    "createdAt": "2026-07-16T05:53:37.592Z"
+  },
+  "createdAt": "2026-07-16T05:53:37.592Z",
+  "stateRevisionObserved": 70,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

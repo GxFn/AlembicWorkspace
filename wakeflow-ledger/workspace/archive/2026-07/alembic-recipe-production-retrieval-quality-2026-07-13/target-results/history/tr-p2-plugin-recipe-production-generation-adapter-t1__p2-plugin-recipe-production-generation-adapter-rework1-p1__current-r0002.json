@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-recipe-production-generation-adapter-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p2-plugin-recipe-production-generation-adapter-p1",
+  "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-recipe-production-generation-adapter-t1",
+  "status": "completed",
+  "summary": "Completed AlembicPlugin rework1 in commit 3cb93137e040c3491605945f466fe01febcc3aaf. Terminal Recipe deletion now detects the last active document and reuses Core removeRecipeVectorsByTruth to clear every divergent content-hash document across all known generations plus canonical/legacy base residue, while stale live-update removal remains exact when an active replacement exists. Active-route compare-and-swap now wraps read/compare/write in an atomic dataRoot directory lock shared by independent runtimes/processes and writes PID+UUID collision-safe temporary files. Controller-reported rollback resurrection and 20/20 multi-runtime ENOENT races are covered by regressions. Host submit/Core production, Search, and Prime code were not changed.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-pipeline/vector/recipe-vector-generation-runtime.ts",
+    "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+    "AlembicPlugin/test/unit/RecipeRetrievalMaintenance.test.ts",
+    "AlembicPlugin/test/unit/SubmitKnowledgeRouter.test.ts",
+    "AlembicPlugin/test/integration/SubmitKnowledgeProduction.test.ts"
+  ],
+  "verification": [
+    "RED reproduction — RecipeVectorGenerationRuntime: 2 failed / 4 passed; legacy base persisted and independent-runtime CAS rejected",
+    "Focused GREEN — RecipeVectorGenerationRuntime: 6/6 passed",
+    "Focused combined suite — 3 files, 26/26 passed",
+    "npm run build:check — passed using AlembicCore b711ea10aa5c67d1d75a58a18c0d56623e26c290",
+    "npm run check — passed; only 15 inherited scripts console warnings",
+    "npm run build — passed",
+    "npm run test:unit — passed: 145 files, 1579 tests",
+    "npm run test:integration — unchanged excluded baseline: 25 files passed, one RealProjectEnhancement Alamofire failure; 664/665 tests passed; SubmitKnowledgeProduction passed",
+    "npm run verify:plugin-distribution — passed",
+    "npm run verify:codex-plugin — passed",
+    "NPM_CONFIG_CACHE=/private/tmp/alembicplugin-npm-cache npm run verify:codex-runtime-package — passed; no file dependencies, offline install and entrypoint passed",
+    "NPM_CONFIG_CACHE=/private/tmp/alembicplugin-npm-cache npm run smoke:codex-plugin — passed; runtime boundary/startup/install/shell bootstrap/stdio",
+    "Alembic Guard guard-public-mrjfi875-3 — complete 2/2 coverage, 0 errors, 0 warnings, 0 violations",
+    "git diff --check and staged diff check — passed; commit parent and clean working tree confirmed"
+  ],
+  "risks": [
+    "The storage mutex intentionally fails closed after five seconds if a process crashes while holding the directory lock; it does not guess that a lock is stale or delete a potentially live lock. Manual runtime-state cleanup is required after such a crash.",
+    "Full integration retains the controller-excluded, unchanged RealProjectEnhancement Alamofire expectation failure (664/665); neither the failing test nor enhancement code changed.",
+    "The user-level ~/.npm cache contains root-owned files. Runtime package and smoke gates passed with an isolated temporary npm cache; this environmental ownership issue remains outside repository scope.",
+    "The previously known release-workflow private-root publish boundary failure was explicitly excluded by the rework verdict and was not modified or re-run."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "3cb93137e040c3491605945f466fe01febcc3aaf",
+      "verify": "git show -s --format='%H %P %s' HEAD confirms exact parent 9919ad250b35e95784a4bbab836c056a4489d52c; git status --short is clean"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "value": "Focused generation runtime covers two-role divergent hashes, offline authoritative delete, base legacy/canonical cleanup, rollback non-resurrection, live replacement preservation, 20 rounds of independent-runtime CAS, and lock/temp cleanup; full unit is 145 files / 1579 tests.",
+      "verify": "npx vitest run test/unit/RecipeVectorGenerationRuntime.test.ts test/unit/RecipeRetrievalMaintenance.test.ts test/unit/SubmitKnowledgeRouter.test.ts; npm run test:unit"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: both controller rework points are closed without Core/Agent/main-runtime changes and submit/Search/Prime remain untouched. Stage 2: cleanup continues after per-store failure, replacement safety is explicit, CAS covers the full read/compare/write boundary, lock storage is outside generation enumeration, temporary writes are owner-unique and cleaned, and lock timeout fails closed.",
+      "verify": "git diff --check; Alembic Guard guard-public-mrjfi875-3 checked 2/2 files with 0 errors, 0 warnings, 0 violations"
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean baseline at 9919ad250b35e95784a4bbab836c056a4489d52c; existing three-file focused suite passed 23/23 before rework.",
+      "verify": "git status --short; git show -s HEAD; npx vitest run test/unit/RecipeVectorGenerationRuntime.test.ts test/unit/RecipeRetrievalMaintenance.test.ts test/unit/SubmitKnowledgeRouter.test.ts"
+    },
+    {
+      "kind": "repro",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "value": "Pre-fix run produced two failures: legacy base entry remained after authoritative deletion, and independent runtime CAS included a rejected ENOENT outcome.",
+      "verify": "npx vitest run test/unit/RecipeVectorGenerationRuntime.test.ts — RED: 2 failed / 4 passed"
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "value": "Post-fix runtime suite passes all 6 tests, including rollback non-resurrection and 20 independent-runtime CAS attempts with exactly [false,true].",
+      "verify": "npx vitest run test/unit/RecipeVectorGenerationRuntime.test.ts — GREEN: 6/6"
+    },
+    {
+      "kind": "red-green-note",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "value": "RED reproduced the two controller probes before implementation; GREEN passes the same tests after identity-aware terminal cleanup and storage-level CAS locking.",
+      "verify": "Recorded RED 2 failed / GREEN 6 passed on the same focused test file"
+    },
+    {
+      "kind": "scope-diff",
+      "value": "One follow-up commit changes exactly two AlembicPlugin files: the Recipe generation runtime and its unit regression suite; 305 insertions and 23 deletions. No Core, Agent, main Alembic, Search, Prime, submit, release, workflow, or Wakeflow product files changed.",
+      "verify": "git show --stat --oneline 3cb93137e040c3491605945f466fe01febcc3aaf"
+    },
+    {
+      "kind": "compatibility-review",
+      "ref": "AlembicPlugin/lib/recipe-pipeline/vector/recipe-vector-generation-runtime.ts",
+      "value": "Live replacement remains queryable because identity-wide cleanup runs only when no other active canonical document for the Recipe remains; otherwise stale-id removal stays exact. Search/get/list still route only the active verified generation, and host submit/Core production code is untouched.",
+      "verify": "Focused 26/26; npm run check; npm run test:unit; unchanged SubmitKnowledgeProduction integration passes"
+    },
+    {
+      "kind": "typecheck",
+      "value": "Plugin and accepted Core dependency type/build boundaries pass.",
+      "verify": "npm run build:check; npm run build"
+    },
+    {
+      "kind": "verification",
+      "value": "Plugin distribution, Codex plugin, offline runtime package installation/entrypoint, and Codex plugin smoke all pass. Runtime package was rerun with a temporary NPM_CONFIG_CACHE after diagnosing unrelated root-owned ~/.npm cache files.",
+      "verify": "npm run verify:plugin-distribution; npm run verify:codex-plugin; NPM_CONFIG_CACHE=/private/tmp/alembicplugin-npm-cache npm run verify:codex-runtime-package; NPM_CONFIG_CACHE=/private/tmp/alembicplugin-npm-cache npm run smoke:codex-plugin"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-recipe-production-generation-adapter-rework1-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-recipe-production-generation-adapter-rework1-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1.json",
+    "deliveryRunId": "run-p2-plugin-recipe-production-generation-adapter-rework1-p1-readback1",
+    "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-recipe-production-generation-adapter-rework1-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 27,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p2-plugin-recipe-production-generation-adapter-p1",
+    "targetTaskId": "p2-plugin-recipe-production-generation-adapter-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-rework1-p1",
+    "resultId": "tr-p2-plugin-recipe-production-generation-adapter-t1",
+    "createdAt": "2026-07-13T16:21:58.076Z"
+  },
+  "createdAt": "2026-07-13T16:21:58.076Z",
+  "stateRevisionObserved": 27,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-p2-plugin-recipe-production-generation-adapter-t1",
+    "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p2-plugin-recipe-production-generation-adapter-t1__p2-plugin-recipe-production-generation-adapter-p1__current-r0001.json"
+  }
+}

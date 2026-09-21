@@ -1,0 +1,375 @@
+{
+  "date": "2026-09-20",
+  "scope": "Confirmed first Agent + Main knowledge/context/resource-scope vertical slice",
+  "commits": {
+    "AlembicAgent": {
+      "commit": "a99497ed9463a61c4b3adbc396e654ac5367d78a",
+      "parent": "69ee567624bc119bf05edcc739d890056e297c9c",
+      "branch": "main",
+      "subject": "fix: scope tool state and preserve knowledge service boundaries",
+      "files": [
+        "README.md",
+        "README.zh-CN.md",
+        "docs/strict-production.md",
+        "docs/tool-host-integration.md",
+        "src/agent/context/ContextWindow.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/MessageAdapter.ts",
+        "src/agent/runtime/toolPipeline/contracts.ts",
+        "src/agent/runtime/toolPipeline/runtimeBridge.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/tools/kernel/context.ts",
+        "src/tools/kernel/knowledge.ts",
+        "src/tools/kernel/registry.ts",
+        "src/tools/kernel/request.ts",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+        "src/tools/runtime/cache/DeltaCache.ts",
+        "src/tools/runtime/handlers/code.ts",
+        "src/tools/runtime/handlers/knowledge/contracts.ts",
+        "src/tools/runtime/handlers/knowledge/management.ts",
+        "src/tools/runtime/handlers/knowledge/queries.ts",
+        "src/tools/runtime/index.ts",
+        "test/pipeline-context-projection.test.ts",
+        "test/tool-resource-scope.test.ts",
+        "test/tool-system.test.ts"
+      ],
+      "remainingWorktreeChanges": [
+        "M AGENTS.md",
+        " M CLAUDE.md"
+      ]
+    },
+    "Alembic": {
+      "commit": "df2d8515ab3c1ca8910bc4493f0be220739e8a10",
+      "parent": "bea42bb4155d3d8f49623acf4a1a5f51fd53c9e2",
+      "branch": "codex/core-knowledge-writes",
+      "subject": "fix: wire Core knowledge services and scope host tool resources",
+      "files": [
+        "config/agent-extraction-boundary.json",
+        "lib/injection/modules/AgentModule.ts",
+        "lib/recipe-pipeline/generate/execution/AgentRunInputBuilders.ts",
+        "lib/recipe-pipeline/generate/execution/BootstrapSystemRunContext.ts",
+        "lib/recipe-pipeline/generate/execution/DimensionRuntimeBuilder.ts",
+        "lib/tools/KnowledgeServiceAdapter.ts",
+        "lib/tools/ToolContextFactory.ts",
+        "lib/tools/ToolScopeResources.ts",
+        "test/unit/GenerateDimensionRuntimeBuilder.test.ts",
+        "test/unit/GenerateInputBuilder.test.ts",
+        "test/unit/KnowledgeServiceAdapter.test.ts",
+        "test/unit/ToolContextScope.test.ts"
+      ],
+      "remainingWorktreeChanges": [
+        "M AGENTS.md",
+        " M CLAUDE.md"
+      ]
+    }
+  },
+  "baselines": [
+    {
+      "repository": "AlembicAgent",
+      "command": "PATH=\"$AGENT_NODE22_BIN:$PATH\" npm test -- test/tool-system.test.ts test/recipe-production-profile-adapter.test.ts test/agent-lifecycle.test.ts test/pipeline-outcome-abandoned.test.ts test/ContextWindow.test.ts test/runtime-terminal-safety.test.ts",
+      "exitCode": 0,
+      "tests": 186,
+      "evidence": {
+        "ref": "evidence/agent-baseline-tests.txt",
+        "digest": "sha256:b6b3556509e03a7e4066ac172dd81dc800a4bae088d95e98f3c3a9f40cb27b6e",
+        "source": "AlembicAgent/tmp/knowledge-scope-2026-09-20/agent-baseline-tests.log",
+        "sourceDigest": "sha256:d3c921934027cb30fef4bcdcbc9594ead068417f8ffbeab05f80be638220b367",
+        "projection": "summary-lines; ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "AlembicAgent",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "tests": null,
+      "evidence": {
+        "ref": "evidence/agent-baseline-types.txt",
+        "digest": "sha256:ab030a4234bc79696746ab3ca2417f9b899b6aeb5bf068222243f7fd0bc946e4",
+        "source": "AlembicAgent/tmp/knowledge-scope-2026-09-20/agent-baseline-types.log",
+        "sourceDigest": "sha256:eb1cbda7a26f50f2c9e72a2e7e25549d02e37014ba0fe00673a8f97bf964bdd0",
+        "projection": "summary-lines; ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "PATH=\"$AGENT_NODE22_BIN:$PATH\" npm run test:unit -- test/unit/ToolContextFactory.test.ts test/unit/AgentService.test.ts test/unit/GenerateInputBuilder.test.ts test/unit/GenerateDimensionRuntimeBuilder.test.ts test/unit/KnowledgeModuleFileFirst.test.ts test/unit/AgentModuleBoundaries.test.ts",
+      "exitCode": 0,
+      "tests": 22,
+      "evidence": {
+        "ref": "evidence/main-baseline-tests.txt",
+        "digest": "sha256:62a8b2516721967ec24a2fa63aa2476d7a6c901ae60758860c005fc106117c32",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-baseline-tests.log",
+        "sourceDigest": "sha256:cb25b86a5aad8e4d368f792fe2e31ac87d23a427da5ebc9aec101ad98b2fce7b",
+        "projection": "summary-lines; ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "tests": null,
+      "evidence": {
+        "ref": "evidence/main-baseline-types.txt",
+        "digest": "sha256:ff467da2a5d8f62b24aea6a7022e187e1dcb4eb7a899602767e58a58dcd8393b",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-baseline-types.log",
+        "sourceDigest": "sha256:5c501382ae7a47415357264b4478e6c6c6504dcfba783edd6ec9e1f5a6d03f0c",
+        "projection": "summary-lines; ANSI and local paths removed"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "repository": "AlembicAgent",
+      "command": "PATH=\"$AGENT_NODE22_BIN:$PATH\" npm run check",
+      "exitCode": 0,
+      "testFiles": 68,
+      "tests": 979,
+      "evidence": {
+        "ref": "evidence/agent-check.txt",
+        "digest": "sha256:c295bb91baa4f9bb9055fe19d5cd2faf8ebccfe732201872eb28f4f3ddfa59a0",
+        "source": "AlembicAgent/tmp/knowledge-scope-2026-09-20/agent-final-check.log",
+        "sourceDigest": "sha256:c6498fd631839220b5120c77e9987d25fe6f7ed58b4324b2f5674059fd13b4e7",
+        "projection": "summary-lines; ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run build:self",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-build.txt",
+        "digest": "sha256:f4f924181cd1481e32c564f6111ab6111a6360e514fec63872e5cb12f8b1686e",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-final-build.log",
+        "sourceDigest": "sha256:f4f924181cd1481e32c564f6111ab6111a6360e514fec63872e5cb12f8b1686e",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint",
+      "exitCode": 0,
+      "warnings": {
+        "count": 5,
+        "unchangedFiles": [
+          "lib/recipe-pipeline/generate/execution/AgentRunProjections.ts",
+          "lib/types/handler-runtime.ts"
+        ]
+      },
+      "evidence": {
+        "ref": "evidence/main-lint.txt",
+        "digest": "sha256:09d8a938f860970a5807fa6c859ed370048e1b0ab5fc2a2f2e8ec429d28dc303",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-final-lint.log",
+        "sourceDigest": "sha256:09d8a938f860970a5807fa6c859ed370048e1b0ab5fc2a2f2e8ec429d28dc303",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint:repo-boundary",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-repo.txt",
+        "digest": "sha256:c0f1db6fb72374a3516a2ed02ec4dbd6a60144bb25529eee2150276bcd5f8f06",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-repo.log",
+        "sourceDigest": "sha256:c0f1db6fb72374a3516a2ed02ec4dbd6a60144bb25529eee2150276bcd5f8f06",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run check:space-edges",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-space.txt",
+        "digest": "sha256:816e5ebd657ad6e31d8062d43ec65bca9ab1660d90dc6c274109b1169c44fd41",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-space.log",
+        "sourceDigest": "sha256:816e5ebd657ad6e31d8062d43ec65bca9ab1660d90dc6c274109b1169c44fd41",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint:layer-contract",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-layer.txt",
+        "digest": "sha256:e04fcaa926fa980540027f9d4d04538ac8d8ef2182a4c8c6f6b3558dcd90ac71",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-layer.log",
+        "sourceDigest": "sha256:e04fcaa926fa980540027f9d4d04538ac8d8ef2182a4c8c6f6b3558dcd90ac71",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint:doctrine",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-doctrine.txt",
+        "digest": "sha256:c5d7093c35b9c31f116a685f53d510e78986d8bcf3688e361aad4b13a067e972",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-doctrine.log",
+        "sourceDigest": "sha256:c5d7093c35b9c31f116a685f53d510e78986d8bcf3688e361aad4b13a067e972",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint:naming",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-naming.txt",
+        "digest": "sha256:2283664f8ea1264b8a5771853b0a3f65e337265c624d8f6468318fc5e0b212fa",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-naming.log",
+        "sourceDigest": "sha256:2283664f8ea1264b8a5771853b0a3f65e337265c624d8f6468318fc5e0b212fa",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint:agent-extraction-boundary",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-agent-final.txt",
+        "digest": "sha256:bfb3c282b54d40bd3efca610287f83af07607af8ac8137a8aea5cad4454c5dc7",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-agent-final.log",
+        "sourceDigest": "sha256:bfb3c282b54d40bd3efca610287f83af07607af8ac8137a8aea5cad4454c5dc7",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint:core-import-boundary",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-core.txt",
+        "digest": "sha256:c76625270924ba219b39fcc695175fefdb3b9d5f0fe158f1b77139fed874252d",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-core.log",
+        "sourceDigest": "sha256:fa16b1125e708230c1088baa592e1fc76c70bc583c451d547a999523b73f058e",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint:retired-symbols",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-retired.txt",
+        "digest": "sha256:35672b9edf8db1555e879e54bbf12b9ad677f3dd24bc7072740b6312b50c51c9",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-retired.log",
+        "sourceDigest": "sha256:35672b9edf8db1555e879e54bbf12b9ad677f3dd24bc7072740b6312b50c51c9",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "npm run lint:ring-direction",
+      "exitCode": 0,
+      "evidence": {
+        "ref": "evidence/main-boundary-ring.txt",
+        "digest": "sha256:1ef8b33138e468486dfaa1705339ef444e8821f498f53af9b793e51e4f0bebbe",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-boundary-ring.log",
+        "sourceDigest": "sha256:1ef8b33138e468486dfaa1705339ef444e8821f498f53af9b793e51e4f0bebbe",
+        "projection": "ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "PATH=\"$AGENT_NODE22_BIN:$PATH\" npm run test:unit -- test/unit/ToolContextScope.test.ts test/unit/ToolContextFactory.test.ts test/unit/KnowledgeServiceAdapter.test.ts test/unit/AgentService.test.ts test/unit/AgentModuleBoundaries.test.ts test/unit/AgentPublicSurfaceSmoke.test.ts test/unit/AgentProfileCompiler.test.ts test/unit/AgentRunCoordinator.test.ts test/unit/GenerateInputBuilder.test.ts test/unit/GenerateDimensionRuntimeBuilder.test.ts test/unit/SystemRunContextFactory.test.ts test/unit/KnowledgeModuleFileFirst.test.ts test/unit/KnowledgeModuleEvolutionWiring.test.ts test/unit/AgentTaskHandlers.test.ts test/unit/GenerateRuntimeInitializer.test.ts",
+      "exitCode": 0,
+      "testFiles": 15,
+      "tests": 63,
+      "evidence": {
+        "ref": "evidence/main-related-tests.txt",
+        "digest": "sha256:2959ca839b07c9102f211430f59b29834004020994488ab996ca5b6dc08e3061",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-final-tests.log",
+        "sourceDigest": "sha256:7927bf07662263f4c42c920b4c14e434b804fe56828e566b68ff2254c45d10d2",
+        "projection": "summary-lines; ANSI and local paths removed"
+      }
+    },
+    {
+      "repository": "Alembic",
+      "command": "PATH=\"$AGENT_NODE22_BIN:$PATH\" npm run test:unit -- test/unit/ToolContextScope.test.ts",
+      "exitCode": 0,
+      "testFiles": 1,
+      "tests": 4,
+      "note": "Adds one real AgentRuntime → host factory lifecycle case and strengthens same-run owner isolation after the 63-test related suite. Three test names overlap. Main validated distinct tests total 64.",
+      "evidence": {
+        "ref": "evidence/main-runtime-host.txt",
+        "digest": "sha256:9753fc9af8d678189d13e645275fb8a6c8143fdf3d4a60274dd5d50508a548f8",
+        "source": "Alembic/scratch/knowledge-scope-2026-09-20/main-runtime-host-green.log",
+        "sourceDigest": "sha256:f69a86abd8fca664c5867ee46a21517533876cb8ab07c95b92aa1abfb2949880",
+        "projection": "summary-lines; ANSI and local paths removed"
+      }
+    }
+  ],
+  "selfReview": "review.md",
+  "executionPlan": "execution-plan.md",
+  "coreSource": "4a0b27786775f7c8568a21823a6ef6217d9146b9",
+  "mainDistinctTestsValidated": 64,
+  "limitations": [
+    "Main full integration and coverage suites were not run in this slice.",
+    "No real model, API key, or online database was used.",
+    "Core was read-only; unrelated Core worktree changes observed at completion were not staged or edited.",
+    "Legacy hosts must opt into releaseScope for deterministic lifetime; Main bounded legacy session fallback is documented.",
+    "Schema availability projection, graph service wiring, and AI contract extraction remain later work."
+  ],
+  "redGreenNotes": [
+    "Agent knowledge/read-view/projection and Main scope regressions were captured before their implementations.",
+    "Main complete knowledge host chain additionally compared the historical HEAD factory after implementation: 5 failed, 1 passed, 8 skipped. This is explicitly a historical comparison, not pre-edit RED."
+  ],
+  "harnessCorrections": [
+    "The first runtime-scope fixture omitted the capability catalog and suppressed tool calls. It was corrected before production changes; runtime-scope-red-entry.log is the valid entrypoint RED, with actual router calls observed.",
+    "The context-projection fixture initially used completed instead of the existing success status. The subtask report records its correction; the valid RED then isolated missing contextWindow."
+  ],
+  "regressionEvidence": [
+    {
+      "ref": "evidence/runtime-scope-red.txt",
+      "digest": "sha256:24e7a9c9d421f63b113cbadeac0eb6cafb5bb2e796f93605591c6e095ca8926f",
+      "source": "AlembicAgent/tmp/knowledge-scope-2026-09-20/runtime-scope-red-entry.log",
+      "sourceDigest": "sha256:a366a9bfc1c6e2d02db38643fe36980aa9a116fa53e97e402fcc82be2bce4699",
+      "projection": "failure/assertion/count excerpts; long fixture payloads and local paths omitted"
+    },
+    {
+      "ref": "evidence/main-scope-red.txt",
+      "digest": "sha256:7e4c6561e4c5cd480229687f2edc4c4673810c489218ff891d005b4e613d7991",
+      "source": "Alembic/scratch/knowledge-scope-2026-09-20/scope-red.log",
+      "sourceDigest": "sha256:5977223f8a8cf34d5084e8a33a759c7cc8c7bc6603203a3255dfa504dbbfae57",
+      "projection": "failure/assertion/count excerpts; long fixture payloads and local paths omitted"
+    },
+    {
+      "ref": "evidence/router-truncation-red.txt",
+      "digest": "sha256:ef3422fe860d5b2865fd97a2be87b9743713a93e154f8c2530401ab3ff6658f2",
+      "source": "AlembicAgent/tmp/knowledge-scope-2026-09-20/router-truncation-red.log",
+      "sourceDigest": "sha256:b8d2cfb12438405dae5ff8f2fd9d31a53004fc4f263d94bfda9f4fd22af3c7e5",
+      "projection": "failure/assertion/count excerpts; long fixture payloads and local paths omitted"
+    },
+    {
+      "ref": "evidence/view-compat-red.txt",
+      "digest": "sha256:f16844b8aaf591c369b8e0e72564a60b89a72215b14a5c0513c063865e40b29a",
+      "source": "AlembicAgent/tmp/knowledge-scope-2026-09-20/view-compat-red.log",
+      "sourceDigest": "sha256:5ae3ae18d44283bc92890af9c851784d0bc9113ff41f1c2a0142ee98fbe86a67",
+      "projection": "failure/assertion/count excerpts; long fixture payloads and local paths omitted"
+    },
+    {
+      "ref": "evidence/view-compat-green.txt",
+      "digest": "sha256:dad98be472a656612fe278b534b81163ca3ba71aa07c3dc914f25a4644dda6ad",
+      "source": "AlembicAgent/tmp/knowledge-scope-2026-09-20/view-compat-green.log",
+      "sourceDigest": "sha256:98b3fc592a8b4db2a6090e480eecba3a6d8d40e9cd39900b573b26733842715f",
+      "projection": "failure/assertion/count excerpts; long fixture payloads and local paths omitted"
+    },
+    {
+      "ref": "evidence/knowledge-historical-comparison.txt",
+      "digest": "sha256:164f0c95d052c1a515132b0bd492605329414d7cd6af5e9e348cb8669adf5063",
+      "source": "Alembic/scratch/knowledge-scope-2026-09-20/adapter-host-old-wiring-red.log",
+      "sourceDigest": "sha256:be0be5cec2a243141bc38679b808085120cf7820f200736eb342473b903f673b",
+      "projection": "failure/assertion/count excerpts; long fixture payloads and local paths omitted"
+    },
+    {
+      "ref": "evidence/context-projection-red.txt",
+      "digest": "sha256:c45d11ce0d35d1a3bc56cdea129b8c07cf57d6088fd059240fd9fcb1fe5ccdfd",
+      "source": "AlembicAgent/tmp/knowledge-scope-2026-09-20/context-projection-red.log",
+      "sourceDigest": "sha256:5bf3d5c526cbd3c9dd4efcd34e8759f5c029f6009c1d87d58e3b748c5f50a431",
+      "projection": "failure/assertion/count excerpts; long fixture payloads and local paths omitted"
+    }
+  ]
+}

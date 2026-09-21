@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i7-alembic-main-strict-orchestration-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "目标与基线\n- 只修改 Alembic；基线必须为 clean HEAD 32578dc3d5fe02eb8c6d24d854066d780ffb668d / tree 945b99963919bb273793c15001a1f845df5964ba。\n- 本地依赖必须实际加载已接受 AlembicCore 6b6341f05332a1d15f79c19a0251d41b962b71d1 / tree 84c094ee01052c91df5c9e94a50862dc61652f15、AlembicAgent e2aa051500cc9fc5c43f1085afd5072c5981f26f / tree 459723c2ecf2919f95b2dccbaae6e4e51d46f61b，以及 PC-F receipt ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6；任一不一致立即阻塞。\n- 这是 Main 一个不可拆分的 strict 生产 combined package。必须落在现有 RecipePipelineFacade、PlanSelectionGate、ColdStartWorkflow、Generate session/runner/finalizer 和现有 Gateway/Repository/Vector/public-route 上；禁止新增平行 orchestrator、第二 journal/store/DB manager 或空接口阶段。\n\n必须完成\n1. strict 入口与复原：为批准根实现 authorization→observed pointers→snapshot/restore-probe→exact allowlist reset→blank receipt；strict 模式禁止 fullReset，失败不得前进。保留非 strict/legacy 行为。\n2. 单一事实与计划：blank 后只 capture/reopen 一次 certified ProjectContext artifact；Plan 必须调用已接受 Agent Plan cognition，随后用 Core deterministic compiler 生成 required universe、lens、fact-query catalog、baseline schedule 和保留 question/tool/priority/budget 的执行投影。不得再走旧 executable PlanSelection、top-N/floor、二次采集或 raw fallback。\n3. 单一可恢复 journal：在现有外层 pipeline/session/finalizer 接入唯一 append-only strict journal，按 Requirement §6 状态顺序记录 receipts、typed failures、owner/resume 和补偿；fresh process 能从精确 durable substate 幂等恢复，generic skip/degrade/completed_with_errors 不得冒充 strict success。\n4. 事实到 fixpoint：执行冻结 backend 的 dimension-free direct/derived fact harvest、完整 population 与 schedule expansion；调用 Agent PipelineStrategy 的 Analyst/cluster/induction/enrolled counterquery/falsification/disposition，封印 final schedule 与 analysis fixpoint。未登记 query、缺 backend、partial/error、live reread或 schema-only edge 作为完整事实均 fail closed。\n5. Producer 与内容闭环：只从最终 survived/narrowed hypotheses 接收 Agent 0/1/N expression sets；按 canonical serial rows 执行 G1→non-persisting admission→expression disposition或独立G2→journal-authorized deterministic prepared ID persist→refs reconcile→contentReady→hypothesis-expression-set closure。Producer 不得 submit/persist/review；无 filler/quantity proxy；最多两次共同 semantic repair。\n6. 私有 revision：每个 fixpoint 分配 confined、absent-before-create 的 private corpus root，使用 Core accepted migration/schema/identity/config/blank init receipt与 existing repository stack。若后续行触发 Analyst re-fixpoint，必须失效并封存旧 root/descendants，关闭句柄，在新物理空 root 从完整最终 eligible set 重放；旧 Recipe 不参与 dedup/coverage/snapshot，旧 root open/read=0。\n7. coverage、索引与发布：完成 G3 required cell/lens closure、durability、candidate assembly、ACTIVE、sparse 验证、首个 explicit vector generation、immutable data seal、G4、serving reconciliation、FinalCoverageBinding、candidate five-tool oracle、ServingSnapshotManifest，最后执行 lock-inside-compare 的唯一 public route CAS；public/null/失败恢复必须符合 §§12-17，严禁 query-time 补数据。\n8. 接线与隔离：canonical module resolver 注入 Main Gateway；refs/binding/manifest/source vector 守恒；source root 与 private revision root 分离，普通 WorkspaceResolver/global container 不可访问 revision root。IncrementalRescan/legacy readers/hooks逐项标 applicable 或 typed-unreachable，不得成为 strict 旁路。\n9. 终态：新增独立 strict completion/finalized 状态，不复用 asyncFill、generic bootstrap completed 或 completed_with_errors；产出可由后续 Plugin 消费的候选/public publication handle 与完整 runtime artifact provenance，但本包不实现五个 MCP serving。\n\n验证与证据\n- 先对现有 fullReset、old PlanSelection、fire-and-forget/asyncFill、required-null/fallback、direct persistence 与旧 coverage closure保留真实 RED，再实现 GREEN。\n- 至少覆盖顺序/单 capture、snapshot/reset/blank、Plan cognition+compile、fact/population/query/falsification/fixpoint、0/1/N与serial admission、prepared-ID crash、ref/contentReady、semantic re-fixpoint双 private roots、G3/G4、sparse/vector、seal、candidate oracle、manifest/public CAS、fresh-process resume、idempotency、concurrency与故障矩阵。\n- 关键 fixture：先持久化 row A、后续 row 触发 re-fixpoint；证明两个 root/DB hash不同但 migrationLedgerSemanticHash相同且 BiliDili 包含 017，旧 A 对新 dedup/coverage/snapshot为零，替换 revision完整重放且无重复 Recipe。\n- 运行 npm run build:check、目标 tests、npm run check、完整 npm run test、必要 integration/e2e、git diff --check；现有无关基线必须 parent/HEAD 对照，不能顺手修改。\n- 只提交一个干净 Alembic commit；回填 parent/commit/tree、changed symbols、Core/Agent/package/dist/load hashes、strict runtime/journal/fault JSON及 SHA-256、原始命令计数、RED/GREEN、兼容性和两阶段自审。\n\n禁止\n- 不改 AlembicCore、AlembicAgent、AlembicPlugin、Dashboard、Design、Test、Wakeflow/controller state、真实 Ghost/data roots或真实 DeepSeek/API。\n- 不实现 Plugin 五工具/Host handshake，不启动 Test，不宣称全需求或真实双项目冷启动完成。\n- 不用 mock-only、类型存在、静态报告、测试数量、旧 public 数据或成功状态代替主链真实状态变化和持久化证据。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§6, 8-15, 17, 18.3; Design/docs/current/recipe-coldstart-production-quality-original-plan-2026-07-15.md I3-I7; accepted AlembicCore@6b6341f05332a1d15f79c19a0251d41b962b71d1 and AlembicAgent@e2aa051500cc9fc5c43f1085afd5072c5981f26f",
+  "designIntent": "把 broad-reset/fire-and-forget bootstrap 收敛到 Alembic 现有 Facade/Workflow/session/finalizer：authorization→blank→one certified facts→Agent Plan cognition+Core compile→fact/population→Agent Analyst/Producer→objective gates/private revision→coverage/index/seal→candidate oracle→single public CAS；不新建旁路编排器或第二存储。",
+  "evidenceContract": {
+    "version": "1",
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "单一 Alembic 提交；回填 parent/commit/tree、changed files/symbols 与 clean worktree。"
+      },
+      {
+        "kind": "dependency-provenance",
+        "verify": "证明实际加载 Core 6b6341f、Agent e2aa051、PC-F receipt及对应 package/dist hashes；无 vendor/stale artifact 混用。"
+      },
+      {
+        "kind": "runtime-report",
+        "verify": "从 RecipePipelineFacade 真实入口展示 authorization→blank→facts→Plan/compile→analysis/fixpoint→Producer/gates/private persistence→coverage/index/seal→candidate oracle→public CAS 的状态与 receipt 演进。"
+      },
+      {
+        "kind": "journal-recovery",
+        "verify": "fresh-process 对精确 durable substate 的幂等 resume、prepared-ID crash recovery、typed owner/resume 与无 skip/degrade success。"
+      },
+      {
+        "kind": "revision-isolation",
+        "verify": "semantic re-fixpoint fixture 证明新旧 private roots/DB隔离、migration semantic ledger、旧 root open/read=0、完整重放和无重复 Recipe。"
+      },
+      {
+        "kind": "negative-tests",
+        "verify": "拒绝 broad fullReset、二次 facts/旧 Plan/fallback、未登记 query、partial/error事实、Producer越权、第三次 repair、stale/drift、旧root读取与CAS竞争。"
+      },
+      {
+        "kind": "tests",
+        "verify": "build:check、目标测试、npm run check、完整 npm test及匹配 integration/e2e 均给出命令、结果与计数。"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "非 strict/legacy入口保持兼容；未修改 Core/Agent/Plugin/Dashboard/Test/Wakeflow，未触碰真实数据根。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "execution-plan"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "two-stage-self-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T07:37:48.392Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i7-alembic-main-strict-orchestration-t1",
+      "taskPackageId": "i3-i7-alembic-main-strict-orchestration-p1",
+      "targetWindow": "Alembic",
+      "summary": "把已接受的 Core producer contracts 与 Agent Plan/Analyst/Producer/reviewer 接入 Alembic 现有 RecipePipelineFacade 主链，完成 strict authorization、exact reset、单 facts、可恢复 journal、私有 revision 内容闭环、coverage/index/seal 与单一 public CAS。",
+      "status": "pending",
+      "createdAt": "2026-07-16T07:37:48.392Z"
+    }
+  ]
+}

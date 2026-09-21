@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p9-core-provider-independent-vector-removal-p1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "summary": "Phase P9 Core repair discovered during controller review of P8: Recipe removal correctness must not depend on an embedding provider.\n\nVerified failure:\n- On accepted Core 627fd7d, VectorService with autoSyncOnCrud=true, a valid EventBus and embedProvider=null initializes with autoSyncEnabled=false.\n- Emitting knowledge:deleted for an index containing entry_dead and recipe_region_dead_* produces removed=[].\n- Plugin correctly degrades to keyword when Ollama/model is unavailable, so this is a normal supported runtime state, not an exceptional test-only condition.\n\nRequired behavior:\n1. Decouple removal listeners from embedding. With autoSyncOnCrud and EventBus configured, delete and lifecycle transition to deprecated must remove entry_<id> and every recipe_region_<id>_* even when embedProvider is null/unavailable. Do not require Ollama for deletion.\n2. Upsert/create/update/reactivate paths may honestly defer/degrade when no provider; they must not fabricate vector success or delete existing live Recipe chunks.\n3. In syncRecipeSemanticRegionVectors authoritative-corpus mode, remove regions whose recipeId is absent from the complete authority set even when pending live chunks cannot be embedded. Preserve old chunks for still-live Recipes until replacement embedding succeeds. Subset mode remains unable to delete unrelated Recipes.\n4. Ensure explicit reconcile/maintenance can remove entry and region orphans without a provider. Missing live vectors must not be falsely reported as synchronized when no embedding can occur; return an honest bounded deferred/degraded signal compatible with existing callers.\n5. Preserve provider-available behavior, event payloads, replacement ordering, Search filtering, query read-only semantics and all no-gate/no-host-selection boundaries.\n6. No Plugin edits, no live BiliDili/AlembicWorkspace mutations, no Test.\n\nValidation:\n- RED/GREEN exact runtime regression: embedProvider=null + delete/deprecate removes both vector families.\n- Authoritative corpus fixture with provider null removes absent Recipe regions while retaining old live Recipe chunks and reports degradation for ungenerated replacements.\n- Subset safety, provider-available update/reactivate regeneration, concurrent flush/destroy, reconcile count/error semantics.\n- Focused vector/lifecycle suites, full Core tests, build/check/public API.\n- Commit Core and return actual full commit hash, changed symbols, raw JSON probe, commands and two-stage self-review.\nCompletion unblocks P8 Plugin rework; it does not accept P8 or authorize real index cleanup.",
+  "status": "pending",
+  "sourceRef": "Controller P8 review runtime probe on 2026-07-13: Core 627fd7d with embedProvider=null initialized autoSyncEnabled=false and knowledge:deleted removed no vectors.",
+  "designIntent": "把删除正确性与向量生成能力解耦：生成需要 embedding，删除不存在/废弃 Recipe 的派生向量不需要；live Recipe 的旧块只在新块成功后替换。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-probe",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "provider-null-delete-proof"
+      },
+      {
+        "kind": "provider-null-authoritative-prune-proof"
+      },
+      {
+        "kind": "live-replacement-safety-proof"
+      },
+      {
+        "kind": "reconcile-degradation-proof"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T01:36:01.350Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p9-core-provider-independent-vector-removal-t1",
+      "taskPackageId": "p9-core-provider-independent-vector-removal-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "让 Recipe 删除、废弃和权威孤儿清理不依赖 embedding provider，同时保持 live Recipe 替换安全；修复无 Ollama 时仍产生孤儿向量的问题。",
+      "status": "pending",
+      "createdAt": "2026-07-13T01:36:01.350Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

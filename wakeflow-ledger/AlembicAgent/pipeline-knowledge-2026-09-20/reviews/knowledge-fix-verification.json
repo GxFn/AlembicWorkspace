@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-20",
+  "baseline": "230c635",
+  "status": "ready-for-root-review-files-frozen",
+  "scope": {
+    "productFiles": [
+      "src/tools/runtime/handlers/knowledge.ts",
+      "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+      "src/ai/AiProvider.ts"
+    ],
+    "testFiles": [
+      "test/recipe-production-profile-adapter.test.ts",
+      "test/SubmitEvidenceExpansion.test.ts",
+      "test/provider-facades.test.ts"
+    ],
+    "otherProductEdits": false,
+    "externalEdits": false,
+    "commitCreated": false,
+    "noCommitReason": "Root 明确负责逐行复审和独立提交；本子任务不提交、不拆分文件。",
+    "sharedDependency": "src/shared/operation.ts 由 root 提供，本子任务只依赖其 runOperation/OperationOptions，未编辑该文件。"
+  },
+  "files": [
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "sha256": "4c724701c707e0e0df98f70650351fa612ea6687c175d15db7450be3ad3587c7"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+      "sha256": "a322a2b4a507d26c136f111350469e1c235f9cb14faecd35d20e5e972e79f54c"
+    },
+    {
+      "path": "AlembicAgent/src/ai/AiProvider.ts",
+      "sha256": "8dd5d5bf66ba2627deb7495ea2654c46cdc2d9f5307982ed32e4688025eb3c6d"
+    },
+    {
+      "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+      "sha256": "d35f012174f11f32cf90d959a13b4c02d62140f40a45fda062bfae2efbc94ed4"
+    },
+    {
+      "path": "AlembicAgent/test/SubmitEvidenceExpansion.test.ts",
+      "sha256": "9d7e00f36c6c6a5cb8f6d9ef94d7c1902c91543cc23fcc6deb5bb809f5e0adf5"
+    },
+    {
+      "path": "AlembicAgent/test/provider-facades.test.ts",
+      "sha256": "3878ef1662b1924aebe93ea2f19d01274a840f8d97f291157c3a9bb0affcfcaa"
+    }
+  ],
+  "changes": [
+    {
+      "id": "K-01",
+      "status": "fixed",
+      "summary": "持久化身份与后处理分离；readiness 不可用显式 readinessStatus=unavailable，不构造 Core ready=false；同步/异步 session save 失败以 _meta.degraded/diagnosticWarnings 返回。",
+      "source": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 862
+      },
+      "tests": {
+        "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+        "line": 353
+      }
+    },
+    {
+      "id": "K-02",
+      "status": "fixed",
+      "summary": "入场与等待后取消检查；style repair 默认30s，通过共享 runOperation 保证终态/清理/迟到结果；readiness 等待可取消，写前拒绝；已进入 Core 写入后保留真实确认结果，不声称 rollback。ChatContext 可选 abortSignal 经 _gatewayChat 转 transport。",
+      "source": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 174
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 706
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 834
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 1332
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+          "line": 390
+        },
+        {
+          "path": "AlembicAgent/src/ai/AiProvider.ts",
+          "line": 61
+        },
+        {
+          "path": "AlembicAgent/src/ai/AiProvider.ts",
+          "line": 472
+        }
+      ],
+      "tests": [
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 203
+        },
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 224
+        },
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 261
+        },
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 291
+        },
+        {
+          "path": "AlembicAgent/test/SubmitEvidenceExpansion.test.ts",
+          "line": 158
+        },
+        {
+          "path": "AlembicAgent/test/provider-facades.test.ts",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "id": "K-03",
+      "status": "fixed",
+      "summary": "style 次数存在稳定 sessionCounterBox；标题/风格计数读自有键，以 defineProperty 写回，兼容普通字典并保持共享身份。保留最多3次提交尝试、最多2次style尝试。",
+      "source": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 691
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 1039
+        }
+      ],
+      "tests": [
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 451
+        },
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 491
+        }
+      ]
+    },
+    {
+      "id": "K-04",
+      "status": "fixed",
+      "summary": "直接 handle 提交也做实际类型验证；7类 truthy 非字符串字段返回具体 Validation failed，不抛 trim TypeError。content/reasoning 使用非数组 record 守卫。",
+      "source": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 1142
+      },
+      "tests": {
+        "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+        "line": 331
+      }
+    },
+    {
+      "id": "K-05",
+      "status": "fixed",
+      "summary": "graph 自动注入沿用 prepared/evaluate 边界并保存首次 codeEvidence；显式与自动提供同一 graphRefs 得到相同生产输入。",
+      "source": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 645
+      },
+      "tests": {
+        "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+        "line": 522
+      }
+    }
+  ],
+  "testFirst": [
+    {
+      "step": "baseline",
+      "command": "./tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/node/bin/node node_modules/vitest/vitest.mjs run test/recipe-production-profile-adapter.test.ts test/SubmitEvidenceExpansion.test.ts test/provider-facades.test.ts",
+      "outcome": "3 files / 51 tests PASS before edits"
+    },
+    {
+      "step": "K-01 RED→GREEN",
+      "filter": "keeps the persisted receipt",
+      "red": "3 failures: readiness/sync save lose created; async save has no degraded warning",
+      "green": "3 pass"
+    },
+    {
+      "step": "K-03 RED→GREEN",
+      "filter": "shares the per-title",
+      "red": "chat expected2 got3 across fresh runtime projections",
+      "green": "1 pass, phase shallow-copy and another-title budget included"
+    },
+    {
+      "step": "K-04 RED→GREEN",
+      "filter": "non-string direct submit",
+      "red": "7 trim TypeError failures through public handle",
+      "green": "7 pass"
+    },
+    {
+      "step": "K-05 RED→GREEN",
+      "filter": "same prepared gate",
+      "red": "auto graphRefs path rejects SOURCE_REF_LINE_OUT_OF_RANGE while explicit same refs creates",
+      "green": "1 pass; same actual Core gate and identical final production items"
+    },
+    {
+      "step": "K-02 RED→GREEN",
+      "filter": "pre-aborted|late style repair|readiness wait is cancelled|Core commit confirmed",
+      "red": "6 public handle failures",
+      "green": "all6 pass"
+    },
+    {
+      "step": "K-02 provider RED→GREEN",
+      "filter": "forwards chat cancellation",
+      "red": "actual mock fetch transport signal remains un-aborted",
+      "green": "1 pass; fetch observes aborted signal"
+    },
+    {
+      "step": "K-02 timer RED→GREEN",
+      "filter": "bounded style repair",
+      "red": "timeout/abort unresolved and completed has no child signal",
+      "green": "all3 pass; logger transport scheduler isolated, warnings asserted, timers/listeners zero, late response ignored"
+    },
+    {
+      "step": "prototype-name RED→GREEN",
+      "filter": "prototype-shaped title",
+      "red": "constructor/__proto__: fourth submit still creates; inherited values falsely exhaust style budget",
+      "green": "2 pass preserving normal dictionary identity"
+    }
+  ],
+  "verification": [
+    {
+      "command": "./tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/node/bin/node node_modules/vitest/vitest.mjs run test/recipe-production-profile-adapter.test.ts test/SubmitEvidenceExpansion.test.ts test/provider-facades.test.ts test/recipe-authoring-inprocess-flatten.test.ts test/SubmissionSanitize.test.ts test/tool-system.test.ts test/scan-run-production-integration.test.ts test/pipeline-outcome-abandoned.test.ts test/runtime-efficiency.test.ts",
+      "result": "PASS",
+      "testFiles": 9,
+      "tests": 172,
+      "durationSeconds": 5.61
+    },
+    {
+      "command": "./tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/node/bin/node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+      "result": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "node_modules/.bin/biome check src/tools/runtime/handlers/knowledge.ts src/tools/runtime/handlers/submitEvidenceExpansion.ts src/ai/AiProvider.ts test/recipe-production-profile-adapter.test.ts test/SubmitEvidenceExpansion.test.ts test/provider-facades.test.ts",
+      "result": "PASS; all6 scoped files"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "testHarnessNote": "Winston Console transport uses setImmediate for its logged event (neighbor Core node_modules/winston/lib/winston/transports/console.js:53). Lifecycle test mocks logger.warn while asserting warning calls, so fake-timer count measures the operation rather than logging transport. Temporary timer instrumentation was removed.",
+  "selfReview": {
+    "stage1": "Confirmed parent-requested K-01..K-05 and prototype names; preserved handle/waiver exports, gate authority, recipe production profile semantics, title budgets and existing four-arg style helper calls. No file splitting, Core/config/Pipeline edit or commit.",
+    "stage2": "Scoped Biome/typecheck and9 direct/integration suites pass. No actionable outstanding finding introduced by the fix."
+  },
+  "knownBoundaries": [
+    "Core createOrStage/publish has no AbortSignal port: cancellation after entry cannot imply rollback; await actual result and retain confirmed identity.",
+    "Legacy custom provider.chat may ignore child signal; runOperation bounds the wait and discards late results. Built-in chat transport cancellation is forwarded and mock-verified.",
+    "Readiness report remains Core-owned; unavailable means missing report plus explicit status/diagnostics, not a fabricated ready flag."
+  ],
+  "nextStep": "Root 接手逐行复审，先独立提交修复，再单独设计/提交职责拆分。这6个文件在本报告生成后由子任务冻结。",
+  "titleBudgetFollowup": {
+    "status": "fixed-and-frozen",
+    "report": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/knowledge-title-budget-verification.json",
+    "reason": "Covers fresh shallow projection from the first call; supersedes title-budget source hashes in the earlier record."
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "date": "2026-09-20",
+  "status": "read-only root-cause investigation complete; all probe processes ended; no further stress runs",
+  "outcome": "Existing Core AST reload lifecycle defect causes cumulative native/WASM resource growth and eventually parser initialization failure; this is not a failed sanitized-config assertion or a null-write guard regression.",
+  "integration": {
+    "fullRun": {
+      "ref": "scratch/schema-projection-2026-09-20/main-final-integration.log",
+      "result": "18 passed / 1 failed in one process; failed case: rejects a changed sanitized config receipt on persisted finalized replay"
+    },
+    "isolated": {
+      "ref": "scratch/schema-projection-2026-09-20/strict-config-replay-isolated.log",
+      "command": "Node22 node_modules/vitest/vitest.mjs run test/integration/StrictRecipePipelineFacade.integration.test.ts -t 'rejects a changed sanitized config receipt on persisted finalized replay'",
+      "exitCode": 0,
+      "result": "1 passed / 18 skipped"
+    },
+    "interpretation": "The isolated pass does not erase the full-suite failure. The original failed case stopped on its first executeFixture, before proxy/config mutation and before private-corpus publish."
+  },
+  "environment": {
+    "coreAtAssignedBaseline": "f58093ddbf6bb4e0e29b687cdb5edc597d322f09",
+    "coreAtFinalRead": "4b052259e4f56f4f7ffa85789ea041a78c3c47a2",
+    "externalCoreCommits": [
+      "d1fbc14 fix(validation): execute consumer import gate through symlinked entrypoints",
+      "4b05225 docs(knowledge): explain nullable receipt handling at host boundaries"
+    ],
+    "relevantSourceUnchanged": "git diff f58093d..4b05225 -- src/core/AstAnalyzer.ts src/core/ast src/service/production/StrictFactExecution.ts package.json package-lock.json: empty",
+    "webTreeSitterVersion": "0.26.8",
+    "runtime": "same Node 22 cached runtime used for final Main validation"
+  },
+  "probes": [
+    {
+      "name": "repeat public reload and parse",
+      "source": "scratch/schema-projection-2026-09-20/strict-ast-reload-repro.mjs",
+      "command": "../AlembicAgent/tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/.bin/node scratch/schema-projection-2026-09-20/strict-ast-reload-repro.mjs",
+      "originalExecution": "Equivalent source was first run via Node --input-type=module stdin; archived script is not rerun after the stop instruction.",
+      "log": "scratch/schema-projection-2026-09-20/strict-ast-reload-probe.log",
+      "exitCode": 1,
+      "result": {
+        "failureIteration": 118,
+        "counts": [
+          null,
+          null,
+          null
+        ],
+        "rssAt0": 158924800,
+        "rssAt30": 777191424,
+        "rssAt60": 1412759552,
+        "rssAtFailure": 1526792192
+      },
+      "boundary": "Only Core public ast reload/analyze APIs; no Main/Agent business code, provider, SQL, fixture mutation, thresholds or network."
+    },
+    {
+      "name": "single reload control",
+      "source": "scratch/schema-projection-2026-09-20/strict-ast-no-reload-control.mjs",
+      "command": "../AlembicAgent/tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/.bin/node scratch/schema-projection-2026-09-20/strict-ast-no-reload-control.mjs",
+      "originalExecution": "Equivalent source was run via Node --input-type=module stdin; archived script is not rerun.",
+      "log": "scratch/schema-projection-2026-09-20/strict-ast-no-reload-control.log",
+      "exitCode": 0,
+      "result": {
+        "sets": 1000,
+        "allCounts": [
+          2,
+          0,
+          1
+        ],
+        "rssAt0": 159236096,
+        "rssAt999": 180600832
+      }
+    }
+  ],
+  "supplementalObservation": {
+    "log": "scratch/schema-projection-2026-09-20/strict-ast-failure-detail.log",
+    "completedBeforeRootStop": true,
+    "method": "Independent-process observational wrappers around public Parser initialize/setLanguage/parse/delete; original implementations called unchanged, no product files modified.",
+    "result": {
+      "failureIteration": 118,
+      "counts": [
+        null,
+        null,
+        null
+      ],
+      "parserInitializations": 121,
+      "parserDeletes": 0,
+      "errorPhase": "initialize",
+      "error": "table index is out of bounds",
+      "errorCount": 3,
+      "rssAtFailure": 2304802816
+    },
+    "interpretation": "Directly observed native parser initialization failure, then Core catch→null→fixture-verification failure. Do not label the exact failure as a proven JavaScript heap OOM; the WASM table/allocation mechanism still needs Core-owner diagnosis."
+  },
+  "exactChain": [
+    {
+      "ref": "lib/recipe-pipeline/generate/strict/StrictFactExecutionRuntime.ts:156",
+      "fact": "Main constructs a fresh Core backend registry for an execution schedule."
+    },
+    {
+      "ref": "../AlembicCore/src/service/production/StrictFactExecution.ts:1357",
+      "fact": "Each new AST backend's first file calls reloadProjectAstPlugins before fixture verification."
+    },
+    {
+      "ref": "../AlembicCore/src/core/ast/ensureGrammars.ts:97",
+      "fact": "reloadPlugins resets the loaded flag and invokes loadPlugins again."
+    },
+    {
+      "ref": "../AlembicCore/src/core/ast/index.ts:204",
+      "fact": "Flag is set before asynchronous loading; every forced reload iterates all registered WASM grammar files at line 218."
+    },
+    {
+      "ref": "../AlembicCore/src/core/ast/parserInit.ts:65",
+      "fact": "loadLanguageWasm reads and calls Language.load anew at line 75; no unchanged-language cache."
+    },
+    {
+      "ref": "../AlembicCore/src/core/AstAnalyzer.ts:230",
+      "fact": "registerLanguage drops the cached parser reference at line 233 without invoking parser.delete."
+    },
+    {
+      "ref": "../AlembicCore/src/core/AstAnalyzer.ts:554",
+      "fact": "new ParserClass initialization throws in the observed failure; catch at 558 returns null."
+    },
+    {
+      "ref": "../AlembicCore/src/service/production/StrictFactExecution.ts:2065",
+      "fact": "The same fixed class/const/interface fixtures are analyzed; null causes FACT_BACKEND_FIXTURE_VERIFICATION_FAILED at 2083."
+    },
+    {
+      "ref": "lib/recipe-pipeline/generate/strict/StrictFactExecutionRuntime.ts:169",
+      "fact": "Main correctly keeps the failed fact receipt failed and aborts analysis; no fact verdict should be weakened."
+    }
+  ],
+  "provenance": [
+    {
+      "commit": "f6e12202",
+      "date": "2026-05-17",
+      "refs": [
+        "src/core/ast/ensureGrammars.ts:97",
+        "src/core/AstAnalyzer.ts:230"
+      ],
+      "fact": "Reload/reset and parser cache-drop code predate this Main/Agent change."
+    },
+    {
+      "commit": "1760dd3d",
+      "date": "2026-07-26",
+      "ref": "src/service/production/StrictFactExecution.ts:1357",
+      "fact": "Per-backend forced reload predates this Main/Agent change."
+    },
+    {
+      "fact": "The current Main/Agent production changes do not edit these AST paths. Adding the null-write integration scenario adds workload and can expose the cumulative defect earlier; the exact per-suite reload count was not instrumented."
+    }
+  ],
+  "narrowCoreDesign": {
+    "implementationNotAuthorized": true,
+    "scope": [
+      "Cache unchanged WASM Language loads at Core loader authority, keyed by actual resource identity/version; coalesce concurrent loads and remove failed cache entries.",
+      "When replacing or clearing a cached parser, explicitly dispose it before losing the reference; align the test reset helper with the same ownership rule.",
+      "Preserve reload semantics: newly installed/changed grammars and plugin registration must still become visible. Do not replace reload with a blind permanent no-op.",
+      "Make reload completion represent finished grammar/plugin registration, rather than allowing concurrent callers to observe the early loaded flag."
+    ],
+    "mustPreserve": [
+      "All strict positive/negative/edge fixture checks and fact verdicts.",
+      "Project plugin reload and missing/new/changed grammar behavior.",
+      "Main full integration assertions in their original sequence; no isolation/skip/threshold workaround disguised as a fix."
+    ],
+    "coreOwnerUnknowns": [
+      "Relative contribution of repeated dynamic WASM Language loads versus undisposed Parser objects to the native table-index failure.",
+      "Correct invalidation/version identity for a replaced grammar resource and the library's supported unloading semantics.",
+      "Concurrent reload behavior while synchronous parser use and backend fixture verification share the registry.",
+      "Whether the dependency version participates in the native failure; only installed web-tree-sitter 0.26.8 was exercised."
+    ],
+    "acceptanceAfterAuthorization": [
+      "Bounded repeated-load regression with stable native resource lifecycle; same [2,0,1] fixture outcomes.",
+      "New/changed grammar reload regression and concurrent loader completion tests.",
+      "Full Main StrictRecipePipelineFacade integration suite in one process, including all 19 original cases."
+    ]
+  },
+  "noProductEdits": true,
+  "noCoreEdits": true,
+  "noThresholdChanges": true,
+  "noTestIsolationChanges": true,
+  "commit": null,
+  "next": "Root may complete the authorized Agent/Main changes while reporting full strict integration 18/19. Core remediation requires explicit user authorization and Core owner verification."
+}

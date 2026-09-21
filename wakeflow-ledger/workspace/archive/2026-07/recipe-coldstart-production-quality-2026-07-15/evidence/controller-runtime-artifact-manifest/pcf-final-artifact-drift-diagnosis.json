@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "kind": "ControllerFinalArtifactDriftDiagnosis",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "stateRevision": 308,
+  "status": "owner-repair-required",
+  "failedGate": "PC-F final capability contract byte identity",
+  "baselineContractHash": "sha256:4d3ecdc70227cd3cc613c9df26ca04107a6327aec7eebc5eae3a5856c614f008",
+  "observedContractHash": "sha256:b2a8e3f4b28cc79571a2d1152b2d5dfec27139d182ad8f56470e391dcc647848",
+  "changedRows": [
+    {
+      "path": "AlembicCore/dist/projectContextFoundation.js",
+      "baselineSha256": "08262be7dbeb2d2777f8d43a9f95c5bf9073112e46e5fd06186a9d359b5a602e",
+      "observedSha256": "7f5c06090694564f2a913f9f842356b3ac4904b4a4f42ceb6cb1939918c692ef",
+      "sourceChange": "AlembicCore@96655b9 added createProjectContextFileRef to the project-context-foundation public aggregator."
+    }
+  ],
+  "unchangedRowCount": 4,
+  "consumer": {
+    "repository": "Alembic",
+    "commit": "602be24027a06284d0622e4d0d72fdbcd0831cc8",
+    "path": "lib/service/semantic-review/StrictSemanticReviewRuntimeFactory.ts",
+    "use": "imports createProjectContextFileRef from @alembic/core/project-context-foundation"
+  },
+  "rootCause": "A later accepted semantic-review integration placed a new public helper on the frozen PC-F foundation aggregator. The helper is required by Main, but the chosen export route mutates the exact PC-F baseline contract and prevents the required final-artifact regression from being certified as unchanged.",
+  "repairRoute": {
+    "producer": "AlembicCore",
+    "producerChange": "Expose createProjectContextFileRef from the existing @alembic/core/project-context public facade and remove only the added project-context-foundation re-export, restoring the five-file PC-F baseline hash.",
+    "consumer": "Alembic",
+    "consumerChange": "After the Core producer commit is accepted, switch StrictSemanticReviewRuntimeFactory to the @alembic/core/project-context public facade and preserve the accepted V5 semantic-review/trust-store behavior.",
+    "ordering": "AlembicCore producer first, then Alembic consumer, then controller rebuilds all exact packages and reruns PC-F/load verification."
+  },
+  "freshRegression": [
+    {
+      "repository": "AlembicCore",
+      "testFiles": 4,
+      "tests": 74,
+      "result": "passed"
+    },
+    {
+      "repository": "Alembic",
+      "testFiles": 3,
+      "tests": 34,
+      "result": "passed"
+    },
+    {
+      "repository": "AlembicPlugin",
+      "testFiles": 3,
+      "tests": 65,
+      "result": "passed"
+    }
+  ],
+  "builtArtifacts": [
+    {
+      "repository": "AlembicCore",
+      "commit": "c0a6633d9570178494cb208b42a268f2f3899911",
+      "sha256": "20712ff5bb913e2145fff0f5be9bbc8e61179378cefdd62b425c1156cae0ac6e"
+    },
+    {
+      "repository": "AlembicAgent",
+      "commit": "a882f61cad34eed873db5ac52870475e6d71da52",
+      "sha256": "f564b4b46cb556ff391c29bf3437e7df071515d5cb0ef263f76e8e4634baa9aa"
+    },
+    {
+      "repository": "Alembic",
+      "commit": "602be24027a06284d0622e4d0d72fdbcd0831cc8",
+      "sha256": "410bf024a0cb03a6e0643f06ac2af33b6b8d70d11ec46a32d2ddb0ee99d9457b"
+    },
+    {
+      "repository": "AlembicPlugin",
+      "commit": "44bbb4f1346cc177ad96dd17199746d7df0029d7",
+      "sha256": "42dd87258735b23c79fc36692c88d31128bded10d4014e3e151415f4ea8dfd03"
+    }
+  ],
+  "forbiddenConclusions": [
+    "The failed artifact rebuild invalidates the already accepted trust-store repair.",
+    "The PC-F drift is compatible merely because focused tests passed.",
+    "Test is authorized.",
+    "The demand is complete or archivable."
+  ]
+}

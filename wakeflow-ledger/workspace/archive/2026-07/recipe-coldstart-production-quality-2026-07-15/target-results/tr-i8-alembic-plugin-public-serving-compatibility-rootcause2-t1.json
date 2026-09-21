@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8-alembic-plugin-public-serving-compatibility-rootcause2-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8-alembic-plugin-public-serving-compatibility-rootcause2-p1",
+  "dispatchGroup": "dg-i8-alembic-plugin-public-serving-compatibility-rootcause2-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8-alembic-plugin-public-serving-compatibility-rootcause2-t1",
+  "status": "completed",
+  "summary": "Rework 完成：Graph 的公共入口现只观察并校验 fixed marker/canonical route，不再打开 pointed DB、Recipe、vector 或 final coverage；四个知识工具仍经完整 sealed resolver fail closed。正式 EmbeddedToolExecutor 回归覆盖 DB 缺失、Recipe 篡改、vector 缺失、final coverage 篡改四类隔离；Swift/iOS 期望已对齐 accepted Core。Plugin 提交 d901f6236843a43765297dda500e71aac80fe2c6，全部验证通过。",
+  "evidenceRefs": [
+    "AlembicPlugin@d901f6236843a43765297dda500e71aac80fe2c6 (tree 8317cc85ae6cf81803f41a1d716df70ebceb578e; parent f71cbd2abe9f64d53dfde8db8dd15876948269da)",
+    "AlembicPlugin/lib/host-runtime/context/StrictPublicKnowledgeResolver.ts",
+    "AlembicPlugin/lib/host-runtime/context/ProjectRuntimeContext.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/host/read-only-graph-executor.ts",
+    "AlembicPlugin/test/unit/StrictPublicFiveToolCompatibility.test.ts",
+    "AlembicPlugin/test/unit/StrictPublicKnowledgeResolver.test.ts",
+    "AlembicPlugin/test/unit/PublicFiveToolReaderInventory.test.ts",
+    "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+    "AlembicPlugin/test/integration/RealProjectEnhancement.test.ts",
+    "AlembicPlugin/test/fixtures/strict-publication-v1/fixture-manifest.json"
+  ],
+  "verification": [
+    "RED before fix: StrictPublicFiveToolCompatibility new formal isolation matrix had 4 failures at buildProjectRuntimeContext with STRICT_PUBLICATION_ARTIFACT_MISSING / DATA_FILE_HASH_MISMATCH / FINAL_COVERAGE_INVALID.",
+    "npx vitest run test/unit/StrictPublicFiveToolCompatibility.test.ts test/unit/StrictPublicKnowledgeResolver.test.ts test/unit/PublicFiveToolReaderInventory.test.ts test/integration/RealProjectEnhancement.test.ts => 4 files, 61 tests passed.",
+    "Order-sensitive seven-file vector/public-serving group run twice consecutively => each 7 files, 61 tests passed.",
+    "npm run check => passed; 15 pre-existing Biome console warnings, 0 errors; Core/layer/repo/scope/shared/cross-shell/doctrine/naming/retired/ring gates passed.",
+    "npm run build:check => passed using exact Core d4de7edd6bbfaeb36a01b3cc243ba1617c001f65.",
+    "npm run test:unit => 150 files, 1627 tests passed.",
+    "npm run test:integration => 26 files, 665 tests passed.",
+    "npm test after all edits => 176 files, 2292 tests passed.",
+    "npm run build && npm run smoke:codex-plugin && npm run verify:codex-plugin && npm run verify:plugin-distribution && npm run verify:codex-runtime-package => all passed.",
+    "git diff --check => passed; Plugin worktree clean after commit; Core d4de7edd6bbfaeb36a01b3cc243ba1617c001f65 and Main 5a92ec24c24ba0992515fae884a510dc6c0a61f4 remained clean."
+  ],
+  "risks": [
+    "This remains fixture-based Plugin compatibility evidence and does not claim MR5/SP/BiliDili real-scenario T6 acceptance.",
+    "The bounded Graph observation intentionally reports the validated route provenance without opening pointed sealed payload; Search/Prime/Map/Guard remain the fail-closed payload consumers.",
+    "Biome emitted 15 pre-existing noConsole warnings in scripts; there were no lint errors and none of those files changed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "d901f6236843a43765297dda500e71aac80fe2c6",
+      "value": "tree 8317cc85ae6cf81803f41a1d716df70ebceb578e; parent f71cbd2abe9f64d53dfde8db8dd15876948269da; 8 Plugin files changed; clean worktree",
+      "verify": "git -C AlembicPlugin show --stat --oneline d901f6236843a43765297dda500e71aac80fe2c6 && git -C AlembicPlugin status --short"
+    },
+    {
+      "kind": "exact-artifact-compatibility",
+      "ref": "AlembicPlugin/test/fixtures/strict-publication-v1/fixture-manifest.json",
+      "value": "fixture unchanged; pathRelativeSha256ListHash sha256:3548600f77d64b46e9e52bd40827e4d69b24906a190b36a9d65a3c4db66ecba1; accepted Core d4de7edd6bbfaeb36a01b3cc243ba1617c001f65 and Main 5a92ec24c24ba0992515fae884a510dc6c0a61f4 remained clean",
+      "verify": "git -C AlembicPlugin diff f71cbd2abe9f64d53dfde8db8dd15876948269da..d901f6236843a43765297dda500e71aac80fe2c6 -- test/fixtures && npm -C AlembicPlugin run build:check"
+    },
+    {
+      "kind": "public-five-handler-fixture-tests",
+      "ref": "AlembicPlugin/test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "value": "Formal EmbeddedToolExecutor calls prove Graph remains live-source for pointed DB missing, Recipe tamper, vector missing and final-coverage tamper while Search/Prime/Recipe Map/Guard return STRICT_PUBLICATION_*.",
+      "verify": "npx vitest run test/unit/StrictPublicFiveToolCompatibility.test.ts"
+    },
+    {
+      "kind": "route-null-isolation",
+      "ref": "AlembicPlugin/test/unit/StrictPublicKnowledgeResolver.test.ts",
+      "value": "marker corruption and route corruption remain explicit; strict route absent stays unavailable; only sealed payload validation is deferred from Graph context construction to the four knowledge readers.",
+      "verify": "npx vitest run test/unit/StrictPublicKnowledgeResolver.test.ts test/unit/StrictPublicFiveToolCompatibility.test.ts"
+    },
+    {
+      "kind": "vector-generation-consumption",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "value": "Strict four-tool resolver still validates the selected generation/store; order-sensitive CAS test now consumes the actual concurrent winner instead of assuming generation-2, and the required seven-file group passed twice consecutively.",
+      "verify": "npx vitest run test/unit/StrictPublicFiveToolCompatibility.test.ts test/unit/StrictPublicKnowledgeResolver.test.ts test/unit/LocalEmbedding.test.ts test/unit/RecipeVectorGenerationRuntime.test.ts test/unit/PublicOrphanVectorTruth.test.ts test/unit/ReadOnlySearchFingerprint.test.ts test/unit/KnowledgeVectorMaintenanceWiring.test.ts"
+    },
+    {
+      "kind": "tests",
+      "value": "Targeted 61/61; unit 1627/1627; integration 665/665; full after all edits 2292/2292; build, smoke, plugin/distribution/runtime-package verification all green.",
+      "verify": "npm -C AlembicPlugin run check && npm -C AlembicPlugin test"
+    },
+    {
+      "kind": "boundary-scan",
+      "value": "No Main/Core/Agent/Dashboard/Design/Test/Wakeflow/vendor changes; no fixture mutation; no caller path override/private/candidate reader; Graph remains Recipe/DB-free and four knowledge tools keep the shared sealed read route.",
+      "verify": "npm -C AlembicPlugin run check && git -C AlembicPlugin show --name-only --format= d901f6236843a43765297dda500e71aac80fe2c6"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 scope review: only the assigned public-serving chain, stale Swift expectation, and one nondeterministic order-sensitive test assertion changed. Stage 2 semantic review: bounded observation validates marker/identity/canonical route/snapshot-id only; full resolver retains every snapshot/data/vector/final-coverage fail-closed check. Rework point 1 and point 2 are both addressed with direct evidence.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "baseline",
+      "value": "Started clean at f71cbd2abe9f64d53dfde8db8dd15876948269da/tree ffb15ac49d8a30bccc5557b7e6647b18a2ade2d6; exact Core d4de7edd6bbfaeb36a01b3cc243ba1617c001f65."
+    },
+    {
+      "kind": "test-first",
+      "value": "New four-case formal isolation matrix was observed RED before implementation, failing during ProjectRuntimeContext construction with the expected strict artifact/hash errors; it is green after the observer/full-resolver split."
+    },
+    {
+      "kind": "change-scope",
+      "value": "8 Plugin files, 216 insertions and 59 deletions; no fixture bytes changed; no other repository changed."
+    },
+    {
+      "kind": "runtime-package",
+      "value": "smoke passed; Codex plugin and distribution verification passed; runtime-package probe reported noFileDependencies=true, forbiddenOldShapeRejected=true, npm-install and entrypointProbe passed."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8-alembic-plugin-public-serving-compatibility-rootcause2-rework1__AlembicPlugin__i8-alembic-plugin-public-serving-compatibility-rootcause2-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8-alembic-plugin-public-serving-compatibility-rootcause2-rework1__AlembicPlugin__i8-alembic-plugin-public-serving-compatibility-rootcause2-t1.json",
+    "deliveryRunId": "run-delivery-dg-i8-alembic-plugin-public-serving-compatibility-rootcause2-rework1__AlembicPlugin__i8-alembic-plugin-public-serving-compatibility-rootcause2-t1",
+    "dispatchGroup": "dg-i8-alembic-plugin-public-serving-compatibility-rootcause2-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8-alembic-plugin-public-serving-compatibility-rootcause2-rework1__AlembicPlugin__i8-alembic-plugin-public-serving-compatibility-rootcause2-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 125,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8-alembic-plugin-public-serving-compatibility-rootcause2-p1",
+    "targetTaskId": "i8-alembic-plugin-public-serving-compatibility-rootcause2-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dg-i8-alembic-plugin-public-serving-compatibility-rootcause2-rework1",
+    "resultId": "tr-i8-alembic-plugin-public-serving-compatibility-rootcause2-t1",
+    "createdAt": "2026-07-16T17:33:54.224Z"
+  },
+  "createdAt": "2026-07-16T17:33:54.224Z",
+  "stateRevisionObserved": 125,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i8-alembic-plugin-public-serving-compatibility-rootcause2-t1",
+    "dispatchGroup": "dg-i8-alembic-plugin-public-serving-compatibility-rootcause2",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i8-alembic-plugin-public-serving-compatibility-rootcause2-t1__dg-i8-alembic-plugin-public-serving-compatibility-rootcause2__current-r0001.json"
+  }
+}

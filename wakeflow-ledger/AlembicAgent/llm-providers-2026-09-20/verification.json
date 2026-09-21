@@ -1,0 +1,325 @@
+{
+  "date": "2026-09-20",
+  "baselineCommit": "36d34a66a46cddf3229b8356127965c8f8265faf",
+  "commit": "f863c52496026558cf0133910fc1053b9dc89827",
+  "branch": "codex/llm-sdk-adapters",
+  "scope": "AlembicAgent only; native provider SDK migration and call-boundary fixes",
+  "changedFiles": [
+    "config/agent-validation-floor.json",
+    "config/layer-contract.json",
+    "docs/llm-adapters.md",
+    "package-lock.json",
+    "package.json",
+    "src/agent/context/ContextWindow.ts",
+    "src/agent/runtime/AgentRuntime.ts",
+    "src/agent/runtime/AgentRuntimeTypes.ts",
+    "src/ai/contracts.ts",
+    "src/ai/gateway/LLMGateway.ts",
+    "src/ai/providers/ClaudeProvider.ts",
+    "src/ai/providers/GoogleGeminiProvider.ts",
+    "src/ai/shared/errorClassify.ts",
+    "src/ai/transport/ClaudeTransport.ts",
+    "src/ai/transport/DeepSeekTransport.ts",
+    "src/ai/transport/GoogleTransport.ts",
+    "src/ai/transport/LLMTransport.ts",
+    "src/ai/transport/OpenAiTransport.ts",
+    "src/ai/transport/sdkContinuation.ts",
+    "src/ai/transport/sdkErrors.ts",
+    "src/ai/transport/sdkProtocol.ts",
+    "test/native-provider-sdk.test.ts",
+    "test/transport-protocols.test.ts"
+  ],
+  "dependencyPins": [
+    {
+      "package": "@ai-sdk/google",
+      "version": "4.0.76",
+      "resolved": "https://registry.npmjs.org/@ai-sdk/google/-/google-4.0.76.tgz",
+      "integrity": "sha512-RHYTfsrlzM2D7VS4dxq2TWFj0tzE+ALesbTIkrFgyqBbBER8TLw/r93h9IVhR27cLcl4II1tLyiuzZq44IyoCQ=="
+    },
+    {
+      "package": "@ai-sdk/anthropic",
+      "version": "4.0.58",
+      "resolved": "https://registry.npmjs.org/@ai-sdk/anthropic/-/anthropic-4.0.58.tgz",
+      "integrity": "sha512-vhXKBz7jnIhBlOoj2d0joyHicWISuIxDNha65SLrAnagAkVgulLoZBRLZRazstxlO/BtXU+cDERe1opVKte2OQ=="
+    },
+    {
+      "package": "@ai-sdk/deepseek",
+      "version": "3.0.49",
+      "resolved": "https://registry.npmjs.org/@ai-sdk/deepseek/-/deepseek-3.0.49.tgz",
+      "integrity": "sha512-fcZ6uFsGKCyMy8FucUGAkI/Wi4vX4QQNfF7+hCzmDxQ9fcvsqTruncPqJ/PKlw7iCj4z4m2mD4cGzTjptYTG6g=="
+    },
+    {
+      "package": "@ai-sdk/provider",
+      "version": "4.0.17",
+      "resolved": "https://registry.npmjs.org/@ai-sdk/provider/-/provider-4.0.17.tgz",
+      "integrity": "sha512-VYMBxIQdcHqbIf1j+YZlI9Ati6LZ4wJe0GGd4z4a5H/KxTggjeOiyaVYTnfF7LHZK5jMQ+rofmzz4QPqf++NUw=="
+    }
+  ],
+  "testFirstPairs": [
+    {
+      "behavior": "Google text/reasoning/usage",
+      "red": "red-google-generation.log",
+      "green": "green-google-generation.log"
+    },
+    {
+      "behavior": "Google batch retry",
+      "red": "red-google-batch-retry.log",
+      "green": "green-google-batch-retry.log"
+    },
+    {
+      "behavior": "Claude finish and cache usage",
+      "red": "red-claude-generation.log",
+      "green": "green-claude-generation.log"
+    },
+    {
+      "behavior": "Signed/opaque block replay",
+      "red": "red-signed-continuation.log",
+      "green": "green-signed-continuation.log"
+    },
+    {
+      "behavior": "DeepSeek invalid tool arguments",
+      "red": "red-deepseek-invalid-tool.log",
+      "green": "green-deepseek-generation.log"
+    },
+    {
+      "behavior": "HTTP success with invalid body",
+      "red": "red-sdk-success-status-invalid-body.log",
+      "green": "green-deepseek-generation.log"
+    },
+    {
+      "behavior": "Provider lifecycle and effective configuration",
+      "red": "red-native-lifecycle-config.log",
+      "green": "green-native-lifecycle-config.log"
+    },
+    {
+      "behavior": "Shared tool-disable intent",
+      "red": "red-shared-tool-none.log",
+      "green": "green-native-lifecycle-config.log"
+    },
+    {
+      "behavior": "DeepSeek connection-bound reasoning",
+      "red": "red-deepseek-continuation-scope.log",
+      "green": "green-deepseek-continuation-scope.log"
+    },
+    {
+      "behavior": "Unique call ids and embedding defaults",
+      "red": "red-native-replay-and-embedding-defaults.log",
+      "green": "green-native-replay-and-defaults.log"
+    },
+    {
+      "behavior": "Invalid usage accounting",
+      "red": "red-invalid-sdk-usage.log",
+      "green": "green-native-final-matrix.log"
+    },
+    {
+      "behavior": "Atomic continuation compaction and legacy estimate",
+      "red": "red-continuation-compaction.log",
+      "green": "green-continuation-compaction.log"
+    },
+    {
+      "behavior": "Local SDK input error circuit isolation",
+      "red": "red-sdk-local-input-circuit.log",
+      "green": "green-sdk-local-input-circuit.log"
+    }
+  ],
+  "verification": {
+    "command": "npm run check",
+    "node": "22.23.2",
+    "exitCode": 0,
+    "testFiles": 75,
+    "testsPassed": 1170,
+    "publicExports": 15,
+    "runtimeBindings": 451,
+    "strictConsumer": "passed",
+    "sourceBoundaries": "passed",
+    "lintWarnings": 17,
+    "warningFilesUnchanged": [
+      "scripts/eval-judge-calibration.mjs",
+      "scripts/eval-mining.mjs",
+      "scripts/lint-provider-neutral-kernel.mjs",
+      "scripts/smoke-agent-public-signatures.mjs",
+      "scripts/verify-agent-validation-floor.mjs",
+      "test/mining-e2e-pipeline.test.ts",
+      "test/runtime-terminal-safety.test.ts"
+    ],
+    "output": "full-check-accepted.log"
+  },
+  "evidenceLocators": [
+    {
+      "ref": "baseline-ai.log",
+      "digest": "sha256:1aa0dc2c5cabcff99f8bd51b46c728701132848180a4e1f86ec7ccd530eeaf3b"
+    },
+    {
+      "ref": "consumer-scan.txt",
+      "digest": "sha256:2ac30e3483f31699deb9103256c615521d62978f9876a24803a1f14e04d01414"
+    },
+    {
+      "ref": "full-check-accepted.log",
+      "digest": "sha256:fb0e0c3efcdcd3e530ee26a8b2370e0bca3948b27dc1665f8c3698d2015be6b2"
+    },
+    {
+      "ref": "green-claude-generation.log",
+      "digest": "sha256:9e6bdc946fe467cd154ca37b8fe7264f57df3f8899eefaf7f3b21e392d6aec8e"
+    },
+    {
+      "ref": "green-continuation-compaction.log",
+      "digest": "sha256:6b3aebe547edf2631598642f82ab0a61522c8b5ebf209727827af11828802e84"
+    },
+    {
+      "ref": "green-deepseek-continuation-scope.log",
+      "digest": "sha256:3fc04d36c797b6485550ad69c79cbea3a0de536afda0429ae2734ca71072f14e"
+    },
+    {
+      "ref": "green-deepseek-generation.log",
+      "digest": "sha256:710930e411e18658a161c4a32a6f62720930294f253446209c608266ade3aa17"
+    },
+    {
+      "ref": "green-google-batch-retry.log",
+      "digest": "sha256:0e88e727c4478c52b4fb4b25d8e12e9c9664c64e0beb6db3dd6ea2ba78ce82d4"
+    },
+    {
+      "ref": "green-google-generation.log",
+      "digest": "sha256:a5b3c9b9292f4575c4ccf57dc942bcca7da494931de3ba769ac69bdb46786389"
+    },
+    {
+      "ref": "green-native-final-matrix.log",
+      "digest": "sha256:0a7765f8c00f906a99c6078e965b61958297cbaea546645917a6a12c1258ad60"
+    },
+    {
+      "ref": "green-native-lifecycle-config.log",
+      "digest": "sha256:2a9b15e4d275b5187df3e2a067a87408239edbe2a461da074c5f8b2756a2a93a"
+    },
+    {
+      "ref": "green-native-replay-and-defaults.log",
+      "digest": "sha256:1373233483365520d272dac52e3a54001e21284784593cf5e8ed88957adc57b0"
+    },
+    {
+      "ref": "green-sdk-local-input-circuit.log",
+      "digest": "sha256:67397c2942d0ac968704d173f820713ee7748d9f9294caeaddb7a2ba31426d9c"
+    },
+    {
+      "ref": "green-signed-continuation.log",
+      "digest": "sha256:03a402f1271d9937fb190bb76a547bc1207bb53a4b011a18a1d2d429b9f04a18"
+    },
+    {
+      "ref": "native-runtime-and-partial-results.log",
+      "digest": "sha256:2eeb7546c3d8e8d0c7fedc8e1839bc99ae877c7443b0859e619c45f496c5a496"
+    },
+    {
+      "ref": "red-claude-generation.log",
+      "digest": "sha256:f59cdd775582cc3fe278bf204bbbb1e3925803031cc46f6d0a30ba4f96d31f24"
+    },
+    {
+      "ref": "red-continuation-compaction.log",
+      "digest": "sha256:ed5e26fb1acd3600ea050627aeb477e27c3dab66fd80fad27a347804d9ab9f57"
+    },
+    {
+      "ref": "red-deepseek-continuation-scope.log",
+      "digest": "sha256:4032260d7c94679265117356562658a24325241354552e46812adaec7e2a32de"
+    },
+    {
+      "ref": "red-deepseek-invalid-tool.log",
+      "digest": "sha256:cebde6dae5981d68f1923856049f801a34662e3f0def758afff959d1ab5b6fd8"
+    },
+    {
+      "ref": "red-google-batch-retry.log",
+      "digest": "sha256:28ba13d94f4487b4d03f1bec994a03789e9445b648cb4281a565063aff0b7a6d"
+    },
+    {
+      "ref": "red-google-generation.log",
+      "digest": "sha256:731d1e642bf9e364ac485b6156df28e34ac78bcf16c6b7b13a9ebe4ed953be58"
+    },
+    {
+      "ref": "red-invalid-sdk-usage.log",
+      "digest": "sha256:73be4b6bc1a3cac0518df68d408b5939e8e15a769635855985fbb7bc3e01c69f"
+    },
+    {
+      "ref": "red-native-lifecycle-config.log",
+      "digest": "sha256:4d5384fd857d75be828cbca99bd6cf0a9ce45ae2f18f96c3981a0ca45bc113cb"
+    },
+    {
+      "ref": "red-native-replay-and-embedding-defaults.log",
+      "digest": "sha256:a7b1889c72f9909fd367ffaeb1c85e51c674f3ac6c42f32db608da6ac044ad21"
+    },
+    {
+      "ref": "red-sdk-local-input-circuit.log",
+      "digest": "sha256:b4ac808d34df1491f05d22fa6497967f21463d4dc510f71bc074c915530ee9e3"
+    },
+    {
+      "ref": "red-sdk-success-status-invalid-body.log",
+      "digest": "sha256:4c7a1e5ea579ff0b35d29d27ccd181255458aeba4aa8acfad1b1e747f1d84883"
+    },
+    {
+      "ref": "red-shared-tool-none.log",
+      "digest": "sha256:833e8c63402a1c714743ba68bad171b72b899ce22008f6f01cc535f0a5559134"
+    },
+    {
+      "ref": "red-signed-continuation.log",
+      "digest": "sha256:ec31a31dbc0a85c1529cd435226af4db56cbe3ba19d9c272df3a47284cb6123a"
+    }
+  ],
+  "preservedExistingChanges": [
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "networkVerification": "SDK requests tested with fake HTTP; no live model calls or credential creation.",
+  "sourceReferences": [
+    {
+      "url": "https://api-docs.deepseek.com/guides/thinking_mode/",
+      "use": "reasoning passback with tools"
+    },
+    {
+      "url": "https://api-docs.deepseek.com/quick_start/agent_integrations/oh_my_pi/",
+      "use": "V4 tool_choice omission and assistant content constraints"
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/docs/build-with-claude/extended-thinking",
+      "use": "complete thinking/signature and redacted block replay"
+    },
+    {
+      "package": "@ai-sdk/google@4.0.76",
+      "files": [
+        "src/google-prepare-tools.ts",
+        "src/google-provider.ts",
+        "src/google-embedding-model.ts",
+        "src/convert-google-usage.ts"
+      ],
+      "use": "native schema/header fields, batch size and usage normalization"
+    },
+    {
+      "package": "@ai-sdk/anthropic@4.0.58",
+      "files": [
+        "src/anthropic-language-model.ts",
+        "src/convert-to-anthropic-prompt.ts",
+        "src/convert-anthropic-usage.ts"
+      ],
+      "use": "native structured output and reasoning/cache semantics"
+    },
+    {
+      "package": "@ai-sdk/deepseek@3.0.49",
+      "files": [
+        "src/chat/deepseek-chat-language-model.ts",
+        "src/chat/convert-to-deepseek-chat-messages.ts"
+      ],
+      "use": "V4 options and complete reasoning replay"
+    }
+  ],
+  "remainingAuthorizedRoadmap": [
+    "Consolidate effective provider/model/endpoint configuration at one assembly point",
+    "Continue responsibility-based file and test cleanup without dropping public compatibility"
+  ],
+  "outsideScope": [
+    "Main/Core parent cancellation wiring remains with their repository owners; no files edited there"
+  ],
+  "explicitCompatibility": [
+    "DeepSeek SDK has no embedding adapter; the existing configured compatibility endpoint remains callable and validated",
+    "DeepSeek text tool translation remains diagnosed and schema-validated",
+    "Raw native wire formats are now SDK-validated; custom relays must match the documented native headers and fields"
+  ],
+  "limits": [
+    "No live vendor/custom relay interoperability claim",
+    "No new streaming or multimodal entrypoint",
+    "Responses stored items remain subject to server retention"
+  ],
+  "reviewDigest": "sha256:30e38d8fadd386ea69a891b89502d82f6ffcf0e2e1ae3eb02ca693e0ab0e7a78"
+}

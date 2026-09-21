@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i8-core-fact-admission-authority-rootcause4-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i8-core-fact-admission-authority-rootcause4-p1",
+  "dispatchGroup": "i3-i8-upstream-failclosed-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i8-core-fact-admission-authority-rootcause4-t1",
+  "status": "completed",
+  "summary": "Rework completed in commit 898a461: every direct Evidence Ledger witness is now bound to the exact certified frozen full-file or declared line-range bytes. Self-consistent forged and misaligned evidence fail closed; exact full-file, explicit full-range and line-range evidence pass. Existing strict fact execution, admission, persistence, snapshot-id and public boundaries remain green.",
+  "evidenceRefs": [
+    "commit:898a461385c676dd2cc467bcf8bd58226409a87b",
+    "/tmp/alembic-core-vitest-upstream-failclosed-rework1-final.json",
+    "guard-public-ms1yhcxa-2",
+    "src/service/production/StrictFactExecution.ts",
+    "test/StrictFactExecution.test.ts"
+  ],
+  "verification": [
+    "Tests-only RED: forged full-file and misaligned-range regressions failed because no exception was thrown before the implementation.",
+    "npm test -- test/StrictFactExecution.test.ts test/StrictPreparedRecipeGateway.test.ts test/ProductionPersistenceContracts.test.ts test/CorePackage.test.ts => 4 files, 55 tests passed.",
+    "npm test -- test/StrictFactExecution.test.ts test/CoreDeliveryBoundary.test.ts test/CoreToolSystemBoundary.test.ts test/CoreCodexBoundary.test.ts test/CorePackage.test.ts => 5 files, 36 tests passed.",
+    "npm run test -- --reporter=json --outputFile=/tmp/alembic-core-vitest-upstream-failclosed-rework1-final.json => 628 suites, 1877 tests passed, 0 failed.",
+    "npm run build:check => passed.",
+    "npm run build => passed.",
+    "npm run lint => Biome checked 773 files, passed.",
+    "npm run smoke:public-api => imported 60 exact public API entrypoints.",
+    "npm pack --dry-run --json => passed.",
+    "git diff --check => passed.",
+    "Alembic Guard guard-public-ms1yhcxa-2 => 2 files checked, 0 violations.",
+    "npm run check => build/public-boundary/layer-contract/consumer-imports/scope/smoke/output-budget/space-edge gates passed, then stopped at pre-existing unmodified src/infrastructure/vector/ASTChunker.ts:32 doctrine violation."
+  ],
+  "risks": [
+    "Intentional fail-closed compatibility change: callers must provide exact raw UTF-8 evidence content matching the certified frozen full file or declared 1-indexed inclusive LF-delimited range; normalized or fabricated content is rejected.",
+    "Repository-wide npm run check still stops at the pre-existing, unmodified doctrine violation src/infrastructure/vector/ASTChunker.ts:32; every gate before doctrine plus standalone full test and lint passed.",
+    "The sibling AlembicAgent repair in the same group remains independently reviewable; this Core result does not claim group or controller acceptance."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "898a461385c676dd2cc467bcf8bd58226409a87b",
+      "verify": "artifact-present; parent 1760dd3d703c360b3f3b034291cae17af478ee8d; git status clean"
+    },
+    {
+      "kind": "test",
+      "ref": "/tmp/alembic-core-vitest-upstream-failclosed-rework1-final.json",
+      "verify": "command-output; success=true; 628/628 suites and 1877/1877 tests passed; sha256 2b3f4d0c7a6839e20fc97d06d12b147405e32a81241155aa391e61b7be51796d"
+    },
+    {
+      "kind": "diff-review",
+      "value": "Only src/service/production/StrictFactExecution.ts and test/StrictFactExecution.test.ts changed; no export, DTO, persistence, snapshot-id, admission, or cross-repository changes.",
+      "verify": "changed-files-and-contracts; git show --stat HEAD => 2 files, 129 insertions, 2 deletions"
+    },
+    {
+      "kind": "runtime-evidence",
+      "ref": "test/StrictFactExecution.test.ts",
+      "verify": "real-backend-and-no-write-admission; exact full-file, explicit full-range, precise single-range, forged-content rejection and misaligned-range rejection pass alongside existing strict fact execution and admission/persistence regressions"
+    },
+    {
+      "kind": "test-first",
+      "value": "Tests-only RED reproduced the defect: forged full-file and misaligned declared-range cases both expected STRICT_FACT_WITNESS_AUTHORITY_INVALID but did not throw; implementation followed afterward.",
+      "verify": "red-before-green"
+    },
+    {
+      "kind": "compatibility-review",
+      "value": "Public exports, DTOs, binding hashes, persistence, admission, snapshot-id and non-strict paths are unchanged; only previously unbound witness content is newly rejected.",
+      "verify": "focused related suite 55/55; public API smoke imported 60 exact entrypoints; CorePackage and boundary tests pass"
+    },
+    {
+      "kind": "failure-path-review",
+      "value": "Self-consistent contentHash is insufficient: full/ranged content must equal certified frozen raw bytes; out-of-range, forged and range-misaligned evidence fail with STRICT_FACT_WITNESS_AUTHORITY_INVALID.",
+      "verify": "negative regression assertions pass"
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean rework baseline at 1760dd3d703c360b3f3b034291cae17af478ee8d; focused StrictFactExecution 10/10 and build:check passed before changes.",
+      "verify": "baseline-captured"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduce with tests, bind bytes at createStrictFactDirectWitnessBindingV1, run focused/full/boundary/public validation, Guard, review, one commit.",
+      "verify": "plan-completed"
+    },
+    {
+      "kind": "repro",
+      "ref": "test/StrictFactExecution.test.ts",
+      "verify": "two targeted tests failed before implementation because forged and misaligned evidence was accepted"
+    },
+    {
+      "kind": "regression",
+      "ref": "test/StrictFactExecution.test.ts",
+      "verify": "positive full-file, explicit full-range and line-range plus negative forged/misaligned cases pass"
+    },
+    {
+      "kind": "tests",
+      "ref": "/tmp/alembic-core-vitest-upstream-failclosed-rework1-final.json",
+      "verify": "full final Vitest JSON: 1877 passed, 0 failed"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 scope/requirement review and Stage 2 byte/range/CRLF/trailing-LF boundary review completed; no in-scope gaps found.",
+      "verify": "two-stage-review-complete"
+    },
+    {
+      "kind": "change-scope",
+      "value": "AlembicCore only; two assigned files; no Main, Agent, Plugin, Design, Test-window or Wakeflow configuration changes.",
+      "verify": "git diff --name-only"
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check",
+      "verify": "exit 0"
+    },
+    {
+      "kind": "lint",
+      "value": "npm run lint",
+      "verify": "Biome checked 773 files; exit 0"
+    },
+    {
+      "kind": "verification",
+      "value": "npm run build; npm run smoke:public-api; npm pack --dry-run --json; four required Core boundary tests; Alembic Guard",
+      "verify": "all exit 0; Guard 2 files, 0 violations"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i8-upstream-failclosed-rework1-p1__AlembicCore__i3-i8-core-fact-admission-authority-rootcause4-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i8-upstream-failclosed-rework1-p1__AlembicCore__i3-i8-core-fact-admission-authority-rootcause4-t1.json",
+    "deliveryRunId": "run-delivery-i3-i8-upstream-failclosed-rework1-p1__AlembicCore__i3-i8-core-fact-admission-authority-rootcause4-t1",
+    "dispatchGroup": "i3-i8-upstream-failclosed-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i8-upstream-failclosed-rework1-p1__AlembicCore__i3-i8-core-fact-admission-authority-rootcause4-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 195,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i8-core-fact-admission-authority-rootcause4-p1",
+    "targetTaskId": "i3-i8-core-fact-admission-authority-rootcause4-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "i3-i8-upstream-failclosed-rework1-p1",
+    "resultId": "tr-i3-i8-core-fact-admission-authority-rootcause4-t1",
+    "createdAt": "2026-07-26T15:32:22.429Z"
+  },
+  "createdAt": "2026-07-26T15:32:22.429Z",
+  "stateRevisionObserved": 195,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 3,
+  "supersedes": {
+    "resultId": "tr-i3-i8-core-fact-admission-authority-rootcause4-t1",
+    "dispatchGroup": "i3-i8-core-fact-admission-authority-rootcause4-p1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i3-i8-core-fact-admission-authority-rootcause4-t1__i3-i8-core-fact-admission-authority-rootcause4-p1__current-r0002.json"
+  }
+}

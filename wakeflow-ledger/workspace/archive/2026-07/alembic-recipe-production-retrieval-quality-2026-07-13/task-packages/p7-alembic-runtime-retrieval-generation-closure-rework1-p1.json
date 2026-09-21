@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "在已验收 Alembic 提交 a3db6fdc88006820f86891bc821abe539f9c041d 上闭合 Dashboard reviewer 的唯一上游缺口，只修改 Alembic。当前 Core 已提供 RecipeProductionPort.evaluateReadiness / KnowledgeService.evaluateRetrievalReadiness，Alembic 已提供 retrievalProfile PATCH、合法 publish 与 generation status/dry-run/rebuild/rollback，但 HTTP 没有任何只读 Recipe RetrievalReadinessReport 入口；Dashboard 因此无法在发布前审阅稳定 violations/warnings，只能在发布失败后被动看到错误。新增一个真实、只读、零写的现有 Recipe readiness API（路径/operationId 按 Alembic 现有知识 API 约定落位），直接调用与 publish 相同的 Core readiness 判定并返回稳定 report；更新 provider contract、生成的 Dashboard API types/契约和必要文档，使 Dashboard 有可追溯真实合同。验证：有效 native/compatibility profile 的 GET 返回完整 ready/schemaVersion/profileHash/documentSetHash/violations/warnings；结构缺口返回 report 而非改写 Recipe；provider/vector/generation/rank 仅出现在 warnings/诊断且不改变 ready；missing id typed 404；请求前后 Markdown/SQLite/audit/event/vector/generation 均零写；publish 继续使用相同判定且旧 POST create 仍 410 零写。先补旧实现 RED，再实现 GREEN，运行 focused HTTP/contract/readiness 测试、build:check/build、npm run check，提交单一 Alembic commit。禁止在 Dashboard 私算 readiness，禁止修改 Core/Agent/Plugin/Dashboard/Test/真实数据，禁止新增生产入口、查询门禁或写操作。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "让 Dashboard 在合法 publish 前能够审阅 Core 的确定性 profile/readiness 缺口；Alembic 只暴露同源只读合同，不复制判定、不引入第二状态或 provider/rank 门禁。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "提供基于 Alembic a3db6fd 的单一干净提交、parent、范围 diff 和 clean status；只改 Alembic。"
+      },
+      {
+        "kind": "tests",
+        "verify": "旧实现 RED；真实 HTTP readiness GET 覆盖 ready/violations/warnings/not-found、与 publish 同源、零 truth/audit/event/vector/generation 写；生成 Dashboard API 合同校验与 full npm run check。"
+      },
+      {
+        "kind": "self-review",
+        "verify": "证明没有在 Alembic 复制 Core readiness 逻辑、没有把 provider/vector/rank 变成 gate、没有新增 Recipe producer、没有改 Dashboard/Core/真实数据。"
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "解释为什么此前 P5/P7 只闭合 PATCH/publish/generation 却漏掉 reviewer 所需的 pre-publish readiness 读取面，以及新 API 如何保持单一判定来源。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green"
+      },
+      {
+        "kind": "api-contract"
+      },
+      {
+        "kind": "zero-write"
+      },
+      {
+        "kind": "scope-diff"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T19:21:56.360Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+      "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+      "targetWindow": "Alembic",
+      "summary": "为 Dashboard 提供与 publish 同源的 Recipe RetrievalReadinessReport 只读 API，并以真实 HTTP/生成合同/零写证据闭合。",
+      "status": "pending",
+      "createdAt": "2026-07-13T19:21:56.360Z"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i7-alembic-main-strict-orchestration-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i7-alembic-main-strict-orchestration-p1",
+  "dispatchGroup": "dg-i3-i7-alembic-main-strict-orchestration",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i3-i7-alembic-main-strict-orchestration-t1",
+  "status": "blocked",
+  "summary": "仅修复同一 round 的 TargetResultEnvelope 证据引用格式；blocker 结论不变，未修改或返工任何产品文件。三仓 commit/tree 与 PC-F 基线匹配，Alembic build:check 已通过。AlembicAgent 源码的 src/agent/runs/index.ts 导出 runStrictPlanAgent；当前检出的 src/agent/service/index.ts 显式列表未转出该符号，实际加载的 dist service/root/agent 公共面也均未暴露 runStrictPlanAgent、strict analysis/Producer/reviewer，且 package exports 未开放 production/evaluation/runs 子路径。AlembicCore private revision 公共面仍只支持 absent-before-create 初始化；Handle 依赖模块私有 authority，已有 revision leaf 拒绝，且没有可从 fresh process rehydrate/resume existing revision leaf 的公共能力。Main 继续实现只能 deep-import、复制上游合同或以新 root 重放冒充 exact durable substate，均违反当前包边界；需总控先修复并验收 Agent 公共 facade 与 Core revision 恢复合同后再重派 Main。",
+  "evidenceRefs": [
+    "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json",
+    "AlembicAgent/package.json",
+    "AlembicAgent/src/agent/service/index.ts",
+    "AlembicAgent/src/agent/runs/index.ts",
+    "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+    "AlembicAgent/src/agent/evaluation/IndependentValueReviewer.ts",
+    "AlembicCore/src/service/production/PrivateCorpusRevisionResolver.ts",
+    "AlembicCore/src/service/production/ProductionPersistenceContracts.ts"
+  ],
+  "verification": [
+    "All eight evidenceRefs were checked with test -f from the workspace root and exist.",
+    "Alembic clean HEAD 32578dc3d5fe02eb8c6d24d854066d780ffb668d tree 945b99963919bb273793c15001a1f845df5964ba; AlembicCore clean HEAD 6b6341f05332a1d15f79c19a0251d41b962b71d1 tree 84c094ee01052c91df5c9e94a50862dc61652f15; AlembicAgent clean HEAD e2aa051500cc9fc5c43f1085afd5072c5981f26f tree 459723c2ecf2919f95b2dccbaae6e4e51d46f61b.",
+    "PCFBaselineReceipt SHA-256 is ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6; Core PC-F capability manifest remains 4d3ecdc70227cd3cc613c9df26ca04107a6327aec7eebc5eae3a5856c614f008.",
+    "Source inspection: AlembicAgent/src/agent/runs/index.ts exports runStrictPlanAgent; current AlembicAgent/src/agent/service/index.ts explicit export list contains runPlanAgent but not runStrictPlanAgent.",
+    "Actual Node ESM imports from the Alembic checkout: @alembic/agent, @alembic/agent/agent and @alembic/agent/service expose required strict symbols as undefined; @alembic/agent/production, /evaluation and /runs fail with ERR_PACKAGE_PATH_NOT_EXPORTED.",
+    "Core public workspace API exposes initialize/open/Handle but no rehydratePrivateCorpusRevisionV1 or resumePrivateCorpusRevisionV1; PrivateCorpusRevisionResolver rejects an existing leaf with PRIVATE_CORPUS_REVISION_LEAF_ALREADY_EXISTS and Handle construction requires module-private PRIVATE_REVISION_INIT_AUTHORITY.",
+    "Alembic npm run build:check passed before source mutation; final Alembic/Core/Agent worktrees remain clean.",
+    "Existing controller-return delivery run remains status=sent with readback.checked=true and readback.ok=true; no second controller-return was created."
+  ],
+  "risks": [
+    "Without an Agent public strict facade, Main cannot legally invoke accepted strict Plan cognition, validate strict analysis epochs/expression sets, or run accepted independent reviewers.",
+    "Without Core existing-revision rehydration, a fresh process cannot resume the exact already-created private revision/handle required by the durable journal; allocating a replacement root is not exact durable-substate recovery.",
+    "No product source changed, so legacy broad-reset, executable PlanSelection, asyncFill/direct-persist and completed_with_errors behavior remains unchanged and must not be treated as partially fixed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "dependency-provenance",
+      "verify": "Three clean commit/tree baselines, realpath package links, package/index SHA-256/load success, PC-F receipt and capability manifest hashes verified."
+    },
+    {
+      "kind": "negative-tests",
+      "verify": "Actual legal Agent imports expose required strict symbols as undefined; forbidden subpaths throw ERR_PACKAGE_PATH_NOT_EXPORTED. Core public workspace surface has no rehydrate/resume symbols and existing-leaf path fails closed by source contract."
+    },
+    {
+      "kind": "tests",
+      "verify": "Alembic npm run build:check passed before any source mutation."
+    },
+    {
+      "kind": "compatibility",
+      "verify": "No Alembic/Core/Agent files changed; all worktrees clean and legacy behavior untouched."
+    },
+    {
+      "kind": "execution-plan",
+      "verify": "Audited Facade→PlanSelectionGate→ColdStartWorkflow→dimension runner/finalizer→Gateway/ref/vector chain and identified exact RED anchors plus correct upstream-first producer/consumer order."
+    },
+    {
+      "kind": "test-first",
+      "verify": "Stopped at dependency gate before writing RED product tests because those tests could not legally import the accepted Agent/rehydration contracts; provided concrete RED slices for redispatch."
+    },
+    {
+      "kind": "two-stage-self-review",
+      "verify": "Contract review compared task/design acceptance to package exports; code-path review independently traced current Main runtime and confirmed no legal workaround."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i3-i7-alembic-main-strict-orchestration__Alembic__i3-i7-alembic-main-strict-orchestration-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-alembic-main-strict-orchestration__Alembic__i3-i7-alembic-main-strict-orchestration-t1.json",
+    "deliveryRunId": "run-delivery-dg-i3-i7-alembic-main-strict-orchestration__Alembic__i3-i7-alembic-main-strict-orchestration-t1",
+    "dispatchGroup": "dg-i3-i7-alembic-main-strict-orchestration",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-alembic-main-strict-orchestration__Alembic__i3-i7-alembic-main-strict-orchestration-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 81,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i7-alembic-main-strict-orchestration-p1",
+    "targetTaskId": "i3-i7-alembic-main-strict-orchestration-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i3-i7-alembic-main-strict-orchestration",
+    "resultId": "tr-i3-i7-alembic-main-strict-orchestration-t1",
+    "createdAt": "2026-07-16T07:53:16.106Z"
+  },
+  "createdAt": "2026-07-16T07:53:16.106Z",
+  "stateRevisionObserved": 81,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i3-i7-alembic-main-strict-orchestration-t1",
+    "dispatchGroup": "dg-i3-i7-alembic-main-strict-orchestration",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i3-i7-alembic-main-strict-orchestration-t1__dg-i3-i7-alembic-main-strict-orchestration__current-r0001.json"
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-p1",
+  "dispatchGroup": "dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1",
+  "status": "completed",
+  "summary": "Completed the Alembic-only rework as one clean commit c84c51952fe119efb89360a08adffa335322b886. Fresh-process recovery now replays a durable quiesced-observation receipt into the exact missing journal event before snapshot progression; terminal not-running progress now resumes exact stale control removal with inventory binding, active-PID rejection, directory fsync, and absence readback. The same strict path also rehashes resumed progress correctly, verifies authorized RESET_STARTED phase deltas, and completes setup-state cleanup after a durable recovery receipt. The independent OS-process matrix covers header, request-unaccepted, accepted-draining, old-PID/receipt, receipt/event, snapshot/probe, reset, and quarantine/restore prefixes while retaining fail-closed unknown-delta and checkpoint-negative behavior.",
+  "evidenceRefs": [
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictProductionJournal.ts",
+    "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+    "Alembic/test/unit/StrictProductionJournal.test.ts",
+    "Alembic/package.json",
+    "wakeflow-ledger/Alembic/recipe-coldstart-production-quality-2026-07-15/i8r-two-stage-quiesced-observation-rework1-fresh-process-matrix.json"
+  ],
+  "verification": [
+    "RED before implementation: receipt-without-event resumed into STRICT_SETUP_JOURNAL_STATE_TRANSITION_INVALID, and terminal not-running progress left daemon.json present.",
+    "npm run check: exit 0; unit 156 files / 1189 passed, integration 32 files / 467 passed with 10 skipped, coverage 3 files / 11 passed, shared-asset drift 17 checks / 0 drift, retired-symbol and ring-direction checks clean.",
+    "Post-commit npm run typecheck && npm run build:self && npm run test:unit -- test/unit/StrictExternalSetupRecovery.test.ts test/unit/StrictProductionJournal.test.ts: exit 0; 2 files / 39 passed.",
+    "git show --check --stat --oneline c84c51952fe119efb89360a08adffa335322b886 and git status --short: commit check passed and Alembic working tree clean.",
+    "Fresh-process matrix artifact JSON validated with jq; SHA-256 bf5f0feb46698759546e033d0f3ff33fef8616a3b48041f7b626f9208d4f25c9.",
+    "Process audit after tests found no residual Alembic test daemon process."
+  ],
+  "risks": [
+    "The deterministic accepted-draining matrix uses POSIX SIGSTOP/SIGCONT on the test old-daemon process and SIGKILL only on the independent test setup coordinator; production old-writer termination remains graceful strict-quiesce only.",
+    "Alembic prime/work/code-guard plugin calls degraded with a non-retryable response schema error rejecting injected _meta; explicit source review and repository validation are the fallback evidence.",
+    "npm run check retained five pre-existing lint warnings in unrelated files and reported no lint errors."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "c84c51952fe119efb89360a08adffa335322b886",
+      "ref": "Alembic",
+      "verify": "git -C Alembic show --check --stat --oneline c84c51952fe119efb89360a08adffa335322b886 && git -C Alembic status --short"
+    },
+    {
+      "kind": "tests",
+      "ref": "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+      "value": "Independent OS-process stage matrix plus strict journal tests; 2 files / 39 passed post-commit and full repository check passed.",
+      "verify": "cd Alembic && npm run typecheck && npm run build:self && npm run test:unit -- test/unit/StrictExternalSetupRecovery.test.ts test/unit/StrictProductionJournal.test.ts"
+    },
+    {
+      "kind": "runtime-evidence",
+      "ref": "wakeflow-ledger/Alembic/recipe-coldstart-production-quality-2026-07-15/i8r-two-stage-quiesced-observation-rework1-fresh-process-matrix.json",
+      "value": "Hash-bound record of all fresh-process prefixes, fail-closed negatives, full check counts, and post-commit verification.",
+      "verify": "jq -e . wakeflow-ledger/Alembic/recipe-coldstart-production-quality-2026-07-15/i8r-two-stage-quiesced-observation-rework1-fresh-process-matrix.json >/dev/null && shasum -a 256 wakeflow-ledger/Alembic/recipe-coldstart-production-quality-2026-07-15/i8r-two-stage-quiesced-observation-rework1-fresh-process-matrix.json"
+    },
+    {
+      "kind": "self-review",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+      "value": "Stage one closed both controller-identified crash gaps and every required matrix prefix; stage two checked hash/inventory binding, fsync/readback, reset allowlists, protected state, negative gates, repository scope, and ordinary non-strict compatibility.",
+      "verify": "git -C Alembic diff f281f8ca196d7381554c7f314a823f58ce0767d9..c84c51952fe119efb89360a08adffa335322b886 --check"
+    },
+    {
+      "kind": "red-green-note",
+      "ref": "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+      "value": "Before implementation, the two rework regressions failed at the missing event transition and retained daemon control; after implementation the expanded 39-test matrix and full check passed.",
+      "verify": "See verification entries in the TargetResultEnvelope and runtime evidence artifact."
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+      "value": "Two independent durable boundaries were treated as atomic: observation receipt before journal event, and terminal progress before control deletion. Fresh-process resume previously skipped the second side of each boundary.",
+      "verify": "Review ensureStrictQuiescedObservation, sealQuiescedObservation, recordQuiescedObservationEvent, and completeNotRunningControlRemoval."
+    },
+    {
+      "kind": "scope-diff",
+      "ref": "Alembic",
+      "value": "Exactly three Alembic files changed; no AlembicCore, AlembicAgent, AlembicPlugin, AlembicDashboard, or Test repository file changed.",
+      "verify": "git -C Alembic diff --name-only f281f8ca196d7381554c7f314a823f58ce0767d9..c84c51952fe119efb89360a08adffa335322b886"
+    },
+    {
+      "kind": "compatibility-review",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+      "value": "The existing two-stage authority/lease/header/quiesce/receipt/snapshot/reset/recovery design is preserved; new behavior is limited to strict external setup crash replay, and no ordinary non-strict entrypoint changed.",
+      "verify": "npm run check"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1__Alembic__i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1__Alembic__i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1__Alembic__i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1",
+    "dispatchGroup": "dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1__Alembic__i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 162,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-p1",
+    "targetTaskId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1",
+    "resultId": "tr-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1",
+    "createdAt": "2026-07-17T02:36:00.680Z"
+  },
+  "createdAt": "2026-07-17T02:36:00.680Z",
+  "stateRevisionObserved": 162,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

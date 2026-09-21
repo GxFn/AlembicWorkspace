@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+  "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "summary": "Implement the one confirmed AlembicPlugin consumer package after accepted AlembicCore commit 7ccddf2372ddaeac2dbcfc1f651157d753709cd7. Baseline AlembicPlugin commit is be7bc058fcd188f38b48ee551f912377c2d19f1d; keep all work in AlembicPlugin and return one clean commit.\n\nP1 — request-scoped reader-only retrieval:\n- Consume the accepted Core public EmbeddingPort, VectorIndexReader, KnowledgeRetrievalPolicy/Port and raw candidate evidence.\n- Refactor public Search and Prime request graphs so they construct only snapshot DB truth, query embedding, a reader-only HNSW adapter and canonical retrieval. They must not construct IndexingPipeline, VectorService, VectorIndexWriter, lifecycle/reconcile/init/rescan/rebuild, or any write-shaped request adapter.\n- Search and Prime must use the same query/filter/topK candidate sequence. Remove Prime's independent 0.45/relative admission threshold and score calibration; Prime may only group/project the already-authoritative candidates and must expose bounded ordered candidateRecipeIds.\n- Preserve dense similarity/rank, sparse score/rank and per-lane/raw RRF contribution through public projection. With embeddings unavailable, sparse truth still works; empty authoritative knowledge returns empty.\n- Frozen eight English BiliDili query fixtures must be non-empty and place Recipe <redacted> in Top 3 without synonym hardcoding or Recipe edits.\n\nP2/P3 — shared real-time ProjectContext:\n- Add a Plugin-owned ProjectContextBuildSessionManager injected into Graph and Recipe Map, keyed by canonical real project root + normalized scope + source/manifest fact fingerprint (exists, size, high-resolution mtime, sha256), never Git state.\n- Merge same-key in-flight work and use ref-counted cancellation. Graph and Recipe Map consume one fact session; Map only adds deterministic Recipe mounts and must not rebuild source facts.\n- Route explicit file/symbol/sourceSlice/anchor requests through a narrow fast path before space/all-repo/map/module traversal. The containing repo identity may be read; unrelated repositories must not be scanned.\n- Full-space work publishes deterministic per-repository chunks. Repo failures/timeouts remain explicit coverage outcomes.\n- Add opaque, project-confined continuation with {resultRef,factSessionRef,nextCursor,hasMore,page,accumulatedCounts}. Pages are deterministic deltas and reconstruct without duplicates or missing stable IDs; partial results must stay honestly partial.\n- Store chunks only in owner-only OS/runtime temp, never projectRoot/dataRoot. Terminal consumption, explicit cancel, exception and TTL expiry must remove all temp files. Expired cursors return bounded retry guidance and need not survive process restart.\n- Propagate one AbortSignal from the unchanged 120-second host deadline through handler/session/Core ProjectContext; abort before response and wait for bounded cleanup acknowledgement so a slow worker actually stops.\n- Keep deprecated raw-path fullMapRef null; do not expose paths in result refs/cursors.\n\nBoundaries:\n- Preserve Guard as a read-only regression consumer; do not redesign Guard.\n- No persistent answer cache, knowledge writes, Git revision/checkpoint/dirty/branch checks, host-selected-project coupling, role/Admin/intent/knowledge-state/tool-visibility gates, hardcoded synonyms, Recipe edits, Test window, Alembic/AlembicAgent/AlembicDashboard source edits, vendor or release changes.\n- No higher heavy-tool deadline and no query-time vector maintenance.\n\nRequired verification/evidence:\n- Focused RED/GREEN tests for Search/Prime parity, orphan/deprecated truth, public raw evidence, reader-only fingerprint/zero mutation, BuildSession reuse/invalidation/ref-count cancellation, narrow fast path, 2+ cursor-page reconstruction, explicit repo failure, cursor confinement, terminal/cancel/error/TTL cleanup, and real worker-stop timeout.\n- Required Design commands: focused unit suites; Zod schema integration; full npm run test:unit; npm run build:check; npm run check; npm run build; npm run verify:codex-runtime-package; plugin package/manifest verification if defined by repository rules.\n- Record exact Core and Plugin commits, changed files/symbols, runtime/package entry hashes, zero-write fingerprints, and two-stage self-review (requirement compliance, then failure paths/performance/cleanup).\n- Do not claim final real BiliDili/AlembicWorkspace acceptance: controller will independently reload the canonical runtime and run the fixed BiliDili Search/Prime matrix plus dual-project Graph/Map/Guard, cursor, fast-path and zero-write checks after accepting this commit.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-retrieval-vector-projectcontext-architecture-requirement-design-2026-07-13.md",
+  "designIntent": "Make every public knowledge query request-scoped and reader-only, and make Graph/Map share a cancellable ephemeral fact build with honest pagination.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "One clean AlembicPlugin commit consuming exact Core commit 7ccddf2372ddaeac2dbcfc1f651157d753709cd7; clean tree and exact changed files."
+      },
+      {
+        "kind": "tests",
+        "verify": "Focused retrieval/session/schema/timeout suites plus full unit/check/build/package verification pass, with raw command summaries."
+      },
+      {
+        "kind": "reader-only-proof",
+        "verify": "Public Search/Prime runtime graph has no writer/lifecycle/indexing/reconcile/init/rescan/rebuild edge and protected data fingerprints remain unchanged."
+      },
+      {
+        "kind": "retrieval-parity-proof",
+        "verify": "Search and Prime ordered candidate IDs match; target Recipe is Top 3 for all eight frozen queries; raw dense/sparse/RRF evidence survives projection."
+      },
+      {
+        "kind": "build-session-proof",
+        "verify": "Same root/scope Graph and Recipe Map build facts once, source/manifest changes invalidate without Git, and explicit file/symbol uses the narrow path."
+      },
+      {
+        "kind": "continuation-proof",
+        "verify": "At least three pages reconstruct stable facts exactly once; cursor/ref is opaque/project-confined; repo failures remain explicit."
+      },
+      {
+        "kind": "cancellation-cleanup-proof",
+        "verify": "Unchanged 120-second deadline propagates AbortSignal to a real worker that stops; terminal/cancel/error/TTL leave zero temp files."
+      },
+      {
+        "kind": "self-review",
+        "verify": "Two-stage requirement and code-quality/failure-path/performance review completed with blockers resolved."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "runtime-package-entry-proof"
+      },
+      {
+        "kind": "compatibility-proof"
+      },
+      {
+        "kind": "zero-write-fingerprint"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T04:21:45.919Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p2-plugin-retrieval-vector-projectcontext-integration-t1",
+      "taskPackageId": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Integrate accepted Core commit 7ccddf2372ddaeac2dbcfc1f651157d753709cd7 into one AlembicPlugin package for canonical five-tool retrieval and cancellable shared ProjectContext sessions.",
+      "status": "pending",
+      "createdAt": "2026-07-13T04:21:45.919Z"
+    }
+  ]
+}

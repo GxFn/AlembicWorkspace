@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i8-core-strict-publication-marker-contract-rootcause1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "执行 I8 上游 AlembicCore strict-publication-marker contract root-cause package。基线必须为干净的 AlembicCore@5ad2e0a04d27000a27927acc4de0d83418b2420a/tree 9cc8ed0966ad71320c792765b4c0a2a3fd1f869d。Plugin I8 的 blocked 证据已由总控复核：Main 尚未发布 physical public bundle；同时 Core 现有 StrictPublicationMarkerV1 的 projectId/projectScopeId/strictConfigReceiptHash/publicationModeVersion 字段与已确认 requirement 中持久化 marker 的 strict-v1/routeSchemaVersion/projectIdentityHash/migrationBundleHash 语义不一致，且全仓无合法生产 writer。此包只修正共享 marker schema，为下一步 Main writer 和 Plugin resolver 提供同一消费者中立权威。\n\n完成条件：在现有 ProductionPersistenceContracts.ts / @alembic/core/knowledge export 单源内原位收敛 StrictPublicationMarkerV1 与 createStrictPublicationMarkerV1；严格表达 mode='strict-v1'、routeSchemaVersion=1、projectIdentityHash、migrationBundleHash 及已有 Core canonical hash/version 约束，具体是否保留 schemaVersion/markerHash 必须按现有 Core receipt 惯例与 Requirement 原文作最小一致实现，不新增第二 marker 类型。构造器必须 exact-key、非空、canonical-hash、固定枚举/版本并 fail closed；旧字段不得继续作为正向 authority。补 focused tests 覆盖 valid marker、旧字段、缺失/额外字段、空值、错误 mode/route version、非 canonical hash 和语义变化导致 hash 变化。同步公共 built artifact 导出并证明真实 package import 可用。\n\n强边界：Core 只拥有 consumer-neutral schema/creator；不得加入 dataRoot、绝对/相对路径、recipe-publications namespace、文件 IO、resolver、marker writer、CAS、Main/Plugin 依赖或 runtime orchestration；不得修改 Alembic/AlembicPlugin/AlembicAgent/Design/Test/Wakeflow，亦不得把 marker 写入 provider/model config。固定 publication namespace、物理 bundle/marker 写入与 CAS 属于下一 Alembic Main package；正式 public resolver 属于后续 Plugin package。\n\n验证与交付：先以 focused test 证明当前 contract mismatch，再实现最小原位改动；运行 targeted ProductionPersistenceContracts tests、public built-artifact import probe、npm run build:check、完整 Core suite、全仓旧 marker 字段与路径知识 boundary scan、git diff --check。仓库窗口提交一个新的干净 AlembicCore commit；回填 parent/commit/tree、changed files/symbols、RED/GREEN、原始命令摘要、两阶段自审、风险及明确的 Main/Plugin consumer handoff。若发现任何真实已发布消费者依赖旧 marker schema，停止并返回具体 caller/artifact 证据，不自行双写或版本化第二协议。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md lines 436,442,472,895,1143,1204 and §§14-15,18.2,18.4; Design/docs/current/recipe-coldstart-production-quality-original-plan-2026-07-15.md line 66; accepted Core@5ad2e0a04d27000a27927acc4de0d83418b2420a; accepted blocked Plugin result tr-i8-alembic-plugin-public-serving-compatibility-redesign1-t1 revision 2; controller decision evt-20260716142727-0112",
+  "designIntent": "原位修正现有 Core strict marker contract，使 Main writer 与 Plugin resolver 共享 exact strict-v1 schema，同时保持 Core 完全不含本地路径和运行时 IO。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "public-contract-probe",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "boundary-scan",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "baseline"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "change-scope"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T14:29:31.198Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i8-core-strict-publication-marker-contract-rootcause1-t1",
+      "taskPackageId": "i8-core-strict-publication-marker-contract-rootcause1-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "把现有 Core StrictPublicationMarkerV1 原位校正为需求确认的 consumer-neutral strict-v1 marker schema；不加入路径知识或新平台，提交单一 Core commit 与可复验证据。",
+      "status": "pending",
+      "createdAt": "2026-07-16T14:29:31.198Z"
+    }
+  ]
+}

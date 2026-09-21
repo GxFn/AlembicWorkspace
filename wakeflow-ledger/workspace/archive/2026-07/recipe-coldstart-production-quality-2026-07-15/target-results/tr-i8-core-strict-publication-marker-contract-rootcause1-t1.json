@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8-core-strict-publication-marker-contract-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8-core-strict-publication-marker-contract-rootcause1-p1",
+  "dispatchGroup": "dg-i8-core-strict-publication-marker-contract-rootcause1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i8-core-strict-publication-marker-contract-rootcause1-t1",
+  "status": "completed",
+  "summary": "AlembicCore 在现有 StrictPublicationMarkerV1/createStrictPublicationMarkerV1 单源内原位校正 consumer-neutral strict publication marker：保留 schemaVersion=1/markerHash，输入严格收敛为 mode='strict-v1'、routeSchemaVersion=1、canonical projectIdentityHash 与 migrationBundleHash；exact-key fail closed 且不包含路径/IO/writer/resolver/CAS。旧 marker schema、缺失/额外/dataRoot、空值、错误 mode/route version 和非 canonical hash 均拒绝。提交 d4de7edd6bbfaeb36a01b3cc243ba1617c001f65。",
+  "evidenceRefs": [
+    "AlembicCore@d4de7edd6bbfaeb36a01b3cc243ba1617c001f65",
+    "AlembicCore/src/service/production/ProductionPersistenceContracts.ts",
+    "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+    "AlembicCore/src/knowledge.ts",
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/task-packages/i8-core-strict-publication-marker-contract-rootcause1-p1.json",
+    "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md"
+  ],
+  "verification": [
+    "Baseline: clean AlembicCore@5ad2e0a04d27000a27927acc4de0d83418b2420a/tree 9cc8ed0966ad71320c792765b4c0a2a3fd1f869d; focused 19/19 and npm run build:check passed.",
+    "RED: npx vitest run test/ProductionPersistenceContracts.test.ts failed only at the new marker test with STRICT_PUBLICATION_MARKER_IDENTITY_MISSING (1 failed, 19 passed), proving the old projectId/projectScopeId/config assumption.",
+    "GREEN: focused ProductionPersistenceContracts passed 20/20.",
+    "npm run build:check and npm run build passed.",
+    "Built public probe imported createStrictPublicationMarkerV1 from @alembic/core/knowledge; exact six output keys, fixed mode/route, canonical markerHash sha256:dd0540a4ac770f8c6c0dcff7b2c4e06d3ac757ea7cc53a20964073e78d8a2bae, semantic hash changes, old schema/path fields rejected. dist JS sha256:0e1bc6f06f2c6c943330d215d916124901145d6a30252ff3b5f4a853fd7573f0.",
+    "Boundary scans: marker source block path/IO/runtime knowledge=0, old marker authority=0, external Main/Plugin/Agent marker consumer files=0; dist marker d.ts contains only the new schema.",
+    "npm test passed 190 files / 1855 tests; npm run lint passed 771 files; public API/layer/consumer/scope/naming/retired/output-budget/space-edge gates passed.",
+    "git diff --check passed; final Core working tree clean."
+  ],
+  "risks": [
+    "Alembic Main still lacks the physical fixed-namespace marker writer/readback and immutable public bundle publication; its sequenced next package must consume this creator and bind accepted project identity plus migration bundle.",
+    "AlembicPlugin still lacks the enrolled strict + marker + public-route resolver; its later package must fail closed on missing/corrupt/mismatched marker and keep Graph live-source. Core intentionally provides no path, IO, alias, or second protocol.",
+    "dist is ignored build evidence and was not committed; downstream acceptance must rebuild Core at d4de7edd6bbfaeb36a01b3cc243ba1617c001f65."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "d4de7edd6bbfaeb36a01b3cc243ba1617c001f65",
+      "verify": "parent 5ad2e0a04d27000a27927acc4de0d83418b2420a; tree 3739ceb11f270fea595b631c45f308166951a8cb; single clean Core commit"
+    },
+    {
+      "kind": "public-contract-probe",
+      "ref": "AlembicCore/src/knowledge.ts",
+      "verify": "built @alembic/core/knowledge import succeeded; exact new marker keys/fixed versions/canonical markerHash verified; old schema and dataRoot rejected"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "focused 20/20; full Core 190 files/1855 tests"
+    },
+    {
+      "kind": "boundary-scan",
+      "ref": "AlembicCore/src/service/production/ProductionPersistenceContracts.ts",
+      "verify": "marker contract block has zero dataRoot/path/IO/resolver/writer/CAS knowledge and zero old marker fields; external consumer inventory zero"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: exact requirement schema, fixed mode/route, canonical hashes, schemaVersion/markerHash receipt convention, all negative cases, public artifact, and no path/runtime scope are covered. Stage 2: no blocker/high/medium findings; explicit semantic object replaces unsafe spread, exact-key and canonical hash checks use existing helpers, error semantics fail closed. Main writer and Plugin resolver remain explicit downstream handoffs."
+    },
+    {
+      "kind": "baseline",
+      "value": "clean 5ad2e0a04d27000a27927acc4de0d83418b2420a/tree 9cc8ed0966ad71320c792765b4c0a2a3fd1f869d; focused 19/19 and build:check pass"
+    },
+    {
+      "kind": "test-first",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "interactive RED before source edit: 1 failed/19 passed at old identity guard; GREEN 20/20; single final commit constraint preserved"
+    },
+    {
+      "kind": "change-scope",
+      "value": "2 tracked Core files only: ProductionPersistenceContracts.ts and its focused test; no Main/Plugin/Agent/Design/Test/Wakeflow or dist commit"
+    },
+    {
+      "kind": "repro",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "old creator reproduced rejecting the valid requirement shape with STRICT_PUBLICATION_MARKER_IDENTITY_MISSING and baseline probe showed it could spread arbitrary extra fields"
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "valid marker plus four-key omission, extra dataRoot, old schema, blank/noncanonical hashes, wrong mode and route version all covered"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "authority/consumer scan -> baseline -> marker RED -> exact in-place GREEN -> build/public probe/boundary/full suite -> two-stage review -> one commit"
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed"
+    },
+    {
+      "kind": "lint",
+      "value": "Biome 771 files plus public API/layer/consumer/scope/naming/retired/output-budget/space-edge gates passed"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8-core-strict-publication-marker-contract-rootcause1__AlembicCore__i8-core-strict-publication-marker-contract-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8-core-strict-publication-marker-contract-rootcause1__AlembicCore__i8-core-strict-publication-marker-contract-rootcause1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i8-core-strict-publication-marker-contract-rootcause1__AlembicCore__i8-core-strict-publication-marker-contract-rootcause1-t1",
+    "dispatchGroup": "dg-i8-core-strict-publication-marker-contract-rootcause1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8-core-strict-publication-marker-contract-rootcause1__AlembicCore__i8-core-strict-publication-marker-contract-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 114,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8-core-strict-publication-marker-contract-rootcause1-p1",
+    "targetTaskId": "i8-core-strict-publication-marker-contract-rootcause1-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "dg-i8-core-strict-publication-marker-contract-rootcause1",
+    "resultId": "tr-i8-core-strict-publication-marker-contract-rootcause1-t1",
+    "createdAt": "2026-07-16T14:41:44.749Z"
+  },
+  "createdAt": "2026-07-16T14:41:44.749Z",
+  "stateRevisionObserved": 114,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

@@ -1,0 +1,504 @@
+{
+  "title": "ToolExecutionPipeline 验收覆盖与文件层级门禁",
+  "date": "2026-09-20",
+  "scope": {
+    "study": [
+      "../../../AlembicAgent/test/runtime-efficiency.test.ts",
+      "../../../AlembicAgent/test/ExplorationStrategies.test.ts",
+      "../../../AlembicAgent/test/tool-v2-contract.test.ts",
+      "../../../AlembicAgent/test/AgentRuntime.test.ts",
+      "../../../AlembicAgent/test/agent-lifecycle.test.ts",
+      "../../../AlembicAgent/test/hook-system.test.ts"
+    ],
+    "initialMode": "只读覆盖调查；父任务随后明确授权独立实现门禁。",
+    "editedFiles": [
+      "../../../AlembicAgent/scripts/lint-layer-contract.mjs",
+      "../../../AlembicAgent/test/layer-contract.test.ts"
+    ],
+    "untouchedByThisAgent": [
+      "src/**",
+      "config/**",
+      "package.json",
+      "其他测试",
+      "相邻 Core 仓库"
+    ],
+    "noCommitReason": "root 统一审阅、执行总门禁与提交；子代理不自动提交。",
+    "initialHeadForGateRed": "0caa65cddb6e4190db4488026509c76a90609340",
+    "verificationBoundary": "仅本地真实 CLI / 临时仓库与已有依赖，不运行真实 API、不修改邻仓。"
+  },
+  "conclusions": [
+    "原有 runtime/adapter 测试能证明多项真实默认链路，但不能替代自定义 middleware 引擎生命周期；root 已新增针对性表征。",
+    "before 短路后所有 after 仍按注册正序执行，before/after 自定义异常传播，router 异常由 bridge 归一化；这些语义需要独立保留。",
+    "原顶层矩阵跳过 agent→agent，无法约束 engine 倒引入口。现按可选 fileBoundaries 在同 area 跳过之前强制逐文件白名单。",
+    "默认工厂、公开旧入口与宿主 adapter 保持原职责；本子任务只实现门禁。"
+  ],
+  "lifecycleContract": [
+    {
+      "trigger": "正常执行",
+      "observed": "所有 before 串行 await → 唯一宿主 executor → 所有 after 正序 await → 一次 efficiency 记账。",
+      "ref": {
+        "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+        "line": 61
+      }
+    },
+    {
+      "trigger": "before 返回 blocked:true，可无 result",
+      "observed": "设置 blocked 并诊断，停止余下 before 和宿主执行，仍运行每个已注册 after。",
+      "ref": {
+        "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+        "line": 33
+      }
+    },
+    {
+      "trigger": "before 返回 result，值为 null/false/0/空字符串",
+      "observed": "只判 undefined；有效短路设置 cacheHit，所有 after 仍执行。",
+      "ref": {
+        "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+        "line": 38
+      }
+    },
+    {
+      "trigger": "before 抛错/Promise reject",
+      "observed": "错误向上传播；不调用 router，不执行 after，也无最终 efficiency 记账。"
+    },
+    {
+      "trigger": "router 返回失败 envelope",
+      "observed": "保留 envelope；blocked/needs-confirmation/aborted/timeout 且 !ok 才设置 blocked；不丢部分输出；after 继续。",
+      "ref": {
+        "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+        "line": 137
+      }
+    },
+    {
+      "trigger": "router 抛 Error/string/null",
+      "observed": "bridge 归一为带可用 error 的结果并诊断，after 继续；错误不能进入成功缓存。",
+      "ref": {
+        "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+        "line": 43
+      }
+    },
+    {
+      "trigger": "某 after 抛错/Promise reject",
+      "observed": "错误向上传播，后续 after 和最终 efficiency 记账停止；不能照搬 HookSystem 的诊断后继续策略。"
+    },
+    {
+      "trigger": "取消/超时/部分结果",
+      "observed": "运行时与 ToolRouter 拥有取消协调；bridge 保留原 abortSignal 身份与 envelope/输出。纯拆分不新增取消策略或回滚承诺。"
+    }
+  ],
+  "currentCoverage": [
+    {
+      "file": "../../../AlembicAgent/test/runtime-efficiency.test.ts",
+      "reviewed": true,
+      "realBoundary": "createToolPipeline + 可控宿主 router；部分 trackerSignal/submitDedup 用例直接调 after。",
+      "anchors": [
+        {
+          "line": 140,
+          "name": "captures evidence before memory, tracker and trace consume the same envelope",
+          "status": "root 本轮新增；真实 EvidenceLedgerStore、默认 factory、envelope 流转，外部观察端口只用断言替代。"
+        },
+        {
+          "line": 190,
+          "name": "awaits before hooks and invokes after hooks in registration order",
+          "status": "root 本轮新增；异步 before 必须结束后才执行下一项。"
+        },
+        {
+          "line": 237,
+          "name": "short-circuits a $label verdict but still runs all after hooks",
+          "status": "root 本轮新增；覆盖 null/zero/false/空串/blocked 无结果。"
+        },
+        {
+          "line": 261,
+          "name": "propagates a custom %s hook failure without silently continuing",
+          "status": "root 本轮新增；before/after 失败分别确定执行次数与后续 after 停止。"
+        },
+        {
+          "line": 291,
+          "name": "retries the host after a $label failure instead of caching it",
+          "status": "root 单独错误缓存修复；Error/string/null 三种失败→成功→缓存，保留。"
+        },
+        {
+          "line": 484,
+          "name": "short-circuits duplicate deterministic tool calls within a session snapshot",
+          "status": "已有默认 pipeline 快照缓存与诊断计数；不要重复新增成功缓存测试。"
+        }
+      ],
+      "preserved": [
+        "当前 capability/policy 在宿主之前拒绝",
+        "参数字节上限在缓存准入之前",
+        "live code/memory/knowledge/meta 不缓存",
+        "submit/副作用不缓存",
+        "直接 note_finding 改写后仍保留 depth slots"
+      ],
+      "limitation": "直接调用 after 的提交失败表格不证明引擎生命周期；取消/部分结果仍主要由下层 adapter 测试证明。"
+    },
+    {
+      "file": "../../../AlembicAgent/test/ExplorationStrategies.test.ts",
+      "reviewed": true,
+      "realBoundary": "Tracker/探索策略；一个真实 createToolPipeline Producer 调用链。",
+      "anchors": [
+        {
+          "line": 13,
+          "name": "counts only persisted candidate submissions as producer progress"
+        },
+        {
+          "line": 306,
+          "name": "keeps Producer focused on submit coverage instead of detail/tools exploration"
+        }
+      ],
+      "preserved": [
+        "只有真实 created/id/pending|staging 提交才计进度",
+        "PRODUCE 拒绝 detail/meta.tools/terminal，允许 submit/review",
+        "producer ledger 保留真实 payloadStored/createdCount"
+      ],
+      "limitation": "该 fixture memoryCoordinator/trace 为空，不能单独证明 evidence→memory→tracker→trace 顺序。"
+    },
+    {
+      "file": "../../../AlembicAgent/test/tool-v2-contract.test.ts",
+      "reviewed": true,
+      "realBoundary": "真实 ToolRouter/ToolRouterAdapter/terminal handler；不是 ToolExecutionPipeline。",
+      "anchors": [
+        {
+          "line": 91,
+          "name": "does not execute a queued mutation after cancellation"
+        },
+        {
+          "line": 117,
+          "name": "preserves an aborted status through the host adapter before execution"
+        },
+        {
+          "line": 347,
+          "name": "serializes concurrent single-concurrency tool calls via the per-tool lock"
+        },
+        {
+          "line": 384,
+          "name": "routes V2 terminal cancellation as a structured partial timeout result"
+        },
+        {
+          "line": 416,
+          "name": "surfaces a degraded handler result on the per-call envelope diagnostics"
+        }
+      ],
+      "preserved": [
+        "排队突变取消后不执行",
+        "协作取消与部分 stdout",
+        "degraded diagnostics",
+        "宿主注入 sandbox 原调用",
+        "串行/独占 action 调度"
+      ],
+      "limitation": "不能代替 pipeline 请求投影的 signal/共享对象身份验证；部分 timeout 输出现为有效部分结果，不能改成空失败。"
+    },
+    {
+      "file": "../../../AlembicAgent/test/AgentRuntime.test.ts",
+      "reviewed": true,
+      "realBoundary": "真实 runtime/default pipeline + mock provider/router。",
+      "anchors": [
+        {
+          "line": 186,
+          "name": "emits developer-safe reflection and tool process payloads"
+        },
+        {
+          "line": 425,
+          "name": "exposes a direct note_finding tool schema when memory is available"
+        },
+        {
+          "line": 471,
+          "name": "records accepted note_finding refs in PCVM node evidence"
+        },
+        {
+          "line": 886,
+          "name": "does not force summary after abort exits"
+        },
+        {
+          "line": 906,
+          "name": "does not force summary after stage timeout exits"
+        }
+      ],
+      "preserved": [
+        "start/end 事件与输出安全",
+        "note_finding bridge 与 PCV 接纳",
+        "取消/超时/降级后不强行生成正常 summary"
+      ],
+      "limitation": "mock memory 已接纳结果不证明真实 ledger 证据有效性；不能用这组替代 evidence 捕获顺序表征。"
+    },
+    {
+      "file": "../../../AlembicAgent/test/agent-lifecycle.test.ts",
+      "reviewed": true,
+      "realBoundary": "service/runtime 生命周期，实际 provider Promise +可控取消。",
+      "anchors": [
+        {
+          "line": 36,
+          "name": "reports the final pipeline timeout attempt (retry=%s)"
+        },
+        {
+          "line": 85,
+          "name": "does not accept a late provider reply after cancellation or emit duplicate abort events"
+        },
+        {
+          "line": 143,
+          "name": "honors an asynchronous tool blocking hook before the router"
+        },
+        {
+          "line": 179,
+          "name": "aborts the in-flight provider and reports cancellation through the service"
+        }
+      ],
+      "preserved": [
+        "迟到 provider reply 不回写",
+        "一次 abort 事件",
+        "超时最后尝试状态",
+        "policy 拒绝不调用 provider"
+      ],
+      "limitation": "tool:execute:before HookSystem 返回 false 会跳过整个 pipeline；不是 middleware.before 的短路表征。"
+    },
+    {
+      "file": "../../../AlembicAgent/test/hook-system.test.ts",
+      "reviewed": true,
+      "realBoundary": "HookSystem 与 EventBus，不是 pipeline middleware。",
+      "anchors": [
+        {
+          "line": 24,
+          "name": "captures asynchronous observer rejection from synchronous dispatch"
+        },
+        {
+          "line": 35,
+          "name": "surfaces synchronous hook errors as stable diagnostics"
+        },
+        {
+          "line": 71,
+          "name": "surfaces asynchronous hook errors without blocking later hooks"
+        }
+      ],
+      "preserved": [
+        "旁路 observer 错误隔离/诊断",
+        "后续 hook 继续",
+        "request/reply correlation 与 timeout"
+      ],
+      "limitation": "这套 best-effort 语义不能迁移到 pipeline gate/业务 after。"
+    }
+  ],
+  "minimalAcceptance": [
+    {
+      "id": "P-1",
+      "scenario": "通过旧入口自定义 middleware 验证 await 顺序、假值短路与所有 after 正序。",
+      "status": "root 已在 runtime-efficiency 落地；避免再测默认中间件名称数组或源码拼接。"
+    },
+    {
+      "id": "P-2",
+      "scenario": "自定义 before/after 失败向上传播；router 失败可归一且失败不缓存。",
+      "status": "root 已落地生命周期表征和独立缓存修复；不保留错误缓存作为既有行为。"
+    },
+    {
+      "id": "P-3",
+      "scenario": "真实默认 factory + EvidenceLedgerStore 验证 evidence 注记先于 memory/tracker/trace，tracker.isNew 先于 trace。",
+      "status": "root 已落地；原 Producer 持久提交事实测试继续保留，不必重建同等提交用例。"
+    },
+    {
+      "id": "P-4",
+      "scenario": "bridge 保留 AbortSignal、sharedState/Set/memory/ledger 身份与失败/部分 envelope 输出。",
+      "status": "下层 adapter/生命周期已有独立覆盖；拆分代码需核对原投影字段。若需补测，以一个 bridge 集成例覆盖 signal+部分输出，不为每个搬动 helper 写镜像测试。"
+    }
+  ],
+  "interfacePreservation": {
+    "facade": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+    "publicBarrel": {
+      "path": "../../../AlembicAgent/src/agent/runtime/index.ts",
+      "line": 153
+    },
+    "publicBindings": [
+      "allowlistGate",
+      "analystVerifyOnlyGate",
+      "createToolPipeline",
+      "deterministicDuplicateGuard",
+      "eventBusPublisher",
+      "evolutionDecisionGate",
+      "observationRecord",
+      "progressEmitter",
+      "recordRepairOnlyGate",
+      "submitDedup",
+      "ToolExecutionPipeline",
+      "traceRecord",
+      "trackerSignal"
+    ],
+    "directSourceCompatibilityOnly": [
+      "toolArgumentBoundsGate",
+      "producerSubmitOnlyGate",
+      "evidenceCapture"
+    ],
+    "callShape": "保留 new ToolExecutionPipeline().use(middleware).execute(call,{runtime,loopCtx,iteration}) 和 createToolPipeline()；use 返回 this。",
+    "observationOwnership": "eventBusPublisher/progressEmitter 仍可手工使用；默认工厂不注册，runtime 外层继续拥有事件上下文与裁剪后的输出，防止重复事件。",
+    "metadata": [
+      "cacheHit",
+      "blocked",
+      "isNew",
+      "durationMs",
+      "dedupMessage",
+      "isSubmit",
+      "envelope",
+      "duplicateShortCircuit",
+      "cacheEligible",
+      "cacheMiss",
+      "内部 cacheKey"
+    ],
+    "hostProjection": "actor/source/surface/abortSignal 与共享 state/Set/memory/ledger 仍从同一上下文直接投影；note_finding 只改真实路由请求，原调用仍供 trace 使用。",
+    "gate": "现有 public-api-signatures 配置已固定 13 个 runtime 导出；不要把3个 source-only 导出自动扩大到 public barrel。"
+  },
+  "fileBoundaryImplementation": {
+    "script": {
+      "path": "../../../AlembicAgent/scripts/lint-layer-contract.mjs",
+      "parserLine": 120,
+      "enforcementLine": 222
+    },
+    "tests": {
+      "path": "../../../AlembicAgent/test/layer-contract.test.ts",
+      "reverseEdgeLine": 79
+    },
+    "schema": {
+      "fileBoundaries": {
+        "requiredUnder": [
+          "src/agent/runtime/toolPipeline/"
+        ],
+        "runtimeImports": {
+          "repoRelativeFile": [
+            "resolved src/file.ts",
+            "external-original-specifier"
+          ]
+        }
+      }
+    },
+    "semantics": [
+      "fileBoundaries 可选，不改变没有该配置时的顶层 area 矩阵。",
+      "requiredUnder 按目录边界匹配，受范围覆盖但缺少精确 runtimeImports 项的源文件失败。",
+      "runtimeImports 明确列出的文件，即使不在 requiredUnder 下仍受约束。",
+      "所有已识别 runtime import/export 的解析目标都须精确列入，无文件级通配符；顶层 allowed/blessed 不覆盖文件白名单。",
+      "relative 与4个已声明 #alias 统一解析真实 src 源文件；.js/.jsx/.mjs/.cjs 按源码扩展替换。无扩展路径仅尝试 .ts/.tsx，再尝试同名 index.ts/index.tsx；不隐式选 .mts/.cts。外部依赖保留原 specifier。",
+      "完整 type-only、纯 inline type import/export、import type = require、ImportTypeNode 类型查询豁免文件边界；mixed/空 import-export/side-effect/动态字面量保留运行时分类。",
+      "非字面 dynamic import 仅在受约束文件失败，不扩大普通文件对此语法的原行为。",
+      "AST 避免注释与普通字符串产生伪 import，TypeScript 现有依赖可直接使用，无新增包。",
+      "--report 仍观察且退出0，保留现有标题、edge计数、Total与成功/失败输出结构。",
+      "直接标识符 require(...) 与 import 使用同一目标白名单；字面量支持本地解析和外部精确 specifier。受约束文件的非字面量 require 拒绝，未约束文件仍忽略未知目标。"
+    ],
+    "realConfigResult": "root 新增的10条精确规则通过；engine/contracts 都没有 runtime 依赖，accessGates 的 node:path 必须显式允许。",
+    "knownBoundary": "这是源码 import/export/直接标识符 require 的静态方向门禁。不追踪任意加载别名、eval 或注入函数，也不建立绑定/调用图分析；模块存在性和完整 TypeScript 语义由 build:check 承担。"
+  },
+  "census": {
+    "before": {
+      "runtime": 63,
+      "typeOnly": 17
+    },
+    "after": {
+      "runtime": 56,
+      "typeOnly": 24
+    },
+    "reason": "原正则将7个 import('module').Type 类型查询算为运行时。AST 将其转到类型桥，未删除7个真实runtime调用。注释/字符串误匹配另外由临时仓库反例证明。",
+    "exactDelta": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-census-delta.json",
+    "afterEdges": {
+      "agent -> ai": 5,
+      "agent -> shared": 14,
+      "agent -> tools": 17,
+      "ai -> shared": 1,
+      "root -> agent": 10,
+      "root -> ai": 1,
+      "root -> tools": 1,
+      "tools -> shared": 7
+    }
+  },
+  "validation": [
+    {
+      "command": "Node22 vitest run test/layer-contract.test.ts (原脚本)",
+      "result": "RED: 17 failed / 12 passed",
+      "log": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-red.log"
+    },
+    {
+      "command": "Node22 vitest run test/layer-contract.test.ts (AST第一版)",
+      "result": "新增类型查询计数/import-equals反例 RED: 2 failed / 30 passed",
+      "log": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-type-query-red.log"
+    },
+    {
+      "command": "Node22 vitest run test/layer-contract.test.ts -t 'prefers a source|value.jsx'",
+      "result": "源码扩展/同名index优先级反例 RED: 2 failed / 1 passed / 31 skipped",
+      "log": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-resolution-red.log"
+    },
+    {
+      "command": "Node22 vitest run test/layer-contract.test.ts -t 'rather than implicit'",
+      "result": "root 独立复审后新增回归 RED: 1 failed / 34 skipped；限制隐式扩展后纳入最终35 GREEN。",
+      "log": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-root-review-red.log"
+    },
+    {
+      "command": "Node22 vitest run test/layer-contract.test.ts -t 'require calls'",
+      "result": "直接 require 回归 RED: 2 failed / 1 passed / 35 skipped；最小 AST 收集后最终38 GREEN。",
+      "log": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-require-red.log"
+    },
+    {
+      "command": "Node22 vitest run test/layer-contract.test.ts",
+      "result": "GREEN: 38 passed",
+      "log": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-green.log"
+    },
+    {
+      "command": "Node22 node scripts/lint-layer-contract.mjs",
+      "result": "PASS: 56 cross-area runtime, 24 type-only",
+      "log": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-real.log"
+    },
+    {
+      "command": "Node22 node scripts/lint-layer-contract.mjs --report",
+      "result": "PASS: 保留既有报告结构",
+      "log": "../../../AlembicAgent/tmp/layering-2026-09-19/layer-contract-report.log"
+    },
+    {
+      "command": "biome check scripts/lint-layer-contract.mjs test/layer-contract.test.ts",
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "findings": [
+    {
+      "id": "PIPELINE-CACHE-FAILURE",
+      "severity": "P1",
+      "status": "fixed-by-root-separately",
+      "issue": "宿主抛错没有 envelope 时旧 duplicate guard 曾按成功缓存错误。",
+      "validation": "真实 createToolPipeline Error/string/null → 下一次重新调用 host → 成功后第三次命中缓存；root已有RED/GREEN，不再重复补测。"
+    },
+    {
+      "id": "LAYER-REVERSE-EDGE",
+      "severity": "P2",
+      "status": "fixed-in-this-task",
+      "issue": "旧门禁对同 area 直接跳过，engine倒引facade会通过。",
+      "validation": "relative与#alias两个真实CLI反例先RED后GREEN。"
+    },
+    {
+      "id": "LAYER-AST-CENSUS",
+      "severity": "P2",
+      "status": "fixed-in-this-task",
+      "issue": "正则误认类型查询为dynamic runtime import，并可能匹配注释/字符串。",
+      "validation": "类型查询计数、注释/字符串、inline type/mixed import均有真实CLI fixture。"
+    },
+    {
+      "id": "LAYER-IMPLICIT-EXTENSION",
+      "severity": "P2",
+      "status": "fixed-in-this-task-after-root-review",
+      "issue": "第一版候选解析会把无扩展 import 隐式解析为 .mts/.cts，与 root 的 TypeScript.resolveModuleName NodeNext 内存 probe 不一致。",
+      "validation": "同名 .mts+.tsx 选择 .tsx；仅 .mts/.cts 时不错误承认该白名单目标。后者先 RED 后 GREEN，未引入完整模块解析框架。"
+    },
+    {
+      "id": "LAYER-DIRECT-REQUIRE",
+      "severity": "P2",
+      "status": "fixed-in-this-task-after-root-review",
+      "issue": "原 AST 只收 import/import-equals，普通直接 require(...) 是真实 Node 依赖却未被文件白名单核对。",
+      "validation": ".cts 字面量 local/alias/node:path 允许；未列出的 facade/node:fs 与范围内非字面量 require 先RED后GREEN；范围外非字面量不扩大约束。"
+    }
+  ],
+  "nextStep": "root 独立审阅两文件差异与全部真实 pipeline 拆分，运行总门禁后统一提交。本报告不替代 root 最终验收。",
+  "finalSnapshot": [
+    {
+      "path": "../../../AlembicAgent/scripts/lint-layer-contract.mjs",
+      "sha256": "7e64541c5056339d069653fe9e8bc2f5052a057971ec2e2c9dc4e4ec1c6be6ea"
+    },
+    {
+      "path": "../../../AlembicAgent/test/layer-contract.test.ts",
+      "sha256": "2b049c8cd62663b7dfb20330ebc1c12f6f066c064c8b8b920a274962480276df"
+    }
+  ]
+}

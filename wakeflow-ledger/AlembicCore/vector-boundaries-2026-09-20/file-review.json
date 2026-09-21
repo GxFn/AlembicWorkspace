@@ -1,0 +1,136 @@
+{
+  "date": "2026-09-20",
+  "baseline": "f39e139cb127a094caf052c68adbd6e0c88a0913",
+  "coreCommit": "c1f6d7760a5fe0549420b72babea39b4f9c02e3d",
+  "note": "仅列本轮实际阅读范围；full-baseline 表示基线全文+最终相关diff；targeted 不等于完整文件验收。详细消费者/测试范围见 embedding-review.md 与 availability-review.md。",
+  "records": [
+    {
+      "file": "src/infrastructure/vector/EmbeddingPort.ts",
+      "depth": "full",
+      "state": "changed",
+      "review": "协议适配、取消结果边界、回退诊断；本轮新增，旧模块保持同一实现的转发",
+      "lines": 149,
+      "sha256": "0acded827deb9104c1756bdd623da3f4f0d5a11a1e59773135437eb1343ff330"
+    },
+    {
+      "file": "src/service/vector/EmbeddingPort.ts",
+      "depth": "full",
+      "state": "changed",
+      "review": "基线完整实现与当前兼容 re-export；不扩公共面",
+      "lines": 17,
+      "sha256": "efac1fcec4316a56d671aa1375475d9dbfcb3e81b90954f8c46b7d64a055cc0a"
+    },
+    {
+      "file": "src/infrastructure/vector/BatchEmbedder.ts",
+      "depth": "full",
+      "state": "changed",
+      "review": "批次/并发/部分结果与协议适配分离；保留双方法旧接入",
+      "lines": 189,
+      "sha256": "b9cf4a8cb86e153604cb29776a0987bcf7e3f212e91c1c646645ed0784a533e8"
+    },
+    {
+      "file": "src/service/vector/VectorIndexPorts.ts",
+      "depth": "full",
+      "state": "retained",
+      "review": "读写能力接口及 adapter；公开契约保留，未删除",
+      "lines": 112,
+      "sha256": "0117484a604295eb5c178c9ce759cbfe8a37a84f016c9cc6f237d583794df2d5"
+    },
+    {
+      "file": "src/service/vector/EmbedProviderSelector.ts",
+      "depth": "full",
+      "state": "retained",
+      "review": "顺序探测、诊断、迁移和 keyword no-op 保留",
+      "lines": 177,
+      "sha256": "f7649783eec1694816fee4f436f03fe0eeebe3011f0030f5331abe067969755b"
+    },
+    {
+      "file": "src/service/vector/VectorService.ts",
+      "depth": "full-baseline-and-changed-sections",
+      "state": "changed",
+      "review": "宿主服务、raw provider readiness 与 adapted embedding；全文件基线阅读，修改段复核",
+      "lines": 853,
+      "sha256": "e7e8bd08a8f76dfd6b088971f0fed6e1a7bc325d2f665722e444bea5a71b9903"
+    },
+    {
+      "file": "src/service/vector/SyncCoordinator.ts",
+      "depth": "full-baseline-and-changed-sections",
+      "state": "changed",
+      "review": "事件合并、串行排空、重试、对账；删除无读取私有状态",
+      "lines": 732,
+      "sha256": "fb072227e8fd0138470a95c87a717496c9d601b3b68fe34d98a618bc1152aff1"
+    },
+    {
+      "file": "src/service/vector/VectorAvailability.ts",
+      "depth": "full",
+      "state": "changed",
+      "review": "新建共享五态探测；原类型继续从服务模块转发",
+      "lines": 72,
+      "sha256": "5f3f182e3ef083dbf4f6173c6afa895d00145d89ab45fda8cf0848c26c473029"
+    },
+    {
+      "file": "src/service/vector/EnrichmentTypes.ts",
+      "depth": "full",
+      "state": "retained",
+      "review": "纯接口有真实 pipeline/enricher 消费，不删除",
+      "lines": 20,
+      "sha256": "0ea9c7ec472b2b6b76773f18d674d80096b1cbc8b9a85f5ed94197e4c161d6d7"
+    },
+    {
+      "file": "src/service/vector/index.ts",
+      "depth": "full",
+      "state": "retained",
+      "review": "原六模块转发；内部 helper 不导出",
+      "lines": 6,
+      "sha256": "f497bc8fc7b47c344a2ab73401eeb305078e61e04710d9677218c072726b3104"
+    },
+    {
+      "file": "src/shared/WeightedRrfAccumulator.ts",
+      "depth": "full",
+      "state": "changed",
+      "review": "排名累积、证据、稳定排序；不决定召回/ID/payload/DTO",
+      "lines": 57,
+      "sha256": "7a3d79e473cbee1e867037f8d6371cb2958f43d8c24aafd489779f599d88e226"
+    },
+    {
+      "file": "src/service/search/HybridRetriever.ts",
+      "depth": "targeted",
+      "state": "changed",
+      "review": "fuse/search默认与输入输出；旧新差分覆盖，不宣称本轮重审其他搜索模块",
+      "lines": 144,
+      "sha256": "4988c3e162bd8ed0f696c19b9f58d2957a19f2aa4665e442d2885fb15b87894e"
+    },
+    {
+      "file": "src/infrastructure/vector/HnswVectorAdapter.ts",
+      "depth": "targeted",
+      "state": "changed",
+      "review": "hybridSearch、keywordSearch、真实 sparse 读取与融合输出；不计为全文件持久化审查",
+      "lines": 976,
+      "sha256": "9f9e65d18b7630547df13858a3aa44327abf12aa0ccceacd65fdc97af1c18a66"
+    },
+    {
+      "file": "src/infrastructure/vector/IndexingPipeline.ts",
+      "depth": "targeted",
+      "state": "changed",
+      "review": "构造/setAiProvider/enrichment/embed/upsert 调用追踪；本次仅类型导入与注释修改",
+      "lines": 605,
+      "sha256": "736b14095ee86101f78d30bf7adbe488649dccad9889c54c6e27d6b2598a67b8"
+    },
+    {
+      "file": "src/infrastructure/cache/CacheService.ts",
+      "depth": "full-read-only-next-candidate",
+      "state": "observed",
+      "review": "本地TTL缓存/全局实例/timer/API出口，下一批生命周期候选；未据此变更缓存语义",
+      "lines": 131,
+      "sha256": "753d51f8c459c877a86b57af06ae40734fcb2274d9700feb45db04d38c63ebb3"
+    },
+    {
+      "file": "src/infrastructure/cache/UnifiedCacheAdapter.ts",
+      "depth": "full-read-only-next-candidate",
+      "state": "observed",
+      "review": "单例初始化与异步兼容门面；Main HttpServer实际初始化，下一批继续追踪",
+      "lines": 103,
+      "sha256": "76819de03e797d22578f693787f3fff43d8a8ef91acb6bd56b4d54de9d88146a"
+    }
+  ]
+}

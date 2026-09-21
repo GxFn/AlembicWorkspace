@@ -1,0 +1,1402 @@
+[
+  {
+    "file": "src/shared/AlembicManagedBlock.ts",
+    "reviewDepth": "manual-full",
+    "role": "宿主指导文档的受管理块文本和文件更新原语",
+    "invariants": [
+      "begin/end唯一且按序；畸形标记抛typed错误而非覆盖用户文本",
+      "块外字节保留；变动才写，写前PathGuard项目scope断言"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        179
+      ]
+    ],
+    "baselineLines": 179,
+    "baselineSha256": "ed9065c217f9c751db8add39be66393b8e64c0134857338790f3db1c5081c740",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/io.ts"
+      ],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "全文检查upsert/remove两纯文本路径和两个文件包装：body只CRLF归LF/trimEnd，追加仅必要newline；重复/半缺/倒序标记fail closed。缺文件remove无写；文件更新返回created/wrote与真实changed一致。没有自动创建父目录，外层负责目标准备。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/CoreContractSpine.ts",
+    "reviewDepth": "manual-full",
+    "role": "公共契约及兼容保留/删除证据的可验证登记表",
+    "invariants": [
+      "固定9个row与4个legacy candidate必须有source/export/owner/consumer/validation证据",
+      "deleted候选不能仍有active consumer",
+      "field policy覆盖所有row并遵守私有字段规则"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        1018
+      ]
+    ],
+    "baselineLines": 1018,
+    "baselineSha256": "bc68f735ff7995630a2a8e70175b483245a594b0a0c765131e31b83ec87e2c63",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/shared/index.ts"
+      ],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "全文三段复核9个功能面与13条字段策略、4个兼容迁移候选；validate可选接收实际export/source集合进行存在性校验，field checker复用FieldTaxonomy，summary只聚合。登记表不执行route/provider/host工具，里面描述的跨仓消费者是维护声明，不能仅凭文字认定当下接线已验证；本轮不删owner仍有消费者的 broad subpath。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/FailureTaxonomy.ts",
+    "reviewDepth": "manual-full",
+    "role": "16类失败的HTTP/MCP/状态/重试/暴露映射与验证",
+    "invariants": [
+      "stableId与mcpErrorCode必须core.failure.kind",
+      "不漏/不重复字段失败类别",
+      "private detail不能无ref/redaction策略"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        620
+      ]
+    ],
+    "baselineLines": 620,
+    "baselineSha256": "d48e46f526da63c0df1af3a4b85910fb5ad5f37c52e6f4effd145416c0e5e9e5",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/daemon/ProjectRuntimeContracts.ts",
+        "src/shared/index.ts"
+      ],
+      "directTestImports": [
+        "test/ErrorRegistry.test.ts",
+        "test/WireTypeManifest.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文逐项核对400/503/501/404/409/403/408/499/206/412/502/424/500/422等映射及retry规则；D25 required floor排除已无必需producer的needs-confirmation但保留该taxonomy。validator检查类别/重复/稳定ID/暴露类型/私有ref，summary按problem/retry/status计数；它是错误元数据单源，不自己sanitize消息，真实输出边界由BaseError/RuntimeContracts等消费。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/FieldTaxonomy.ts",
+    "reviewDepth": "manual-full",
+    "role": "字段暴露级别、schema closure、owner/consumer和诊断政策单源",
+    "invariants": [
+      "私有class不得ordinary output",
+      "consumer-needed/diagnostic/ref/兼容字段必须消费者和验证命令",
+      "compatibility-private需cleanupTrigger，typed/ref closure必须对应"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        518
+      ]
+    ],
+    "baselineLines": 518,
+    "baselineSha256": "ea97bfb623644a2b478c970fc54bdca2bd9d6fb70dff30a14fb65d9c32527256",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/daemon/ProjectRuntimeContracts.ts",
+        "src/shared/CoreContractSpine.ts",
+        "src/shared/FailureTaxonomy.ts",
+        "src/shared/index.ts"
+      ],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "全文复核11 class、7 closure、5接口role/诊断policy与16failurekind；validate按expected paths检漏并逐policy检查owner/forbidden owner、类型、failure列表、consumer、诊断context、public exposure，summary仅计合法枚举。要求typed CoreFieldPolicy输入，未承担任意JSON解码；登记validator不等同运行时redactor，不能移除真实consumer sanitizer。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/OutputBudget.ts",
+    "reviewDepth": "manual-full",
+    "role": "测量支持的工具响应预算、UTF8截断与破坏性重置archive合同",
+    "invariants": [
+      "超预算必须truncated=true且返回overflow/omittedBytes",
+      "删除有数量且声称保留时必须archiveRef"
+    ],
+    "findings": [
+      {
+        "id": "FC-002",
+        "title": "UTF8截断在完整多字节结尾额外丢一个字符",
+        "priority": "P3",
+        "evidence": "foundation-contracts-readonly-probe.log:合法前缀16384bytes/末字符中，返回16381bytes；不含半字符但非最大完整前缀",
+        "tests": [
+          "test/OutputBudget.test.ts"
+        ],
+        "status": "implemented-targeted-green-pending-root-review"
+      }
+    ],
+    "disposition": "minimal-fix-or-regression-pending-root-review",
+    "tests": [
+      {
+        "file": "test/OutputBudget.test.ts",
+        "status": "targeted-green",
+        "log": "foundation-contracts-fixes-green.log"
+      }
+    ],
+    "reviewedRanges": [
+      [
+        1,
+        234
+      ]
+    ],
+    "baselineLines": 238,
+    "baselineSha256": "9334f1b79aa25591e6feee7ed43a7b8de9498d0059cc78f62757b188598bfd50",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/index.ts",
+        "src/workflows/surfaces/host-agent/session/HostAgentSubmissionTracker.ts",
+        "src/workflows/surfaces/planning/knowledge/RescanEvidenceProjectors.ts"
+      ],
+      "directTestImports": [
+        "test/OutputBudget.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文读取预算表8工具与内容slice单源，applyOutputBudget未知tool保留content/Infinity预算。truncateToBytes保障不输出半个codepoint，但会把恰好落在预算边界的完整末尾多字节字符也舍弃；只读public probe预算16384前缀恰好16384含中，实际返回16381。编码安全仍成立，属于额外截断精度问题，未改源码。",
+      "44项只读审查落盘后，根线程明确授权两处最小修复：Workspace getter使用contextDir；UTF8看预算后的首字节，仅部分序列回退。各现有suite新增一个真实public入口测试分别1 RED，联合20 GREEN，4文件Biome通过；预算数值/DTO/wire不变。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/PathGuard.ts",
+    "reviewDepth": "manual-full",
+    "role": "进程级写入词法路径边界与项目scope白名单",
+    "invariants": [
+      "configured后assertSafe仅项目/package/显式allow路径",
+      "项目新文件仅.asd/知识库/明确宿主扩展与根文件",
+      "排除项目拒runtime和知识库"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        464
+      ]
+    ],
+    "baselineLines": 464,
+    "baselineSha256": "fac1529e00b3dd9793e8325aec9041a66cf0976fb9ccec43926b1cf441d84f7c",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/infrastructure/config/Paths.ts",
+        "src/infrastructure/database/DatabaseConnection.ts",
+        "src/infrastructure/io/WriteZone.ts",
+        "src/infrastructure/logging/Logger.ts",
+        "src/infrastructure/vector/HnswVectorAdapter.ts",
+        "src/infrastructure/vector/JsonVectorAdapter.ts",
+        "src/io.ts",
+        "src/service/guard/ExclusionManager.ts",
+        "src/service/guard/RuleLearner.ts",
+        "src/service/knowledge/KnowledgeFileWriter.ts",
+        "src/service/knowledge/validation/quality/FeedbackCollector.ts",
+        "src/shared/AlembicManagedBlock.ts",
+        "src/shared/index.ts",
+        "src/workflows/surfaces/persistence/DimensionCheckpoint.ts"
+      ],
+      "directTestImports": [
+        "test/AlembicManagedBlock.test.ts",
+        "test/CodeEntityRepositoryFloor.test.ts",
+        "test/DatabaseRepository.test.ts",
+        "test/EntrypointEffects.test.ts",
+        "test/FailureSemanticsCO3.test.ts",
+        "test/KnowledgeFileWriter.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/LoggerFloor.test.ts",
+        "test/LoggerRuntimeBoundary.test.ts",
+        "test/MigrationsRerunIdempotency.test.ts",
+        "test/PathGuard.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeContextAdapters.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/RecipeSourceRefRepositoryFloor.test.ts",
+        "test/StagingManager.test.ts",
+        "test/SyncRepoAdapterFloor.test.ts",
+        "test/ViolationsStoreAttribution.test.ts",
+        "test/unit/SourceRefContentFingerprint.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文核对configure一次绑定、host扩展前缀/文件标准化、Layer1/2区别、动态KB探测与排除判定缓存。未配置时兼容放行，#isUnder用path.resolve字符串边界，不做realpath防symlink；不能把这个原语当完整文件系统confinement，strict private revision另有真实symlink检查。重复configure不清allowList（extraProject sets会清），记录生命周期边界，未推断为已利用缺陷。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/ProjectRegistry.ts",
+    "reviewDepth": "manual-full",
+    "role": "全局projects.json注册、Ghost模式事实与dataRoot解析",
+    "invariants": [
+      "路径realpath归一生成稳定8位ID",
+      "register幂等不改已有mode，显式setWorkspaceMode才切换",
+      "未注册standard，Ghost数据根在全局workspaces"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        286
+      ]
+    ],
+    "baselineLines": 286,
+    "baselineSha256": "8763fb34bf22834fa99e6e5288536d97abbde1a4d15951ea809ce083543942ae",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/daemon/ProjectRuntimeContracts.ts",
+        "src/daemon/RuntimeContracts.ts",
+        "src/service/search/SearchTypes.ts",
+        "src/shared/ProjectMarkers.ts",
+        "src/shared/ProjectScope.ts",
+        "src/shared/WorkspaceResolver.ts",
+        "src/shared/index.ts",
+        "src/workspace.ts"
+      ],
+      "directTestImports": [
+        "test/DaemonState.test.ts",
+        "test/WorkspaceResolver.test.ts",
+        "test/WorkspaceSettingsStore.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文检查root最近改动保留既有Ghost attach模式、inspect统一诊断事实；load坏registry回空、save可WriteZone或0700dir/0600file路径，list/get不写。当前registry entry形状宽信任与无锁read-modify-write是运行态存储边界，不能把本对象当防损坏事务库。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/WorkspaceResolver.ts",
+    "reviewDepth": "manual-full",
+    "role": "ProjectRoot/dataRoot分离、标准/Ghost/多folder路径投影",
+    "invariants": [
+      "projectRoot解析绝对，标准dataRoot=projectRoot；Ghost需registry或显式projectId",
+      "ProjectScope优先固定Ghost边界和其dataRoot",
+      "fromProjectScopeRegistry可显式singleRoot保兼容"
+    ],
+    "findings": [
+      {
+        "id": "FC-001",
+        "title": "memoryEmbeddingsPath忽略project.context目录覆盖",
+        "priority": "P2",
+        "evidence": "foundation-contracts-workspace-probe.log: contextDir=.asd/custom-context，memoryEmbeddingsPath仍.asd/context/memory_embeddings.json",
+        "tests": [
+          "test/WorkspaceResolver.test.ts"
+        ],
+        "status": "implemented-targeted-green-pending-root-review"
+      }
+    ],
+    "disposition": "minimal-fix-or-regression-pending-root-review",
+    "tests": [
+      {
+        "file": "test/WorkspaceResolver.test.ts",
+        "status": "targeted-green",
+        "log": "foundation-contracts-fixes-green.log"
+      }
+    ],
+    "reviewedRanges": [
+      [
+        1,
+        334
+      ]
+    ],
+    "baselineLines": 334,
+    "baselineSha256": "599af1d61809f79f037fe64944b62bf29618c077f84f2ba04e11b244c1399fa8",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/core/discovery/DiscovererRegistry.ts",
+        "src/daemon/DaemonState.ts",
+        "src/infrastructure/database/DatabaseConnection.ts",
+        "src/infrastructure/database/openAlembicDatabase.ts",
+        "src/infrastructure/io/WriteZone.ts",
+        "src/service/plan/facts/transientTransport.ts",
+        "src/service/production/PrivateCorpusRevisionResolver.ts",
+        "src/service/production/ProductionPersistenceContracts.ts",
+        "src/shared/WorkspaceSettingsStore.ts",
+        "src/shared/index.ts",
+        "src/shared/resolveProjectRoot.ts",
+        "src/workspace.ts"
+      ],
+      "directTestImports": [
+        "test/DatabaseConnectionScopeGuard.test.ts",
+        "test/ProjectScopeRegistryLoader.test.ts",
+        "test/WorkspaceResolver.test.ts"
+      ],
+      "verifiedConsumers": [
+        "../AlembicPlugin/lib/service/knowledge/KnowledgeState.ts:490"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文核对构造、registry恢复、toFacts及所有runtime/knowledge getter；只解析不创建目录。folderNames由单段校验后生效，但memoryEmbeddingsPath独用literal context，覆写context目录会偏离contextDir，纯只读构造probe已确认；Plugin KnowledgeState真实读取该getter。toFacts的mode/dataRootSource为既有简化字段，scope详单另带，不改shape。",
+      "44项只读审查落盘后，根线程明确授权两处最小修复：Workspace getter使用contextDir；UTF8看预算后的首字节，仅部分序列回退。各现有suite新增一个真实public入口测试分别1 RED，联合20 GREEN，4文件Biome通过；预算数值/DTO/wire不变。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/folderNames.ts",
+    "reviewDepth": "manual-full",
+    "role": "package/dev/global/project目录单段名称与默认值",
+    "invariants": [
+      "拒非string/空/外围空格/点号/斜线/反斜线/~",
+      "按section合并并验证所有合并值"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        104
+      ]
+    ],
+    "baselineLines": 104,
+    "baselineSha256": "0a551967e9950152917c832adbac9347af40182f9df70bda93da17b0328f9e0d",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/infrastructure/config/Paths.ts",
+        "src/shared/ProjectMarkers.ts",
+        "src/shared/ProjectRegistry.ts",
+        "src/shared/WorkspaceResolver.ts",
+        "src/shared/index.ts",
+        "src/shared/packageRoot.ts",
+        "src/workspace.ts"
+      ],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "全文核对resolveFolderNames复制各section防常规override互改，validateFolderNameSegment保证目录名而非path；DEFAULT_FOLDER_NAMES导出可变是现契约，调用者不能假设冻结。WorkspaceResolver基于此拼dataRoot/package/global位置，未把平台路径写入业务模块。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/gitBlob.ts",
+    "reviewDepth": "manual-full",
+    "role": "有timeout/maxBuffer的历史git blob读取",
+    "invariants": [
+      "无shell插值，execFileSync参数数组",
+      "空commit/path、绝对path与..拒绝；任何git失败null"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        65
+      ]
+    ],
+    "baselineLines": 65,
+    "baselineSha256": "b673178adb8e4d1e32df37b63eabe7cc6fd6f48bcea952bfcffdf658d684f59a",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/index.ts"
+      ],
+      "directTestImports": [
+        "test/unit/DriftClassifier.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文检查5秒/4MB默认上限，保留git输出逐字文本，不裁内容；SourceRef漂移判定取不到旧blob时保守降级。commit是单独show参数但未使用--end-of-options，选项形状输入的行为正在只读probe核对；不改当前代码或测试。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/recipeTokens.ts",
+    "reviewDepth": "manual-full",
+    "role": "跨recipe字段抽API tokens用于impact与相似度",
+    "invariants": [
+      "保留标识符大小写，关键词和教学占位符过滤",
+      "所有来源去重Set，sources记录最后一次所属字段"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        146
+      ]
+    ],
+    "baselineLines": 146,
+    "baselineSha256": "0cbeba5e3ac844fe5652e3cc6d0c209be7897ef5edbb748effe74734fb7699d2",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/domain/similarity/RecipeSimilarity.ts",
+        "src/service/sustain/ContentImpactAnalyzer.ts",
+        "src/service/sustain/RecipeImpactPlanner.ts",
+        "src/shared/diffParser.ts",
+        "src/shared/index.ts"
+      ],
+      "directTestImports": [
+        "test/SharedBasics.test.ts",
+        "test/unit/DiffRevisionRange.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文核对coreCode→Markdown code blocks→pattern→steps采集，tokenizer先删//、块注释、字符串再ASCII identifier regex；是多语言启发式而非AST。source map后出现者覆盖前来源，注释所称价值优先不是权重机制，不自行改变排序或引入parser。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/resolveProjectRoot.ts",
+    "reviewDepth": "manual-full",
+    "role": "DI/env/cwd项目根与Ghost感知数据根兼容解析",
+    "invariants": [
+      "container _projectRoot优先ALEMBIC_PROJECT_DIR再cwd",
+      "dataRoot优先容器WorkspaceResolver，再registry恢复，异常回projectRoot",
+      "scan dirs同时保留legacy recipes/candidates"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        100
+      ]
+    ],
+    "baselineLines": 100,
+    "baselineSha256": "2bdf2c11f585c57a27068d13f741c859b1dd50630e942c2b4eafbf78e5055e34",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/core/capability/CapabilityProbe.ts",
+        "src/shared/index.ts",
+        "src/workflows/surfaces/host-agent/session/HostAgentDimensionCompletionWorkflow.ts",
+        "src/workflows/surfaces/host-agent/session/SessionSupport.ts",
+        "src/workspace.ts"
+      ],
+      "directTestImports": [
+        "test/resolveProjectRoot.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文检查resolveKnowledgeScanDirs以resolved dataRoot计算recipe/candidate相对目录并保留旧扫描位置；resolveWorkspace仅查询现容器不隐式构建。fallback返回原输入非强制绝对路径验证，路径/初始化校验仍在resolver与调用方，不擅自加新gate。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/schemas/common.ts",
+    "reviewDepth": "manual-full",
+    "role": "共享分页、知识枚举、content/reasoning Zod输入合同",
+    "invariants": [
+      "分页integer limit1..200/offset>=0",
+      "content需rationale且pattern或markdown",
+      "reasoning需why/source数组/0..1 confidence"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        77
+      ]
+    ],
+    "baselineLines": 77,
+    "baselineSha256": "5f390f425534e28b8a7f501ab76e313ac5a8c5803821860a2acfea8b166906c8",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/shared/schemas/index.ts"
+      ],
+      "directTestImports": [
+        "test/SharedBasics.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文复核optional structure fields与styleAdvisories/styleWaiver/evidenceRefs显式保留，避免Zod默认剥离；common只做结构校验，source真实性/深度/可执行性由知识gate，不把非空字符串当grounded证据。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/schemas/config.ts",
+    "reviewDepth": "manual-full",
+    "role": "App/default、workspace runtime v2与constitution的独立配置schema",
+    "invariants": [
+      "app各section可选、顶层passthrough",
+      "runtime必version2/name/database/core.subRepoDir，拒退休core.dir/core.constitution/watch",
+      "数字端口/阈值/token/缓存界限显式"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        248
+      ]
+    ],
+    "baselineLines": 248,
+    "baselineSha256": "3c2e9e4d6f0f4d2c8c7964067ece06e75472687fecc14e173f5e6047e8f27622",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/infrastructure/config/ConfigLoader.ts",
+        "src/shared/ProjectMarkers.ts",
+        "src/shared/schemas/index.ts"
+      ],
+      "directTestImports": [
+        "test/WorkspaceRuntimeConfigSchema.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文区分AppConfig的非阻断校验与runtime membership合同；AI provider字段是配置数据不实现runtime。nested Zod对象默认strip未知字段，需结合ConfigLoader是否消费parse.data判断，不能孤立宣称未知配置被产品丢弃。Constitution允许扩展capability和priorities，规则/角色必需字段独立。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/schemas/index.ts",
+    "reviewDepth": "manual-full",
+    "role": "共同schema与config schema barrel",
+    "invariants": [
+      "只重导出common/config，不加入宿主MCP schema"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        9
+      ]
+    ],
+    "baselineLines": 9,
+    "baselineSha256": "c0bbbc447455b97a209e550de979c835199f67b14b9a8b5059fb4abe5aaab122",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/shared/index.ts"
+      ],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "全文确认两条export*提供shared schema单源，不是空占位；公开shared与ConfigLoader都能复用。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "src/shared/testMode.ts",
+    "reviewDepth": "manual-full",
+    "role": "测试维度过滤与宿主terminal/sandbox能力配置描述",
+    "invariants": [
+      "test mode仅1/true开启，关闭/无dims时原数组返回",
+      "terminal默认run、baseline关闭，与test mode独立",
+      "过滤后stderr有明确计数"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        130
+      ]
+    ],
+    "baselineLines": 130,
+    "baselineSha256": "1faf35e19ee18c84fcff75947657a163f067c5d5262c415bc47888497007653c",
+    "consumerEvidence": {
+      "directSourceImports": [
+        "src/shared/index.ts",
+        "src/workflows/surfaces/planning/dimensions/GenerateTerminalToolset.ts"
+      ],
+      "directTestImports": [
+        "test/GenerateTerminalToolset.test.ts",
+        "test/SharedBasics.test.ts"
+      ]
+    },
+    "semanticReviewNotes": [
+      "全文检查envList trim/filter、terminal旧值默认归run，sandbox disabled/0/off及audit/enforce映射；available按darwin只是配置描述并不运行sandbox。泛型{id}消除shared→types反向耦合，保留外层真正执行治理。"
+    ],
+    "reviewLimitation": "已分段人工阅读全文；保留理由见semanticReviewNotes。只对实际探针/测试声明行为验证，不将阅读等同无缺陷证明。"
+  },
+  {
+    "file": "test/AlembicManagedBlock.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "受管理文档文本及真实文件更新边界",
+    "invariants": [
+      "实际io公共入口验证append/replace/idempotence/remove与块外字节原样，畸形markers fail closed"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        185
+      ]
+    ],
+    "baselineLines": 186,
+    "baselineSha256": "8452248d24a96db18ba1b9f4847dbd0f1f5f437ea972d6f26203facc17dc3946",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "实际io公共入口验证append/replace/idempotence/remove与块外字节原样，畸形markers fail closed；真实临时文件必须显式PathGuard允许CLAUDE.md，未授权AGENTS拒绝，缺文件remove不造目录。每例finally reset并清root；保留输入文本与IO两层测试。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/CodeEntityRepositoryFloor.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "PathGuard配置下真实SQLite实体repository行为",
+    "invariants": [
+      "临时.asd DB真实migration，复合key upsert/跨project隔离、batch空/ignore、name排序/type+limit、jsonmetadata/protocol往返、delete/count、模块nodeType过滤、missing返回。PathGuard仅setup及reset，DB行为归根线程其他域review"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        187
+      ]
+    ],
+    "baselineLines": 188,
+    "baselineSha256": "89db8abe46fd96d1f382db3065762b08490731546e12f10676f1cac1f1e5922f",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "临时.asd DB真实migration，复合key upsert/跨project隔离、batch空/ignore、name排序/type+limit、jsonmetadata/protocol往返、delete/count、模块nodeType过滤、missing返回。PathGuard仅setup及reset，DB行为归根线程其他域review；无纯mock持久化。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/DaemonState.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "Ghost dataRoot驱动daemon状态路径与恢复",
+    "invariants": [
+      "真实临时registry和state文件，Ghost路径不落源码，删除state不删owned lock选项、token缺失拒绝、entrypoint registry跨graceful-exit保留/坏文件null。数据token为fixture，不从真实用户环境读取"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        149
+      ]
+    ],
+    "baselineLines": 150,
+    "baselineSha256": "92a3faaab4e56e4b2336625e4d6517298db1f6d5a85616a7b0a4c1a39d9c9c7c",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "真实临时registry和state文件，Ghost路径不落源码，删除state不删owned lock选项、token缺失拒绝、entrypoint registry跨graceful-exit保留/坏文件null。数据token为fixture，不从真实用户环境读取；状态路径contract与provider运行器分离。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/DatabaseConnectionScopeGuard.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "ProjectScope排除源码根禁止写DB",
+    "invariants": [
+      "真实构造标记为Core的member目录、scope dataRoot错误指向源码，DatabaseConnection必须抛可定位错误且没有生成.asd DB，不能静默转dev/tmp掩盖。WorkspaceResolver作为source/data身份传入，补词法guard外的服务行为。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        62
+      ]
+    ],
+    "baselineLines": 63,
+    "baselineSha256": "5896d0121a14764e94063dd0b81333b9062d93d188f195be771c961f6e1af684",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "真实构造标记为Core的member目录、scope dataRoot错误指向源码，DatabaseConnection必须抛可定位错误且没有生成.asd DB，不能静默转dev/tmp掩盖。WorkspaceResolver作为source/data身份传入，补词法guard外的服务行为。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/DatabaseRepository.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "迁移完整性和真实repo图关系集成",
+    "invariants": [
+      "PathGuard临时根上跑真migration并固定active版本/禁retired tables，无plans表"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        145
+      ]
+    ],
+    "baselineLines": 108,
+    "baselineSha256": "45a24d15a1dc27d6d78f0e564f3ac37ebb218556ce41d15c8968b94ac9cb86ce",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "PathGuard临时根上跑真migration并固定active版本/禁retired tables，无plans表；KnowledgeEntry持久化往返，根线程追加diamond/cycle BFS每节点first-depth唯一、maxDepth0/1边界。新增测试属于图修复，不是本只读阶段改动。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/EntrypointEffects.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "入口副作用与写入数据根证明",
+    "invariants": [
+      "空cwd子进程import已构建dist八大facade后目录仍空"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        110
+      ]
+    ],
+    "baselineLines": 111,
+    "baselineSha256": "b1e96b19aeb803a2cc724c05bdfbf925251525285e23de3d8671f5ea1dc0bf6a",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "空cwd子进程import已构建dist八大facade后目录仍空；真DB迁移只能在指定临时root的.asd，另一root无文件；package无bin。此suite依赖dist新鲜，不单独证明源码未构建状态，未在只读阶段运行。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/ErrorRegistry.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "JSON错误registry与运行类/元数据防漂移",
+    "invariants": [
+      "比对failureKinds、实例化错误类取stable code、diagnostic codes，跨仓adoption区记录Agent只是documentation。另检查shared具名error export不含冻结预算外两类"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        96
+      ]
+    ],
+    "baselineLines": 97,
+    "baselineSha256": "fad217cf86236019e90516cef1e07236bd70f2af555794641019774432654d3a",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "比对failureKinds、实例化错误类取stable code、diagnostic codes，跨仓adoption区记录Agent只是documentation。另检查shared具名error export不含冻结预算外两类；和taxonomy组件值断言不同（磁盘registry与构建产品对账），保留。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/LoggerFloor.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "PathGuard下真实file logging分类与singleton重配",
+    "invariants": [
+      "读取真实JSONL验证error/combined/audit路由、level/env优先、quiet不建console但保留3file、同logger引用换目录"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        132
+      ]
+    ],
+    "baselineLines": 133,
+    "baselineSha256": "dcb2e604af9bb84db09a693df425ec63a3245dfb73c31c7ac94972304f5103d8",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "读取真实JSONL验证error/combined/audit路由、level/env优先、quiet不建console但保留3file、同logger引用换目录；250ms仅等异步transportflush。保存env并finally关闭singleton/reset路径守卫，日志服务真实而非返回mock。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/LoggerRuntimeBoundary.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "开发仓禁止日志入侵",
+    "invariants": [
+      "真实构造Alembic dev markers，PathGuard配置后Logger相对.asd路径应转dev/tmp，源root不创建.asd"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        39
+      ]
+    ],
+    "baselineLines": 40,
+    "baselineSha256": "5d2ef955caa4eb9b3747efafbf6b4bd1444f90f05284a7d71844d22c4641445f",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "真实构造Alembic dev markers，PathGuard配置后Logger相对.asd路径应转dev/tmp，源root不创建.asd；测试清共享tmp日志目录可能影响并发其他logger测试，作为现有环境边界记录，未改。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/MigrationsRerunIdempotency.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "新库重复迁移/部分恢复/跟踪账本",
+    "invariants": [
+      "真SQLite检所有版本、rerun appliedAt不变/数据保留、002/003缺口合法、删005表与tracking行后reapply、versionPK和另一DBschema等价。PathGuard仅临时root setup，检验migration执行恢复不同于固定registry数据，可保留。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        187
+      ]
+    ],
+    "baselineLines": 188,
+    "baselineSha256": "31acdcb2a5b93b9c3851bcdcbad0629665dc638155ca3f244fa557e1e46a620d",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "真SQLite检所有版本、rerun appliedAt不变/数据保留、002/003缺口合法、删005表与tracking行后reapply、versionPK和另一DBschema等价。PathGuard仅临时root setup，检验migration执行恢复不同于固定registry数据，可保留。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/OutputBudget.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "输出预算与archive合同回归",
+    "invariants": [
+      "ASCII超预算omitted精确、within/unknown透传，多字节仅断言无替换符/不超限，预算表和slice数值冻结，archive保留声明无备份必拒。未覆盖刚好结束完整多字节字符这一边界，已用只读probe确认该缺口"
+    ],
+    "findings": [],
+    "disposition": "minimal-fix-or-regression-pending-root-review",
+    "tests": [
+      {
+        "file": "test/OutputBudget.test.ts",
+        "status": "targeted-green",
+        "log": "foundation-contracts-fixes-green.log"
+      }
+    ],
+    "reviewedRanges": [
+      [
+        1,
+        122
+      ]
+    ],
+    "baselineLines": 106,
+    "baselineSha256": "48ba0628807df3752326dc456e2a3063550913cacca04b932f065ac8071c8f78",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "ASCII超预算omitted精确、within/unknown透传，多字节仅断言无替换符/不超限，预算表和slice数值冻结，archive保留声明无备份必拒。未覆盖刚好结束完整多字节字符这一边界，已用只读probe确认该缺口；按授权后续加一例。",
+      "44项只读审查落盘后，根线程明确授权两处最小修复：Workspace getter使用contextDir；UTF8看预算后的首字节，仅部分序列回退。各现有suite新增一个真实public入口测试分别1 RED，联合20 GREEN，4文件Biome通过；预算数值/DTO/wire不变。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/PathGuard.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "双层词法路径策略行为矩阵",
+    "invariants": [
+      "全文覆盖absolute配置、父路径/同名前缀/外部拒绝，project/package/global cache、runtime/KB/根文件白名单，host delivery目录和.env仅显式授权、setKB后旧目录拒绝、未配置兼容放行、便捷boolean及错误属性。平台/HOME正例条件跳过有明确环境原因"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        437
+      ]
+    ],
+    "baselineLines": 438,
+    "baselineSha256": "986bc0bde8aaf905703b04cb22e43261fd01ee6c990c3ef4bb980f757a0ee41d",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "全文覆盖absolute配置、父路径/同名前缀/外部拒绝，project/package/global cache、runtime/KB/根文件白名单，host delivery目录和.env仅显式授权、setKB后旧目录拒绝、未配置兼容放行、便捷boolean及错误属性。平台/HOME正例条件跳过有明确环境原因；无symlink防护断言，不把词法测试解读为真实FS confinement。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/ProjectScopeRegistryLoader.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "磁盘scope registry恢复与最长folder匹配",
+    "invariants": [
+      "真实JSON fixture缺失/损坏空registry、多folder加载、重叠nested按最长prefix、controlRoot不算member，以及singleRoot显式退回原fromProject。scope selector影响WorkspaceResolver dataRoot，测试实际解析而非拼预期路径。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        169
+      ]
+    ],
+    "baselineLines": 170,
+    "baselineSha256": "2bcdc23e3a239714d8c8e7705f8e63ab0a4eaeb1fc42ab76907558a1f3bc5287",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "真实JSON fixture缺失/损坏空registry、多folder加载、重叠nested按最长prefix、controlRoot不算member，以及singleRoot显式退回原fromProject。scope selector影响WorkspaceResolver dataRoot，测试实际解析而非拼预期路径。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/RecipeContextAdapters.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "RecipeContext adapter跨真实service/SQLite的读合同",
+    "invariants": [
+      "全文核对真实KnowledgeEntry/KnowledgeService转read-only record与NotFound→null，sourceRef真库stale/renamed/drifted含wide-query两adapter形态，VectorService缺provider显式degrade。canonical retrieval注入不调用legacy search/vector"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        389
+      ]
+    ],
+    "baselineLines": 365,
+    "baselineSha256": "5e969e71667e34e54b305ed67ba5ff7bc1e1f065798b4e68fbc83092aaef6305",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "全文核对真实KnowledgeEntry/KnowledgeService转read-only record与NotFound→null，sourceRef真库stale/renamed/drifted含wide-query两adapter形态，VectorService缺provider显式degrade。canonical retrieval注入不调用legacy search/vector；两nested hybrid hit形状有精确region identity断言。PathGuard仅root setup，真实持久化与投影seam均保留。"
+    ],
+    "reviewLimitation": "人工阅读全文，未运行此suite；后续明确授权的回归另记。"
+  },
+  {
+    "file": "test/RecipeSourceRefRepositoryFloor.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "sourceRef复合key与状态/路径查询边界",
+    "invariants": [
+      "真SQLite/migration/FK父行，upsert/status/rename/replace、stale+drift统计、active-only和cascade、missing table可访问性"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        155
+      ]
+    ],
+    "baselineLines": 136,
+    "baselineSha256": "7e3229723fe6d76cff9b256db70821697791252aebe8a1adc7dc292a359ba3f1",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "真SQLite/migration/FK父行，upsert/status/rename/replace、stale+drift统计、active-only和cascade、missing table可访问性；根线程新增bare-file bounded refs精确匹配避SQL wildcard/case/sibling。PathGuard配置实际DB根，sourceRef位置合同与Workspace名字覆盖不同，不删整套。"
+    ],
+    "reviewLimitation": "人工阅读全文，未运行此suite；后续明确授权的回归另记。"
+  },
+  {
+    "file": "test/SharedBasics.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "共享tokens/schema/测试模式的基础可执行样例",
+    "invariants": [
+      "token估算hash稳定、Markdown blocks→tokenizer、diff hunk和非git安静fallback、ContentSchema与textSimilarity、env控制维度过滤。不同叶功能基础suite，不能当完整tokenizer多语言正确性证明"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        110
+      ]
+    ],
+    "baselineLines": 111,
+    "baselineSha256": "a90d2f3c9957fa76d4268cef51dbf8b7a7b381585b14e51f59b4f8886389f53e",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "token估算hash稳定、Markdown blocks→tokenizer、diff hunk和非git安静fallback、ContentSchema与textSimilarity、env控制维度过滤。不同叶功能基础suite，不能当完整tokenizer多语言正确性证明；环境变量恢复，未新增测试。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/SyncRepoAdapterFloor.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "file-first同步adapter实际SQL与失败类型",
+    "invariants": [
+      "临时root+真schema验证upsert保护createdBy/createdAt/id，audit statement真实写与缺表PersistenceError、active sourcefile过滤、deprecate修改与unknown无影响。与生命周期writer E2E不同：此层测试raw adapter SQL，没有声称文件同步完整闭环。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        150
+      ]
+    ],
+    "baselineLines": 151,
+    "baselineSha256": "a514332dd9028648942345f8fb9c890c3f26fc89e5c9635f5885e51dd8b14fd9",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "临时root+真schema验证upsert保护createdBy/createdAt/id，audit statement真实写与缺表PersistenceError、active sourcefile过滤、deprecate修改与unknown无影响。与生命周期writer E2E不同：此层测试raw adapter SQL，没有声称文件同步完整闭环。"
+    ],
+    "reviewLimitation": "人工阅读全文，未运行此suite；后续明确授权的回归另记。"
+  },
+  {
+    "file": "test/ViolationsStoreAttribution.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "Guard写入来源归属真实表回归",
+    "invariants": [
+      "迁移011必须tool/surface列，appendRun明确writer两值落库，未知writer仍NULL而非编造名字。实际SQLite在PathGuard测试根，仅归属字段合同，无外层工具执行。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        80
+      ]
+    ],
+    "baselineLines": 81,
+    "baselineSha256": "6e2263a32d44218f20bfd8812a3894e369739a8056ae6f1bdff0aa8611c36a25",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "迁移011必须tool/surface列，appendRun明确writer两值落库，未知writer仍NULL而非编造名字。实际SQLite在PathGuard测试根，仅归属字段合同，无外层工具执行。"
+    ],
+    "reviewLimitation": "人工阅读全文，未运行此suite；后续明确授权的回归另记。"
+  },
+  {
+    "file": "test/WireTypeManifest.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "磁盘wire manifest与代码枚举防漂移",
+    "invariants": [
+      "candidate/lifecycle/job kinds比runtime authority，failure指向error registry，proposal type-only union从source提取，所有模块与package specifier可达。source字符串检查只用于无runtime union，不把字节包含检查当行为测试替代"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        66
+      ]
+    ],
+    "baselineLines": 67,
+    "baselineSha256": "c90690fdb1087f4e24c4376d8766f416dd022d3bad6ad4520975af79ecd0c04d",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "candidate/lifecycle/job kinds比runtime authority，failure指向error registry，proposal type-only union从source提取，所有模块与package specifier可达。source字符串检查只用于无runtime union，不把字节包含检查当行为测试替代；这是生成下游types artifact的必要locator守护。"
+    ],
+    "reviewLimitation": "人工阅读全文，未运行此suite；后续明确授权的回归另记。"
+  },
+  {
+    "file": "test/WorkspaceResolver.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "标准/Ghost/ProjectScope真实路径与注册模式合同",
+    "invariants": [
+      "全文验证默认/自定义目录、Ghost registry真实落盘与symlink同项目、inspect/toFacts诊断、register attach不翻已有mode、显式mode切换留ID、未注册standard与多folderdataRoot隔离。自定义目录旧例未包含context/memoryEmbeddingsPath，后续授权回归补此缺口"
+    ],
+    "findings": [],
+    "disposition": "minimal-fix-or-regression-pending-root-review",
+    "tests": [
+      {
+        "file": "test/WorkspaceResolver.test.ts",
+        "status": "targeted-green",
+        "log": "foundation-contracts-fixes-green.log"
+      }
+    ],
+    "reviewedRanges": [
+      [
+        1,
+        324
+      ]
+    ],
+    "baselineLines": 308,
+    "baselineSha256": "d1695242c808d910bf6569868e6186f87a484a83bc3d682b65f6711001504b1a",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "全文验证默认/自定义目录、Ghost registry真实落盘与symlink同项目、inspect/toFacts诊断、register attach不翻已有mode、显式mode切换留ID、未注册standard与多folderdataRoot隔离。自定义目录旧例未包含context/memoryEmbeddingsPath，后续授权回归补此缺口；原测试临时home仅还原env，未全清所有tempDirs，记录测试卫生限制不擅改。",
+      "44项只读审查落盘后，根线程明确授权两处最小修复：Workspace getter使用contextDir；UTF8看预算后的首字节，仅部分序列回退。各现有suite新增一个真实public入口测试分别1 RED，联合20 GREEN，4文件Biome通过；预算数值/DTO/wire不变。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/WorkspaceRuntimeConfigSchema.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "workspace v2配置与ProjectMarkers真实文件消费",
+    "invariants": [
+      "schema通过/拒绝stale字段、shared导出与源schema恒等、ProjectMarkers实际读合法subRepo路径/URL并错误输入回default。成功/失败分支前均断言result.success，不存在无条件零断言漏洞"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        120
+      ]
+    ],
+    "baselineLines": 121,
+    "baselineSha256": "0f2d1216078b537ed1bd771e3efb630a170bb8508c62ac3bc858071e76755dde",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "schema通过/拒绝stale字段、shared导出与源schema恒等、ProjectMarkers实际读合法subRepo路径/URL并错误输入回default。成功/失败分支前均断言result.success，不存在无条件零断言漏洞；field paths具体证明拒绝原因。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/WorkspaceSettingsStore.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "registry模式及settings/secrets分离的真实磁盘接入",
+    "invariants": [
+      "已读root当前新增坏JSON禁止无关update覆盖/prototype成员ignore，真实Ghost下settings与secrets分家、进程env显式值优先且不读项目.env、embedding配置历史字段不被无关update剥离。fixtures每例清AI env并finally恢复/删tempRoots，所有密钥是显式fixture字符串，无真实凭据访问。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        324
+      ]
+    ],
+    "baselineLines": 318,
+    "baselineSha256": "a521315a58224a5d26dac2b80fd6fa1f3f3771c984167f30637c6c69bbf81aec",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "已读root当前新增坏JSON禁止无关update覆盖/prototype成员ignore，真实Ghost下settings与secrets分家、进程env显式值优先且不读项目.env、embedding配置历史字段不被无关update剥离。fixtures每例清AI env并finally恢复/删tempRoots，所有密钥是显式fixture字符串，无真实凭据访问。"
+    ],
+    "reviewLimitation": "人工阅读全文，未运行此suite；后续明确授权的回归另记。"
+  },
+  {
+    "file": "test/resolveProjectRoot.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "Ghost/custom KB与原生scope fallback的调用端",
+    "invariants": [
+      "容器resolver路径与实际registry fallback分开：scan dirs为dataRoot相对并保留legacy，custom KB不混默认，WriteZone.fromProjectRoot跟随scope dataRoot。四例各验证不同依赖来源，root/env本体fallback在源码已读，未扩大case删除。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        116
+      ]
+    ],
+    "baselineLines": 117,
+    "baselineSha256": "4cd960e6afbff99524ccee9ee3ce6be2368f7b724a34b39c4aaeef4b5faf90b8",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "容器resolver路径与实际registry fallback分开：scan dirs为dataRoot相对并保留legacy，custom KB不混默认，WriteZone.fromProjectRoot跟随scope dataRoot。四例各验证不同依赖来源，root/env本体fallback在源码已读，未扩大case删除。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/unit/DiffRevisionRange.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "git diff工作树/commit-range与token impact语义",
+    "invariants": [
+      "真实隔离git仓关闭签名：默认HEAD看未提交、提交后空，显式HEAD~1..HEAD保留committed改动并进入ContentImpactAnalyzer"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        135
+      ]
+    ],
+    "baselineLines": 112,
+    "baselineSha256": "1bc83d8521cf4352f3187a6fb5fdd90991754488c6cf14b4ae4129119216073e",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "真实隔离git仓关闭签名：默认HEAD看未提交、提交后空，显式HEAD~1..HEAD保留committed改动并进入ContentImpactAnalyzer；root追加++/--源行不误当文件头。RecipeTokens是类型输入，gitBlob源函数没有由此直接覆盖，不能将此suite当readFileAtCommit参数安全验证。"
+    ],
+    "reviewLimitation": "人工阅读全文，未运行此suite；后续明确授权的回归另记。"
+  },
+  {
+    "file": "test/unit/SourceRefContentFingerprint.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "源region指纹与漂移细分的真文件/SQLite合同",
+    "invariants": [
+      "源码region hash独立knowledge hash并CRLF归一"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        253
+      ]
+    ],
+    "baselineLines": 254,
+    "baselineSha256": "4421bda0b05d8865a3dce86e2513b3c3487d4067381075ec8457a889d6a4f201",
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "源码region hash独立knowledge hash并CRLF归一；新锚立即seed、历史null只回填、区间内变drifted区间外不误报。gitReader注入旧版本区分内容变化和行号平移，但保持observe-only不改range；缺git上下文不精判。PathGuard临时根setup，全部行为均有无条件断言，不与blob读取封装测试重复。"
+    ],
+    "reviewLimitation": "人工阅读全文，未运行此suite；后续明确授权的回归另记。"
+  },
+  {
+    "file": "test/CoreContractSpine.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "公共shared门面契约注册/兼容收敛守护",
+    "invariants": [
+      "完整核对9rows与forbidden职责、实际package.exports和source exists，字段taxonomy覆盖与summary计数，移除guard导出负例"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        257
+      ]
+    ],
+    "baselineLines": 257,
+    "baselineSha256": null,
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "完整核对9rows与forbidden职责、实际package.exports和source exists，字段taxonomy覆盖与summary计数，移除guard导出负例；4legacy候选保留/删除分类、owner/触发器以及已删仍有consumer拒绝。文件存在性在此是被测产品registry功能而非零价值smoke，不能与PlanSelection冗余typeof混同。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/FailureTaxonomy.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "公共失败taxonomy词表与映射回归",
+    "invariants": [
+      "真实shared入口验证D25floor和16kind顺序、summary分支、needs-confirmation/provider-error/host-failure语义分离、敏感detail redacted-ref、缺kind返回typed issue。固定映射是跨仓wire策略，表驱动值断言具有守护价值，保留。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        105
+      ]
+    ],
+    "baselineLines": 105,
+    "baselineSha256": null,
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "真实shared入口验证D25floor和16kind顺序、summary分支、needs-confirmation/provider-error/host-failure语义分离、敏感detail redacted-ref、缺kind返回typed issue。固定映射是跨仓wire策略，表驱动值断言具有守护价值，保留。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  },
+  {
+    "file": "test/FieldTaxonomy.test.ts",
+    "reviewDepth": "manual-full",
+    "role": "字段owner/closure/私有暴露策略负例",
+    "invariants": [
+      "shared入口固定11class词表，输入缺owner/consumer/failure/validation及expectedPath，强制敏感ordinary输出拒绝，compatibility/typed/detail/artifact closure不匹配及diagnostic缺context分别捕获code/path。该validator对受类型约束policy检查，不是任意JSON fuzz套件。"
+    ],
+    "findings": [],
+    "disposition": "retain-reviewed",
+    "tests": [],
+    "reviewedRanges": [
+      [
+        1,
+        145
+      ]
+    ],
+    "baselineLines": 145,
+    "baselineSha256": null,
+    "consumerEvidence": {
+      "directSourceImports": [],
+      "directTestImports": []
+    },
+    "semanticReviewNotes": [
+      "shared入口固定11class词表，输入缺owner/consumer/failure/validation及expectedPath，强制敏感ordinary输出拒绝，compatibility/typed/detail/artifact closure不匹配及diagnostic缺context分别捕获code/path。该validator对受类型约束policy检查，不是任意JSON fuzz套件。"
+    ],
+    "reviewLimitation": "人工阅读全文；此阶段仅只读审查，未运行该suite。后续明确授权新增回归另记录。"
+  }
+]

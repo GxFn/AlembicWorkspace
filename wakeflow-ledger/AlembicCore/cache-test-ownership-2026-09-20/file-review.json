@@ -1,0 +1,111 @@
+{
+  "date": "2026-09-20",
+  "baseline": "c1f6d77",
+  "records": [
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/cache/CacheService.ts",
+      "depth": "full + API probes",
+      "state": "changed",
+      "decision": "实例 TTL 数据与timer同生命周期；方法语义/公开字段限制明确。",
+      "sha256": "d3e69b11da9996ed936637adc5d57e82a61f44bd29d7de18b1bf89144d325a03"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/cache/UnifiedCacheAdapter.ts",
+      "depth": "full + consumer trace",
+      "state": "retained",
+      "decision": "多个adapter借用同一module缓存，保持异步兼容返回/初始化。",
+      "sha256": "76819de03e797d22578f693787f3fff43d8a8ef91acb6bd56b4d54de9d88146a"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/cache/GraphCache.ts",
+      "depth": "full",
+      "state": "retained",
+      "decision": "文件/hash缓存独立；只借相同barrel，不需要内存cache timer。",
+      "sha256": "b35c6f7062e45e7bf96da8a2529cf941ec0103e5d468f0dd6cd08078ec335135"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/cache/index.ts",
+      "depth": "full",
+      "state": "retained",
+      "decision": "原export集合保持。",
+      "sha256": "eb5770131ae59768f9454b6c4d899ca751e63a7599c118c6e2b945a9a1187b27"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "test/HnswVector.test.ts",
+      "depth": "21 baseline describe groups + exact-source move proof",
+      "state": "reorganized",
+      "decision": "图/量化/store查询保留；断言和fixture完整移动到拥有模块。",
+      "sha256": "10c622b6dcb6fee5d619babc62a1ea128f5da0dae453d67aac218b66d99ad5a8"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "test/VectorPersistence.test.ts",
+      "depth": "full moved groups",
+      "state": "new owner",
+      "decision": "6组binary/migration/WAL及恢复；完整describe源码不变。",
+      "sha256": "802a4cc7745e9057a60d38b499541e217804aa7ac29c5fa58ec2e45d7d87d009"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "test/VectorPipeline.test.ts",
+      "depth": "full moved groups",
+      "state": "new owner",
+      "decision": "4组embedding/chunk/AST/pipeline；完整describe源码不变。",
+      "sha256": "1dfafe15e2cedf9c2270c1596ace5929962542df41bef83dd9542c72e172be66"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "test/SearchRanking.test.ts",
+      "depth": "existing imports + moved HybridRetriever group",
+      "state": "extended owner",
+      "decision": "通用RRF并入排名文件，旧ranking断言保留。",
+      "sha256": "7f4b19053328cd3aaedb9e3b242075249c390a8d5203da9faf1582257fbcb31f"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "test/CacheService.test.ts",
+      "depth": "full",
+      "state": "added regression",
+      "decision": "3项测试锁住timer ownership、关闭后重用及TTL兼容。",
+      "sha256": "d617c08f653f32a81b16a157c39b554f6e6e7d5f8d00c1ea11e325e11b468feb"
+    },
+    {
+      "repository": "AlembicPlugin",
+      "file": "test/unit/HnswVector.test.ts",
+      "depth": "all 21 groups / 91 tests, assertions/hooks/helpers mapped",
+      "state": "deleted duplicate",
+      "decision": "85 callback规范化相同，6差异Core有更强或等价覆盖；替代package链已通过。",
+      "baseline": "11f8d47476fb09b52977242b3ab5a1fa413e4226"
+    },
+    {
+      "repository": "AlembicPlugin",
+      "file": "test/unit/VectorPipeline.test.ts",
+      "depth": "existing fixture/imports + complete added package chain",
+      "state": "changed",
+      "decision": "既有8项保留；新增1项真实 package→pipeline→flush/reopen→hybrid，两类结果契约。 最终复核按既有公开类型声明修正fixture；旧无provider用例省略冗余null，断言保留。",
+      "sha256": "f3bbb7492c3d069896f0be3e3461e402549c7c402b8ba68926086119dec4b571"
+    },
+    {
+      "repository": "Alembic",
+      "file": "lib/infrastructure/cache/UnifiedCacheAdapter.ts",
+      "depth": "full + runtime probe",
+      "state": "retained",
+      "decision": "通过正式package转发；实际导入和get/set/clear探针通过。",
+      "sha256": "cf88856cb295a5abaa5bc40f751bd876daafddd863c12fd13e588cfdcd899772"
+    },
+    {
+      "repository": "Alembic",
+      "file": "lib/http/HttpServer.ts",
+      "depth": "cache field/init/stop and consumer trace",
+      "state": "retained",
+      "decision": "当前只初始化/持有，不赋予单个HTTP服务共享cache销毁权。",
+      "sha256": "72ff61cd67bf89c7fa67c57eb1998fbe0e5aa74b0f002b49e62c5079e0710171"
+    }
+  ],
+  "scope": "仅表述实际阅读深度，不作全部仓库审核完成声明。"
+}

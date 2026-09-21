@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+  "dispatchGroup": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+  "status": "completed",
+  "summary": "Core 已在单一提交 5106e8a9f47a12a52614d77cb5e3908462a4a49c 修复 KnowledgeService.update 的 retrievalProfile 编辑回写：profile-only 与混合更新均经过结构/schema 前置校验并按既有 file-first→SQLite→knowledge:changed 链无损保存；legacy null/未知扩展字段保持兼容，readiness 语义不被误作编辑门禁，pending/staging/active 生命周期及发布事实不变。真实 SQLite/Markdown/API wire→readiness/projector 回归已 GREEN。",
+  "evidenceRefs": [
+    "AlembicCore@5106e8a9f47a12a52614d77cb5e3908462a4a49c",
+    "AlembicCore/src/service/knowledge/KnowledgeService.ts",
+    "AlembicCore/test/RecipeRetrievalProduction.test.ts"
+  ],
+  "verification": [
+    "RED: npx vitest run test/RecipeRetrievalProduction.test.ts => 4 failed/17 passed；profile-only/active 均为 No updatable fields，混合更新保留旧 profile，非法输入缺少 typed validation。",
+    "GREEN focused: npx vitest run test/RecipeRetrievalProduction.test.ts test/unit/KnowledgeService.test.ts test/FailureSemanticsCO3.test.ts => 3 files/92 tests passed。",
+    "npm run build:check => passed。",
+    "npm run test => 184 files/1743 tests passed。",
+    "npm run build => passed；npm run lint => 746 files passed。",
+    "npx vitest run test/CoreDeliveryBoundary.test.ts test/CoreToolSystemBoundary.test.ts test/CoreCodexBoundary.test.ts test/CorePackage.test.ts => 4 files/22 tests passed。",
+    "npm run lint:public-api-boundary => 66 exports classified/passed；npm run lint:layer-contract => 431 runtime imports/280 type-only bridges passed。",
+    "npm run check executed: build/public-api/layer/consumer-imports/scope/smoke/output-budgets/space-edges passed, then stopped only on inherited src/infrastructure/vector/ASTChunker.ts:32 Doctrine violation；该文件相对 baseline 4e0124e1 零差异。",
+    "npm run lint:naming => passed；npm run lint:retired-symbols => passed；git diff --check => passed；post-commit git status => clean。"
+  ],
+  "risks": [
+    "仓库既有 Doctrine gate 仍在 src/infrastructure/vector/ASTChunker.ts:32 报 1 项 module-scope mutable let；本提交未触及该文件且相对 4e0124e1 零差异。",
+    "本窗口只修 Core 合同；Alembic HTTP PATCH schema/integration 仍需控制器按既定 producer→consumer 顺序继续原 Alembic 任务。"
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "5106e8a9f47a12a52614d77cb5e3908462a4a49c",
+      "verify": "git show --stat --oneline HEAD；单一提交仅含 KnowledgeService.ts 与 RecipeRetrievalProduction.test.ts。"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/RecipeRetrievalProduction.test.ts",
+      "verify": "真实 profile-only、混合、非法零写入、pending/staging/active 保留、无自动发布、SQLite/Markdown/API/readiness/projector 回归；focused 92 与 full 1743 均通过。"
+    },
+    {
+      "kind": "self-review",
+      "value": "行为审：只拒绝结构/schema 错误，不以 readiness 阻断可修复编辑；成功只发既有 knowledge:changed。质量审：无公共 export、无第二存储、无 provider/rank/vector gate、无外仓改动，工作树干净。",
+      "verify": "git diff --check；Biome 746 files；public API/layer/四边界 gates 全通过。"
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicCore/test/RecipeRetrievalProduction.test.ts",
+      "verify": "同一 fixture 实现前 4 项按预期失败，实现后 21/21 通过；三文件 focused 92/92。"
+    },
+    {
+      "kind": "baseline",
+      "value": "变更前三文件 focused baseline 3 files/88 tests passed；HEAD baseline 4e0124e1，工作树干净。",
+      "verify": "npx vitest run test/RecipeRetrievalProduction.test.ts test/unit/KnowledgeService.test.ts test/FailureSemanticsCO3.test.ts"
+    },
+    {
+      "kind": "change-scope",
+      "value": "2 files changed, 266 insertions(+), 3 deletions(-)：仅 Core KnowledgeService 运行时门禁和已有 Recipe retrieval 真实集成测试。",
+      "verify": "git show --stat 5106e8a；无 Alembic/Dashboard/Plugin/Agent/Wakeflow 产品改动。"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "根因是 update 的 UPDATABLE/switch 遗漏 retrievalProfile；domain、API wire、Markdown writer/parser、SQLite repository 已完整支持，导致 profile-only 被拒、mixed profile 静默丢失。",
+      "verify": "RED 输出与 KnowledgeService.ts update 分支、repository/file writer 读取证据交叉确认。"
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed",
+      "verify": "tsc -p tsconfig.json --noEmit"
+    },
+    {
+      "kind": "lint",
+      "value": "Biome、public API、layer、naming、retired-symbols 通过；组合 check 的唯一 Doctrine 失败为未改 baseline ASTChunker.ts:32。",
+      "verify": "npm run lint；lint:public-api-boundary；lint:layer-contract；lint:naming；lint:retired-symbols"
+    },
+    {
+      "kind": "verification",
+      "value": "full test 184/1743；Core boundaries 4/22；build passed；consumer imports/scope/smoke/budgets/space edges passed。",
+      "verify": "见 TargetResultEnvelope verification 原始命令摘要。"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p6-core-retrieval-profile-edit-roundtrip-repair-p1__AlembicCore__p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-core-retrieval-profile-edit-roundtrip-repair-p1__AlembicCore__p6-core-retrieval-profile-edit-roundtrip-repair-t1.json",
+    "deliveryRunId": "run-p6-core-retrieval-profile-edit-roundtrip-repair-202607131831",
+    "dispatchGroup": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-core-retrieval-profile-edit-roundtrip-repair-p1__AlembicCore__p6-core-retrieval-profile-edit-roundtrip-repair-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 46,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+    "targetTaskId": "p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+    "resultId": "tr-p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+    "createdAt": "2026-07-13T18:42:46.629Z"
+  },
+  "createdAt": "2026-07-13T18:42:46.629Z",
+  "stateRevisionObserved": 46,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

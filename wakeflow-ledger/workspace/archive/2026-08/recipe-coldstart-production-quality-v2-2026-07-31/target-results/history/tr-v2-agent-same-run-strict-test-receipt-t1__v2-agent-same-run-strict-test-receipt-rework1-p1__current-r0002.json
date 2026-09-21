@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-v2-agent-same-run-strict-test-receipt-t1",
+  "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+  "taskPackageId": "v2-agent-same-run-strict-test-receipt-p1",
+  "dispatchGroup": "v2-agent-same-run-strict-test-receipt-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-v2-2026-07-31",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "v2-agent-same-run-strict-test-receipt-t1",
+  "status": "completed",
+  "summary": "rework1 已关闭两个 strict-test 成功权威绕过：AgentService 仅在完整 automatic-selection binding、canonical generate-dimension profile、completed PipelineStrategy outcome 与 matching canonical receipt 同时成立时返回 success；PipelineStrategy 在 G1/G2 gate 前对白名单 stage 输出建立深拷贝、深冻结、同 run seal/hash，gate 只读 sealed source/冻结 phase view，finalizer 使用预存 seal hash。现有 AgentService→generate-dimension→AgentStageFactoryRegistry→PipelineStrategy 单链及 exact selected-cell conservation 保持不变。",
+  "changedRepos": [
+    "AlembicAgent"
+  ],
+  "commits": [
+    "077f4f6f08da731a40547c90f085460f434087f1",
+    "4a2649f0d758a43f0884af5377c8b8531eed0b41"
+  ],
+  "commitDisposition": "committed",
+  "evidenceRefs": [
+    "AlembicAgent@4a2649f0d758a43f0884af5377c8b8531eed0b41",
+    "AlembicAgent/src/agent/service/AgentService.ts",
+    "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+    "AlembicAgent/src/agent/production/StrictTestDimensionAgentContract.ts",
+    "AlembicAgent/test/strict-test-dimension-agent-contract.test.ts",
+    "AlembicAgent/scripts/probe-strict-test-dimension-agent.mjs",
+    "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/v2-agent-same-run-strict-test-receipt-controller-review.md"
+  ],
+  "verification": [
+    "RED before implementation: focused strict-test contract => 6 failed / 32 passed (real AgentRuntime policy reject, early return, missing receipt, identity mismatch, wrong profile, gate mutation)",
+    "npx vitest run test/strict-test-dimension-agent-contract.test.ts test/strict-production-chain.test.ts test/strict-iterative-analysis.test.ts test/public-strict-facades.test.ts => 4 files / 65 tests passed",
+    "npm run probe:strict-test-dimension-agent => passed; runtimeBuild=1/pipelineExecute=1 path, 2 model calls, receipt returned, actualStageHashesMatch=true",
+    "npm run build:check => passed",
+    "npm run lint => passed with pre-existing warnings only",
+    "lint:core-import-boundary, lint:agent-import-boundary, lint:public-api-boundary, lint:space-edges, lint:layer-contract, lint:doctrine, lint:naming, lint:provider-neutral-kernel, lint:retired-symbols => passed",
+    "npm run verify:validation-floor => passed",
+    "npm run smoke:public-signatures => passed (15 exports / 461 bindings)",
+    "npm test => 73 files / 627 tests passed; 1 unchanged file / 20 tests failed because installed Core facade lacks createProjectContextFileRef",
+    "npm run smoke:strict-consumer => failed at the same pre-existing missing Core createProjectContextFileRef export"
+  ],
+  "risks": [
+    "全量 durable-semantic-review-runtime 与 strict-consumer smoke 仍受已知 Core facade 缺少 createProjectContextFileRef 阻断；本任务禁止修改相邻仓库，且聚焦 strict-test suite/probe/public facade 均通过。",
+    "stage seal 严格限定于带 strictTestAuthority+eligibleCells 的 automatic-selection strict-test port；不生成本任务 canonical receipt 的 generic strictProduction 兼容路径保持原语义，未在本包内扩大合同。"
+  ],
+  "craftEvidence": [
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-agent-same-run",
+      "red": "真实 AgentRuntime policy reject/early return 可因非空 reply 被 AgentService 判 success 且无 receipt；gate 还可改写 raw model stage 后让 phases/receipt观察改写值。",
+      "green": "strict success 现强制 completed outcome+matching canonical receipt；Analyst/Producer gate 前 seal，receipt 的 runId/authorityHash/selectedCellSetHash 与预存实际 stage hashes均匹配。",
+      "ref": "AlembicAgent/test/strict-test-dimension-agent-contract.test.ts#strict-policy-missing-mismatch-and-gate-mutation"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-agent-cell-conservation",
+      "red": "extra/missing/duplicate/reordered/cross-run/unselected/cross-cell terminal或fact分配曾可在不连续证据路径中进入结果。",
+      "green": "现有 exact selected-cell 负向矩阵全部保持 fail closed；canonical replay与AgentService identity gate阻止任何偏差进入success receipt。",
+      "ref": "AlembicAgent/test/strict-test-dimension-agent-contract.test.ts#selected-cell-conservation-negative-matrix"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-agent-existing-chain",
+      "red": "旧路径可在真实运行之后独立后置合成或在PipelineStrategy前提前返回，未证明唯一主链完成。",
+      "green": "公开 AgentService 仍只build一次 runtime、execute一次现有 PipelineStrategy；canonical profile在coordinator/build前验证，policy early return零 pipeline调用且fail closed，正常路径仍为两次既有stage调用。",
+      "ref": "AlembicAgent/test/strict-test-dimension-agent-contract.test.ts#existing-chain-call-count-and-real-policy-probe"
+    }
+  ],
+  "resultMapping": {
+    "contract": "target-result-envelope-v2",
+    "compatibility": "enforced",
+    "status": "complete",
+    "acceptanceAnchorIds": [
+      "v2-agent-same-run",
+      "v2-agent-cell-conservation",
+      "v2-agent-existing-chain"
+    ],
+    "testPlanIndices": []
+  },
+  "deliveryContext": {
+    "deliveryId": "delivery-v2-agent-same-run-strict-test-receipt-rework1-p1__AlembicAgent__v2-agent-same-run-strict-test-receipt-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-agent-same-run-strict-test-receipt-r--404d14ac75e3.json",
+    "deliveryRunId": "run-delivery-v2-agent-same-run-strict-test-receipt-rework1-p1__AlembicAgent__v2-agent-same-run-strict-test-receipt-t1",
+    "dispatchGroup": "v2-agent-same-run-strict-test-receipt-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-agent-same-run-strict-test-receipt-r--404d14ac75e3.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-v2-2026-07-31",
+    "stateRevision": 7,
+    "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+    "taskPackageId": "v2-agent-same-run-strict-test-receipt-p1",
+    "targetTaskId": "v2-agent-same-run-strict-test-receipt-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "v2-agent-same-run-strict-test-receipt-rework1-p1",
+    "resultId": "tr-v2-agent-same-run-strict-test-receipt-t1",
+    "createdAt": "2026-07-31T17:48:42.774Z"
+  },
+  "createdAt": "2026-07-31T17:48:42.774Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-v2-agent-same-run-strict-test-receipt-t1",
+    "dispatchGroup": "v2-agent-same-run-strict-test-receipt-p1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-v2-2026-07-31/target-results/history/tr-v2-agent-same-run-strict-test-receipt-t1__v2-agent-same-run-strict-test-receipt-p1__current-r0001.json"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-v2-dashboard-strict-test-entry-consumer-t1",
+  "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+  "taskPackageId": "v2-dashboard-strict-test-entry-consumer-p1",
+  "dispatchGroup": "v2-dashboard-strict-test-entry-consumer-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-v2-2026-07-31",
+  "targetWindow": "AlembicDashboard",
+  "targetTaskId": "v2-dashboard-strict-test-entry-consumer-t1",
+  "status": "needs-review",
+  "summary": "Committed the Dashboard strict-test Candidates consumer: both cold-start/rerun entries share one strict handler, generated Main b50bff1 contract is byte-identical and pinned, adapter validates all declared request/response matrices fail-closed, and the controller preserves one project-scoped durable run authority through polling/restore/report with private-only UI. Full npm run check passes. Real Main browser verification reached the strict preflight endpoint and failed closed with HTTP 422 because the current dispatch/state root provides no ALEMBIC_RUNTIME_ARTIFACT_MANIFEST_PATH/controller runtime artifact manifest; therefore the required real preflight→runs/status→report terminal evidence is unavailable and is not represented as completed.",
+  "changedRepos": [
+    "<workspace-root>/AlembicDashboard"
+  ],
+  "commits": [
+    "6562eb13e9ccc204021a8580a2045c25a9ad9697"
+  ],
+  "commitDisposition": "committed",
+  "evidenceRefs": [
+    "commit:6562eb13e9ccc204021a8580a2045c25a9ad9697",
+    "~/.codex/visualizations/2026/07/26/<redacted>/dashboard-strict-preflight.png",
+    "~/.codex/visualizations/2026/07/26/<redacted>/dashboard-strict-preflight-error.png"
+  ],
+  "verification": [
+    "npm run check: PASS (lint 105 files; api artifact drift gate; space boundary; layer contract 105 files/14 areas/205 runtime edges/37 type-only bridges; doctrine; naming 110 files; 46/46 tests; typecheck; production build)",
+    "cmp src/generated/api-types.ts ../Alembic/lib/generated/dashboard-api-types.ts: byte-identical",
+    "SHA-256 canonical and Dashboard artifact: 8dc8d0da03bb53f6f86b8a07df28a082c821774bae4de436557f3559d2eae352",
+    "git diff --check: PASS",
+    "Real browser/Main: POST strict-test-dimension/preflight observed; HTTP 422 shown fail-closed; no strict runs/status/report or legacy endpoint was issued because preflight did not authorize continuation"
+  ],
+  "risks": [
+    "Required real Main preflight→runs/status→report terminal browser evidence remains unavailable: StrictTestDimensionRuntime requires ALEMBIC_RUNTIME_ARTIFACT_MANIFEST_PATH, but no controller runtime artifact manifest or reference exists in the current task package/state root. The Dashboard target cannot safely fabricate this path-bound, hash-verified controller artifact.",
+    "The completed private report screenshot is consequently missing; current screenshots prove preflight and fail-closed 422/private semantics only.",
+    "Build retains pre-existing non-failing CSS unknown-property and large-chunk warnings."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-dashboard-strict-entry-no-legacy",
+      "red": "Existing App.handleColdStart called api.bootstrap and initialized legacy bootstrapSession/activeJob.",
+      "green": "Candidates cold-start and rerun testids enter handleStrictTestStart only; adapter probe records preflight→runs→status→report and zero modules/bootstrap or jobs/bootstrap. Real browser recorded only strict preflight then a fail-closed 422, with zero legacy calls, but could not exercise the remaining real sequence because the controller runtime artifact manifest is absent.",
+      "ref": "scripts/strict-test-contract.test.mjs#strict-test-adapter-validates-every-request-response-and-never-falls-back"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-dashboard-generated-exact-contract",
+      "red": "Dashboard artifact SHA-256 was 5545fc9c... while accepted Main canonical was 8dc8d0da....",
+      "green": "cmp is byte-identical; both SHA-256 values are 8dc8d0da03bb53f6f86b8a07df28a082c821774bae4de436557f3559d2eae352; generated drift gate passes; validator tests cover exact requests and 200/202/400/404/409/422 plus undeclared status/fields and projectRoot drift rejection.",
+      "ref": "src/generated/api-types.sha256"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-dashboard-automatic-selection",
+      "red": "No strict-test preflight/canAutoSelect consumer existed; Candidates used legacy bootstrap.",
+      "green": "Controller sends exact demandKey/projectRoot/runId then demandKey/preflightHash/runId, sends no dimension/confirmation, requires canAutoSelect=true, and rejects recommendation/automaticSelection mismatch.",
+      "ref": "scripts/strict-test-contract.test.mjs#controller-fails-closed-for-automatic-selection-drift-and-durable-failed-starts"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-dashboard-same-run-durable-ui",
+      "red": "No strict-test authority, concurrent status polling, duplicate suppression, or refresh restoration existed.",
+      "green": "Controller tests prove one demandKey/runId/preflightHash across long POST polling, duplicate click suppression, sessionStorage restore, durable 422 failure, restore 404, report 409, and same-run report readback.",
+      "ref": "scripts/strict-test-contract.test.mjs#controller-polls-during-the-long-start-persists-one-authority-suppresses-duplicates-and-restores-it"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-dashboard-private-semantics",
+      "red": "Candidates exposed destructive Clean & Rebuild copy and no private strict-test status/report panel.",
+      "green": "UI render probe and browser screenshots show private-only, productionFinalized=false, publicRouteChanged=false, non-destructive rerun copy, authoritative phase/failure/report fields, and unexecuted dimensions without completion inference.",
+      "ref": "src/components/Views/StrictTestStatusPanel.tsx"
+    }
+  ],
+  "resultMapping": {
+    "contract": "target-result-envelope-v2",
+    "compatibility": "enforced",
+    "status": "partial",
+    "acceptanceAnchorIds": [
+      "v2-dashboard-strict-entry-no-legacy",
+      "v2-dashboard-generated-exact-contract",
+      "v2-dashboard-automatic-selection",
+      "v2-dashboard-same-run-durable-ui",
+      "v2-dashboard-private-semantics"
+    ],
+    "testPlanIndices": [],
+    "partialIssues": []
+  },
+  "deliveryContext": {
+    "deliveryId": "delivery-v2-dashboard-strict-test-entry-consumer-p1__AlembicDashboard__v2-dashboard-strict-test-entry-consumer-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-dashboard-strict-test-entry-consumer--60bd437d309b.json",
+    "deliveryRunId": "run-delivery-v2-dashboard-strict-test-entry-consumer-p1",
+    "dispatchGroup": "v2-dashboard-strict-test-entry-consumer-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-dashboard-strict-test-entry-consumer--60bd437d309b.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-v2-2026-07-31",
+    "stateRevision": 30,
+    "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+    "taskPackageId": "v2-dashboard-strict-test-entry-consumer-p1",
+    "targetTaskId": "v2-dashboard-strict-test-entry-consumer-t1",
+    "targetWindow": "AlembicDashboard",
+    "dispatchGroup": "v2-dashboard-strict-test-entry-consumer-p1",
+    "resultId": "tr-v2-dashboard-strict-test-entry-consumer-t1",
+    "createdAt": "2026-08-03T14:19:14.651Z"
+  },
+  "createdAt": "2026-08-03T14:19:14.651Z",
+  "stateRevisionObserved": 30,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

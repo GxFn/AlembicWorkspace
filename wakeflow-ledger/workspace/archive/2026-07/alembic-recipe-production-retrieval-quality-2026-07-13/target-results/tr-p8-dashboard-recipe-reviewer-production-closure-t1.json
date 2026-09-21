@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p8-dashboard-recipe-reviewer-production-closure-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p8-dashboard-recipe-reviewer-production-closure-p1",
+  "dispatchGroup": "p8-dashboard-recipe-reviewer-production-closure-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicDashboard",
+  "targetTaskId": "p8-dashboard-recipe-reviewer-production-closure-t1",
+  "status": "completed",
+  "summary": "AlembicDashboard now reviews existing candidate/Recipe IDs without creating a fifth producer, round-trips the canonical retrieval profile without field loss, displays Core readiness and generation state, keeps provider/vector/generation warnings non-gating, requires explicit confirmation for legal publish, exposes zero-write generation dry-run only, and recovers visibly from structural/runtime failures. Browser-found locale and StrictMode loading defects were fixed before closeout.",
+  "evidenceRefs": [
+    "AlembicDashboard commit 7f8753475cd3703d4ae37296023fc04ebbd0c6b4",
+    "AlembicDashboard/scripts/dashboard-contract.test.mjs",
+    "<workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/reviewer-ready-warnings-generation.png",
+    "<workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/generation-dry-run-zero-write.png",
+    "<workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/reviewer-structural-readiness-blocked.png",
+    "<workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/candidate-explicit-publish-failure-state-preserved.png",
+    "<workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/reviewer-profile-edit-controls.png"
+  ],
+  "verification": [
+    "npm run check — exit 0: lint, API drift, space boundary, layer contract, doctrine, naming, 38/38 tests, typecheck, production build",
+    "Browser contract fixture — profile preview/edit, loading recovery, readiness codes, warning non-gate, generation, zero-write dry-run, explicit publish confirmation, failure visibility, and unchanged candidate verified",
+    "git diff --cached --check — passed",
+    "7f8753475cd3703d4ae37296023fc04ebbd0c6b4^ = f26427682f45cce6ce5ce4304ce9dfde84c26f17; worktree clean"
+  ],
+  "risks": [
+    "No real product publish or rebuild/rollback was executed; browser mutation paths used a traceable local contract fixture and dry-run reported writePerformed=false.",
+    "Build retains pre-existing generated CSS unknown-property and large Mermaid chunk warnings; both are non-failing and outside this task."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "7f8753475cd3703d4ae37296023fc04ebbd0c6b4",
+      "verify": "Single AlembicDashboard commit based directly on f26427682f45cce6ce5ce4304ce9dfde84c26f17."
+    },
+    {
+      "kind": "tests",
+      "ref": "npm run check",
+      "value": "All gates passed, including 38/38 tests, typecheck, and production build.",
+      "verify": "Final run exited 0 after browser-found fixes."
+    },
+    {
+      "kind": "browser-screenshot",
+      "ref": "<workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/reviewer-ready-warnings-generation.png",
+      "value": "<workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/generation-dry-run-zero-write.png; <workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/reviewer-structural-readiness-blocked.png; <workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/candidate-explicit-publish-failure-state-preserved.png; <workspace-root>/AlembicDashboard/node_modules/.tmp/wakeflow-p8-dashboard/screenshots/reviewer-profile-edit-controls.png",
+      "verify": "Traceable local fixture covers profile edit/preview, loading recovery, ready warnings, generation/dry-run zero-write, structural blocked code, explicit confirm, stable failure, and state preservation."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 checked every acceptance and forbidden item. Stage 2 checked async lifecycle, StrictMode, error recovery, unknown fields, locale ownership, accessibility, generated API pin, prohibited routes, and staged scope. No unresolved P0/P1/P2.",
+      "verify": "16 AlembicDashboard files only; diff check and final status clean."
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The old path POSTed Knowledge, auto-published, deleted candidates, lacked canonical profile/readiness/generation, and PATCHed only visible fields. Browser review also found locale keys under scanResult, a StrictMode mount-ref replay that froze async loading, and Axios errors masking stable provider messages.",
+      "verify": "Replaced with existing-ID GET + full snapshot projector; moved locale keys; restored mount ref on effect setup; prioritized stable Axios problem messages; added executable regressions."
+    },
+    {
+      "kind": "red-green",
+      "value": "RED: 34 baseline tests passed plus 3 new reviewer tests failed. GREEN: final 38/38 passed.",
+      "verify": "Executable round-trip, provider fixture, locale, StrictMode, and UI assertions are in dashboard-contract.test.mjs."
+    },
+    {
+      "kind": "api-contract",
+      "ref": "AlembicDashboard/src/generated/api-types.sha256",
+      "value": "5545fc9cb93fb5befc62aae3d8218a769567301cd2c8525a2c0217a26b98c44e",
+      "verify": "API drift gate passed byte-identical to accepted Alembic canonical."
+    },
+    {
+      "kind": "accessibility",
+      "value": "Async panels use polite live regions, errors use assertive regions, fact controls are labeled, and long-running actions disable.",
+      "verify": "Browser DOM observed two polite regions and zero warning/error console logs on the final reviewer page."
+    },
+    {
+      "kind": "scope-diff",
+      "value": "16 Dashboard files; no sibling repo, Wakeflow state, rebuild/rollback surface, fixture, or screenshot committed.",
+      "verify": "Commit parent and clean worktree verified."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p8-dashboard-recipe-reviewer-production-closure-p1__AlembicDashboard__p8-dashboard-recipe-reviewer-production-closure-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p8-dashboard-recipe-reviewer-production-closure-p1__AlembicDashboard__p8-dashboard-recipe-reviewer-production-closure-t1.json",
+    "deliveryRunId": "run-delivery-p8-dashboard-recipe-reviewer-production-closure-p1__AlembicDashboard__p8-dashboard-recipe-reviewer-production-closure-t1",
+    "dispatchGroup": "p8-dashboard-recipe-reviewer-production-closure-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p8-dashboard-recipe-reviewer-production-closure-p1__AlembicDashboard__p8-dashboard-recipe-reviewer-production-closure-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 58,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p8-dashboard-recipe-reviewer-production-closure-p1",
+    "targetTaskId": "p8-dashboard-recipe-reviewer-production-closure-t1",
+    "targetWindow": "AlembicDashboard",
+    "dispatchGroup": "p8-dashboard-recipe-reviewer-production-closure-p1",
+    "resultId": "tr-p8-dashboard-recipe-reviewer-production-closure-t1",
+    "createdAt": "2026-07-13T20:24:56.410Z"
+  },
+  "createdAt": "2026-07-13T20:24:56.410Z",
+  "stateRevisionObserved": 58,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

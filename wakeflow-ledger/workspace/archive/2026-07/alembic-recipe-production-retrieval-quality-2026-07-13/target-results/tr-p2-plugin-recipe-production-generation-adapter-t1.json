@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-recipe-production-generation-adapter-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p2-plugin-recipe-production-generation-adapter-p1",
+  "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-rework2-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-recipe-production-generation-adapter-t1",
+  "status": "blocked",
+  "summary": "Blocked by the dispatched Core-contract stop rule. Rework2 was reproduced through Core VectorLifecycleCoordinator: when the current generation excludes the deleted Recipe, entry_<recipeId> is removed but rollback-only canonical documents survive and resurrect after rollback. Core retains terminal entryId in its private coordinator, then collapses it to VectorIndexWriter.remove(id); the same entry_<id> remove is also used after live upsert to retire a legacy competitor, so AlembicPlugin cannot safely infer terminal truth from the id or current active visibility. The minimum unblock is an additive, typed, awaited Core Recipe truth-removal port (for example RecipeVectorTruthRemover.removeRecipeByIdentity(recipeId)) wired into VectorLifecycleCoordinator/VectorService terminal remove/deprecate processing; AlembicPlugin can then implement base plus every-known-generation cleanup. No source changes or commit were retained.",
+  "evidenceRefs": [
+    ".wakeflow-local/wakeflow-delivery/dispatch-packets/p2-plugin-recipe-production-generation-adapter-rework2-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1.json",
+    ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/controller-events.jsonl",
+    "AlembicPlugin/lib/recipe-pipeline/vector/recipe-vector-generation-runtime.ts",
+    "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+    "AlembicCore/src/service/knowledge/KnowledgeService.ts",
+    "AlembicCore/src/service/vector/SyncCoordinator.ts",
+    "AlembicCore/src/service/vector/VectorIndexPorts.ts",
+    "AlembicCore/src/service/vector/VectorService.ts",
+    "AlembicCore/src/service/vector/RecipeVectorGeneration.ts"
+  ],
+  "verification": [
+    "Baseline: AlembicPlugin HEAD 3cb93137e040c3491605945f466fe01febcc3aaf and AlembicCore HEAD b711ea10aa5c67d1d75a58a18c0d56623e26c290 were clean.",
+    "Baseline focused test: npx vitest run test/unit/RecipeVectorGenerationRuntime.test.ts => 6/6 passed before the temporary RED regression.",
+    "RED reproduction: a temporary test used Core VectorLifecycleCoordinator with provider absent, target only in an older rollback generation, current generation containing only an unrelated Recipe, and the real knowledge:deleted entry-removal plus active-region-scan shape. It failed because the base canonical vector remained; old-generation vectors also remained eligible for rollback resurrection.",
+    "The same RED run independently reproduced the committed CAS test defect: concurrent activation returned [false,true] while the test expected [true,false].",
+    "Temporary test edits were removed with apply_patch; git diff --check and git status --short completed clean with no retained diff.",
+    "Alembic work lifecycle finish-public-mrjg8ayx-3 recorded outcome=blocked; Guard was correctly skipped because there is no code diff."
+  ],
+  "risks": [
+    "Until Core supplies an awaited Recipe-identity truth-removal contract, delete/deprecate can leave rollback-only generation documents that resurrect after rollback.",
+    "Treating every entry_<recipeId> removal as terminal would risk deleting a live Recipe because Core uses the identical call after successful upsert and during legacy reconcile.",
+    "The existing caller-order CAS assertion remains flaky; changing it alone would be surrounding-surface motion while the main lifecycle chain is blocked, so no partial commit was made.",
+    "The previously disclosed directory-lock crash residue/manual-recovery limitation remains unchanged for the later operator-surface phase."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "execution-plan",
+      "value": "Pin clean baseline; trace real Core delete/deprecate call chain; re-derive recurring root cause; RED the rollback-only generation shape; implement only if the accepted public contract is safe; otherwise stop and return the exact blocker."
+    },
+    {
+      "kind": "baseline",
+      "value": "Plugin 3cb93137e040c3491605945f466fe01febcc3aaf clean; Core b711ea10aa5c67d1d75a58a18c0d56623e26c290 clean; focused runtime suite 6/6."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "verify": "Baseline 6/6. Temporary real-coordinator RED produced the expected terminal-cleanup failure and independently exposed the invalid caller-order CAS assertion; temporary edits were removed after the stop condition."
+    },
+    {
+      "kind": "repro",
+      "value": "Provider-offline Core VectorLifecycleCoordinator deletion: old generation contained the target, current generation contained only another Recipe, base contained entry_ plus stale canonical. After knowledge:deleted and coordinator.flush(), base/old canonical truth remained and rollback could resurrect it."
+    },
+    {
+      "kind": "regression",
+      "value": "No passing regression can be retained safely until Core conveys terminal Recipe identity through an awaited public truth-removal port; retaining a test-only or heuristic patch would violate the dispatch stop rule."
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "AlembicCore/src/service/vector/SyncCoordinator.ts",
+      "verify": "knowledge:deleted/lifecycle:transition preserve entryId internally, but terminal processing calls writer.remove(entry_<id>) and scans only reader.listIds(); VectorIndexWriter has no Recipe-identity removal method. The same entry removal is used for live legacy retirement, making Plugin id/current-visibility inference unsafe."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1/spec: agreed with both controller points; reproduced terminal rollback resurrection and caller-order CAS flake, then honored the explicit missing-Core-contract stop rule. Stage 2/quality: rejected entry_ parsing, active-absence inference, and unawaited EventBus listeners as unsafe; no source diff or partial commit remains."
+    },
+    {
+      "kind": "change-scope",
+      "value": "No retained file changes. AlembicPlugin and AlembicCore worktrees are clean; no Core, Agent, Alembic, Dashboard, Test, vendor, cache, or real data mutation."
+    },
+    {
+      "kind": "verification",
+      "value": "git diff --check passed; git status --short empty; Alembic finish outcome blocked; Guard skipped because no code diff."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-recipe-production-generation-adapter-rework2-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-recipe-production-generation-adapter-rework2-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1.json",
+    "deliveryRunId": "run-p2-plugin-recipe-production-generation-adapter-rework2-p1-readback1",
+    "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-rework2-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-recipe-production-generation-adapter-rework2-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 30,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p2-plugin-recipe-production-generation-adapter-p1",
+    "targetTaskId": "p2-plugin-recipe-production-generation-adapter-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-rework2-p1",
+    "resultId": "tr-p2-plugin-recipe-production-generation-adapter-t1",
+    "createdAt": "2026-07-13T16:41:46.578Z"
+  },
+  "createdAt": "2026-07-13T16:41:46.578Z",
+  "stateRevisionObserved": 30,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 3,
+  "supersedes": {
+    "resultId": "tr-p2-plugin-recipe-production-generation-adapter-t1",
+    "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-rework1-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p2-plugin-recipe-production-generation-adapter-t1__p2-plugin-recipe-production-generation-adapter-rework1-p1__current-r0002.json"
+  }
+}

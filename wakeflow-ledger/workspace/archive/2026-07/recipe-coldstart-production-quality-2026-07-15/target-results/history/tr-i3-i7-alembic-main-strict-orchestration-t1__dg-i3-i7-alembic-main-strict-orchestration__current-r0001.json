@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i7-alembic-main-strict-orchestration-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i7-alembic-main-strict-orchestration-p1",
+  "dispatchGroup": "dg-i3-i7-alembic-main-strict-orchestration",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i3-i7-alembic-main-strict-orchestration-t1",
+  "status": "blocked",
+  "summary": "依赖前置硬阻塞，未修改 Alembic。三仓 commit/tree 与 PC-F hash 均匹配派发且 Alembic build:check 通过；但 AlembicAgent@e2aa051 的 runStrictPlanAgent、strict analysis/Producer/reviewer 合同没有任何合法 package export，public imports 返回 undefined，production/evaluation/runs/deep paths 返回 ERR_PACKAGE_PATH_NOT_EXPORTED。另 AlembicCore@6b6341f 的 private revision 公开面只支持 absent-before-create 初始化并依赖进程内私有-authority Handle；已有 leaf 拒绝，且无 fresh-process rehydrate/resume API。Main 若继续只能 deep-import、复制上游合同或用新 root 重放冒充 exact durable substate，均违反任务包与项目直接消费正式外部 API 的边界。正确 next step 是 controller 先让 Agent 暴露 curated strict facade，并让 Core 暴露经 receipt 校验的 revision rehydrate/resume 合同，分别验收后再重派 Main。",
+  "evidenceRefs": [
+    "Alembic baseline clean HEAD 32578dc3d5fe02eb8c6d24d854066d780ffb668d tree 945b99963919bb273793c15001a1f845df5964ba",
+    "AlembicCore clean HEAD 6b6341f05332a1d15f79c19a0251d41b962b71d1 tree 84c094ee01052c91df5c9e94a50862dc61652f15",
+    "AlembicAgent clean HEAD e2aa051500cc9fc5c43f1085afd5072c5981f26f tree 459723c2ecf2919f95b2dccbaae6e4e51d46f61b",
+    "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json sha256 ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6",
+    "AlembicAgent/package.json exports omit ./production, ./evaluation and ./runs; src/agent/service/index.ts omits runStrictPlanAgent although src/agent/runs/index.ts has it",
+    "Actual Node imports: @alembic/agent, @alembic/agent/agent and @alembic/agent/service expose all required strict symbols as undefined; strict/deep subpaths throw ERR_PACKAGE_PATH_NOT_EXPORTED",
+    "AlembicCore/src/service/production/PrivateCorpusRevisionResolver.ts rejects an existing revision leaf with PRIVATE_CORPUS_REVISION_LEAF_ALREADY_EXISTS",
+    "AlembicCore/src/service/production/ProductionPersistenceContracts.ts constructs active handles only with module-private PRIVATE_REVISION_INIT_AUTHORITY; public workspace API exposes no rehydrate/resume function",
+    "Alembic npm run build:check passed; final Alembic/Core/Agent worktrees remain clean"
+  ],
+  "verification": [
+    "git status --short + git rev-parse HEAD + HEAD^{tree} in Alembic, AlembicCore and AlembicAgent",
+    "shasum -a 256 PCFBaselineReceipt and five Core PC-F dist files; capability manifest remains 4d3ecdc70227cd3cc613c9df26ca04107a6327aec7eebc5eae3a5856c614f008",
+    "Node ESM public-import matrix for @alembic/agent, @alembic/agent/agent, @alembic/agent/service and forbidden strict/deep subpaths",
+    "Node ESM public-import matrix for @alembic/core plans/host-agent-workflows/knowledge/workspace/vector",
+    "npm run build:check in Alembic"
+  ],
+  "risks": [
+    "Without Agent public facade, Main cannot call the accepted strict Plan cognition, construct/validate accepted strict analysis epochs/expression sets, or run accepted independent reviewers.",
+    "Without Core private-revision rehydration, a fresh process cannot resume the exact already-created revision root/handle required by the journal; allocating a new root is not exact durable-substate recovery.",
+    "No product source was changed, so all legacy broad-reset/PlanSelection/asyncFill/direct-persist/completed_with_errors behavior remains unchanged and must not be treated as partially fixed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "dependency-provenance",
+      "verify": "Three clean commit/tree baselines, realpath package links, package/index SHA-256/load success, PC-F receipt and capability manifest hashes verified."
+    },
+    {
+      "kind": "negative-tests",
+      "verify": "Actual legal Agent imports expose required strict symbols as undefined; forbidden subpaths throw ERR_PACKAGE_PATH_NOT_EXPORTED. Core public workspace surface has no rehydrate/resume symbols and existing-leaf path fails closed by source contract."
+    },
+    {
+      "kind": "tests",
+      "verify": "Alembic npm run build:check passed before any source mutation."
+    },
+    {
+      "kind": "compatibility",
+      "verify": "No Alembic/Core/Agent files changed; all worktrees clean and legacy behavior untouched."
+    },
+    {
+      "kind": "execution-plan",
+      "verify": "Audited Facade→PlanSelectionGate→ColdStartWorkflow→dimension runner/finalizer→Gateway/ref/vector chain and identified exact RED anchors plus correct upstream-first producer/consumer order."
+    },
+    {
+      "kind": "test-first",
+      "verify": "Stopped at dependency gate before writing RED product tests because those tests could not legally import the accepted Agent/rehydration contracts; provided concrete RED slices for redispatch."
+    },
+    {
+      "kind": "two-stage-self-review",
+      "verify": "Contract review compared task/design acceptance to package exports; code-path review independently traced current Main runtime and confirmed no legal workaround."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i3-i7-alembic-main-strict-orchestration__Alembic__i3-i7-alembic-main-strict-orchestration-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-alembic-main-strict-orchestration__Alembic__i3-i7-alembic-main-strict-orchestration-t1.json",
+    "deliveryRunId": "run-delivery-dg-i3-i7-alembic-main-strict-orchestration__Alembic__i3-i7-alembic-main-strict-orchestration-t1",
+    "dispatchGroup": "dg-i3-i7-alembic-main-strict-orchestration",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-alembic-main-strict-orchestration__Alembic__i3-i7-alembic-main-strict-orchestration-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 81,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i7-alembic-main-strict-orchestration-p1",
+    "targetTaskId": "i3-i7-alembic-main-strict-orchestration-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i3-i7-alembic-main-strict-orchestration",
+    "resultId": "tr-i3-i7-alembic-main-strict-orchestration-t1",
+    "createdAt": "2026-07-16T07:46:59.036Z"
+  },
+  "createdAt": "2026-07-16T07:46:59.036Z",
+  "stateRevisionObserved": 81,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

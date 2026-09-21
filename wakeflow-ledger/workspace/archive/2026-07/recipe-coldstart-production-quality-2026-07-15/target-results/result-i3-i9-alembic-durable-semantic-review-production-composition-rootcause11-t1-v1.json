@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "resultId": "result-i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1-v1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1",
+  "dispatchGroup": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1",
+  "status": "blocked",
+  "summary": "Main/Core/Agent 精确基线上的真实 RecipePipelineFacade 生产组合证明，V4 仅支持同一 harvest 内的多 receipt/多 scale；真实 Main complete schedule 对同一 Evidence Ledger entry 产生多个 harvest，Core 在 evidence load 前以 SEMANTIC_DISPOSITION_REVIEW_EVIDENCE_EXECUTION_SET_INVALID 拒绝。Request V3/V4 receipt-union 与 Agent shared-harvest gates 又阻止按 harvest 拆 authority/request。修复需要新的 Core+Agent public cross-harvest authority contract，超出 Main-only 边界；所有实验改动已撤回，三个仓库干净，无提交。",
+  "evidenceRefs": [
+    "<workspace-root>/wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1/blocker-report.md",
+    "<workspace-root>/AlembicCore/src/service/production/SemanticDispositionReviewExecution.ts",
+    "<workspace-root>/AlembicCore/src/service/production/DurableSemanticDispositionReviewAuthority.ts",
+    "<workspace-root>/AlembicAgent/src/agent/evaluation/DurableSemanticReviewRuntime.ts",
+    "<workspace-root>/Alembic/lib/recipe-pipeline/generate/strict/StrictFactExecutionRuntime.ts",
+    "alembic-finish:finish-public-ms514lle-1"
+  ],
+  "verification": [
+    "Baseline passed: npm run build:check && npx vitest run test/integration/StrictRecipePipelineFacade.integration.test.ts test/unit/RecipePipelineFacadeStrict.test.ts test/unit/StrictProductionJournal.test.ts (3 files, 30/30 tests; integration 18/18).",
+    "Bounded real-Facade RED probe observed SEMANTIC_DISPOSITION_REVIEW_EVIDENCE_EXECUTION_SET_INVALID for complete mixed-harvest receipt population; a retained shared-harvest pair plus remaining receipts observed SEMANTIC_DISPOSITION_REVIEW_EVIDENCE_AUTHORITY_V3_MISMATCH; diagnostic edits fully reverted.",
+    "Post-revert passed: npx tsc --noEmit --pretty false; git diff --check; git diff --exit-code.",
+    "Exact clean heads verified: Main 1c16269796f270ec95ab8a3b1ae9c129573b9ee6; Core 8602b9e6dd03a362736118a92cfd4ae24e35661e; Agent 07efa7ef7aef638900c62e3efa68c03afdeee95e.",
+    "Alembic lifecycle finish-public-ms514lle-1 recommends Guard skip with reason no-code-diff."
+  ],
+  "risks": [
+    "The assigned end-to-end V4 production composition, journal/checkpoint persistence, Core consumption, G3/G4/CAS ordering, and fresh-process no-remint recovery remain unimplemented because the upstream public authority model cannot represent the real receipt universe.",
+    "Main-only filtering/grouping or a partial custody scaffold would violate the task boundary and could falsely detach semantic authority from the complete strict schedule.",
+    "A sibling-authorized Core/Agent repair must preserve mixed-harvest negative security while admitting one legitimate complete Evidence-entry population across multiple harvest groups."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "ref": "<workspace-root>/wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1/blocker-report.md",
+      "verify": "Maps accepted rootcause10 V4 repair, real Main chain, both exact failure gates, no Main-only decomposition, and required upstream contract."
+    },
+    {
+      "kind": "runtime-fixture",
+      "ref": "bounded-real-RecipePipelineFacade-RED-probes",
+      "verify": "Real production path reached Core V4 and reproduced mixed-harvest execution-set invalid plus incomplete-authority-union mismatch; experiment reverted after diagnosis."
+    },
+    {
+      "kind": "boundary",
+      "ref": "clean-Main-Core-Agent-head-proof",
+      "verify": "No sibling/vendor/Test edits; all three worktrees clean at exact assigned commits; no second authority or receipt selection was retained."
+    },
+    {
+      "kind": "command",
+      "ref": "baseline-and-post-revert-validation",
+      "verify": "build:check plus 30 focused tests passed before experiment; TypeScript, diff check, exact heads, and clean worktrees passed after revert."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1__Alembic__i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1__Alembic__i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1__Alembic__i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1",
+    "dispatchGroup": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1__Alembic__i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 286,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1",
+    "targetTaskId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-p1",
+    "resultId": "result-i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1-v1",
+    "createdAt": "2026-07-28T19:09:51.429Z"
+  },
+  "createdAt": "2026-07-28T19:09:51.429Z",
+  "stateRevisionObserved": 286,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

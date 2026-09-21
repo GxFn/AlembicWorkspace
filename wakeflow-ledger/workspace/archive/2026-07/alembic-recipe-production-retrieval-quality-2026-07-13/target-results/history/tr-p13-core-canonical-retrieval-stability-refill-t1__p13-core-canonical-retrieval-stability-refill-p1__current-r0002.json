@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+  "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p13-core-canonical-retrieval-stability-refill-t1",
+  "status": "completed",
+  "summary": "AlembicCore commit 0fff37dbbb8bd311bc99b455bbc9a22431b063bb replaces candidate-count early stop with bounded truth-aware RRF Top-K stability proof. q2 is RED at window 32/rank 8 and GREEN after refill/rank 1 without query/data/weight/budget special cases. Full Core gates pass apart from the inherited untouched ASTChunker Doctrine violation; the copy-only eight-query probe used the exact Plugin-linked Core and left protected live roots unchanged. It also honestly exposes q7 final rank 11 and q8 rank 4 because later Recipes gain valid missing-lane evidence while the target RRF stays unchanged; those quality outcomes require controller/Recipe-production follow-up, not a Core special case. No final public MCP acceptance is claimed.",
+  "evidenceRefs": [
+    "AlembicCore commit 0fff37dbbb8bd311bc99b455bbc9a22431b063bb parent 5106e8a9f47a12a52614d77cb5e3908462a4a49c",
+    "/private/tmp/alembic-p13-copy-only-eight-query.json"
+  ],
+  "verification": [
+    "RED: focused q2-shaped test expected windows [32,64] but received [32] before repair (1 failed/5 passed).",
+    "GREEN: KnowledgeRetrievalPolicy 11/11; related retrieval/vector/Search/Prime 133/133.",
+    "Full Core test 184 files and 1749/1749; required boundary suite 4 files and 22/22.",
+    "build:check, build, lint, public-api, layer, consumer-import, scope, smoke, budgets, space, naming and retired-symbol gates pass.",
+    "npm run check stops only at inherited src/infrastructure/vector/ASTChunker.ts:32 Doctrine violation; exact-parent diff for that file is empty.",
+    "Copy-only report sha256 cc066813e57abbcd36c767f12cfecd324e2b46d915543de5158bc7ec12561af8; public target ranks [1,1,1,1,1,2,outside Top-8,4], all vector routes ready, protected roots equal."
+  ],
+  "risks": [
+    "Stable refill reveals q7 target rank 11 and q8 rank 4; per-window analysis proves target RRF is unchanged while later Recipes acquire valid missing-lane contributions. Preserve for Recipe production/profile optimization and controller decision.",
+    "Unstable requests can reach the unchanged 256 budget; observed public fixture calls were about 230-320 ms with cached loopback embeddings.",
+    "The proof relies on the existing ranked-prefix dense/sparse topK contract; approximate HNSW remains bounded by the unchanged budget.",
+    "Repository check retains the inherited untouched ASTChunker Doctrine failure."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "0fff37dbbb8bd311bc99b455bbc9a22431b063bb",
+      "verify": "exact parent 5106e8a9f47a12a52614d77cb5e3908462a4a49c and clean worktree"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The old projected-count gate stopped at raw window 32 although neither lane was exhausted, excluding q2 dense raw rank 42. The repair upper-bounds every later current candidate and a wholly unseen Recipe with the next truth-projected unique-live lane ranks, then requires every Top-K prefix endpoint to strictly exceed those challengers.",
+      "verify": "HybridCandidateRetriever.collect -> KnowledgeTruthProjector authoritative ranks/RRF -> KnowledgeRetrievalPolicy stop traced"
+    },
+    {
+      "kind": "red-green",
+      "value": "Same q2-shaped Core fixture failed with received window [32], then passed with [32,64] and target Top3 at denseRank 6/sparseRank 3.",
+      "verify": "focused final suite 11/11"
+    },
+    {
+      "kind": "tests",
+      "value": "Focused 11/11, related 133/133, full 1749/1749, boundaries 22/22 and all applicable build/lint/public gates pass; inherited ASTChunker Doctrine failure untouched.",
+      "verify": "raw command results recorded in verification"
+    },
+    {
+      "kind": "real-probe",
+      "ref": "/private/tmp/alembic-p13-copy-only-eight-query.json",
+      "verify": "sha256 cc066813e57abbcd36c767f12cfecd324e2b46d915543de5158bc7ec12561af8; raw ranks/similarities/RRF/regions and protected-root fingerprints included"
+    },
+    {
+      "kind": "self-review",
+      "value": "Compliance review: no public API, budget, alpha/rrfK, query/UUID/title/synonym, provider, Plugin, data or write-path changes. Correctness review: strict truth-aware upper bounds, ties unstable, exhausted lanes zero, duplicate/filter ranks authoritative, abort preserved, cost bounded, q7/q8 evidence not hidden.",
+      "verify": "separate diff, gates, runtime and clean-status review completed"
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Only KnowledgeRetrievalPolicy/private stability helper and its policy tests; 2 files, 404 insertions, 2 deletions."
+    },
+    {
+      "kind": "runtime-provenance",
+      "value": "Plugin bdcb3de1d6aa35732a141cbd699b4007b6bbafa6 resolves @alembic/core to this checkout; qwen3-embedding:0.6b fixed fixtures; per-request copied SQLite/config/vector then readonly query_only/HNSW."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p13-core-canonical-retrieval-stability-refill-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p13-core-canonical-retrieval-stability-refill-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1.json",
+    "deliveryRunId": "run-delivery-p13-core-canonical-retrieval-stability-refill-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1",
+    "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p13-core-canonical-retrieval-stability-refill-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 81,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+    "targetTaskId": "p13-core-canonical-retrieval-stability-refill-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-p1",
+    "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+    "createdAt": "2026-07-13T23:33:06.683Z"
+  },
+  "createdAt": "2026-07-13T23:33:06.683Z",
+  "stateRevisionObserved": 81,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+    "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p13-core-canonical-retrieval-stability-refill-t1__p13-core-canonical-retrieval-stability-refill-p1__current-r0001.json"
+  }
+}

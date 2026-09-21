@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p3-plugin-five-tool-truth-graph-drift-quality-p1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "summary": "Phase P3: integrate accepted Core vector truth filtering and close the two Plugin quality defects exposed by real five-tool calls.\n\nUpstream dependency:\n- Consume sibling AlembicCore commit 9e499809b3721a0d49e78853db4e115515b281ac through the existing @alembic/core file dependency. Build against that exact Core. Do not update vendor/AlembicCore or release pointers.\n\nIncluded mainline:\n1. Public Search/Prime truth integration\n- Add Plugin public-route tests where the vector index returns a mixture of live and orphan/deprecated entry ids while the request-scoped read-only database contains only live rows.\n- Prove alembic_search semantic/auto and alembic_prime never expose orphan ids/titles, surviving live ordering/limits remain useful, route evidence stays honest, and filtered-orphan metadata/diagnostics are bounded and do not become a gate.\n- Verify public get for a filtered orphan remains not found. Do not repair/rebuild the index during query.\n\n2. Real multi-repository Graph candidate quality\n- Fix ProjectGraphProvider candidate construction, not only final-node scoring: rank module seeds and file-flow targets by exact/full identifier and multi-term coverage before applying bounded target caps.\n- Add a large multi-repo/noise fixture exceeding the existing candidate cap. Query `HostMcpServer ProjectLocationService request` must include the actual HostMcpServer and ProjectLocationService file/symbol nodes within the bounded top results; weak `request`/`service` matches must not exclude them before final ranking.\n- Avoid collecting unrelated module-layer contexts solely because of weak terms when stronger exact candidates exist, so unrelated cyclic/invalid-scope warnings do not degrade this focused query. Preserve exact file queries, budgets, source-of-truth=false, and structural—not semantic knowledge—Graph behavior.\n\n3. Recipe Map drift truth\n- Extend Plugin Recipe source-ref normalization to understand Core `status=drifted` instead of converting it to `unresolved`.\n- A drifted ref means the file exists but anchored content changed: keep it eligible for deterministic path mounting, emit a bounded drift-specific diagnostic/nextAction, and never label it missing/unresolved. Preserve stale, renamed, unresolved and metadata-only semantics.\n- Keep equivalent single-line anchors such as `:330` and `:330-330` deduplicated for the same recipe; do not collapse distinct recipes sharing a source location.\n- Query remains read-only and must not rescan, repair, rewrite or gate knowledge visibility.\n\nNon-goals and boundaries:\n- No Git revision/checkpoint, host-project, current Alembic selection, role/admin, intent, knowledge-state, tool-visibility or no-KB gates.\n- No changes to Alembic main, AlembicCore, AlembicAgent, Dashboard, Test, real project files, live databases/vector indexes, plugin marketplace version, or vendor snapshots.\n- Do not broaden into keyword ranking changes: earlier keyword/semantic disagreement was caused by orphan semantic entries, not proven keyword scorer failure.\n\nValidation/backfill:\n- Commit the AlembicPlugin change.\n- Run focused Search public-route/Prime/Graph/Recipe Map/read-only tests; full unit suite; pnpm check; pnpm build; verify Codex runtime package/plugin distribution/Codex plugin; canonical local reload on the exact final Plugin commit.\n- After reload, controller will run real AlembicWorkspace and BiliDili MCP calls. Target should return fixture public JSON and may run its own safe fresh-process probes, but must not mutate real knowledge.\n- Backfill final commit, exact Core provenance, changed files/symbols, RED/GREEN evidence, public JSON samples, no-write proof, full commands, two-stage self-review, and honest residual limits.\n\nCompletion means the Plugin consumer chain is ready for controller real-project five-tool acceptance; it does not complete the demand and does not dispatch Test.",
+  "status": "pending",
+  "sourceRef": "Accepted Core package p2 plus controller real BiliDili/AlembicWorkspace runtime, SQLite, and source-code evidence recorded in continuation-0011.",
+  "designIntent": "Keep all five tools request-scoped and read-only: consume Core database-truth filtering, repair Plugin candidate selection before Graph caps, and carry Core drift semantics honestly instead of adding readiness or maintenance gates.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-probe",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "core-provenance-proof"
+      },
+      {
+        "kind": "public-orphan-filter-proof"
+      },
+      {
+        "kind": "graph-preselection-proof"
+      },
+      {
+        "kind": "recipe-drift-truth-proof"
+      },
+      {
+        "kind": "read-only-no-write-proof"
+      },
+      {
+        "kind": "public-json-samples"
+      }
+    ]
+  },
+  "createdAt": "2026-07-12T15:37:16.350Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p3-plugin-five-tool-truth-graph-drift-quality-t1",
+      "taskPackageId": "p3-plugin-five-tool-truth-graph-drift-quality-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Integrate Core 9e49980, eliminate orphan vector knowledge from public Search/Prime, make real multi-repo Graph exact identifiers survive candidate caps, and represent drifted Recipe refs truthfully without writes or new gates.",
+      "status": "pending",
+      "createdAt": "2026-07-12T15:37:16.350Z"
+    }
+  ]
+}

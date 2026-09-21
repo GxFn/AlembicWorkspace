@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i2-1-alembic-main-pcf-adapters-rootcause3-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Alembic Main PC-F rootcause3，基于干净的 Alembic@7a8c1f1364efca2001fd8452bb919ca7ec735c41，并实际加载已复验的 AlembicCore@4a3e8bab3fc7aa05ef7b680593599634422513aa；只修整组接受前剩余的两个 Main 根因。\n\n完成合同：\n1. 在 Plan/Recipe 已创建 session 后，dependency-graph 与 module-coverage 的实际生产入口必须通过 Core GenerateSession.replaceProjectContext()（或同一已接受边界）把各自产生的 receipt/counter 写回同一个 session id；每次调用返回即已持久化，fresh GenerateSessionManager/新进程依次看到 plan+recipe -> +dependency -> +module。不得把 toSnapshot() 副本当可写 session，也不得靠后续偶然 onChange 落盘。\n2. 四个 Main receipt 必须各自由真实入口产生、共享同一 artifact identity/scope/vector，并保存在有界 carrier 中；禁止中央循环预制四个 receipt 作为主证明。Main 只证明自己的四行，不得伪造 Plugin 的 dimension-completion，也不得宣称五行全局 lineage 已完成。\n3. 删除 buildCertifiedModules 中对无 owner eligible source 的 `repo:<repoId>` 静默合成，expectedOwnerModuleCount 不得复用合成规则制造假零。含 owned src/owned.ts 与 unowned loose.ts 的 fixture 必须 fail closed；成功返回的 synthesizedProjectScopeFactCount=0 必须真实表示没有发生合成。\n4. capture-time 空 legacy instrumentation 不能作为 post-open 可达性证明；严格成功以实际入口执行后的 carrier/receipt/counter 与 fresh reload 为准。保留既有 relativeRoot、路径约束、ModuleService certified 重绑定、malformed presenter/graph fail-closed、>12 files、>80 modules、control root+4 members 的已验语义。\n5. 回归必须执行真实生产顺序，证明同 session 四次演进、每阶段 fresh reload、stale/hash/scope/vector mutation fail closed、carrier 无文件正文且有界；不得仅手工构造 reducer event 或直接循环中央 helper。\n\n验证并回填：npm run build:check；focused ProjectContext/plan/session/dependency/ModuleService tests；npm run check；完整 npm run test；git diff --check。提交 Alembic 单一干净 commit，提供 parent/commit/tree、changed files/symbols、RED/GREEN、原始 runtime JSON/日志路径与 hash、两阶段自审。\n\n禁止范围：不改 Core/Plugin/Agent/Dashboard/Test/Wakeflow；不改 reset/阶段顺序；不做 I2.2/I3+；不建第二 store/journal/runtime；不放宽现有门禁。若真实入口无法在保持 session identity 下消费新 Core API，停止并回填精确 blocker。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§3, 4.2 PC-F2, 7.1–7.3, 18.0, 18.3; controller decisions tc-20260715195745-0035 and tc-20260715203247-0039; accepted Core producer AlembicCore@4a3e8bab3fc7aa05ef7b680593599634422513aa",
+  "designIntent": "复用 Core 已接受的 session 原地持久化 API，在 Main 既有真实入口做最小写回并让无归属源码严格失败；不新建存储、不伪造 Plugin 行。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T20:36:31.402Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i2-1-alembic-main-pcf-adapters-rootcause3-t1",
+      "taskPackageId": "i2-1-alembic-main-pcf-adapters-rootcause3-p1",
+      "targetWindow": "Alembic",
+      "summary": "把 dependency/module 两个真实入口写回同一 Generate session，并删除无 owner 源码的 repo:* 静默合成与同源假零；用实际生产顺序/fresh reload 证明四个 Main receipt。",
+      "status": "pending",
+      "createdAt": "2026-07-15T20:36:31.402Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

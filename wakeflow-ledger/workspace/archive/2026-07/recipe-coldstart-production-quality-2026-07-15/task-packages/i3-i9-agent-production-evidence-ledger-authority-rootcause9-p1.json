@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Repair the accepted Agent V3 runtime's remaining production-connectivity gap. Expose an Agent-owned public production authority that creates/reopens the real existing EvidenceLedgerStore at trusted dataRoot/job/session/dimension coordinates, provides a controlled immutable capture facet for Main strict fact evidence and a read-only strict-snapshot/get facet for durable semantic review, and keeps both facets bound to the same persisted JSONL/store identity. Refactor the existing AgentRuntime ledger construction to share this authority instead of introducing a second store. The public runtime path and fresh-process consumer must use only @alembic/agent public exports—no internal EvidenceLedgerStore import, manual fixture-only store, caller-provided fake ledger adapter, or task-supplied signer/policy. Preserve Core@d0d33e49 contracts and Main@1c16269 as read-only downstream context; no sibling edits, no Test, no Design.",
+  "status": "pending",
+  "sourceRef": "Original Plan completion bullets 7-10; Requirement Design §§2, 3, 11.3, 11.6-11.8, 17, 18.2, 18.3, 18.6; accepted Agent rootcause8 commit 5f6e8b1; blocked Alembic rootcause8 decision evt-20260727181332-0258 and blocker report; controller code review of DurableSemanticReviewRuntime.ts, EvidenceLedgerStore.ts, AgentRuntime.ts and package public exports",
+  "designIntent": "在 AlembicAgent 内把现有 EvidenceLedgerStore 的真实持久化能力封装成稳定、opaque、public production authority：可信 bootstrap 以 dataRoot/job/session/dimension 打开同一 JSONL，受控 capture facet 写入严格事实证据，durable-review read facet 读取同一完整 snapshot/get；AgentRuntime 与新公开入口复用同一实现。Main 后续只消费公开 authority 与返回的 immutable evidence identity，不得构造假 ledger adapter；不导出私有 store 类，不新建第二 evidence DB/store/service。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "One clean AlembicAgent commit based exactly on 5f6e8b1e6745a46752c8a6b035827e8889bcefbf; report parent, commit, tree and changed files. Consume local-source Core@d0d33e49 only through public package exports; no Core/Main/Plugin/Test/Wakeflow/vendor edits."
+      },
+      {
+        "kind": "command",
+        "verify": "Run build:check/build, focused Evidence Ledger production-authority + durable semantic runtime + AgentRuntime integration tests, full Agent check and full tests, public-signature/public-import/Core-import/layer/provider-neutral/retired/naming gates, a fresh-process public consumer probe, and git diff --check. Report exact counts and distinguish pre-existing warnings."
+      },
+      {
+        "kind": "runtime-fixture",
+        "verify": "Through @alembic/agent public exports only, create a trusted production ledger authority, capture exact strict fact evidence through its controlled capture facet, build/use the corresponding Core witness/execution bindings, execute createDurableSemanticReviewRuntime with the authority's read facet, emit a V3 attestation, then start a fresh process that reopens the same dataRoot/job/session/dimension and proves the same persisted ledger snapshot/evidence identities are loaded and the serialized attestation verifies. The proof must not import src/agent/evidence/EvidenceLedgerStore or manually seed a private test store."
+      },
+      {
+        "kind": "negative-probe",
+        "verify": "Reject caller-provided fake/replacement ledger adapters, task/request store coordinates, mismatched job/session/dimension/store identity, foreign or rebound evidence IDs, missing/duplicate/partial/corrupt JSONL entries, changed content/hash, truncated/incomplete snapshot, path-escape coordinates, and reopening a different/empty store. No fallback to caller summaries, in-memory fixtures or direct KnowledgeDispositionReview."
+      },
+      {
+        "kind": "boundary",
+        "verify": "Agent owns the opaque real Evidence Ledger construction, persisted capture/read authority, redaction/integrity diagnostics and public facade. Reuse EvidenceLedgerStore and the existing AgentRuntime ledger path; do not export the private store class, create a second store/database, copy Core witness logic, add Main config/key-policy wiring, or implement Plugin/daemon/UI/Test behavior. Main will later retain Core fact witness bundles and compose this accepted public authority with its stable key/trust configuration."
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "Explain why Agent@5f6e8b1 was still fixture-only for production connectivity: durable-semantic-review-runtime.test.ts imports the internal EvidenceLedgerStore and manually appends evidence, while src/evaluation.ts exports only a structural SemanticReviewEvidenceLedgerPortV1 and no factory/handle for the real runtime store. Identify the new public factory/facets, shared AgentRuntime construction path, persisted file identity, downstream Main composition point, and remaining Main-only stable key/public-policy responsibilities."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "self-review"
+      },
+      {
+        "kind": "guard"
+      },
+      {
+        "kind": "compatibility"
+      }
+    ]
+  },
+  "createdAt": "2026-07-27T18:17:09.214Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-t1",
+      "taskPackageId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Expose and prove one public Agent-owned production Evidence Ledger authority that captures strict fact evidence and reopens the same real store for V3 durable review; eliminate the internal-test-only/manual-ledger false green.",
+      "status": "pending",
+      "createdAt": "2026-07-27T18:17:09.214Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

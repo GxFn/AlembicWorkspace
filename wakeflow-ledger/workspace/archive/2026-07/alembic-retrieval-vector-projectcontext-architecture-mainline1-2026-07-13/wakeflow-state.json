@@ -1,0 +1,390 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "title": "检索、向量与实时 ProjectContext 架构主线实现",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "controllerWindow": "AlembicWorkspace",
+  "testDecision": "No Test window. Product windows run deterministic unit/contract/build gates; controller validates existing AlembicWorkspace multi-repo and BiliDili standalone knowledge roots read-only, with no init/rescan/reconcile and unchanged DB/WAL/SHM/config/vector fingerprints.",
+  "state": "archived",
+  "stateReason": "Demand completed at revision 32 after 5/5 task acceptance and independent controller verification. Archive now so later Recipe producer ranking optimization is handled separately and is not conflated with this closed Graph/Map and retrieval-architecture demand.",
+  "revision": 33,
+  "activeStageId": null,
+  "updatedAt": "2026-07-13T10:09:37.150Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p1-core-retrieval-vector-projectcontext-architecture-p1",
+      "summary": "Implement one combined AlembicCore producer package for the confirmed retrieval/vector/ProjectContext architecture.\n\nRequired implementation:\n- Add an EmbeddingPort with embedQuery/embedDocuments and an explicit provider/model/dimension descriptor; adapt existing providers without exposing provider details to callers.\n- Split VectorIndexReader from VectorIndexWriter. Query/search/Prime/RecipeContext construction may depend only on the reader. Indexing, reconcile and lifecycle maintenance own the writer.\n- Introduce canonical KnowledgeRetrievalCandidate, HybridCandidateRetriever, KnowledgeTruthProjector and bounded refill. Make Search, Prime and RecipeContext use the same KnowledgeRetrievalPort semantics.\n- Preserve raw dense, sparse and RRF contribution evidence; remove per-page max normalization that makes broad English ranking unstable.\n- Evolve SyncCoordinator into provider-independent VectorLifecycleCoordinator while retaining a compatibility facade for existing consumers. Removal/cleanup must not require embedding availability; live replacement remains safe.\n- Extend ProjectContext execution with an optional non-serialized AbortSignal request option so Plugin can enforce real cancellation without changing persisted/public schemas.\n- Add deterministic tests for the fixed eight-query BiliDili-style matrix and authoritative Recipe id <redacted> using fixtures at Core seams; do not hardcode query synonyms or edit Recipe content.\n\nCompatibility and non-goals:\n- Preserve current public consumers and existing source-truth/refill/filter behavior.\n- No Plugin, Alembic main, Test, vendor, release, real knowledge data, Git/revision/checkpoint, host-project, role/Admin, intent, knowledge-state or tool-visibility changes.\n- No query-time writes and no provider-specific policy leaking into retrieval contracts.\n\nRequired evidence:\n- Commit only AlembicCore.\n- Focused RED/GREEN tests for reader/writer isolation, shared Search/Prime retrieval parity, refill/truth projection, raw score contribution stability, provider-independent lifecycle removal, cancellation, and eight-query ranking.\n- Full Core unit suite, typecheck/check, build, exact changed files/symbols and compatibility review.\n- Two-stage self-review: requirement compliance, then code quality/failure paths/performance.\n- Return the exact commit for Plugin consumption.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-retrieval-vector-projectcontext-architecture-recovery1-requirement-design-2026-07-13.md",
+      "designIntent": "Make authoritative Recipe candidates and vector lifecycle boundaries shared, deterministic Core capabilities while preserving existing consumers.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "build",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "reader-writer-isolation-proof"
+          },
+          {
+            "kind": "retrieval-parity-proof"
+          },
+          {
+            "kind": "ranking-matrix-proof"
+          },
+          {
+            "kind": "lifecycle-proof"
+          },
+          {
+            "kind": "cancellation-proof"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T03:30:56.244Z"
+    },
+    {
+      "taskPackageId": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+      "summary": "Implement the one confirmed AlembicPlugin consumer package after accepted AlembicCore commit 7ccddf2372ddaeac2dbcfc1f651157d753709cd7. Baseline AlembicPlugin commit is be7bc058fcd188f38b48ee551f912377c2d19f1d; keep all work in AlembicPlugin and return one clean commit.\n\nP1 — request-scoped reader-only retrieval:\n- Consume the accepted Core public EmbeddingPort, VectorIndexReader, KnowledgeRetrievalPolicy/Port and raw candidate evidence.\n- Refactor public Search and Prime request graphs so they construct only snapshot DB truth, query embedding, a reader-only HNSW adapter and canonical retrieval. They must not construct IndexingPipeline, VectorService, VectorIndexWriter, lifecycle/reconcile/init/rescan/rebuild, or any write-shaped request adapter.\n- Search and Prime must use the same query/filter/topK candidate sequence. Remove Prime's independent 0.45/relative admission threshold and score calibration; Prime may only group/project the already-authoritative candidates and must expose bounded ordered candidateRecipeIds.\n- Preserve dense similarity/rank, sparse score/rank and per-lane/raw RRF contribution through public projection. With embeddings unavailable, sparse truth still works; empty authoritative knowledge returns empty.\n- Frozen eight English BiliDili query fixtures must be non-empty and place Recipe <redacted> in Top 3 without synonym hardcoding or Recipe edits.\n\nP2/P3 — shared real-time ProjectContext:\n- Add a Plugin-owned ProjectContextBuildSessionManager injected into Graph and Recipe Map, keyed by canonical real project root + normalized scope + source/manifest fact fingerprint (exists, size, high-resolution mtime, sha256), never Git state.\n- Merge same-key in-flight work and use ref-counted cancellation. Graph and Recipe Map consume one fact session; Map only adds deterministic Recipe mounts and must not rebuild source facts.\n- Route explicit file/symbol/sourceSlice/anchor requests through a narrow fast path before space/all-repo/map/module traversal. The containing repo identity may be read; unrelated repositories must not be scanned.\n- Full-space work publishes deterministic per-repository chunks. Repo failures/timeouts remain explicit coverage outcomes.\n- Add opaque, project-confined continuation with {resultRef,factSessionRef,nextCursor,hasMore,page,accumulatedCounts}. Pages are deterministic deltas and reconstruct without duplicates or missing stable IDs; partial results must stay honestly partial.\n- Store chunks only in owner-only OS/runtime temp, never projectRoot/dataRoot. Terminal consumption, explicit cancel, exception and TTL expiry must remove all temp files. Expired cursors return bounded retry guidance and need not survive process restart.\n- Propagate one AbortSignal from the unchanged 120-second host deadline through handler/session/Core ProjectContext; abort before response and wait for bounded cleanup acknowledgement so a slow worker actually stops.\n- Keep deprecated raw-path fullMapRef null; do not expose paths in result refs/cursors.\n\nBoundaries:\n- Preserve Guard as a read-only regression consumer; do not redesign Guard.\n- No persistent answer cache, knowledge writes, Git revision/checkpoint/dirty/branch checks, host-selected-project coupling, role/Admin/intent/knowledge-state/tool-visibility gates, hardcoded synonyms, Recipe edits, Test window, Alembic/AlembicAgent/AlembicDashboard source edits, vendor or release changes.\n- No higher heavy-tool deadline and no query-time vector maintenance.\n\nRequired verification/evidence:\n- Focused RED/GREEN tests for Search/Prime parity, orphan/deprecated truth, public raw evidence, reader-only fingerprint/zero mutation, BuildSession reuse/invalidation/ref-count cancellation, narrow fast path, 2+ cursor-page reconstruction, explicit repo failure, cursor confinement, terminal/cancel/error/TTL cleanup, and real worker-stop timeout.\n- Required Design commands: focused unit suites; Zod schema integration; full npm run test:unit; npm run build:check; npm run check; npm run build; npm run verify:codex-runtime-package; plugin package/manifest verification if defined by repository rules.\n- Record exact Core and Plugin commits, changed files/symbols, runtime/package entry hashes, zero-write fingerprints, and two-stage self-review (requirement compliance, then failure paths/performance/cleanup).\n- Do not claim final real BiliDili/AlembicWorkspace acceptance: controller will independently reload the canonical runtime and run the fixed BiliDili Search/Prime matrix plus dual-project Graph/Map/Guard, cursor, fast-path and zero-write checks after accepting this commit.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-retrieval-vector-projectcontext-architecture-requirement-design-2026-07-13.md",
+      "designIntent": "Make every public knowledge query request-scoped and reader-only, and make Graph/Map share a cancellable ephemeral fact build with honest pagination.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "One clean AlembicPlugin commit consuming exact Core commit 7ccddf2372ddaeac2dbcfc1f651157d753709cd7; clean tree and exact changed files."
+          },
+          {
+            "kind": "tests",
+            "verify": "Focused retrieval/session/schema/timeout suites plus full unit/check/build/package verification pass, with raw command summaries."
+          },
+          {
+            "kind": "reader-only-proof",
+            "verify": "Public Search/Prime runtime graph has no writer/lifecycle/indexing/reconcile/init/rescan/rebuild edge and protected data fingerprints remain unchanged."
+          },
+          {
+            "kind": "retrieval-parity-proof",
+            "verify": "Search and Prime ordered candidate IDs match; target Recipe is Top 3 for all eight frozen queries; raw dense/sparse/RRF evidence survives projection."
+          },
+          {
+            "kind": "build-session-proof",
+            "verify": "Same root/scope Graph and Recipe Map build facts once, source/manifest changes invalidate without Git, and explicit file/symbol uses the narrow path."
+          },
+          {
+            "kind": "continuation-proof",
+            "verify": "At least three pages reconstruct stable facts exactly once; cursor/ref is opaque/project-confined; repo failures remain explicit."
+          },
+          {
+            "kind": "cancellation-cleanup-proof",
+            "verify": "Unchanged 120-second deadline propagates AbortSignal to a real worker that stops; terminal/cancel/error/TTL leave zero temp files."
+          },
+          {
+            "kind": "self-review",
+            "verify": "Two-stage requirement and code-quality/failure-path/performance review completed with blockers resolved."
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "runtime-package-entry-proof"
+          },
+          {
+            "kind": "compatibility-proof"
+          },
+          {
+            "kind": "zero-write-fingerprint"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T04:21:45.919Z"
+    },
+    {
+      "taskPackageId": "p3-core-qwen-query-format-retrieval-quality-p1",
+      "summary": "Continue the same confirmed demand after controller real BiliDili acceptance exposed an in-scope Core defect and an unmet retrieval completion gate.\n\nAuthoritative raw evidence:\n- Accepted Core commit is 7ccddf2372ddaeac2dbcfc1f651157d753709cd7; AlembicCore worktree is clean.\n- Public Search and Prime candidate ordering now matches, but the frozen eight-query real BiliDili matrix places Recipe <redacted> at ranks 5, absent from Top 8, 1, 1, 1, absent from Top 8, 3, 2. Expanded Search ranks for the three failures are 7/16/17, with dense ranks 5/21/8 and sparse ranks 20/15/39.\n- OllamaEmbedProvider currently sends identical raw text from embedQuery and embedDocuments and declares formatProfile=symmetric for qwen3-embedding:0.6b.\n- Qwen3-Embedding's authoritative usage contract requires each query to carry a one-sentence task instruction while retrieval documents carry no instruction. Read-only probes show generic project-knowledge instructions materially improve the target dense ranks, proving the adapter defect, but the broad second query still remains below Top 3; query formatting alone is not sufficient.\n- Generic English stemming/question-stopword simulation alone also does not satisfy the matrix and regresses ordering, so do not land a blind tokenizer patch.\n- The target Recipe's actual authoritative content directly describes layered Features→Infrastructure→Core dependencies and forbidden feature-to-feature coupling; higher candidates for the failing broad query are mostly superficial Swift/app/module matches, so this is candidate-quality failure, not an unsupported frozen target.\n\nRequired repair:\n1. Make OllamaEmbedProvider purpose handling honest and provider-adapter-owned. For Qwen3 embedding models, embedQuery must apply one stable, generic software-project-knowledge retrieval instruction in the official Qwen format; embedDocuments and legacy document ingestion must remain byte-for-byte unprefixed. The capability descriptor must expose the real asymmetric format profile/input purposes. Do not leak model-specific prompt construction above the adapter and do not require rebuilding existing document vectors.\n2. Continue on the same canonical KnowledgeRetrievalPolicy chain and implement the smallest general candidate-quality correction needed for the real eight-query matrix. It must be principled for project knowledge, must preserve authoritative truth filtering, per-Recipe region aggregation, bounded refill, raw dense/sparse/RRF evidence and Search/Prime parity, and must not hardcode any frozen query term, BiliDili/SwiftPM synonym, target Recipe ID, or Recipe content. Do not tune RRF constants or add stemming unless adversarial and real evidence shows the change improves the entire matrix without degrading already-correct queries.\n3. Preserve vector reader/writer isolation, provider-independent maintenance, sparse fallback when embedding is unavailable, and zero query-time writes. No Plugin/Alembic/Test/vendor/release/data edits.\n\nRequired verification:\n- RED/GREEN provider tests assert exact Qwen query transport text, unchanged document transport text, honest capabilities, abort/batch behavior, and non-Qwen compatibility.\n- RED/GREEN canonical retrieval tests reproduce the real failure shape rather than fabricated always-winning ranks; include irrelevant Swift/app/module candidates and all eight frozen queries without special-case branches.\n- Run focused retrieval/vector tests, full Core test/check/build/public-surface gates, git show --check, and two-stage self-review.\n- Run a read-only real BiliDili snapshot probe from copied DB/vector/config artifacts only (never open live alembic.db directly), reporting all eight target ranks and protected live fingerprints before/after. Do not claim final public Search/Prime acceptance; controller will verify after Plugin consumes the exact Core commit.\n- Commit only AlembicCore and return exact commit, changed symbols, raw commands, runtime probe output, boundaries and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-retrieval-vector-projectcontext-architecture-requirement-design-2026-07-13.md",
+      "designIntent": "Keep model-purpose formatting inside the Core provider adapter, then improve canonical candidate quality generically at Core retrieval seams without query-specific synonyms, Recipe edits, or a Plugin-side prompt.",
+      "createdAt": "2026-07-13T07:55:06.115Z"
+    },
+    {
+      "taskPackageId": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+      "summary": "修复总控真实 BiliDili Graph/Recipe Map 验收暴露的同一 ProjectContext continuation 链缺陷：Graph 不得向 Core 发送不存在或大小写失真的 modulePath；Recipe Map rollup 必须按 nodeId 唯一；continuation 必须在 inline-byte 裁剪之前保存完整 bounded 结果，使多页 union 无重复、无缺失，并让 terminal status/conservation/region.truncated 反映完整分页后的真实状态。保持 shared fact session、5/5 repo progressive coverage、opaque cursor、只读快照、120 秒 deadline、清理与零写入边界。不要修改 Core、Recipe 数据、检索排名或插件外仓库。",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13/task-packages/p2-plugin-retrieval-vector-projectcontext-integration-p1.json",
+      "designIntent": "Keep Core strict, reconcile Plugin module seeds to existing canonical source paths, dedupe rollups by stable node id, and paginate the complete bounded Recipe Map before applying per-page inline budgets.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "One clean AlembicPlugin commit only; report exact parent and changed files."
+          },
+          {
+            "kind": "tests",
+            "verify": "Focused RED/GREEN tests prove invalid module seeds are not emitted, root rollup is unique, and 3+ Recipe Map pages reconstruct the full bounded baseline exactly once; run relevant Graph/Map/session/schema tests plus build:check."
+          },
+          {
+            "kind": "real-repro",
+            "verify": "Run the BiliDili full-space source-path probe: Graph reaches 5/5 with no project-context-invalid-scope; Recipe Map shares factSessionRef and terminal multi-page union has zero duplicate/missing stable IDs."
+          },
+          {
+            "kind": "reader-only-proof",
+            "verify": "BiliDili DB/WAL/SHM fingerprints remain unchanged and continuation artifacts clean after terminal consumption."
+          },
+          {
+            "kind": "self-review",
+            "verify": "Review failure paths, status/conservation honesty, cursor confinement, and no Core/data/ranking scope drift."
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "full-unit-suite"
+          },
+          {
+            "kind": "runtime-package-entry-proof"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T08:47:05.248Z"
+    },
+    {
+      "taskPackageId": "p5-plugin-search-fixture-schema-closure-p1",
+      "summary": "Close the only remaining demand-local integration regression after accepted Core schema evolution. Current AlembicPlugin HEAD must be d26fe67b3b25c653fddcca517b27de04a90ed7af and the worktree must be clean before editing. Reproduction is fixed: PublicOrphanVectorTruth.test.ts has 2 failures and ReadOnlySearchFingerprint.test.ts has 1 failure because their synthetic knowledge_entries tables omit dontClause while the accepted Core Search reader selects that field. Update only the minimal stale fixture schema/insert definitions needed for the current read contract. Do not change production Search/Prime behavior, Core, retrieval ranking, Graph/Recipe Map, real knowledge data, plugin packaging, or any repository outside AlembicPlugin. Add or retain an assertion that the fixtures exercise the real reader path rather than bypassing it. Verify the two focused files pass, then run the full Plugin unit suite and build:check; review git diff/check, commit only AlembicPlugin, and return the exact parent/commit, changed files, command summaries, and two-stage self-review. This is a test-fixture compatibility closure, not authority to reopen vector ranking or redesign retrieval.",
+      "status": "accepted",
+      "sourceRef": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13/target-results/tr-p4-plugin-graph-recipemap-real-acceptance-defects-t1.json",
+      "designIntent": "Keep current production behavior unchanged and align the two stale synthetic knowledge_entries schemas with the accepted Core read contract so the Plugin unit suite is again trustworthy.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "One clean AlembicPlugin commit on parent d26fe67b3b25c653fddcca517b27de04a90ed7af; report exact changed files and git diff --check."
+          },
+          {
+            "kind": "tests",
+            "verify": "PublicOrphanVectorTruth.test.ts and ReadOnlySearchFingerprint.test.ts pass, followed by the complete npm run test:unit suite and npm run build:check."
+          },
+          {
+            "kind": "self-review",
+            "verify": "Stage 1 confirms only current Core fixture compatibility; Stage 2 confirms no production Search/Prime/ranking/Graph/Map/data or cross-repository drift."
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green-note"
+          },
+          {
+            "kind": "scope-diff"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T09:54:12.344Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p1-core-retrieval-vector-projectcontext-architecture-t1",
+      "taskPackageId": "p1-core-retrieval-vector-projectcontext-architecture-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Implement one combined AlembicCore producer package for the confirmed retrieval/vector/ProjectContext architecture.\n\nRequired implementation:\n- Add an EmbeddingPort with embedQuery/embedDocuments and an explicit provider/model/dimension descriptor; adapt existing providers without exposing provider details to callers.\n- Split VectorIndexReader from VectorIndexWriter. Query/search/Prime/RecipeContext construction may depend only on the reader. Indexing, reconcile and lifecycle maintenance own the writer.\n- Introduce canonical KnowledgeRetrievalCandidate, HybridCandidateRetriever, KnowledgeTruthProjector and bounded refill. Make Search, Prime and RecipeContext use the same KnowledgeRetrievalPort semantics.\n- Preserve raw dense, sparse and RRF contribution evidence; remove per-page max normalization that makes broad English ranking unstable.\n- Evolve SyncCoordinator into provider-independent VectorLifecycleCoordinator while retaining a compatibility facade for existing consumers. Removal/cleanup must not require embedding availability; live replacement remains safe.\n- Extend ProjectContext execution with an optional non-serialized AbortSignal request option so Plugin can enforce real cancellation without changing persisted/public schemas.\n- Add deterministic tests for the fixed eight-query BiliDili-style matrix and authoritative Recipe id <redacted> using fixtures at Core seams; do not hardcode query synonyms or edit Recipe content.\n\nCompatibility and non-goals:\n- Preserve current public consumers and existing source-truth/refill/filter behavior.\n- No Plugin, Alembic main, Test, vendor, release, real knowledge data, Git/revision/checkpoint, host-project, role/Admin, intent, knowledge-state or tool-visibility changes.\n- No query-time writes and no provider-specific policy leaking into retrieval contracts.\n\nRequired evidence:\n- Commit only AlembicCore.\n- Focused RED/GREEN tests for reader/writer isolation, shared Search/Prime retrieval parity, refill/truth projection, raw score contribution stability, provider-independent lifecycle removal, cancellation, and eight-query ranking.\n- Full Core unit suite, typecheck/check, build, exact changed files/symbols and compatibility review.\n- Two-stage self-review: requirement compliance, then code quality/failure paths/performance.\n- Return the exact commit for Plugin consumption.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T03:30:56.244Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-core-retrieval-vector-projectcontext-architecture-p1__AlembicCore__p1-core-retrieval-vector-projectcontext-architecture-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-retrieval-vector-projectcontext-architecture-p1__AlembicCore__p1-core-retrieval-vector-projectcontext-architecture-t1.json",
+        "deliveryRunId": "run-delivery-p1-core-retrieval-vector-projectcontext-architecture-p1__AlembicCore__p1-core-retrieval-vector-projectcontext-architecture-t1",
+        "dispatchGroup": "p1-core-retrieval-vector-projectcontext-architecture-p1",
+        "sentAt": "2026-07-13T03:31:48.781Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-core-retrieval-vector-projectcontext-architecture-t1"
+    },
+    {
+      "targetTaskId": "p2-plugin-retrieval-vector-projectcontext-integration-t1",
+      "taskPackageId": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Integrate accepted Core commit 7ccddf2372ddaeac2dbcfc1f651157d753709cd7 into one AlembicPlugin package for canonical five-tool retrieval and cancellable shared ProjectContext sessions.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T04:21:45.919Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 3,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1.json",
+        "deliveryRunId": "run-delivery-p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1",
+        "dispatchGroup": "p2-plugin-retrieval-vector-projectcontext-integration-rework2-p1",
+        "sentAt": "2026-07-13T06:44:47.230Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-plugin-retrieval-vector-projectcontext-integration-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p3-core-qwen-query-format-retrieval-quality-t1",
+      "taskPackageId": "p3-core-qwen-query-format-retrieval-quality-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Continue the same confirmed demand after controller real BiliDili acceptance exposed an in-scope Core defect and an unmet retrieval completion gate.\n\nAuthoritative raw evidence:\n- Accepted Core commit is 7ccddf2372ddaeac2dbcfc1f651157d753709cd7; AlembicCore worktree is clean.\n- Public Search and Prime candidate ordering now matches, but the frozen eight-query real BiliDili matrix places Recipe <redacted> at ranks 5, absent from Top 8, 1, 1, 1, absent from Top 8, 3, 2. Expanded Search ranks for the three failures are 7/16/17, with dense ranks 5/21/8 and sparse ranks 20/15/39.\n- OllamaEmbedProvider currently sends identical raw text from embedQuery and embedDocuments and declares formatProfile=symmetric for qwen3-embedding:0.6b.\n- Qwen3-Embedding's authoritative usage contract requires each query to carry a one-sentence task instruction while retrieval documents carry no instruction. Read-only probes show generic project-knowledge instructions materially improve the target dense ranks, proving the adapter defect, but the broad second query still remains below Top 3; query formatting alone is not sufficient.\n- Generic English stemming/question-stopword simulation alone also does not satisfy the matrix and regresses ordering, so do not land a blind tokenizer patch.\n- The target Recipe's actual authoritative content directly describes layered Features→Infrastructure→Core dependencies and forbidden feature-to-feature coupling; higher candidates for the failing broad query are mostly superficial Swift/app/module matches, so this is candidate-quality failure, not an unsupported frozen target.\n\nRequired repair:\n1. Make OllamaEmbedProvider purpose handling honest and provider-adapter-owned. For Qwen3 embedding models, embedQuery must apply one stable, generic software-project-knowledge retrieval instruction in the official Qwen format; embedDocuments and legacy document ingestion must remain byte-for-byte unprefixed. The capability descriptor must expose the real asymmetric format profile/input purposes. Do not leak model-specific prompt construction above the adapter and do not require rebuilding existing document vectors.\n2. Continue on the same canonical KnowledgeRetrievalPolicy chain and implement the smallest general candidate-quality correction needed for the real eight-query matrix. It must be principled for project knowledge, must preserve authoritative truth filtering, per-Recipe region aggregation, bounded refill, raw dense/sparse/RRF evidence and Search/Prime parity, and must not hardcode any frozen query term, BiliDili/SwiftPM synonym, target Recipe ID, or Recipe content. Do not tune RRF constants or add stemming unless adversarial and real evidence shows the change improves the entire matrix without degrading already-correct queries.\n3. Preserve vector reader/writer isolation, provider-independent maintenance, sparse fallback when embedding is unavailable, and zero query-time writes. No Plugin/Alembic/Test/vendor/release/data edits.\n\nRequired verification:\n- RED/GREEN provider tests assert exact Qwen query transport text, unchanged document transport text, honest capabilities, abort/batch behavior, and non-Qwen compatibility.\n- RED/GREEN canonical retrieval tests reproduce the real failure shape rather than fabricated always-winning ranks; include irrelevant Swift/app/module candidates and all eight frozen queries without special-case branches.\n- Run focused retrieval/vector tests, full Core test/check/build/public-surface gates, git show --check, and two-stage self-review.\n- Run a read-only real BiliDili snapshot probe from copied DB/vector/config artifacts only (never open live alembic.db directly), reporting all eight target ranks and protected live fingerprints before/after. Do not claim final public Search/Prime acceptance; controller will verify after Plugin consumes the exact Core commit.\n- Commit only AlembicCore and return exact commit, changed symbols, raw commands, runtime probe output, boundaries and residual risks.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T07:55:06.115Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-core-qwen-query-format-retrieval-quality-rework1-p1__AlembicCore__p3-core-qwen-query-format-retrieval-quality-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-qwen-query-format-retrieval-quality-rework1-p1__AlembicCore__p3-core-qwen-query-format-retrieval-quality-t1.json",
+        "deliveryRunId": "run-p3-core-qwen-query-format-retrieval-quality-rework1-p1-scope-stop",
+        "dispatchGroup": "p3-core-qwen-query-format-retrieval-quality-rework1-p1",
+        "sentAt": "2026-07-13T08:38:27.846Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-core-qwen-query-format-retrieval-quality-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+      "taskPackageId": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "合并修复 Graph invalid module seed、Recipe Map 重复 root rollup、pre-pagination budget 丢失三项真实验收缺陷，并返回一个 AlembicPlugin 提交与聚焦回归证据。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T08:47:05.248Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-plugin-graph-recipemap-real-acceptance-defects-p1__AlembicPlugin__p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-graph-recipemap-real-acceptance-defects-p1__AlembicPlugin__p4-plugin-graph-recipemap-real-acceptance-defects-t1.json",
+        "deliveryRunId": "run-p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+        "dispatchGroup": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+        "sentAt": "2026-07-13T08:47:48.783Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-plugin-graph-recipemap-real-acceptance-defects-t1"
+    },
+    {
+      "targetTaskId": "p5-plugin-search-fixture-schema-closure-t1",
+      "taskPackageId": "p5-plugin-search-fixture-schema-closure-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Synchronize the two stale Search fixture schemas with the accepted Core read contract and restore the full AlembicPlugin unit suite without production-code changes.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T09:54:12.344Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-plugin-search-fixture-schema-closure-p1__AlembicPlugin__p5-plugin-search-fixture-schema-closure-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-search-fixture-schema-closure-p1__AlembicPlugin__p5-plugin-search-fixture-schema-closure-t1.json",
+        "deliveryRunId": "run-p5-plugin-search-fixture-schema-closure-p1-readback1",
+        "dispatchGroup": "p5-plugin-search-fixture-schema-closure-p1",
+        "sentAt": "2026-07-13T09:55:48.331Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-plugin-search-fixture-schema-closure-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-core-retrieval-vector-projectcontext-architecture-p1",
+        "p3-core-qwen-query-format-retrieval-quality-p1"
+      ],
+      "targetTaskIds": [
+        "p1-core-retrieval-vector-projectcontext-architecture-t1",
+        "p3-core-qwen-query-format-retrieval-quality-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+        "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+        "p5-plugin-search-fixture-schema-closure-p1"
+      ],
+      "targetTaskIds": [
+        "p2-plugin-retrieval-vector-projectcontext-integration-t1",
+        "p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+        "p5-plugin-search-fixture-schema-closure-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p5-plugin-search-fixture-schema-closure-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-07-13T03:30:56.290Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "executionPlacement": {
+    "mode": "main",
+    "podId": null
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p5-plugin-search-fixture-schema-closure-p1__AlembicPlugin__p5-plugin-search-fixture-schema-closure-t1",
+    "lastDeliveryRunId": "run-p5-plugin-search-fixture-schema-closure-p1-readback1",
+    "lastDispatchGroup": "p5-plugin-search-fixture-schema-closure-p1",
+    "lastTargetTaskId": "p5-plugin-search-fixture-schema-closure-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-07-13T09:55:48.346Z"
+  }
+}

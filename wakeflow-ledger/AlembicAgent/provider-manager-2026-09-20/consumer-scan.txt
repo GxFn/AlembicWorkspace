@@ -1,0 +1,135 @@
+manager consumer boundaries
+$ rg -n AiProviderManager|setEmbedProvider|setTokenRecorder|_bindDiSync|_bindDependentClearer|_bindEmbedFallbackInit|reloadAiProvider src test ../Alembic/lib/injection ../Alembic/lib/http/routes/ai.ts
+../Alembic/lib/http/routes/ai.ts:344: * 获取当前 AI 配置（优先从 AiProviderManager 读取）
+../Alembic/lib/http/routes/ai.ts:363: * 更新 AI 配置（切换提供商/模型）— 通过 AiProviderManager 统一热切换
+../Alembic/lib/http/routes/ai.ts:385:    // 通过 reloadAiProvider → AiProviderManager.switchProvider() 统一热切换
+../Alembic/lib/http/routes/ai.ts:387:    container.reloadAiProvider(newProvider as unknown as Record<string, unknown>);
+../Alembic/lib/http/routes/ai.ts:388:    logger.info('AI provider switched via AiProviderManager', {
+../Alembic/lib/http/routes/ai.ts:907:    // 尝试热切换 AI Provider（通过 AiProviderManager 统一处理）
+../Alembic/lib/http/routes/ai.ts:914:      container.reloadAiProvider(newProvider as unknown as Record<string, unknown>);
+../Alembic/lib/http/routes/ai.ts:915:      logger.info('AI provider hot-swapped via AiProviderManager after env update', {
+test/ai-provider-manager.test.ts:3:import { AiProviderManager, type ManagedAiProvider, type SwitchResult } from '../src/ai/index.js';
+test/ai-provider-manager.test.ts:17:describe('AiProviderManager usage ownership', () => {
+test/ai-provider-manager.test.ts:19:    const manager = new AiProviderManager(provider('initial'));
+test/ai-provider-manager.test.ts:22:    manager.setTokenRecorder({ record });
+test/ai-provider-manager.test.ts:24:    manager._bindDiSync((p) => {
+test/ai-provider-manager.test.ts:40:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:42:    manager.setTokenRecorder({ record });
+test/ai-provider-manager.test.ts:50:    manager.setEmbedProvider(initial);
+test/ai-provider-manager.test.ts:69:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:71:    manager.setTokenRecorder({ record });
+test/ai-provider-manager.test.ts:123:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:125:    manager.setTokenRecorder({ record });
+test/ai-provider-manager.test.ts:126:    manager.setEmbedProvider(embedding);
+test/ai-provider-manager.test.ts:130:    manager._bindEmbedFallbackInit(() => embedding);
+test/ai-provider-manager.test.ts:133:    manager.setTokenRecorder({ record });
+test/ai-provider-manager.test.ts:149:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:153:    manager.setTokenRecorder({ record });
+test/ai-provider-manager.test.ts:167:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:169:    manager.setTokenRecorder({ record });
+test/ai-provider-manager.test.ts:175:describe('AiProviderManager routing lifecycle', () => {
+test/ai-provider-manager.test.ts:178:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:205:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:210:    manager._bindDiSync(() => pending);
+test/ai-provider-manager.test.ts:224:    manager._bindDiSync(() => {});
+test/ai-provider-manager.test.ts:239:    const manager = new AiProviderManager(provider('initial'));
+test/ai-provider-manager.test.ts:240:    manager.setTokenRecorder({
+test/ai-provider-manager.test.ts:260:    const manager = new AiProviderManager(provider('initial'));
+test/ai-provider-manager.test.ts:273:    manager._bindDependentClearer(() => ['search']);
+test/ai-provider-manager.test.ts:287:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:292:        () => manager.setEmbedProvider(provider('nested-embedding')),
+test/ai-provider-manager.test.ts:305:    manager.setEmbedProvider(provider('standalone-embedding'));
+test/ai-provider-manager.test.ts:318:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:319:    manager.setEmbedProvider(embedding);
+test/ai-provider-manager.test.ts:325:    manager._bindDiSync((p, e) => {
+test/ai-provider-manager.test.ts:332:    manager._bindDependentClearer(() => {
+test/ai-provider-manager.test.ts:354:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:355:    manager._bindDiSync(() => {
+test/ai-provider-manager.test.ts:368:    manager._bindDiSync((p) => {
+test/ai-provider-manager.test.ts:382:    const manager = new AiProviderManager(initial);
+test/ai-provider-manager.test.ts:383:    manager.setEmbedProvider(embedding);
+test/ai-provider-manager.test.ts:387:    manager._bindDiSync(sync);
+test/ai-provider-manager.test.ts:388:    manager._bindDependentClearer(clear);
+test/ai-provider-manager.test.ts:390:    manager._bindEmbedFallbackInit(() => {
+test/ai-provider-manager.test.ts:404:describe('AiProviderManager', () => {
+test/ai-provider-manager.test.ts:424:    const manager = new AiProviderManager(initialProvider);
+test/ai-provider-manager.test.ts:426:    manager.setTokenRecorder({
+../Alembic/lib/injection/modules/AiModule.ts:9: *   - AiProviderManager 统一管理层
+../Alembic/lib/injection/modules/AiModule.ts:16:import { AiProviderManager, type ManagedAiProvider } from '@alembic/agent/ai';
+../Alembic/lib/injection/modules/AiModule.ts:26: * 3. 创建 AiProviderManager（统一管理层）
+../Alembic/lib/injection/modules/AiModule.ts:68:  // ── 创建 AiProviderManager（统一管理层）──
+../Alembic/lib/injection/modules/AiModule.ts:108:    manager.setEmbedProvider(initialEmbed);
+../Alembic/lib/injection/modules/AiModule.ts:115: * 被 initEmbeddingFallback() 和 AiProviderManager 的 embedFallbackInit 回调共用
+../Alembic/lib/injection/modules/AiModule.ts:172:  const manager = c.singletons._aiProviderManager as AiProviderManager | null;
+../Alembic/lib/injection/modules/AiModule.ts:182:): AiProviderManager | null {
+../Alembic/lib/injection/modules/AiModule.ts:189:  const existing = c.singletons._aiProviderManager as AiProviderManager | null | undefined;
+../Alembic/lib/injection/modules/AiModule.ts:194:  const manager = new AiProviderManager(provider);
+../Alembic/lib/injection/modules/AiModule.ts:199:  manager._bindDiSync((nextProvider, embed) => {
+../Alembic/lib/injection/modules/AiModule.ts:205:  manager._bindDependentClearer(() => clearAiDependentSingletons(c));
+../Alembic/lib/injection/modules/AiModule.ts:208:  manager._bindEmbedFallbackInit((currentProvider) => {
+../Alembic/lib/injection/modules/AiModule.ts:226:export function attachTokenRecorder(c: ServiceContainer, manager: AiProviderManager): void {
+../Alembic/lib/injection/modules/AiModule.ts:228:  manager.setTokenRecorder({
+src/ai/index.ts:3:export * from './AiProviderManager.js';
+../Alembic/lib/injection/ServiceContainer.ts:120:      // 哪些 singleton key 持有 aiProvider 引用，在 reloadAiProvider() 时需要清除
+../Alembic/lib/injection/ServiceContainer.ts:169:   * 委托给 AiProviderManager.switchProvider() — 原子操作:
+../Alembic/lib/injection/ServiceContainer.ts:176:  reloadAiProvider(newProvider: Record<string, unknown> | null) {
+../Alembic/lib/injection/ServiceContainer.ts:178:      this.logger.warn('[ServiceContainer] reloadAiProvider called with null — ignored');
+../Alembic/lib/injection/ServiceMap.ts:28:import type { AiProvider, AiProviderManager } from '@alembic/agent/ai';
+../Alembic/lib/injection/ServiceMap.ts:159:  aiProviderManager: AiProviderManager | null;
+src/ai/AiProviderManager.ts:2: * AiProviderManager — 宿主可注入的 Provider 路由生命周期。
+src/ai/AiProviderManager.ts:33:export class AiProviderManager {
+src/ai/AiProviderManager.ts:279:      this.#logger[level](`[AiProviderManager] ${event}`, details);
+src/ai/AiProviderManager.ts:291:  setEmbedProvider(ep: ManagedAiProvider | null): void {
+src/ai/AiProviderManager.ts:306:  setTokenRecorder(recorder: TokenRecorder): void {
+src/ai/AiProviderManager.ts:327:  _bindDependentClearer(fn: () => string[]): void {
+src/ai/AiProviderManager.ts:332:  _bindEmbedFallbackInit(fn: EmbedFallbackInitializer): void {
+src/ai/AiProviderManager.ts:337:  _bindDiSync(fn: (provider: ManagedAiProvider, embed: ManagedAiProvider | null) => void): void {
+
+
+old public type and test ownership
+$ git grep -n -E AiProviderManager|TokenUsagePayload|EmbedFallbackInitializer 8f58bde -- src/ai test/ai-provider.test.ts
+8f58bde:src/ai/AiProviderManager.ts:2: * AiProviderManager — 统一 AI 提供商管理器（切面层）
+8f58bde:src/ai/AiProviderManager.ts:27:  _onTokenUsage?: ((usage: TokenUsagePayload) => void) | null;
+8f58bde:src/ai/AiProviderManager.ts:32:export interface TokenUsagePayload {
+8f58bde:src/ai/AiProviderManager.ts:69:export type EmbedFallbackInitializer = (
+8f58bde:src/ai/AiProviderManager.ts:75:export class AiProviderManager {
+8f58bde:src/ai/AiProviderManager.ts:86:  #embedFallbackInit: EmbedFallbackInitializer | null = null;
+8f58bde:src/ai/AiProviderManager.ts:197:    this.#logger.info('[AiProviderManager] Provider switched', {
+8f58bde:src/ai/AiProviderManager.ts:236:    p._onTokenUsage = (usage: TokenUsagePayload) => {
+8f58bde:src/ai/AiProviderManager.ts:276:  _bindEmbedFallbackInit(fn: EmbedFallbackInitializer): void {
+8f58bde:src/ai/index.ts:3:export * from './AiProviderManager.js';
+8f58bde:test/ai-provider.test.ts:4:  AiProviderManager,
+8f58bde:test/ai-provider.test.ts:216:describe('AiProviderManager', () => {
+8f58bde:test/ai-provider.test.ts:236:    const manager = new AiProviderManager(initialProvider);
+
+
+new responsibility seams
+$ rg -n ^export|^describe|^  it src/ai/management test/ai-provider-manager.test.ts
+test/ai-provider-manager.test.ts:17:describe('AiProviderManager usage ownership', () => {
+test/ai-provider-manager.test.ts:18:  it('keeps the ownership marker when a host decorates a candidate hook before a failed switch', () => {
+test/ai-provider-manager.test.ts:38:  it('respects a host decorator after binding without double-counting or deduplicating later events', () => {
+test/ai-provider-manager.test.ts:60:  it('keeps the original observer and records an old in-flight SDK response under its request model', async () => {
+test/ai-provider-manager.test.ts:118:  it('tracks emitted embedding usage and does not stack hooks when providers are reused', () => {
+test/ai-provider-manager.test.ts:145:  it('isolates recorder failure from the existing observer without retrying a possible write', () => {
+test/ai-provider-manager.test.ts:160:  it.each([
+test/ai-provider-manager.test.ts:175:describe('AiProviderManager routing lifecycle', () => {
+test/ai-provider-manager.test.ts:176:  it('observes an asynchronous capability rejection and requires repair of the synchronous contract', async () => {
+test/ai-provider-manager.test.ts:202:  it('rejects asynchronous DI hooks and blocks another switch until the invalid hook settles', async () => {
+test/ai-provider-manager.test.ts:233:  it('isolates asynchronous observer failures and reports them without copying error payloads', async () => {
+test/ai-provider-manager.test.ts:259:  it('uses a stable listener snapshot and isolates result mutation during notification', () => {
+test/ai-provider-manager.test.ts:284:  it('rejects routing mutation during a switch and releases the guard after completion', () => {
+test/ai-provider-manager.test.ts:309:  it.each([
+test/ai-provider-manager.test.ts:351:  it('marks a failed compensation as recovery-required and allows a later successful switch', () => {
+test/ai-provider-manager.test.ts:376:  it('keeps the old provider and embedding when candidate preparation fails', () => {
+test/ai-provider-manager.test.ts:404:describe('AiProviderManager', () => {
+test/ai-provider-manager.test.ts:405:  it('rewires token tracking and emits switch events when routing providers', () => {
+src/ai/management/ProviderUsageTracker.ts:7:export class ProviderUsageTracker {
+src/ai/management/contracts.ts:5:export interface ManagedAiProvider {
+src/ai/management/contracts.ts:14:export interface TokenUsagePayload extends TokenUsage {
+src/ai/management/contracts.ts:22:export interface TokenRecorder {
+src/ai/management/contracts.ts:33:export interface ProviderInfo {
+src/ai/management/contracts.ts:41:export interface SwitchResult {
+src/ai/management/contracts.ts:48:export type SwitchListener = (result: SwitchResult) => void;
+src/ai/management/contracts.ts:51:export type EmbedFallbackInitializer = (
+src/ai/management/observers.ts:2:export function isThenable(value: unknown): value is PromiseLike<unknown> {
+src/ai/management/observers.ts:11:export function observeSafely(operation: () => unknown, onFailure: () => void): void {

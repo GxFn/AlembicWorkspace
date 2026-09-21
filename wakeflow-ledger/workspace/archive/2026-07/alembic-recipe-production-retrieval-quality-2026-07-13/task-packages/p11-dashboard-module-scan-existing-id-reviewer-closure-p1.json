@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p11-dashboard-module-scan-existing-id-reviewer-closure-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "让 Dashboard 严格消费 Alembic P10 的 module-scan existing-ID 结果合同，正确呈现 completed/empty/skipped/failed/partial，并通过 GET/PATCH/合法 publish 审阅现有 Recipe，彻底闭合 reviewer 链。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "Dashboard 只审阅由四类生产入口创建的现有 pending/staging Recipe；它必须忠实呈现 Alembic module-scan 的领域结果与故障状态，不创建、不自动发布。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "One clean AlembicDashboard commit limited to the authoritative existing-ID reviewer correction."
+      },
+      {
+        "kind": "test",
+        "verify": "Executable tests cover exact backend normalization, all named outcomes, existing-ID review, and absence of create/auto-publish."
+      },
+      {
+        "kind": "runtime",
+        "verify": "Reviewable API/App chain evidence proves GET(existingId)→PATCH review→explicit publish only, with no fifth producer."
+      },
+      {
+        "kind": "visual",
+        "verify": "Browser or screenshot evidence covers completed, empty, failed, and partial user-visible states; fixture use is labeled and not claimed as backend connectivity."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "diff"
+      },
+      {
+        "kind": "self-review"
+      },
+      {
+        "kind": "call-chain"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T21:44:11.475Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p11-dashboard-module-scan-existing-id-reviewer-closure-t1",
+      "taskPackageId": "p11-dashboard-module-scan-existing-id-reviewer-closure-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "仅修改 AlembicDashboard 仓库。以上游已验收 Alembic commits 3ff157a66275e6ef13549fde1dbe3547194008ae 与 e0cd0f018c3b6b436325da94769c3a99482616e1 的 `ModuleScanProjectResult` 为真实后端合同，修复当前 `src/api/modules.ts` 丢弃 `outcome/errors/batches`、`App.handleScanProject` 把失败/空结果与 scannedFiles 混成成功提示、`resolveExistingRecipeId` 仅取任一 ID 而未验证权威 envelope 的缺口。新增可执行的 response normalizer/view model：只接收 status=created、lifecycle=pending|staging、非空且完全相等的 id/candidateId；非法项必须丢弃并保留可诊断信息，禁止从 title/provider 文本补 ID。UI 必须分别处理 completed（展示 existing ID 并通过 GET 打开 reviewer）、partial（保留已成功 ID，同时明确显示 errors、batch 与 operationMayContinue）、failed（不显示成功 Recipe，展示失败代码/消息）、empty（无新 Recipe）和 skipped（AI unavailable/明确原因）；不得把 transport success 当作生产成功，也不得仅凭 scannedFiles 宣告 Recipe 成功。保留旧 P8 已完成的 profile/readiness/generation reviewer、完整 PATCH round-trip 与显式合法 publish，但补足真实 module-scan response 消费证据；禁止 `knowledgeCreate`、POST `/knowledge`、auto-publish、candidate promotion 或任何第五生产入口。补充可执行 normalizer/API/App interaction contract tests，覆盖 pending/staging 正向、id mismatch、blank ID、active lifecycle、zero-submit empty、Agent failed、partial timeout 与 operationMayContinue；证明点击审阅只调用 `knowledgeGet(existingId)`，保存只 PATCH，发布仅用户确认后的 lifecycle publish。运行 `npm run check`、类型、构建、API drift/边界门禁，提交单一干净 Dashboard commit。按 Dashboard 规则对 completed/empty/failed/partial 的用户可见状态做浏览器/截图验证；fixture 可用于 UI 状态渲染但不得冒充真实后端连通性。旧 p8 accepted 事件不作为最终完成证据，本任务结果才是 Dashboard reviewer 真实链的权威验收输入。",
+      "status": "pending",
+      "createdAt": "2026-07-13T21:44:11.475Z"
+    }
+  ]
+}

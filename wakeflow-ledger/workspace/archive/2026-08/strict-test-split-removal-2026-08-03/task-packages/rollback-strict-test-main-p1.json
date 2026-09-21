@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rollback-strict-test-main-p1",
+  "demandKey": "strict-test-split-removal-2026-08-03",
+  "summary": "移除 Alembic Main 中被否决的独立 strict-test-dimension 私有管线和公开 API",
+  "status": "pending",
+  "sourceRef": null,
+  "contextVersion": 1,
+  "workType": "implementation",
+  "objective": "用精确逆向提交删除 Alembic Main 的独立 strict-test-dimension 路由、契约、运行时/编排器、探针与聚焦测试，同时保留通用 strict production/cold-start 代码。",
+  "contextSummary": [
+    "控制器已在干净临时克隆中按顺序模拟回滚 b50bff1、3a591f5、7df0517、07ec740、b0f3f31，无冲突且 git diff --check 通过。",
+    "当前 Alembic Main 基线为 b50bff157448b4986064ddbe20d8d2ad9305c738，工作树在派发前应保持干净。",
+    "这是纯删除任务；不得设计替代测试模式，也不得改变 Dashboard、Agent、Core 或 DaemonJob。"
+  ],
+  "requirementRefs": [
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#user-decision",
+      "role": "goal",
+      "label": "用户否决与删除授权"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#verified-rollback-authority",
+      "role": "evidence",
+      "label": "提交归因与无冲突回滚模拟"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#dependency-order",
+      "role": "constraint",
+      "label": "消费者优先的回滚顺序"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#completion-definition",
+      "role": "completion",
+      "label": "纯删除验收定义"
+    }
+  ],
+  "boundaries": {
+    "inScope": [
+      "按顺序 revert b50bff157448b4986064ddbe20d8d2ad9305c738、3a591f59d0b3cf598a0cdb8901034672094a5e23、7df05174c5df6319c3e183405e0655cc556594c9、07ec74090a633a0d5a0ca9f340a18915fbc76499、b0f3f31494c991030f4aeae7bff75f99a07253dd",
+      "删除由上述提交引入的 dedicated HTTP route、generated/provider contract、request/public contracts、private workspace、runtime/orchestrator、probe 与 focused tests",
+      "运行完整仓库检查和独立 strict-test-dimension 公共表面零残留扫描"
+    ],
+    "outOfScope": [
+      "Dashboard、Agent、Core、Plugin 代码",
+      "正确测试模式的状态、入口、维度选择或管线设计",
+      "DaemonJob、legacy bootstrap 与生产冷启动行为的其他调整"
+    ],
+    "forbidden": [
+      "设计或实现替代测试模式",
+      "恢复 legacy bootstrap、ALEMBIC_TEST_MODE、Plugin testMode 或 DaemonJob 路径",
+      "把历史 Wakeflow 证据改写成已接受或已完成",
+      "修改本任务包未列出的其他仓库",
+      "宽泛删除被否决分叉复用的通用 strict production/cold-start 实现",
+      "用手写重构替代指定提交的精确逆向变更，除非仅为解决回滚后由该分叉造成的编译残留"
+    ]
+  },
+  "completionExpectations": [
+    "提交精确回滚结果，列出新 commit SHA 与每个原提交的对应关系。",
+    "报告完整检查命令、退出码和独立 strict-test-dimension 零残留扫描。",
+    "提供 git status --short 为空以及自审说明：未设计替代模式、未触碰 DaemonJob/legacy/Dashboard/Agent/Core。"
+  ],
+  "dependsOnTaskIds": [],
+  "commitExpectation": "commit",
+  "acceptanceAnchors": [
+    {
+      "id": "main-exact-revert-lineage",
+      "claim": "五个已归因提交被逐一逆向且不相关历史保持不变",
+      "probe": "审查新提交父链、git show --stat/--name-status，并确认每个指定 SHA 均有对应 revert 记录",
+      "expected": "一个或一组干净回滚提交只包含指定分叉的逆向差异，无无关文件变更"
+    },
+    {
+      "id": "main-public-surface-absent",
+      "claim": "Alembic Main 不再发布或执行独立 strict-test-dimension API/私有管线",
+      "probe": "对路由、生成 API operation、请求/公开契约、orchestrator/runtime/private workspace、probe、package script 与 focused tests 做 rg 和类型/生成一致性检查",
+      "expected": "被否决分叉的公开和运行时符号零残留，生成物与源码一致"
+    },
+    {
+      "id": "main-shared-production-preserved",
+      "claim": "通用 strict production/cold-start 能力未被连带删除",
+      "probe": "运行仓库 full check 以及覆盖共享 strict production 路径的现有测试",
+      "expected": "完整检查通过，现有通用生产链路保持可构建和可测试"
+    }
+  ],
+  "createdAt": "2026-08-03T14:46:34.040Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rollback-strict-test-main-t1",
+      "taskPackageId": "rollback-strict-test-main-p1",
+      "targetWindow": "Alembic",
+      "summary": "移除 Alembic Main 中被否决的独立 strict-test-dimension 私有管线和公开 API",
+      "status": "pending",
+      "createdAt": "2026-08-03T14:46:34.040Z"
+    }
+  ]
+}

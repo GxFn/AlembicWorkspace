@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-core-terminal-recipe-vector-removal-contract-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p3-core-terminal-recipe-vector-removal-contract-p1",
+  "dispatchGroup": "p3-core-terminal-recipe-vector-removal-contract-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p3-core-terminal-recipe-vector-removal-contract-t1",
+  "status": "completed",
+  "summary": "AlembicCore now exposes the awaited RecipeVectorTruthRemover.removeRecipeByIdentity(recipeId) contract through @alembic/core/vector and VectorServiceConfig. VectorLifecycleCoordinator routes knowledge:deleted and lifecycle transitions to deprecated through the explicit Recipe identity remover, never infers terminal intent from current-reader ids, keeps live upsert/reconcile legacy entry retirement separate, awaits cleanup, and preserves failed identities for explicit flush/destroy retry. The single-store compatibility adapter remains provider-independent; multi-generation hosts inject the storage implementation that removes base residue and every known generation. Commit 4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4 is clean on parent b711ea10aa5c67d1d75a58a18c0d56623e26c290.",
+  "evidenceRefs": [
+    "AlembicCore@4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4",
+    "AlembicCore/src/service/vector/SyncCoordinator.ts",
+    "AlembicCore/src/service/vector/VectorService.ts",
+    "AlembicCore/src/vector.ts",
+    "AlembicCore/src/shared/DiagnosticCodes.ts",
+    "AlembicCore/config/error-registry.json",
+    "AlembicCore/scripts/smoke-public-api.mjs",
+    "AlembicCore/test/SyncCoordinator.test.ts",
+    "AlembicCore/test/VectorService.test.ts",
+    ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/tr-p2-plugin-recipe-production-generation-adapter-t1.json"
+  ],
+  "verification": [
+    "Baseline: HEAD b711ea10aa5c67d1d75a58a18c0d56623e26c290 clean; npx vitest run test/SyncCoordinator.test.ts test/RecipeVectorGeneration.test.ts test/unit/KnowledgeService.test.ts => 3 files / 87 tests passed; npm run build:check passed.",
+    "RED: npx vitest run test/SyncCoordinator.test.ts test/VectorService.test.ts => 5 expected failures / 72 existing passes because removeRecipeByIdentity was never called; reproduced delete/deprecate rollback-only survival, absent await/error propagation, and missing VectorService pass-through.",
+    "GREEN focused: npx vitest run test/SyncCoordinator.test.ts test/VectorService.test.ts test/RecipeVectorGeneration.test.ts test/unit/KnowledgeService.test.ts => 4 files / 136 tests passed.",
+    "npm run test => 184 files / 1739 tests passed.",
+    "npm run build:check passed; npm run build passed; npm run lint passed across 746 files.",
+    "npx vitest run test/CoreDeliveryBoundary.test.ts test/CoreToolSystemBoundary.test.ts test/CoreCodexBoundary.test.ts test/CorePackage.test.ts => 4 files / 22 tests passed.",
+    "npm run smoke:public-api => 59 exact public API entrypoints imported and RecipeVectorTruthRemover declaration found.",
+    "npm run check passed build, public API boundary (66 exports classified), layer contract, consumer imports for Agent/Alembic/Plugin, scope resolution, public smoke, output budgets and space edges; it stopped only at the inherited src/infrastructure/vector/ASTChunker.ts:32 Doctrine violation. git diff --exit-code b711ea10 -- that file passed.",
+    "npm run lint:naming passed 656 files; npm run lint:retired-symbols passed; git diff --check passed; final worktree clean."
+  ],
+  "risks": [
+    "AlembicPlugin still must implement RecipeVectorTruthRemover against its base store and every known generation before its blocked lifecycle task can resume; this Core task intentionally does not edit Plugin.",
+    "The compatibility adapter covers the single store visible to existing Core consumers. Multi-generation completion is guaranteed by the injected port contract, not by unsafe current-reader inference.",
+    "npm run check remains nonzero solely because of the inherited ASTChunker.ts Doctrine finding; the file is unchanged from parent b711ea10."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4",
+      "verify": "parent b711ea10aa5c67d1d75a58a18c0d56623e26c290; 8 scoped files; final worktree clean"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/SyncCoordinator.test.ts",
+      "verify": "RED 5 contract failures before implementation; GREEN focused 4 files/136 tests; full 184 files/1739 tests; controller can rerun"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1/spec: explicit awaited Recipe identity port is wired through both deleted and deprecated terminal events, provider-offline, all-generation implementation boundary, retry identity preservation, live-upsert separation, VectorService pass-through and public vector export; no Plugin/query/EventBus/KnowledgeService scope expansion. Stage 2/quality: blocker/high/medium findings are zero after registering the new diagnostic and formatting; failure retains unprocessed work without overwriting newer events; stable diagnostics and compatibility adapter are covered. The inherited Doctrine issue is outside this diff."
+    },
+    {
+      "kind": "red-green-note",
+      "ref": "AlembicCore/test/SyncCoordinator.test.ts",
+      "verify": "Before implementation the new cross-generation/await/retry tests failed because the port was absent; after implementation the same tests pass."
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Only eight AlembicCore files changed: coordinator/service/public vector facade/diagnostic registry/public smoke plus two test files; 265 insertions and 41 deletions. No outer repository, query-time Search/Prime, KnowledgeService, EventBus, generation store, real data, Test, or Wakeflow product source changed."
+    },
+    {
+      "kind": "compatibility-review",
+      "value": "Existing VectorIndexReader/Writer contracts and all constructors remain compatible because recipeVectorTruthRemover is additive and optional. Default single-store behavior still performs idempotent entry_<id> removal plus exact current-store canonical cleanup. Live upsert and reconcile continue their prior legacy retirement behavior. No runtime public export count grew; the new public surface is a type declaration on @alembic/core/vector."
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "AlembicCore/src/service/vector/SyncCoordinator.ts",
+      "verify": "The original event queue retained entryId but batch removal collapsed it to entry_<id> and current reader ids; the same writer remove is used for live legacy retirement, so terminal intent could not reach a multi-generation storage owner. The new identity port fixes that boundary."
+    },
+    {
+      "kind": "baseline",
+      "value": "Parent b711ea10 clean; relevant baseline 3 files/87 tests and build:check passed."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Pin clean baseline; RED terminal delete/deprecate/rollback/await/retry; implement explicit port and compatibility adapter; pass through VectorService and public facade; focused GREEN; full gates; two-stage review; one clean commit and TargetResult."
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check and npm run build passed after the final change."
+    },
+    {
+      "kind": "lint",
+      "value": "npm run lint, lint:naming and lint:retired-symbols passed; combined check only inherited Doctrine finding in unchanged ASTChunker.ts."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-core-terminal-recipe-vector-removal-contract-p1__AlembicCore__p3-core-terminal-recipe-vector-removal-contract-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-terminal-recipe-vector-removal-contract-p1__AlembicCore__p3-core-terminal-recipe-vector-removal-contract-t1.json",
+    "deliveryRunId": "run-p3-core-terminal-recipe-vector-removal-contract-p1-readback1",
+    "dispatchGroup": "p3-core-terminal-recipe-vector-removal-contract-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-terminal-recipe-vector-removal-contract-p1__AlembicCore__p3-core-terminal-recipe-vector-removal-contract-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 34,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p3-core-terminal-recipe-vector-removal-contract-p1",
+    "targetTaskId": "p3-core-terminal-recipe-vector-removal-contract-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p3-core-terminal-recipe-vector-removal-contract-p1",
+    "resultId": "tr-p3-core-terminal-recipe-vector-removal-contract-t1",
+    "createdAt": "2026-07-13T17:04:52.455Z"
+  },
+  "createdAt": "2026-07-13T17:04:52.455Z",
+  "stateRevisionObserved": 34,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+  "dispatchGroup": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+  "status": "completed",
+  "summary": "Alembic P5 runtime legacy Recipe production cleanup is complete in one clean commit 671ab051e0a2797cc8d915caf510f0118e546533. AiScan module scanning now observes real pending/staging IDs produced by Agent knowledge.submit through the accepted Core RecipeProductionPort; product-level direct KnowledgeService.create and AiScan auto-publish are gone. POST /api/v1/knowledge is a typed 410 zero-write retired surface and is absent from generated provider/API capabilities, while GET/PATCH/lifecycle/quality remain and publish uses RecipeProductionGateway readiness. A file-backed generation runtime now provides zero-write dry-run, authoritative shadow build, exact verification, active-pointer CAS, failed-shadow diagnostics, rollback, routed Recipe/generic vector isolation, terminal cleanup across base/all generations, and cold-start/incremental/daemon/startup maintenance without query-time writes. No real BiliDili/AlembicWorkspace knowledge root was mutated.",
+  "evidenceRefs": [
+    "Alembic commit 671ab051e0a2797cc8d915caf510f0118e546533",
+    "Alembic/lib/cli/AiScanService.ts",
+    "Alembic/lib/http/routes/knowledge.ts",
+    "Alembic/lib/http/routes/commands.ts",
+    "Alembic/lib/service/vector/RecipeVectorGenerationRuntime.ts",
+    "Alembic/lib/recipe-pipeline/generate/execution/consumers/RecipeVectorGenerationConsumer.ts",
+    "Alembic/test/unit/AiScanRecipeProductionBoundary.test.ts",
+    "Alembic/test/unit/RecipeProductionBoundaryStatic.test.ts",
+    "Alembic/test/unit/RecipeGenerationCommands.test.ts",
+    "Alembic/test/unit/RecipeVectorGenerationRuntime.test.ts",
+    "Alembic/test/unit/RecipeVectorGenerationConsumer.test.ts",
+    "Alembic/test/unit/UiStartupRecipeGeneration.test.ts",
+    "guard-public-mrjjobuj-3",
+    "finish-public-mrjjqu12-1"
+  ],
+  "verification": [
+    "Baseline before changes: npx vitest run test/unit/KnowledgeRouteEntrypointSafetyAo3.test.ts test/unit/VectorPipeline.test.ts test/integration/IndexingPipeline.test.ts -> 3 files, 29 tests passed; npm run build:check -> passed.",
+    "RED before implementation: targeted production/generation tests failed because RecipeVectorGenerationRuntime did not exist, AiScan still requested knowledgeService and direct-published, POST /api/v1/knowledge returned 201, and publish bypassed RecipeProductionGateway.",
+    "GREEN focused production/generation/static suites passed; after final hook formatting, 12 key test files passed with 133/133 tests.",
+    "npx vitest run test/integration/KnowledgeCRUD.test.ts -> 31/31 passed with valid RetrievalReadiness fixtures.",
+    "npm test -- --reporter=dot --silent=passed-only -> 170 files passed; 1536 tests passed, 10 skipped.",
+    "npm run check -> exit 0 after final changes: typecheck, repository/space/layer/doctrine/naming/import boundaries, 138 unit files, 31 integration files, coverage, shared-asset drift, retired symbols, and ring direction all passed.",
+    "npm run build:check -> passed; npm run build -> passed; generated dashboard API types regenerated and drift gate passed.",
+    "Alembic Guard guard-public-mrjjobuj-3 -> 8 newly added files checked, 0 violations. Modified-file Guard results guard-public-mrjjov75-4 and guard-public-mrjjpayp-5 mapped to git diff -U0 -> 0 findings on added/replaced lines.",
+    "Static source scan -> no product knowledgeService.create call, no AiScan direct create/publish, no provider POST /knowledge advertisement, and no Recipe generation writer/reconcile call in resident search route.",
+    "Generation fault coverage -> dry-run creates no storage/pointer, same-dimension model change creates a distinct generation, failed shadow retains prior active pointer and failed manifest, CAS contention preserves foreign lock, rollback restores prior verified generation, and terminal cleanup removes base plus every generation.",
+    "git diff --cached --check and git diff HEAD^..HEAD --check passed. Commit 671ab051e0a2797cc8d915caf510f0118e546533 parent is baseline ac4921580ec1bbfb644886b6a201baeb1c1a2921; post-commit git status is clean."
+  ],
+  "risks": [
+    "Repository lint still reports the same five non-blocking pre-existing explicit-any warnings in AgentRunProjections.ts and handler-runtime.ts; npm run check exits 0 and none intersect this diff.",
+    "Whole-file Alembic Guard reports existing complexity/synchronous-IO findings in legacy large files, but newly added files pass 0/8 and automated diff-line mapping found zero findings introduced by this commit."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "671ab051e0a2797cc8d915caf510f0118e546533",
+      "ref": "Alembic",
+      "value": "Single clean Alembic commit on main; parent ac4921580ec1bbfb644886b6a201baeb1c1a2921; 28 files, 2262 insertions, 259 deletions; post-commit worktree clean.",
+      "verify": "git rev-parse HEAD HEAD^; git status --short; git show --stat HEAD; git diff HEAD^..HEAD --check"
+    },
+    {
+      "kind": "tests",
+      "ref": "Alembic/test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "value": "RED→GREEN coverage for module scan real ID return, retired HTTP zero-write, gateway readiness publish, generation dry-run/shadow/CAS/failure/rollback/model switch, workflow maintenance, terminal cleanup, generated capability drift, and legacy contract compatibility.",
+      "verify": "npm run check exited 0; npm test passed 170 files / 1536 tests with 10 skipped; build and build:check passed; post-commit key regression passed 12 files / 133 tests."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 acceptance review traced the only four supported candidate capabilities (cold-start, incremental, AiScan module scan, knowledge submit) to accepted Agent/Core production contracts; classified and retired direct create/auto-publish and verified generated capability removal. Stage 2 quality review verified CAS lock ownership, shadow flush-before-ready, failed-manifest retention, active preservation, rollback metadata continuity, provider/model/dimension manifest identity, generic-vector preservation, all-generation terminal cleanup, query read-only behavior, temp-root-only tests, and Alembic-only repository scope. No blocker/high finding remains.",
+      "verify": "Guard new-file review 0 violations; modified-file diff intersection 0; static boundary suite passed; full repository gates passed; no real init/bootstrap/rescan/rebuild/migration was run."
+    },
+    {
+      "kind": "red-green",
+      "value": "Before implementation the focused tests reproduced missing generation runtime, direct AiScan knowledgeService access/auto-publish, writable HTTP 201 create, and lifecycle publish bypass. The same focused boundaries are green after implementation.",
+      "verify": "RED failures were captured before source changes; GREEN focused suites and post-commit 133-test regression passed."
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Commit is confined to 28 files in Alembic: production/runtime DI and routes, generated provider types, and tests. No AlembicCore, AlembicAgent, AlembicPlugin, AlembicDashboard, Test, BiliDili, or real knowledge/data root file was changed.",
+      "verify": "Commit parent is the dispatched Alembic baseline; staged name list and commit stat contain only Alembic paths; repository boundary and shared-asset drift gates passed."
+    },
+    {
+      "kind": "compatibility",
+      "value": "GET/PATCH/deprecate/delete/usage/quality routes remain; publish and batch publish preserve their response shapes while entering Core RecipeProductionGateway readiness. Generic vectors remain in base storage, active Recipe queries route to generation storage, legacy active Recipes stay readable through accepted Core compatibility projection, and provider/vector readiness is not added to publish gate.",
+      "verify": "Knowledge route, provider-contract, AO4, V2, lifecycle, KnowledgeCRUD, vector runtime, full unit/integration and generated drift tests passed."
+    },
+    {
+      "kind": "root-cause",
+      "value": "Alembic still had three split legacy paths after Core/Agent acceptance: AiScan performed a second direct create+publish, generic HTTP POST directly wrote Recipe truth, and startup/event maintenance used mutable shared vector storage without generation identity or atomic activation. The fix removes the duplicate writers and makes Alembic consume the accepted production/readiness and generation contracts at the actual caller and storage boundaries.",
+      "verify": "Static call scan and RED tests reproduced the old bypasses; final source scan and generation fault matrix prove their replacement."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p5-alembic-runtime-legacy-recipe-production-cleanup-p1__Alembic__p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-alembic-runtime-legacy-recipe-production-cleanup-p1__Alembic__p5-alembic-runtime-legacy-recipe-production-cleanup-t1.json",
+    "deliveryRunId": "run-p5-alembic-runtime-legacy-recipe-production-cleanup-202607131732",
+    "dispatchGroup": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-alembic-runtime-legacy-recipe-production-cleanup-p1__Alembic__p5-alembic-runtime-legacy-recipe-production-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 42,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+    "targetTaskId": "p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+    "resultId": "tr-p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+    "createdAt": "2026-07-13T18:21:30.733Z"
+  },
+  "createdAt": "2026-07-13T18:21:30.733Z",
+  "stateRevisionObserved": 42,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

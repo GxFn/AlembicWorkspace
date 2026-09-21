@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-plugin-search-fixture-schema-closure-t1",
+  "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "taskPackageId": "p5-plugin-search-fixture-schema-closure-p1",
+  "dispatchGroup": "p5-plugin-search-fixture-schema-closure-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p5-plugin-search-fixture-schema-closure-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin 已在唯一提交 79f46cda0a1325b5e5a32a8e629fbb822ca65fdc 中，只给两个实际失败的 synthetic knowledge_entries schema 补齐 nullable dontClause 列，保留真实 SearchEngine/executeReadOnlySearch reader 路径与只读指纹断言；聚焦测试、完整 1578 单测和 build:check 均通过，未修改任何生产或跨仓库文件。",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13/task-packages/p5-plugin-search-fixture-schema-closure-p1.json",
+    "AlembicPlugin/test/unit/PublicOrphanVectorTruth.test.ts",
+    "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts"
+  ],
+  "verification": [
+    "Required baseline: HEAD d26fe67b3b25c653fddcca517b27de04a90ed7af and clean worktree.",
+    "RED: focused two-file run produced exactly 3 failures with no such column: dontClause and empty Search/Prime results.",
+    "GREEN: focused two-file run passed 2 files / 4 tests; real Search logs reported semantic=2, auto=2 and keyword=1.",
+    "npm run test:unit passed 145 files / 1578 tests.",
+    "npm run build:check passed using ../AlembicCore @ d17db939ed49ea30bdbf380f400b783530b6d6a8.",
+    "git diff --check passed; final commit contains only two test files.",
+    "Alembic Guard guard-public-mrj207wm-1 covered 2/2 files with 0 errors and 6 pre-existing fixture-I/O warnings."
+  ],
+  "risks": [
+    "Alembic prime was unavailable for this turn because its legacy failure payload violated the current public output contract; no project knowledge was used as implementation evidence.",
+    "A whole-file Biome check reports 5 existing style/import errors and 6 explicit-any warnings in the two legacy test files; none touches the added SQL column, and adjacent cleanup was excluded by this task.",
+    "Alembic Guard's failed verdict is warning-only: six existing synchronous filesystem operations in ReadOnlySearchFingerprint.test.ts; the final change adds no filesystem or runtime operation."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "79f46cda0a1325b5e5a32a8e629fbb822ca65fdc",
+      "value": "One clean AlembicPlugin test-only commit.",
+      "verify": "parent=d26fe67b3b25c653fddcca517b27de04a90ed7af; exactly two changed test files; git diff --check passed; worktree clean; no push"
+    },
+    {
+      "kind": "tests",
+      "value": "Focused two-file suite passed 4/4; complete Plugin unit suite passed 145 files / 1578 tests; build:check passed.",
+      "verify": "npx vitest run test/unit/PublicOrphanVectorTruth.test.ts test/unit/ReadOnlySearchFingerprint.test.ts; npm run test:unit; npm run build:check"
+    },
+    {
+      "kind": "self-review",
+      "ref": "guard-public-mrj207wm-1",
+      "value": "Stage 1: only accepted Core Search reader fixture compatibility, with real reader-path and read-only fingerprint assertions retained. Stage 2: nullable column addition is minimal and no production Search/Prime/ranking/Graph/Recipe Map/data/cross-repo drift exists.",
+      "verify": "Alembic Guard explicit 2/2 scope: 0 errors, 6 warning-only pre-existing synchronous fixture I/O findings"
+    },
+    {
+      "kind": "red-green-note",
+      "value": "RED reproduced exactly 3 failures and no such column: dontClause; GREEN returned expected 2 live vector items, 2 Prime knowledge items, and 1 keyword item.",
+      "verify": "Baseline focused command failed 3/4; post-change focused command passed 4/4 without knowledge-load/vector-truth dontClause degradation"
+    },
+    {
+      "kind": "scope-diff",
+      "value": "2 files changed, 2 insertions and 1 replacement line; only nullable dontClause TEXT declarations.",
+      "verify": "git diff --stat and diff-tree show only test/unit/PublicOrphanVectorTruth.test.ts and test/unit/ReadOnlySearchFingerprint.test.ts"
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean required baseline at d26fe67b3b25c653fddcca517b27de04a90ed7af.",
+      "verify": "git status empty before editing; focused baseline reproduced the task package's exact 2+1 failures"
+    },
+    {
+      "kind": "verification",
+      "value": "Full unit and typecheck gates green.",
+      "verify": "145/145 unit files and 1578/1578 tests passed; build:check used ../AlembicCore @ d17db939ed49ea30bdbf380f400b783530b6d6a8"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p5-plugin-search-fixture-schema-closure-p1__AlembicPlugin__p5-plugin-search-fixture-schema-closure-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-search-fixture-schema-closure-p1__AlembicPlugin__p5-plugin-search-fixture-schema-closure-t1.json",
+    "deliveryRunId": "run-p5-plugin-search-fixture-schema-closure-p1-readback1",
+    "dispatchGroup": "p5-plugin-search-fixture-schema-closure-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-search-fixture-schema-closure-p1__AlembicPlugin__p5-plugin-search-fixture-schema-closure-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+    "stateRevision": 29,
+    "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+    "taskPackageId": "p5-plugin-search-fixture-schema-closure-p1",
+    "targetTaskId": "p5-plugin-search-fixture-schema-closure-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p5-plugin-search-fixture-schema-closure-p1",
+    "resultId": "tr-p5-plugin-search-fixture-schema-closure-t1",
+    "createdAt": "2026-07-13T10:03:38.110Z"
+  },
+  "createdAt": "2026-07-13T10:03:38.110Z",
+  "stateRevisionObserved": 29,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

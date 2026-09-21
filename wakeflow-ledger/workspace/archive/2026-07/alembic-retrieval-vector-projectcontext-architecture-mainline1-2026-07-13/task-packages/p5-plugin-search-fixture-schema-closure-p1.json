@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p5-plugin-search-fixture-schema-closure-p1",
+  "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "summary": "Close the only remaining demand-local integration regression after accepted Core schema evolution. Current AlembicPlugin HEAD must be d26fe67b3b25c653fddcca517b27de04a90ed7af and the worktree must be clean before editing. Reproduction is fixed: PublicOrphanVectorTruth.test.ts has 2 failures and ReadOnlySearchFingerprint.test.ts has 1 failure because their synthetic knowledge_entries tables omit dontClause while the accepted Core Search reader selects that field. Update only the minimal stale fixture schema/insert definitions needed for the current read contract. Do not change production Search/Prime behavior, Core, retrieval ranking, Graph/Recipe Map, real knowledge data, plugin packaging, or any repository outside AlembicPlugin. Add or retain an assertion that the fixtures exercise the real reader path rather than bypassing it. Verify the two focused files pass, then run the full Plugin unit suite and build:check; review git diff/check, commit only AlembicPlugin, and return the exact parent/commit, changed files, command summaries, and two-stage self-review. This is a test-fixture compatibility closure, not authority to reopen vector ranking or redesign retrieval.",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13/target-results/tr-p4-plugin-graph-recipemap-real-acceptance-defects-t1.json",
+  "designIntent": "Keep current production behavior unchanged and align the two stale synthetic knowledge_entries schemas with the accepted Core read contract so the Plugin unit suite is again trustworthy.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "One clean AlembicPlugin commit on parent d26fe67b3b25c653fddcca517b27de04a90ed7af; report exact changed files and git diff --check."
+      },
+      {
+        "kind": "tests",
+        "verify": "PublicOrphanVectorTruth.test.ts and ReadOnlySearchFingerprint.test.ts pass, followed by the complete npm run test:unit suite and npm run build:check."
+      },
+      {
+        "kind": "self-review",
+        "verify": "Stage 1 confirms only current Core fixture compatibility; Stage 2 confirms no production Search/Prime/ranking/Graph/Map/data or cross-repository drift."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "scope-diff"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T09:54:12.344Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p5-plugin-search-fixture-schema-closure-t1",
+      "taskPackageId": "p5-plugin-search-fixture-schema-closure-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Synchronize the two stale Search fixture schemas with the accepted Core read contract and restore the full AlembicPlugin unit suite without production-code changes.",
+      "status": "pending",
+      "createdAt": "2026-07-13T09:54:12.344Z"
+    }
+  ]
+}

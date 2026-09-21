@@ -1,0 +1,155 @@
+{
+  "scope": "Independent bounded review of the specified first stable root fixes only; router additions excluded as requested.",
+  "reviewMode": "git diff plus implementation/caller context and associated assertions, not full-repository acceptance",
+  "verdict": "needs-rework",
+  "findings": [
+    {
+      "id": "FIRST-01",
+      "severity": "P1",
+      "path": "src/tools/runtime/handlers/terminalSafety.ts",
+      "line": 283,
+      "issue": "The guard accepts the actual TypeScript syntax --noEmit false, permitting emission through a readonly command.",
+      "repro": "checkTerminalCommandAllowlist('tsc --noEmit false',['tsc']) => {safe:true}; TypeScript.parseCommandLine(['--noEmit','false']) => noEmit:false with zero errors. Repeated ['--noEmit','--noEmit','false'] also produces false. Equals forms --noEmit=false and --noEmit=true instead yield TS5023.",
+      "suggestion": "Parse sequential --noEmit flags and optional adjacent true/false values; require final effective noEmit=true. Test split false and repeated override.",
+      "testAssessment": "The added --noEmit=false case rejects a compiler-invalid form and misses the genuine emit-enabling form.",
+      "certainty": "pure-function reproduction; no compilation or writes"
+    },
+    {
+      "id": "FIRST-02",
+      "severity": "P1",
+      "path": "src/agent/utils/Redaction.ts",
+      "line": 14,
+      "issue": "JSON-key support does not redact the complete JSON string. Whitespace leaks suffixes; escaped quotes break JSON and leak suffixes.",
+      "repro": [
+        {
+          "inputPassword": "synthetic sensitive value",
+          "output": "{\"password\":\"[redacted] sensitive value\",\"normal\":\"kept\"}"
+        },
+        {
+          "inputPassword": "synthetic\"secret-tail",
+          "output": "{\"password\":\"[redacted]\"secret-tail\",\"normal\":\"kept\"}",
+          "validJson": false
+        },
+        {
+          "inputPassword": "with space",
+          "output": "unchanged"
+        }
+      ],
+      "suggestion": "Match quoted JSON keys and full escape-aware JSON string values before legacy bare key=value handling; replace the entire value and preserve valid JSON. Add spaces, escaped quotes and backslashes to synthetic value tests.",
+      "testAssessment": "New tests cover only long single-token values. Existing assertions remain.",
+      "certainty": "source import pure-function reproduction, synthetic inputs only"
+    },
+    {
+      "id": "FIRST-03",
+      "severity": "P2",
+      "path": "src/tools/runtime/handlers/code.ts",
+      "line": 680,
+      "issue": "handleStructure passes a canonical absDir and lexical projectRoot to buildDirectoryTree; the resulting path.relative header escapes the visible project for legitimate symlinked roots.",
+      "repro": "On this host resolveProjectPath('/tmp','.') => {absolute:'/private/tmp',relative:''}; path.relative('/tmp','/private/tmp') => '../private/tmp'. Structure therefore prints '../private/tmp/' instead of './'.",
+      "suggestion": "Use one canonical root throughout the tree renderer, or render from the verified relative coordinate. Add a symlinked-project-root structure case.",
+      "testAssessment": "New tests cover file symlink denial/protected targets but omit a legitimate symlinked projectRoot.",
+      "certainty": "actual helper/path probe plus direct call-chain inspection; regression introduced by this patch"
+    }
+  ],
+  "checks": [
+    {
+      "group": "structured JSON extraction",
+      "files": [
+        "src/ai/shared/structuredOutput.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "verdict": "acceptable",
+      "findings": [],
+      "reason": "String-state scanning preserves commas/brackets/fences/escape state and repairs only structural trailing commas. Complete and truncated response tests both exercise preservation; old parsing coverage remains."
+    },
+    {
+      "group": "provider retry and first-call concurrency",
+      "files": [
+        "src/ai/AiProvider.ts",
+        "test/OpenAiProvider.test.ts"
+      ],
+      "verdict": "acceptable",
+      "findings": [],
+      "reason": "Nullish retries preserves zero; shared reliability also uses nullish defaults. Post-import gateway double-check closes the race because assignment follows synchronously. The concurrent mocked-fetch test uses the real provider gateway."
+    },
+    {
+      "group": "JSON redaction",
+      "files": [
+        "src/agent/utils/Redaction.ts",
+        "test/Redaction.test.ts"
+      ],
+      "verdict": "needs-rework",
+      "findings": [
+        "FIRST-02"
+      ],
+      "reason": "Whitespace and escaped-value gaps remain; no existing test weakened."
+    },
+    {
+      "group": "project containment and judge slices",
+      "files": [
+        "src/shared/projectPath.ts",
+        "src/agent/evaluation/MiningJudge.ts",
+        "test/mining-eval-harness.test.ts"
+      ],
+      "verdict": "acceptable",
+      "findings": [],
+      "reason": "Lexical and realpath containment agree; missing paths walk existing ancestors and dangling symlinks are refused. Judge rejects absolute/invalid ranges and nonpositive caps. Existing normal-slice tests and new traversal/symlink tests preserve coverage."
+    },
+    {
+      "group": "code file paths and range rereads",
+      "files": [
+        "src/tools/runtime/handlers/code.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verdict": "partially-acceptable",
+      "findings": [
+        "FIRST-03"
+      ],
+      "reason": "Read/write freshness and protected targets consistently use canonical relative paths. Explicit ranges bypass unchanged-cache short circuit, matching delta behavior. New small/full and large/outline tests cover range rereads. Structure rendering mixes roots. Router changes deliberately excluded."
+    },
+    {
+      "group": "readonly terminal checks",
+      "files": [
+        "src/tools/runtime/handlers/terminalSafety.ts",
+        "test/runtime-terminal-safety.test.ts"
+      ],
+      "verdict": "needs-rework",
+      "findings": [
+        "FIRST-01"
+      ],
+      "reason": "Newlines/variables/find execution-output/rg preprocessors are blocked on the allowlisted route while unrestricted behavior remains. TypeScript boolean syntax still bypasses the check."
+    },
+    {
+      "group": "context transcript compaction",
+      "files": [
+        "src/agent/context/ContextWindow.ts",
+        "test/ContextWindow.test.ts"
+      ],
+      "verdict": "acceptable",
+      "findings": [],
+      "reason": "Removing title-based call dedup preserves call/result pairing and retry outcomes; both resets clear projection threshold. Forced thresholds exercise L2/L3 and check IDs plus projection without removing previous assertions."
+    },
+    {
+      "group": "conversation traversal and summary race",
+      "files": [
+        "src/agent/context/ConversationStore.ts",
+        "test/memory-context.test.ts"
+      ],
+      "verdict": "acceptable",
+      "findings": [],
+      "reason": "Shared ID validation precedes raw fs and WriteZone writes/deletes; load/summarize use it too. Byte snapshot check after model await prevents same-process lost updates before synchronous replacement. New tests cover traversal and append-during-summary."
+    }
+  ],
+  "testsWeakened": false,
+  "validation": {
+    "suiteRunByThisAgent": false,
+    "networkCalls": 0,
+    "productEdits": 0,
+    "method": "Read source/diffs/tests; pure probes of Redaction, terminalSafety, TypeScript.parseCommandLine, resolveProjectPath/path.relative. Synthetic inputs only. Root owns test execution and acceptance."
+  },
+  "optionalTestImprovements": [
+    "Zero retries currently asserted on constructor state; an additional mocked retryable error with one-fetch assertion would prove request behavior, although source delegation correctly preserves zero.",
+    "Add legitimate symlinked projectRoot and dangling-target cases to path helper coverage.",
+    "Conversation summary deletion/second-summary races share the guarded branch; optional table cases can complement the existing append-during-await test."
+  ]
+}

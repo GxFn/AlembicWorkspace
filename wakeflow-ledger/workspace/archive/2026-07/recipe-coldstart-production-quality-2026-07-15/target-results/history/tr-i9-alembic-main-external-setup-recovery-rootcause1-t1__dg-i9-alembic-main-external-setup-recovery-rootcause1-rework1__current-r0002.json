@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i9-alembic-main-external-setup-recovery-rootcause1-p1",
+  "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i9-alembic-main-external-setup-recovery-rootcause1-t1",
+  "status": "completed",
+  "summary": "Alembic rework 已在 clean commit 8f0edfcb0d3807b9b3efb1d4795bdd482a9506d8 完成：保留 f5d32020 的 external authority/journal/snapshot/restore 与单一 strict production chain，只接通生产 launcher 断链。DaemonSupervisor 的 strict pristine 启动在 child 前不创建 target 内 dirs/lock/log/pid/jobs，child 完成受支持初始化后才进入 ready；strict recover/complete 的成功 child exit 被识别为 startup action completed。daemon/API 入口通过同一 AppRuntime.initialize consumer boundary 识别 terminal startup action，成功退出且不继续 DI/HTTP/jobs。未新增第二编排器，未修改 AlembicCore、AlembicAgent、AlembicPlugin 或 Test。",
+  "evidenceRefs": [
+    "Alembic/bin/api-server.ts",
+    "Alembic/bin/daemon-server.ts",
+    "Alembic/lib/Bootstrap.ts",
+    "Alembic/lib/daemon/runtime/DaemonSupervisor.ts",
+    "Alembic/lib/daemon/runtime/ServerStartupBoundary.ts",
+    "Alembic/test/unit/DaemonSupervisor.test.ts",
+    "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+    "Alembic/test/unit/StrictProductionBoundaryStatic.test.ts"
+  ],
+  "verification": [
+    "TDD RED: npx vitest run test/unit/DaemonSupervisor.test.ts test/unit/StrictExternalSetupRecovery.test.ts test/unit/StrictProductionBoundaryStatic.test.ts failed for the intended gaps: missing ServerStartupBoundary module, supervisor pre-created target state/returned starting, and server bins lacked initializeServerRuntime.",
+    "Focused GREEN: npx vitest run test/unit/DaemonSupervisor.test.ts test/unit/StrictExternalSetupRecovery.test.ts test/unit/StrictProductionJournal.test.ts test/unit/StrictProductionBoundaryStatic.test.ts test/unit/RecipePipelineFacadeStrict.test.ts passed 5 files, 40/40 tests.",
+    "npm run typecheck passed.",
+    "npm run build passed, including build:core, clean dist, tsc, and postbuild.",
+    "Final npm run check passed on commit 8f0edfcb: unit 154 files / 1160 tests; integration 32 files / 467 passed and 10 existing skips; coverage thresholds passed (89.1% statements, 80.3% branches, 84.84% functions, 89% lines); all repository boundary, doctrine, naming, consumer-import, drift and ring-direction gates passed.",
+    "Focused Biome check for all 8 changed files passed; git diff --check passed.",
+    "Git evidence: parent f5d32020aea4e2bfd69bcb3212300aad6263618d; commit 8f0edfcb0d3807b9b3efb1d4795bdd482a9506d8; tree db1ec135fe554afdf6cd2fab2d9e96d2d57bfce2; worktree clean."
+  ],
+  "risks": [
+    "Alembic project Prime, work lifecycle start, and post-change Code Guard were attempted but the installed Alembic MCP rejected its own emitted _meta key as an unrecognized schema field. Product verification therefore relies on raw focused tests, build, full npm run check, diff check, and clean Git evidence; this plugin-surface degradation is not a product-code blocker.",
+    "Final full check emitted five pre-existing Biome noExplicitAny warnings in unrelated unchanged files; lint exited successfully and no new warning was introduced.",
+    "No residual product blocker identified in this assigned launcher rework; controller still owns independent evidence review and acceptance."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "clean-baseline",
+      "commit": "f5d32020aea4e2bfd69bcb3212300aad6263618d",
+      "verify": "Before rework, git status was clean and the controller-specified accepted implementation commit was HEAD."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Repair exactly two disconnected production boundaries: supervisor pristine child launch semantics, then server startup-only terminal disposition; preserve the existing AppRuntime strict orchestrator and external authority implementation.",
+      "verify": "Implementation is confined to the existing supervisor/AppRuntime launcher path and its executable regressions."
+    },
+    {
+      "kind": "test-first",
+      "ref": "Alembic/test/unit/DaemonSupervisor.test.ts",
+      "verify": "The three-file RED command failed on the intended missing launcher boundary and pre-created target behavior before production edits."
+    },
+    {
+      "kind": "regression-test",
+      "ref": "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+      "verify": "Fresh AppRuntime instances execute recover and complete as terminal startup actions, retain durable receipts, and return no runtime-ready components."
+    },
+    {
+      "kind": "regression-test",
+      "ref": "Alembic/test/unit/StrictProductionBoundaryStatic.test.ts",
+      "verify": "Both supported server bins are wired to the executable startup boundary; runtime behavior is additionally exercised by unit tests."
+    },
+    {
+      "kind": "implementation",
+      "commit": "8f0edfcb0d3807b9b3efb1d4795bdd482a9506d8",
+      "verify": "DaemonSupervisor preserves pristine target absence through spawn; ServerStartupBoundary consumes the single AppRuntime.initialize path; Bootstrap exposes explicit startupDisposition."
+    },
+    {
+      "kind": "change-scope",
+      "value": "8 Alembic files only: 5 production/launcher files and 3 unit tests; no AlembicCore, AlembicAgent, AlembicPlugin, Test, Design, or Wakeflow product changes.",
+      "verify": "Commit tree db1ec135fe554afdf6cd2fab2d9e96d2d57bfce2 and clean worktree were inspected."
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run typecheck",
+      "verify": "Passed."
+    },
+    {
+      "kind": "lint",
+      "value": "npx biome check on all 8 changed files plus final npm run check",
+      "verify": "Changed-file Biome passed; full lint passed with only five pre-existing warnings in unchanged files."
+    },
+    {
+      "kind": "verification",
+      "value": "Focused 40/40, npm run build, and final npm run check",
+      "verify": "Build passed; unit 1160/1160; integration 467 passed with 10 existing skips; coverage and all repository gates passed."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 requirement review and Stage 2 diff review checked pristine absence, external lease/header ordering, supported initialization, fresh-process recover/complete terminal exit, normal-path compatibility, no second orchestrator, and no sibling-repository edits.",
+      "verify": "All controller rework points have executable or source evidence in the listed refs."
+    },
+    {
+      "kind": "commit",
+      "commit": "8f0edfcb0d3807b9b3efb1d4795bdd482a9506d8",
+      "verify": "Parent f5d32020aea4e2bfd69bcb3212300aad6263618d; tree db1ec135fe554afdf6cd2fab2d9e96d2d57bfce2; worktree clean after commit."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 146,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i9-alembic-main-external-setup-recovery-rootcause1-p1",
+    "targetTaskId": "i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1",
+    "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "createdAt": "2026-07-16T22:23:28.804Z"
+  },
+  "createdAt": "2026-07-16T22:23:28.804Z",
+  "stateRevisionObserved": 146,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i9-alembic-main-external-setup-recovery-rootcause1-t1__dg-i9-alembic-main-external-setup-recovery-rootcause1__current-r0001.json"
+  }
+}

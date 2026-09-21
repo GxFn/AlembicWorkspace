@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i2-1-alembic-main-pcf-adapters-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Alembic Main I2.1 rework1，基于干净的 Alembic@b5b63edfc3ee2921d71d67e052f0dbc8fe450afd；AlembicCore 保持已接受的 f82bfec58e36ea71e575a23bee356623a7a28381，不修改其他仓库。\n\n根因：当前中央 runtime 一次性预制四个投影/receipt 并把完整 frozen facts 重复塞进 session，真实四入口没有各自 reopen；路径丢失 relativeRoot，ModuleService 还可能永久缓存 legacy；旁路计数是常量而非测量。\n\n只完成以下修复：\n1. 一份 immutable artifact/binding 持久化；session carrier 保持有界，不重复携带四份文件正文。Plan、Recipe generation、dependency graph、module coverage 在各自实际生产入口通过 Core consumer port reopen，并生成入口准确、base identity 相同的 receipt。\n2. 保留 repository relativeRoot，单仓和 ProjectScope 投影路径必须还原到真实存在的源文件；禁止 `${repoId}/${relativePath}` 当作磁盘相对路径。\n3. ModuleService 在 certified carrier 出现或变化时必须重新绑定或 fail closed，不能继续已缓存的 legacy 数据；presenter/graph 缺失或解析失败不得吞错返回空载荷。\n4. direct/raw/synthesized/capped 四类 counter 与 legacy reachability 必须来自实际 instrumentation/可复现探针，不能硬编码零或只写 typedReason。\n5. 用真实 capture fixture 验证：>12 files；>80 modules 且 owned-file 守恒、无空模块伪计数；ProjectScope 的 control root 自身 + 4 member repos，scope/vector/tuple 全量一致；删除/partial/hash/scope/vector/stale mutation 全部 fail closed。\n6. 加回归探针覆盖 projected path 存在、carrier 不重复文件正文且尺寸有界、ModuleService 先 legacy 后 certified 不得静默沿旧路、四个实际 entrypoint receipt 准确且 distinct。\n\n重新运行 build:check、focused PC-F/plan/session/ModuleService tests、npm run check、完整 npm run test、git diff --check；重建 Main evidence report，不能把合成 fixture 写成 Alembic/BiliDili 实跑。只提交 Alembic 一个干净 repair commit。\n\n禁止范围：不改 Core/Plugin/Agent/Dashboard/Test/Wakeflow；不做 I2.2、I3+、冷启动 reset 顺序重构或第二套 runtime/store/parser/graph 平台。若 Core API 确实不能支撑 actual-entrypoint reopen，停止并回填精确 blocker。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§7.1–7.3, 18.0, 18.3; controller review tc-20260715190144-0031",
+  "designIntent": "保留 Core 单一权威，在 Main 现有四个生产入口做最小 reopen 迁移；删掉中央预制和重复正文，不扩展后续阶段。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T19:02:44.364Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i2-1-alembic-main-pcf-adapters-rework1-t1",
+      "taskPackageId": "i2-1-alembic-main-pcf-adapters-rework1-p1",
+      "targetWindow": "Alembic",
+      "summary": "修正 Main PC-F 中央预制/重复 carrier、relativeRoot 路径、ModuleService legacy 缓存和伪零计数；以四个真实入口和真实守恒 fixture 重新证明 I2.1。",
+      "status": "pending",
+      "createdAt": "2026-07-15T19:02:44.364Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

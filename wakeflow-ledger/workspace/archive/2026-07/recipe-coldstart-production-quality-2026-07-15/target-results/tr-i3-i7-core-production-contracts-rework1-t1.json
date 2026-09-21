@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i7-core-production-contracts-rework1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i7-core-production-contracts-rework1-p1",
+  "dispatchGroup": "dg-i3-i7-core-production-contracts-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i7-core-production-contracts-rework1-t1",
+  "status": "completed",
+  "summary": "在 AlembicCore@9805d2ff 上关闭 private corpus revision replacement 的真实 public-entry authority bypass。DatabaseConnection 现按 canonical runtime root 登记全部真实活动连接；revoke 先 durable fsync marker，再同步关闭该 root/后代连接，关闭失败抛 ALEMBIC_DATABASE_ROOT_REVOCATION_FAILED，replace 不返回 next。公开 openAlembicDatabase 预开的未注册 runtime 与预先 prepared read/write statement、handle runtime、post-revoke open 均在 replace 后失败；next revision 与普通祖先 data root 继续读写。未修改公共导出、其他仓库、PCFBaselineReceipt 或既有 post-PCF 合同。",
+  "evidenceRefs": [
+    "AlembicCore commit 868d9070bc8907c5be691ca4024f3ed4aa1da371",
+    "AlembicCore tree b170b1e2081808b671c5c3a3a3ac449d928b218c",
+    "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+    "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+    "AlembicCore/scripts/smoke-public-api.mjs",
+    "AlembicCore/config/public-api-boundary.json",
+    "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json"
+  ],
+  "verification": [
+    "RED: npx vitest run test/ProductionPersistenceContracts.test.ts -t \"terminates every public runtime\" — failed at publicBypass post-replace read because no error was thrown",
+    "GREEN/focused: ProductionPersistenceContracts + DatabaseConnectionScopeGuard — 2 files / 13 tests passed",
+    "post-PCF focused — 7 files / 49 tests passed",
+    "PC-F regression — 15 files / 130 tests passed",
+    "npm run build:check — passed",
+    "npm test — 190 files / 1847 tests passed on final diff",
+    "consumer imports — AlembicAgent 72 refs/0 issues; Alembic 497/0; AlembicPlugin 456/0",
+    "public API boundary — 67 classified, 60 exact, 7 wildcard; smoke imported 60 exact entrypoints",
+    "Biome, naming, retired-symbols, git diff --check — passed",
+    "npm run check — reached lint:doctrine; only unchanged pre-existing ASTChunker.ts:32 baseline, baseline/current blob both 6e88dab655821ed72e9389a7c274b87d07fbecde",
+    "PCFBaselineReceipt SHA-256 unchanged: ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6",
+    "post-commit worktree clean"
+  ],
+  "risks": [
+    "Active-handle termination is the task-authorized in-process authority boundary. The durable marker blocks future opens across processes, but this mechanism does not claim to forcibly terminate a SQLite handle already owned by another process.",
+    "npm run check retains the unchanged out-of-scope ASTChunker doctrine baseline; the repair did not touch or waive it.",
+    "This result closes only the Core revision-replacement rework; controller review must not infer downstream Agent/Main orchestration, Plugin serving, or whole-demand completion."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "868d9070bc8907c5be691ca4024f3ed4aa1da371",
+      "value": "parent=9805d2ff5bb138ee0e91539a80710ccf8e74c2f0 tree=b170b1e2081808b671c5c3a3a3ac449d928b218c files=2 insertions=103 deletions=1",
+      "verify": "single-clean-core-rework-commit-on-9805d2ff"
+    },
+    {
+      "kind": "negative-tests",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "Public openAlembicDatabase pre-opens an unregistered old-revision runtime and pre-prepares read/write statements; after replace both statements fail, registered runtime fails, post-revoke open fails, while next revision and ordinary root read/write succeed.",
+      "verify": "public-preopen-unregistered-runtime-read-write-fail-after-replace"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "focused=2 files/13; post-PCF=7 files/49; PC-F=15 files/130; full=190 files/1847",
+      "verify": "focused-full-build-check-and-git-diff-check-rerunnable"
+    },
+    {
+      "kind": "runtime-report",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "Fresh temp RED failed at line 150 because post-replace publicBypass SELECT still succeeded; GREEN on the same public entry closes pre-prepared read/write and records post-revoke open rejection while sibling/ordinary roots remain writable.",
+      "verify": "fresh-temp-public-entry-red-green-evidence"
+    },
+    {
+      "kind": "compatibility",
+      "ref": "AlembicCore/scripts/smoke-public-api.mjs",
+      "value": "60 exact entrypoints imported; 67 exports classified; consumer imports Agent 72/0, Main 497/0, Plugin 456/0; PCF receipt SHA-256 unchanged ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6.",
+      "verify": "normal-root-next-revision-consumer-and-pcf-regression"
+    },
+    {
+      "kind": "baseline",
+      "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json",
+      "value": "HEAD=9805d2ff; clean worktree; focused baseline 2 files/12 tests and build:check passed; receipt hash unchanged.",
+      "verify": "pre-change-baseline-pinned"
+    },
+    {
+      "kind": "repro",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "Controller-equivalent public open against first.handle.resolver remained readable after replace before the fix.",
+      "verify": "white-box-root-cause-and-black-box-public-entry"
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "Fail-before/pass-after regression covers pre-open and pre-prepared read/write, registered runtime, future open, next revision, and ordinary root.",
+      "verify": "same-command-red-green"
+    },
+    {
+      "kind": "test-first",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "value": "The new public-entry regression was run RED before DatabaseConnection production changes, then rerun GREEN.",
+      "verify": "red-before-green-in-one-required-clean-commit"
+    },
+    {
+      "kind": "change-scope",
+      "ref": "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+      "value": "Only DatabaseConnection runtime authority and its ProductionPersistence regression changed; no export, service, cross-repo, ledger, prompt, or serving changes.",
+      "verify": "designIntent-confined"
+    },
+    {
+      "kind": "typecheck",
+      "ref": "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+      "value": "npm run build:check passed.",
+      "verify": "tsc-no-emit"
+    },
+    {
+      "kind": "lint",
+      "ref": "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+      "value": "Biome, naming, retired-symbols, public boundary, layer/scope/output/space gates passed; doctrine only unchanged ASTChunker baseline.",
+      "verify": "final-diff-lint-evidence"
+    },
+    {
+      "kind": "self-review",
+      "value": "Rework response: agree with controller verdict and close the real DB/runtime root authority rather than hiding resolver or adding another marker. Stage 1 verified all five completion clauses and preserved public/PC-F contracts. Stage 2 found no blocker/high/medium issue; checked canonical confinement, descendant selection, marker-before-close ordering, close-failure propagation, idempotent external raw close, registry cleanup, next/ordinary compatibility, and process-boundary honesty.",
+      "verify": "point-by-point-rework-response-and-two-stage-review"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i3-i7-core-production-contracts-rework1__AlembicCore__i3-i7-core-production-contracts-rework1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-core-production-contracts-rework1__AlembicCore__i3-i7-core-production-contracts-rework1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i3-i7-core-production-contracts-rework1__AlembicCore__i3-i7-core-production-contracts-rework1-t1",
+    "dispatchGroup": "dg-i3-i7-core-production-contracts-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-core-production-contracts-rework1__AlembicCore__i3-i7-core-production-contracts-rework1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 66,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i7-core-production-contracts-rework1-p1",
+    "targetTaskId": "i3-i7-core-production-contracts-rework1-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "dg-i3-i7-core-production-contracts-rework1",
+    "resultId": "tr-i3-i7-core-production-contracts-rework1-t1",
+    "createdAt": "2026-07-16T05:41:39.068Z"
+  },
+  "createdAt": "2026-07-16T05:41:39.068Z",
+  "stateRevisionObserved": 66,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

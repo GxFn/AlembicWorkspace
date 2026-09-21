@@ -1,0 +1,122 @@
+[
+  {
+    "id": "RUN",
+    "interface": "AgentRunInput / AgentRunResult",
+    "producer_to_consumer": "Main callers → AgentService",
+    "owner": "Agent service",
+    "current_state": "已接通；外层错误与runtime结果政策不同",
+    "decision": "保留公开入口，归一化有效上下文",
+    "evidence": "AgentRunContracts.ts; AgentService.ts",
+    "change_boundary": "Agent-only consumer wiring; Main projection migration needs Main"
+  },
+  {
+    "id": "BUILD",
+    "interface": "CompiledAgentProfile / RuntimeBuilder",
+    "producer_to_consumer": "ProfileCompiler → RuntimeBuilder → Runtime",
+    "owner": "Agent profiles/service",
+    "current_state": "build options仍有unknown，legacy构造形态需保留",
+    "decision": "窄化依赖，保留真实capability/policy组装",
+    "evidence": "AgentProfileCompiler.ts; AgentRuntimeBuilder.ts",
+    "change_boundary": "Agent"
+  },
+  {
+    "id": "SCOPE",
+    "interface": "SystemRunContext / strategyContext / sharedState",
+    "producer_to_consumer": "Main input builders → AgentService → PipelineStrategy",
+    "owner": "Main assembly + Agent scope",
+    "current_state": "多份投影；顶层/嵌套sharedState行为不同，两个Main compactor相同",
+    "decision": "一次有效上下文解析和一个兼容投影",
+    "evidence": "context-probe.json",
+    "change_boundary": "Agent + Main"
+  },
+  {
+    "id": "LIFETIME",
+    "interface": "ToolContextFactory resources",
+    "producer_to_consumer": "Main singleton factory → per-call ToolContext",
+    "owner": "Main",
+    "current_state": "不同fixture身份仍共享sessionStore/deltaCache",
+    "decision": "按服务/父会话/run或view/call分域",
+    "evidence": "scope-probe.json",
+    "change_boundary": "Main + Agent semantic contract"
+  },
+  {
+    "id": "TOOL_CALL",
+    "interface": "ToolCallRequest / ParsedToolCall",
+    "producer_to_consumer": "runtime/HTTP/DAG → adapter → router → handler",
+    "owner": "kernel / router / host",
+    "current_state": "一套执行链；不同入口guard路径不同",
+    "decision": "保留信封与内部语法，明确各入口授权owner",
+    "evidence": "tool-ports.json TP-1",
+    "change_boundary": "Agent + Main entrypoint audit"
+  },
+  {
+    "id": "SCHEMA",
+    "interface": "schema query / ToolActionAllowlist",
+    "producer_to_consumer": "TOOL_REGISTRY → catalog → runtime/schema/gates",
+    "owner": "tools + runtime",
+    "current_state": "重复query wrapper和allowlist词汇",
+    "decision": "单一查询port和allowlist定义，保留旧wrapper",
+    "evidence": "tool-ports.json TP-4/TP-5",
+    "change_boundary": "Agent first"
+  },
+  {
+    "id": "TOOL_RESULT",
+    "interface": "ToolResult / Envelope / OrdinaryOutput",
+    "producer_to_consumer": "handler → adapter → pipeline/host/presenter",
+    "owner": "handler / adapter / kernel",
+    "current_state": "业务、调用、展示含不同信息，status并非全部由typed分支产出",
+    "decision": "集中分类/诊断映射，保留partial和confirmed write",
+    "evidence": "tool-ports.json TP-2",
+    "change_boundary": "Agent"
+  },
+  {
+    "id": "KNOWLEDGE",
+    "interface": "query / production / management ports",
+    "producer_to_consumer": "Main services → knowledge handlers → Core",
+    "owner": "Core semantic contract; Agent consumer ports; Main wiring",
+    "current_state": "production已接；原始repo与read/manage方法不等价",
+    "decision": "受控Core服务adapter，启用前验证required ports",
+    "evidence": "ToolContextFactory.ts; knowledge/contracts.ts",
+    "change_boundary": "Agent + Main"
+  },
+  {
+    "id": "GRAPH",
+    "interface": "projectGraph / codeEntityGraph",
+    "producer_to_consumer": "Main factory → graph handler",
+    "owner": "Main/Core + Agent consumer",
+    "current_state": "当前factory未提供实际graph端口",
+    "decision": "补真实port或明确availability，不给成功占位",
+    "evidence": "ToolContextFactory.ts; handlers/graph.ts",
+    "change_boundary": "Main + Agent"
+  },
+  {
+    "id": "MODEL",
+    "interface": "Provider / Gateway / Transport DTO",
+    "producer_to_consumer": "Main AI module → provider → gateway → transport",
+    "owner": "AI",
+    "current_state": "主链统一，DTO/error引入反向依赖",
+    "decision": "先leaf contracts，再按vendor收敛重复转换",
+    "evidence": "ai-ports.json AI-I01/03",
+    "change_boundary": "Agent"
+  },
+  {
+    "id": "CONFIG",
+    "interface": "provider config/defaults/env",
+    "producer_to_consumer": "Main bootstrap, Factory, constructors, Gateway",
+    "owner": "composition/config resolver",
+    "current_state": "多个合法入口有不同precedence",
+    "decision": "先矩阵，再resolved config；入口不新增触网",
+    "evidence": "ai-ports.json AI-I02",
+    "change_boundary": "Agent, with Main caller validation"
+  },
+  {
+    "id": "USAGE",
+    "interface": "response usage / observer / run budget",
+    "producer_to_consumer": "transport → gateway → provider/manager and runtime",
+    "owner": "per-call response + independent consumers",
+    "current_state": "全局账本/run预算不同，旧structured/embed取消能力有限",
+    "decision": "统一纯映射；逐调用关联，不用lastUsage侧信道",
+    "evidence": "ai-ports.json AI-I04",
+    "change_boundary": "Agent"
+  }
+]

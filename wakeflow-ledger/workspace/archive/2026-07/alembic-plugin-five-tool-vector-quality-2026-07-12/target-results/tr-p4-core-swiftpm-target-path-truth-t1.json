@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-core-swiftpm-target-path-truth-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p4-core-swiftpm-target-path-truth-p1",
+  "dispatchGroup": "p4-core-swiftpm-target-path-truth-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p4-core-swiftpm-target-path-truth-t1",
+  "status": "completed",
+  "summary": "AlembicCore now preserves explicit main Package.swift target ownership paths at the SpmDiscoverer -> RepoContext seam. Home and VideoPlay project to Sources/Features/Home and Sources/Features/VideoPlay through the public ProjectContextCapabilities API, while local-package and no-path targets retain prior package-root semantics. BiliDili-shaped RED commit 153eba5 precedes GREEN implementation commit ce1a29a16bbc7239b3fdfedc466fef6c45e02c44.",
+  "evidenceRefs": [
+    "AlembicCore/src/core/discovery/SpmDiscoverer.ts",
+    "AlembicCore/test/ProjectContextRepoContext.test.ts",
+    "commit:153eba5:test(project-context)-expose-lost-SwiftPM-target-paths",
+    "commit:ce1a29a16bbc7239b3fdfedc466fef6c45e02c44:fix(project-context)-preserve-SwiftPM-target-paths",
+    "command:focused-project-context:6-files-46-tests-passed",
+    "command:full-core:177-files-1650-tests-passed",
+    "command:npm-run-build:passed",
+    "command:npm-run-build-check:passed",
+    "command:public-api-layer-consumer-scope-smoke-budgets-space-edge:passed",
+    "runtime:BiliDili-public-ProjectContextCapabilities-Home-VideoPlay-paths-correct-readonly",
+    "check:npm-run-check:stopped-at-preexisting-ASTChunker-doctrine-violation"
+  ],
+  "verification": [
+    "Baseline: related ProjectContext repo/file-flow/module suites passed 17/17 and npm run build:check passed at start HEAD 9e49980.",
+    "Baseline runtime reproduction: public RepoContext returned Home and VideoPlay target refs with label/filePath='.' although Package.swift declares Sources/Features/Home and Sources/Features/VideoPlay.",
+    "RED: npm test -- test/ProjectContextRepoContext.test.ts -t 'preserves declared SwiftPM target paths' failed exactly on Home label/filePath '.' versus Sources/Features/Home.",
+    "GREEN focused: 6 relevant ProjectContext/SPM/public-contract files passed 46/46.",
+    "Full suite: npm test => 177 files, 1650 tests passed after final refinements.",
+    "npm run build and npm run build:check passed.",
+    "npm run check ran: build, public API boundary, layer contract, consumer imports, scope resolution, public API smoke, output budgets, and space-edge gates passed; it stopped only at src/infrastructure/vector/ASTChunker.ts:32 doctrine. That file is outside this task diff and its blob hash 6e88dab655821ed72e9389a7c274b87d07fbecde exactly matches start HEAD 9e49980.",
+    "Remaining gates run independently: npm run lint:naming, npm run lint, and npm run lint:retired-symbols all passed.",
+    "Public runtime probe: @alembic/core/project-context-capabilities returned Home=>Sources/Features/Home and VideoPlay=>Sources/Features/VideoPlay with repoId BiliDili; AOXPlayer remained Packages/AOXPlayer; localPackages, sourceRoots, entrypoints=[], and errors=[] were compatible.",
+    "Read-only proof: BiliDili git status was clean before and after the probe, and Package.swift SHA-256 stayed 7eeb94d671a6a7539e8abb7271036bb917124f0a464451e671bbe7f269f8a2b2.",
+    "Final Core worktree clean; HEAD ce1a29a16bbc7239b3fdfedc466fef6c45e02c44."
+  ],
+  "risks": [
+    "Repository-wide npm run check is not green because of the pre-existing ASTChunker doctrine violation at the exact task-start blob; this SwiftPM task did not modify that unrelated AST lifetime surface.",
+    "The existing regex Package.swift parser still cannot resolve computed or non-literal target paths; this task preserves literal declared paths and leaves dynamic manifest evaluation unchanged.",
+    "Local-package targets intentionally retain package-root refs even when their own manifests declare a nested path, matching the package's compatibility boundary; only main-package explicit paths become precise.",
+    "Existing getTargetFiles parent-traversal/symlink behavior was not changed; RepoContext ref projection continues to reject lexical paths outside the repository."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "SpmDiscoverer parsed each literal SwiftPM target path and getTargetFiles used it, but listTargets overwrote the public DiscoveredTarget.path with pkgDir. RepoContext correctly consumed that public field and normalized the root package directory to '.', so target refs and Plan Facts lost ownership truth."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Pin focused baseline and real BiliDili output; add/commit BiliDili-shaped public-capability RED; minimally repair the SpmDiscoverer main-package projection; prove focused/full/build/check and public read-only runtime output; perform spec and skeptical quality review; commit and return evidence."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Only AlembicCore src/core/discovery/SpmDiscoverer.ts and test/ProjectContextRepoContext.test.ts changed. No Plugin, BiliDili, vendor, database, vector, Test, marketplace, release pointer, DTO, export, ranking, or gate edits."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/ProjectContextRepoContext.test.ts",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "full-suite",
+      "value": "npm test => 177 files, 1650 tests passed",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "runtime-probe",
+      "value": "From AlembicCore after npm run build, import @alembic/core/project-context-capabilities and execute kind=repo against ../BiliDili with includeMapSummary=false,maxFiles=800. Assert Home/VideoPlay exact paths, repoId=BiliDili, AOXPlayer package-root compatibility; output errors=[]; pre/post git status clean and Package.swift SHA-256 identical.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "commit",
+      "commit": "ce1a29a16bbc7239b3fdfedc466fef6c45e02c44",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: complete against original package—BiliDili-shaped fixture has nested main targets, explicit test target, no-path target, three local path packages, AOXPlayer noise, public API assertions, compatibility fields, full checks and real probe. Stage 2: independent read-only review found no blocker; main-package detection was strengthened to exact root Package.swift, normalization/local explicit-path/no-path cases were added, and only inherited/dynamic-manifest risks remain.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "swiftpm-target-path-proof",
+      "value": "RED '.' -> GREEN Home Sources/Features/Home and VideoPlay Sources/Features/VideoPlay in both deterministic test and real BiliDili public JSON."
+    },
+    {
+      "kind": "repo-context-compatibility-proof",
+      "value": "AOXFoundationKit/AOXNetworkKit/AOXPlayer target refs stay at Packages/* roots; Shared no-path target stays '.'; broad Sources, localPackages, target names/kinds, repoId, entrypoints and public contract remain compatible."
+    },
+    {
+      "kind": "read-only-no-write-proof",
+      "value": "Runtime path uses discovery and filesystem reads only; BiliDili status stayed clean and Package.swift hash was identical before/after."
+    },
+    {
+      "kind": "public-json-samples",
+      "value": "Home={kind:'target',label:'Sources/Features/Home',filePath:'Sources/Features/Home',repoId:'BiliDili'}; VideoPlay analogous; AOXPlayer={label:'Packages/AOXPlayer',filePath:'Packages/AOXPlayer'}; errors=[]"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-core-swiftpm-target-path-truth-p1__AlembicCore__p4-core-swiftpm-target-path-truth-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-swiftpm-target-path-truth-p1__AlembicCore__p4-core-swiftpm-target-path-truth-t1.json",
+    "deliveryRunId": "run-delivery-p4-core-swiftpm-target-path-truth-p1__AlembicCore__p4-core-swiftpm-target-path-truth-t1",
+    "dispatchGroup": "p4-core-swiftpm-target-path-truth-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-swiftpm-target-path-truth-p1__AlembicCore__p4-core-swiftpm-target-path-truth-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 23,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p4-core-swiftpm-target-path-truth-p1",
+    "targetTaskId": "p4-core-swiftpm-target-path-truth-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p4-core-swiftpm-target-path-truth-p1",
+    "resultId": "tr-p4-core-swiftpm-target-path-truth-t1",
+    "createdAt": "2026-07-12T17:14:07.611Z"
+  },
+  "createdAt": "2026-07-12T17:14:07.611Z",
+  "stateRevisionObserved": 23,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "同一 demand 的 Alembic NEXT combined package。以 clean baseline Alembic@43306622a06e2782381aa1aa257681f1f7aa8781 为父提交，完整 supersede revision 154 暴露的 V1 不可实现 equality；这不是第四次 point-fix，而是用户确认、Design 完整修订、controller revision 156 接受后的第二次且最终 requirement redesign 实现。\n\n唯一目标：\n把 strict external setup 收敛为可证明的两阶段顺序：\nexternal authority → existing external root-identity lease → StrictRunJournalHeaderV2 durable/readback/fsync → authenticated graceful quiesce → old PID exit + observable SQLite checkpoint/close → immutable QuiescedPreResetObservationReceiptV1 → exact whole-root snapshot/restore probe → reset/blank；pre-quiesce whole-root 只作 authorization/drift/recovery provenance，绝不能再作为 post-quiesce snapshot/restore expected hash。\n\n必须连接的真实入口和行为：\n1. DaemonSupervisor 在 ordinary ready fast-path 前识别 strict execute|recover|complete；strict launch 必须启动/等待新的 strict child 身份，不得把现有 ready daemon 当成功，也不得在 child 建立 external authority/lease/header 前 terminate/restart writer。普通非 strict ready/restart/start/stop 语义不变。\n2. 在现有 daemon HTTP/token/shutdown 面上增加一个最窄、hashes-only、run-bound、幂等的 strict-quiesce request/StrictQuiesceAcceptedAckV1；request 不含路径或 secret。校验 daemon token、项目/root identity 和 canonical request hash；相同 request 返回同一 ack，冲突 request fail closed 且 writer 保持运行。accepted ack 仅证明 daemon 接受停写，不冒充 checkpoint 完成。\n3. ack 后调用现有 shutdown coordinator。Bootstrap checkpoint(TRUNCATE)/DB close 失败必须对 strict owner 可观测，不能继续吞错。strict child 等待旧 PID 退出、daemon.json/daemon.pid 移除和 post-exit DB/WAL/SHM 稳态，再封印 QuiescedPreResetObservationReceiptV1。\n4. receipt 必须绑定 run/authority/header/lease/root identity、pre-quiesce receipt、request/ack或typed not-running/pristine-absent、exact post-quiesce rootTreeHash、checkpoint/integrity/WAL/SHM proof、protected config/marker/public-route hashes和最小 volatile delta。只有源码证明的 daemon.json/daemon.pid 删除可默认合法；daemon log 仅在运行证据证明本次 active stdio append 时精确记录。DB/WAL/SHM、daemon-entrypoint、marker、provider config和未知路径都不能被排除或宽泛 allowlist。\n5. snapshot source、restore probe、restoreWholeRootCrashSafely 和 recovery equality 全部改用 post-quiesce receipt/rootTreeHash；snapshot 后不得含 stale PID/state/token。恢复完成后只允许正常 runtime 新建 fresh daemon control identity，再恢复/reselect原 reader-mode binding并验证 DB/files/vector/route/migration/config/marker/baseline-read。\n6. journal execute/recover/complete 明确并实现幂等阶段：header 前；request 未接受；accepted/正在 drain；old PID exit/checkpoint 完成但 receipt 未写；receipt 已写、snapshot 未写；snapshot/restore-probe；quarantine/reset；restore；后续 public states。fresh process 只能重放同一 request hash或从已封印 receipt/snapshot继续。timeout/conflict/malformed ack/checkpoint failure/unknown delta 均禁止 SIGKILL 后继续 snapshot/reset。\n7. pristine absent 仍走 typed absent receipt，不伪造 shutdown/snapshot；authorized rebuild 使用真实 live-ready daemon 覆盖上述链。不得引入第二套 daemon control、operation lock、journal、snapshot、recovery platform，不得修改 Core/Agent/Plugin/Dashboard，不得把 Plugin 五工具或 Test 带回 pre-CAS。\n\n验收证据：\n- 先增加可复现 RED，再 GREEN。至少证明：(a) live-ready strict execute 不被吞；(b) authority→lease→header durable 时间/写入先于 request、control-file 删除和 checkpoint/root mutation；(c) malformed/conflict 不停 daemon；(d) accepted ack 幂等且 request 无路径/secret；(e) checkpoint failure 可观测并阻止 receipt/snapshot；(f) post-quiesce receipt 精确绑定 whole-root/DB/WAL/SHM和最小 delta；(g) snapshot/probe/reset成功且旧 V1 equality 不再执行；(h) 在上述每个 crash stage 由新进程恢复，exact restore 后无 stale control identity；(i) ordinary non-strict daemon ready/restart/start/stop 无回归。\n- 运行 focused unit/integration tests、built-entry/live-daemon runtime probes、fresh-process crash matrix、build/typecheck/lint/仓库规则要求的完整回归。原有 26-test baseline 只是回归起点，不是完成证据。\n- 两阶段自审：先逐项对 Design §§2.3/8/17/18.3 与 controller revision 156；再审认证/并发/TOCTOU、durability、checkpoint failure、hash authority、恢复幂等、普通兼容性和范围。\n- 只提交 Alembic 一个干净、可审查 commit；返回 parent/commit/tree、changed files/symbols、RED/GREEN、原始命令摘要、runtime/fault evidence 路径和内容 hash、逐条契约响应、兼容性及剩余风险。\n- 当前不得创建、修改、准备或派发 Test。即使本包通过，也必须由 controller 独立复验、重建并核验 exact artifacts/manifest，之后仍等待用户再次明确启动并配合 Test。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§2.3, 4.2/R0, 8, 17, 18.3, 23; workspace handoff §§5.1, 6–8; Original Plan I8-R; controller redesign revision 156",
+  "designIntent": "复用 Alembic 现有 strict recovery、daemon supervisor/HTTP/shutdown、Bootstrap checkpoint、external lease/journal/snapshot，在 authority/lease/header durable 后优雅停写，并以 post-quiesce exact receipt 作为 snapshot/restore authority。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-17T01:12:26.684Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-t1",
+      "taskPackageId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-p1",
+      "targetWindow": "Alembic",
+      "summary": "实现并证明 strict external setup 的两阶段优雅停写、post-quiesce snapshot authority 与逐阶段 fresh-process recovery；Test 保持暂停。",
+      "status": "pending",
+      "createdAt": "2026-07-17T01:12:26.684Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

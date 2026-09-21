@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1",
+  "dispatchGroup": "i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1",
+  "status": "blocked",
+  "summary": "Main 的 V1 自建 prompt/直铸 review 断点与上游 V3 公共契约已定位，但接受版本不存在真实跨进程稳定 Ed25519 key-custody/config route、预批准 public trust-policy store；Agent 也未公开生产 EvidenceLedgerStore 只读权威。任务包明确禁止用 ephemeral key、journal 私钥或第二套 authority 平台，因此按边界停止 fixture-only 实现。",
+  "evidenceRefs": [
+    "<workspace-root>/wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1/blocker-report.md",
+    "Alembic@1c16269796f270ec95ab8a3b1ae9c129573b9ee6",
+    "AlembicCore@d0d33e49cab732ec541bcfc3fb35447b6e2ad58d",
+    "AlembicAgent@5f6e8b1e6745a46752c8a6b035827e8889bcefbf",
+    "Alembic finishRef=finish-public-ms3jckwb-1"
+  ],
+  "verification": [
+    "npm run build:check — passed on clean Main baseline",
+    "npx vitest run test/integration/StrictRecipePipelineFacade.integration.test.ts — passed, 18/18",
+    "git status --short and git diff --check — clean for Main/Core/Agent after investigation",
+    "Source search confirmed no Main Ed25519/signingKey/trust-policy DI/config route and no public Agent EvidenceLedgerStore export"
+  ],
+  "risks": [
+    "Without an authorized stable key-custody and pre-approved trust-policy route, a new process could self-authorize a newly generated signer or remint reviews.",
+    "Without a public real Evidence Ledger authority and retained witness bundles, V3 review cannot consume the accepted historical evidence chain.",
+    "No product commit was created because the only implementable route inside this package would violate the explicit production boundary."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "baseline",
+      "ref": "Alembic@1c16269796f270ec95ab8a3b1ae9c129573b9ee6; Core@d0d33e49cab732ec541bcfc3fb35447b6e2ad58d; Agent@5f6e8b1e6745a46752c8a6b035827e8889bcefbf",
+      "verify": "All three git status --short outputs empty."
+    },
+    {
+      "kind": "command",
+      "ref": "npm run build:check",
+      "verify": "Passed on clean Alembic baseline."
+    },
+    {
+      "kind": "command",
+      "ref": "npx vitest run test/integration/StrictRecipePipelineFacade.integration.test.ts",
+      "verify": "Passed 1 file / 18 tests; establishes V1 baseline only."
+    },
+    {
+      "kind": "boundary",
+      "ref": "task-package production key boundary",
+      "verify": "No real across-process stable configured Ed25519 key-custody/config route exists; ephemeral production keys, journaled private keys, or a second authority platform are forbidden."
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "<workspace-root>/wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1/blocker-report.md",
+      "verify": "Documents V1 call sites, checkpoint/journal replay gap, V3 public contracts, exact blocker, and redispatch prerequisites."
+    },
+    {
+      "kind": "change-scope",
+      "value": "No product files changed and no commit created.",
+      "verify": "Main/Core/Agent remain clean at exact accepted revisions."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1__Alembic__i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1__Alembic__i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1__Alembic__i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1",
+    "dispatchGroup": "i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1__Alembic__i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 256,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1",
+    "targetTaskId": "i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "i3-i9-alembic-durable-semantic-review-consumption-rootcause8-p1",
+    "resultId": "tr-i3-i9-alembic-durable-semantic-review-consumption-rootcause8-t1",
+    "createdAt": "2026-07-27T18:03:55.585Z"
+  },
+  "createdAt": "2026-07-27T18:03:55.585Z",
+  "stateRevisionObserved": 256,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

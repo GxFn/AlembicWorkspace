@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-p1",
+  "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause3",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+  "status": "completed",
+  "summary": "Completed rootcause3 on the exact a829535 baseline with one bounded producer-owned strict-publication error contract. Migrated every currently reachable strict throw in the resolver/vector reader/Search executor/snapshot chain to the registered type; EmbeddedToolExecutor preserves only that explicit code and keeps unknown failures generic. Search accepts only a strict structured producer-failure schema and projects registered codes or CODEX_MCP_ERROR without inspecting message text. Real producer plus HostMcpServer regressions preserve provider unavailable/mismatch, corrupt store, out-of-root path, and ID-set mismatch codes; reader regressions cover invalid item, duplicate IDs, and query-dimension mismatch; fake strict tokens are not promoted. Existing top-level _meta provenance, five formal public tool compatibility, read-only behavior, and package/runtime startup gates remain green.",
+  "evidenceRefs": [
+    "commit:2a36c9b6c61ec765f54c8660f510c779b2bbc05c",
+    "tree:11438e5a9252bd6d84041faee55c5f16f12692e4",
+    "lib/host-runtime/context/StrictPublicationError.ts",
+    "lib/host-runtime/context/StrictPublicKnowledgeResolver.ts",
+    "lib/host-runtime/mcp/host/embedded-executor.ts",
+    "lib/host-runtime/mcp/host/read-only-json-vector-reader.ts",
+    "lib/host-runtime/mcp/host/read-only-search-executor.ts",
+    "lib/host-runtime/mcp/host/read-only-search-snapshot.ts",
+    "lib/host-runtime/mcp/knowledge-context-tools/search-output.ts",
+    "lib/host-runtime/mcp/project-runtime-output-schema.ts",
+    "test/unit/StrictPublicationErrorTransport.test.ts",
+    "test/unit/StrictPublicFiveToolCompatibility.test.ts"
+  ],
+  "verification": [
+    "RED on a829535: four real Search producer failures (provider unavailable, provider mismatch, corrupt non-array store, out-of-root store path) returned CODEX_MCP_ERROR; after producer typing, a second RED showed Search projection replacing the explicit producer code with alembic-search-output-contract-mismatch.",
+    "GREEN focused post-commit: 5 files / 57 tests passed, covering real Client + InMemoryTransport + HostMcpServer paths, formal five-tool compatibility, resolver behavior, reader inventory, and read-only fingerprint; npx tsc --noEmit passed.",
+    "Full npm run test:unit passed: 151 files / 1654 tests.",
+    "npm run check passed: typecheck, Biome with only 15 pre-existing noConsole warnings, import/layer/repository/scope/shared-asset/cross-shell/doctrine/naming/ring boundaries.",
+    "npm run build:check and npm run build passed using AlembicCore d4de7edd6bbfaeb36a01b3cc243ba1617c001f65.",
+    "npm run verify:plugin-distribution, verify:codex-runtime-package, verify:codex-plugin, and smoke:codex-plugin passed; runtime package npm-install/entrypoint, startup, shell bootstrap, and stdio all passed.",
+    "Source scans found no reachable plain Error strict throw, no throw new Error(code), no message match/includes fallback, and no unregistered strict literal in the covered producer chain; git diff --check passed and final worktree is clean.",
+    "Alembic Guard was invoked over all 11 changed files but the then-loaded runtime rejected its own top-level _meta with unrecognized_keys/CODEX_MCP_ERROR; no installed-cache or vendor edits/reload were made."
+  ],
+  "risks": [
+    "The Alembic Guard invocation performed before the Wakeflow restart produced no successful verdict because that installed Alembic runtime rejected its own _meta. Repository source tests, build, packaged runtime verification, and smoke are green.",
+    "JSON parse syntax failures remain generic CODEX_MCP_ERROR; only existing explicit strict classification sites were migrated, intentionally avoiding new message/path inference or scope widening.",
+    "Query-dimension mismatch is typed and directly regression-tested at the reader producer; the higher Search layer intentionally degrades that lane rather than surfacing it through Host transport, so no false Host claim is made."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "2a36c9b6c61ec765f54c8660f510c779b2bbc05c",
+      "verify": "parent a829535d5eaa7f2457be7d6ad10721500a5dad53; tree 11438e5a9252bd6d84041faee55c5f16f12692e4; clean worktree"
+    },
+    {
+      "kind": "mcp-transport-red-green",
+      "ref": "test/unit/StrictPublicationErrorTransport.test.ts",
+      "value": "RED proved four real Search producer codes collapsed to CODEX_MCP_ERROR and then exposed Search projector contract mismatch; GREEN carries exact registered codes through raw producer and real Host MCP transport.",
+      "verify": "post-commit focused 57/57; controller-rerun"
+    },
+    {
+      "kind": "prime-work-transport-tests",
+      "ref": "test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "value": "Previously accepted Prime/Work/Guard explicit-code transport, malformed failure rejection, and fake-token non-promotion remain intact.",
+      "verify": "post-commit formal compatibility 19/19 within focused 57/57; controller-rerun"
+    },
+    {
+      "kind": "public-five-transport-tests",
+      "ref": "test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "value": "All five formal public tools remain schema-legal with top-level _meta, no nested _meta, strict ready/unavailable/corrupt paths, and read-only serving.",
+      "verify": "post-commit focused 57/57 and full unit 1654/1654; controller-rerun"
+    },
+    {
+      "kind": "runtime-package",
+      "value": "Build, plugin distribution, runtime package installation/entrypoint, plugin verification, and startup smoke passed.",
+      "verify": "npm run build:check; npm run build; npm run verify:plugin-distribution; npm run verify:codex-runtime-package; npm run verify:codex-plugin; npm run smoke:codex-plugin"
+    },
+    {
+      "kind": "tests",
+      "ref": "test/unit/StrictPublicationErrorTransport.test.ts",
+      "value": "Focused 57/57 twice before commit and once after commit; full unit 151 files/1654 tests; check, typecheck, build, and diff gates passed.",
+      "verify": "controller-rerun commands recorded in verification array"
+    },
+    {
+      "kind": "boundary-scan",
+      "value": "Exactly 11 AlembicPlugin files changed; no Core/Main/Agent/Dashboard/Test/Wakeflow/vendor/cache edits, no cold-start semantic change, no message inference, no broad error-code pass-through.",
+      "verify": "git show --stat 2a36c9b; source scans; clean git status"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 matched every controller completion condition and prohibited conclusion. Stage 2 inspected the full diff/new files, checked strict schema exactness and allowlist completeness, reran post-hook tests/typecheck, and verified parent/commit/tree plus clean worktree.",
+      "verify": "self-attested with raw command evidence"
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "lib/host-runtime/context/StrictPublicationError.ts",
+      "value": "After repeated rework, the re-derived root cause was not another _meta projector defect: the earlier resolver-private error type left reachable vector/Search/snapshot producers throwing plain Error, so executor normalization erased valid strict codes after message inference was correctly removed. The repair centralizes one producer-owned bounded contract and keeps projector inference deleted.",
+      "verify": "a829535 RED raw producer collapses; second RED projector mismatch; 2a36c9b GREEN real producer/Host tests"
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean AlembicPlugin main at accepted rootcause2 commit before edits.",
+      "verify": "a829535d5eaa7f2457be7d6ad10721500a5dad53, tree d385ce0751baa3b4b6c19a3a349c8dadab9dc1d4"
+    },
+    {
+      "kind": "test-first",
+      "ref": "test/unit/StrictPublicationErrorTransport.test.ts",
+      "value": "Added real producer/Host negative cases first; observed four CODEX collapses, then observed the Search projector mismatch before implementing the strict producer-failure projection.",
+      "verify": "RED observations and final regression test"
+    },
+    {
+      "kind": "minimal-change",
+      "value": "One internal registered error contract, existing producer throw sites, existing executor boundary, and existing Search diagnostics channel; shared runtime schema was moved unchanged to avoid duplication.",
+      "verify": "11-file commit 2a36c9b; no second external protocol/fallback/cross-repo exception system"
+    },
+    {
+      "kind": "transport-sample",
+      "ref": "test/unit/StrictPublicationErrorTransport.test.ts",
+      "value": "Provider unavailable/mismatch, corrupt store, invalid path, and expected-ID mismatch retain exact STRICT_PUBLICATION_* diagnostics through Host MCP; a generic CODEX failure containing STRICT_PUBLICATION_FAKE_ONLY remains CODEX_MCP_ERROR.",
+      "verify": "real HostMcpServer assertions"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause3__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause3__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1.json",
+    "deliveryRunId": "run-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause3-host-send-1",
+    "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause3",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause3__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 175,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-p1",
+    "targetTaskId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause3",
+    "resultId": "tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "createdAt": "2026-07-26T09:15:47.344Z"
+  },
+  "createdAt": "2026-07-26T09:15:47.344Z",
+  "stateRevisionObserved": 175,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 4,
+  "supersedes": {
+    "resultId": "tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause2",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1__dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rootcause2__current-r0003.json"
+  }
+}

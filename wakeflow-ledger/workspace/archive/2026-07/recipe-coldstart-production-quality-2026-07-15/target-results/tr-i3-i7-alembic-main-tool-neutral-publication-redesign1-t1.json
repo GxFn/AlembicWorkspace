@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i7-alembic-main-tool-neutral-publication-redesign1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i7-alembic-main-tool-neutral-publication-redesign1-p1",
+  "dispatchGroup": "dg-i3-i7-alembic-main-tool-neutral-publication-redesign1-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i3-i7-alembic-main-tool-neutral-publication-redesign1-t1",
+  "status": "completed",
+  "summary": "Fresh strict sealed-corpus verification now rereads the full canonical SQLite knowledge row, exact Recipe file bytes, and complete canonical source-ref rows for every ready member in the fresh private revision, then compares each actual readback hash with its original ready-member proof before snapshot validation and public compare-null CAS. Missing or mismatched DB/file/ref storage fails closed. The existing manifest binding, journal order, public CAS, and package boundaries remain unchanged. Alembic commit bee8272f9ef2f959829577d38f27447a492e75e7 has parent 8a789ea2b5c17aa52af8e75bff0f9f0a4f1d0b8e and tree c255770449cf4a9c68227f67730861a2db1d3801.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/task-packages/i3-i7-alembic-main-tool-neutral-publication-redesign1-p1.json",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictPrivateCorpusRuntime.ts",
+    "Alembic/test/unit/StrictSealedCorpusVerification.test.ts",
+    "Alembic/test/unit/StrictServingSnapshotValidation.test.ts",
+    "Alembic/test/unit/StrictProductionJournal.test.ts",
+    "Alembic/test/unit/StrictResetAndPublicCas.test.ts",
+    "Alembic/test/unit/StrictProductionBoundaryStatic.test.ts",
+    "Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts"
+  ],
+  "verification": [
+    "Baseline provenance: Alembic 8a789ea2b5c17aa52af8e75bff0f9f0a4f1d0b8e / tree d378fc4af503f69bc7195730560a41aacdd6cd38; AlembicCore 5ad2e0a04d27000a27927acc4de0d83418b2420a / tree 9cc8ed0966ad71320c792765b4c0a2a3fd1f869d; AlembicAgent b2888aab463ae996341f9eeaba6d2bf91a6a11c0 / tree bb0b63aeec698a2b37a25f189ab453b254d549c2.",
+    "Test-first RED: the three new real-storage drift cases initially failed because DB content, Recipe file bytes, and source-ref row mutations all resolved instead of rejecting; the other three sealed-corpus tests remained green.",
+    "Actual-store GREEN: StrictSealedCorpusVerification.test.ts passed 6/6, including real SQLite row, real Recipe file, and actual recipe_source_refs drift fail-closed cases.",
+    "Post-commit focused verification passed 7 files / 28 tests, including publication journal order, compare-null public CAS, static boundaries, authorization, serving snapshot validation, sealed-store conservation, and real Facade/Generate/ColdStart one-public-CAS integration.",
+    "Post-commit npm run build:check passed; git diff HEAD^ --check passed; repository worktree is clean.",
+    "Full npm run check passed before commit-hook formatting: 151 unit files / 1120 tests; 32 integration files / 463 passed and 10 skipped; 3 coverage files / 11 tests; shared assets, retired symbols, and ring direction clean. The only lint diagnostics were five pre-existing unrelated noExplicitAny warnings outside changed scope.",
+    "Targeted Biome check passed for both changed files. Alembic Guard guard-public-mrnkheep-7 passed 2/2 files with zero violations after fixture decomposition.",
+    "Two-stage self-review confirmed the rework is limited to fresh actual-store conservation and its tests; journal, manifest, compare-null CAS, public activation, and cross-package boundaries were not redesigned."
+  ],
+  "risks": [
+    "This closes only the assigned sealed-store conservation defect and does not claim later I8/T6 completion or controller acceptance.",
+    "Strict ready-member proofs produced before this hash-semantics hardening use older readback projections and will fail closed under the new verifier; an interrupted pre-fix run must start a fresh strict run rather than resume through publication.",
+    "The full repository check still reports five pre-existing unrelated noExplicitAny warnings outside the changed scope; all checks exit successfully."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "bee8272f9ef2f959829577d38f27447a492e75e7",
+      "verify": "artifact-present"
+    },
+    {
+      "kind": "publication-order-tests",
+      "ref": "Alembic/test/unit/StrictProductionJournal.test.ts",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "public-cas-tests",
+      "ref": "Alembic/test/unit/StrictResetAndPublicCas.test.ts",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "boundary-scan",
+      "ref": "Alembic/test/unit/StrictProductionBoundaryStatic.test.ts",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "tests",
+      "ref": "Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "self-review",
+      "value": "Two-stage spec-compliance and code-quality review completed; Guard passed 2/2 changed files with zero violations, focused/post-commit validation passed, and the full repository check passed.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "baseline",
+      "value": "Alembic parent 8a789ea2b5c17aa52af8e75bff0f9f0a4f1d0b8e; Core 5ad2e0a04d27000a27927acc4de0d83418b2420a; Agent b2888aab463ae996341f9eeaba6d2bf91a6a11c0; sibling repositories clean.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Confirm rework gap and clean baseline; add three real-store drift RED tests; implement fresh DB/file/ref rehydration and proof comparison; run focused/full/build/boundary/Guard review; create one scoped commit and return evidence.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "test-first",
+      "value": "Three new actual-storage drift cases failed before implementation while three existing cases passed; after implementation the sealed suite passed 6/6 and the post-commit focused suite passed 28/28.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "change-scope",
+      "value": "Only Alembic/lib/recipe-pipeline/generate/strict/StrictPrivateCorpusRuntime.ts and Alembic/test/unit/StrictSealedCorpusVerification.test.ts changed; Core, Agent, Plugin, Test, journal/CAS architecture, and package exports were untouched.",
+      "verify": "self-attested"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i3-i7-alembic-main-tool-neutral-publication-redesign1-rework1__Alembic__i3-i7-alembic-main-tool-neutral-publication-redesign1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-alembic-main-tool-neutral-publication-redesign1-rework1__Alembic__i3-i7-alembic-main-tool-neutral-publication-redesign1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i3-i7-alembic-main-tool-neutral-publication-redesign1-rework1__Alembic__i3-i7-alembic-main-tool-neutral-publication-redesign1-t1",
+    "dispatchGroup": "dg-i3-i7-alembic-main-tool-neutral-publication-redesign1-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i7-alembic-main-tool-neutral-publication-redesign1-rework1__Alembic__i3-i7-alembic-main-tool-neutral-publication-redesign1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 106,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i7-alembic-main-tool-neutral-publication-redesign1-p1",
+    "targetTaskId": "i3-i7-alembic-main-tool-neutral-publication-redesign1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i3-i7-alembic-main-tool-neutral-publication-redesign1-rework1",
+    "resultId": "tr-i3-i7-alembic-main-tool-neutral-publication-redesign1-t1",
+    "createdAt": "2026-07-16T13:55:54.081Z"
+  },
+  "createdAt": "2026-07-16T13:55:54.081Z",
+  "stateRevisionObserved": 106,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i3-i7-alembic-main-tool-neutral-publication-redesign1-t1",
+    "dispatchGroup": "dg-i3-i7-alembic-main-tool-neutral-publication-redesign1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i3-i7-alembic-main-tool-neutral-publication-redesign1-t1__dg-i3-i7-alembic-main-tool-neutral-publication-redesign1__current-r0001.json"
+  }
+}

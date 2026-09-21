@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i8-alembic-public-lineage-integrity-rootcause5-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Main strict lineage root-cause repair. Baseline is clean Alembic commit bd58c342d78596e5e7af3c0535456cb0895ea3f8; consume accepted AlembicCore 898a461385c676dd2cc467bcf8bd58226409a87b and AlembicAgent 846e93d5351545d855489586948d60f1fa5f67b5. Preserve the already verified full facts→multi-epoch→G1/admission/G2/disposition→persist→G3 behavior. Repair the concrete disconnect found by controller review: a real two-epoch/15-obligation run currently reaches PUBLIC_CAS with expansionLedgerHeadHash=hash([]), and finalCodeFactGenerationManifestHash is a new hash of fact IDs rather than analysis.factExecutionManifest.manifestHash. Carry the authoritative expansion-ledger head/final schedule receipt and exact Core CodeFactGeneration manifest identity out of the analysis runtime, persist them in the checkpoint, and bind the same values without recomputation into ServingSnapshotValidation lineage, serving manifest, PublicKnowledgeRoute, runtime report and resume/reconstruction checks. No empty/default lineage may pass after an accepted expansion; base no-expansion runs must use the canonical Core no-expansion ledger identity, not an ad hoc constant. Add focused RED/GREEN assertions for multi-epoch route equality, actual manifest equality, tampered/missing lineage rejection before PUBLIC_CAS_PREPARED, and checkpoint replay divergence. Regenerate raw runtime/checkpoint/public-bundle evidence and include a collision-recovery UUID-suffix physical snapshot for the downstream Plugin consumer; do not claim the synthetic plugin-entry tgz from RuntimeArtifactManifestFixture as exact Plugin artifact evidence. If the helper remains for isolated runtime-load unit testing, label its synthetic boundary explicitly and keep it out of cross-repo acceptance. Run focused tests, the real Facade bootstrap integration, build:check, npm run check, release package guard, diff check and Guard; produce one clean Alembic commit and a point-by-point response to revision 201.",
+  "status": "pending",
+  "sourceRef": "controller revision 201 rework decision; Design requirement §§4.2,12.4,15.2-15.3; Alembic/lib/recipe-pipeline/generate/strict/StrictFinalizationRuntime.ts:348-354; wakeflow-ledger/Alembic/i3-i8-alembic-strict-chain-integrity-rootcause4-t1/checkpoint.json",
+  "designIntent": "只修复 strict analysis→finalization 的真实 lineage 传递：从 accepted Core/Agent expansion receipts 与 fact execution manifest 取得权威 hash，贯通 checkpoint、serving validation、manifest、route 和恢复校验；不重写已通过的 fact/admission/G1-G3/Plugin parser 实现。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "test",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "diff-review",
+        "verify": "changed-files-and-full-lineage"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "real-expansion-head-and-fact-manifest-bound"
+      },
+      {
+        "kind": "integration-evidence",
+        "verify": "bootstrap-entry-through-recovered-persisted-snapshot"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "failure-path-review"
+      },
+      {
+        "kind": "cross-repo-contract-review"
+      },
+      {
+        "kind": "root-cause-note"
+      }
+    ]
+  },
+  "createdAt": "2026-07-26T16:53:01.697Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i8-alembic-public-lineage-integrity-rootcause5-t1",
+      "taskPackageId": "i3-i8-alembic-public-lineage-integrity-rootcause5-p1",
+      "targetWindow": "Alembic",
+      "summary": "Repair the real expansion-ledger and final CodeFactGeneration manifest lineage through Main finalization/public route, then emit a physical recovered snapshot for Plugin revalidation.",
+      "status": "pending",
+      "createdAt": "2026-07-26T16:53:01.697Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

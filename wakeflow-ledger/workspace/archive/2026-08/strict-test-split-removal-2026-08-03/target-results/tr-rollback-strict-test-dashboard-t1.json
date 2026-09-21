@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rollback-strict-test-dashboard-t1",
+  "demandKey": "strict-test-split-removal-2026-08-03",
+  "taskPackageId": "rollback-strict-test-dashboard-p1",
+  "dispatchGroup": "rollback-strict-test-dashboard-p1",
+  "stateRoot": ".wakeflow-active/current/strict-test-split-removal-2026-08-03",
+  "targetWindow": "AlembicDashboard",
+  "targetTaskId": "rollback-strict-test-dashboard-t1",
+  "status": "completed",
+  "summary": "Precisely reverted rejected Dashboard consumer commit 6562eb13e9ccc204021a8580a2045c25a9ad9697, removing the strict-test API adapter/controller/hook/status panel/focused tests/generated projection. The pure revert restored the exact pre-6562eb1 tree. A separate minimal safety commit removes App.handleColdStart and the Candidates onColdStart binding, adds a fail-closed regression test, and makes the unavailable state explicit in zh/en; it does not design a replacement mode. Full npm run check passes, generated types are byte-identical to the rolled-back Main canonical, consumer residual scan is zero, browser DOM exposes no cold-start/rebuild/strict-test button, and an actual Vite-proxied browser request recorder observed zero modules/bootstrap, jobs/bootstrap, or strict-test-dimension requests.",
+  "changedRepos": [
+    "<workspace-root>/AlembicDashboard"
+  ],
+  "commits": [
+    "d965cf690568e63a85423a138867d926afe22e94",
+    "b6df7904e668301013f4d120fb24027d1f1edd6c"
+  ],
+  "commitDisposition": "committed",
+  "evidenceRefs": [
+    "commit:d965cf690568e63a85423a138867d926afe22e94",
+    "commit:b6df7904e668301013f4d120fb24027d1f1edd6c",
+    "AlembicDashboard/scripts/dashboard-contract.test.mjs"
+  ],
+  "verification": [
+    "npm run check: PASS (lint 101 source files; generated drift; space boundary; layer contract 101 files/13 areas/200 runtime edges/33 type-only bridges; doctrine; naming 105 files; 41/41 tests; typecheck; production build)",
+    "Consumer residual rg scan across src/scripts/package.json/config: zero for strict-test-dimension, DashboardStrictTest, StrictTestRun, strictTestApi, useStrictTest, handleStrictTest, and candidates-strict-test",
+    "cmp src/generated/api-types.ts ../Alembic/lib/generated/dashboard-api-types.ts: byte-identical; both SHA-256 5545fc9cb93fb5befc62aae3d8218a769567301cd2c8525a2c0217a26b98c44e",
+    "git diff --quiet 6562eb1^ d965cf6: PASS (pure revert restores exact parent tree)",
+    "git diff --check 6562eb1^ HEAD: PASS; git status --porcelain: clean",
+    "Focused RED/GREEN: node --test --test-name-pattern='Candidates cold-start stays unavailable' scripts/dashboard-contract.test.mjs",
+    "Browser DOM at http://127.0.0.1:5173/candidates: unavailable message visible; visible button labels only Alembic and search; no cold-start/rebuild/strict-test button",
+    "Actual Vite-proxied local HTTP recorder: normal page reads observed; filtered cold-start endpoints /api/v1/modules/bootstrap, /api/v1/jobs/bootstrap, and strict-test-dimension count 0",
+    "Cleanup: no listener remains on 127.0.0.1:5173 or 127.0.0.1:3000"
+  ],
+  "risks": [
+    "The browser recorder observed pre-existing GET /api/v1/modules/test-mode Header status reads. This path predates 6562eb1, is not wired to the removed Candidates entry, and was intentionally preserved by the exact-lineage/out-of-scope boundary; no ALEMBIC_TEST_MODE or replacement cold-start mode was introduced.",
+    "Build retains pre-existing non-failing CSS unknown-property and large-chunk warnings."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "dashboard-consumer-absent",
+      "red": "Pre-change rg scan found the dedicated strict-test adapter/controller/hook/panel/test/i18n/imports and generated route/operation/type validators throughout src, scripts, package, and layer contract.",
+      "green": "Post-revert scan across src/scripts/package/config returns zero dedicated consumer symbols; API adapter/controller/hook/panel/focused test files are deleted; npm typecheck/build pass; generated Dashboard artifact is byte-identical to Main canonical.",
+      "ref": "commit:d965cf690568e63a85423a138867d926afe22e94"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "dashboard-no-legacy-fallback",
+      "red": "Immediately after the pure revert, App.handleColdStart called api.bootstrap and App passed onColdStart to CandidatesView; the new focused test failed on that exact restored call chain.",
+      "green": "The same focused test passes after removing App.handleColdStart/onColdStart binding and adding explicit unavailable copy. Real browser DOM showed only Alembic/search buttons, no cold-start/rebuild/strict-test button; the Vite-proxied local request recorder captured normal page reads but zero /modules/bootstrap, /jobs/bootstrap, or strict-test-dimension requests.",
+      "ref": "AlembicDashboard/scripts/dashboard-contract.test.mjs"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "dashboard-exact-lineage",
+      "red": "Initial HEAD was rejected consumer commit 6562eb1 with no inverse commit present.",
+      "green": "d965cf6 is a standard Git revert carrying This reverts commit 6562eb1; its tree is byte-for-byte the 6562eb1 parent tree. The separate b6df790 safety commit touches only App, the focused contract test, and zh/en unavailable copy; git diff --check passes and the worktree is clean.",
+      "ref": "commit:d965cf690568e63a85423a138867d926afe22e94"
+    },
+    {
+      "kind": "baseline",
+      "value": "Pre-change npm run check stopped at expected generated drift: Dashboard 8dc8d0da... versus controller-accepted rolled-back Main canonical 5545fc9c.... This dependency drift is the generated projection removed by the task."
+    },
+    {
+      "kind": "test-first",
+      "ref": "AlembicDashboard/scripts/dashboard-contract.test.mjs",
+      "verify": "Candidates cold-start test failed after the pure revert on const handleColdStart/api.bootstrap and later passed unchanged in behavioral meaning after the safety patch; unavailable-copy assertion also failed before locale patch and passed after."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: exact task scope satisfied—consumer deleted, no legacy network fallback, no replacement mode, only one repo changed. Stage 2: no P0/P1/P2 findings; retained optional CandidatesView onColdStart rendering seam is unreachable because App supplies no callback, is locked by test, and avoids widening the exact revert beyond the allowed hidden-entry strategy."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Pure revert modifies exactly the 14 files attributed to 6562eb1. Safety commit modifies only scripts/dashboard-contract.test.mjs, src/App.tsx, and zh/en locale files."
+    }
+  ],
+  "resultMapping": {
+    "contract": "target-result-envelope-v2",
+    "compatibility": "enforced",
+    "status": "complete",
+    "acceptanceAnchorIds": [
+      "dashboard-consumer-absent",
+      "dashboard-no-legacy-fallback",
+      "dashboard-exact-lineage"
+    ],
+    "testPlanIndices": []
+  },
+  "deliveryContext": {
+    "deliveryId": "delivery-rollback-strict-test-dashboard-p1__AlembicDashboard__rollback-strict-test-dashboard-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/strict-test-split-removal-2026-08-03__delivery-rollback-strict-test-dashboard-p1__Alem--8bf88f16f9b7.json",
+    "deliveryRunId": "run-delivery-rollback-strict-test-dashboard-p1",
+    "dispatchGroup": "rollback-strict-test-dashboard-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/strict-test-split-removal-2026-08-03__delivery-rollback-strict-test-dashboard-p1__Alem--8bf88f16f9b7.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/strict-test-split-removal-2026-08-03",
+    "stateRevision": 10,
+    "demandKey": "strict-test-split-removal-2026-08-03",
+    "taskPackageId": "rollback-strict-test-dashboard-p1",
+    "targetTaskId": "rollback-strict-test-dashboard-t1",
+    "targetWindow": "AlembicDashboard",
+    "dispatchGroup": "rollback-strict-test-dashboard-p1",
+    "resultId": "tr-rollback-strict-test-dashboard-t1",
+    "createdAt": "2026-08-03T15:22:34.708Z"
+  },
+  "createdAt": "2026-08-03T15:22:34.708Z",
+  "stateRevisionObserved": 10,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

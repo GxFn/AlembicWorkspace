@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i6-agent-public-strict-facade-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "基线与范围\n- 仅修改 AlembicAgent；开工必须是 clean HEAD e2aa051500cc9fc5c43f1085afd5072c5981f26f / tree 459723c2ecf2919f95b2dccbaae6e4e51d46f61b。相邻已验收 Core 上游为 737ac265dc50b8ccf788c1b9103ead537d94ff06，只读使用，不修改 Core/Main/Plugin/Design/Test/Wakeflow。\n- 这是 Main blocker 已复现的最小公共面修复：现有 strict 实现已验收，但合法 package imports 无法访问。不得重写 Plan/Analyst/Producer/reviewer、prompt、provider、runtime 或新增 orchestrator/store。\n\n完成合同\n1. 新增三个窄且稳定的 exact package subpaths：@alembic/agent/runs、@alembic/agent/production、@alembic/agent/evaluation。优先用顶层 curated facade 文件，避免把内部 barrel 全量暴露；不得扩大根入口，除非现有边界测试证明唯一合法方案。\n2. runs 至少公开 runStrictPlanAgent 及其 RunStrictPlanAgentInput、PlanContextProjectionV1 类型；production 公开 Main 完成 strict orchestration 真正需要的现有 strict analysis projection/expansion、Analyst epoch/fixpoint、Producer lineage/expression-set/repair/gate/stage contracts，不复制实现；evaluation 公开 IndependentValueReviewer、InvestigatedEmptyReviewer 及其输入/决策类型。不要公开 module-private authority、fixture/eval runner 或 provider internals。\n3. package.json exports 的 import/types 必须指向构建后真实文件；同步更新 agent-public-api-boundary 的 stable count/list/contract matrix、public signatures 与相应 smoke/fixture。原 12 个公共 subpath 的绑定集合和语义保持不变，新增面只包含批准的 strict contracts。\n4. 用构建后的包从 Alembic checkout 真实导入三个新 subpath，证明上述运行时函数/class 非 undefined，并用 TypeScript consumer fixture 证明必要类型可解析；不得使用 src/dist deep import、相对跨仓 import或 test alias。\n5. 负向证明 @alembic/agent/src/*、dist/*、三段及更深内部路径仍是 ERR_PACKAGE_PATH_NOT_EXPORTED；现有 legacy root/service/runtime/prompts 等入口继续通过。不得为了 consumer 方便开放 wildcard。\n6. 只提交一个干净 AlembicAgent commit；回填 parent/commit/tree、changed exports/symbols、RED/GREEN actual import、built artifact/signature hashes、Alembic consumer probe、focused/full tests与两阶段自审。\n\n验证至少包含 npm run build:check、npm run check、npm run test、lint:public-api-boundary、smoke:public-imports、smoke:public-signatures、lint:core-import-boundary、release package/pack preview 相关现有门禁及 git diff --check。不得进入 Main orchestration、Core rehydrate、LLM 外网/真实 key、Recipe persistence/serving 或 Test。",
+  "status": "pending",
+  "sourceRef": "Requirement Design I3-I7 Agent→Main producer/consumer chain；accepted AlembicAgent@e2aa051500cc9fc5c43f1085afd5072c5981f26f；Main blocker result tr-i3-i7-alembic-main-strict-orchestration-t1；controller route decision evt-20260716083524-0086",
+  "designIntent": "复用现有 strict modules，只增加三个精确顶层 package facade 与机械边界/签名/消费者验证，让 Main 可通过合法 @alembic/agent 子路径消费。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "single-clean-agent-commit-on-e2aa0515"
+      },
+      {
+        "kind": "public-api",
+        "verify": "built exact runs/production/evaluation exports and approved runtime/type symbols"
+      },
+      {
+        "kind": "consumer-import",
+        "verify": "real Alembic checkout runtime and TypeScript imports use only legal package specifiers"
+      },
+      {
+        "kind": "negative-tests",
+        "verify": "src/dist/deep/wildcard imports remain ERR_PACKAGE_PATH_NOT_EXPORTED"
+      },
+      {
+        "kind": "tests",
+        "verify": "build-check/check/full/public-smokes/core-boundary/release-package/diff checks"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "original 12 public surfaces unchanged and no strict runtime implementation rewrite"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "execution-plan"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "two-stage-self-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T08:37:10.301Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i6-agent-public-strict-facade-rework1-t1",
+      "taskPackageId": "i3-i6-agent-public-strict-facade-rework1-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "在 AlembicAgent 已验收 strict 实现上补 @alembic/agent/runs、/production、/evaluation 三个 curated 公共 facade，以及边界/签名/真实 Main consumer import 证据；不改实现、不扩根入口。",
+      "status": "pending",
+      "createdAt": "2026-07-16T08:37:10.301Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

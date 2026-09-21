@@ -1,0 +1,260 @@
+{
+  "scope": "Final bounded independent review of current fixes: memory coordinator/retrieval/consolidation/session restore, provider fallback/gateway/JSON/usage/timeout plus changed tests",
+  "baseCommit": "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05",
+  "status": "three concrete remaining findings at observation time; root owns follow-up edits",
+  "files": [
+    {
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/agent/memory/MemoryRetriever.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/agent/memory/MemoryConsolidator.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/agent/memory/SessionStore.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/agent/memory/SessionStoreSchema.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/ai/AiFactory.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/ai/gateway/LLMGateway.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/ai/transport/LLMTransport.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/ai/transport/OpenAiTransport.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/ai/transport/DeepSeekTransport.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "src/ai/transport/GoogleTransport.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "test/memory-context.test.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "test/AiFactory.test.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "test/LLMGateway.test.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "test/OpenAiTransportResponses.test.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    },
+    {
+      "path": "test/OpenAiProvider.test.ts",
+      "reviewed": true,
+      "reviewLevel": "current-diff-and-dependent-consumer-review"
+    }
+  ],
+  "findings": [
+    {
+      "id": "FPR-01",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStoreSchema.ts",
+      "line": 84,
+      "relatedFinding": "PC-13",
+      "issue": "恢复校验仍未校验工作记忆和reflection里的被消费集合；坏嵌套值被接受，恢复后的首次上下文读取直接抛错。",
+      "evidence": [
+        {
+          "input": {
+            "dimensionReports": {
+              "a": {
+                "workingMemoryDistilled": {
+                  "keyFindings": {}
+                }
+              }
+            }
+          },
+          "restore": "SessionStore.fromJSON accepted",
+          "call": "buildContextForDimension(\"b\")",
+          "actual": "report.workingMemoryDistilled.keyFindings.map is not a function"
+        },
+        {
+          "input": {
+            "tierReflections": [
+              {
+                "tierIndex": 1,
+                "topFindings": [
+                  null
+                ]
+              }
+            ]
+          },
+          "restore": "SessionStore.fromJSON accepted",
+          "call": "getRelevantReflections(\"b\")",
+          "actual": "Cannot read properties of null (reading 'importance')"
+        }
+      ],
+      "suggestion": "在纯校验阶段校验/归一化 workingMemoryDistilled.keyFindings、tierReflections.topFindings 及已有消费者读取的string数组字段；合法缺省及legacy结构继续保留。加载坏嵌套checkpoint应返回false且不改旧状态。",
+      "missingTest": "目前新增无效checkpoint测试仅invalid:null和findings:null；补这两类坏嵌套输入及原子性断言。"
+    },
+    {
+      "id": "FPR-02",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "line": 527,
+      "relatedFinding": "PC-18",
+      "issue": "预算透传已修复，但真实SessionStore仍用字符/4并在裁剪后额外加footer；中文上下文实际token超过新传入的分配预算。",
+      "evidence": {
+        "setup": "MemoryCoordinator({sessionStore,totalMemoryBudget:100}); allocateBudget(\"producer\"); storeDimensionReport(\"a\",{digest:{summary:\"证据\".repeat(1000)}})",
+        "call": "buildStaticMemoryPrompt({currentDimId:\"b\"})",
+        "allocatedSessionTokens": 55,
+        "actualEstimateTokens": 115,
+        "renderedChars": 247
+      },
+      "suggestion": "SessionStore的render裁剪复用与MemoryRetriever一致的token估算，预算包括footer；0预算不能经||Infinity变成无限。保留完整状态，仅改变prompt投影。",
+      "missingTest": "当前新增Coordinator测试只mock buildContextForDimension并断言传参；补真实中文SessionStore输出<=分配token预算。"
+    },
+    {
+      "id": "FPR-03",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "line": 933,
+      "relatedFinding": "PC-11",
+      "issue": "新normalizeCacheArgs用内层params覆盖顶层action，与runtime顶层action优先的解析不一致，并让副作用调用可被缓存成read结果。",
+      "evidence": {
+        "writeCall": {
+          "action": "write",
+          "params": {
+            "action": "read",
+            "path": "src/a.ts"
+          }
+        },
+        "storedResult": "write-result",
+        "readCall": {
+          "action": "read",
+          "path": "src/a.ts"
+        },
+        "actualCachedResult": {
+          "content": "write-result",
+          "path": "src/a.ts",
+          "cached": true
+        }
+      },
+      "suggestion": "顶层action存在时必须优先；或直接拒绝action冲突的请求。仅经过明确read/search动作判定后构造key和写cache。",
+      "missingTest": "添加顶层write/内层read冲突，断言正常read无法命中；保留已有扁平/params等价参数命中测试。"
+    }
+  ],
+  "verified": [
+    {
+      "area": "新evidenceStore往返",
+      "method": "当前源码内存转译，Core logger/timer依赖stub，无真实fs写入",
+      "result": "SessionStore.toJSON/fromJSON保留Finding与timestamp，searchEvidence结果深等。"
+    },
+    {
+      "area": "legacy恢复/原子性/定时器",
+      "method": "内存fs fixture",
+      "result": {
+        "version1LegacyFileAccepted": true,
+        "legacyEvidenceCount": 1,
+        "missingProjectContextPreserved": true,
+        "nullReportRejectedWithoutMutation": true,
+        "loadCreatedTimers": 0,
+        "disposedFromJsonInstancesTimerBalance": 0
+      }
+    },
+    {
+      "area": "usage与结构化输出",
+      "method": "当前Gateway→Transport代码、global fetch stub",
+      "result": [
+        {
+          "provider": "openai",
+          "style": "chat",
+          "value": 42,
+          "usageCount": 1,
+          "jsonFormat": "json_object"
+        },
+        {
+          "provider": "openai",
+          "style": "responses",
+          "value": 42,
+          "usageCount": 1,
+          "jsonFormat": "json_object"
+        },
+        {
+          "provider": "google",
+          "value": 42,
+          "usageCount": 1,
+          "jsonFormat": "application/json",
+          "schemaPreservedAndDefaultStripped": true
+        },
+        {
+          "provider": "deepseek",
+          "value": 42,
+          "usageCount": 1,
+          "jsonFormat": "json_object"
+        }
+      ]
+    },
+    {
+      "area": "取消/timeout",
+      "method": "mock fetch按signal响应，maxRetries=0",
+      "result": {
+        "globalTimeoutOverridesExplicitProviderTimeout": true,
+        "internalTimeoutCode": "ETIMEDOUT",
+        "fetchesForTimeout": 1,
+        "preAbortError": "AbortError",
+        "preAbortedNewFetches": 0
+      }
+    },
+    {
+      "area": "冲突事务与重要性",
+      "method": "逐行diff和新增SQLite测试审查，未另运行native SQLite",
+      "result": "preResolveConflicts与enforceCapacity均在同一transaction；持久化错误传播；importance新增可选字段在add和duplicate提升路径透传。未发现新的可定位回归。"
+    },
+    {
+      "area": "AiFactory",
+      "method": "逐行diff和新增mock-probe测试审查",
+      "result": "主provider排除身份已改用primary.name；未发现新的可定位回归。"
+    },
+    {
+      "area": "patch whitespace",
+      "method": "git diff --check scoped files",
+      "result": "exit 0"
+    }
+  ],
+  "limitations": [
+    "Only current requested diffs and direct consumers reviewed; no new architecture scope.",
+    "No product/test files changed. No actual provider/network requests.",
+    "No native SQLite execution in this pass; existing added SQLite tests inspected.",
+    "Root may change files concurrently after these observations; line numbers identify observed working-tree version."
+  ]
+}

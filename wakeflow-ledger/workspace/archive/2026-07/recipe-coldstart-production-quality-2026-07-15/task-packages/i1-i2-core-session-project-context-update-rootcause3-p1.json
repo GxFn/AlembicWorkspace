@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i1-i2-core-session-project-context-update-rootcause3-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Core PC-F rootcause3，基于已接受 AlembicCore@f82bfec58e36ea71e575a23bee356623a7a28381，只补一个缺失的 producer 能力：GenerateSession 当前仅在 constructor 复制 projectContext，toSnapshot 只是读取，Main 的 dependency/module actual-entrypoint receipts 在 session 创建后产生却无法触发持久化；新进程重开因此只剩 plan/recipe。\n\n最小实现合同：\n1. 在既有 GenerateSession/GenerateSessionManager 责任内提供受控的 projectContext replace/update API，保持同 session id、projectRoot、lease、dimensions 和已有进度不变，并调用既有 onChange/#persist；禁止调用方选择 dataRoot、禁止第二 store/journal/registry。\n2. 更新值必须作为持久化 snapshot 的权威值；调用返回后同进程 toSnapshot 与 fresh GenerateSessionManager(dataRoot) 重开完全相同。不得依赖后续 dimension completion 等偶然 onChange 才落盘。\n3. 防止外部对象在未调用更新 API 时通过浅引用静默改变 session；至少 projectContext 更新输入和 toSnapshot 输出不能成为绕过 onChange 的可变后门。\n4. 加回归：创建 session(carrier receipts=[plan,recipe])→受控更新为 [plan,recipe,dependency]→再更新 module→同 id fresh-process/file reload 得到四项；未调用更新时修改读出对象不得改变内存或磁盘；现有 session lease/complete/expiry 行为不回归。\n5. 仅提交 AlembicCore 一个干净 commit，运行 build/check 与 GenerateSession focused/full tests、git diff --check，回填 commit/命令/原始 runtime JSON 或日志。\n\n禁止范围：不改 Alembic/Plugin/Agent/Dashboard/Test/Wakeflow；不实现 Main carrier、PC-F counters、strict journal、I3+；不新建存储。若现有 session contract 不能在不破坏兼容性的前提下支持，回填精确 blocker，不用旁路文件。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§3 Session construction, 18.0 Alembic actual Generate session persistence; controller decision tc-20260715195745-0035",
+  "designIntent": "在既有 GenerateSession/GenerateSessionManager 上增加一个受控、同 session 原地更新 projectContext 并立即持久化的最小边界；不新建 store、journal 或 Main 专用类型。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T20:00:22.921Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i1-i2-core-session-project-context-update-rootcause3-t1",
+      "taskPackageId": "i1-i2-core-session-project-context-update-rootcause3-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "为 Main actual-entrypoint lineage 提供唯一缺失的 Core session 原地持久化边界，并证明同 ID 新进程重开与不可变快照。",
+      "status": "pending",
+      "createdAt": "2026-07-15T20:00:22.921Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

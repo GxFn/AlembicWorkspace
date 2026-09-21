@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8r-alembic-main-two-stage-quiesced-observation-redesign2-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-p1",
+  "dispatchGroup": "dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-t1",
+  "status": "completed",
+  "summary": "Implemented and committed the strict two-stage daemon quiesce and post-quiesce observation redesign. Strict startup now classifies before the ordinary ready path, binds authority/lease/V2 journal before target mutation, performs token-authenticated hashes-only idempotent quiesce through the existing daemon HTTP/shutdown chain, proves exact accepted-ack plus successful LIFO shutdown transcript, rejects nonterminal WAL checkpoints without snapshot/reset, seals the sole post-quiesce receipt, snapshots/restores from that receipt, and resumes setup/recovery crashes through a single hash-chained multi-track journal. Non-strict startup and shutdown behavior remains compatible.",
+  "evidenceRefs": [
+    "Alembic/bin/daemon-server.ts",
+    "Alembic/lib/Bootstrap.ts",
+    "Alembic/lib/daemon/runtime/DaemonSupervisor.ts",
+    "Alembic/lib/daemon/runtime/StrictDaemonQuiesce.ts",
+    "Alembic/lib/http/routes/daemon.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictProductionJournal.ts",
+    "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+    "Alembic/test/unit/StrictProductionJournal.test.ts",
+    "Alembic/package.json"
+  ],
+  "verification": [
+    "Commit f281f8ca196d7381554c7f314a823f58ce0767d9 is a single Alembic-only commit; working tree is clean.",
+    "npm run check passed on the final tree: 156 unit files / 1173 tests, 32 integration files / 467 passed with 10 skipped, coverage gate 11/11, plus type/lint/boundary/drift/retired-symbol/ring checks.",
+    "npm run build:self passed and the rebuilt dist live-process positive test proved old PID exit, exact ack/shutdown transcript, terminal SQLite checkpoint, receipt/snapshot creation, and fresh replacement identity.",
+    "The rebuilt dist live-reader negative test proved checkpoint failure leaves old daemon control files observable and creates neither post-quiesce receipt nor snapshot; no SIGKILL-then-continue path is used.",
+    "Manual two-stage self-review checked authority ordering, hashes-only payloads, exact filesystem delta, crash points, protected bindings, non-strict compatibility, repository scope, secret/absolute-path absence, and process cleanup."
+  ],
+  "risks": [
+    "Alembic code_guard could not run because the plugin rejects its own injected _meta field with non-retryable unrecognized_keys; repository-native full checks and manual review passed.",
+    "The exact successful shutdown transcript is deliberately coupled to the registered LIFO hook labels/order; a future shutdown-hook change must update the transcript contract and its built live-process test."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "f281f8ca196d7381554c7f314a823f58ce0767d9",
+      "ref": "Alembic",
+      "verify": "git show --check f281f8ca196d7381554c7f314a823f58ce0767d9 && git status --short"
+    },
+    {
+      "kind": "tests",
+      "ref": "Alembic/package.json",
+      "value": "npm run check",
+      "verify": "cd Alembic && npm run check"
+    },
+    {
+      "kind": "runtime-evidence",
+      "ref": "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+      "value": "rebuilt dist live daemon positive and WAL-reader checkpoint failure probes",
+      "verify": "cd Alembic && npm run build:self && npm run test:unit -- test/unit/StrictExternalSetupRecovery.test.ts"
+    },
+    {
+      "kind": "self-review",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+      "value": "two-stage protocol, crash recovery, exact delta, compatibility, scope and secret review",
+      "verify": "cd Alembic && git diff 43306622a06e2782381aa1aa257681f1f7aa8781..f281f8ca196d7381554c7f314a823f58ce0767d9 --check"
+    },
+    {
+      "kind": "test-first",
+      "ref": "Alembic/test/unit/DaemonSupervisor.test.ts",
+      "value": "RED proved the ordinary ready fast path swallowed strict setup before implementation",
+      "verify": "review committed RED/GREEN coverage in DaemonSupervisor and strict recovery tests"
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "Alembic/lib/daemon/runtime/DaemonSupervisor.ts",
+      "value": "strict classification occurred after ready return and replacement pre-terminated the old daemon, preventing an authoritative quiesced observation",
+      "verify": "review strictExternalLaunch classification and manageTargetControlFiles branches"
+    },
+    {
+      "kind": "scope-diff",
+      "ref": "Alembic/bin/daemon-server.ts",
+      "value": "13 Alembic product/test files only; no AlembicCore, AlembicAgent, ledger, or sibling product edits",
+      "verify": "git show --name-status --format= f281f8ca196d7381554c7f314a823f58ce0767d9"
+    },
+    {
+      "kind": "compatibility-review",
+      "ref": "Alembic/lib/Bootstrap.ts",
+      "value": "strict-only fail-closed checkpoint and silent shutdown are opt-in; ordinary ready/start/checkpoint/logging paths retain existing behavior",
+      "verify": "cd Alembic && npm run check"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2__Alembic__i8r-alembic-main-two-stage-quiesced-observation-redesign2-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2__Alembic__i8r-alembic-main-two-stage-quiesced-observation-redesign2-t1.json",
+    "deliveryRunId": "run-delivery-dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2",
+    "dispatchGroup": "dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2__Alembic__i8r-alembic-main-two-stage-quiesced-observation-redesign2-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 158,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-p1",
+    "targetTaskId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2",
+    "resultId": "tr-i8r-alembic-main-two-stage-quiesced-observation-redesign2-t1",
+    "createdAt": "2026-07-17T02:00:43.893Z"
+  },
+  "createdAt": "2026-07-17T02:00:43.893Z",
+  "stateRevisionObserved": 158,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

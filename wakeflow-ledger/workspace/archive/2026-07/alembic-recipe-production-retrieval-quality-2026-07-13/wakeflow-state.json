@@ -1,0 +1,1095 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "title": "统一冷启动、增量、模块扫描、知识提交四类 Recipe 生产能力，建立 evidence-grounded retrieval profile/readiness 与安全索引代际，并清理历史创建/自动发布旁路。",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "controllerWindow": "AlembicWorkspace",
+  "testDecision": "no Test window；controller 使用受控副本验证 profile/projector/migration/shadow/rollback，并对 BiliDili 与 AlembicWorkspace 原始知识根只读重复 Search/Prime、冷进程和零写指纹验收。",
+  "state": "archived",
+  "stateReason": "Demand completed after all 16 target tasks were controller-accepted and the final public BiliDili/AlembicWorkspace Search-Prime acceptance passed with zero writes; archive the completed runtime state and free active capacity.",
+  "revision": 92,
+  "activeStageId": null,
+  "updatedAt": "2026-07-14T01:05:05.775Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p1-core-recipe-retrieval-production-generation-p1",
+      "summary": "Implement the complete AlembicCore producer foundation for the confirmed Recipe production/retrieval-quality requirement, starting from clean baseline d17db939ed49ea30bdbf380f400b783530b6d6a8 and returning one clean Core commit.\n\nRequired connected implementation:\n1. Add the additive, Recipe-embedded retrieval profile contract across KnowledgeEntry/domain, Markdown serialization, SQLite/API wire and public exports. Preserve old Recipes through a versioned compatibility projector; do not add a separate retrieval database or state machine. Profile semantics must include schema version, project-primary summary, evidence-grounded technical English summary/concepts/scenarios/exclusions, field/source provenance and deterministic content hashes.\n2. Implement deterministic RetrievalReadiness and connect it to the real Recipe production/persistence/publish path, not an unused facade. pending/staging may retain repairable violations; every active transition uses the same readiness result. Provider availability, vector state, query ranks and frozen acceptance queries must be absent from hard readiness inputs. Include at least one real in-test production consumer through persistence and projection.\n3. Replace conflicting sparse/dense Recipe material with one RecipeRetrievalDocumentSet projector: required intent plus information-dense, non-duplicate optional guidance/implementation/rationale roles. Raw paths, evidence IDs, quality bookkeeping and bridge metadata are provenance only. Sparse and dense serialize/weight the same facts and hashes. Retire fixed nine-region active Recipe candidate generation and prevent generic entry vectors from competing as a second Recipe representation, while preserving accepted KnowledgeRetrievalPort, truth projection, refill, raw lane evidence and query-side reader-only boundaries.\n4. Make lifecycle derivation identical for knowledge events, incremental maintenance and full build. Add generation manifest identity covering projection schema/provider/model/dimension/format/corpus; exact per-Recipe expected IDs; detection/repair planning for orphan, missing, partial, duplicate, hash mismatch and stale generation; provider-independent delete/deprecate cleanup; verified replacement; shadow build, atomic active switch and rollback. A failed build must leave the old generation queryable. No query-time projector persistence, reconcile, rebuild or writer construction.\n5. Preserve compatibility for existing Core and outer consumers through stable package exports and explicit diagnostics. Exact TypeScript shape may adapt only within confirmed semantics.\n\nRequired RED/GREEN evidence:\n- profile Markdown/domain/SQLite/API round-trip without field loss;\n- ungrounded/default/whole-file code evidence produces stable readiness violations and cannot publish active;\n- provider offline yields the same readiness decision;\n- compatibility projection never invents English facts;\n- projector emits required/distinct roles and sparse+dense share source/profile/document hashes;\n- incremental and full derivation are byte-equivalent for the same Recipe;\n- same-dimension model or projection-schema changes require a new generation;\n- exact reconcile catches orphan/missing/partial/duplicate/stale-generation fixtures;\n- update verifies full replacement before old removal; delete works without provider;\n- failed shadow build preserves active generation and rollback restores it;\n- public Search/Prime/Recipe retrieval call graphs remain reader-only and existing truth/refill tests pass.\n\nRepository gates and return:\n- run focused tests, npm run test, npm run build:check, npm run build, npm run lint and npm run check as applicable under repository rules, plus Core delivery/tool/Codex/package boundary tests;\n- review git diff/check, public exports, migrations and compatibility;\n- two-stage self-review: requirement compliance, then correctness/failure paths/performance/maintainability;\n- commit only AlembicCore, return exact parent/commit, changed files/symbols, raw command summaries, compatibility notes and residual risks.\n\nExplicit non-goals: no AlembicAgent/AlembicPlugin/Alembic/AlembicDashboard edits; no real BiliDili/AlembicWorkspace data access or mutation; no query weighting/rank tuning, hardcoded query/Recipe ID/global synonyms, model replacement, Test work, Graph/Recipe Map changes, Plugin↔Alembic coupling, Git/host/role/knowledge-status gates, query-time maintenance or empty type-only contracts.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Make Recipe retrieval expression and derived index identity one shared, deterministic contract without changing query-time truth boundaries.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green-note"
+          },
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "compatibility-review"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T10:51:15.762Z"
+    },
+    {
+      "taskPackageId": "p2-agent-recipe-production-profile-adapter-p1",
+      "summary": "Implement the single combined AlembicAgent landing for the confirmed Recipe production/retrieval-quality demand, consuming accepted AlembicCore commit b711ea10aa5c67d1d75a58a18c0d56623e26c290 through its public contracts.\n\nRequired connected implementation:\n1. Inventory the real Agent Recipe-producing call graph, including knowledge.submit, session-bound/opportunistic variants, and any cold-start or incremental producer path actually owned by Agent. Preserve non-Recipe behavior, but every Recipe submit must terminate at Core RecipeProductionPort with capability=knowledge-submit (or the exact other one of the four confirmed capabilities only where a real Agent caller owns it); do not call KnowledgeService.create or rebuild Core readiness/profile semantics locally.\n2. Extend Agent producer schemas, prompts and deterministic front-loading so equivalent source evidence produces the Core RecipeRetrievalProfile semantics: project-primary summary, evidence-grounded technical English summary/concepts/scenarios/exclusions, stable provenance/source refs and source-content hash. English text is retrieval expression only; never use frozen queries, expected Recipe IDs, hardcoded/global synonyms, provider/rank output or invented facts.\n3. Remove or replace unsafe mechanical coreCode repair. coreCode may be emitted only from a cited bounded code range matching the evidence; an invalid, unbounded, whole-file or unrelated-document range must leave coreCode empty or produce a stable Core readiness violation while the candidate remains pending/staging. Do not make provider/vector availability a submit or publish gate.\n4. Surface Core readiness/profile violations in the existing Agent result/stop-loss evidence without parsing prose, preserve evidence ledger and session behavior, and keep pending/staging repairable truth. Do not add a second profile database/status machine or bypass publish readiness.\n5. Keep changes confined to AlembicAgent; no Plugin/Alembic/Dashboard/Core edits, no real knowledge-root writes, no query ranking/Graph/Test work.\n\nRequired RED/GREEN and exit evidence:\n- schema-to-runtime validation parity for every real Agent Recipe submit variant;\n- equivalent evidence across cold/opportunistic/session-bound submit variants yields the same profile semantics where those variants exist;\n- bounded range produces matching coreCode/provenance; whole-file, invalid and unrelated ranges cannot inject code and cannot activate;\n- missing/ungrounded profile facts remain pending/staging with stable Core violation codes;\n- provider offline does not change deterministic readiness or Agent submit result truth;\n- real in-test Agent call reaches Core RecipeProductionPort and persists/profile-projects through the accepted contract; no empty adapter or disconnected type-only work;\n- focused and full Agent tests, build/type/lint/import-boundary gates, git diff/check, two-stage self-review, clean single AlembicAgent commit with exact parent/commit and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Generate evidence-grounded profile fields and bounded code evidence, while delegating final semantics/readiness to Core.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green-note"
+          },
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "compatibility-review"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T13:10:48.263Z"
+    },
+    {
+      "taskPackageId": "p2-plugin-recipe-production-generation-adapter-p1",
+      "summary": "Implement the single combined AlembicPlugin landing for the confirmed Recipe production/retrieval-quality demand, starting from clean Plugin baseline 79f46cda0a1325b5e5a32a8e629fbb822ca65fdc and consuming accepted AlembicCore commit b711ea10aa5c67d1d75a58a18c0d56623e26c290 through public @alembic/core contracts. AlembicAgent commit cc85887c0cd88fd5d004c2d1f965eec0d8747caa is accepted behavioral evidence for field/code provenance and publish readiness, not an implementation dependency to import or copy.\n\nRequired connected implementation:\n1. Inventory the real Codex host call graph for alembic_submit_knowledge, cold-start/bootstrap Recipe production, knowledge-rescan/incremental maintenance, lifecycle publish if Plugin owns one, and Search/Prime readers. Every Recipe-producing path actually owned by Plugin must terminate at Core RecipeProductionPort with the exact confirmed capability (knowledge-submit, cold-start, or incremental); do not call KnowledgeService.create, duplicate Agent internals, or introduce Alembic main-runtime coupling.\n2. Extend real MCP schemas/results and host adapters so source evidence and Recipe fields can carry the Core RecipeRetrievalProfile wire contract and return structured production/readiness/profile diagnostics. Preserve Plugin stage-1/stage-2 host checks only for their legitimate content/evidence role; they must not redefine Core profile/readiness, infer English facts, parse prose errors, add provider/rank/Git/host/role/status gates, or block repairable pending/staging truth. Invalid, whole-file, documentation-as-code, or unrelated coreCode is empty/diagnosed through the shared contract while independently grounded profile facts survive.\n3. Replace Plugin-owned fixed-region, duplicate sparse/dense, or generic Recipe-vector construction with Core RecipeRetrievalDocumentSet/projector output. Keyword and dense indexing must consume the same source/profile/document hashes and exact per-Recipe expected IDs. Raw paths, evidence IDs, quality bookkeeping and generation metadata remain metadata, not standalone retrieval candidates. Remove only replaced duplicate builders after proving all callers migrated.\n4. Connect cold-start/rescan and any existing daemon/host maintenance path to Core generation planning/manifest/exact reconcile/shadow build/verified switch/rollback contracts. Full and incremental maintenance must derive byte-equivalent documents for the same Recipe; provider/model/dimension/projection/format changes create a new generation; deletion/deprecation cleanup works without provider. Maintenance remains explicit or lifecycle-owned outside request handlers.\n5. Prove alembic_search_recipes and alembic_prime stay request-scoped read-only consumers of the accepted KnowledgeRetrievalPort/common retrieval truth. They must construct no writer, profile/projector persistence, reconcile, rebuild, generation switch, bootstrap, Git check, host-project gate, knowledge-status/visibility gate, or Alembic main-runtime dependency during a query. Existing no-knowledge behavior remains an ordinary empty/not-found result, not a precondition block.\n6. Preserve Codex MCP annotations/output compatibility, skills/distribution/runtime boundaries and existing Graph/Recipe Map behavior. Confine changes to AlembicPlugin; no AlembicCore/AlembicAgent/Alembic/AlembicDashboard edits, vendor gitlink refresh, local plugin-cache refresh, real project knowledge-root mutation, Test work, query ranking/weight tuning, hardcoded queries/Recipe IDs/global synonyms, or new state machine.\n\nRequired RED/GREEN and exit evidence:\n- real in-test MCP/host submit call reaches Core RecipeProductionPort, persists/profile-projects a native profile, returns stable readiness/profile/code-evidence fields, and never auto-publishes;\n- field-only and exact documentation profile provenance survives independently from coreCode; whole-file/invalid/unrelated/documentation coreCode cannot inject code or activate;\n- cold-start and incremental/rescan use the same Core production/projector contracts and yield identical document IDs/hashes for equal Recipe truth;\n- Plugin legacy/fixed region builders and generic duplicate Recipe candidates have no remaining live caller; sparse/dense consume the same document-set/profile/source hashes;\n- exact reconcile fixtures cover orphan/missing/partial/duplicate/hash/stale-generation cases through the Core maintenance surface; provider-offline delete/deprecate and failed shadow build preserve queryable active generation/rollback;\n- Search and Prime request probes prove zero writes/zero maintenance invocation and preserve common truth/refill/raw-lane behavior;\n- no direct Core source imports, Agent runtime reintroduction, Alembic main runtime import, disconnected type-only work, real data write, or query-specific tuning;\n- run focused RED/GREEN tests, build:check/build, relevant unit/integration/e2e tests, npm run check, repo/Core/public/API/provider/boundary gates, Codex plugin smoke/verify/distribution/session checks appropriate to changed surfaces, git diff/check and two-stage self-review;\n- one clean AlembicPlugin commit with exact parent/commit, changed files/symbols, raw command summaries, compatibility/deletion evidence and residual risks.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Route host cold-start/rescan/knowledge-submit through the shared Core production and generation contracts while keeping Search/Prime reader-only.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green-note"
+          },
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "compatibility-review"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T14:35:04.826Z"
+    },
+    {
+      "taskPackageId": "p3-core-terminal-recipe-vector-removal-contract-p1",
+      "summary": "Repair the confirmed in-scope AlembicCore lifecycle contract defect discovered during Plugin integration. Add a public, awaited, provider-independent terminal Recipe-identity removal contract and wire knowledge:deleted plus lifecycle transition to deprecated through it, separately from the existing entry_<id> legacy-vector retirement used after live upsert/reconcile. The contract must preserve authoritative Recipe identity until the storage implementation has removed base residue and every known vector generation; it must not infer terminal intent from current-reader visibility or canonical IDs. Keep query-time Search/Prime reader-only and keep live Recipe update replacement intact. Provide a connected Core consumer/call chain and public exports for AlembicPlugin to implement; do not edit Plugin or copy its generation store into Core. RED/GREEN must reproduce target-only-in-old-rollback-generation with current generation containing another Recipe and base containing legacy/canonical residue, then prove provider-offline delete and deprecate remove terminal truth and rollback cannot resurrect it. Also cover live upsert retaining the Recipe, awaited flush/error semantics, and existing Core lifecycle/generation suites. Return one clean Core commit with exact parent/commit, changed public symbols, focused/full test commands, compatibility notes, and two-stage self-review.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Make terminal Recipe lifecycle intent an explicit awaited Core contract so storage implementations can remove the Recipe from base and every known generation without confusing live legacy-entry retirement.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green-note"
+          },
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "compatibility-review"
+          },
+          {
+            "kind": "root-cause-note"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T16:46:46.278Z"
+    },
+    {
+      "taskPackageId": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+      "summary": "Resume the authorized AlembicPlugin generation integration from clean commit 3cb93137e040c3491605945f466fe01febcc3aaf after accepted AlembicCore commit 4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4. Implement the public RecipeVectorTruthRemover contract in the Plugin-owned vector generation runtime so removeRecipeByIdentity(recipeId) is provider-independent, awaited, and removes legacy/base canonical residue plus that Recipe's documents from every known generation, including generations that are not active and cases where the active reader never exposes the target. Inject this implementation through the real Plugin host/VectorService lifecycle path for knowledge:deleted and deprecated transitions. Preserve live update replacement, atomic generation pointer/CAS behavior, cold-start/rescan maintenance, Search/Prime zero-write behavior, and Plugin independence from Alembic main runtime. Do not infer terminal intent from entry_<id> removal, current-generation absence, or query visibility. Add a real-coordinator RED/GREEN regression with target only in an old rollback generation, unrelated Recipe in current generation, base residue present and provider offline; after delete and deprecate, prove all target vectors are absent and rollback cannot resurrect them. Prove failure is surfaced/retryable without erasing a newer same-Recipe event. Correct the existing CAS regression to assert exactly one successful activator regardless of caller order, and repeat it enough to reject the prior flake. Run focused/full Plugin gates, build/check/distribution/public-boundary checks appropriate to the changed surface, two-stage self-review, and return one clean Plugin commit with exact parent/commit and residual risks. No Core/Agent/Alembic/Dashboard/Test/real-data/plugin-cache edits.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Consume the accepted Core terminal Recipe identity contract in Plugin-owned base/all-generation storage while preserving Search/Prime read-only behavior and live-update replacement.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green-note"
+          },
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "compatibility-review"
+          },
+          {
+            "kind": "root-cause-note"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T17:09:24.440Z"
+    },
+    {
+      "taskPackageId": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+      "summary": "在 Alembic 干净基线 ac4921580ec1bbfb644886b6a201baeb1c1a2921 上完成本需求唯一的主程序合并落地，消费已接受 AlembicCore 4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4 与 AlembicAgent cc85887c0cd88fd5d004c2d1f965eec0d8747caa。先盘点真实 caller 并给出替换证据，再把模块扫描及四类已确认生产能力中的 Alembic 进程内路径接到 Core RecipeProductionPort：候选只能进入 pending/staging 并返回真实 id，active/publish 必须消费 Core RetrievalReadiness 结构结论。连接 cold-start/incremental/daemon 的 generation 维护，提供显式且可验证的 dry-run、shadow rebuild、验证后切换和 rollback 运维面；dry-run 必须零写，失败不得破坏当前 generation。迁移 AiScanService 等 caller，删除其直接 KnowledgeService.create/自动 publish；在 caller 已替换后退役 POST /api/v1/knowledge 的 Recipe 创建能力，使其 typed zero-write，并从生成的 API/provider 文档中移除广告，同时保留 GET/PATCH/lifecycle/quality 能力。证明没有隐藏的第五生产入口、没有 query-time 写入、没有对真实 BiliDili/AlembicWorkspace 数据的修改。不得修改 AlembicPlugin、AlembicCore、AlembicAgent、AlembicDashboard、Test 或真实知识库；不得删除仍有真实 caller 的能力。完成 Alembic 所属代码、测试、构建、全量仓库门禁和干净单一提交，并回填原始命令输出、调用链、失败/回滚场景、自审与边界。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "让 Alembic 主程序消费已接受的 Core/Agent 生产契约，将模块扫描、生命周期与 generation 运维收口到唯一生产链，并在真实 caller replacement 之后退役可写的旧 Recipe 创建入口，不能产生第五个生产入口。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "提供 Alembic 单一干净提交 hash、parent、git status 与范围 diff。"
+          },
+          {
+            "kind": "tests",
+            "verify": "提供定向测试、构建及仓库全量门禁原始结果，覆盖模块扫描、readiness、旧 POST 零写、generation dry-run/shadow/switch/rollback。"
+          },
+          {
+            "kind": "self-review",
+            "verify": "逐项核对真实 caller replacement、无第五生产入口、无 query-time 写、真实数据零修改与仓库边界。"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green"
+          },
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "compatibility"
+          },
+          {
+            "kind": "root-cause"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T17:32:18.284Z"
+    },
+    {
+      "taskPackageId": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+      "summary": "在 AlembicCore 干净基线 4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4 上修复已接受 Recipe 生产合同的一个确定性缺口：KnowledgeService.update 当前 UPDATABLE 与持久化分支不接收 retrievalProfile，导致 Alembic HTTP PATCH 无法为 Dashboard P4 提供完整 profile 编辑回写。只修改 AlembicCore：让 retrievalProfile 作为 Recipe 真相的增量字段可被 update 明确验证和保存，保持 Markdown↔domain↔SQLite wire 无损，更新后 readiness/projector 使用新 profile，发出既有 knowledge changed 生命周期信号但不得自动 publish、不得调用 provider/排名/向量门禁。必须拒绝结构错误或不受支持 schema，保留未编辑字段与 lifecycle；existing legacy null/compatibility 继续可读。不得新增第二数据库、side-channel profile API、第五生产入口或 Dashboard/Alembic/Plugin/Agent 改动。添加真实 update→reload→Markdown/SQLite/API wire→readiness/projector 的 RED/GREEN 测试，覆盖只更新 profile、与其它字段混合更新、非法 profile 不写、pending/staging 保留、active 条目编辑不触发新 active transition/自动发布，并运行 Core 全量测试、构建、类型、public/layer gates，提交单一干净 commit 和原始证据。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "补齐已确认但当前缺失的 Recipe retrievalProfile 编辑持久化合同，让 Dashboard 后续能在不新建 Recipe、不绕过 lifecycle 的前提下完整审阅和修正 profile。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "提供单一 AlembicCore commit、parent、范围 diff 与 clean status。"
+          },
+          {
+            "kind": "tests",
+            "verify": "提供 update→reload→Markdown/SQLite wire→readiness/projector RED/GREEN，以及 Core 全量 tests/build/type/public/layer 原始结果。"
+          },
+          {
+            "kind": "self-review",
+            "verify": "逐项证明无自动 publish、无 provider/rank gate、无第二存储、未编辑字段/lifecycle 保留且只改 Core。"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green"
+          },
+          {
+            "kind": "root-cause"
+          },
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "compatibility"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T18:30:45.822Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-p1",
+      "summary": "在 Alembic 当前干净提交 671ab051e0a2797cc8d915caf510f0118e546533 上完成 P5 的根因级收口，只修改 Alembic，并消费已验证 AlembicCore 5106e8a9f47a12a52614d77cb5e3908462a4a49c（file:../AlembicCore）。已知缺陷与完成定义：1) GatewayActionRegistry 仍把 candidate:create / recipe:create 注册到 KnowledgeService.create；必须从真实注册表和对外能力中退役/拒绝写入，不能只做 regex 静态测试，需用真实 action lookup+invoke 证明未注册或 typed zero-write，且四类受支持生产能力保持可用。2) GenerationRoutingVectorStore 在没有 verified active generation 时过滤 legacy base entry_*，导致启动 plan-only 后 dense recall 消失；必须保证 active pointer 尚不存在/无 verified generation 时 legacy base 向量仍可查询，verified active 切换后才隔离旧 Recipe 表示并避免 base/generation 双重竞争，覆盖 searchVector/searchByFilter/query/hybridSearch/get/list 等实际读面。3) 将 Core 5106e8a 的 retrievalProfile update 接入 Alembic HTTP PATCH：UpdateKnowledgeBody/schema/route 必须接受 profile-only 和 mixed patch，保留未知扩展字段与未编辑 Recipe/lifecycle，经 Core 前置结构/schema 校验，真实 PATCH→Core update→Markdown/SQLite→GET round-trip 无损；非法/unsupported schema 在任何写入、audit/event 前 typed reject；不得自动 publish。4) recipe-vector-active.json.lock 必须具备中断/崩溃后的可恢复语义：stale lock 可基于明确 owner/token/timestamp/进程存活或等价可审计规则回收，活跃 foreign lock/CAS 仍不得覆盖；失败保持旧 active generation 可查询，不得永久锁死。5) 保持原任务其它已正确能力：POST /knowledge typed zero-write、AiScan caller replacement、dry-run/shadow/verify/switch/rollback、query-time zero-write、真实知识库零修改。先添加能在旧实现上失败的语义测试，再修真实调用链；运行 focused、full test、build:check/build、npm run check、lint/boundary/drift，提交单一 Alembic commit。不要修改 Core/Plugin/Agent/Dashboard/Test/真实数据，不要创建新生产入口或 provider/rank/readiness 门禁。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "完成已确认的 Alembic 主程序唯一生产链与 generation 运维收口；消费已验收 Core retrievalProfile update，删除仍存活的 create 旁路，并保证迁移前 legacy 查询连续、activation lock 可恢复。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "提供基于 Alembic 671ab051 的单一干净提交、parent、范围 diff 与 clean status；Core 只作为 file dependency 消费。"
+          },
+          {
+            "kind": "tests",
+            "verify": "提供旧实现 RED 与新实现 GREEN：真实 Gateway action lookup/invoke 零写；无 active/有 verified active 的完整读面；profile-only/mixed/invalid PATCH 全链无损/零写；stale lock recovery 与 live foreign lock/CAS；再跑 full Alembic gates。"
+          },
+          {
+            "kind": "self-review",
+            "verify": "逐项回应四个控制器缺陷，证明没有 regex-only 假阳性、没有迁移前召回断层、没有 lifecycle/auto-publish/provider gate、没有真实数据写入或外仓改动。"
+          },
+          {
+            "kind": "root-cause-note",
+            "verify": "解释四个缺陷为何穿过原测试及真实修复点；本任务已达到 recurring-problem 阈值，禁止再做表面 point-fix。"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green"
+          },
+          {
+            "kind": "compatibility"
+          },
+          {
+            "kind": "scope-diff"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T18:48:03.952Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+      "summary": "在已验收 Alembic 提交 a3db6fdc88006820f86891bc821abe539f9c041d 上闭合 Dashboard reviewer 的唯一上游缺口，只修改 Alembic。当前 Core 已提供 RecipeProductionPort.evaluateReadiness / KnowledgeService.evaluateRetrievalReadiness，Alembic 已提供 retrievalProfile PATCH、合法 publish 与 generation status/dry-run/rebuild/rollback，但 HTTP 没有任何只读 Recipe RetrievalReadinessReport 入口；Dashboard 因此无法在发布前审阅稳定 violations/warnings，只能在发布失败后被动看到错误。新增一个真实、只读、零写的现有 Recipe readiness API（路径/operationId 按 Alembic 现有知识 API 约定落位），直接调用与 publish 相同的 Core readiness 判定并返回稳定 report；更新 provider contract、生成的 Dashboard API types/契约和必要文档，使 Dashboard 有可追溯真实合同。验证：有效 native/compatibility profile 的 GET 返回完整 ready/schemaVersion/profileHash/documentSetHash/violations/warnings；结构缺口返回 report 而非改写 Recipe；provider/vector/generation/rank 仅出现在 warnings/诊断且不改变 ready；missing id typed 404；请求前后 Markdown/SQLite/audit/event/vector/generation 均零写；publish 继续使用相同判定且旧 POST create 仍 410 零写。先补旧实现 RED，再实现 GREEN，运行 focused HTTP/contract/readiness 测试、build:check/build、npm run check，提交单一 Alembic commit。禁止在 Dashboard 私算 readiness，禁止修改 Core/Agent/Plugin/Dashboard/Test/真实数据，禁止新增生产入口、查询门禁或写操作。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "让 Dashboard 在合法 publish 前能够审阅 Core 的确定性 profile/readiness 缺口；Alembic 只暴露同源只读合同，不复制判定、不引入第二状态或 provider/rank 门禁。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "提供基于 Alembic a3db6fd 的单一干净提交、parent、范围 diff 和 clean status；只改 Alembic。"
+          },
+          {
+            "kind": "tests",
+            "verify": "旧实现 RED；真实 HTTP readiness GET 覆盖 ready/violations/warnings/not-found、与 publish 同源、零 truth/audit/event/vector/generation 写；生成 Dashboard API 合同校验与 full npm run check。"
+          },
+          {
+            "kind": "self-review",
+            "verify": "证明没有在 Alembic 复制 Core readiness 逻辑、没有把 provider/vector/rank 变成 gate、没有新增 Recipe producer、没有改 Dashboard/Core/真实数据。"
+          },
+          {
+            "kind": "root-cause-note",
+            "verify": "解释为什么此前 P5/P7 只闭合 PATCH/publish/generation 却漏掉 reviewer 所需的 pre-publish readiness 读取面，以及新 API 如何保持单一判定来源。"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green"
+          },
+          {
+            "kind": "api-contract"
+          },
+          {
+            "kind": "zero-write"
+          },
+          {
+            "kind": "scope-diff"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T19:21:56.360Z"
+    },
+    {
+      "taskPackageId": "p8-dashboard-recipe-reviewer-production-closure-p1",
+      "summary": "在已验收 Core 5106e8a9f47a12a52614d77cb5e3908462a4a49c 与 Alembic 849766b56a10c6e808a0a75ffbb2a8b8f938c791 合同上，只修改 AlembicDashboard，完成 Recipe reviewer 迁移。消费生成/真实 API 中 retrievalProfile、GET /knowledge/{id}/retrieval-readiness、现有合法 PATCH/lifecycle publish 与 recipe-index generation status/dry-run；在现有候选审阅/编辑工作流展示 profile schemaVersion、primaryLanguage、primarySummary、technicalSummaryEn、concepts、scenarios、exclusions、source-field provenance，展示 readiness ready、稳定 violations/warnings code、profileHash/documentSetHash，并展示 generation 状态/报告而不在前端复制 readiness 或索引维护逻辑。编辑只针对冷启动、增量、模块扫描、知识提交产生的 existing pending/staging Recipe ID；PATCH 必须完整 round-trip 保留未展示字段、retrievalProfile provenance 和未知扩展，不能用局部 payload 丢失数据。发布只由用户显式确认后调用现有合法 lifecycle endpoint；结构 readiness 失败显示稳定 code 并保持原状态，provider/vector/generation warning 只展示、不得禁用发布。删除 runtime UI 的 knowledgeCreate 调用、create payload builder 与 create 后 auto-publish 分支；模块扫描结果必须消费后端返回的现有 Recipe/candidate ID，不能发明第五个 producer。保留 loading/empty/error/partial/long-running 与失败恢复状态、现有视觉交互和基本可访问性。仅 AlembicDashboard；禁止修改 Alembic/Core/Agent/Plugin/Test/真实知识库，禁止本地计算 readiness、自动 rebuild/rollback、rank/provider gate、静态 mock 代替真实合同。先以旧实现补 RED，再实现 GREEN；覆盖 API/组件 contract、create-call absence scan、editor full round-trip + unknown extension preservation、readiness failure UI、provider warning non-gate、合法 publish confirmation、generation status/dry-run，以及 typecheck/build/lint/full tests；复杂 UI 必须浏览器验证并提供截图。提交一个基于当前 clean f26427682f45cce6ce5ce4304ce9dfde84c26f17 的单一干净 Dashboard commit。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Review and repair retrieval profile/readiness on existing candidates without remaining a Recipe creation or auto-publish path.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "提供基于 AlembicDashboard f26427682f45cce6ce5ce4304ce9dfde84c26f17 的单一干净提交、parent、范围 diff 与 clean status；只改 AlembicDashboard。"
+          },
+          {
+            "kind": "tests",
+            "verify": "提供旧实现 RED 与 GREEN；API/组件 contract、knowledgeCreate/create payload/auto-publish absence、profile full round-trip/未知扩展保留、readiness failure、provider warning non-gate、显式合法 publish、generation status/dry-run；typecheck/build/lint/full tests 通过。"
+          },
+          {
+            "kind": "browser-screenshot",
+            "verify": "使用真实 Dashboard 页面/真实后端合同或可追溯 contract fixture 验证 profile/readiness/generation、loading/empty/error/partial/长任务与发布失败交互，并提供可审阅截图路径；mock 不得冒充后端连通性。"
+          },
+          {
+            "kind": "self-review",
+            "verify": "按严重级别复审最终 diff，证明没有前端 readiness 复制、第五 producer、自动 publish、字段丢失、provider/rank gate、跨仓修改或真实数据写。"
+          },
+          {
+            "kind": "root-cause-note",
+            "verify": "解释旧 knowledgeCreate→auto-publish 与 partial edit 如何绕过统一生产/丢失检索字段，以及新 existing-ID reviewer 链如何闭合。"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "red-green"
+          },
+          {
+            "kind": "api-contract"
+          },
+          {
+            "kind": "accessibility"
+          },
+          {
+            "kind": "scope-diff"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T19:48:27.917Z"
+    },
+    {
+      "taskPackageId": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+      "summary": "修复真实模块扫描中 knowledge.submit 成功结果与 ScanRunProjection 的合同断裂，使扫描输出稳定携带已持久化 pending/staging Recipe ID，供 Alembic 与 Dashboard 只读审阅链消费。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "模块扫描必须复用真实知识提交的持久化结果，并向消费者提供 existing pending/staging Recipe ID；Dashboard 只审阅，不创建。",
+      "createdAt": "2026-07-13T20:35:18.496Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+      "summary": "将已验收的 Agent 模块扫描持久化结果接入 Alembic `/api/v1/modules/scan-project`，只向 Dashboard 返回真实 pending/staging Recipe ID 与受控审阅摘要，闭合生产端到 reviewer 的现有 ID 链。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "模块扫描只传递生产端已创建的现有 Recipe ID；Alembic 后端保持唯一接线和故障语义，Dashboard 只做 reviewer，不创建或自动发布。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "Alembic clean commit limited to the assigned backend integration."
+          },
+          {
+            "kind": "test",
+            "verify": "Raw focused and relevant full-suite command output covers positive and all named failure paths."
+          },
+          {
+            "kind": "runtime",
+            "verify": "Reviewable service-to-Dashboard-operation-to-HTTP evidence proves returned IDs are persisted pending/staging results and create/publish have zero extra calls."
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "diff"
+          },
+          {
+            "kind": "call-chain"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T21:12:25.583Z"
+    },
+    {
+      "taskPackageId": "p11-dashboard-module-scan-existing-id-reviewer-closure-p1",
+      "summary": "让 Dashboard 严格消费 Alembic P10 的 module-scan existing-ID 结果合同，正确呈现 completed/empty/skipped/failed/partial，并通过 GET/PATCH/合法 publish 审阅现有 Recipe，彻底闭合 reviewer 链。",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Dashboard 只审阅由四类生产入口创建的现有 pending/staging Recipe；它必须忠实呈现 Alembic module-scan 的领域结果与故障状态，不创建、不自动发布。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "One clean AlembicDashboard commit limited to the authoritative existing-ID reviewer correction."
+          },
+          {
+            "kind": "test",
+            "verify": "Executable tests cover exact backend normalization, all named outcomes, existing-ID review, and absence of create/auto-publish."
+          },
+          {
+            "kind": "runtime",
+            "verify": "Reviewable API/App chain evidence proves GET(existingId)→PATCH review→explicit publish only, with no fifth producer."
+          },
+          {
+            "kind": "visual",
+            "verify": "Browser or screenshot evidence covers completed, empty, failed, and partial user-visible states; fixture use is labeled and not claimed as backend connectivity."
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "diff"
+          },
+          {
+            "kind": "self-review"
+          },
+          {
+            "kind": "call-chain"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T21:44:11.475Z"
+    },
+    {
+      "taskPackageId": "p12-plugin-prime-output-bounds-q2-ranking-closure-p1",
+      "summary": "Controller real acceptance found two same-demand AlembicPlugin defects on the frozen BiliDili matrix using both the currently loaded MCP and a fresh child MCP at Plugin dist commit 5cd06485a03dbf935ddef8c55e59e9e5a8d4fc3e.\n\nDefect A — Prime public projection failure:\n- Frozen q2: \"What architecture rules should guide modular boundaries in a Swift app?\"\n- Search returns 8 canonical candidates, but Prime fails in every warm repeat and in a fresh MCP process.\n- Raw stderr: \"[MCP/PublicTools] alembic_prime output projection rejected; degraded to base envelope: detailRefs.8.summary: too_big\".\n- primeMaterialDetailRefs copies item.summary/actionHint into AgentDetailRef.summary without enforcing the public max(500); the fallback then emits a legacy {success,message,errorCode,tool,data} result that AgentPublicToolOutputSchema rejects again.\n- Fix the active public result path so any valid Search candidate content cannot break Prime. Bound/normalize all projected detail-ref summaries at the contract boundary, and ensure projection failure still returns a valid AgentPublicToolResultEnvelope/PrimePublicPackage rather than a legacy error shape. Preserve source refs and candidate IDs. Add a regression fixture with >500-character knowledge/guard text and verify the returned candidate order/evidence.\n\nDefect B — frozen q2 ranking:\n- Search is stable rank 8 for authoritative Recipe <redacted>, with sparseRank=3 but no dense rank; Prime therefore cannot satisfy Top 3 even after Defect A.\n- q1/q3/q4/q5/q8 remain rank 1 and q6/q7 rank 2; do not regress them.\n- Repair only through the confirmed shared Recipe retrieval profile/projector/sparse+dense document contract or a general ranking/candidate correctness defect. No query text/UUID/title hardcoding, synonym table, Recipe edit, real-data migration, query-time write/maintenance, provider-specific consumer prompt, new admission threshold, or host/Alembic coupling.\n- The existing real BiliDili Recipe has legacy fields (topicHint default, moduleName empty, no persisted new profile). Preserve the confirmed compatibility behavior for active legacy Recipes; the fix must be general and evidence-grounded, not tailored to this ID.\n\nRequired validation:\n1. Focused RED/GREEN for >500-character Prime detail summary plus valid fallback/public envelope.\n2. Search/Prime exact ordered candidate parity at limit 8 for all frozen eight queries.\n3. Fresh child MCP process using dist/bin/host-mcp.js against real BiliDili, three serial repetitions: all Search/Prime calls ok, target Top 3, q1-q5/q8 no regression, q6/q7 Top 3, raw dense/sparse/RRF present, real DB/WAL/SHM/config/vector/recipes unchanged.\n4. Full AlembicPlugin unit/check/build/package/runtime freshness gates required by repository AGENTS; clean single commit and two-stage review.\n5. Do not create a Test window or modify Alembic/Core/Agent/Dashboard/real knowledge roots. If the root cause is irreducibly Core-owned, stop with exact raw evidence; do not patch around it in Plugin.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Keep Search and Prime on the same canonical read-only candidate sequence, bound every public projection field before schema parsing, and improve q2 through the shared producer/retrieval facts rather than query hardcoding.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "clean AlembicPlugin commit and exact parent"
+          },
+          {
+            "kind": "root-cause-note",
+            "verify": "trace both q2 public projection failure and rank-8 cause through the active call chain"
+          },
+          {
+            "kind": "red-green",
+            "verify": "focused failing then passing regression tests for oversized detail summary and q2"
+          },
+          {
+            "kind": "tests",
+            "verify": "focused plus full repository gates and runtime/package freshness"
+          },
+          {
+            "kind": "real-probe",
+            "verify": "fresh child MCP eight-query x3 serial matrix with Search/Prime parity, evidence, and zero-write fingerprints"
+          },
+          {
+            "kind": "self-review",
+            "verify": "requirement compliance then failure-path/performance/scope review"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "runtime-provenance"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T22:30:29.207Z"
+    },
+    {
+      "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+      "summary": "Continue the same confirmed Recipe production/retrieval-quality demand after controller review accepted the Plugin-owned Prime projection fix but preserved the unmet q2 Top3 gate.\n\nAccepted upstream evidence:\n- AlembicPlugin commit bdcb3de1d6aa35732a141cbd699b4007b6bbafa6 fixes oversized Prime detail summaries and returns a strict Prime-shaped fallback. Controller reviewed the three-file diff and reran AgentPublicToolsContract 6/6.\n- AlembicCore baseline is clean at 5106e8a9f47a12a52614d77cb5e3908462a4a49c.\n- Fresh BiliDili public Search/Prime evidence remains q2 target rank 8 with sparseRank=3 and no dense contribution; target Recipe is <redacted>.\n- Exhaustive read-only vector inspection found the target's best dense region at raw vector rank 42 / unique Recipe rank 17.\n- Plugin createReadOnlySearchContainer supplies the real read-only HNSW reader and sparse retriever directly to Core HybridCandidateRetriever; it performs no second rerank.\n- Core KnowledgeRetrievalPolicy starts at max(32, topK*4) and currently stops as soon as the projected live Recipe count reaches topK, even when both lanes are not exhausted and missing evidence beyond the current raw window can still change RRF membership/order. For q2 limit=8, the initial window 32 therefore excludes the target's dense evidence and returns the unstable rank 8.\n\nRequired Core repair:\n1. Replace the \"candidate count >= topK\" early stop with a principled, bounded stability/refill decision. Continue lane collection when unseen dense/sparse evidence could still move a current or unseen Recipe into Top-K; stop only when Top-K membership/order is defensibly stable, both lanes/index are exhausted, or the configured candidate budget is reached with an explicit diagnostic.\n2. Preserve authoritative Recipe truth lookup, lifecycle/filter/orphan handling, per-Recipe region aggregation, raw dense/sparse ranks and similarities, RRF contributions, abort propagation, Search/Prime shared ordering, sparse-only degradation, and the existing max candidate budget.\n3. The fix must be algorithmic and schema-wide. Do not merely raise initialCandidateWindow/maxCandidateBudget, tune alpha/rrfK, add target/query/title/UUID/synonym branches, edit Recipe/profile/vector data, add query-time writes/maintenance, or leak provider/Plugin/Alembic host concerns into Core.\n4. Keep public interfaces compatible unless a minimal diagnostic field is necessary; any new field must be consumed by real callers/tests in this package.\n\nRequired RED/GREEN:\n- Reproduce the real failure shape at the Core seam: topK=8, target sparse rank 3, target dense raw rank 42 with duplicate regions aggregating to a later unique-Recipe rank, at least eight live Recipes already present within window 32. RED must show the current premature stop/rank 8; GREEN must refill and place the target Top3 without special casing.\n- Cover stability-aware early stop, refill to the next window, both-lane exhaustion, candidate-budget exhaustion diagnostics, missing-lane evidence upper bounds, duplicate regions, orphan/deprecated truth filtering, sparse-only fallback, and AbortSignal.\n- Preserve the frozen eight-query BiliDili-style fixture and AlembicWorkspace control fixtures without rewriting expected queries after the fix.\n\nRuntime evidence:\n- Run a read-only/copy-only BiliDili canonical retrieval probe using copied DB/vector/config artifacts, report all eight target ranks and raw dense/sparse/RRF evidence, and fingerprint the protected live roots before/after. Never open a write-capable service on the real knowledge root and do not modify real DB/WAL/SHM/config/vector/recipes.\n- Do not claim final public MCP acceptance; after Core is accepted, the controller will send one Plugin integration package to rebuild against the exact Core commit and rerun the fresh-process Search/Prime matrix.\n\nRepository gates:\n- Commit only AlembicCore with exact parent 5106e8a9f47a12a52614d77cb5e3908462a4a49c.\n- Run focused retrieval/vector tests plus all AlembicCore test/check/build/public-surface gates required by AlembicCore/AGENTS.md.\n- Provide exact changed symbols, RED/GREEN output, runtime probe output, clean status, and two-stage self-review (requirement compliance, then correctness/failure/performance/scope).\n- No Plugin/Alembic/Agent/Dashboard/Test/Wakeflow/vendor/release/data edits and no Test window.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Preserve the shared read-only Recipe candidate truth and raw lane evidence while making bounded refill stop on defensible ranking stability or exhaustion, not merely because the current projection already contains topK live Recipes.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "commit",
+            "verify": "clean AlembicCore commit with exact parent 5106e8a9f47a12a52614d77cb5e3908462a4a49c"
+          },
+          {
+            "kind": "root-cause-note",
+            "verify": "trace unstable early stop from raw lane window through truth aggregation/RRF and explain the general stability criterion"
+          },
+          {
+            "kind": "red-green",
+            "verify": "same focused Core fixture fails before and passes after the refill/stability repair"
+          },
+          {
+            "kind": "tests",
+            "verify": "focused retrieval/vector plus full Core repository gates"
+          },
+          {
+            "kind": "real-probe",
+            "verify": "copy-only BiliDili eight-query canonical retrieval report with raw lanes and protected live fingerprints"
+          },
+          {
+            "kind": "self-review",
+            "verify": "requirement compliance and separate correctness/failure/performance/scope review"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "runtime-provenance"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T23:04:22.891Z"
+    },
+    {
+      "taskPackageId": "p14-plugin-final-public-retrieval-acceptance-p1",
+      "summary": "Close the final public AlembicPlugin retrieval acceptance after the accepted Core repair.\n\nAccepted upstream:\n- AlembicCore exact commit 10e43a66fac8748b1da176844bd77505aa949b0e; its parent 0fff37dbbb8bd311bc99b455bbc9a22431b063bb is the accepted bounded stability-refill repair, and 10e43a66 adds canonical sparse role corroboration without query/data hardcoding.\n- AlembicPlugin baseline bdcb3de1d6aa35732a141cbd699b4007b6bbafa6 already contains the accepted Prime public-output bound/fallback fix.\n- Controller independently reran Core focused tests 81/81, full tests 1751/1751, boundary 22/22, build/lint/diff/hardcode checks; copy-only BiliDili Core matrix ranks [1,1,1,1,1,1,2,2] with raw dense/sparse/RRF and protected roots unchanged.\n- Controller independently ran the three frozen AlembicWorkspace control queries through the currently loaded public Search MCP; all expected Recipes were rank 1 with vector evidence.\n\nThis package is an integration/acceptance closure, not permission to redesign ranking:\n1. Rebuild AlembicPlugin from the exact local Core commit 10e43a66 and verify runtime provenance resolves @alembic/core to the sibling Core source/dist, not a stale vendor or registry copy.\n2. Start a fresh temporary Plugin MCP process from the rebuilt dist. Do not use the already loaded host process as the only evidence.\n3. Against the real BiliDili knowledge base in request-scoped read-only mode, run the frozen eight queries serially through both public Search and Prime at the same limit (8), for three warm repetitions plus the fresh-process run. Require every call ok, exact ordered candidate-ID parity between Search and Prime, every target Top3, no regression from the accepted Core matrix, raw dense/sparse/RRF evidence present, no sparse-only transient degradation, and Prime/public schema bounds preserved.\n4. Against AlembicWorkspace, run the frozen three control semantics (canonical Recipe production entry/validation pipeline; Markdown→SQLite→vector truth flow; knowledge:changed keyword/vector propagation) through public Search and Prime. Require expected Recipes Top3, ordered parity, and vector evidence.\n5. Fingerprint all protected real DB/WAL/SHM/config/vector/Recipe roots before and after; changed set must be empty. No rescan, rebuild, re-embed, migration, generation activation, maintenance, publish, or query-time write.\n6. Run focused public-tool/retrieval tests plus repository build/check/lint/boundary/plugin smoke/distribution/session gates appropriate to the touched surface.\n7. If exact-Core rebuild and fresh-process acceptance pass with no Plugin source defect, return completed with an explicit no-commit reason and clean baseline. If a genuine Plugin integration defect is reproduced, fix only AlembicPlugin, add RED/GREEN evidence, and make one clean commit with exact parent bdcb3de1d6aa35732a141cbd699b4007b6bbafa6.\n8. Do not change Core/Alembic/Agent/Dashboard/Wakeflow/vendor/real knowledge data; do not add query text, UUID, title, synonym, provider, host-project, Git-state, visibility/status, or data-availability gates; do not create or use a Test window.",
+      "status": "accepted",
+      "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+      "designIntent": "Consume the accepted Core retrieval behavior through the existing Plugin adapter and prove the public Search/Prime contract in a fresh process; change Plugin only if a reproducible Plugin-owned defect remains.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "runtime-provenance",
+            "verify": "fresh Plugin MCP process resolves the exact accepted sibling AlembicCore commit 10e43a66fac8748b1da176844bd77505aa949b0e"
+          },
+          {
+            "kind": "real-probe",
+            "verify": "BiliDili frozen eight-query Search/Prime matrix across fresh plus three serial warm repetitions; exact ordered parity, all targets Top3, raw lanes/RRF, no degradation"
+          },
+          {
+            "kind": "control-probe",
+            "verify": "AlembicWorkspace three frozen control semantics through Search and Prime; expected Recipes Top3 with ordered parity and vector evidence"
+          },
+          {
+            "kind": "zero-write",
+            "verify": "protected real DB/WAL/SHM/config/vector/Recipe fingerprints identical before and after"
+          },
+          {
+            "kind": "tests",
+            "verify": "focused retrieval/public-tool plus build/check/lint/boundary/plugin smoke/distribution/session gates"
+          },
+          {
+            "kind": "commit-or-no-commit",
+            "verify": "one clean AlembicPlugin commit with exact parent bdcb3de when a Plugin defect is fixed, otherwise explicit verified no-commit reason and clean baseline"
+          },
+          {
+            "kind": "self-review",
+            "verify": "separate requirement-compliance and correctness/failure/performance/scope reviews"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "scope-diff"
+          },
+          {
+            "kind": "raw-command-output"
+          }
+        ]
+      },
+      "createdAt": "2026-07-14T00:24:26.290Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p1-core-recipe-retrieval-production-generation-t1",
+      "taskPackageId": "p1-core-recipe-retrieval-production-generation-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Build the connected Core Recipe profile/readiness/projector/production and safe vector-generation foundation.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T10:51:15.762Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 4,
+        "reworkCount": 3
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-core-recipe-retrieval-production-generation-rework3-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-recipe-retrieval-production-generation-rework3-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1.json",
+        "deliveryRunId": "run-p1-core-recipe-retrieval-production-generation-rework3-p1-readback1",
+        "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework3-p1",
+        "sentAt": "2026-07-13T12:47:03.591Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p2-agent-recipe-production-profile-adapter-t1",
+      "taskPackageId": "p2-agent-recipe-production-profile-adapter-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Connect every AlembicAgent Recipe submit path to the accepted Core production/profile/readiness contract with evidence-grounded retrieval facts and bounded code evidence.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T13:10:48.263Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-agent-recipe-production-profile-adapter-rework1-p1__AlembicAgent__p2-agent-recipe-production-profile-adapter-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-agent-recipe-production-profile-adapter-rework1-p1__AlembicAgent__p2-agent-recipe-production-profile-adapter-t1.json",
+        "deliveryRunId": "run-p2-agent-recipe-production-profile-adapter-rework1-p1-readback1",
+        "dispatchGroup": "p2-agent-recipe-production-profile-adapter-rework1-p1",
+        "sentAt": "2026-07-13T14:06:59.908Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-agent-recipe-production-profile-adapter-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p2-plugin-recipe-production-generation-adapter-t1",
+      "taskPackageId": "p2-plugin-recipe-production-generation-adapter-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Connect AlembicPlugin host submit/cold-start/rescan and explicit index maintenance to the accepted Core Recipe profile/readiness/projector/generation contracts while keeping Search/Prime request-scoped and zero-write.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T14:35:04.826Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 3,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-plugin-recipe-production-generation-adapter-rework2-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-recipe-production-generation-adapter-rework2-p1__AlembicPlugin__p2-plugin-recipe-production-generation-adapter-t1.json",
+        "deliveryRunId": "run-p2-plugin-recipe-production-generation-adapter-rework2-p1-readback1",
+        "dispatchGroup": "p2-plugin-recipe-production-generation-adapter-rework2-p1",
+        "sentAt": "2026-07-13T16:31:02.445Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-plugin-recipe-production-generation-adapter-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p3-core-terminal-recipe-vector-removal-contract-t1",
+      "taskPackageId": "p3-core-terminal-recipe-vector-removal-contract-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Implement and prove an explicit Core terminal Recipe vector-removal port; no Plugin edits.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T16:46:46.278Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-core-terminal-recipe-vector-removal-contract-p1__AlembicCore__p3-core-terminal-recipe-vector-removal-contract-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-core-terminal-recipe-vector-removal-contract-p1__AlembicCore__p3-core-terminal-recipe-vector-removal-contract-t1.json",
+        "deliveryRunId": "run-p3-core-terminal-recipe-vector-removal-contract-p1-readback1",
+        "dispatchGroup": "p3-core-terminal-recipe-vector-removal-contract-p1",
+        "sentAt": "2026-07-13T16:47:46.591Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-core-terminal-recipe-vector-removal-contract-t1"
+    },
+    {
+      "targetTaskId": "p4-plugin-terminal-recipe-vector-removal-integration-t1",
+      "taskPackageId": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Implement Core RecipeVectorTruthRemover in Plugin base/all-generation storage and prove rollback non-resurrection plus order-independent CAS.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T17:09:24.440Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-plugin-terminal-recipe-vector-removal-integration-p1__AlembicPlugin__p4-plugin-terminal-recipe-vector-removal-integration-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-terminal-recipe-vector-removal-integration-p1__AlembicPlugin__p4-plugin-terminal-recipe-vector-removal-integration-t1.json",
+        "deliveryRunId": "run-p4-plugin-terminal-recipe-vector-removal-integration-p1-readback1",
+        "dispatchGroup": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+        "sentAt": "2026-07-13T17:09:55.999Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-plugin-terminal-recipe-vector-removal-integration-t1"
+    },
+    {
+      "targetTaskId": "p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+      "taskPackageId": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+      "targetWindow": "Alembic",
+      "summary": "完成 Alembic 主程序 P3：唯一 Recipe 生产契约接入、旧可写入口按 caller replacement 顺序退役、generation 运维接入与零写/回滚证明；只改 Alembic 仓库并提交可审查证据。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T17:32:18.284Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-alembic-runtime-legacy-recipe-production-cleanup-p1__Alembic__p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-alembic-runtime-legacy-recipe-production-cleanup-p1__Alembic__p5-alembic-runtime-legacy-recipe-production-cleanup-t1.json",
+        "deliveryRunId": "run-p5-alembic-runtime-legacy-recipe-production-cleanup-202607131732",
+        "dispatchGroup": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+        "sentAt": "2026-07-13T17:33:01.387Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-alembic-runtime-legacy-recipe-production-cleanup-t1"
+    },
+    {
+      "targetTaskId": "p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+      "taskPackageId": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "补齐 Core retrievalProfile 的合法 update、持久化、reload 与 readiness/projector 回归合同；只改 Core，不触碰 lifecycle 发布或其它仓库。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T18:30:45.822Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-core-retrieval-profile-edit-roundtrip-repair-p1__AlembicCore__p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-core-retrieval-profile-edit-roundtrip-repair-p1__AlembicCore__p6-core-retrieval-profile-edit-roundtrip-repair-t1.json",
+        "deliveryRunId": "run-p6-core-retrieval-profile-edit-roundtrip-repair-202607131831",
+        "dispatchGroup": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+        "sentAt": "2026-07-13T18:31:21.798Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p6-core-retrieval-profile-edit-roundtrip-repair-t1"
+    },
+    {
+      "targetTaskId": "p7-alembic-runtime-retrieval-generation-closure-t1",
+      "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-p1",
+      "targetWindow": "Alembic",
+      "summary": "修复 Alembic P5 的四个已证实缺陷：真实 Gateway create 旁路、无 active generation 的 legacy 召回断层、retrievalProfile PATCH 丢失，以及 activation lock 崩溃后永久锁；只改 Alembic 并用语义级 RED/GREEN 和全量门禁证明。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T18:48:03.952Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p7-alembic-runtime-retrieval-generation-closure-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-alembic-runtime-retrieval-generation-closure-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-t1.json",
+        "deliveryRunId": "run-p7-alembic-runtime-retrieval-generation-closure-202607140248",
+        "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-p1",
+        "sentAt": "2026-07-13T18:48:38.141Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p7-alembic-runtime-retrieval-generation-closure-t1"
+    },
+    {
+      "targetTaskId": "p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+      "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+      "targetWindow": "Alembic",
+      "summary": "为 Dashboard 提供与 publish 同源的 Recipe RetrievalReadinessReport 只读 API，并以真实 HTTP/生成合同/零写证据闭合。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T19:21:56.360Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p7-alembic-runtime-retrieval-generation-closure-rework1-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-alembic-runtime-retrieval-generation-closure-rework1-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-rework1-t1.json",
+        "deliveryRunId": "run-delivery-p7-alembic-runtime-retrieval-generation-closure-rework1-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+        "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+        "sentAt": "2026-07-13T19:22:24.122Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p7-alembic-runtime-retrieval-generation-closure-rework1-t1"
+    },
+    {
+      "targetTaskId": "p8-dashboard-recipe-reviewer-production-closure-t1",
+      "taskPackageId": "p8-dashboard-recipe-reviewer-production-closure-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "实现 Dashboard reviewer 闭环：真实 profile/readiness/generation 审阅、无损编辑、显式合法发布，彻底删除 create/auto-publish 运行时路径。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T19:48:27.917Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-p8-dashboard-recipe-reviewer-production-closure-p1__AlembicDashboard__p8-dashboard-recipe-reviewer-production-closure-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p8-dashboard-recipe-reviewer-production-closure-p1__AlembicDashboard__p8-dashboard-recipe-reviewer-production-closure-t1.json",
+        "deliveryRunId": "run-delivery-p8-dashboard-recipe-reviewer-production-closure-p1__AlembicDashboard__p8-dashboard-recipe-reviewer-production-closure-t1",
+        "dispatchGroup": "p8-dashboard-recipe-reviewer-production-closure-p1",
+        "sentAt": "2026-07-13T19:49:34.234Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p8-dashboard-recipe-reviewer-production-closure-t1"
+    },
+    {
+      "targetTaskId": "p9-agent-scan-created-recipe-id-projection-closure-t1",
+      "taskPackageId": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "目标：闭合 AlembicAgent 模块扫描的真实生产结果投影。当前 knowledge handler 成功返回 status=created、id、title、lifecycle、readiness，但 ScanRunProjection 仍只识别已废弃的 status=collected + recipe，导致真实扫描无法向下游提供 existing Recipe ID。\n实现边界：仅修改 AlembicAgent；以当前 Core RecipeProductionGateway/knowledge.submit 的真实 created envelope 为权威，统一 extract/summarize 扫描投影，使每个被接受并持久化的 Recipe 输出明确 id/candidateId、lifecycle/pending-staging 状态及必要审阅摘要；不得恢复 collected 假路径，不得二次写入或制造未持久化 Recipe，不得把 rejected/failed 当成功。\n真实链要求：覆盖 ScanAgentRun→knowledge tool handler→RecipeProductionGateway→ScanRunProjection；如果 handler 结果缺少下游所需的可追溯字段，只在既有成功 envelope 上补充由已持久化 Recipe 得到的字段，不能注入测试 id。\n验证：新增针对 status=created 的投影单测、rejected/failed/混合批次负例，以及至少一条使用真实 handler/gateway seam 的集成测试，证明返回 id 对应持久化 pending/staging Recipe；确认没有额外 create、publish 或向量查询写入；运行相关测试、typecheck/build。\n交付：保持仓库基线整洁，提交一个 AlembicAgent commit；回填原始命令输出、关键调用链文件、commit hash、边界/风险。不要修改 Alembic、Dashboard、Core 或 Wakeflow 状态。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T20:35:18.496Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p9-agent-scan-created-recipe-id-projection-closure-rework1-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-agent-scan-created-recipe-id-projection-closure-rework1-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1.json",
+        "deliveryRunId": "run-delivery-p9-agent-scan-created-recipe-id-projection-closure-rework1-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1",
+        "dispatchGroup": "p9-agent-scan-created-recipe-id-projection-closure-rework1-p1",
+        "sentAt": "2026-07-13T21:02:36.344Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p9-agent-scan-created-recipe-id-projection-closure-t1"
+    },
+    {
+      "targetTaskId": "p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+      "taskPackageId": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+      "targetWindow": "Alembic",
+      "summary": "仅修改 Alembic 仓库。以上游已验收 AlembicAgent commit b3c4998de7264094bb32def4c904efcae768d477 的 ScanRunProjection 契约为唯一权威：检查 ModuleService.scanProject、#aiExtractRecipes、DashboardOperations.scanProject 与 POST /api/v1/modules/scan-project 的真实调用链，使响应 recipes 仅来自 knowledge.submit 已成功持久化且 id/candidateId 非空、lifecycle 为 pending/staging 的结果。不得从 provider 原始 JSON 重建 Recipe，不得二次 create，不得 publish，不得修改 Dashboard 前端；zero-submit、submit rejection/failure、空或非法 ID、非法 lifecycle 必须返回空 recipes，并保留可诊断但不伪装成功的 outcome/partial/error 信息。审查并收敛现有 #enrichRecipes：不得改写持久化 Recipe 身份或制造虚假质量真相，审阅摘要只能来自权威结果或明确可追溯的只读派生。为正向 existing-ID、zero-submit、失败/拒绝、malformed ID/lifecycle、部分超时补齐 Alembic 真实 service→Dashboard operation→HTTP seam 回归，并断言 create/publish 零额外调用；运行定向测试、类型/构建及相关全量测试，提交干净 Alembic commit 与原始命令证据。旧 p8 Dashboard accepted 事件不构成完成证据；本任务验收后由总控新建 Dashboard 真实后端消费闭合任务。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T21:12:25.583Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p10-alembic-dashboard-module-scan-existing-id-closure-p1__Alembic__p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-dashboard-module-scan-existing-id-closure-p1__Alembic__p10-alembic-dashboard-module-scan-existing-id-closure-t1.json",
+        "deliveryRunId": "run-delivery-p10-alembic-dashboard-module-scan-existing-id-closure-p1__Alembic__p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+        "dispatchGroup": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+        "sentAt": "2026-07-13T21:12:48.663Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p10-alembic-dashboard-module-scan-existing-id-closure-t1"
+    },
+    {
+      "targetTaskId": "p11-dashboard-module-scan-existing-id-reviewer-closure-t1",
+      "taskPackageId": "p11-dashboard-module-scan-existing-id-reviewer-closure-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "仅修改 AlembicDashboard 仓库。以上游已验收 Alembic commits 3ff157a66275e6ef13549fde1dbe3547194008ae 与 e0cd0f018c3b6b436325da94769c3a99482616e1 的 `ModuleScanProjectResult` 为真实后端合同，修复当前 `src/api/modules.ts` 丢弃 `outcome/errors/batches`、`App.handleScanProject` 把失败/空结果与 scannedFiles 混成成功提示、`resolveExistingRecipeId` 仅取任一 ID 而未验证权威 envelope 的缺口。新增可执行的 response normalizer/view model：只接收 status=created、lifecycle=pending|staging、非空且完全相等的 id/candidateId；非法项必须丢弃并保留可诊断信息，禁止从 title/provider 文本补 ID。UI 必须分别处理 completed（展示 existing ID 并通过 GET 打开 reviewer）、partial（保留已成功 ID，同时明确显示 errors、batch 与 operationMayContinue）、failed（不显示成功 Recipe，展示失败代码/消息）、empty（无新 Recipe）和 skipped（AI unavailable/明确原因）；不得把 transport success 当作生产成功，也不得仅凭 scannedFiles 宣告 Recipe 成功。保留旧 P8 已完成的 profile/readiness/generation reviewer、完整 PATCH round-trip 与显式合法 publish，但补足真实 module-scan response 消费证据；禁止 `knowledgeCreate`、POST `/knowledge`、auto-publish、candidate promotion 或任何第五生产入口。补充可执行 normalizer/API/App interaction contract tests，覆盖 pending/staging 正向、id mismatch、blank ID、active lifecycle、zero-submit empty、Agent failed、partial timeout 与 operationMayContinue；证明点击审阅只调用 `knowledgeGet(existingId)`，保存只 PATCH，发布仅用户确认后的 lifecycle publish。运行 `npm run check`、类型、构建、API drift/边界门禁，提交单一干净 Dashboard commit。按 Dashboard 规则对 completed/empty/failed/partial 的用户可见状态做浏览器/截图验证；fixture 可用于 UI 状态渲染但不得冒充真实后端连通性。旧 p8 accepted 事件不作为最终完成证据，本任务结果才是 Dashboard reviewer 真实链的权威验收输入。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T21:44:11.475Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p11-dashboard-module-scan-existing-id-reviewer-closure-p1__AlembicDashboard__p11-dashboard-module-scan-existing-id-reviewer-closure-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p11-dashboard-module-scan-existing-id-reviewer-closure-p1__AlembicDashboard__p11-dashboard-module-scan-existing-id-reviewer-closure-t1.json",
+        "deliveryRunId": "run-delivery-p11-dashboard-module-scan-existing-id-reviewer-closure-p1__AlembicDashboard__p11-dashboard-module-scan-existing-id-reviewer-closure-t1",
+        "dispatchGroup": "p11-dashboard-module-scan-existing-id-reviewer-closure-p1",
+        "sentAt": "2026-07-13T21:46:01.716Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p11-dashboard-module-scan-existing-id-reviewer-closure-t1"
+    },
+    {
+      "targetTaskId": "p12-plugin-prime-output-bounds-q2-ranking-closure-t1",
+      "taskPackageId": "p12-plugin-prime-output-bounds-q2-ranking-closure-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Fix Prime output-bound/schema closure and the frozen BiliDili q2 Top-3/parity defect, then prove the full eight-query matrix in a fresh MCP process with zero real-root writes.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T22:30:29.207Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p12-plugin-prime-output-bounds-q2-ranking-closure-p1__AlembicPlugin__p12-plugin-prime-output-bounds-q2-ranking-closure-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p12-plugin-prime-output-bounds-q2-ranking-closure-p1__AlembicPlugin__p12-plugin-prime-output-bounds-q2-ranking-closure-t1.json",
+        "deliveryRunId": "run-delivery-p12-plugin-prime-output-bounds-q2-ranking-closure-p1__AlembicPlugin__p12-plugin-prime-output-bounds-q2-ranking-closure-t1",
+        "dispatchGroup": "p12-plugin-prime-output-bounds-q2-ranking-closure-p1",
+        "sentAt": "2026-07-13T22:31:17.877Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p12-plugin-prime-output-bounds-q2-ranking-closure-t1"
+    },
+    {
+      "targetTaskId": "p13-core-canonical-retrieval-stability-refill-t1",
+      "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Repair Core canonical hybrid retrieval so bounded refill continues when unseen lane evidence can still change Top-K membership/order, then prove q2 and protected matrices without query/data hardcoding.",
+      "status": "accepted",
+      "createdAt": "2026-07-13T23:04:22.891Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p13-core-canonical-retrieval-stability-refill-rework1-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p13-core-canonical-retrieval-stability-refill-rework1-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1.json",
+        "deliveryRunId": "run-delivery-p13-core-canonical-retrieval-stability-refill-rework1-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1",
+        "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-rework1-p1",
+        "sentAt": "2026-07-13T23:39:09.044Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p14-plugin-final-public-retrieval-acceptance-t1",
+      "taskPackageId": "p14-plugin-final-public-retrieval-acceptance-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Rebuild Plugin against accepted Core 10e43a66 and close fresh-process BiliDili/AlembicWorkspace public Search-Prime parity, Top3, schema-bound and zero-write acceptance.",
+      "status": "accepted",
+      "createdAt": "2026-07-14T00:24:26.290Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p14-plugin-final-public-retrieval-acceptance-p1__AlembicPlugin__p14-plugin-final-public-retrieval-acceptance-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p14-plugin-final-public-retrieval-acceptance-p1__AlembicPlugin__p14-plugin-final-public-retrieval-acceptance-t1.json",
+        "deliveryRunId": "run-delivery-p14-plugin-final-public-retrieval-acceptance-p1-readback1",
+        "dispatchGroup": "p14-plugin-final-public-retrieval-acceptance-p1",
+        "sentAt": "2026-07-14T00:24:58.730Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p14-plugin-final-public-retrieval-acceptance-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-core-recipe-retrieval-production-generation-p1",
+        "p3-core-terminal-recipe-vector-removal-contract-p1",
+        "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+        "p13-core-canonical-retrieval-stability-refill-p1"
+      ],
+      "targetTaskIds": [
+        "p1-core-recipe-retrieval-production-generation-t1",
+        "p3-core-terminal-recipe-vector-removal-contract-t1",
+        "p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+        "p13-core-canonical-retrieval-stability-refill-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicAgent",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p2-agent-recipe-production-profile-adapter-p1",
+        "p9-agent-scan-created-recipe-id-projection-closure-p1"
+      ],
+      "targetTaskIds": [
+        "p2-agent-recipe-production-profile-adapter-t1",
+        "p9-agent-scan-created-recipe-id-projection-closure-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p2-plugin-recipe-production-generation-adapter-p1",
+        "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+        "p12-plugin-prime-output-bounds-q2-ranking-closure-p1",
+        "p14-plugin-final-public-retrieval-acceptance-p1"
+      ],
+      "targetTaskIds": [
+        "p2-plugin-recipe-production-generation-adapter-t1",
+        "p4-plugin-terminal-recipe-vector-removal-integration-t1",
+        "p12-plugin-prime-output-bounds-q2-ranking-closure-t1",
+        "p14-plugin-final-public-retrieval-acceptance-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+        "p7-alembic-runtime-retrieval-generation-closure-p1",
+        "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+        "p10-alembic-dashboard-module-scan-existing-id-closure-p1"
+      ],
+      "targetTaskIds": [
+        "p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+        "p7-alembic-runtime-retrieval-generation-closure-t1",
+        "p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+        "p10-alembic-dashboard-module-scan-existing-id-closure-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicDashboard",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p8-dashboard-recipe-reviewer-production-closure-p1",
+        "p11-dashboard-module-scan-existing-id-reviewer-closure-p1"
+      ],
+      "targetTaskIds": [
+        "p8-dashboard-recipe-reviewer-production-closure-t1",
+        "p11-dashboard-module-scan-existing-id-reviewer-closure-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p14-plugin-final-public-retrieval-acceptance-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-07-13T10:52:35.735Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "executionPlacement": {
+    "mode": "main",
+    "podId": null
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p14-plugin-final-public-retrieval-acceptance-p1__AlembicPlugin__p14-plugin-final-public-retrieval-acceptance-t1",
+    "lastDeliveryRunId": "run-delivery-p14-plugin-final-public-retrieval-acceptance-p1-readback1",
+    "lastDispatchGroup": "p14-plugin-final-public-retrieval-acceptance-p1",
+    "lastTargetTaskId": "p14-plugin-final-public-retrieval-acceptance-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-07-14T00:24:58.739Z"
+  }
+}

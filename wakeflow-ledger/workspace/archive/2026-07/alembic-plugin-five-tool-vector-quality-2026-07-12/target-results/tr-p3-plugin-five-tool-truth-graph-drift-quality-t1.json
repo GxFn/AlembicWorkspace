@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p3-plugin-five-tool-truth-graph-drift-quality-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p3-plugin-five-tool-truth-graph-drift-quality-p1",
+  "dispatchGroup": "p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p3-plugin-five-tool-truth-graph-drift-quality-t1",
+  "status": "needs-review",
+  "summary": "Rework1 closes the controller-proven Graph seam on AlembicPlugin commit a1f3282e2f29af9fb25ff1c7a12125814b757a19. Exact full identifiers now survive module/file-flow caps, each identifier reserves an exact file and same-name symbol before bounded slicing, SwiftPM Sources targets are probed despite weak app/AOXPlayer noise, and weak module-layer diagnostics are suppressed only after the final bounded selection proves complete exact file+symbol coverage. Accepted Search/Prime orphan truth and Recipe drift behavior remain green.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/service/project-knowledge-context/project/ProjectGraphProvider.ts",
+    "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+    "AlembicPlugin/test/unit/PublicOrphanVectorTruth.test.ts",
+    "AlembicPlugin/test/unit/RecipeMapTool.test.ts",
+    "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+    "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+    "AlembicCore/src/service/search/SearchEngine.ts"
+  ],
+  "verification": [
+    "Baseline: ProjectGraphTool 26/26 passed before rework; new Alembic symbol-starvation and SwiftPM module-probe cases RED (2 failed), then GREEN 27/27.",
+    "Focused final: PublicOrphanVectorTruth + ProjectGraphTool + RecipeMapTool + ReadOnlySearchFingerprint = 4 files / 52 tests passed.",
+    "Full final: 139 test files / 1539 tests passed, 0 failed.",
+    "pnpm check passed; 15 pre-existing script noConsole warnings only, 0 errors.",
+    "pnpm build passed on final commit and used exact AlembicCore 9e499809b3721a0d49e78853db4e115515b281ac.",
+    "Fresh local-dist real AlembicWorkspace Graph probe for `HostMcpServer ProjectLocationService request`: status=ready, exact file+symbol count=4, diagnostics=[], errorCount=0, partial=false, repository coverage 5/5 complete.",
+    "Temporary npm cache workaround proved prepare:codex-runtime-package, check:runtime-pack-freshness, verify:codex-runtime-package, verify:plugin-distribution, and verify:codex-plugin all pass.",
+    "Canonical dev:codex-plugin:reload on a1f3282 completed build and marketplace-shell preparation, then failed only at installed-cache rewrite with EPERM under ~/.codex/plugins/cache before fresh-process readback."
+  ],
+  "risks": [
+    "Sandbox policy blocks the final installed-cache rewrite under ~/.codex/plugins/cache, so controller must rerun canonical reload in owner context and perform fresh-process readback on a1f3282.",
+    "Controller must rerun its real BiliDili installed-cache Graph query after reload; target regression deterministically reproduces the SwiftPM target/AOXPlayer-noise shape without writing the real project."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "Controller real probes showed two independent Graph defects: per-scope module seed selection could stop at a weak top directory before exact-file ownership was discovered, and final node ranking let one exact file's many symbols exhaust the bounded item budget. The remaining cyclic/invalid-scope degradation came from unrelated broad module-layer probes."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduce both controller shapes -> add RED fixtures -> repair module/file-flow preselection -> reserve exact file/symbol representation -> constrain weak diagnostic suppression to proven final coverage -> focused/full/check/build/package/real probe -> two-stage review -> commit."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Only ProjectGraphProvider.ts and ProjectGraphTool.test.ts changed in AlembicPlugin. No Search/Prime/Recipe implementation, Core, vendor, marketplace version, Test, real project, database, vector index, keyword scorer, or gate changes."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+      "verify": "Controller can rerun deterministic AlembicWorkspace symbol-starvation and SwiftPM BiliDili/AOXPlayer-noise regressions; 27/27 pass."
+    },
+    {
+      "kind": "full-suite",
+      "value": "139 test files / 1539 tests passed, 0 failed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "runtime-probe",
+      "ref": "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+      "verify": "Artifact records final-commit canonical build/shell preparation and the owner-context-only EPERM cache rewrite boundary; fresh local-dist real Graph probe separately returned ready with four exact nodes."
+    },
+    {
+      "kind": "commit",
+      "commit": "a1f3282e2f29af9fb25ff1c7a12125814b757a19",
+      "verify": "git status clean; commit contains only two scoped AlembicPlugin files."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 spec review: answered every rework point and preserved accepted Search/Prime/Recipe behavior and all non-goals. Stage 2 quality review: replaced time-of-collection diagnostic guessing with final-selection proof; explicit file-flow/file-symbols/module-layers errors remain unsuppressed, missing identifiers cannot satisfy the file+symbol coverage gate, and all budgets remain bounded."
+    },
+    {
+      "kind": "core-provenance-proof",
+      "value": "AlembicCore HEAD and Plugin build provenance both equal 9e499809b3721a0d49e78853db4e115515b281ac."
+    },
+    {
+      "kind": "public-orphan-filter-proof",
+      "ref": "AlembicPlugin/test/unit/PublicOrphanVectorTruth.test.ts"
+    },
+    {
+      "kind": "graph-preselection-proof",
+      "ref": "AlembicPlugin/test/unit/ProjectGraphTool.test.ts"
+    },
+    {
+      "kind": "recipe-drift-truth-proof",
+      "ref": "AlembicPlugin/test/unit/RecipeMapTool.test.ts"
+    },
+    {
+      "kind": "read-only-no-write-proof",
+      "ref": "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts"
+    },
+    {
+      "kind": "public-json-samples",
+      "value": "Fresh local-dist Graph JSON: status=ready; exact HostMcpServer/ProjectLocationService file+symbol count=4; diagnostics=[]; projectContext errorCount=0, partial=false; repoCoverage=5/5 complete."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1__AlembicPlugin__p3-plugin-five-tool-truth-graph-drift-quality-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1__AlembicPlugin__p3-plugin-five-tool-truth-graph-drift-quality-t1.json",
+    "deliveryRunId": "run-delivery-p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1__AlembicPlugin__p3-plugin-five-tool-truth-graph-drift-quality-t1",
+    "dispatchGroup": "p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1__AlembicPlugin__p3-plugin-five-tool-truth-graph-drift-quality-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 19,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p3-plugin-five-tool-truth-graph-drift-quality-p1",
+    "targetTaskId": "p3-plugin-five-tool-truth-graph-drift-quality-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1",
+    "resultId": "tr-p3-plugin-five-tool-truth-graph-drift-quality-t1",
+    "createdAt": "2026-07-12T16:53:24.854Z"
+  },
+  "createdAt": "2026-07-12T16:53:24.854Z",
+  "stateRevisionObserved": 19,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-p3-plugin-five-tool-truth-graph-drift-quality-t1",
+    "dispatchGroup": "p3-plugin-five-tool-truth-graph-drift-quality-p1",
+    "historyFile": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12/target-results/history/tr-p3-plugin-five-tool-truth-graph-drift-quality-t1__p3-plugin-five-tool-truth-graph-drift-quality-p1__current-r0001.json"
+  }
+}

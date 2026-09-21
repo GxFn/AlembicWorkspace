@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i10-agent-strict-test-execution-integration-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i10-agent-strict-test-execution-integration-p1",
+  "dispatchGroup": "i3-i10-agent-strict-test-execution-integration-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "i3-i10-agent-strict-test-execution-integration-t1",
+  "status": "blocked",
+  "summary": "总控已变更需求语义并明确停止当前包：strict 冷启动测试模式应由后端基于 preflight 确定性自动选择一个 applicable dimension，不应等待第二次用户 confirmation；当前 task package 绑定人工 confirmation，已失效。已立即停止，未继续实现、未提交、未修改 Core/Main/Dashboard。AlembicAgent 工作树保留未提交事实：修改 src/agent/production/StrictProductionStages.ts、src/agent/production/index.ts、src/production.ts；新增未跟踪 src/agent/production/StrictTestDimensionAgentContract.ts、test/strict-test-dimension-agent-contract.test.ts。",
+  "evidenceRefs": [
+    "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+    "AlembicAgent/src/agent/production/index.ts",
+    "AlembicAgent/src/production.ts",
+    "AlembicAgent/src/agent/production/StrictTestDimensionAgentContract.ts",
+    "AlembicAgent/test/strict-test-dimension-agent-contract.test.ts"
+  ],
+  "verification": [
+    "基线确认：Agent HEAD=a882f61cad34eed873db5ac52870475e6d71da52，tree=2b2af813b3538308d957a5227ab102c15c04ea58。",
+    "基线 npm run build:check：通过。",
+    "基线 npx vitest run test/strict-production-chain.test.ts test/strict-iterative-analysis.test.ts test/public-strict-facades.test.ts：3 files / 27 tests 通过。",
+    "RED npx vitest run test/strict-test-dimension-agent-contract.test.ts：1 test 失败，证明伪造 strict-test authority 仍进入 AgentService -> generate-dimension -> AgentStageFactoryRegistry -> PipelineStrategy，并触发 Analyst/Producer 调用。",
+    "当前 npm run build:check：失败；StrictTestDimensionAgentContract.ts 有 4 个 TypeScript 错误（CompiledColdStartPlanV2 非导出成员及 3 个隐式 any）。",
+    "git status --short：3 个已修改文件、2 个未跟踪文件；无 commit，HEAD 仍为 a882f61cad34eed873db5ac52870475e6d71da52。"
+  ],
+  "risks": [
+    "当前未提交工作树是旧语义下的部分实现，类型检查不通过，不可接受或发布。",
+    "新语义需要总控重写权威合同与任务包，明确后端如何从 preflight 确定性选择 applicable dimension，以及移除第二次用户 confirmation 后的 authority/receipt 边界。",
+    "保留的工作树可能与后续重写合同冲突；在收到新任务前不得继续修复、提交或迁移这些改动。"
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i10-agent-strict-test-execution-integration-p1__AlembicAgent__i3-i10-agent-strict-test-execution-integration-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i10-agent-strict-test-execution-integration-p1__AlembicAgent__i3-i10-agent-strict-test-execution-integration-t1.json",
+    "deliveryRunId": "run-delivery-i3-i10-agent-strict-test-execution-integration-p1__AlembicAgent__i3-i10-agent-strict-test-execution-integration-t1",
+    "dispatchGroup": "i3-i10-agent-strict-test-execution-integration-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i10-agent-strict-test-execution-integration-p1__AlembicAgent__i3-i10-agent-strict-test-execution-integration-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 334,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i10-agent-strict-test-execution-integration-p1",
+    "targetTaskId": "i3-i10-agent-strict-test-execution-integration-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "i3-i10-agent-strict-test-execution-integration-p1",
+    "resultId": "tr-i3-i10-agent-strict-test-execution-integration-t1",
+    "createdAt": "2026-07-30T07:08:28.166Z"
+  },
+  "createdAt": "2026-07-30T07:08:28.166Z",
+  "stateRevisionObserved": 334,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

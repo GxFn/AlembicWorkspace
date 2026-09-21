@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-plugin-terminal-recipe-vector-removal-integration-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+  "dispatchGroup": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p4-plugin-terminal-recipe-vector-removal-integration-t1",
+  "status": "completed",
+  "summary": "Consumed accepted AlembicCore 4e0124e and implemented Plugin-owned RecipeVectorTruthRemover end to end. Terminal Recipe identity removal now clears legacy/base truth plus every persisted generation, is injected into the production VectorService, works without an embedding provider, aggregates partial failures for retry, prevents rollback resurrection, and preserves newer same-Recipe events. Created clean Plugin commit 5cd06485a03dbf935ddef8c55e59e9e5a8d4fc3e.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-pipeline/vector/recipe-vector-generation-runtime.ts",
+    "AlembicPlugin/lib/injection/modules/KnowledgeModule.ts",
+    "AlembicPlugin/lib/injection/modules/VectorModule.ts",
+    "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+    "AlembicPlugin/test/unit/LocalEmbedding.test.ts"
+  ],
+  "verification": [
+    "RED: npx vitest run test/unit/RecipeVectorGenerationRuntime.test.ts test/unit/LocalEmbedding.test.ts -> 4 failed / 24 passed before implementation (base/generation cleanup and production injection absent).",
+    "RED: newer same-Recipe event characterization failed before the explicit truth remover existed.",
+    "GREEN: npx vitest run test/unit/RecipeVectorGenerationRuntime.test.ts test/unit/LocalEmbedding.test.ts -> 29 passed.",
+    "Focused regression: six relevant unit files -> 100 passed.",
+    "npm run build:check -> passed against accepted AlembicCore 4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4.",
+    "npm run build -> passed; Plugin dist rebuilt.",
+    "npm run check -> passed; typecheck, lint, import/layer/repository/scope/doctrine/naming/retired-symbol/ring and drift gates all passed (15 inherited noConsole warnings, 0 errors).",
+    "npm run verify:plugin-distribution; npm run verify:codex-plugin; npm run smoke:codex-plugin -> passed.",
+    "Full Vitest JSON: 2248/2249 tests passed; sole failure is inherited unrelated test/integration/RealProjectEnhancement.test.ts Alamofire negative fixture.",
+    "Alembic Guard guard-public-mrjhtirb-4 -> 5 files checked, 0 violations.",
+    "git diff --check passed; commit parent is 3cb93137e040c3491605945f466fe01febcc3aaf; post-commit worktree clean."
+  ],
+  "risks": [
+    "Repository-wide Vitest remains non-green only for the pre-existing, out-of-scope Alamofire negative enhancement fixture (expected 0 packs, observed 1); the changed Recipe vector lifecycle tests and all repository gates pass.",
+    "Existing stale generation lock recovery remains manual and was intentionally not changed by this terminal-removal task."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "5cd06485a03dbf935ddef8c55e59e9e5a8d4fc3e",
+      "value": "Single AlembicPlugin commit; parent 3cb93137e040c3491605945f466fe01febcc3aaf.",
+      "verify": "git status --short is empty and git rev-parse HEAD^ matches the dispatch baseline."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorGenerationRuntime.test.ts",
+      "value": "Actual VectorLifecycleCoordinator coverage for delete/deprecate, provider-offline removal, base/all-generation cleanup, rollback non-resurrection, partial-failure retry, newer-event safety, and order-independent activation CAS.",
+      "verify": "29 direct tests and 100 focused regressions passed; full suite 2248/2249 with only the inherited unrelated Alamofire fixture failing."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 contract review confirmed accepted Core identity port consumption, physical base plus all-generation removal, production injection, terminal lifecycle coverage, and unchanged ordinary update/search/prime/submit paths. Stage 2 quality review found no blocker/high findings; both storage sides are attempted, failures are aggregated, retry is idempotent, and scope is five Plugin files only.",
+      "verify": "npm run check and all package/boundary gates passed; Alembic Guard checked 5 files with 0 violations."
+    },
+    {
+      "kind": "red-green-note",
+      "value": "Before implementation, four tests failed because canonical base/rollback vectors survived and production VectorModule had no truth remover; a newer-event characterization also failed because the runtime lacked the port. After implementation, the same tests passed.",
+      "verify": "RED 4 failed/24 passed; GREEN 29 passed."
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Only Plugin generation runtime, KnowledgeModule/VectorModule wiring, and two unit suites changed; no AlembicCore, Test, plugin cache, search/prime/submit behavior, or provider implementation changed.",
+      "verify": "Commit stat: 5 files, 259 insertions, 2 deletions; repository boundary and Core import boundary passed."
+    },
+    {
+      "kind": "compatibility-review",
+      "value": "The existing RoutedRecipeVectorStore remove path remains unchanged for non-terminal maintenance. The new Core port is optional at construction and injected only after Plugin vectorStore initialization creates the generation runtime singleton. Provider-null terminal cleanup is exercised through the real service/coordinator path.",
+      "verify": "build/check, distribution verification, Codex plugin verification, startup/install/stdio smoke, and provider-offline test passed."
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "Core terminal lifecycle events previously reached only the routed active-store compatibility removal, so canonical base residues and non-active rollback generations were outside the deletion boundary. The fix implements the explicit identity port at the Plugin storage owner and fans it out to raw base truth plus every persisted generation.",
+      "verify": "The RED fixtures reproduced both surviving base truth and rollback resurrection; GREEN fixtures prove both are absent while unrelated vectors remain."
+    },
+    {
+      "kind": "guard",
+      "ref": "guard-public-mrjhtirb-4",
+      "value": "Alembic task-scoped Guard review.",
+      "verify": "5 files checked, complete coverage, 0 violations."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-plugin-terminal-recipe-vector-removal-integration-p1__AlembicPlugin__p4-plugin-terminal-recipe-vector-removal-integration-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-terminal-recipe-vector-removal-integration-p1__AlembicPlugin__p4-plugin-terminal-recipe-vector-removal-integration-t1.json",
+    "deliveryRunId": "run-p4-plugin-terminal-recipe-vector-removal-integration-p1-readback1",
+    "dispatchGroup": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-terminal-recipe-vector-removal-integration-p1__AlembicPlugin__p4-plugin-terminal-recipe-vector-removal-integration-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 38,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+    "targetTaskId": "p4-plugin-terminal-recipe-vector-removal-integration-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+    "resultId": "tr-p4-plugin-terminal-recipe-vector-removal-integration-t1",
+    "createdAt": "2026-07-13T17:26:18.356Z"
+  },
+  "createdAt": "2026-07-13T17:26:18.356Z",
+  "stateRevisionObserved": 38,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

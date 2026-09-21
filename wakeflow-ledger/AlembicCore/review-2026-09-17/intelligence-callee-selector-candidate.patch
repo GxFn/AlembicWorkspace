@@ -1,0 +1,44 @@
+--- a/src/core/AstAnalyzer.ts
++++ b/src/core/AstAnalyzer.ts
+@@ -930,8 +930,19 @@
+     return receiver ? [...names, ...names.map((name) => `${receiver}.${name}`)] : names;
+   }
+   // TS/JS/Go/Rust 使用 function 字段；Swift/Kotlin 的第一个命名子节点是 callee。
+-  const name = readDirectCallableName(node.childForFieldName('function') ?? node.namedChild(0));
+-  return name ? [name, name.split(/\.|::/).at(-1)!] : [];
++  const callable = unwrapDirectCallableNode(node.childForFieldName('function') ?? node.namedChild(0));
++  const name = readDirectCallableName(callable);
++  if (name) return [name, name.split(/\.|::/).at(-1)!];
++  const suffix = callable?.childForFieldName('suffix') ?? callable?.namedChildren.find((child) => child.type === 'navigation_suffix');
++  let selector = callable?.childForFieldName('property') ?? callable?.childForFieldName('field') ?? suffix?.childForFieldName('suffix') ?? suffix?.namedChildren.find((child) => child.type === 'simple_identifier') ?? null;
++  if (callable?.type === 'subscript_expression') {
++    const index = callable.childForFieldName('index');
++    selector = index?.type === 'string' && index.namedChildCount === 1 && index.namedChild(0)?.type === 'string_fragment' ? index.namedChild(0) : null;
++  }
++  const member = selector?.text ?? '';
++  if (!/^[\p{ID_Start}_$][\p{ID_Continue}$]*$/u.test(member)) return [];
++  const receiver = readDirectCallableName(callable?.childForFieldName('object') ?? callable?.childForFieldName('operand') ?? callable?.childForFieldName('value') ?? callable?.childForFieldName('target') ?? callable?.namedChild(0) ?? null);
++  return receiver ? [member, receiver + '.' + member] : [member];
+ }
+ 
+ function readDartDirectCalls(node: TreeSitterNode) {
+@@ -993,10 +1004,16 @@
+   return calls;
+ }
+ 
++function unwrapDirectCallableNode(node: TreeSitterNode | null): TreeSitterNode | null {
++  while (node) {
++    if (node.type === 'parenthesized_expression' && node.namedChildCount === 1) node = node.namedChild(0);
++    else if (node.type === 'generic_function') node = node.childForFieldName('function');
++    else break;
++  }
++  return node;
++}
+ function readDirectCallableName(node: TreeSitterNode | null): string | null {
+-  while (node?.type === 'parenthesized_expression' && node.namedChildCount === 1) {
+-    node = node.namedChild(0);
+-  }
++  node = unwrapDirectCallableNode(node);
+   const name = node?.text.replace(/\s+/g, '').replace(/\?\./g, '.') ?? '';
+   // 限定为标识符/限定名。getFactory("target")() 这类动态callee不从参数正文推断API名。
+   return /^[\p{ID_Start}_$][\p{ID_Continue}$]*(?:(?:\.|::)[\p{ID_Start}_$][\p{ID_Continue}$]*)*$/u.test(

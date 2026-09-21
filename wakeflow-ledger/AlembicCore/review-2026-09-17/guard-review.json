@@ -1,0 +1,312 @@
+[
+  {
+    "file": "src/service/guard/EnhancementGuardRules.ts",
+    "lines": 114,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        114
+      ]
+    ],
+    "role": "同步 registry 规则适配与异步 manifest→language/framework→pack 规则选择；frameworkAgnostic 优先级及未初始化空集兼容必须保留。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "Guard facade、Main/Plugin Guard 管线；EnhancementGuardRules.test.ts覆盖同步与实际manifest规则。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 114
+  },
+  {
+    "file": "src/service/guard/ExclusionManager.ts",
+    "lines": 311,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        311
+      ]
+    ],
+    "role": "path/per-file rule/global rule三级排除、glob、导入导出、JSON持久化和旧.asd迁移；WriteZone可选，不能删除旧构造或排除导入面。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "两宿主 GuardModule；GuardImmuneSystem与PublicSearchVectorGuardEntrypoints覆盖排除持久化。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 311
+  },
+  {
+    "file": "src/service/guard/GuardCheckEngine.ts",
+    "lines": 1796,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        1796
+      ]
+    ],
+    "role": "数据库regex/AST、builtins、EP规则合并与缓存；路径/测试/scope排除；regex/code/AST Layer2执行、uncertainty、reasoning、hits与SignalBus汇总。完整读取1–1810范围（基线1796行），保留B的AST过滤、dialect与callee修复。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "两宿主GuardModule、HTTP/MCP guard、GuardService；GuardCheckEngine.test与GuardScopeFiltering锁住真实SQLite/grammar行为。新IR-12 member-call cases的in-flight失败由B/root负责。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 1796,
+    "crossAgentDelta": "后续IR-12 member-call修复由B实现并由root复验；本记录全文读取对应原审查基线，不冒认后续并发代码审查。"
+  },
+  {
+    "file": "src/service/guard/GuardCodeChecks.ts",
+    "lines": 428,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        428
+      ]
+    ],
+    "role": "ObjC KVO/category、JS promise、Go defer循环、Python缩进、Swift unwrap、Java资源/synchronized、Kotlin协程、Rust unwrap/unsafe、Dart mounted/late等确定性启发式检查。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "GuardCheckEngine.checkCode直接消费；规则为业务启发式，未实证的边界漏报不当作缺陷重构。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 428
+  },
+  {
+    "file": "src/service/guard/GuardCrossFileChecks.ts",
+    "lines": 333,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        333
+      ]
+    ],
+    "role": "跨文件相对import、JS双向循环、ObjC重复category、JVM同名类、Go init数量、Swift extension冲突等检查；保留返回ruleId/文件组合/严重度。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "GuardCheckEngine.auditFiles直接消费；GuardCheckEngine/GuardImmuneSystem实际批量用例保留。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 333
+  },
+  {
+    "file": "src/service/guard/GuardFeedbackLoop.ts",
+    "lines": 190,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        190
+      ]
+    ],
+    "role": "按当前与历史ruleId差集识别已修复项，经rule/fixSuggestion关联知识，记录反馈并发signal；历史更新顺序属于宿主消费契约。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "Main routes/guard.ts先反馈后append；Plugin handler先append再反馈存在待复现顺序疑点，不在本次5项修复内。GuardImmuneSystem真实存储反馈case保留。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 190
+  },
+  {
+    "file": "src/service/guard/GuardPatternUtils.ts",
+    "lines": 175,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        175
+      ]
+    ],
+    "role": "RegExp透传/string缓存编译、注释/test行mask、Rust test块追踪和语言识别adapter。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "GuardCheckEngine、GuardCodeChecks消费；不因RegExp可变lastIndex的静态假设删除对RegExp的公开支持。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 175
+  },
+  {
+    "file": "src/service/guard/GuardService.ts",
+    "lines": 393,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        509
+      ]
+    ],
+    "role": "公开规则创建/启用/禁用、审计、引擎优先与DB-only降级、列表/搜索/统计；本次接入可选fileStore，共用persistKnowledgeUpdate并刷新cache，AST正文保存真实query。旧repo/constructor兼容。",
+    "findings": [
+      "GUARD-02",
+      "GUARD-03",
+      "GUARD-05"
+    ],
+    "disposition": "fixed-minimal-compatible",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-fixes-red.log",
+        "guard-core-final-green.log",
+        "guard-main-final-green.log",
+        "guard-plugin-final-green.log",
+        "guard-core-final-noemit.log",
+        "guard-main-noemit.log",
+        "guard-plugin-noemit.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "Main GatewayActionRegistry和guardRules路由；两宿主GuardModule真实注册；GuardServicePersistence真实SQLite/writer/trigger回归。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 393,
+    "currentLines": 509
+  },
+  {
+    "file": "src/service/guard/RuleLearner.ts",
+    "lines": 405,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        405
+      ]
+    ],
+    "role": "可持久化触发/反馈统计、precision/recall/F1/FP率、问题阈值、14天有效性、质量signal与规则优化建议；不包含AI运行时。旧.asd迁移和JSON兼容保留。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "两宿主GuardModule；GuardImmuneSystem/PublicSearchVectorGuardEntrypoints规则学习与落盘测试。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 405
+  },
+  {
+    "file": "src/service/guard/UncertaintyCollector.ts",
+    "lines": 232,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        232
+      ]
+    ],
+    "role": "逐层执行/跳过计数、uncertain结果、skipReason边界和覆盖报告；reset/get/buildReport对外输出需要保留。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "GuardCheckEngine单/批文件audit与公开facade；GuardImmuneSystem/PublicSearchVectorGuardEntrypoints。nested引用别名仅静态观察，未列bug。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 232
+  },
+  {
+    "file": "src/service/guard/ViolationsStore.ts",
+    "lines": 327,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        365
+      ]
+    ],
+    "role": "SQLite审计run写入、指纹去重、200条上限、历史/趋势/统计/分页/归属；本次精确rule清理保留mixed run其他规则，同秒顺序用rowid稳定。",
+    "findings": [
+      "GUARD-01",
+      "GUARD-04"
+    ],
+    "disposition": "fixed-minimal-compatible",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-fixes-red.log",
+        "guard-core-final-green.log",
+        "guard-main-final-green.log",
+        "guard-plugin-final-green.log",
+        "guard-core-final-noemit.log",
+        "guard-main-noemit.log",
+        "guard-plugin-noemit.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "Main violations路由、两宿主GuardFeedbackLoop/MCP、ViolationsStoreAttribution；Promise<void>/void兼容保留。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 327,
+    "currentLines": 365
+  },
+  {
+    "file": "src/service/guard/index.ts",
+    "lines": 11,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        11
+      ]
+    ],
+    "role": "11个Guard子模块公共barrel，真实facade与两宿主消费；不扩大exports，不删除兼容入口。",
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "policy": "保留真实行为/SQLite/grammar测试；本组没有产品或测试删除。",
+      "evidence": [
+        "guard-core-final-green.log"
+      ],
+      "fullSuiteOwner": "root; GuardCheckEngine IR-12在B修复中，不能把交叉运行失败当绿色。"
+    },
+    "consumers": "src/guard.ts、Main/Plugin GuardModule、公共entrypoint测试。",
+    "cleanup": "无新增安全删除候选；保留已确认真实消费者的入口。",
+    "baselineLines": 11
+  }
+]

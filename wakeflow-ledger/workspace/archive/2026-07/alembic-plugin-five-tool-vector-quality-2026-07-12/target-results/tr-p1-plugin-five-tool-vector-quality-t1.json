@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-plugin-five-tool-vector-quality-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+  "dispatchGroup": "p1-plugin-five-tool-vector-quality-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p1-plugin-five-tool-vector-quality-t1",
+  "status": "needs-review",
+  "summary": "Rework1 implemented and committed at 67ce4f6ad265729c6162fc94b2e69eb82186c9fe. The Plugin now resolves an untagged configured/default Ollama model family to the exact installed tagged model name returned by /api/tags before constructing the embedding provider, so /api/embed receives qwen3-embedding:0.6b rather than the failing qwen3-embedding base name. Explicitly tagged model authority is preserved: a missing requested tag does not silently switch to another installed tag and falls back to keyword. Existing disable, keyword-only, bounded timeout, absent service/model, no-download/cloud, Search/Prime route and no-write tests remain green. Focused tests, final full unit suite, check, build, runtime package, distribution and plugin verification passed. A live Workspace snapshot probe was attempted, but this target sandbox cannot reach 127.0.0.1:11434 (fetch failed), and canonical cache reload is also blocked by EPERM on ~/.codex/plugins/cache; controller must reload the commit in its owner context and run the required AlembicWorkspace config-absent plus BiliDili explicit-tag Search/Prime validation.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-pipeline/vector/LocalEmbedding.ts",
+    "AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+    "AlembicPlugin/test/unit/SearchEnginePublicRoute.test.ts",
+    "AlembicPlugin/test/unit/PrimeSearchRouteEvidence.test.ts",
+    "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+    "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json"
+  ],
+  "verification": [
+    "Baseline before rework: LocalEmbedding/SearchEnginePublicRoute/PrimeSearchRouteEvidence/ReadOnlySearchFingerprint — 4 files / 21 tests passed",
+    "RED: LocalEmbedding exact installed tag and explicit different-tag authority — 2 expected failures reproduced",
+    "GREEN focused: LocalEmbedding/SearchEnginePublicRoute/PrimeSearchRouteEvidence/ReadOnlySearchFingerprint — 4 files / 23 tests passed",
+    "Final HEAD full unit: 138 files / 1534 tests passed",
+    "pnpm check — passed (15 pre-existing console warnings only)",
+    "pnpm build — passed against sibling AlembicCore f4275572282a24c45af282a2ef7b435108f74fdd",
+    "runtime package freshness/boundary, plugin distribution and Codex plugin verification — passed",
+    "Live Workspace read-only Search attempt: config absent resolved enabled=true/model=qwen3-embedding; localhost Ollama probe returned fetch failed under target sandbox, so real vector route remains controller validation",
+    "Canonical reload: build and packaged runtime preparation passed; cache rewrite failed with EPERM at ~/.codex/plugins/cache"
+  ],
+  "risks": [
+    "Controller must run canonical reload/readback from a context allowed to write ~/.codex/plugins/cache.",
+    "Controller must rerun the real read-only AlembicWorkspace semantic Search/Prime proof and BiliDili explicit-tag regression because this target sandbox cannot reach the local Ollama endpoint.",
+    "No Graph, Recipe Map, Guard, real KB, rescan, download, cloud or cross-repository behavior was changed in rework1."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "ref": "AlembicPlugin/lib/recipe-pipeline/vector/LocalEmbedding.ts",
+      "value": "Controller verdict confirmed: Core probe tolerated a base/tag family match, but Plugin constructed the selected provider before probing and kept the unresolved base model for /api/embed."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Read rework verbatim; pin clean baseline; RED exact tagged request body and explicit-tag authority; mutate selected lane provider only after exact installed-name resolution; focused/check; commit; full/build/package; attempt live read-only probe; report environment boundary."
+    },
+    {
+      "kind": "change-scope",
+      "ref": "AlembicPlugin/lib/recipe-pipeline/vector/LocalEmbedding.ts",
+      "value": "Two files only: LocalEmbedding model resolution and its unit tests. Graph, Recipe Map, Guard, Search handler, Prime handler, real KB and other repositories untouched."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+      "verify": "18 LocalEmbedding tests pass, including exact qwen3-embedding:0.6b embed body and no silent explicit-tag substitution."
+    },
+    {
+      "kind": "full-suite",
+      "value": "Final HEAD 67ce4f6: 138 test files / 1534 tests passed.",
+      "verify": "pnpm vitest run --config vitest.unit.config.ts --reporter=dot"
+    },
+    {
+      "kind": "runtime-probe",
+      "ref": "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+      "value": "Final commit build and packaged runtime preparation succeeded; installed-cache write was EPERM. Direct live Workspace snapshot probe resolved absent config to enabled base model but localhost probe was fetch failed in sandbox; controller re-probe required."
+    },
+    {
+      "kind": "commit",
+      "commit": "67ce4f6ad265729c6162fc94b2e69eb82186c9fe",
+      "verify": "git status clean; two-file rework commit."
+    },
+    {
+      "kind": "self-review",
+      "value": "Point-by-point rework response: (1) agree base/tag mismatch was the root cause; fixed provider construction from exact installed name. (2) preserve explicit config/env authority; explicit tag mismatch now falls back and has regression. (3) preserve opt-out, timeout and honest fallback; all prior cases pass. (4) Workspace/Bili live proof attempted but cannot be claimed because localhost is sandbox-blocked and cache reload is EPERM; controller must perform it. Stage 2 found no scope expansion or remaining code blocker."
+    },
+    {
+      "kind": "baseline",
+      "value": "Before changes, 4 focused files / 21 tests passed on 5dee91d."
+    },
+    {
+      "kind": "repro",
+      "ref": "AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+      "value": "Before fix, selected provider POST body used model=qwen3-embedding despite installed qwen3-embedding:0.6b; explicit qwen3-embedding:1.0b incorrectly selected Ollama when only 0.6b was installed."
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+      "verify": "Both controller-reported model-resolution behaviors fail before and pass after."
+    },
+    {
+      "kind": "vector-default-proof",
+      "ref": "AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+      "verify": "Absent config default plus exact installed tag, explicit opt-outs, missing model/service, timeout and available provider cases pass."
+    },
+    {
+      "kind": "public-search-route-proof",
+      "ref": "AlembicPlugin/test/unit/SearchEnginePublicRoute.test.ts",
+      "verify": "Public vector success and sanitized keyword fallback remain green."
+    },
+    {
+      "kind": "prime-diagnostic-proof",
+      "ref": "AlembicPlugin/test/unit/PrimeSearchRouteEvidence.test.ts",
+      "verify": "Prime vector/fallback route evidence remains green."
+    },
+    {
+      "kind": "read-only-no-write-proof",
+      "ref": "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+      "verify": "DB/WAL/SHM/vector fingerprints remain byte-identical."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-plugin-five-tool-vector-quality-rework1-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-five-tool-vector-quality-rework1-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1.json",
+    "deliveryRunId": "run-delivery-p1-plugin-five-tool-vector-quality-rework1-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1",
+    "dispatchGroup": "p1-plugin-five-tool-vector-quality-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-five-tool-vector-quality-rework1-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 7,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+    "targetTaskId": "p1-plugin-five-tool-vector-quality-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p1-plugin-five-tool-vector-quality-rework1-p1",
+    "resultId": "tr-p1-plugin-five-tool-vector-quality-t1",
+    "createdAt": "2026-07-12T13:37:56.726Z"
+  },
+  "createdAt": "2026-07-12T13:37:56.726Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-p1-plugin-five-tool-vector-quality-t1",
+    "dispatchGroup": "p1-plugin-five-tool-vector-quality-p1",
+    "historyFile": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12/target-results/history/tr-p1-plugin-five-tool-vector-quality-t1__p1-plugin-five-tool-vector-quality-p1__current-r0001.json"
+  }
+}

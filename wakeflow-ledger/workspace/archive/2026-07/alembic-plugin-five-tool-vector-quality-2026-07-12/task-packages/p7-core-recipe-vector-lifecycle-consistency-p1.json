@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p7-core-recipe-vector-lifecycle-consistency-p1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "summary": "Phase P7 producer repair: make Recipe vector production and maintenance lifecycle-consistent so normal full refresh, update, deprecate, reactivate and delete paths do not create or retain orphan semantic-region vectors.\n\nController raw evidence (BiliDili, read-only):\n- The HNSW snapshot contains 1,307 vectors: 75 entry_* vectors and 1,232 recipe_region_* vectors.\n- SQLite contains 75 non-deprecated Recipe rows. All 75 entry_* ids match exactly (0 entry orphan, 0 missing entry vector).\n- Region vectors resolve to 147 distinct recipeIds; 72 recipeIds are absent from SQLite, leaving 595 orphan recipe_region_* vectors. The public query-time count only reports orphan candidates encountered by that query, not the total.\n- Current index mtime is 2026-07-10 23:38:45 +0800. The current live Recipes were created before that sync, proving the full region build appended the current corpus but failed to prune the prior corpus.\n- Root cause in RecipeRegionVectorIndex.syncRecipeSemanticRegionVectors: removeStale only removes a region id when recipeId is present in the current entries batch and the exact chunk id is no longer expected. It intentionally skips recipeIds absent from entries. Plugin full build calls the method in batches, so vanished Recipes are never pruned.\n- Additional same-chain gaps: KnowledgeService lifecycle transitions emit lifecycle:transition but SyncCoordinator listens only knowledge:changed/knowledge:deleted; knowledge:deleted currently removes entry_* only, not recipe_region_*; KnowledgeSyncService direct orphan deprecation bypasses lifecycle events.\n\nRequired Core behavior:\n1. Introduce an explicit, fail-safe distinction between subset refresh and authoritative-corpus maintenance. Subset refresh for one/batched Recipe must never delete unrelated Recipe regions. An authoritative full-corpus call must remove every recipe_region_* whose recipeId is absent from the authoritative non-deprecated Recipe id set, and must also remove obsolete chunks for live Recipes whose region content changed. Do not infer authority merely from a non-empty array.\n2. Make canonical Recipe lifecycle removal close both vector families: physical delete and transition to deprecated remove entry_<id> plus every recipe_region_<id>_* vector. Reactivation/publish/update must have an explicit refresh route that regenerates current entry and region vectors from current DB truth; no query-time mutation.\n3. Bring direct maintenance deprecation (including KnowledgeSyncService orphan detection) onto the same observable lifecycle/vector-maintenance path or provide one canonical post-maintenance authoritative reconciliation that callers can await. Do not leave silent direct SQL writes that bypass vector cleanup.\n4. Extend explicit repair/reconcile proof so existing orphan recipe regions are countable/removable on an isolated fixture/copy. Query-time Search filtering remains defense-in-depth and must stay read-only; it is not the correctness mechanism.\n5. Shutdown/destruction must not silently drop queued removals needed for acknowledged Recipe mutations. Preserve bounded diagnostics for failures.\n6. Preserve existing local embedding, Search, Prime, Graph, Recipe Map, Guard, project confinement, no-Git-gate and no-host-selection semantics. No live BiliDili/AlembicWorkspace DB or vector mutation in target validation.\n\nValidation:\n- RED/GREEN unit/integration fixtures reproducing exactly: 75 live + absent prior recipe regions; authoritative full sync prunes absent ids; subset/batched refresh preserves unrelated live regions; content update replaces old chunks; deprecate/delete remove entry+regions; reactivate/publish regenerate; direct sync orphan deprecation is closed; shutdown/flush does not lose removal.\n- Focused Core vector/knowledge lifecycle suites, full Core test suite, npm run check and npm run build.\n- Return final Core commit, changed symbols, raw count proofs, failure-path analysis, command summaries and two-stage self-review.\n- No Test window and no real knowledge-base writes. Plugin authoritative-caller integration will be a dependent consumer package after this producer is accepted.",
+  "status": "pending",
+  "sourceRef": "User command 2026-07-13 plus controller read-only BiliDili HNSW/SQLite reconciliation and Core/Plugin call-chain audit.",
+  "designIntent": "把索引正确性放回 Recipe 的生产与生命周期维护链：显式区分子集刷新和权威语料刷新，让所有删除/停用路径同步清理主向量与区域向量，并保留查询过滤仅作防御。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "real-orphan-count-proof"
+      },
+      {
+        "kind": "authoritative-vs-subset-proof"
+      },
+      {
+        "kind": "lifecycle-vector-closure-proof"
+      },
+      {
+        "kind": "shutdown-flush-proof"
+      },
+      {
+        "kind": "read-only-real-data-proof"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T00:33:56.610Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p7-core-recipe-vector-lifecycle-consistency-t1",
+      "taskPackageId": "p7-core-recipe-vector-lifecycle-consistency-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "修复 Core Recipe 向量生产/维护生命周期一致性：权威全量清理孤儿区域向量，子集更新不误删，deprecate/delete/reactivate/update 与 shutdown 闭环。",
+      "status": "pending",
+      "createdAt": "2026-07-13T00:33:56.610Z"
+    }
+  ]
+}

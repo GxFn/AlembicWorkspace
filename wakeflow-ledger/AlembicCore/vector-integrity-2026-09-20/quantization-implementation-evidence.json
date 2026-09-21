@@ -1,0 +1,456 @@
+{
+  "status": "product-frozen-pending-root-review",
+  "baseline": "9e8d033ac4dbab4e3555d243fc711269b48eeab9",
+  "commitExpectation": "no-commit: root requested a unified review and commit",
+  "changedFiles": [
+    {
+      "file": "src/infrastructure/vector/HnswVectorAdapter.ts",
+      "sha256": "fce8b3f3bc4d1441f1c29eafbc9d72e7a9c8a28297f060e43115505b008c8f1d",
+      "scope": "authorized implementation/regression"
+    },
+    {
+      "file": "src/infrastructure/vector/ScalarQuantizer.ts",
+      "sha256": "5adc1ccdfcb4a756605e318f446989e6a074326d04cbeb23083d7d8cd713440b",
+      "scope": "comments only"
+    },
+    {
+      "file": "src/infrastructure/vector/VectorMigration.ts",
+      "sha256": "d8a700f98bd16de368d4ceaf4df995a848cf06323bf70a6cf37cccf50fb5e402",
+      "scope": "authorized implementation/regression"
+    },
+    {
+      "file": "test/HnswVector.test.ts",
+      "sha256": "e0cf7401a8e3f980f41b2a01c0d891acd45e693841f617597fd8243add1c7699",
+      "scope": "authorized implementation/regression"
+    }
+  ],
+  "checks": [
+    {
+      "label": "quantization-baseline",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "ScalarQuantizer|SQ8 2-pass search"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.53,
+      "log": "quantization-baseline.log",
+      "sha256": "a6c989681d1bcb672c820df8541468084261312d828999cf5bae3b0560d49063"
+    },
+    {
+      "label": "quantization-red-none",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "respects quantize:none"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 0.91,
+      "log": "quantization-red-none.log",
+      "sha256": "919b084a0b0482c558fd647a2b1eb4e051daa99794c6404878b348336f0563d3"
+    },
+    {
+      "label": "quantization-green-none",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "respects quantize:none"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.65,
+      "log": "quantization-green-none.log",
+      "sha256": "4455c8ce6f49041eeae3262f14ee96e1c2a07307037a1c487370128bba362997"
+    },
+    {
+      "label": "quantization-red-empty",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "rebuilds usable SQ8"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.23,
+      "log": "quantization-red-empty.log",
+      "sha256": "4c807f27ad513320ced38584ef317db34cfd1e04264d4a071c3ef761537d5689"
+    },
+    {
+      "label": "quantization-green-empty",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "rebuilds usable SQ8"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.68,
+      "log": "quantization-green-empty.log",
+      "sha256": "bea1a33f6a3d747d70d02eb39485b6163af0416a02f91b6f473917ebd772fff2"
+    },
+    {
+      "label": "quantization-red-single-read",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "reads a snapshot once"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.09,
+      "log": "quantization-red-single-read.log",
+      "sha256": "c59252ca1458508c704863253fdb5d32d53ea3e897016d73088a8746dbb11dd3"
+    },
+    {
+      "label": "quantization-green-single-read",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "reads a snapshot once"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.81,
+      "log": "quantization-green-single-read.log",
+      "sha256": "54432dc543fff1e31ef71019801ed46b1a79aa4de007f889c626fe80fb299037"
+    },
+    {
+      "label": "quantization-green-related",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "test/VectorPersistence.test.ts",
+        "-t",
+        "ScalarQuantizer|SQ8 2-pass search|rejects flush and retains WAL|retains recovered WAL|should recover WAL on restart|should handle WAL with remove|should fallthrough to json when .asvec is corrupted"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.07,
+      "log": "quantization-green-related.log",
+      "sha256": "c1d71eccb916cae3abd43e6e4cc6bc2cb30bb8858250f90c126a949e1509fc3c"
+    },
+    {
+      "label": "quantization-types",
+      "command": [
+        "npm",
+        "run",
+        "build:check"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 6.16,
+      "log": "quantization-types.log",
+      "sha256": "bc62f15e2d04df1a120630ca683d25225a735865425c421a2bcce1deb7891db5"
+    },
+    {
+      "label": "quantization-fixture-types",
+      "command": [
+        "node",
+        "../wakeflow-ledger/AlembicCore/vector-integrity-2026-09-20/quantization-fixture-types.mjs"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.3,
+      "log": "quantization-fixture-types.log",
+      "sha256": "3057a946e8c99ac677296cd80e03118667bfd551721c00dc2feaf2af72dfdbf6"
+    },
+    {
+      "label": "quantization-final-diff",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "src/infrastructure/vector/HnswVectorAdapter.ts",
+        "src/infrastructure/vector/ScalarQuantizer.ts",
+        "test/HnswVector.test.ts"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.02,
+      "log": "quantization-final-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "quantization-final-lint",
+      "command": [
+        "node_modules/.bin/biome",
+        "check",
+        "src/infrastructure/vector/HnswVectorAdapter.ts",
+        "src/infrastructure/vector/ScalarQuantizer.ts",
+        "test/HnswVector.test.ts"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.14,
+      "log": "quantization-final-lint.log",
+      "sha256": "26afb9ed586430c66ad4136377d5edf67ab93bdae8486c616707558c1c898f5c"
+    },
+    {
+      "label": "quantization-green-integrated",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "test/VectorPersistence.test.ts",
+        "-t",
+        "ScalarQuantizer|SQ8 2-pass search|rejects flush and retains WAL|retains recovered WAL|should recover WAL on restart|should handle WAL with remove|should fallthrough to json when .asvec is corrupted"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.98,
+      "log": "quantization-green-integrated.log",
+      "sha256": "a28b44816bb7eff128151c21832be39735326266aa5053e99d462e1c73066a20"
+    },
+    {
+      "label": "quantization-migration-baseline",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/VectorPersistence.test.ts",
+        "-t",
+        "VectorMigration"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.01,
+      "log": "quantization-migration-baseline.log",
+      "sha256": "add56b69e9d2103b43e84583c84c8405af1a693ac229153b11ae064fa5224110"
+    },
+    {
+      "label": "quantization-migration-red",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "keeps legacy JSON until"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.02,
+      "log": "quantization-migration-red.log",
+      "sha256": "52ef2efddfa0cc09a62cb583648fe836c7313323f8b62e41f80e3fe182993ab4"
+    },
+    {
+      "label": "quantization-migration-green",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "-t",
+        "keeps legacy JSON until"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.09,
+      "log": "quantization-migration-green.log",
+      "sha256": "3256ad888d5973c8b60acdc36fd8b4c80c3ec6eee3402a28c22071115ac5b0e4"
+    },
+    {
+      "label": "quantization-migration-compat",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "test/VectorPersistence.test.ts",
+        "-t",
+        "JSON migration recovery|VectorMigration"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.12,
+      "log": "quantization-migration-compat.log",
+      "sha256": "440374ad7e7df0bbedf6a7d4f9cc857b00a2fca49a3201f5f86be1f9c356f474"
+    },
+    {
+      "label": "quantization-migration-format",
+      "command": [
+        "node_modules/.bin/biome",
+        "check",
+        "--write",
+        "src/infrastructure/vector/HnswVectorAdapter.ts",
+        "src/infrastructure/vector/VectorMigration.ts",
+        "test/HnswVector.test.ts"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.72,
+      "log": "quantization-migration-format.log",
+      "sha256": "0eded88f3fd7fc58d0eeb2f3cf9785b5b0006c4f43df39de3f19ec99a6440215"
+    },
+    {
+      "label": "quantization-migration-legacy-edge",
+      "command": [
+        "node",
+        "../wakeflow-ledger/AlembicCore/vector-integrity-2026-09-20/migration-legacy-edge-probe.mjs"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.5,
+      "log": "quantization-migration-legacy-edge.log",
+      "sha256": "73fa77b415e6b22a1a31cdcc2c8b9177be0e3067bd0c2103e9ddfa29c9b91ccb"
+    },
+    {
+      "label": "quantization-migration-current-edge",
+      "command": [
+        "node",
+        "../wakeflow-ledger/AlembicCore/vector-integrity-2026-09-20/migration-legacy-edge-probe.mjs",
+        ".",
+        "working-tree"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.71,
+      "log": "quantization-migration-current-edge.log",
+      "sha256": "51b7e51df1f1344a96b47418c97312da47eee70aa815b11a5a4037131aec37a9"
+    },
+    {
+      "label": "quantization-migration-final-format",
+      "command": [
+        "node_modules/.bin/biome",
+        "check",
+        "--write",
+        "src/infrastructure/vector/HnswVectorAdapter.ts",
+        "src/infrastructure/vector/VectorMigration.ts",
+        "src/infrastructure/vector/ScalarQuantizer.ts",
+        "test/HnswVector.test.ts"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.34,
+      "log": "quantization-migration-final-format.log",
+      "sha256": "fc6e81f812976e8726a6f36868a710f771e069c2c7cc277b70c98fc561fb895e"
+    },
+    {
+      "label": "quantization-migration-final-green",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/HnswVector.test.ts",
+        "test/VectorPersistence.test.ts",
+        "-t",
+        "JSON migration recovery|VectorMigration|ScalarQuantizer|SQ8 2-pass search|rejects flush and retains WAL|retains recovered WAL|should recover WAL on restart|should handle WAL with remove"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.91,
+      "log": "quantization-migration-final-green.log",
+      "sha256": "a0fa1f862bc10f528059daacdef7026798c7d7f4711fa6f190270fdedc262156"
+    },
+    {
+      "label": "quantization-migration-fixture-types",
+      "command": [
+        "node",
+        "../wakeflow-ledger/AlembicCore/vector-integrity-2026-09-20/quantization-fixture-types.mjs"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.92,
+      "log": "quantization-migration-fixture-types.log",
+      "sha256": "529c5bc2699009a358109d0733f35db97e9af5b566b146a1a23003a8a22d95ec"
+    },
+    {
+      "label": "quantization-migration-types",
+      "command": [
+        "npm",
+        "run",
+        "build:check"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 7.06,
+      "log": "quantization-migration-types.log",
+      "sha256": "bc62f15e2d04df1a120630ca683d25225a735865425c421a2bcce1deb7891db5"
+    },
+    {
+      "label": "quantization-migration-diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "src/infrastructure/vector/HnswVectorAdapter.ts",
+        "src/infrastructure/vector/VectorMigration.ts",
+        "src/infrastructure/vector/ScalarQuantizer.ts",
+        "test/HnswVector.test.ts"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.02,
+      "log": "quantization-migration-diff-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "quantization-migration-lint",
+      "command": [
+        "node_modules/.bin/biome",
+        "check",
+        "src/infrastructure/vector/HnswVectorAdapter.ts",
+        "src/infrastructure/vector/VectorMigration.ts",
+        "src/infrastructure/vector/ScalarQuantizer.ts",
+        "test/HnswVector.test.ts"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 0.36,
+      "log": "quantization-migration-lint.log",
+      "sha256": "8c714fb827709beb64246ce06980b352e98f7e34425817832d5efd17171c5770"
+    }
+  ],
+  "selfReview": {
+    "scopeCompliance": "Adapter restore/migration, VectorMigration error boundary, existing Hnsw test file, and explicitly requested ScalarQuantizer comments only; BinaryPersistence remains separately owned.",
+    "correctness": "Both init paths share one synchronous snapshot load; WAL initialization/replay/flush remain outside its catch. Disabled/invalid stored quantizers are ignored with diagnostics while index/metadata/contents remain loaded; normal write-triggered training is unchanged.",
+    "testMeaning": "Real snapshots and real SQ8; spies observe original quantization/fs methods. Fixed historical zero-dimension bytes keep restore coverage independent of the corrected writer. Seeded 128x4d fixture checks code bytes, result ordering and non-NaN distance.",
+    "findings": []
+  },
+  "limits": [
+    "No full test suite run in this slice; root owns final integrated checks.",
+    "The pinned probe intentionally remains a reproduction of baseline 9e8d033, not a current-code green test.",
+    "No changes to ANN distance/ranking, quantize threshold, training cadence, ASVEC/WAL schema or public exports."
+  ],
+  "integratedDependency": {
+    "file": "src/infrastructure/vector/BinaryPersistence.ts",
+    "sha256": "ce93fd0c0a73cb8ffa192913f3f2e42fba28995518d5891a008f2c8545ad4d46",
+    "owner": "separate persistence implementation"
+  },
+  "migrationExtension": {
+    "rootAuthorized": true,
+    "red": "quantization-migration-red.log: async JSON prematurely archived; sync persistence error swallowed; 4 failing real-EISDIR cases",
+    "green": "quantization-migration-final-green.log: 43 necessary cases passed; fresh retry publishes exactly once",
+    "legacyCompatibility": "migration-legacy-edge-comparison.json: 8 cases equal to 9e8d033, including existing async/sync differences",
+    "additionalFixtures": "3 empty/bad JSON DTO new cases and 2 archive-failure success cases",
+    "storeFailureBoundary": "Only JSON read/parse faults degrade; batch/persist failures propagate, preserving JSON input. Archive failure after persistence remains non-fatal."
+  }
+}

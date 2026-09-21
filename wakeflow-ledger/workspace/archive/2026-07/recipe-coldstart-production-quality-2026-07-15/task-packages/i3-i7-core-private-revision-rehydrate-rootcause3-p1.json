@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i7-core-private-revision-rehydrate-rootcause3-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "基线与范围\n- 仅修改 AlembicCore；开工必须是 clean HEAD 6b6341f05332a1d15f79c19a0251d41b962b71d1 / tree 84c094ee01052c91df5c9e94a50862dc61652f15，并保持 PCFBaselineReceipt sha256 ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6。\n- 这是 Main blocker 揭示的 Core NEXT 修复，不重做既有 private-revision 设计：只补“fresh process 对同一 active existing revision 的安全重开”。不得修改 Alembic、AlembicAgent、Plugin、Design、Test 或 Wakeflow。\n\n完成合同\n1. 在现有 ProductionPersistenceContracts / PrivateCorpusRevisionResolver / @alembic/core/workspace 公共面增加一个最小 rehydrate/resume existing revision API。名称可按仓库约定，但 Main 必须通过正式 package export 直接消费。\n2. 新建初始化仍严格 absent-before-create；resume 只能重开已经初始化且未 revoked 的同一 confined leaf，不能创建目录、换 root、重跑 blank init 或把新 root 当成原 substate。\n3. 以已持久化 PrivateCorpusRevisionInitReceiptV1（或其完整等价输入）校验 canonical receipt hash、run/revision/fixpoint、project root/id/scope、data/parent/leaf identity、no-symlink、config、migration bundle/set/semantic hash和 SQLite integrity。缺 root、receipt/hash/identity/config/migration drift、path escape/symlink、revoked root一律 fail closed。\n4. 通过同一模块私有 authority 构造并登记 active Handle/runtime，复用现有 openAlembicDatabase、root revocation registry 与 one-connection/one-native-handle 不变量；不公开 authority，不新增第二 store/DB manager/resolver platform。\n5. fresh-process 回归：进程 A 初始化同一 revision、写入可识别 durable row/receipt并关闭；进程 B 只凭 approved base resolver + sealed init receipt 重开同一 leaf，证明 dataRoot/DB hash和数据一致、可继续现有 repository stack。另覆盖 tampered receipt、wrong scope/config/migration、missing/revoked leaf、existing-leaf initializer仍拒绝、replace 后旧 root仍不可读、普通 root/新 revision不回归。\n6. 更新 public exports/types 与 built-artifact consumer import probe。只提交一个干净 Core commit；回填 parent/commit/tree、changed symbols、RED/GREEN、fresh-process JSON及 SHA-256、public package/dist/load hashes、focused/full tests和两阶段自审。\n\n验证至少包含 focused private-revision/database/public-api tests、npm run build:check、npm run check、完整 npm test、consumer imports、PC-F regression与 git diff --check。不得进入 Main strict journal、Agent facade、Plugin serving、LLM/prompt/SOP、真实 Ghost data或 Test。",
+  "status": "pending",
+  "sourceRef": "Requirement Design §6 persistence/ref/index/publication failure resumes exact failed durable substate; §§18.1 and 18.3 private revision + fresh-process acceptance; controller decision evt-20260716075431-0083; accepted AlembicCore@6b6341f05332a1d15f79c19a0251d41b962b71d1",
+  "designIntent": "复用现有 private revision resolver/init receipt/Handle/openAlembicDatabase 权威，在同一 workspace 公共入口补一个严格校验的 existing-active-revision rehydrate，使 Main 可在 fresh process 恢复精确 durable substate；不改变 absent-before-create 初始化和 revoked-root 终态。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "single-clean-core-next-commit-on-6b6341f"
+      },
+      {
+        "kind": "public-api",
+        "verify": "built-package-workspace-import-and-consumer-probe"
+      },
+      {
+        "kind": "fresh-process-runtime",
+        "verify": "process-a-init-write-close-process-b-rehydrate-same-root-and-data"
+      },
+      {
+        "kind": "negative-tests",
+        "verify": "tamper-scope-config-migration-missing-symlink-revoked-and-existing-init-fail-closed"
+      },
+      {
+        "kind": "tests",
+        "verify": "focused-build-check-check-full-pcf-and-git-diff-check"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "absent-init-replace-revocation-ordinary-root-and-next-revision-preserved"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "execution-plan"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "two-stage-self-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T07:55:10.993Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i7-core-private-revision-rehydrate-rootcause3-t1",
+      "taskPackageId": "i3-i7-core-private-revision-rehydrate-rootcause3-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "在已接受 Core private-revision 初始化/撤销边界上补一个可公开消费、receipt 校验、fresh-process 可重开的 existing active revision 合同；不改 Main/Agent，不新增存储平台。",
+      "status": "pending",
+      "createdAt": "2026-07-16T07:55:10.993Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

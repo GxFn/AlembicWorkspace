@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i9-agent-durable-semantic-review-attestation-integration-rootcause8-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Integrate accepted Core V3 durable semantic-review trust root into the real AlembicAgent runtime. Replace script-only/direct KnowledgeDispositionReview synthesis with an Agent-owned production service that obtains signer/reviewer/evidence-store dependencies only from trusted bootstrap, loads exact frozen Evidence Ledger authority, invokes the independent reviewer/provider with the compiled prompt, and emits durable attestations. Keep Main policy pinning/verification for the later Alembic package.",
+  "status": "pending",
+  "sourceRef": "Original Plan completion bullets 7-10; Requirement Design §§3, 11.3, 11.6-11.8, 17, 18.2, 18.6; accepted Core rootcause8 decision evt-20260727164237-0250 and Core@d0d33e49; prior Agent@3c95549 script-only semantic probe gap",
+  "designIntent": "在 AlembicAgent 真实 internal Agent/evaluator runtime 中消费已接受 Core@d0d33e49 的 host-agent-workflows V3 producer contract：私钥/可信 reviewer load/evidence-store adapter 仅从宿主启动时受信依赖注入，逐请求执行真实独立 reviewer 与 authoritative EvidenceLedgerStore load，输出可序列化 attestation；调用参数、task payload 或 Main 不得提供 signer、policy、任意 invoke/load adapter。复用现有 provider、evaluation、EvidenceLedgerStore、runtime diagnostics/cancellation，不创建第二 reviewer/evidence/key 平台。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "One clean AlembicAgent commit based exactly on 3c95549bb82aa011216d6d3be0f41741ba42d5ad; report parent, commit, tree and changed files. Consume local-source Core@d0d33e49 through package exports; no Core/Main/Plugin/Test/Wakeflow/vendor edits."
+      },
+      {
+        "kind": "command",
+        "verify": "Run build:check/build, focused durable semantic reviewer/provider/evidence-store/runtime/public-contract tests, full Agent check and full tests, public/core-import/layer/provider-neutral/retired/naming gates, strict public consumer probe, and git diff --check. Report exact counts and any pre-existing failure separately."
+      },
+      {
+        "kind": "runtime-fixture",
+        "verify": "Prove one real Agent service/runtime entrypoint—not a script-only constructor—receives a semantic request, loads every cited Evidence Ledger entry/blob/ref/fact execution through the existing authoritative EvidenceLedgerStore path, invokes the existing independent reviewer/provider boundary with Core's exact compiled prompt, and returns serialized SemanticDispositionReviewDurableAttestationV3 whose execution/prompt/load/invocation/raw-output/decision/workflow/evaluator lineage verifies under a separately provisioned pinned policy after fresh process rehydrate."
+      },
+      {
+        "kind": "negative-probe",
+        "verify": "Prove request/task/Main input cannot inject or replace private key, trust policy, reviewer invoke adapter, evidence-store adapter/config, model-load receipt, evaluator identity or attestation fields. Caller-built evidence summaries/objects, wrong session/blob/ref/execution receipt, alternate key/policy, producer-self-review, reused invocation/output, malformed response, provider error/timeout/cancel/permission failure and partial evidence load all fail without emitting an accepted attestation or fallback KnowledgeDispositionReview."
+      },
+      {
+        "kind": "boundary",
+        "verify": "Agent owns key custody abstraction, real provider/reviewer execution, EvidenceLedgerStore loading, cancellation/timeout/error diagnostics and attestation production. Core remains deterministic contract/verifier; Main policy persistence/verification is not implemented here. Reuse current evaluation/provider/evidence/runtime surfaces and expose a stable Agent entrypoint; do not add a second key store, reviewer service, evidence DB, Core implementation copy, Codex/plugin/daemon/UI behavior or real API-key dependency."
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "Explain why prior Agent commit 3c95549's connected probe still synthesized KnowledgeDispositionReviewV1 and therefore could not satisfy the accepted Core V3 trust root; identify the exact new source entrypoint, provider call, EvidenceLedgerStore load path, signer provisioning boundary, emitted attestation consumer and remaining Main responsibilities."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "guard"
+      },
+      {
+        "kind": "compatibility"
+      },
+      {
+        "kind": "self-review"
+      },
+      {
+        "kind": "test-first"
+      }
+    ]
+  },
+  "createdAt": "2026-07-27T16:43:43.668Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i9-agent-durable-semantic-review-attestation-integration-rootcause8-t1",
+      "taskPackageId": "i3-i9-agent-durable-semantic-review-attestation-integration-rootcause8-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Wire Core@d0d33e49 V3 attestation production into real Agent evaluator/provider and EvidenceLedgerStore paths; no task-supplied signer/policy/adapters and no script-only false green.",
+      "status": "pending",
+      "createdAt": "2026-07-27T16:43:43.668Z"
+    }
+  ]
+}

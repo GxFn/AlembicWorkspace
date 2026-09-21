@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "wakeflow-create-demand-intent",
+  "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-v2-2026-07-31",
+  "intentDigest": "907aea1d8df0c1ceccfb095df62134d63a4414a69e3e09d2e80a9523df35e0f3",
+  "intent": {
+    "version": 1,
+    "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+    "title": "Recipe 冷启动生产质量 V2：从 AlembicAgent 同 run strict-test 回执链继续",
+    "todoId": null,
+    "sourceDocumentRefs": [],
+    "goal": "继承旧 demand 已接受证据且保持未接受结果未接受，从已验证的 AlembicAgent 真实成功执行与 canonical receipt 断裂点恢复 strict-test 自动选维度执行链，再按原生产者/消费者顺序完成 Recipe 冷启动生产质量目标。",
+    "completionDefinition": "Original Plan 的 Final Completion Definition 全部满足；AlembicAgent 的真实成功运行必须直接返回由同一次运行、同一 automatic-selection authority、同一 selected-cell set 的真实 stage/gate 输出构成的 canonical receipt；受影响下游 exact artifacts 均经 Controller 验收；全部 required non-Test 目标 accepted 后，仅由用户明确启动真实 Test；Test 与原最终定义均满足后才可完成。",
+    "testDecision": "Required but paused. 当前不创建、不派发 Test；只有全部 required non-Test 目标 accepted、exact artifacts 经 Controller 验证，且用户明确启动 MR-ALEMBIC / SP-BILIDILI Test 后，才可执行真实场景 Test。strict-test 通过不得冒充 production finalized。",
+    "stagePlan": "P1 AlembicAgent same-run canonical receipt 修复与 Controller 原始证据验收；P1 accepted 后才依据实际受影响消费者按 producer→consumer 顺序建立后续包；Controller 完成 exact-artifact 自验；最后等待用户明确启动 Test 并做最终完成评审。",
+    "controllerWindow": null,
+    "taskPackages": [
+      {
+        "targetWindow": "AlembicAgent",
+        "targetTaskId": "v2-agent-same-run-strict-test-receipt-t1",
+        "taskPackageId": "v2-agent-same-run-strict-test-receipt-p1",
+        "workType": "implementation",
+        "objective": "把现有 AgentService/PipelineStrategy 的真实 strict-test 自动选维度成功执行，直接连接为一个由实际 selected-cell stage/gate 输出生成的 canonical StrictTestDimensionAgentExecutionReceiptV1，并对 cross-run 或 cell-set 偏差 fail closed。",
+        "summary": "修复 AlembicAgent 真实成功管线与 canonical execution receipt 的断裂，保留现有主链，不新增第二条 Agent pipeline。",
+        "contextSummary": [
+          "已接受的 AlembicCore automatic-selection authority 基线为 0815eb24944ea0ab3d4f4e2390205fbfe35f59f0；AlembicAgent 待修基线为 7dfb4bada72d78a5bc9e65cafa54574cb36ae698。",
+          "Controller 已证明当前 runtime probe 先完成真实两次模型调用，再从空 facts 单独合成失败 receipt；成功执行对象与返回 receipt 没有同 run 连续性。",
+          "必须复用 AgentService → generate-dimension → AgentStageFactoryRegistry → PipelineStrategy；测试模式自动选择适用维度，不要求用户手选或确认。"
+        ],
+        "requirementRefs": [
+          {
+            "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#v2-entry-scope",
+            "role": "goal",
+            "label": "V2 首包与自动选择权威"
+          },
+          {
+            "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#completion-definition",
+            "role": "completion",
+            "label": "V2 完成定义"
+          },
+          {
+            "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#test-boundary",
+            "role": "constraint",
+            "label": "Test 暂停边界"
+          },
+          {
+            "ref": "Design/docs/current/recipe-coldstart-strict-test-profile-supplement-requirement-design-2026-07-30.md#8-strict-test-execution-chain",
+            "role": "design",
+            "label": "复用 strict 执行链"
+          },
+          {
+            "ref": "Design/docs/current/recipe-coldstart-strict-test-profile-supplement-requirement-design-2026-07-30.md#12-acceptance-criteria",
+            "role": "validation",
+            "label": "strict-test 验收标准"
+          },
+          {
+            "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/i3-i10-agent-strict-test-automatic-selection-integration-controller-review-rework1.md#controller-acceptance",
+            "role": "evidence",
+            "label": "已验证的链路断裂"
+          }
+        ],
+        "boundaries": {
+          "inScope": [
+            "现有 AgentService/PipelineStrategy 真实结果返回路径",
+            "canonical receipt builder/validator 与 same-run、authority、selected-cell lineage",
+            "针对真实主链的聚焦单测、负向测试、runtime probe 和可复核证据"
+          ],
+          "outOfScope": [
+            "Alembic Main、Dashboard、DaemonJob、Plugin、持久化、serving、生产 UI 或 public CAS",
+            "Test 派发、下游实现包或 legacy bootstrap"
+          ],
+          "forbidden": [
+            "新增第二条 Agent pipeline，或在真实成功运行后再以空 facts / 独立运行后置合成 synthetic receipt",
+            "把用户手选/确认维度或 legacy bootstrap 重新引入测试模式",
+            "接受 cross-run、额外、缺失、重复、重排或未选择 cell 的终态结果"
+          ]
+        },
+        "completionExpectations": [
+          "真实 AgentService/PipelineStrategy 成功运行直接返回 canonical receipt，runId、authorityHash、selectedCellSetHash 与该次实际执行完全一致。",
+          "每个 selected eligible cell 恰有一个真实 terminal fact/analysis/producer/review disposition，额外、缺失、重复、重排、cross-run 或未选择 cell 均 fail closed。",
+          "聚焦测试与单链 runtime probe 证明成功路径和上述负向路径；相关 build/check 通过。",
+          "AlembicAgent 形成干净提交并返回 commit、命令输出、runtime JSON/日志摘要及关键文件证据。"
+        ],
+        "commitExpectation": "commit",
+        "acceptanceAnchors": [
+          {
+            "id": "v2-agent-same-run",
+            "claim": "真实成功执行与 canonical receipt 必须是同一次运行、同一 automatic-selection authority 和同一 selected-cell set。",
+            "probe": "先用 RED probe 证明当前成功执行与 receipt 不连续；修复后运行真实 AgentService/PipelineStrategy probe，并逐字段比对 runId、authorityHash、selectedCellSetHash 与实际 stage/gate 输出。",
+            "expected": "同一次真实成功运行直接返回 matching canonical receipt；不存在第二次运行或后置 synthetic receipt。"
+          },
+          {
+            "id": "v2-agent-cell-conservation",
+            "claim": "selected-cell slice 必须守恒且每个 cell 只有一个终态。",
+            "probe": "分别注入额外、缺失、重复、重排、cross-run 和未选择 cell 的结果，验证在成功终态前拒绝。",
+            "expected": "所有偏差均 fail closed；仅 exact selected-cell set 的真实终态结果可进入 canonical receipt。"
+          },
+          {
+            "id": "v2-agent-existing-chain",
+            "claim": "修复必须复用现有 AgentService → generate-dimension → AgentStageFactoryRegistry → PipelineStrategy 主链。",
+            "probe": "用调用计数/trace 运行公开 AgentService 入口，证明一条既有主链完成自动选择后的实际 stage/gate 执行并生成 receipt。",
+            "expected": "只执行一条现有 Agent pipeline；测试模式无需用户确认，也不经过 legacy bootstrap。"
+          }
+        ],
+        "designIntent": "在现有 AgentService/PipelineStrategy 成功结果对象上建立唯一 canonical execution result/receipt builder；沿用已有 pipeline 与 Core automatic-selection authority，不建立并行实现。",
+        "sourceRef": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#v2-entry-scope"
+      }
+    ]
+  },
+  "packageIds": [
+    "v2-agent-same-run-strict-test-receipt-p1"
+  ],
+  "targetTaskIds": [
+    "v2-agent-same-run-strict-test-receipt-t1"
+  ],
+  "status": "complete",
+  "partialCreated": false,
+  "createdAt": "2026-07-31T16:23:43.126Z",
+  "completedAt": "2026-07-31T16:23:43.394Z"
+}

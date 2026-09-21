@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p10-plugin-provider-independent-authoritative-maintenance-p1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "summary": "Plugin-only companion rework to consume accepted-in-evidence Core P9 commit 6b7de17494bac4236822d8a0baaa61cc3b01b670.\n\nVerified remaining defect:\n- AlembicPlugin HEAD 7d92768f3e143d0e9fa4458788041b4d9f95d00a calls vectorService.getAvailability() and returns before knowledgeService.list() and syncRecipeSemanticRegions() whenever availability is degraded/unavailable.\n- RecipeRegionVectorAvailability.test.ts explicitly expects zero maintenance calls in this state.\n- Therefore Core P9 provider-independent delete/reconcile/authoritative prune cannot run through the Plugin's normal authoritative maintenance caller when Ollama/model is unavailable.\n\nRequired behavior:\n1. Remove availability as a precondition for authoritative maintenance. Keep availability as bounded diagnostic/report data only. Provider missing, unavailable, or availability-probe failure must not prevent reading the complete non-deprecated Recipe corpus and invoking syncRecipeSemanticRegions with maintenanceScope.kind=authoritative-corpus and the same full nonDeprecatedRecipeIds set for every batch (including empty corpus).\n2. Let Core own generation degradation. When embedding is unavailable, Core must remove only regions for deleted/deprecated/authority-absent Recipes, preserve all old chunks for still-live Recipes, perform zero fabricated upserts, and return honest degradedReason/embed-provider-unavailable.\n3. Preserve provider-available generation, batching, semantic-memory behavior, shutdown drain, direct KnowledgeSync maintenance wiring, subset safety, request-scoped project independence, query read-only behavior, and all no-gate/no-Git/no-host-selection boundaries.\n4. Replace the obsolete test that expects maintenance to be skipped. Add RED/GREEN tests for unavailable and availability-probe-error paths proving authority is still listed and cleanup is called; add an integration fixture using the real Core path proving absent regions removed, live old regions retained, zero upserts without provider, and second run idempotent.\n5. Consume the current local Core 6b7de17. Do not edit Core. Do not mutate BiliDili/AlembicWorkspace live knowledge DB/WAL/vector/config. No Test window.\n6. Run focused Plugin tests, full unit suite, check/build/runtime-package/Codex-plugin verification as applicable. Commit Plugin and return the exact full HEAD (verify with git rev-parse HEAD), changed symbols, raw fixture JSON, commands, and two-stage self-review.\n\nCompletion means the normal Plugin authoritative maintenance caller actually invokes provider-independent cleanup in no-Ollama/no-provider states; it does not authorize live index repair or demand completion.",
+  "status": "pending",
+  "sourceRef": "Controller P9 review on 2026-07-13: Core 6b7de17 passes provider-null removal, but Plugin 7d92768 still exits authoritative maintenance when vector availability is degraded.",
+  "designIntent": "把 availability 降级为诊断信息，不再作为权威清理前置门禁；无 provider 时仍传递完整非废弃 Recipe authority 给 Core，让 Core 只清不存在/废弃派生向量并保留 live 旧块。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-probe",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "core-provenance-proof"
+      },
+      {
+        "kind": "provider-null-cleanup-proof"
+      },
+      {
+        "kind": "availability-probe-error-proof"
+      },
+      {
+        "kind": "live-replacement-safety-proof"
+      },
+      {
+        "kind": "idempotence-proof"
+      },
+      {
+        "kind": "real-data-no-write-proof"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T01:58:51.460Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p10-plugin-provider-independent-authoritative-maintenance-t1",
+      "taskPackageId": "p10-plugin-provider-independent-authoritative-maintenance-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "删除 Plugin authoritative maintenance 的 availability 前置返回，让无 provider 时仍调用 Core P9 cleanup-only 路径；隔离验证不存在 Recipe 被清、live 旧块保留、零写入且幂等。",
+      "status": "pending",
+      "createdAt": "2026-07-13T01:58:51.460Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

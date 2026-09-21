@@ -1,0 +1,656 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-20",
+  "baseline": "56900c5",
+  "coreCommit": "9e8d033",
+  "status": "authorized-agent-fixes-complete-files-frozen",
+  "scope": {
+    "readOnlyReview": true,
+    "productEditsDuringReview": false,
+    "externalEdits": false,
+    "realDatabaseWrites": false,
+    "realApiCalls": false,
+    "commitCreated": false
+  },
+  "fileReview": {
+    "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+    "lines": 440,
+    "reviewed": true,
+    "functions": [
+      {
+        "name": "handleActiveTransition",
+        "line": 86,
+        "endLine": 162,
+        "reviewed": true,
+        "role": "Core readiness preflight→Core publish；投影成功/typed readiness失败，当前generic失败误称unchanged。"
+      },
+      {
+        "name": "handleManage",
+        "line": 164,
+        "endLine": 299,
+        "reviewed": true,
+        "role": "operation/id归一与review队列/复核/evolution/普通repo动作分发。"
+      },
+      {
+        "name": "handleEvolutionManage",
+        "line": 301,
+        "endLine": 362,
+        "reviewed": true,
+        "role": "构建EvolutionDecision，调用唯一ProposalGateway，投影outcome与取消后的已完成写入。"
+      },
+      {
+        "name": "resolveEvolutionSource",
+        "line": 364,
+        "endLine": 369,
+        "reviewed": true,
+        "role": "从可信runtime sharedState选Core领域source白名单，兼容旧IDE来源。"
+      },
+      {
+        "name": "defaultEvolutionDescription",
+        "line": 371,
+        "endLine": 379,
+        "reviewed": true,
+        "role": "按operation补缺省说明。"
+      },
+      {
+        "name": "evolutionStatus",
+        "line": 381,
+        "endLine": 392,
+        "reviewed": true,
+        "role": "兼容status映射，当前skipped被误标成proposal。"
+      },
+      {
+        "name": "buildEvolutionEvidence",
+        "line": 394,
+        "endLine": 419,
+        "reviewed": true,
+        "role": "保留对象型evidence，再追加内联字段；不生成新证据。"
+      },
+      {
+        "name": "collectInlineEvidence",
+        "line": 421,
+        "endLine": 440,
+        "reviewed": true,
+        "role": "收集type/sourceStatus/currentCode/newLocation/suggestedChanges/confidence白名单。"
+      }
+    ],
+    "snapshot": "Original 56900c5 review; current implementation is recorded in closure."
+  },
+  "findings": [
+    {
+      "id": "MG-01",
+      "severity": "P1",
+      "title": "Generic update bypasses Core lifecycle authority through the actual host repository",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 265,
+          "endLine": 273
+        },
+        {
+          "path": "AlembicWorkspace/Alembic/lib/tools/ToolContextFactory.ts",
+          "line": 151
+        },
+        {
+          "path": "AlembicWorkspace/Alembic/lib/injection/modules/InfraModule.ts",
+          "line": 129,
+          "endLine": 130
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/repository/knowledge/KnowledgeRepositoryImpl.ts",
+          "line": 168,
+          "endLine": 192
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/KnowledgeService.ts",
+          "line": 367,
+          "endLine": 390
+        }
+      ],
+      "repro": "Actual public handle + actual Core KnowledgeRepositoryImpl, with memory-only Drizzle and entity readback. update(id,{lifecycle:active}) changes pending→active with updateCalls=1, readinessCalls=0 and ok:true.",
+      "minimalFix": "Agent入口拒绝Core管理的生命周期字段；优先公开Core规则/常量，若无公开字段列表只做明确输入边界拒绝，不复制状态机。普通更新仍需真正host service adapter，不能把raw repository当完整管理服务。",
+      "tests": [
+        "通过实际handle传lifecycle等受管理字段，write端口不调用、readiness/publish不绕过。",
+        "普通明确可编辑字段继续原调用，避免把所有update变成空壳。"
+      ],
+      "disposition": "fixed",
+      "implementedFix": "Explicit Agent content-edit allowlist matches all 28 current Core KnowledgeService.update UPDATABLE fields. Every non-permitted own key is rejected as a whole, including stats, stagingDeadline, lifecycle and explicit undefined; no stripping/partial application. Core business validation, tag merging and persistence are not reimplemented."
+    },
+    {
+      "id": "MG-02",
+      "severity": "P2",
+      "title": "Partial Core persistence is lost or falsely marked unchanged",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 141,
+          "endLine": 159
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 236,
+          "endLine": 244
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/sustain/StagingManager.ts",
+          "line": 211,
+          "endLine": 248
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/commitKnowledgeWrite.ts",
+          "line": 42,
+          "endLine": 91
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/shared/errors/BaseError.ts",
+          "line": 111,
+          "endLine": 126
+        }
+      ],
+      "repro": "Actual Core StagingManager + in-memory fileStore success + repository.update failure yields STATE_DIVERGENCE with fileOpsCompleted:1, entryIds, operation, reconcileVia. Public review rejects Promise; public publish given the same typed error reports lifecycle:unchanged and drops details.",
+      "minimalFix": "规范化错误保留Core code/details与readback/reconcile依据；readiness阻断等写前路径可说unchanged，publish已进入后的一般异常应unknown/partial，不能推断rollback。",
+      "tests": [
+        "STATE_DIVERGENCE details完整保留，ok:false且partial/readback明确。",
+        "Core readiness false仍不publish且unchanged。",
+        "普通publish失败不伪称unchanged；已确认成功后取消继续返回成功事实+degraded诊断。"
+      ],
+      "disposition": "fixed"
+    },
+    {
+      "id": "MG-03",
+      "severity": "P2",
+      "title": "Review services escape the ToolResult boundary and review-queue cannot settle on cancellation",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 178,
+          "endLine": 206
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 222,
+          "endLine": 244
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 10,
+          "endLine": 31
+        }
+      ],
+      "repro": "listReviewQueue/recordReview throw store unavailable → public handle Promise rejects. A pending listReviewQueue remains unsettled after abort; it only returns aborted failure after the underlying read eventually resolves.",
+      "minimalFix": "review/queue统一catch到结构化ToolResult；只读queue用shared runOperation响应取消并丢弃迟到结果。写入review一旦开始继续等待真实receipt，不伪称rollback或取消成功写入。",
+      "tests": [
+        "普通服务异常resolve为fail，不reject公开handle。",
+        "pending queue在abort后及时settle，迟到数据不成为成功响应。",
+        "pre-abort不调用端口；review已开始后返回true仍recorded:true并标degraded；false保持not-in-staging失败。"
+      ],
+      "disposition": "fixed"
+    },
+    {
+      "id": "MG-04",
+      "severity": "P2",
+      "title": "Invalid explicit management inputs reach mutation ports or are silently defaulted",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 168,
+          "endLine": 210
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 275,
+          "endLine": 281
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 314,
+          "endLine": 317
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/registry.ts",
+          "line": 394,
+          "endLine": 430
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/domain/evolution/EvolutionPolicy.ts",
+          "line": 91,
+          "endLine": 92
+        }
+      ],
+      "repro": "score NaN/Infinity/string high forwarded unchanged and ok:true with mock score port. deprecate confidence80 through actual Core ProposalGateway invokes immediate transition. numeric/object/blank id reaches proposalGateway through direct handle. queue limit0.5 becomes0, -1/Infinity/string silently becomes undefined.",
+      "minimalFix": "统一management输入归一：id为非空string；score至少实际finite number；显式confidence须finite0..1，缺席才默认；显式limit须合法正整数，缺席保留原默认，不新增队列策略。registry提供相应字段说明/约束但handler仍自己校验。",
+      "tests": [
+        "非法显式数值/类型零端口写入；有效0/1等边界保留。",
+        "confidence缺席保留旧default；非法data.confidence不能偷偷落到top-level/default。",
+        "data.score缺席不隐式写0；合法分数不发明新范围。"
+      ],
+      "disposition": "fixed"
+    },
+    {
+      "id": "MG-05",
+      "severity": "P2",
+      "title": "Core skipped outcome is described as a successful proposal and its reason is dropped",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 345,
+          "endLine": 357
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 381,
+          "endLine": 391
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/sustain/ProposalGateway.ts",
+          "line": 227,
+          "endLine": 291
+        },
+        {
+          "path": "AlembicAgent/src/agent/utils/toolOutcomes.ts",
+          "line": 92,
+          "endLine": 100
+        }
+      ],
+      "repro": "Actual Core ProposalGateway.create returns null and no richer evidence → outcome skipped,error Duplicate proposal or creation failed. handle returns ok:true,status evolution_proposed,outcome skipped with no error reason.",
+      "minimalFix": "skipped显式投影为非proposal状态并保留Core原因；不能把重复跳过统一当error重试，也不能编造proposalId。现有proposal-created/upgraded/immediately-executed/verified兼容状态保留。",
+      "tests": [
+        "evolve/deprecate的skipped不能含proposed成功状态，保留reason。",
+        "Core正常四类成功各映射正确；evolution统计继续不把skipped计成功。"
+      ],
+      "disposition": "fixed"
+    },
+    {
+      "id": "MG-06",
+      "severity": "P2",
+      "title": "Actual host repository does not implement declared management methods",
+      "refs": [
+        {
+          "path": "AlembicWorkspace/Alembic/lib/injection/modules/AgentModule.ts",
+          "line": 32,
+          "endLine": 47
+        },
+        {
+          "path": "AlembicWorkspace/Alembic/lib/tools/ToolContextFactory.ts",
+          "line": 149,
+          "endLine": 154
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts",
+          "line": 37,
+          "endLine": 42
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 251,
+          "endLine": 297
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/repository/knowledge/KnowledgeRepositoryImpl.ts",
+          "line": 61,
+          "endLine": 76
+        }
+      ],
+      "repro": "Actual Core repository instance has reject/score/validate/getById undefined and update function. Public handle reject/score/validate returns generic repo.X is not a function.",
+      "minimalFix": "本仓先结构化报端口不可用、做typeof方法检查；不得造repo alias实现或改用未确认等价Core操作。跨仓需正式host管理service adapter，用户授权后另行接入。getById读fallback本轮不扩。",
+      "tests": [
+        "缺失方法返回port-unavailable，零mutation。",
+        "存在的旧可用端口仍可调用；不因本仓零引用删公开动作。"
+      ],
+      "disposition": "agent-boundary-fixed-host-adapter-remains-cross-repository"
+    }
+  ],
+  "actualCallerMap": [
+    {
+      "flow": "Alembic AgentModule creates @alembic/agent ToolRouterAdapter with host ToolContextFactory → factory injects Core repository/stagingManager/proposalGateway → Agent registry knowledge.manage → public handle → handleManage",
+      "refs": [
+        {
+          "path": "AlembicWorkspace/Alembic/lib/injection/modules/AgentModule.ts",
+          "line": 32,
+          "endLine": 47
+        },
+        {
+          "path": "AlembicWorkspace/Alembic/lib/tools/ToolContextFactory.ts",
+          "line": 142,
+          "endLine": 169
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/registry.ts",
+          "line": 390,
+          "endLine": 434
+        }
+      ]
+    },
+    {
+      "flow": "review → Core StagingManager.recordReview → persistKnowledgeUpdate → commitKnowledgeWrite(file first, DB commit/readback second)",
+      "refs": [
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/sustain/StagingManager.ts",
+          "line": 211,
+          "endLine": 248
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/persistKnowledgeUpdate.ts",
+          "line": 14,
+          "endLine": 53
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/commitKnowledgeWrite.ts",
+          "line": 13,
+          "endLine": 91
+        }
+      ]
+    },
+    {
+      "flow": "evolve/deprecate/skip_evolution → Core ProposalGateway.submit(update/deprecate/valid); Core owns immediate-vs-proposal policy and dedup/upgrade",
+      "refs": [
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/sustain/ProposalGateway.ts",
+          "line": 82,
+          "endLine": 103
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/sustain/ProposalGateway.ts",
+          "line": 119,
+          "endLine": 146
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/domain/evolution/EvolutionPolicy.ts",
+          "line": 91,
+          "endLine": 92
+        }
+      ]
+    },
+    {
+      "flow": "approve/publish → Core RecipeProductionPort.evaluateReadiness/publish → KnowledgeService lifecycle guard and file-first write; Agent must not infer rollback from an exception",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 86,
+          "endLine": 161
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/KnowledgeService.ts",
+          "line": 588,
+          "endLine": 596
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/KnowledgeService.ts",
+          "line": 1035,
+          "endLine": 1061
+        }
+      ]
+    }
+  ],
+  "existingTests": {
+    "agent": [
+      {
+        "path": {
+          "path": "AlembicAgent/test/tool-v2-contract.test.ts",
+          "line": 557,
+          "endLine": 598
+        },
+        "coverage": "Evolution source defaults/legacy/domain vocabulary through real router; does not test invalid numeric inputs or skipped errors."
+      },
+      {
+        "path": {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 599,
+          "endLine": 757
+        },
+        "coverage": "readiness preflight, publish, typed readiness errors and cancellation; no review/review-queue service failure coverage found."
+      },
+      {
+        "path": {
+          "path": "AlembicAgent/test/agent-surface-floor.test.ts",
+          "line": 129,
+          "endLine": 147
+        },
+        "coverage": "Outcome accounting already gives Core skipped priority over misleading legacy proposed status."
+      }
+    ],
+    "coreReadOnly": [
+      {
+        "path": {
+          "path": "AlembicWorkspace/AlembicCore/test/StagingManager.test.ts",
+          "line": 112,
+          "endLine": 173
+        },
+        "coverage": "real staging review success/false, queue exclusion, pass/fail/missing promotion semantics."
+      }
+    ]
+  },
+  "retainedSemantics": [
+    "review-queue不需要id；已review条目由Core筛除，不在Agent重写队列策略。",
+    "review返回false表示非staging/不存在；true是Core确认写入，取消后不能抹掉。",
+    "Core无signal的写入已开始后等待真实结果；只读等待可取消。",
+    "approve/publish仍必须Core readiness+publish；不可回退到repo生命周期字段更新。",
+    "没有partial信息时不能凭异常文本猜测持久化成功；保留unknown与Core typed details。"
+  ],
+  "simplificationRecommendations": [
+    {
+      "title": "单一management输入归一",
+      "suggestion": "小型内部managementInput.ts集中operation/id/limit/score/confidence与受管理字段拒绝；handler保留明确动作分支，schema不是唯一校验层。"
+    },
+    {
+      "title": "统一结果/错误投影",
+      "suggestion": "必要时单一managementResults.ts承接端口不可用、Core skipped/error以及typed divergence的ToolResult；分清read与mutation，复用现有operation.ts，不新建框架。"
+    },
+    {
+      "title": "使用公开Core端口词汇",
+      "suggestion": "ProposalGatewayLike的EvolutionDecision/EvolutionResult与StagingManager队列shape可从@alembic/core/sustain的公开类型派生，避免第二份outcome/source union漂移；普通KnowledgeRepoLike与真实host不匹配需明确host adapter，不在Agent复制Core service。"
+    }
+  ],
+  "hostIntegrationAdvice": {
+    "required": "将普通知识管理动作接到明确、可审计的KnowledgeService/公开能力port，携带真实user/context；保留raw repository供读基础数据但不得冒充生命周期服务。",
+    "mustConfirm": "Core没有score/validate同名等价操作时，先定义这些现有公开tool动作的宿主适配，不能临时映成任意repository.update或updateQuality并伪称语义相同。",
+    "authorization": "本轮只允许Agent结构化port不可用和输入/结果边界修复，不修改Alembic/AlembicCore/AlembicPlugin。"
+  },
+  "probeEvidence": {
+    "entrypoint": "Actual src/tools/runtime/handlers/knowledge.ts handle(manage)",
+    "method": "Node22 TypeScript transpile in-memory; real Core KnowledgeRepositoryImpl with in-memory Drizzle/entity readback; real ProposalGateway/StagingManager with memory-only repositories/fileStore; no network and no real knowledge persistence.",
+    "confirmed": [
+      "update pending→active via real raw repository",
+      "review/queue errors escape public handle",
+      "queue does not settle on abort until read resolves",
+      "score nonfinite/string reaches mutation port",
+      "confidence80 triggers real Core immediate-deprecate branch",
+      "malformed id reaches gateway",
+      "real Core skipped misleading status/reason lost",
+      "real Core file/DB divergence generated and partial fields lost by publish projection",
+      "actual Core repository missing reject/score/validate"
+    ],
+    "positive": "review already writing then cancellation+true receipt remains recorded:true with degraded metadata."
+  },
+  "implementationAuthorization": {
+    "received": true,
+    "allowed": [
+      "knowledge/management.ts",
+      "related internal contract/helper",
+      "optional single managementResults.ts or managementInput.ts",
+      "registry.ts corresponding schema/docs",
+      "existing test/tool-system.test.ts or recipe-production-profile-adapter.test.ts"
+    ],
+    "forbidden": [
+      "adjacent repositories",
+      "real knowledge databases/API",
+      "commits",
+      "splitting the 440-line main body",
+      "unrequested read fallback/getById adaptation"
+    ]
+  },
+  "nextStep": "Root reviews the frozen four-file patch and commits within Agent. Independent scoped bypass review is closed; host adapter follow-up remains explicitly outside this subtask.",
+  "closure": {
+    "completedAt": "2026-09-20T10:34:29.357Z",
+    "filesFrozen": true,
+    "commitCreated": false,
+    "noCommitReason": "Root owns final independent review and commit; this subtask was explicitly instructed not to commit.",
+    "files": [
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+        "sha256": "14a9f663d1531d0d8f2c9bee1d7e9618ad3289200ee7f2e2f0aa201f4a2ceb2d"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+        "sha256": "631bca7adb12b691ca12aa1e4ea946114e28160ccea82783bd0d21a21c1a43a2"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/registry.ts",
+        "sha256": "84771e4f92ea1d98f48464d8bed4f5488297e56ca7165e95b47a57be5961589c"
+      },
+      {
+        "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+        "sha256": "7d21c317f3ab5f2b6b1fac46df44be893ba65c6f6506a8a148b33c2d155210a0"
+      }
+    ],
+    "changes": [
+      {
+        "id": "MG-01",
+        "source": {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+          "line": 10
+        },
+        "test": {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 253
+        },
+        "summary": "28-field content allowlist; real Core merge unsafe/unknown inputs rejected, permitted description/title update persists into test-local row, input unchanged."
+      },
+      {
+        "id": "MG-02",
+        "source": {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 99
+        },
+        "summary": "Core code/details retained; writeState not-started/unknown/partial and requiresReadback distinguish preflight from invoked mutation. STATE_DIVERGENCE is degraded and cannot become lifecycle unchanged."
+      },
+      {
+        "id": "MG-03",
+        "source": {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 244
+        },
+        "summary": "review and queue exceptions normalize to ToolResult. Queue waits use shared cancellable operation. Review writes preserve confirmed true/false receipts after cancellation."
+      },
+      {
+        "id": "MG-04",
+        "source": {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+          "line": 42
+        },
+        "summary": "Common non-empty canonical id; positive safe integer queue limit; score requires finite actual number; both compatibility confidence inputs validate explicit finite0..1 before defaults."
+      },
+      {
+        "id": "MG-05",
+        "source": {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 449
+        },
+        "summary": "Core skipped maps to evolution_skipped/deprecation_skipped and retains reason; confirmed successful outcome mappings remain."
+      },
+      {
+        "id": "MG-06",
+        "source": {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 72
+        },
+        "summary": "Missing callable ports return structured KNOWLEDGE_MANAGEMENT_PORT_UNAVAILABLE; no fake reject/score/validate/read fallback implementations."
+      }
+    ],
+    "privateHelpers": [
+      "unavailableManagementPort",
+      "managementFailure",
+      "handleActiveTransition"
+    ],
+    "publicEntry": "knowledge.ts handle and Core style-rule reexports unchanged; management.ts only exports handleManage. validateManagementInput is an internal input-module export and is not added to any public barrel.",
+    "organization": "Management validation belongs to the existing pure input.ts normalization module. No new source module or file-boundary configuration shipped; no split of the management action body.",
+    "typeReuse": "EvolutionDecision/EvolutionResult/ProposalGateway/StagingManager contracts are derived from public @alembic/core/sustain exports; duplicate local port/outcome shapes were removed.",
+    "testFirst": [
+      {
+        "step": "baseline",
+        "result": "2 files57 tests PASS before edits"
+      },
+      {
+        "step": "Core-managed fields",
+        "red": "8 failed; update reached host for each protected field",
+        "green": "9 pass including ordinary edit preservation"
+      },
+      {
+        "step": "explicit input validation",
+        "red": "18 failures including invalid values and untrimmed id",
+        "green": "18 pass"
+      },
+      {
+        "step": "missing management ports",
+        "red": "4 failures: null data/generic method TypeError",
+        "green": "4 pass"
+      },
+      {
+        "step": "Core skipped result",
+        "red": "2 failures: misleading proposed statuses + lost reason",
+        "green": "6 pass including 4 confirmed success outcomes"
+      },
+      {
+        "step": "staging failures/cancellation and typed partial persistence",
+        "red": "7 failures; 2 existing confirmed-write receipt cases already pass",
+        "green": "9 pass"
+      },
+      {
+        "step": "own undefined lifecycle field",
+        "red": "write accepted",
+        "green": "1 pass"
+      },
+      {
+        "step": "independent-review allowlist closure",
+        "red": "3 real Core merge cases: deadline changed1000000→1, fail review removed, unknown field dropped while description was written",
+        "green": "4 pass including allowed real Core description/title edit, unchanged input and unchanged staging review/deadline"
+      }
+    ],
+    "verification": [
+      {
+        "command": "./tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/node/bin/node node_modules/vitest/vitest.mjs run test/recipe-production-profile-adapter.test.ts test/tool-system.test.ts test/tool-v2-contract.test.ts test/runtime-efficiency.test.ts test/agent-surface-floor.test.ts test/contract-surface.test.ts test/recipe-authoring-inprocess-flatten.test.ts",
+        "result": "PASS",
+        "files": 7,
+        "tests": 239,
+        "durationSeconds": 5.61
+      },
+      {
+        "command": "./tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/node/bin/node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+        "result": "PASS",
+        "exitCode": 0
+      },
+      {
+        "command": "node_modules/.bin/biome check src/tools/runtime/handlers/knowledge/management.ts src/tools/runtime/handlers/knowledge/input.ts src/tools/runtime/registry.ts test/recipe-production-profile-adapter.test.ts",
+        "result": "PASS"
+      },
+      {
+        "command": "./tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/node/bin/node scripts/lint-layer-contract.mjs",
+        "result": "PASS"
+      },
+      {
+        "command": "./tmp/npm-cache/_npx/52027bd8fc0022aa/node_modules/node/bin/node ../AlembicCore/scripts/lint-consumer-core-imports.mjs . --config config/core-import-boundary.json",
+        "result": "PASS"
+      },
+      {
+        "command": "git diff --check -- src/tools/runtime/handlers/knowledge/management.ts src/tools/runtime/handlers/knowledge/input.ts src/tools/runtime/registry.ts test/recipe-production-profile-adapter.test.ts",
+        "result": "PASS"
+      }
+    ],
+    "independentReview": {
+      "reviewer": "knowledge_pipeline",
+      "reportedResult": "Management boundaries51/51 GREEN; AST comparison confirms all28 allowed fields match Core UPDATABLE in the same order; MIR-01 fixed and no open scoped P1/P2.",
+      "note": "Independent reviewer reported no product/test edits."
+    },
+    "scopeCompliance": {
+      "productFiles": 3,
+      "testFiles": 1,
+      "neighborFilesChanged": false,
+      "configsChanged": false,
+      "realApiCalls": false,
+      "realKnowledgeBaseWrites": false,
+      "readFallbackAdded": false,
+      "coreBusinessTransformationsAdded": false
+    },
+    "remainingHostBoundary": "Alembic ToolContextFactory still injects the raw Core repository. Missing reject/score/validate are now explicit port-unavailable; adding correct controlled service adapters remains a separately authorized host task. The allowlist is tool permission only and does not claim to replace Core validation, tag merging, profile logic, audit or file/DB coordination."
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8-alembic-plugin-recovery-snapshot-contract-rootcause3-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8-alembic-plugin-recovery-snapshot-contract-rootcause3-p1",
+  "dispatchGroup": "i3-i8-downstream-reconnect-rootcause4-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8-alembic-plugin-recovery-snapshot-contract-rootcause3-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin now consumes Core's canonical strict publication snapshot-id parser in both the resolver and Recipe Map output schema, accepts base and lowercase UUID-v4 collision-recovery ids, rejects malformed/uppercase/path-unsafe ids, preserves candidate manifest hash verification for recovered ids, and proves the real HostMcpServer Recipe Map transport against a rebuilt Main-style recovery fixture.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/host-runtime/context/StrictPublicKnowledgeResolver.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/contracts/AlembicRecipeMapOutput.ts",
+    "AlembicPlugin/test/unit/StrictPublicKnowledgeResolver.test.ts",
+    "AlembicPlugin/test/unit/RecipeMapTool.test.ts",
+    "AlembicPlugin/test/unit/StrictPublicFiveToolCompatibility.test.ts"
+  ],
+  "verification": [
+    "Commit 3e6cb743b92d95dd7baf0eabd916e78e395f1203 has parent 66b661fcba81647968b104224138a99a134401c4 and exactly five authorized files.",
+    "npx vitest run --config vitest.unit.config.ts test/unit/StrictPublicKnowledgeResolver.test.ts test/unit/RecipeMapTool.test.ts test/unit/StrictPublicFiveToolCompatibility.test.ts => 3 files, 73 tests passed (post-commit).",
+    "npm run test:unit => 152 files, 1668 tests passed.",
+    "npm run test:integration => 26 files, 665 tests passed.",
+    "npm run check; npm run build; npm run build:check => passed, using ../AlembicCore @ 898a461385c676dd2cc467bcf8bd58226409a87b.",
+    "npm run verify:codex-runtime-package; npm run verify:plugin-distribution; npm run verify:codex-plugin; npm run smoke:codex-plugin => passed; smoke covered install/startup/shell-bootstrap/stdio.",
+    "git diff --check and git diff --cached --check => passed; production static scan found no remaining SNAPSHOT_ID_PATTERN, route.snapshotId.slice, or base-only snapshot regex in the two repaired validators.",
+    "Alembic inline Code Guard guard-public-ms1z9mp8-2 => 0 errors, 0 warnings for newly introduced parser/schema adapter logic."
+  ],
+  "risks": [
+    "The full-file Alembic Guard reported warning-only node-no-sync-io findings in the existing synchronous resolver and test-fixture style; the isolated newly introduced production parser/schema logic passed Guard with 0 errors and 0 warnings.",
+    "package.json has no verify:codex-session script; the available verify:codex-plugin and smoke:codex-plugin gates passed, including a real stdio startup probe."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "3e6cb743b92d95dd7baf0eabd916e78e395f1203",
+      "verify": "git show --stat --oneline 3e6cb743b92d95dd7baf0eabd916e78e395f1203; git rev-parse 3e6cb743^ 3e6cb743"
+    },
+    {
+      "kind": "test",
+      "value": "Focused 73/73, unit 1668/1668, integration 665/665; build/check and all required Plugin package/distribution/smoke gates passed.",
+      "verify": "Run the focused Vitest command plus npm run test:unit, npm run test:integration, npm run check, npm run build:check, and the four Plugin verification commands."
+    },
+    {
+      "kind": "diff-review",
+      "value": "Five-file scoped diff replaces both Plugin base-only validators with parseStrictPublicationSnapshotIdV1, removes the recovered-id manifestHash slicing bug, and adds acceptance/rejection plus transport coverage.",
+      "verify": "git show --name-only --stat 3e6cb743; rg -n 'SNAPSHOT_ID_PATTERN|route\\.snapshotId\\.slice|snapshot-\\\\\\[a-f0-9' AlembicPlugin/lib/host-runtime/context/StrictPublicKnowledgeResolver.ts AlembicPlugin/lib/service/project-knowledge-context/contracts/AlembicRecipeMapOutput.ts returns no matches."
+    },
+    {
+      "kind": "integration-evidence",
+      "ref": "AlembicPlugin/test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "value": "Real HostMcpServer plus MCP SDK client resolves a Main-style collision-recovery fixture and returns the UUID-suffixed snapshot id in transport publication metadata and Recipe Map servingCoverage.",
+      "verify": "npx vitest run --config vitest.unit.config.ts test/unit/StrictPublicFiveToolCompatibility.test.ts -t 'resolves a Main-style recovered snapshot'"
+    },
+    {
+      "kind": "test-first",
+      "value": "RED was observed independently in the real resolver transport (STRICT_PUBLICATION_SNAPSHOT_ID_INVALID) and Recipe Map schema (base-only regex), then both tests turned GREEN after the canonical parser adapters.",
+      "verify": "See task execution log for the two filtered Vitest RED commands and the subsequent focused 73/73 GREEN run."
+    },
+    {
+      "kind": "path-confinement-review",
+      "value": "No path construction/confinement code changed; resolver tests reject uppercase, malformed UUID, extra suffix, slash separator, traversal, and path-unsafe prefix before physical-path selection; real recovered snapshot remains read-only.",
+      "verify": "Run StrictPublicKnowledgeResolver.test.ts and inspect the five-file diff."
+    },
+    {
+      "kind": "cross-repo-contract-review",
+      "value": "Plugin builds against accepted AlembicCore 898a461385c676dd2cc467bcf8bd58226409a87b and imports only @alembic/core/knowledge and @alembic/core/project-context-foundation public exports.",
+      "verify": "git -C AlembicCore rev-parse HEAD; npm run build:check; npm run lint:core-import-boundary"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i8-downstream-reconnect-rootcause4-p1__AlembicPlugin__i8-alembic-plugin-recovery-snapshot-contract-rootcause3-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i8-downstream-reconnect-rootcause4-p1__AlembicPlugin__i8-alembic-plugin-recovery-snapshot-contract-rootcause3-t1.json",
+    "deliveryRunId": "run-delivery-i3-i8-downstream-reconnect-rootcause4-p1__AlembicPlugin__i8-alembic-plugin-recovery-snapshot-contract-rootcause3-t1",
+    "dispatchGroup": "i3-i8-downstream-reconnect-rootcause4-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i8-downstream-reconnect-rootcause4-p1__AlembicPlugin__i8-alembic-plugin-recovery-snapshot-contract-rootcause3-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 199,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8-alembic-plugin-recovery-snapshot-contract-rootcause3-p1",
+    "targetTaskId": "i8-alembic-plugin-recovery-snapshot-contract-rootcause3-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "i3-i8-downstream-reconnect-rootcause4-p1",
+    "resultId": "tr-i8-alembic-plugin-recovery-snapshot-contract-rootcause3-t1",
+    "createdAt": "2026-07-26T15:54:39.240Z"
+  },
+  "createdAt": "2026-07-26T15:54:39.240Z",
+  "stateRevisionObserved": 199,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

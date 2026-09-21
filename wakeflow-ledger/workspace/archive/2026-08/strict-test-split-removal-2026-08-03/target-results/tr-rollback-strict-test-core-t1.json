@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rollback-strict-test-core-t1",
+  "demandKey": "strict-test-split-removal-2026-08-03",
+  "taskPackageId": "rollback-strict-test-core-p1",
+  "dispatchGroup": "rollback-strict-test-core-p1",
+  "stateRoot": ".wakeflow-active/current/strict-test-split-removal-2026-08-03",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "rollback-strict-test-core-t1",
+  "status": "needs-review",
+  "summary": "已按任务包顺序完成六个标准 Core revert，专用 strict-test-dimension profile/automatic-selection receipt 及导出/测试零残留，通用 cold-start compiler 与完整 26 维度能力保持；请求控制器仅审查 npm run check 在实施前后均由同一未改动 ASTChunker Doctrine 基线违规停止的处置。",
+  "changedRepos": [
+    "AlembicCore"
+  ],
+  "commits": [
+    "da5d9f54628d59c108ab3a0fce329deab73d8005",
+    "f1a9fc53d84bd6fd2bf28afe20d79747191e4560",
+    "ceb21e785c2ab846e8281b5efdffa08e4b0eb285",
+    "301d9b52d4406ecbb25d2afcfa27dc8e2bd97e95",
+    "1fe1fbe0db57cff9cc9ff54a671f420b6461db4c",
+    "e274e31ea4e4611314124eeb1111a44975c48896"
+  ],
+  "commitDisposition": "committed",
+  "evidenceRefs": [
+    "AlembicCore@e274e31ea4e4611314124eeb1111a44975c48896",
+    "../../../AlembicCore/src/plans.ts",
+    "../../../AlembicCore/src/production.ts",
+    "../../../AlembicCore/src/service/plan/intent/coldStartProductionPlan.ts",
+    "../../../AlembicCore/test/ColdStartProductionPlanCompiler.test.ts",
+    "../../../AlembicCore/test/DimensionCatalogPayload.test.ts",
+    "../../../AlembicCore/test/CorePackage.test.ts"
+  ],
+  "verification": [
+    "RED exact-revert probe: six missing revert records before implementation; GREEN: six inverse patch-id/parent-chain checks passed.",
+    "RED profile probe: dedicated source/export/test symbols present before; GREEN: source/test/package and filename scans zero matches after.",
+    "npm run build:check => passed after reverts.",
+    "Generic preservation suite => 4 files, 25 tests passed both before and after.",
+    "Package runtime probe => removed exports [], buildDimensionCatalogSnapshot=function, compileColdStartPlan=function, dimension counts 26/26.",
+    "npm run check before and after => same failure only at src/infrastructure/vector/ASTChunker.ts:32 after all preceding stages passed.",
+    "npm test => 194 files passed, 1 skipped; 1905 tests passed, 1 skipped.",
+    "npm run lint => 783 files clean; lint:naming and lint:retired-symbols passed.",
+    "Core boundary suite => 4 files, 24 tests passed.",
+    "git diff --check 024209d..HEAD and git status --short => clean."
+  ],
+  "risks": [
+    "The repository-wide npm run check remains non-zero because accepted baseline and final HEAD both violate the unchanged doctrine rule at src/infrastructure/vector/ASTChunker.ts:32; fixing it is outside this pure-revert task and requires controller disposition.",
+    "Target result is evidence for controller review, not acceptance."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "core-exact-revert-lineage",
+      "red": "Baseline probe reported all six required revert records missing while all six product commits and 024209d were ancestors of HEAD.",
+      "green": "Six consecutive standard revert commits exist in the required order; each commit patch-id equals the inverse of its source commit, every parent link matches, each intermediate tree differs from the source parent only by retained 024209d AGENTS.md/CLAUDE.md content, and final net patch from f6e3f19 equals 024209d.",
+      "ref": "AlembicCore@e274e31ea4e4611314124eeb1111a44975c48896"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "core-profile-receipt-absent",
+      "red": "Baseline source/test/package scan found strictTestDimensionProfile.ts, StrictTestDimensionProfile.test.ts, StrictTestAutomaticSelectionReplacement.test.ts, plans/production exports, and automatic-selection receipt symbols.",
+      "green": "Post-revert source/test/package and filename scans have zero dedicated profile/receipt matches; package runtime imports of @alembic/core/plans and @alembic/core/production expose none of the removed symbols; build:check passes.",
+      "ref": "../../../AlembicCore/src/plans.ts"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "core-general-coldstart-preserved",
+      "red": "Before deletion, build:check and the generic cold-start/full-dimension suite established the preservation baseline at 4 files/25 tests passing; the compound check separately exposed the pre-existing ASTChunker doctrine failure.",
+      "green": "After deletion, the identical 4-file/25-test suite passes, package runtime reports buildDimensionCatalogSnapshot and compileColdStartPlan as functions with 26 dimension ids and 26 snapshot rows, and the full suite passes 1905 tests with 1 skipped; compound check reaches the identical unrelated baseline doctrine failure.",
+      "ref": "../../../AlembicCore/test/ColdStartProductionPlanCompiler.test.ts"
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean HEAD 024209d; six product commits and 024209d all ancestors. build:check passed; generic cold-start/full-dimension suite 4 files/25 tests passed. Desired exact-revert and zero-residual probes were RED. npm run check stopped at existing src/infrastructure/vector/ASTChunker.ts:32 doctrine violation."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Confirm accepted Agent dependency and clean topology; map three anchors to probes; record RED/baseline; revert six commits one at a time; prove inverse patches and retained rules; run zero-residual/public/runtime/focused/full/boundary checks; self-review and return evidence."
+    },
+    {
+      "kind": "test-first",
+      "value": "Deletion probes were observed RED before revert and GREEN after the same probes; generic preservation used the same 4-file/25-test suite before and after."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 spec: exact six-revert lineage, profile/receipt/export/test deletion, 024209d retention, generic cold-start/26 dimensions, no replacement/legacy/DaemonJob/fallback all match. Stage 2 quality: no task-scope findings; all commits are standard reverts and worktree is clean. Only inherited ASTChunker doctrine failure remains and is not modified."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Net diff from 024209d touches only src/plans.ts, src/production.ts, deleted strictTestDimensionProfile.ts, ColdStartProductionPlanCompiler.test.ts, CorePackage.test.ts, and the two deleted focused tests; 4 insertions/3969 deletions. AGENTS.md/CLAUDE.md are unchanged from 024209d and no other repository changed."
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed after all six reverts."
+    },
+    {
+      "kind": "lint",
+      "value": "npm run lint passed (783 files); lint:naming and lint:retired-symbols passed. npm run check's public API, layer, consumer-import, scope-resolution, smoke, output-budget, and space-edge stages passed before the inherited doctrine stop."
+    },
+    {
+      "kind": "tests",
+      "ref": "../../../AlembicCore/test/ColdStartProductionPlanCompiler.test.ts",
+      "verify": "Generic preservation suite passed 4 files/25 tests before and after; full suite passed 194 files with 1 skipped and 1905 tests with 1 skipped; Core boundary suite passed 4 files/24 tests."
+    },
+    {
+      "kind": "verification",
+      "value": "Static zero-residual scans clean; package runtime removed-symbol list empty; buildDimensionCatalogSnapshot/compileColdStartPlan present; full dimension counts 26/26; inverse patch and parent-chain assertions passed; net tree retains only 024209d refresh over f6e3f19; diff-check and git status clean."
+    }
+  ],
+  "resultMapping": {
+    "contract": "target-result-envelope-v2",
+    "compatibility": "enforced",
+    "status": "partial",
+    "acceptanceAnchorIds": [
+      "core-exact-revert-lineage",
+      "core-profile-receipt-absent",
+      "core-general-coldstart-preserved"
+    ],
+    "testPlanIndices": [],
+    "partialIssues": []
+  },
+  "deliveryContext": {
+    "deliveryId": "delivery-rollback-strict-test-core-p1__AlembicCore__rollback-strict-test-core-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/strict-test-split-removal-2026-08-03__delivery-rollback-strict-test-core-p1__AlembicCo--81801e0b45d1.json",
+    "deliveryRunId": "run-delivery-rollback-strict-test-core-p1",
+    "dispatchGroup": "rollback-strict-test-core-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/strict-test-split-removal-2026-08-03__delivery-rollback-strict-test-core-p1__AlembicCo--81801e0b45d1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/strict-test-split-removal-2026-08-03",
+    "stateRevision": 16,
+    "demandKey": "strict-test-split-removal-2026-08-03",
+    "taskPackageId": "rollback-strict-test-core-p1",
+    "targetTaskId": "rollback-strict-test-core-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "rollback-strict-test-core-p1",
+    "resultId": "tr-rollback-strict-test-core-t1",
+    "createdAt": "2026-08-03T16:03:31.355Z"
+  },
+  "createdAt": "2026-08-03T16:03:31.355Z",
+  "stateRevisionObserved": 16,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

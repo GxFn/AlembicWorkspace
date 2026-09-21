@@ -1,0 +1,37 @@
+{
+  "removedFile": "test/unit/LlmGatewayTransport.test.ts",
+  "reason": "Only imports Agent internals; Main product has no direct LLMGateway or Transport consumer. Protocol ownership is Agent; Main exercises the actual AiModule/ServiceContainer consumer.",
+  "oldFailureCount": 6,
+  "baseline": "baseline.log",
+  "replacement": [
+    {
+      "behavior": "model resolution, explicit blank credentials, base transport JSON/unsupported-embed compatibility, Anthropic parameter filtering",
+      "owner": "AlembicAgent/test/LLMGateway.test.ts",
+      "status": "migrated unique cases with real Response fixtures; 5 owner files/173 tests green"
+    },
+    {
+      "behavior": "tool-call/usage normalization, HTTP 401/429/503 and no SDK retry multiplication",
+      "owner": "AlembicAgent/test/openai-sdk.test.ts + test/native-provider-sdk.test.ts",
+      "status": "existing stronger HTTP and Runtime coverage retained"
+    },
+    {
+      "behavior": "structured parse/schema failures, provider identity/configuration",
+      "owner": "AlembicAgent/test/structured-output-validation.test.ts + test/ai-configuration.test.ts + test/ai-provider.test.ts",
+      "status": "existing owner matrices retained"
+    },
+    {
+      "behavior": "packaged LLM -> Main DI/manager -> SDK HTTP -> token store; hot reload invalidates LLM consumers and leaves embedding absent",
+      "owner": "Alembic/test/unit/AgentPublicSurfaceSmoke.test.ts",
+      "status": "new real Main consumer chain passed before refactor; retained as host contract"
+    }
+  ],
+  "removedPrivateIndirection": [
+    "AiModule cached _aiFactory namespace",
+    "write-only _aiModuleReady",
+    "zero-consumer isAiRuntimeReady wrapper",
+    "duplicate attachTokenRecorder export/registration",
+    "Record<string,unknown> reloadAiProvider bridge"
+  ],
+  "replacementInterface": "ManagedAiProvider + AiProviderManager public Agent types; singleton recorder callback installed at Manager creation.",
+  "scan": "repo lib/test/scripts/config/docs; no remaining external consumer of removed module cache or wrappers"
+}

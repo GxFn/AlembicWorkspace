@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p12-plugin-prime-output-bounds-q2-ranking-closure-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "Controller real acceptance found two same-demand AlembicPlugin defects on the frozen BiliDili matrix using both the currently loaded MCP and a fresh child MCP at Plugin dist commit 5cd06485a03dbf935ddef8c55e59e9e5a8d4fc3e.\n\nDefect A — Prime public projection failure:\n- Frozen q2: \"What architecture rules should guide modular boundaries in a Swift app?\"\n- Search returns 8 canonical candidates, but Prime fails in every warm repeat and in a fresh MCP process.\n- Raw stderr: \"[MCP/PublicTools] alembic_prime output projection rejected; degraded to base envelope: detailRefs.8.summary: too_big\".\n- primeMaterialDetailRefs copies item.summary/actionHint into AgentDetailRef.summary without enforcing the public max(500); the fallback then emits a legacy {success,message,errorCode,tool,data} result that AgentPublicToolOutputSchema rejects again.\n- Fix the active public result path so any valid Search candidate content cannot break Prime. Bound/normalize all projected detail-ref summaries at the contract boundary, and ensure projection failure still returns a valid AgentPublicToolResultEnvelope/PrimePublicPackage rather than a legacy error shape. Preserve source refs and candidate IDs. Add a regression fixture with >500-character knowledge/guard text and verify the returned candidate order/evidence.\n\nDefect B — frozen q2 ranking:\n- Search is stable rank 8 for authoritative Recipe <redacted>, with sparseRank=3 but no dense rank; Prime therefore cannot satisfy Top 3 even after Defect A.\n- q1/q3/q4/q5/q8 remain rank 1 and q6/q7 rank 2; do not regress them.\n- Repair only through the confirmed shared Recipe retrieval profile/projector/sparse+dense document contract or a general ranking/candidate correctness defect. No query text/UUID/title hardcoding, synonym table, Recipe edit, real-data migration, query-time write/maintenance, provider-specific consumer prompt, new admission threshold, or host/Alembic coupling.\n- The existing real BiliDili Recipe has legacy fields (topicHint default, moduleName empty, no persisted new profile). Preserve the confirmed compatibility behavior for active legacy Recipes; the fix must be general and evidence-grounded, not tailored to this ID.\n\nRequired validation:\n1. Focused RED/GREEN for >500-character Prime detail summary plus valid fallback/public envelope.\n2. Search/Prime exact ordered candidate parity at limit 8 for all frozen eight queries.\n3. Fresh child MCP process using dist/bin/host-mcp.js against real BiliDili, three serial repetitions: all Search/Prime calls ok, target Top 3, q1-q5/q8 no regression, q6/q7 Top 3, raw dense/sparse/RRF present, real DB/WAL/SHM/config/vector/recipes unchanged.\n4. Full AlembicPlugin unit/check/build/package/runtime freshness gates required by repository AGENTS; clean single commit and two-stage review.\n5. Do not create a Test window or modify Alembic/Core/Agent/Dashboard/real knowledge roots. If the root cause is irreducibly Core-owned, stop with exact raw evidence; do not patch around it in Plugin.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "Keep Search and Prime on the same canonical read-only candidate sequence, bound every public projection field before schema parsing, and improve q2 through the shared producer/retrieval facts rather than query hardcoding.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "clean AlembicPlugin commit and exact parent"
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "trace both q2 public projection failure and rank-8 cause through the active call chain"
+      },
+      {
+        "kind": "red-green",
+        "verify": "focused failing then passing regression tests for oversized detail summary and q2"
+      },
+      {
+        "kind": "tests",
+        "verify": "focused plus full repository gates and runtime/package freshness"
+      },
+      {
+        "kind": "real-probe",
+        "verify": "fresh child MCP eight-query x3 serial matrix with Search/Prime parity, evidence, and zero-write fingerprints"
+      },
+      {
+        "kind": "self-review",
+        "verify": "requirement compliance then failure-path/performance/scope review"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "runtime-provenance"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T22:30:29.207Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p12-plugin-prime-output-bounds-q2-ranking-closure-t1",
+      "taskPackageId": "p12-plugin-prime-output-bounds-q2-ranking-closure-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Fix Prime output-bound/schema closure and the frozen BiliDili q2 Top-3/parity defect, then prove the full eight-query matrix in a fresh MCP process with zero real-root writes.",
+      "status": "pending",
+      "createdAt": "2026-07-13T22:30:29.207Z"
+    }
+  ]
+}

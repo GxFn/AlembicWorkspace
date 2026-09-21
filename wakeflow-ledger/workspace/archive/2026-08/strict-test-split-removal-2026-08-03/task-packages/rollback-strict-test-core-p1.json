@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rollback-strict-test-core-p1",
+  "demandKey": "strict-test-split-removal-2026-08-03",
+  "summary": "移除 Core 中被否决的 strict-test-dimension 自动选择 profile/receipt 基础",
+  "status": "pending",
+  "sourceRef": null,
+  "contextVersion": 1,
+  "workType": "implementation",
+  "objective": "在 Agent 回滚被接受后，精确逆向 AlembicCore 的 strict-test-dimension profile、automatic-selection receipt 及其导出/测试，同时保留通用冷启动编译与完整维度能力。",
+  "contextSummary": [
+    "控制器已在干净临时克隆中按顺序模拟回滚 0815eb2、744616b、cd295c7、a12f0e5、933920f、8383808，无冲突且 git diff --check 通过。",
+    "必须保留后续 Wakeflow 指令刷新提交 024209d；只删除专用 profile/receipt 分叉。",
+    "Core 是最底层生产者，必须等 Agent 消费者回滚被控制器接受后才能派发。"
+  ],
+  "requirementRefs": [
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#user-decision",
+      "role": "goal",
+      "label": "用户否决与删除授权"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#verified-rollback-authority",
+      "role": "evidence",
+      "label": "提交归因与无冲突回滚模拟"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#dependency-order",
+      "role": "constraint",
+      "label": "消费者优先的回滚顺序"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#completion-definition",
+      "role": "completion",
+      "label": "纯删除验收定义"
+    }
+  ],
+  "boundaries": {
+    "inScope": [
+      "按顺序 revert 0815eb24944ea0ab3d4f4e2390205fbfe35f59f0、744616bde2322efa92aecd66b0b4f862f17fe69a、cd295c728496b917c720c0ce44615d70bf18812c、a12f0e574ebb9cfd721dd46e5c59b8154ed29ef8、933920fa214c1ba04787244f073145bcc48e929c、8383808cce71e80c717b6121235597c24229f10e",
+      "删除 strict-test dimension profile、automatic-selection receipt、exports 与 focused tests",
+      "运行 Core 全量检查、公开导出零残留和完整维度/通用 cold-start 回归测试"
+    ],
+    "outOfScope": [
+      "Alembic Main、Dashboard、Agent、Plugin 代码",
+      "正确测试模式设计、DaemonJob 或 legacy 改动",
+      "通用 dimension/cold-start compiler 行为变更"
+    ],
+    "forbidden": [
+      "设计或实现替代测试模式",
+      "恢复 legacy bootstrap、ALEMBIC_TEST_MODE、Plugin testMode 或 DaemonJob 路径",
+      "把历史 Wakeflow 证据改写成已接受或已完成",
+      "修改本任务包未列出的其他仓库",
+      "回滚 024209d 或其他 Wakeflow/AGENTS/CLAUDE 文档刷新",
+      "删除完整维度集合、通用自动选择设施或生产冷启动能力中未由指定提交独立引入的部分"
+    ]
+  },
+  "completionExpectations": [
+    "提交六个提交的精确回滚，列出新 commit SHA 与原 SHA 对应关系。",
+    "报告全量检查、公开导出零残留和通用 cold-start/完整维度回归证据。",
+    "提供干净工作树并确认 024209d/规则文档未回滚。"
+  ],
+  "dependsOnTaskIds": [
+    "rollback-strict-test-agent-t1"
+  ],
+  "commitExpectation": "commit",
+  "acceptanceAnchors": [
+    {
+      "id": "core-exact-revert-lineage",
+      "claim": "六个专用产品提交被精确逆向，后续规则文档提交保留",
+      "probe": "审查 revert commit、父链、git show --name-status，并确认 024209d 仍在",
+      "expected": "只有指定 profile/receipt 分叉逆向差异，无无关或规则文档变化"
+    },
+    {
+      "id": "core-profile-receipt-absent",
+      "claim": "Core 不再导出 strict-test-dimension profile/automatic-selection receipt",
+      "probe": "扫描源文件、public exports、package surface 和 focused tests",
+      "expected": "专用 profile/receipt/exports/tests 零残留且类型检查通过"
+    },
+    {
+      "id": "core-general-coldstart-preserved",
+      "claim": "通用 cold-start 编译与完整维度能力保持可用",
+      "probe": "运行仓库 full check 以及覆盖完整维度集合和通用 cold-start compiler 的现有测试",
+      "expected": "全量检查和相关回归测试通过，非被否决分叉能力未被删除"
+    }
+  ],
+  "createdAt": "2026-08-03T14:46:34.291Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rollback-strict-test-core-t1",
+      "taskPackageId": "rollback-strict-test-core-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "移除 Core 中被否决的 strict-test-dimension 自动选择 profile/receipt 基础",
+      "status": "pending",
+      "createdAt": "2026-08-03T14:46:34.291Z",
+      "dependsOnTaskIds": [
+        "rollback-strict-test-agent-t1"
+      ]
+    }
+  ]
+}

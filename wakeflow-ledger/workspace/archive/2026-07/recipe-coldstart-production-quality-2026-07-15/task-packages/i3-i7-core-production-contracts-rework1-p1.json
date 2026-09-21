@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i7-core-production-contracts-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "对 i3-i7-core-production-contracts-t1 做一次根因级返工，只修复 private corpus revision replacement 的真实 authority bypass，并保留 commit 9805d2ff5bb138ee0e91539a80710ccf8e74c2f0 已交付的全部 post-PCF producer contracts 与 PCFBaselineReceipt。\n\n控制器已用 fresh temp runtime 复现：先 initialize revision-1，再通过公开 openAlembicDatabase({path:first.handle.resolver.databasePath},{workspaceResolver:first.handle.resolver}) 打开一个未注册到 handle 的 bypass runtime；initialize revision-2 并执行 PrivateCorpusRevisionHandleV1.replace 后，bypass runtime 的 SELECT 1 仍成功，而替换后新开才被 ALEMBIC_DATABASE_ROOT_REVOKED 拒绝。原因是 handle 暴露 resolver，replace 只关闭 #runtimes 内已注册实例，root marker 只拦未来 connect。\n\n完成合同：\n1. 在现有数据库/PrivateCorpusRevisionHandle 单源边界上收口 authority，保证同一旧 revision root 的全部已打开 runtime（包括替换前经公开 openAlembicDatabase 的未注册实例）在 replace 后不能继续 read/write；替换后的任何 open 也继续 fail closed。不得靠调用者约定、仅隐藏类型、仅补 marker 或只关闭已知 handle runtime 声称完成。\n2. 保留 openAlembicDatabase 作为现有公共能力及普通项目/非 private revision 行为；不要新增第二 DB/store/service、全局 data-root override 或跨仓改动。允许的最小方案可以是在现有 DatabaseConnection/open runtime 层建立按 canonical dataRoot 的活动连接登记与同步 revocation，或同等可证明机制，但必须是进程内真实执行边界而非测试专用 hook。\n3. `replace` 必须维持先 seal/evidence marker、再终止旧 revision runtime 的可审计语义；若关闭/撤销失败应 fail closed，不能返回 next 后仍留下旧 root 可读写。保持 cross-run、same-revision、same-fixpoint 等既有拒绝语义。\n4. 新增回归：预先通过公开数据库入口打开未注册 bypass runtime，replace 后 read 和 write 都失败；registered runtime 同样失败；post-revoke open 失败；next revision 正常；普通非-private root 不被误伤。测试必须直接走公开入口，不得 mock 掉 DatabaseConnection。\n5. 复验原任务 focused suites、npm run build:check、npm run check、完整 Core tests、consumer imports、PC-F baseline/hash 与 git diff --check。只提交一个干净 AlembicCore 返工 commit；回填 parent/commit/tree、RED（当前反证）/GREEN 命令原始摘要、changed symbols、故障语义、两阶段自审与剩余风险。\n\n禁止修改其他仓库、Wakeflow/Design/Test/ledger、真实 Ghost 数据、LLM/prompt/SOP、Main orchestration 或 Plugin serving；禁止重写已完成的大合同来规避该缺陷。完成后只返回 controller 复验，不自行接受或派发下游。",
+  "status": "pending",
+  "sourceRef": "i3-i7-core-production-contracts-p1; controller decision evt-20260716052906-0064; AlembicCore commit 9805d2ff5bb138ee0e91539a80710ccf8e74c2f0; AlembicCore/src/service/production/ProductionPersistenceContracts.ts; AlembicCore/src/infrastructure/database/openAlembicDatabase.ts; AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+  "designIntent": "在现有 DatabaseConnection/open runtime 与 PrivateCorpusRevisionHandle 单源边界上同步撤销 canonical private revision root 的所有活动连接，使 replace 成为真实 terminal fence；不复制存储平台、不改变普通数据库公共入口。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "single-clean-core-rework-commit-on-9805d2ff"
+      },
+      {
+        "kind": "negative-tests",
+        "verify": "public-preopen-unregistered-runtime-read-write-fail-after-replace"
+      },
+      {
+        "kind": "tests",
+        "verify": "focused-full-build-check-and-git-diff-check-rerunnable"
+      },
+      {
+        "kind": "runtime-report",
+        "verify": "fresh-temp-public-entry-red-green-evidence"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "normal-root-next-revision-consumer-and-pcf-regression"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "self-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T05:29:45.764Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i7-core-production-contracts-rework1-t1",
+      "taskPackageId": "i3-i7-core-production-contracts-rework1-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "修复 private corpus revision 替换前公开入口预开连接仍可读写的 authority bypass，并用真实 public-entry regression 证明 old revision open/read/write=0；保留全部既有 Core/PC-F 合同。",
+      "status": "pending",
+      "createdAt": "2026-07-16T05:29:45.764Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

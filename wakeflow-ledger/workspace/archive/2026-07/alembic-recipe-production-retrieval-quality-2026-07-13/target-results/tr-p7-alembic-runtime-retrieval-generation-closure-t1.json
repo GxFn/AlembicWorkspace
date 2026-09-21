@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p7-alembic-runtime-retrieval-generation-closure-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-p1",
+  "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p7-alembic-runtime-retrieval-generation-closure-t1",
+  "status": "completed",
+  "summary": "Committed the P7 Alembic runtime closure as a single commit: legacy Gateway create actions are absent and publish aliases now consume RecipeProductionGateway readiness; legacy Recipe vectors remain readable until a verified active generation exists and are isolated afterward across every read surface; HTTP PATCH retrievalProfile now round-trips through Core to Markdown/SQLite/GET while invalid schemas cause typed zero writes/audit/events and no lifecycle transition; activation locks now recover auditable dead/empty crash artifacts without overwriting live foreign locks or the previous active generation.",
+  "evidenceRefs": [
+    "Alembic@a3db6fdc88006820f86891bc821abe539f9c041d",
+    "Alembic parent@671ab051e0a2797cc8d915caf510f0118e546533",
+    "lib/governance/gateway/GatewayActionRegistry.ts",
+    "lib/service/vector/RecipeVectorGenerationRuntime.ts",
+    "lib/shared/schemas/http-requests.ts",
+    "test/unit/GatewayActionRegistryRecipeBoundary.test.ts",
+    "test/unit/RecipeVectorGenerationRuntime.test.ts",
+    "test/integration/HttpApi.test.ts",
+    "test/integration/ZodSchemas.test.ts",
+    "alembic guard result guard-public-mrjlmvxs-3"
+  ],
+  "verification": [
+    "npm run check — exit 0; 139 unit files/1062 tests, 31 integration files/461 passed + 10 skipped, coverage, lint, repository boundaries, Core import boundaries, retired-symbol, ring-direction and shared-asset-drift gates passed",
+    "npm run build — exit 0",
+    "npm run build:check — exit 0 after final edits",
+    "focused closure suite — 13 files/137 tests passed before full gate",
+    "final focused verification — HttpApi 16/16 and RecipeVectorGenerationRuntime 12/12 passed",
+    "npx biome check on all 8 changed files — clean",
+    "git diff --check and git diff HEAD^..HEAD --check — clean",
+    "git status --short after commit — clean",
+    "Alembic Guard — all introduced errors cleared; only baseline ast_method_too_long warning remains (195 lines at baseline, 181 after deletion)"
+  ],
+  "risks": [
+    "Alembic Guard still reports the pre-existing GatewayActionRegistry registerGatewayActions length warning; this task reduced the method from 195 to 181 lines and intentionally did not expand into unrelated registry refactoring."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "a3db6fdc88006820f86891bc821abe539f9c041d",
+      "verify": "single Alembic commit; parent is exact task baseline 671ab051e0a2797cc8d915caf510f0118e546533; worktree clean"
+    },
+    {
+      "kind": "tests",
+      "ref": "npm run check",
+      "value": "Full repository gate passed, plus focused HTTP/Gateway/generation regression suites and final build:check.",
+      "verify": "exit 0; 1062 unit passed; 461 integration passed and 10 skipped; coverage and repository gates passed"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 confirmed all four controller defects and non-goals against the diff; Stage 2 reviewed concurrency, zero-write ordering, read-surface isolation, extension preservation, compatibility, scope and maintainability. No introduced blocker remained.",
+      "verify": "changed-file Biome clean; diff checks clean; Guard introduced errors reduced from two false-positive test fixtures to zero"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The recurring failures came from four disconnected runtime boundaries: obsolete Gateway action registration bypassed the production gateway; read routing assumed any pointer was active and always suppressed base Recipe vectors; the HTTP schema stripped retrievalProfile before Core could validate/persist it; activation used an unowned create-only lock with no crash-recovery protocol. The fix reconnects each boundary to its authoritative readiness/validation/ownership contract instead of adding fallback writes.",
+      "verify": "red tests reproduced absent-action, legacy visibility, HTTP schema stripping and stale-lock failures before their respective fixes; all now pass through real runtime entrypoints"
+    },
+    {
+      "kind": "red-green",
+      "value": "Gateway RED found both obsolete actions and direct service approval; generation RED lost legacy vectors and leaked base IDs after activation; HTTP RED returned 400 because the field was stripped; lock RED could not recover a dead lock. Each went green after the scoped fix.",
+      "verify": "new actual lookup/invoke, all-read-surface, real HTTP server and cross-instance CAS tests"
+    },
+    {
+      "kind": "compatibility",
+      "value": "Read/list/get Gateway aliases remain; legacy base Recipe vectors remain visible until verified active generation; accepted P5 dry-run/shadow/rollback/terminal cleanup behaviors remain covered.",
+      "verify": "full npm run check and focused Recipe generation consumer/command/startup regressions passed"
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Exactly 8 Alembic files changed; no AlembicCore product file, user data, Wakeflow controller state outside TargetResultEnvelope, or remote branch was modified.",
+      "verify": "commit stat 8 files, 686 insertions, 63 deletions; no push; clean worktree"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p7-alembic-runtime-retrieval-generation-closure-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-alembic-runtime-retrieval-generation-closure-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-t1.json",
+    "deliveryRunId": "run-p7-alembic-runtime-retrieval-generation-closure-202607140248",
+    "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-alembic-runtime-retrieval-generation-closure-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 50,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-p1",
+    "targetTaskId": "p7-alembic-runtime-retrieval-generation-closure-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-p1",
+    "resultId": "tr-p7-alembic-runtime-retrieval-generation-closure-t1",
+    "createdAt": "2026-07-13T19:14:04.683Z"
+  },
+  "createdAt": "2026-07-13T19:14:04.683Z",
+  "stateRevisionObserved": 50,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

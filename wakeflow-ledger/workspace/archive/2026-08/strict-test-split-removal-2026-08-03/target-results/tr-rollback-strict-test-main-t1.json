@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rollback-strict-test-main-t1",
+  "demandKey": "strict-test-split-removal-2026-08-03",
+  "taskPackageId": "rollback-strict-test-main-p1",
+  "dispatchGroup": "rollback-strict-test-main-p1",
+  "stateRoot": ".wakeflow-active/current/strict-test-split-removal-2026-08-03",
+  "targetWindow": "Alembic",
+  "targetTaskId": "rollback-strict-test-main-t1",
+  "status": "completed",
+  "summary": "Alembic Main 已按任务包对五个 strict-test-dimension 分叉提交逐一创建精确逆向提交；最终树与 pre-split c95dccb87bdc5a8412792f97917aed6992024b7e 完全一致，独立 API/私有管线零残留，通用 strict production/cold-start 与 full check 保持绿色。",
+  "changedRepos": [
+    "Alembic"
+  ],
+  "commits": [
+    "53a13188b8bfcdeaec2eba2376558ec7a99ff3ab",
+    "8f9f963d896868a99e72a08c364194826a1e8cdc",
+    "fb1a32471d8b61cfc1a52114b984589fcadc3d14",
+    "a0915fa30c6aef56c8dd6fd469b03b9e33a375f6",
+    "d5bfeb128fc86f6447bf9d1f74ebdac7f95e003f"
+  ],
+  "commitDisposition": "committed",
+  "evidenceRefs": [
+    "<workspace-root>/wakeflow-ledger/Alembic/strict-test-split-removal-2026-08-03/rollback-strict-test-main-t1/execution-plan.md",
+    "commit:53a13188b8bfcdeaec2eba2376558ec7a99ff3ab",
+    "commit:8f9f963d896868a99e72a08c364194826a1e8cdc",
+    "commit:fb1a32471d8b61cfc1a52114b984589fcadc3d14",
+    "commit:a0915fa30c6aef56c8dd6fd469b03b9e33a375f6",
+    "commit:d5bfeb128fc86f6447bf9d1f74ebdac7f95e003f"
+  ],
+  "verification": [
+    "npm run build:check (exit 0)",
+    "npm run build (exit 0)",
+    "focused strict production/cold-start Vitest (exit 0; 4 files/32 tests)",
+    "npm run check:dashboard-types-drift (exit 0)",
+    "npm run check (exit 0; unit 159/1210; integration 32/480 passed + 10 skipped; coverage 3/11)",
+    "zero-residual rg (exit 1/no matches, PASS)",
+    "git diff --exit-code c95dccb87bdc5a8412792f97917aed6992024b7e..HEAD (exit 0)",
+    "git diff --check c95dccb87bdc5a8412792f97917aed6992024b7e..HEAD (exit 0)",
+    "git status --short (exit 0/empty)"
+  ],
+  "risks": [
+    "Alembic Main 边界内未发现残留实现风险；兄弟仓库拆分移除属于控制器后续依赖任务，本结果未越界修改。"
+  ],
+  "craftEvidence": [
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "main-exact-revert-lineage",
+      "red": "初始 HEAD=b50bff157448b4986064ddbe20d8d2ad9305c738，五个被否决提交均为连续祖先且尚无 inverse lineage。",
+      "green": "五个 git revert --no-edit 均 exit 0；逐一对应 53a13188/8f9f963d/fb1a3247/a0915fa3/d5bfeb12；最终 tree 051c3636 等于 pre-split c95dccb8 tree，git diff --exit-code 与 diff --check 均 exit 0。",
+      "ref": "<workspace-root>/wakeflow-ledger/Alembic/strict-test-split-removal-2026-08-03/rollback-strict-test-main-t1/execution-plan.md"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "main-public-surface-absent",
+      "red": "基线 rg 对 dedicated route/contract/runtime/private-workspace/probe/focused-test/package-script 符号返回匹配。",
+      "green": "最终同一扫描 exit 1 且无输出（no-match PASS）；专用文件均不存在，package scripts 不再包含 probe:strict-test-main 与 typecheck:strict-test-consumer，dashboard generated type drift 检查 exit 0。",
+      "ref": "<workspace-root>/wakeflow-ledger/Alembic/strict-test-split-removal-2026-08-03/rollback-strict-test-main-t1/execution-plan.md"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "main-shared-production-preserved",
+      "red": "回滚前冻结 npm run build:check 和 4-file/32-test 通用 strict production/cold-start 基线，两者 exit 0。",
+      "green": "回滚后 npm run build、build:check、同一聚焦套件与 npm run check 全部 exit 0；full check unit=159/1210、integration=32/480 passed+10 skipped、coverage=3/11，全部边界/漂移门禁通过。",
+      "ref": "<workspace-root>/wakeflow-ledger/Alembic/strict-test-split-removal-2026-08-03/rollback-strict-test-main-t1/execution-plan.md"
+    }
+  ],
+  "resultMapping": {
+    "contract": "target-result-envelope-v2",
+    "compatibility": "enforced",
+    "status": "complete",
+    "acceptanceAnchorIds": [
+      "main-exact-revert-lineage",
+      "main-public-surface-absent",
+      "main-shared-production-preserved"
+    ],
+    "testPlanIndices": []
+  },
+  "deliveryContext": {
+    "deliveryId": "delivery-rollback-strict-test-main-p1__Alembic__rollback-strict-test-main-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/strict-test-split-removal-2026-08-03__delivery-rollback-strict-test-main-p1__Alembic__--c231af5efb0e.json",
+    "deliveryRunId": "run-delivery-rollback-strict-test-main-p1",
+    "dispatchGroup": "rollback-strict-test-main-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/strict-test-split-removal-2026-08-03__delivery-rollback-strict-test-main-p1__Alembic__--c231af5efb0e.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/strict-test-split-removal-2026-08-03",
+    "stateRevision": 7,
+    "demandKey": "strict-test-split-removal-2026-08-03",
+    "taskPackageId": "rollback-strict-test-main-p1",
+    "targetTaskId": "rollback-strict-test-main-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "rollback-strict-test-main-p1",
+    "resultId": "tr-rollback-strict-test-main-t1",
+    "createdAt": "2026-08-03T15:02:44.043Z"
+  },
+  "createdAt": "2026-08-03T15:02:44.043Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

@@ -1,0 +1,245 @@
+{
+  "title": "共享操作与知识修复独立复审",
+  "date": "2026-09-20",
+  "verdict": "发现1项影响真实会话止损的缺陷，已由provider_context修复并经本次独立定向测试验证；最终审阅范围内无still-open确定回归。",
+  "scope": {
+    "files": [
+      {
+        "path": "AlembicAgent/src/shared/operation.ts",
+        "review": "全文及纯内存运行probe；该文件期间由root纳入8cb0301。"
+      },
+      {
+        "path": "AlembicAgent/src/agent/memory/MemoryReadPolicy.ts",
+        "review": "迁移diff、readMemoryValue/deadline/policy全文与实际memory/Analyst读取消费链。"
+      },
+      {
+        "path": "AlembicAgent/src/ai/AiProvider.ts",
+        "review": "ChatContext与_gatewayChat修改、LLMGateway/transport信号转发、实际provider facade新增测试。"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "review": "本轮全部修改分支，提交准备、graph重评、style/title预算、创建后readiness/save、manage取消/已确认写入回执。"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+        "review": "repairStyleViolations全文及其新增OperationOptions调用链。"
+      }
+    ],
+    "exclusions": "未审root正在独立拆分的PipelineStrategy模块设计；仅只读查看其sharedState浅拷贝作为已发现预算问题的消费证据。未修改源码/测试/配置、未提交、不运行全量check或真实API。",
+    "noCommitReason": "独立复审只产报告与本地验证日志，root统一编辑和提交。",
+    "headObservedAtFinalReview": "8cb0301"
+  },
+  "findings": [
+    {
+      "id": "IKR-01",
+      "severity": "P2",
+      "status": "fixed-and-independently-verified",
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "originalLine": 520,
+      "currentLine": 519,
+      "issue": "原补丁只稳定style repair计数；_submitTitleAttempts仍首次写入阶段sharedState副本顶层。带sourceIdentities的阶段/重试会重新浅拷贝base，导致同一标题的3次止损从0重新计数。",
+      "actualCallChain": "PipelineStrategy阶段绑定使用{...baseSharedState}保留嵌套_sessionCounters；ToolExecutionPipeline继续转发该阶段sharedState；旧handler向该副本首次挂_submitTitleAttempts，base仍没有字典。每个新副本可重新允许3次。",
+      "repro": "base={_sessionCounters:{}}；4次真实handle('submit', gate-clean同题候选, {runtime:{sharedState:{...base},aiProvider}})；原版本第四次也到达createOrStage。原型标题测试复用同一对象，原style测试只计chat次数，未覆盖此组合。",
+      "fix": "把标题尝试字典归属稳定_sessionCounters；若旧顶层字典已存在则保留原引用接入，阶段顶层只作兼容别名；仍以3次提交/2次style修复为上限。",
+      "fixedLines": [
+        519,
+        523,
+        526,
+        530,
+        538
+      ],
+      "regression": {
+        "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+        "line": 488,
+        "name": "stops the fourth title attempt when every call receives a fresh shallow projection",
+        "assertions": "每次都创建fresh projection；前三次成功、第四次硬停；create=3、chat=2；base没有顶层字典仍有效；每个副本与稳定盒指向同一attempts引用。"
+      },
+      "compatibilityRegression": {
+        "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+        "line": 523,
+        "name": "counts the prototype-shaped title %s using its own session entries",
+        "assertions": "constructor/__proto__仍作为own key记账，并新增旧顶层字典identity不变断言。"
+      },
+      "validation": "独立Node22定向用例通过，纳入13 passed结果；未上调任何预算。",
+      "dispositionOwner": "provider_context修复；本子代理只读验证。"
+    }
+  ],
+  "reviewedBehavior": [
+    {
+      "boundary": "runOperation终态竞争",
+      "source": {
+        "path": "AlembicAgent/src/shared/operation.ts",
+        "line": 34
+      },
+      "conclusion": "finish先设settled并resolve，再abort child；cooperative abort listener同步resolve也不能覆盖timeout。操作在microtask启动前检查settled；父取消已发生时不会调用operation。同步throw及Promise rejection统一为error；迟到resolve/reject不再改变终态。",
+      "evidence": [
+        "纯内存真实源码transpile+import probe：cooperative resolve-on-abort结果仍timeout且childAborted=true。",
+        "纯内存probe：runOperation后立即parent.abort，返回aborted且operation调用0次。",
+        "纯内存probe：同步抛错返回error。",
+        "SubmitEvidenceExpansion新增三个实际调用层测试固定timeout/aborted/completed、timer/listener清理与迟到结果不采纳。"
+      ],
+      "status": "no-confirmed-regression"
+    },
+    {
+      "boundary": "MemoryReadPolicy默认deadline与取消",
+      "source": {
+        "path": "AlembicAgent/src/agent/memory/MemoryReadPolicy.ts",
+        "line": 53
+      },
+      "conclusion": "默认5000ms和嵌套绝对deadline仍由memoryReadDeadline决定；runOperation只接收剩余时长。调用后父signal再检查保留旧MemoryReadPolicy的取消优先消费政策，未把读取层fallback/diagnostic移入通用工具。",
+      "evidence": [
+        "现有MemoryRetriever迟到embedding不touch记忆的实际读取测试通过。",
+        "永久pending embedding在20ms deadline回退词法结果的实际读取测试通过。",
+        "真实Analyst preset prompt边界的aborted/timeout测试通过，仍向下传递child signal并清timer。"
+      ],
+      "status": "no-confirmed-regression"
+    },
+    {
+      "boundary": "AiProvider文本子调用取消",
+      "source": {
+        "path": "AlembicAgent/src/ai/AiProvider.ts",
+        "line": 469
+      },
+      "conclusion": "ChatContext.abortSignal仅加性进入_gatewayChat→LLMGateway.chatWithTools→reliability/transport，与工具调用路径复用同一个信号机制；历史消息、model routing和usageSource仍保持。",
+      "evidence": [
+        "provider-facades新增测试驱动真实OpenAiProvider.chat与实际transport到mock fetch；父取消后transport signal中止，文本结果reject而非接受late response。",
+        "两个相关完整测试文件29/29通过。"
+      ],
+      "status": "no-confirmed-regression"
+    },
+    {
+      "boundary": "style repair等待与后续提交",
+      "source": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+        "line": 389
+      },
+      "conclusion": "可选修复有30秒本地默认等待期限，child signal传入chat；超时/取消/错误返回null并留诊断。handler在style await后重新检查父取消，且createOrStage之前再次检查，未把取消后的late repair写入Core。",
+      "evidence": [
+        "does not persist a late style repair after cancellation通过；create为0，provider child signal已中止。",
+        "bounded style repair lifecycle三个分支全部通过；非合作provider的late文本未改变终态。"
+      ],
+      "status": "no-confirmed-regression"
+    },
+    {
+      "boundary": "已创建身份和readiness未知",
+      "source": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 869
+      },
+      "conclusion": "createOrStage一旦开始仍等待真实回执；获得created后readiness失败/中止只追加warning。输出始终保留created/id/candidateId/lifecycle；缺少readiness用readinessStatus=unavailable，不伪造ready:false或ready:true。session save失败同样降级而非抹掉身份。",
+      "evidence": [
+        "readiness、同步session-save、异步session-save拒绝三个后处理失败用例通过。",
+        "Core commit确认时父signal已中止用例通过：仍created，readiness/save均不启动。",
+        "只读核对toolOutcomes.hasPersistedCandidate：_meta.degraded不会被误作提交失败；status created + id + pending/staging事实仍成立。",
+        "只读核对scanRunProjection.extractCreatedRecipes：spread res保留readinessStatus及原身份字段。"
+      ],
+      "status": "no-confirmed-regression"
+    },
+    {
+      "boundary": "manage读写边界",
+      "source": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 1340
+      },
+      "conclusion": "approve/publish在readiness等待取消后不会启动新publish；已开始且确认完成的publish/review/update/reject/score/proposal保留结果，并附completed-after-abort诊断。搜索/detail/prime/review-queue读取完成后取消时不会继续消费或发起后续读取。",
+      "evidence": [
+        "approve/publish readiness等待取消的定向用例通过；publish调用0次。",
+        "预取消submit/publish在入口被挡；readiness/create/publish不启动。",
+        "阅读新增completedMutationMeta及其各写入分支调用点，未发现取消后抹掉已确认mutation的分支。"
+      ],
+      "status": "no-confirmed-regression"
+    },
+    {
+      "boundary": "graph注入与prepared重评",
+      "source": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 653
+      },
+      "conclusion": "graph refs只更新prepared.item.reasoning，不复活已去除coreCode；重评统一走evaluatePreparedItem并保留codeEvidence，因此显式refs和Analyst注入refs拥有同一过滤语义。style改写authored字段仍重新prepare以刷新profile hash。",
+      "evidence": [
+        "显式vs注入graph refs的完整items相等测试通过，unsafe coreCode保持空且原诊断保留。",
+        "已安装Core computeRecipeSourceContentHash纯函数probe确认仅增加reasoning.graphRefs不改变source hash；不存在因此需要重算authored hash的回归。",
+        "保留原style字段变更sourceContentHash测试；本次未修改其断言。"
+      ],
+      "status": "no-confirmed-regression"
+    }
+  ],
+  "testReview": {
+    "additionsReviewed": [
+      {
+        "file": "AlembicAgent/test/SubmitEvidenceExpansion.test.ts",
+        "scope": "bounded style repair lifecycle全组；fake timers、mock logger隔离与finally恢复均完整。"
+      },
+      {
+        "file": "AlembicAgent/test/provider-facades.test.ts",
+        "scope": "新增chat cancellation到mock fetch；原describe afterEach仍清stub，未弱化原provider协议断言。"
+      },
+      {
+        "file": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+        "scope": "本轮全部新增取消、post-processing、非字符串输入、稳定预算、prototype key、graph re-evaluation用例；标题新修复后再读测试。"
+      },
+      {
+        "file": "AlembicAgent/test/memory-context.test.ts",
+        "scope": "与MemoryReadPolicy迁移直接有关的迟到embedding与deadline实际消费测试，未编辑。"
+      },
+      {
+        "file": "AlembicAgent/test/llm-input-layering.test.ts",
+        "scope": "真实Analyst preset bounded memory等待测试，未编辑。"
+      }
+    ],
+    "weakeningObserved": false,
+    "caveat": "本次只执行与本轮修改直接相关的46个测试，没有替代root的全量门禁或最终源码拆分验收。"
+  },
+  "verification": [
+    {
+      "command": "Node22 vitest run test/SubmitEvidenceExpansion.test.ts test/provider-facades.test.ts",
+      "result": "29 passed / 2 files",
+      "log": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/independent-operation-provider-tests.log"
+    },
+    {
+      "command": "Node22 vitest run test/recipe-production-profile-adapter.test.ts -t 'title|per-title|graph refs|Core commit|post-processing|readiness wait|late style'",
+      "result": "13 passed / 34 skipped / 1 file",
+      "log": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/independent-knowledge-focused-tests.log"
+    },
+    {
+      "command": "Node22 vitest run test/memory-context.test.ts test/llm-input-layering.test.ts -t 'does not accept late embedding|returns lexical candidates by the deadline|propagates .* through the actual Analyst preset'",
+      "result": "4 passed / 77 skipped / 2 files",
+      "log": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/independent-memory-operation-tests.log"
+    },
+    {
+      "command": "只读Node内存probe：真实shared/operation.ts经TypeScript转译，运行cooperative timeout / pre-dispatch abort / sync throw；调用公开Core hash函数比较graphRefs",
+      "result": "4个断言方向均符合预期；无临时产品文件、数据库、网络或真实API。"
+    }
+  ],
+  "limitations": [
+    "runOperation不能终止不合作的外部代码本身，只保证本次等待终态与迟到结果不重新进入消费路径；这是当前明示边界。",
+    "Core createOrStage/publish没有取消端口；一旦启动，handler保留并等待真实回执，不声称取消等于回滚。",
+    "SessionStoreLike.save当前合同返回void；实现额外await兼容Promise拒绝。本次没有对永久挂起的任意异步宿主save宣称有独立取消/期限保障，也没有据此扩大本轮修复范围。",
+    "runtime/profiles/shared state由宿主注入；稳定预算依赖同一会话盒的共享身份。新回归覆盖本仓阶段浅拷贝，未测试跨进程重新构建会话对象。",
+    "只读复审期间root在拆分PipelineStrategy，因此报告只对上述5个目标文件的最终记录快照及相关接口消费判断负责。"
+  ],
+  "stillOpen": [],
+  "nextStep": "root把标题稳定盒修复及其RED/GREEN纳入最终变更，继续既定职责拆分与总门禁；本子代理不编辑或提交。",
+  "snapshots": [
+    {
+      "path": "AlembicAgent/src/shared/operation.ts",
+      "sha256": "41080efd3505d08de748dd8ff2521666d7496469461f2100a2c514422cc30147"
+    },
+    {
+      "path": "AlembicAgent/src/agent/memory/MemoryReadPolicy.ts",
+      "sha256": "a16bffe8490bdbc11aa8fd29b3963eb8478078d3a18f3884d4423482f8ca55e0"
+    },
+    {
+      "path": "AlembicAgent/src/ai/AiProvider.ts",
+      "sha256": "8dd5d5bf66ba2627deb7495ea2654c46cdc2d9f5307982ed32e4688025eb3c6d"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "sha256": "b67092f05d471f3f59f5f99ad3cec5991218532bbe89426a4f68f8130e05f6cf"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+      "sha256": "a322a2b4a507d26c136f111350469e1c235f9cb14faecd35d20e5e972e79f54c"
+    }
+  ]
+}

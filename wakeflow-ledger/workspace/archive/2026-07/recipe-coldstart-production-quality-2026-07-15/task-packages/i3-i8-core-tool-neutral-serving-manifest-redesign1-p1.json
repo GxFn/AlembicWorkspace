@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i8-core-tool-neutral-serving-manifest-redesign1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Design revision 97 的用户确认已删除每次 candidate 的 Plugin 五工具 pre-CAS gate；本 NEXT package 只修正该决定在 AlembicCore 公共 production contract 单源中的最后一个上游残留。基线必须是干净的 AlembicCore@737ac265dc50b8ccf788c1b9103ead537d94ff06/tree，并保留全部已接受 PC-F、private-revision、journal/public-route 合同。当前 `ProductionPersistenceContracts.ts#ServingSnapshotManifestV1`、exact input keys 与 tests 仍强制 `candidateOracleHash`，而后续 Alembic Main 被确认只能在 G4→FinalCoverage 后生成消费者中立 `ServingSnapshotValidationReceipt`，不得调用/复制 Plugin MCP 或伪填旧字段。\n\n完成合同：在现有 `ServingSnapshotManifestV1/createServingSnapshotManifestV1` 单源内原位移除 candidate-oracle 语义，改为必填、非空、canonical-hashed 的 `servingSnapshotValidationHash`（若当前未发布 strict-v1 兼容事实允许，优先最小原位修正；不得新增平行 manifest/service/transport）。同步 exact-key 常量、public `@alembic/core/knowledge` 类型/构造器与 focused tests；证明旧 `candidateOracleHash` 输入 fail closed、新 validation hash 被 manifest hash 覆盖、字段遗漏/额外字段/空值失败，PublicKnowledgeRouteV1 仍只引用 serving manifest hash且 CAS recovery semantics 不变。全仓搜索要求 Core source/test/dist-facing contract 中不再存在正向 candidate-oracle manifest authority；不修改 Alembic/AlembicPlugin/AlembicAgent，不实现 validator、MCP handler、candidate reader/handle/path override，不进入 Test。\n\n仓库窗口提交一个新的干净 Core commit，并回填 parent/commit/tree、changed symbols、公共 built-artifact import probe、focused RED/GREEN、`npm run build:check`、相关 contract suite、完整 Core suite 与 `git diff --check`。如果发现真实已发布兼容消费者要求版本化而不能原位修正，停止并返回具体 consumer/artifact 证据，不自行保留双重权威。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§14-15,18.1,18.3,18.6; Design/docs/current/recipe-coldstart-production-quality-workspace-handoff-2026-07-15.md; controller revision 97; AlembicCore/src/service/production/ProductionPersistenceContracts.ts:1129; Alembic/lib/recipe-pipeline/generate/strict/StrictFinalizationRuntime.ts",
+  "designIntent": "在现有 Core serving manifest/public-route contract 单源上用消费者中立 validation hash 替换 stale candidate-oracle 字段；不新增平台、服务或跨仓运行时依赖。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "public-contract-probe",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "boundary-scan",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": []
+  },
+  "createdAt": "2026-07-16T12:20:07.462Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i8-core-tool-neutral-serving-manifest-redesign1-t1",
+      "taskPackageId": "i3-i8-core-tool-neutral-serving-manifest-redesign1-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "把 Core serving manifest 的 stale candidate-oracle 必填字段原位收敛为 tool-neutral serving-validation hash，供后续 Main finalizer 与 Plugin I8 fixtures 使用。",
+      "status": "pending",
+      "createdAt": "2026-07-16T12:20:07.462Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

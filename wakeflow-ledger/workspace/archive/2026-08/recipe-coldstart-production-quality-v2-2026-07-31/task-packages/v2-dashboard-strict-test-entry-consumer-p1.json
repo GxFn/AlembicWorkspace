@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "v2-dashboard-strict-test-entry-consumer-p1",
+  "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+  "summary": "把 Candidates 页面冷启动入口从 legacy bootstrap 切换到 Main strict-test-dimension 的 preflight→自动选维→private run/status/report 真链路。",
+  "status": "pending",
+  "sourceRef": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/dashboard-strict-test-entry-trigger-decision.md#user-goal",
+  "contextVersion": 1,
+  "workType": "implementation",
+  "objective": "让用户在 AlembicDashboard Candidates 页面点击冷启动或再次运行 strict 测试时，唯一调用已接受 Alembic Main strict-test-dimension API，自动选择一个适用维度，持续展示同 run 的权威 phase/terminal/report，并且不创建 DaemonJob、不调用 legacy bootstrap、不宣称 production finalized。",
+  "contextSummary": [
+    "Controller 已接受 Alembic Main commit b50bff157448b4986064ddbe20d8d2ad9305c738；它提供 /api/v1/strict-test-dimension/preflight、/runs、/runs/{runId}、/runs/{runId}/report，精确矩阵分别为 200/400/422、202/400/404/422、200/400/404/422、200/400/404/409/422。",
+    "Dashboard 当前 App.handleColdStart 仍调用 api.bootstrap()→POST /api/v1/modules/bootstrap，并把 legacy bootstrapSession 接到 Socket/DaemonJob；Candidates 的冷启动和“清理重建”共用该 handler。",
+    "Dashboard 当前 generated api-types copy 已被 npm run check:api-types-drift 证明落后于 Main canonical：Dashboard sha256 5545fc9c...，Main canonical sha256 8dc8d0da...；必须机械同步 artifact+pin 后再消费生成 types/validators。",
+    "V2 strict-test 已由后端自动选择适用维度，不需要用户选择或确认；成功终点严格为 STRICT_TEST_COMPLETED_PRIVATE，productionFinalized=false 且 publicRouteChanged=false。",
+    "Dashboard runtime/project-info 已向 App 提供 provider-issued data.projectRoot；浏览器不得猜 Main Node path dialect，只允许用这个原始非空值注入 generated canonical-path format validator。"
+  ],
+  "requirementRefs": [
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/dashboard-strict-test-entry-trigger-decision.md#user-goal",
+      "role": "goal",
+      "label": "用户触发的 Dashboard 下一消费者目标"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/dashboard-strict-test-entry-trigger-decision.md#controller-implementation-decision",
+      "role": "design",
+      "label": "Controller 精确实现决策"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/dashboard-strict-test-entry-trigger-decision.md#completion-and-evidence",
+      "role": "completion",
+      "label": "Dashboard 完成与证据定义"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/v2-alembic-main-strict-test-private-pipeline-controller-acceptance-rework4.md#controller-acceptance",
+      "role": "evidence",
+      "label": "已接受 Main strict-test HTTP/consumer authority"
+    },
+    {
+      "ref": "Design/docs/current/recipe-coldstart-strict-test-profile-supplement-requirement-design-2026-07-30.md#10-api-and-dashboard-contract",
+      "role": "design",
+      "label": "Dashboard 只控制和展示真实后端合同"
+    },
+    {
+      "ref": "Design/docs/current/recipe-coldstart-strict-test-profile-supplement-requirement-design-2026-07-30.md#14-non-goals-and-forbidden-conclusions",
+      "role": "constraint",
+      "label": "非破坏、私有、无 legacy fallback"
+    },
+    {
+      "ref": "Design/docs/current/recipe-coldstart-production-quality-original-plan-2026-07-15.md#final-completion-definition",
+      "role": "validation",
+      "label": "原始最终完成定义边界"
+    }
+  ],
+  "boundaries": {
+    "inScope": [
+      "机械同步 Alembic/lib/generated/dashboard-api-types.ts 到 Dashboard src/generated/api-types.ts，并更新 api-types.sha256；生成文件禁止手改。",
+      "新增 Dashboard strict-test API family 并由 src/api/index.ts 聚合；使用 generated request/response operation validators 覆盖完整实际 status matrix。",
+      "以 provider-issued projectRoot 原值作为 canonical-path format authority；固定产品级 demandKey=dashboard-strict-test-dimension，使用 crypto.randomUUID 生成符合 contract 的唯一 runId。",
+      "实现 preflight→canAutoSelect gate→start，并在长运行 start 期间并行轮询同 run status；terminal 后读取 report；project-scoped sessionStorage 支持刷新后同 authority 幂等恢复。",
+      "Candidates 页面展示 preflight/full universe/recommendation、自动选中维度、phase、terminal、失败、report 与非生产声明；冷启动和原清理重建入口都进入同一 strict-test handler并采用非破坏文案。",
+      "聚焦 contract/adapter/hook/view-model/UI tests、npm run check、真实 Main 浏览器网络/截图证据和 Dashboard 本仓 commit/backfill。"
+    ],
+    "outOfScope": [
+      "Alembic、AlembicCore、AlembicAgent、AlembicPlugin 产品代码或生成器修改。",
+      "JobsView 通用 DaemonJob bootstrap、rescan、DaemonJob 过度设计或后续架构整改。",
+      "production strict 冷启动、正式 root reset/cleanup、Recipe publication、public CAS/active route 或完整 26 维执行。",
+      "Test task/card/dispatch、真实 BiliDili Test 窗口执行或全需求最终验收。"
+    ],
+    "forbidden": [
+      "Candidates 冷启动链路调用或回退 /api/v1/modules/bootstrap、/api/v1/jobs/bootstrap、ALEMBIC_TEST_MODE、Plugin testMode/briefing 或创建/消费 DaemonJob。",
+      "让用户选择/确认维度，或在 request body 中发送 dimension、confirmation、testMode、profile、privateRoot 等 Main exact contract 禁止字段。",
+      "在 UI 猜测/补写 backend phase、terminal、report、productionFinalized/publicRouteChanged，或把候选数量/前端进度/通知当作 pass。",
+      "手改生成 API types、直接 import sibling Alembic source、增加 @alembic runtime dependency，或绕过 generated request/response validator。",
+      "把 mock/fixture 当作真实 Main 连通性证据，暴露 private checkpoint/executionContext/path/provider secret，或在失败时静默启动第二 run。"
+    ]
+  },
+  "completionExpectations": [
+    "Candidates 两类可见冷启动入口均只进入一个 strict-test handler；静态/运行时探针和真实浏览器网络记录证明调用顺序为 preflight→runs/status→report，且 legacy bootstrap/DaemonJob 调用计数为零。",
+    "Dashboard generated artifact 与 Main b50bff1 canonical byte-identical、SHA-256 pin 更新，generated drift gate 与全部 npm run check 通过；新 API adapter 对每个请求和 200/202/400/404/409/422 实际响应 fail-closed 验证。",
+    "UI 自动执行后端推荐维度，没有选择器/确认门；缺失 projectRoot、canAutoSelect=false、schema drift、ordinary problem、durable 422 failure 和 report-not-ready 都显示安全可诊断状态且不 fallback。",
+    "长运行 start 与 status polling 使用同 demandKey/runId/preflightHash；重复点击被抑制，刷新页面从 project-scoped 最小 authority 恢复同 run，terminal 后读取/展示 canonical report，不生成第二 run。",
+    "页面清楚展示 full universe、自动选中维度、phase、terminal/failure/evidence refs/report，并固定呈现 private-only、productionFinalized=false、publicRouteChanged=false；原“清理重建”改成非破坏 strict-test 重跑语义。",
+    "AlembicDashboard 提交本仓变更并回填 commit、RED/GREEN 映射、npm run check 输出、真实 Main 浏览器请求摘要与终态截图；明确 Jobs/DaemonJob、production/public 与 Test 均未变。"
+  ],
+  "dependsOnTaskIds": [
+    "v2-alembic-main-strict-test-private-pipeline-t1"
+  ],
+  "commitExpectation": "commit",
+  "designIntent": "在既有 api 单一 normalizer seam 下新增 strict-test route family，并用一个 project-scoped hook/view-model 串联 exact generated contract、长运行 start、并行 status polling、刷新恢复和 Candidates 权威状态面板；只替换 Candidates 冷启动 handler，不改 Jobs/rescan。",
+  "acceptanceAnchors": [
+    {
+      "id": "v2-dashboard-strict-entry-no-legacy",
+      "claim": "Candidates 冷启动和再次运行入口只触发 Main strict-test API，不触发 legacy bootstrap 或 DaemonJob。",
+      "probe": "在点击两种 Candidates 入口的 adapter/UI test 与真实浏览器网络记录中统计 endpoint 和 job 创建；搜索 handler 调用图。",
+      "expected": "观察到 preflight→runs/status→report，同一次点击对 /modules/bootstrap、/jobs/bootstrap、bootstrap socket init 与 DaemonJob 创建均为 0。"
+    },
+    {
+      "id": "v2-dashboard-generated-exact-contract",
+      "claim": "Dashboard 机械消费已接受 Main exact request/response contract 并对 drift fail closed。",
+      "probe": "先让旧 artifact drift RED，再同步 canonical+pin；对四 operation 的 request keys 和完整 200/202/400/404/409/422 response matrix 运行 generated validator contract tests。",
+      "expected": "artifact byte/hash 与 Main b50bff1 相同；合法矩阵全过，extra/missing keys、错误 status/schema、非 provider-issued projectRoot 全拒绝。"
+    },
+    {
+      "id": "v2-dashboard-automatic-selection",
+      "claim": "测试模式自动选择后端推荐的一个适用维度，Dashboard 不建立人工选择或确认权威。",
+      "probe": "点击冷启动并捕获 preflight/start payload 与 UI；用 canAutoSelect=false 和 recommendation/selection mismatch fixtures 做负向测试。",
+      "expected": "preflight body 精确为 demandKey/projectRoot/runId，start body 精确为 demandKey/preflightHash/runId；无 dimension/confirmation 字段或选择器，选中维度只来自 status.automaticSelection。"
+    },
+    {
+      "id": "v2-dashboard-same-run-durable-ui",
+      "claim": "长运行、失败和刷新恢复始终绑定同一个 run authority，并从 durable status/report 显示终态。",
+      "probe": "以可控延迟模拟 start，同时轮询 status；刷新/重挂 hook，覆盖 success、422 durable failure、404、409 report-not-ready、重复点击。",
+      "expected": "同 demandKey/runId/preflightHash 保持不变，非 terminal 不建第二 run，terminal 后恰好读取同 run report；错误可诊断且无 fallback。"
+    },
+    {
+      "id": "v2-dashboard-private-semantics",
+      "claim": "UI 不把 strict-test 私有完成表达为 production 完成或 destructive rebuild。",
+      "probe": "渲染成功/失败 report 并检查文案、字段与旧清理重建入口；浏览器截图复核。",
+      "expected": "页面明确 private-only、productionFinalized=false、publicRouteChanged=false，展示未执行维度/禁止推断；重跑入口无清理/删除语义。"
+    }
+  ],
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "test",
+        "verify": "RED/GREEN contract, adapter, hook/view-model and UI tests plus full npm run check."
+      },
+      {
+        "kind": "runtime",
+        "verify": "Real Alembic Main HTTP/browser request sequence with zero legacy endpoints and durable terminal/report readback."
+      },
+      {
+        "kind": "screenshot",
+        "verify": "Candidates page preflight/running and terminal private report states, including non-production declaration."
+      }
+    ],
+    "advisory": []
+  },
+  "createdAt": "2026-08-03T12:52:25.163Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "v2-dashboard-strict-test-entry-consumer-t1",
+      "taskPackageId": "v2-dashboard-strict-test-entry-consumer-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "同步 Main 生成合同并实现 Candidates strict-test 冷启动控制/观察状态机，禁止 legacy fallback。",
+      "status": "pending",
+      "createdAt": "2026-08-03T12:52:25.163Z",
+      "dependsOnTaskIds": [
+        "v2-alembic-main-strict-test-private-pipeline-t1"
+      ]
+    }
+  ]
+}

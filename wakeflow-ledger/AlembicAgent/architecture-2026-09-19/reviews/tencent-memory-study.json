@@ -1,0 +1,544 @@
+{
+  "localRepository": {
+    "root": "../../../../TencentDB-Agent-Memory",
+    "commit": "06414ac10766b9bd61e4a69f3cf0ea414afb6d4f",
+    "workingTreeClean": true
+  },
+  "alembicBaseline": {
+    "commit": "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05",
+    "workingTree": "Read current working-tree changes from preceding review; did not reset/edit them."
+  },
+  "method": "README_CN and directory maps first; bounded reads of recall/search/embedding facade and Proxy injection/client/bridge only. No install, launch, network request, live model, or external-repo write.",
+  "coreCallChains": [
+    {
+      "name": "host/legacy auto-recall",
+      "flow": [
+        "OpenClaw before_prompt_build or HTTP /recall",
+        "TdaiCore.handleBeforeRecall",
+        "performAutoRecall deadline wrapper",
+        "searchMemories(query sanitize + strategy)",
+        "IMemoryStore FTS/vector/nativeHybrid + EmbeddingService",
+        "L3 scoped profile + L2 scene index",
+        "stable appendSystemContext + dynamic prependContext"
+      ],
+      "refs": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/index.ts",
+          "line": 719,
+          "claim": "host adapter calls core"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/gateway/server.ts",
+          "line": 1394,
+          "claim": "legacy gateway entry"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/tdai-core.ts",
+          "line": 374,
+          "claim": "facade"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+          "line": 92,
+          "claim": "orchestration"
+        }
+      ]
+    },
+    {
+      "name": "current strict memory data-plane",
+      "flow": [
+        "v3 team/user/agent validation",
+        "atomic/search shared v2-router handler",
+        "executeMemorySearch",
+        "native hybrid OR parallel FTS/vector",
+        "type/scene filter + limit + structured items/strategy"
+      ],
+      "refs": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+          "line": 130,
+          "claim": "isolation"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+          "line": 1192,
+          "claim": "handler"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/tools/memory-search.ts",
+          "line": 87,
+          "claim": "search engine boundary"
+        }
+      ]
+    }
+  ],
+  "proxyCallChain": {
+    "flow": [
+      "handler pipeline.process before forwarding",
+      "protocol adapter parse → AgentContext",
+      "registry hook priority/order",
+      "session_init cache or fresh profile fetch",
+      "TdaiProfileMemoryInjector: fixed assets → parallel L3/L2 index",
+      "stable system suffix + static read-tool guide",
+      "LLM existing host tool → read-only memory bridge → Core v3 search/read",
+      "serialize protocol body → upstream forwarding"
+    ],
+    "activeVsLegacy": "TdaiL1RecallInjector file exists but current registration explicitly disables it (injection/index.ts:346-348). L0/L1 are currently on-demand tools; do not model retired file as default behavior."
+  },
+  "interfacesAndBoundaries": [
+    "MemoryCore owns IMemoryStore / EmbeddingService / StorageAdapter and isolated memory data; the core facade is host-neutral and does not host the Agent loop.",
+    "Proxy InjectionHook emits ContextBlock[] with point/priority/cacheStrategy; ProtocolAdapter owns conversion; HookCacheRepo stores injection snapshots separate from semantic memory.",
+    "Proxy read-only bridge derives authority-owned identity and credentials; never adopt its curl delivery mechanism into AlembicAgent where native typed tool contracts already exist.",
+    "MemoryCore nativeHybrid capability is delegated to storage; do not copy FTS/vector/nativeDB code into AlembicAgent."
+  ],
+  "budgetConcurrencyAndFailureFacts": [
+    "Auto-recall default5000ms Promise.race produces RecallError20001 on deadline, but does not abort the losing inner promise. EmbeddingCallOptions only carries timeoutMs, not external AbortSignal.",
+    "Keyword+embedding search runs concurrently; per-path catches preserve other source. Native hybrid avoids duplicate local embedding request. Results over-fetched3x before filters and final limit.",
+    "Core recall snippet/total limits are character-based and default0 means unbounded; preserve Alembic explicit-zero-token semantics instead of copying defaults.",
+    "Proxy profile resolves self+max2 imported agents; per-agent L3/L2 calls run in parallel. L3 body capped6000chars, each L2 summary200, list boundedl2Limit. No global token budget was observed in InjectionPipeline.",
+    "Injection hooks run in point/priority order sequentially, per-hook failure recorded and does not abort pipeline. Profile prewarm is parallel/allSettled with20000ms default; its timers do not cancel underlying prewarm.",
+    "TdaiClient postForCtx enforces HTTP timeout but returns{} on network/HTTP/business failure, losing empty-vs-failure distinction. ACL errors deliberately fail-closed via checkAclOrDeny.",
+    "Memory bridge multi-source search preserves source_agent metadata and uses allSettled, but reports code0 after dropping failed sources; do not infer strong partial-error signaling.",
+    "Prompt says search<=3 calls per turn; this is prompt guidance in the inspected path, not a demonstrated runtime-enforced quota."
+  ],
+  "comparisons": [
+    {
+      "area": "stable/dynamic context",
+      "tencent": "Core splits appendSystemContext/prependContext; current Proxy freezes profile+index at session initialization and asks tools for detail.",
+      "alembic": "Already keeps base system prompt static and adds phase/ActiveContext as ephemeral provider input. No need to introduce an HTTP proxy or second hook runtime.",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+          "line": 855,
+          "claim": "Static system prompt"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+          "line": 872,
+          "claim": "Scoped dynamic working memory"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/MemoryCoordinator.ts",
+          "line": 299,
+          "claim": "Static string assembly"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/MemoryCoordinator.ts",
+          "line": 352,
+          "claim": "Dynamic string assembly"
+        }
+      ]
+    },
+    {
+      "area": "budget/selection",
+      "tencent": "Recall limits individual snippets and total body; profile injector sends scene paths/summaries rather than all full scene bodies.",
+      "alembic": "PersistentMemory now fits rendered token budget, ActiveContext keeps high-priority findings, SessionStore builds all completed reports in insertion order then truncates the string. Selection policies and token accounting are spread over3 modules.",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+          "line": 232,
+          "claim": "Render-aware token fitting"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/ActiveContext.ts",
+          "line": 579,
+          "claim": "Finding-first priority selection"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/SessionStore.ts",
+          "line": 450,
+          "claim": "Completed dimension insertion order"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/SessionStore.ts",
+          "line": 525,
+          "claim": "Whole-string final truncation"
+        }
+      ]
+    },
+    {
+      "area": "retrieval/degradation",
+      "tencent": "Structured search identifies effective strategy, parallel sources, stable IDs, source identity, latency/hits; several low-level errors still collapse to empty results.",
+      "alembic": "MemoryRetriever can perform lexical+embedding scoring but awaits optional embedding before ranking and silently falls back on throw; no request abort/deadline on embedding callback and no retrieval status returned.",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+          "line": 109,
+          "claim": "retrieve array contract"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+          "line": 122,
+          "claim": "Unbounded embedding await with silent lexical fallback"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+          "line": 175,
+          "claim": "Returned candidates touch access before later prompt budget filtering"
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/memory/MemoryCoordinator.ts",
+          "line": 801,
+          "claim": "Persistent section passes source/budget, not task query"
+        }
+      ]
+    },
+    {
+      "area": "progressive detail tools",
+      "tencent": "L2 index → scenario/read; L0/L1 search/query through a read-only bridge.",
+      "alembic": "Existing native registry already supports memory.get_previous_evidence and evidence.search/get, so use those surfaces. memory.recall is a different injected save/recall port and must not be equated with Agent SessionStore.",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/tools/runtime/handlers/memory.ts",
+          "line": 219,
+          "claim": "Previous-dimension evidence lookup"
+        },
+        {
+          "path": "../../../AlembicAgent/src/tools/runtime/handlers/memory.ts",
+          "line": 265,
+          "claim": "Distinct injected sessionStore.recall contract"
+        },
+        {
+          "path": "../../../AlembicAgent/src/tools/runtime/registry.ts",
+          "line": 657,
+          "claim": "Existing evidence search/get detail seam"
+        }
+      ]
+    }
+  ],
+  "proposals": [
+    {
+      "id": "TM-A1",
+      "priority": 1,
+      "title": "统一有来源的记忆投影和预算装配",
+      "goal": "减少ActiveContext/SessionStore/PersistentMemory各自拼接字符串、估算token和解释截断的重复；保持静态/动态输入边界。",
+      "design": [
+        "引入Agent内部纯函数级MemorySection/MemoryEntry结构：id、scope/source、stability、priority、content、evidenceRefs、estimatedTokens；不新增通用插件框架。",
+        "让现有三个builder先产出候选section，集中执行去重、稳定排序、标题/分隔符/截断标记计费和token预算；旧build*Prompt继续返回string作为兼容包装。",
+        "可对同run/scope且数据版本未变的稳定section复用projection，动态section每轮刷新；仅内存缓存，变更findings/report/配置或scope后失效。不要新建Redis/COS/DB。",
+        "旁路diagnostics记录选入/省略/截断数量、所用预算与section来源；不得把历史记忆字符串提升成证据权威。"
+      ],
+      "alembicFiles": [
+        "src/agent/memory/MemoryCoordinator.ts",
+        "src/agent/memory/MemoryRetriever.ts",
+        "src/agent/memory/ActiveContext.ts",
+        "src/agent/memory/SessionStore.ts",
+        "src/agent/runtime/AgentRuntime.ts"
+      ],
+      "borrowedFrom": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+          "line": 258,
+          "claim": "Stable vs dynamic split"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+          "line": 327,
+          "claim": "Typed injection blocks and explicit stability policy"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 520,
+          "claim": "Stable identity dedupe"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+          "line": 835,
+          "claim": "Snippet + aggregate budget and omission observability"
+        }
+      ],
+      "behaviorTests": [
+        "同一run两轮仅动态进度变化，stable section字节一致，模型历史不累计动态注入。",
+        "中文/emoji/短预算含标题footer整体不超限；高优先短finding不被低优先长内容挤掉。",
+        "相同证据id跨section去重但来源信息保留；scope不同不可共享cache。",
+        "noteFinding/storeDimensionReport或budget改变后稳定projection失效；旧string facade与新projection渲染一致。"
+      ],
+      "boundary": "Agent上下文投影策略；不改Core schema/search/vector、宿主DI所有权及现有证据收据。"
+    },
+    {
+      "id": "TM-A2",
+      "priority": 2,
+      "title": "前序维度先索引、命中后读取详情",
+      "goal": "避免SessionStore大报告抢占后续维度上下文，让最相关证据在固定预算内可被定位。",
+      "design": [
+        "在SessionStore已有report/findings/ref文件上构建轻量维度目录：dimId、短summary、finding数量、可用证据路径/真实已有refs；按currentDimId/focusKeywords和重要性挑选目录项。",
+        "在预算内直接展开少量最相关finding，其余保留可检索定位符，沿现有memory.get_previous_evidence或evidence.search/get取详情；不发明filesystem路径或E-id。",
+        "为现有memory.get_previous_evidence保留summary，同时可添加结构化items/受限分页，以闭合目录→详情；当前只渲染前8项且返回summary，应按真实handler契约完善，不声称已经提供完整报告读取。",
+        "保持原有full投影为默认兼容模式，先在明确的system-analysis profile用有测试的progressive选项；不削掉任务本来要求完整供给的strict context。"
+      ],
+      "alembicFiles": [
+        "src/agent/memory/SessionStore.ts",
+        "src/agent/memory/MemoryCoordinator.ts",
+        "src/tools/runtime/handlers/memory.ts",
+        "src/tools/runtime/registry.ts"
+      ],
+      "borrowedFrom": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-profile-memory-injector.ts",
+          "line": 11,
+          "claim": "L3 direct + L2 index only"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/tdai/client.ts",
+          "line": 184,
+          "claim": "Bounded scene listing distinct from body read"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-tools-injector.ts",
+          "line": 109,
+          "claim": "Discover index then read known path"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/scene/scene-navigation.ts",
+          "line": 44,
+          "claim": "Navigation projection"
+        }
+      ],
+      "behaviorTests": [
+        "几十个长报告、小预算、目标关键词只出现在较晚维度；目录仍包含目标而非只保留最早插入报告。",
+        "目录所列每个locator可经现有受控接口查回相同finding/证据；无匹配明确空结果。",
+        "未注入SessionStore/ledger时返回可观察degraded，不生成虚假详情入口。",
+        "重新恢复checkpoint后目录与证据一致；strict/producer仍只能消费已验证结构化发现。"
+      ],
+      "boundary": "只改变已有Agent数据的读时projection与现有只读工具输出；不引入Tencent的HTTP/curl桥、身份租户系统或新的存储。"
+    },
+    {
+      "id": "TM-A3",
+      "priority": 3,
+      "title": "召回有截止时间、取消语义和明确的降级结果",
+      "goal": "防止慢embedding阻塞prompt装配，并区分没有记忆与召回失败；与现有Agent取消/超时链一致。",
+      "design": [
+        "为可选embedding port增加兼容第二参数{abortSignal,deadlineMs/timeoutMs}；旧单参数回调仍可用但诊断明确其不支持底层取消。",
+        "在MemoryRetriever内部先计算词汇候选；embedding在请求剩余deadline内完成则合并当前评分，否则保留词汇结果并报告embedding-timeout/degraded。显式用户abort停止该次projection，不能伪装为正常无结果。",
+        "提供结构化内部RecallOutcome（items、strategy、status、warningCodes、elapsedMs、counts），旧retrieve():ScoredMemory[]/toPromptSection():string保留包装；避免用共享lastOutcome记录并发状态。",
+        "只对最终交付给消费者的item更新访问元数据；prompt投影中因预算未选入的候选不应在后台迟到完成时继续touchAccess。借用现有ReliabilityController/host AbortSignal，不复制Tencent重试实现。"
+      ],
+      "alembicFiles": [
+        "src/agent/memory/MemoryRetriever.ts",
+        "src/agent/memory/PersistentMemory.ts",
+        "src/agent/memory/MemoryCoordinator.ts",
+        "src/ai/AiProvider.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ],
+      "borrowedFrom": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/recall-errors.ts",
+          "line": 19,
+          "claim": "Safe typed recall failures"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/tools/memory-search.ts",
+          "line": 185,
+          "claim": "Independent retrieval sources and effective strategy"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/store/embedding.ts",
+          "line": 66,
+          "claim": "Per-call embedding budget"
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/memory/memory-bridge.ts",
+          "line": 437,
+          "claim": "Partial-source collection"
+        }
+      ],
+      "behaviorTests": [
+        "正常embedding与词汇路径保留当前排序；embedding缺失/拒绝/超时返回词汇候选并区分status。",
+        "预先abort不调用embedding；执行中abort及时返回且迟到promise不能改变accessCount或context。",
+        "一个来源失败不丢已有候选；两个并发scope/query的结果与诊断互不串线。",
+        "port忽略signal时deadline仍结束等待、观察promise失败避免unhandled rejection，明确记录底层取消不保证。",
+        "测试只用fake clock/mock embedding，不依赖API key或真实网络。"
+      ],
+      "boundary": "Agent异步召回编排/预算/观测接口增量；索引、向量算法、SQLite migration和Core仓储保持原位。"
+    }
+  ],
+  "sourceEvidence": [
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/README_CN.md",
+      "line": 3,
+      "claim": "MemoryCore owns memory/metadata; knowledge content is a different service, agents are consumers."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/README_CN.md",
+      "line": 7,
+      "claim": "Proxy owns access/forwarding, MemoryCore owns memory storage/processing."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/tdai-core.ts",
+      "line": 374,
+      "claim": "Host-neutral handleBeforeRecall delegates to performAutoRecall and reports retrieval metrics."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+      "line": 92,
+      "claim": "Recall wrapper has a 5000ms default deadline and structured timeout result."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+      "line": 258,
+      "claim": "Stable persona/navigation/tools text is separated from per-turn L1 recall text."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+      "line": 433,
+      "claim": "Query sanitized before configured retrieval strategy; explicit embedding configuration absence is a failure."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+      "line": 503,
+      "claim": "nativeHybridSearch capability avoids duplicate local embedding and a second storage request."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+      "line": 638,
+      "claim": "Local hybrid executes keyword/vector concurrently and merges ranked IDs with RRF."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/auto-recall.ts",
+      "line": 835,
+      "claim": "Independent per-memory and total recall character budgets; counts dropped/truncated snippets."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/scene/scene-navigation.ts",
+      "line": 44,
+      "claim": "Scene index is a sorted navigation projection; full content is fetched only on demand."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/tools/memory-search.ts",
+      "line": 87,
+      "claim": "Structured L1 search accepts query, limit, type/scene and storage isolation filter."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/tools/memory-search.ts",
+      "line": 142,
+      "claim": "Over-fetches limit*3, short-circuits native hybrid, otherwise parallel FTS/vector then filters and trims."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+      "line": 119,
+      "claim": "V3 requires team/agent/user; session optional; v2/v3 share handlers."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/gateway/v2-router.ts",
+      "line": 1192,
+      "claim": "Atomic search validates schema, propagates identity filter, deliberately searches across sessions."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/store/embedding.ts",
+      "line": 66,
+      "claim": "Per-call embedding contract exposes timeoutMs, not external AbortSignal."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/store/embedding.ts",
+      "line": 519,
+      "claim": "Remote embedding uses per-attempt AbortController, HTTP classification and bounded retries."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryCore/src/core/hooks/recall-errors.ts",
+      "line": 19,
+      "claim": "Safe typed error category/code/retryable contract separates dependency failure from empty retrieval."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/handler.ts",
+      "line": 1234,
+      "claim": "Request handler runs injection pipeline before forwarding; injection failure retains original body."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+      "line": 324,
+      "claim": "Actual memory registration uses profile injector and static read-tool instructions."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+      "line": 346,
+      "claim": "Legacy per-turn L1 recall injector is explicitly not registered in current default path."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+      "line": 80,
+      "claim": "Protocol adapter parse → context hooks → serialize orchestration."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+      "line": 164,
+      "claim": "Injection points and hook priority run deterministically; each hook failure is isolated."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+      "line": 269,
+      "claim": "none/session_init/hybrid strategies and multidimensional session cache keys."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+      "line": 520,
+      "claim": "Stable cached blocks precede fresh blocks; dedupe via metadata.cacheKey or type/content."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/prewarm.ts",
+      "line": 95,
+      "claim": "Parallel best-effort prewarm with per-hook and outer deadlines, optional clear-before refresh."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-profile-memory-injector.ts",
+      "line": 25,
+      "claim": "Actual profile hook uses system suffix, session_init cache, L3 content + L2 path/summary index."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-profile-memory-injector.ts",
+      "line": 79,
+      "claim": "Per-agent profile loads in parallel; no L2 body prefetch."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-profile-memory-injector.ts",
+      "line": 105,
+      "claim": "Each L3 body capped at6000 chars, each L2 summary at200; metadata identifies source/mode/counts."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-fixed-asset.ts",
+      "line": 49,
+      "claim": "Request-local fixed-asset resolution cache; self+at most2 imported agents, failure falls back to self."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-tools-injector.ts",
+      "line": 55,
+      "claim": "Static instructions expose read-only retrieval/read operations without credentials in model context."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/tdai/client.ts",
+      "line": 184,
+      "claim": "L2 index filtered to files and bounded by l2Limit; body retrieval is separate method."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/tdai/client.ts",
+      "line": 264,
+      "claim": "Per-request HTTP timeout and identity headers; data-plane failures collapse to empty object."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/tdai/client.ts",
+      "line": 320,
+      "claim": "ACL error path deliberately throws; checkAclOrDeny fails closed."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/memory/memory-bridge.ts",
+      "line": 46,
+      "claim": "Bridge has explicit read-only endpoint allowlist."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/memory/memory-bridge.ts",
+      "line": 377,
+      "claim": "Authority-owned identity override and per-upstream timeout; no raw credential in prompts."
+    },
+    {
+      "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/memory/memory-bridge.ts",
+      "line": 428,
+      "claim": "Across-agent search uses allSettled, preserves source_agent metadata and truncates merged hits."
+    }
+  ],
+  "cautions": [
+    "README/comments sometimes describe older behavior: searchMemories comment promiseskeyword fallback, actual missingconfiguredembedding fails; Proxy README L2/L3 wording is coarse, code injectsL3 + L2 index. Prefer cited code.",
+    "Do not copy raw preview/query logging for sensitive recall content; Alembic diagnostics should log bounded IDs/status/counts and retain redaction.",
+    "No new database, service, provider dependency, scheduler or HTTP proxy is required for these proposals.",
+    "Targeted tracked-test search found no recall/injection unit suites in this local snapshot (only unrelated ensure-hook-policy.test.ts); no test-pass claim made. Proposed tests are Alembic behavior tests."
+  ],
+  "writtenArtifactOnly": "tmp/architecture-2026-09-19/tencent-memory-study.json"
+}

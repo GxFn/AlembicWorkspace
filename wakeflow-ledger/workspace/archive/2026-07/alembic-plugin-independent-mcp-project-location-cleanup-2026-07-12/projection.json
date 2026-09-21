@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+  "title": "AlembicPlugin 独立 MCP 与单一项目定位清理",
+  "interfaceLanguage": "zh",
+  "sourceRevision": 3,
+  "sourceEventId": "evt-20260712094928-0003",
+  "progressDoc": "developer-progress.md",
+  "unifiedStatus": {
+    "demand": "alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12 - AlembicPlugin 独立 MCP 与单一项目定位清理",
+    "mainState": "planned",
+    "stage": "无",
+    "currentTaskPackages": "p1-plugin-independent-mcp-project-location-cleanup-p1(pending)",
+    "windows": "AlembicPlugin(pending)",
+    "blockers": "无",
+    "nextAction": "prepare-dispatch-from-state, add-task-package, wakeflow-render-progress",
+    "review": "无",
+    "automation": "未启用",
+    "userDecisionsNeeded": "无",
+    "lastUpdated": "2026-07-12T09:49:28.838Z"
+  },
+  "slices": {
+    "windows": [
+      {
+        "windowName": "AlembicPlugin",
+        "windowState": "pending",
+        "taskPackageIds": [
+          "p1-plugin-independent-mcp-project-location-cleanup-p1"
+        ],
+        "targetTaskIds": [
+          "p1-plugin-independent-mcp-project-location-cleanup-t1"
+        ]
+      }
+    ],
+    "taskPackages": [
+      {
+        "taskPackageId": "p1-plugin-independent-mcp-project-location-cleanup-p1",
+        "status": "pending",
+        "summary": "Implement the user's authoritative AlembicPlugin independence architecture as one combined repository change and commit.\n\nCurrent phase goal:\n- Make AlembicPlugin MCP a standalone plugin runtime whose only project identity is the current call's explicit projectRoot (or the current host workspace root when omitted), resolved through exactly one project-location service into projectId, ghost mode, dataRoot, databasePath and database existence.\n- Completely remove Alembic main selected/active/runtime-control influence and remove Plugin MCP dependence on Alembic resident/daemon availability, project selection, handoff, fallback probing or status. Do not modify Alembic main, AlembicCore, Agent, Dashboard or BiliDili.\n- All public MCP tools remain visible and callable regardless of knowledge initialization/usability/freshness. Remove HostKnowledgeState-driven visibility, knowledge/tool policy, preflight knowledge gate and agent-public prebootstrap isolation block. If the request project has no database, no knowledge, or no match, each tool returns its own truthful empty/not-found/unavailable result without auto-init, blocking, cross-project fallback, stale downgrade or invented repair flow.\n- Centralize projectRoot/ghost/dataRoot/databasePath resolution and physical confinement in one service used by status, initialization, query executors, skill/workflow paths and runtime composition. Remove duplicate per-handler identity validation after the service returns a resolved location. Keep only centralized path confinement and explicit destructive-write confirmation; do not create multiple new policy layers.\n- Delete all selected/active mismatch/handoff fields, actions, diagnostics, onboarding states and bootstrap/rescan response metadata, including HostProjectAlignment/buildLocalSelectionMismatch and resident selected/active scope fallback.\n- Delete old daemon MCP bridge residue. Preserve only a Plugin-owned embedded execution path if it has a real current caller; remove obsolete bridge adapters/comments/tests and all Alembic main/resident routing from public query execution.\n- Delete alembic_task completely: retired intercepts, error taxonomy entries used only by it, ServiceRequestBoundary special cases, legacy policy/classification residues, prompt/docs/catalog/test references and compatibility tests. Do not replace it with another hidden route.\n- Remove every MCP-consumer Git revision/checkpoint gate and public field: status/search/get/expand/graph/recipe-map/prime/guard must not read HEAD/checkpoint posture, attach gitDiffCheckpoint/sourceRevisionManifest, downgrade/suppress results, clear materials, remember manifests or demand rescan because commits differ. Keep Git diff/checkpoint code only where it is actually consumed by internal Recipe evolution/incremental maintenance; prove no public query consumer remains.\n- Remove all Prime intent admission: obsolete intent rejection, taskAction/requirementGoal/locator-facet requirements, automation-envelope/sourceRefs requirement, intentKind non-code blocking, low-information intent suppression and related schemas/reasons/tests. Prime consumes optional query/context solely to retrieve and present project knowledge; absence of intent is not a blocker.\n- Query tools may validate only executable input shape and use the centralized project location. Remove external readiness/trust/freshness checks that suppress otherwise queryable Recipe/Guard results. Recipe lifecycle/content/schema/sourceRefs and tool-local matching/ranking/display facts remain data semantics, not host-level availability gates.\n- Remove Admin/tier/role visibility machinery (ALEMBIC_MCP_TIER, ALEMBIC_CODEX_ENABLE_ADMIN, effective tier, admin diagnostics/preflight/catalog tier filtering). Expose one ordinary tool surface. Keep or delete knowledge lifecycle only by real current capability, but it must not require an Admin role.\n- Review the Plugin write-source normalizer. The current caller is the Plugin host-agent submission route; remove duplicate legacy source normalization and caller spoofable source overrides, using one canonical actual producer source at the write boundary or the existing Core canonical helper. It must not affect read/query behavior.\n- Remove associated obsolete schemas, projections, descriptions, skills/prompts, tests and dead code; do not leave comments asserting deleted architecture.\n\nExplicit non-goals:\n- No Test window, no new synthetic environment, no edits to real BiliDili/AlembicWorkspace knowledge data.\n- No Alembic main/Core/Agent/Dashboard product edits.\n- Do not remove centralized projectRoot/dataRoot physical confinement, request input schema needed for execution, Guard explicit code/files scope, Recipe-owned lifecycle/schema/content rules, destructive rebuild/cleanup confirmation, or write-zone/path safety merely because host-level gates are removed.\n- Do not create a universal policy framework, replacement state machine, hidden fallback, automatic bootstrap/rescan, or new status vocabulary.\n\nRequired implementation order:\n1. Inventory real current callers and add failing regressions for project-location independence, always-visible/no-KB behavior, no revision gate, intent-free Prime, one public tier and complete alembic_task absence.\n2. Land the single project-location service and migrate all consumers.\n3. Remove main/resident/daemon/visibility/state/revision/intent/admin/legacy-source chains.\n4. Remove dead schemas/projections/tests/docs and run a production import scan.\n5. Commit the complete AlembicPlugin change.\n\nRequired validation and evidence:\n- Focused before/after regressions proving foreign selected/active/runtime-control files cannot change any MCP identity or response; no knowledge returns tool-native empty/not-found; an advanced/dirty HEAD does not change public knowledge results; Prime works with minimal/no intent frame; all tools list without role/tier env; alembic_task and old bridge symbols have zero live/public callers.\n- Request-root/ghost isolation tests proving AlembicWorkspace and BiliDili projectRoot values resolve distinct projectId/dataRoot/databasePath using the single service, with zero cross-project fallback.\n- Exact full repository gates: npm run test:unit, npm run check, npm run build, npm run verify:codex-runtime-package, npm run verify:plugin-distribution, npm run verify:codex-plugin (or report exact unavailable script name as a blocker, never silently skip).\n- Return touched files/symbols, deleted-chain inventory, production import/caller scans, focused/full raw summaries, representative public JSON for no-KB and knowledge-present cases, final commit hash and two-stage self-review.\n- Completion leads to controller diff/raw-evidence review, local Plugin refresh and controller-owned direct real five-tool calls against explicit AlembicWorkspace and BiliDili projectRoot values after restart. No Test dispatch."
+      }
+    ],
+    "targetTasks": [
+      {
+        "targetTaskId": "p1-plugin-independent-mcp-project-location-cleanup-t1",
+        "taskPackageId": "p1-plugin-independent-mcp-project-location-cleanup-p1",
+        "targetWindow": "AlembicPlugin",
+        "status": "pending",
+        "reviewDecision": null,
+        "counts": null
+      }
+    ],
+    "blockers": [],
+    "decisionsRequired": []
+  }
+}

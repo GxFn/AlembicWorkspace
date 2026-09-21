@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "修复真实模块扫描中 knowledge.submit 成功结果与 ScanRunProjection 的合同断裂，使扫描输出稳定携带已持久化 pending/staging Recipe ID，供 Alembic 与 Dashboard 只读审阅链消费。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "模块扫描必须复用真实知识提交的持久化结果，并向消费者提供 existing pending/staging Recipe ID；Dashboard 只审阅，不创建。",
+  "createdAt": "2026-07-13T20:35:18.496Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p9-agent-scan-created-recipe-id-projection-closure-t1",
+      "taskPackageId": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "目标：闭合 AlembicAgent 模块扫描的真实生产结果投影。当前 knowledge handler 成功返回 status=created、id、title、lifecycle、readiness，但 ScanRunProjection 仍只识别已废弃的 status=collected + recipe，导致真实扫描无法向下游提供 existing Recipe ID。\n实现边界：仅修改 AlembicAgent；以当前 Core RecipeProductionGateway/knowledge.submit 的真实 created envelope 为权威，统一 extract/summarize 扫描投影，使每个被接受并持久化的 Recipe 输出明确 id/candidateId、lifecycle/pending-staging 状态及必要审阅摘要；不得恢复 collected 假路径，不得二次写入或制造未持久化 Recipe，不得把 rejected/failed 当成功。\n真实链要求：覆盖 ScanAgentRun→knowledge tool handler→RecipeProductionGateway→ScanRunProjection；如果 handler 结果缺少下游所需的可追溯字段，只在既有成功 envelope 上补充由已持久化 Recipe 得到的字段，不能注入测试 id。\n验证：新增针对 status=created 的投影单测、rejected/failed/混合批次负例，以及至少一条使用真实 handler/gateway seam 的集成测试，证明返回 id 对应持久化 pending/staging Recipe；确认没有额外 create、publish 或向量查询写入；运行相关测试、typecheck/build。\n交付：保持仓库基线整洁，提交一个 AlembicAgent commit；回填原始命令输出、关键调用链文件、commit hash、边界/风险。不要修改 Alembic、Dashboard、Core 或 Wakeflow 状态。",
+      "status": "pending",
+      "createdAt": "2026-07-13T20:35:18.496Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

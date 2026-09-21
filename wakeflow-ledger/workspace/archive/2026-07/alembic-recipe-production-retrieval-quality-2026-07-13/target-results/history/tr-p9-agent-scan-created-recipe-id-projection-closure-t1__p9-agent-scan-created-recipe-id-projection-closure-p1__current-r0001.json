@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p9-agent-scan-created-recipe-id-projection-closure-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+  "dispatchGroup": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p9-agent-scan-created-recipe-id-projection-closure-t1",
+  "status": "completed",
+  "summary": "AlembicAgent 已闭合真实模块扫描的 created Recipe 投影：ScanRunProjection 仅接受 knowledge.submit 的 status=created 且带真实 ID、pending/staging lifecycle 的结果，统一输出 id/candidateId/readiness/审阅摘要；handler 成功包从 gateway 返回的同一份 persisted raw 补充有界 reviewer 字段。rejected/failed/duplicate/legacy collected/active/空 ID 均不投影；发生 submit 后不再把 provider 文本制造为 Recipe，无 submit 的显式 preview 路径保持兼容。提交 725aecae1a2b949a034e660a004d907c267b0a88。",
+  "evidenceRefs": [
+    "AlembicAgent commit 725aecae1a2b949a034e660a004d907c267b0a88",
+    "AlembicAgent/src/agent/runs/scan/ScanRunProjection.ts",
+    "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+    "AlembicAgent/test/scan-run-projection.test.ts",
+    "AlembicAgent/test/scan-run-production-integration.test.ts"
+  ],
+  "verification": [
+    "RED: npx vitest run test/scan-run-projection.test.ts test/scan-run-production-integration.test.ts -> integration failed because persisted created envelope omitted description/trigger",
+    "GREEN: npx vitest run test/scan-run-projection.test.ts test/scan-run-production-integration.test.ts test/recipe-production-profile-adapter.test.ts -> 3 files, 31 tests passed",
+    "npm run build:check -> passed",
+    "npm run check -> passed; 67 test files and 525 tests passed, all boundary/signature/retired-symbol gates passed (pre-existing non-blocking Biome warnings only)",
+    "real seam assertion: ScanAgentRun -> AgentService -> knowledge.submit handler -> real RecipeProductionGateway/KnowledgeService -> ScanRunProjection returned repository-matching pending ID; createOrStage=1, KnowledgeService.create=1, evaluateReadiness=1, findSimilarRecipes=1 existing dedup query, publish=0"
+  ],
+  "risks": [
+    "Intentional compatibility boundary: callers with zero knowledge.submit attempts may still consume provider JSON as explicit preview output; once any submit occurs, unpersisted provider output is ignored and diagnosed.",
+    "Out-of-scope read-only observation: sibling Alembic AiScanService onToolCall observer appears to expect a wrapped {ok,data} result although the Agent runtime hook supplies the unwrapped tool result. The ModuleService -> runScanAgentTask main projection chain covered here does not depend on that observer; no sibling change or new requirement is claimed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "test-first",
+      "ref": "AlembicAgent/test/scan-run-projection.test.ts and AlembicAgent/test/scan-run-production-integration.test.ts",
+      "verify": "Observed RED on missing persisted review summary before handler change, then GREEN after minimal implementation."
+    },
+    {
+      "kind": "integration",
+      "ref": "AlembicAgent/test/scan-run-production-integration.test.ts",
+      "verify": "Exercises real handler/Core gateway persistence seam and proves projected ID equals repository pending Recipe without extra create/publish."
+    },
+    {
+      "kind": "commit",
+      "commit": "725aecae1a2b949a034e660a004d907c267b0a88",
+      "verify": "Single AlembicAgent commit from clean parent cc85887c0cd88fd5d004c2d1f965eec0d8747caa."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p9-agent-scan-created-recipe-id-projection-closure-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-agent-scan-created-recipe-id-projection-closure-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1.json",
+    "deliveryRunId": "run-delivery-p9-agent-scan-created-recipe-id-projection-closure-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "dispatchGroup": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-agent-scan-created-recipe-id-projection-closure-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 62,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+    "targetTaskId": "p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+    "resultId": "tr-p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "createdAt": "2026-07-13T20:56:39.338Z"
+  },
+  "createdAt": "2026-07-13T20:56:39.338Z",
+  "stateRevisionObserved": 62,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

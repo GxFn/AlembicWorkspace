@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8r-alembic-plugin-host-neutral-mcp-errors-p1",
+  "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+  "status": "completed",
+  "summary": "同一任务证据修复完成，未修改源码、配置或测试，未创建新提交。HEAD/tree/lineage/clean 基线重新核验；准备态 runtime package 已从旧 dist pin 刷新到 exact HEAD 66b661fc 的 live dist，freshness、manifest、dist、loaded entry 与新鲜 tarball 哈希全部对齐。commit craftEvidence 现只使用 machine-resolvable commit 字段；此前行为修复、RED/GREEN、双宿主、边界扫描、全量测试、自审与最小变更证据完整保留。",
+  "evidenceRefs": [
+    "AlembicPlugin@66b661fcba81647968b104224138a99a134401c4",
+    "tree:8e29eff75db807d31d811e07edf4ebf47390c742",
+    ".tmp/wakeflow-i8r-host-neutral-errors-evidence-repair/pack/alembic-runtime-0.3.0.tgz",
+    "runtime-package:sha256:0ae60dd195929f87efa1f074a0a9e185f03406ed0562eb45e00fafe657b415f8",
+    "alembic-guard:guard-public-ms1nkf3p-2",
+    "red:vitest-real-sdk-search-timeout-contract-mismatch",
+    "green:focused-48-unit-1661-integration-665"
+  ],
+  "verification": [
+    "Git evidence repair baseline/final: HEAD 66b661fcba81647968b104224138a99a134401c4, tree 8e29eff75db807d31d811e07edf4ebf47390c742, lineage 2a36c9b -> 60dc367 -> 66b661f, worktree clean, no new commit.",
+    "npm run prepare:codex-runtime-package: passed; prepared root .tmp/alembic-runtime-package, entry dist/bin/host-mcp.js, package alembic-runtime@0.3.0.",
+    "npm run check:runtime-pack-freshness: PASS; clean-build source/commits/loaded-entry e2ff192fb524; prepared dist pin now equals live dist 56a785649b39; prepared manifest unchanged and entry hash agrees.",
+    "Prepared boundary: pluginCommit 66b661fc, distContentHash 56a785649b3987a8619af43ab8c76549e7243de054c90abad89ccf89fb76c1b2, buildManifestHash 2b0ba9108b80979b05b455e545becf9119044bd54e3fdb6eca8c5147054d422a, publicEntryHash e2ff192fb524532e90ee8ff2902c71dca13342fca22944da19f133f76ea48a0c.",
+    "Fresh tarball .tmp/wakeflow-i8r-host-neutral-errors-evidence-repair/pack/alembic-runtime-0.3.0.tgz SHA-256 0ae60dd195929f87efa1f074a0a9e185f03406ed0562eb45e00fafe657b415f8; 1408 files, unpackedSize 45930399; in-tar manifest and entry hashes equal prepared/live values.",
+    "Existing unchanged-HEAD behavior evidence retained: real SDK RED before fix; 48/48 focused including Search/Graph/Recipe Map timeout and dual-host parity; unit 1661/1661; integration 665/665; build/check/distribution/runtime/plugin/smoke gates passed.",
+    "Alembic Guard guard-public-ms1nkf3p-2 covered all 8 changed files from commit 66b661fc; only five pre-existing advisory whole-file warnings, none on new projector/taxonomy/registry/transport lines."
+  ],
+  "risks": [
+    "Prepared tarball and package root are ignored local review artifacts under .tmp; their exact paths and SHA-256 are supplied for controller review.",
+    "No Test-window dispatch was authorized or used."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "66b661fcba81647968b104224138a99a134401c4",
+      "verify": "git rev-parse HEAD HEAD^{tree}, git log -3 --format='%H %T %P %s', git status --short --branch, and git diff --check confirm cumulative lineage 2a36c9b6c61ec765f54c8660f510c779b2bbc05c -> 60dc367264059f9fe8eef7e09d12f874278936bd -> 66b661fcba81647968b104224138a99a134401c4; current tree 8e29eff75db807d31d811e07edf4ebf47390c742; worktree clean; evidence repair created no commit."
+    },
+    {
+      "kind": "test-first",
+      "ref": "test/unit/HostNeutralMcpErrors.test.ts",
+      "value": "RED at unchanged implementation lineage: real SDK Search timeout returned alembic-search-output-contract-mismatch with retryable=false and no top-level _meta before the projector repair; GREEN after the existing 66b661fc fix.",
+      "verify": "npm exec vitest -- run test/unit/HostNeutralMcpErrors.test.ts -t 'preserves a real SDK Search timeout through the search projector'; original RED exited 1 for the precise mismatch and post-fix focused suite passed."
+    },
+    {
+      "kind": "mcp-transport-red-green",
+      "ref": "test/unit/HostNeutralMcpErrors.test.ts",
+      "value": "Real SDK Client + InMemoryTransport + HostMcpServer validates Search/Graph/Recipe Map timeout as a legal CallToolResult with top-level _meta, isError=true, diagnostic/error TOOL_TIMEOUT and core.failure.timeout.",
+      "verify": "Controller independently re-ran the exact-HEAD focused transport group 48/48; target post-fix focused group also passed 48/48."
+    },
+    {
+      "kind": "dual-host-parity",
+      "ref": "test/unit/HostNeutralMcpErrors.test.ts",
+      "value": "Codex and Claude Code shared HostMcpServer generic failure outputs remain host-neutral and behaviorally identical.",
+      "verify": "HostNeutralMcpErrors 6/6 passed at unchanged HEAD 66b661fc."
+    },
+    {
+      "kind": "boundary-scan",
+      "ref": "lib/host-runtime/mcp",
+      "value": "Runtime CODEX_MCP_ERROR occurrences are limited to the deprecated error-taxonomy decoder/alias; shared generic error text is Plugin-owned and no cross-repository files changed.",
+      "verify": "Prior exact-HEAD rg scans remain applicable; evidence repair changed only ignored .tmp package artifacts."
+    },
+    {
+      "kind": "runtime-package",
+      "ref": ".tmp/wakeflow-i8r-host-neutral-errors-evidence-repair/pack/alembic-runtime-0.3.0.tgz",
+      "value": "Fresh alembic-runtime@0.3.0 tarball SHA-256 0ae60dd195929f87efa1f074a0a9e185f03406ed0562eb45e00fafe657b415f8, 1408 files, unpackedSize=45930399. Prepared boundary pins pluginCommit=66b661fcba81647968b104224138a99a134401c4, distContentHash=56a785649b3987a8619af43ab8c76549e7243de054c90abad89ccf89fb76c1b2, buildManifestHash=2b0ba9108b80979b05b455e545becf9119044bd54e3fdb6eca8c5147054d422a and publicEntryHash=e2ff192fb524532e90ee8ff2902c71dca13342fca22944da19f133f76ea48a0c.",
+      "verify": "npm run prepare:codex-runtime-package passed; npm run check:runtime-pack-freshness passed all clean-build, .tmp freshness-pin and manifest/loaded-entry checks. shasum verified repo/prepared/tarball manifest and host-mcp entry hashes agree; tarball contains package/dist/.build-manifest.json, package/dist/bin/host-mcp.js and package/package.json. Git remained clean."
+    },
+    {
+      "kind": "tests",
+      "ref": "test/unit/HostNeutralMcpErrors.test.ts",
+      "value": "At unchanged exact HEAD: focused=48/48, unit=1661/1661, integration=665/665; build:check, check, build and all named distribution/runtime/plugin/smoke gates passed. This evidence-only repair additionally passed runtime prepare and freshness checks.",
+      "verify": "Existing exact-HEAD raw validation evidence is unchanged; current repair ran npm run prepare:codex-runtime-package and npm run check:runtime-pack-freshness successfully without source changes."
+    },
+    {
+      "kind": "self-review",
+      "value": "Rework response: agree that descriptive commit ref caused artifact-missing and that prepared runtime pin was stale. Fixed only those evidence/runtime-artifact issues. Stage 1: all six controller repair points satisfied with no source/config/test edit or commit. Stage 2: no high/medium/low code findings because diff is empty; package hashes and Git cleanliness independently rechecked.",
+      "verify": "TargetResult commit item contains only commit, no ref. Freshness PASS and git status --short empty after packing."
+    },
+    {
+      "kind": "minimal-change",
+      "value": "Evidence repair only: no source, config or test changes; no new commit; no new protocol/framework; no Core/Main/Agent/Dashboard/Test/Wakeflow/vendor/cache/cold-start/CAS/Recipe behavior changes.",
+      "verify": "git rev-parse HEAD/tree unchanged and git status --short empty after all commands."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1.json",
+    "deliveryRunId": "run-dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1-20260726t1010",
+    "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 182,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8r-alembic-plugin-host-neutral-mcp-errors-p1",
+    "targetTaskId": "i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1",
+    "resultId": "tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "createdAt": "2026-07-26T10:39:02.367Z"
+  },
+  "createdAt": "2026-07-26T10:39:02.367Z",
+  "stateRevisionObserved": 182,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 3,
+  "supersedes": {
+    "resultId": "tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1__dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1__current-r0002.json"
+  }
+}

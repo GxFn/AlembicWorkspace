@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i8-alembic-plugin-public-serving-compatibility-rootcause2-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "执行 I8 AlembicPlugin public-serving compatibility root-cause combined package。基线必须为干净的 AlembicPlugin@aba8c511be2a0de812fb8e9976062090fe49998d/tree 692dfa44f2b9b8cead5adde2755cc6396b75a643；通过 workspace file dependency 精确消费已接受 AlembicCore@d4de7edd6bbfaeb36a01b3cc243ba1617c001f65，并以已接受 Alembic Main@5a92ec24c24ba0992515fae884a510dc6c0a61f4 的真实 fixed publication bundle 为唯一 producer contract。旧 I8 blocker 已被 Main 物理产物关闭；不得继续从旧 Main 源码结论出发，也不得复用旧 blocked task。\n\n完成链路：\n1) 在现有 ProjectRuntimeContext/EmbeddedToolExecutor 公共链路内增加 ordinary strict publication resolver。只从 accepted dataRoot 推导 .asd/context/recipe-publications/{marker.json,active.json,snapshots/<snapshotId>/...}；验证 Core StrictPublicationMarkerV1、project/scope identity、migration bundle、Core PublicKnowledgeRouteV1 canonical hash/bytes、snapshotId confinement/no-symlink、ServingSnapshotManifest、candidate-data-manifest、FinalCoverageBindingReceipt、ServingSnapshotValidationReceipt 和逐文件 hash。不得接收 caller path/root override。\n2) 保持兼容分流准确：marker absent 才允许现有 legacy reader；valid strict marker + active route absent 时 Search/Prime/Recipe Map/Guard 返回 typed knowledge-unavailable，绝不回退 legacy DB/vector，Graph 仍从真实 projectRoot 读取 live source；marker/route/manifest/hash/project/migration 损坏或不匹配 fail closed。ProjectRuntimeContext 公开 bounded publication provenance（mode/route state/session/snapshot/vector/source hashes），不公开绝对 snapshot path/private revision。\n3) Search/Prime/Map/Guard 只使用 CAS pointed snapshot 的 exact SQLite、sanitized serving config、Recipe files、selected vector generation/store/manifest。收窄 createReadOnlySearchSnapshot 的 legacy hard-coded vector_index.asvec 假设：strict mode 必须加载 route 指定 generation/hash 并验证 present/expected IDs、model/dimension/corpus binding；不得静默退到 legacy vector 或 keyword-only 后宣称 vector compatibility。所有 public calls 保持物理只读、不产生 WAL/SHM、hit/adoption/guard write。\n4) Recipe Map 从 fixed snapshot 的 exact final-coverage.json 读取覆盖结论并提供 bounded summary+continuation；Recipe mount/accounting 与 project coverage 分字段，不从 Graph、coverage_ledger 或 PC-F probe 重建 final coverage。Graph 不读取 DB/Recipe/mount，继续 live-source/Recipe-free，只携带同一 publication provenance 和 source-revision match 状态。\n5) 添加可移植、versioned strict-publication-v1 serving fixture，由已接受 Core/Main synthetic physical artifact 生成或字节固定，钉住 marker/route/manifest/data/vector/final-coverage hashes。通过现有 EmbeddedToolExecutor 正式 schemas/handlers 做 I8 compatibility：Search/Prime/Map/Guard 从 pointed fixture 返回同一 session/snapshot/vector provenance，Graph 只返回 source structure；覆盖 marker absent/strict route null/corrupt marker、canonical route drift、DB/Recipe/vector/manifest/final-coverage tamper、cross-generation/cross-project、traversal/symlink、read-only。该 fixture 是兼容性证据，不得声称 MR5/SP/BiliDili 的正式五工具已通过；真实每场景矩阵只在 CAS 后 T6。\n6) 对 Plugin 内 reachable public five-tool reader 及其 repository/vector hooks 做入口 inventory；strict marker 生效后禁止任何 public MCP 路径绕过 resolver 读 legacy live DB/vector，且 legacy EventBus/StagingManager/afterPublish 不得进入 public read。只修与五工具 strict serving 直接相连的入口，不新增平台/service 或无关重构。\n\n强边界：Plugin 继续唯一拥有正式 MCP handlers/schemas；不得修改 Core/Main/Agent/Dashboard/Design/Test/Wakeflow/vendor/gitlink/cache，不得导入 Alembic Main，不得增加 CandidatePublicationHandle、candidate/private reader、Main checkpoint/revision access、path override、pre-CAS execution mode或跨仓 transport；不得把 fixture 变成第二套协议。Graph 不因 Recipe 缺失失败，四知识工具不因 live legacy DB 存在而绕过 strict route-null。不得启动真实 MR5/SP/Alembic/BiliDili Test。\n\n验证与完成定义：先在现有正式 EmbeddedToolExecutor/五 executor 上证明 RED（strict marker/bundle 存在仍解析 legacy databasePath/vector，Map 未读取 exact final coverage），再最小修复。运行 exact Core/Main artifact/hash probe、build:check、check、test:unit、targeted public-resolver/five-handler/route-null/vector/Map/Graph tests、integration/full tests、build、smoke:codex-plugin、verify:codex-plugin、verify:plugin-distribution、verify:codex-runtime-package、scope/layer/repo/Core/retired/ring/shared-asset gates，并让既有 order-sensitive vector group 连续成组通过。仓库窗口提交一个新的干净 Plugin commit；回填 parent/commit/tree、changed files/symbols、fixture manifest/hash、五 handler schema/output/provenance矩阵、route-null/negative/raw command evidence、两阶段自审、风险和 T6 handoff。完成后只返回总控，不自行启动 Test。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§15.3-15.4,16,18.4; accepted Core@d4de7edd6bbfaeb36a01b3cc243ba1617c001f65; accepted Main@5a92ec24c24ba0992515fae884a510dc6c0a61f4; accepted blocked Plugin result tr-i8-alembic-plugin-public-serving-compatibility-redesign1-t1 revision 2; controller acceptance evt-20260716162041-0120",
+  "designIntent": "复用现有 ProjectRuntimeContext、EmbeddedToolExecutor 和五个正式 read-only executors，增加一个固定路径 strict publication resolver；四知识工具只读 pointed snapshot，Graph 保持 live-source/Recipe-free，不读取 run-private candidate。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "exact-artifact-compatibility",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "public-five-handler-fixture-tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "route-null-isolation",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "vector-generation-consumption",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "boundary-scan",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "baseline"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "change-scope"
+      },
+      {
+        "kind": "runtime-package"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T16:24:18.935Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i8-alembic-plugin-public-serving-compatibility-rootcause2-t1",
+      "taskPackageId": "i8-alembic-plugin-public-serving-compatibility-rootcause2-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "关闭 Plugin 公共五工具对 strict publication 的消费断链：fixed resolver、route-null isolation、exact snapshot/vector/final-coverage provenance 与 versioned serving fixture 兼容性；提交单一 Plugin commit。",
+      "status": "pending",
+      "createdAt": "2026-07-16T16:24:18.935Z"
+    }
+  ]
+}

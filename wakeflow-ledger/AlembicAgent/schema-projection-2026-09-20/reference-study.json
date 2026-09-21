@@ -1,0 +1,401 @@
+{
+  "title": "工具schema查询、动作allowlist与宿主可用性：官方与腾讯实现的有界参考",
+  "recordedAt": "2026-09-20T12:45:06.820893+00:00",
+  "scope": {
+    "tencentRoot": "../../TencentDB-Agent-Memory",
+    "tencentHead": "06414ac10766b9bd61e4a69f3cf0ea414afb6d4f",
+    "agentHead": "a99497ed9463a61c4b3adbc396e654ac5367d78a",
+    "priorStudy": "tmp/interface-study-2026-09-20/tencent-ports.json",
+    "changes": "仅此ignored研究产物；不改产品/测试/邻仓、不运行provider/服务/写工具，不提交。",
+    "coverage": "沿用先前工具/host线索，只读相关声明和真实调用路径，不声称腾讯全仓审计。"
+  },
+  "officialSources": [
+    {
+      "id": "MCP_TOOLS",
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools",
+      "accessed": "2026-09-20",
+      "sections": [
+        "Capabilities",
+        "Listing Tools",
+        "Calling Tools",
+        "Security Considerations"
+      ],
+      "facts": "latest重定向该版本。工具列表允许为空，可按本次授权变化；list与call是独立操作。服务器仍须验证输入并实施访问控制。",
+      "inference": "Alembic可借鉴分离边界；不能把列在schema里推断为已授权执行，也不需要移植MCP wire协议。"
+    },
+    {
+      "id": "MCP_AUTH",
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization",
+      "accessed": "2026-09-20",
+      "sections": [
+        "Purpose and Scope",
+        "Access Token Usage",
+        "Runtime Insufficient Scope Errors"
+      ],
+      "facts": "这是HTTP transport授权规范；每次HTTP请求携带授权，服务器验证token和目标audience，并区分缺权限。",
+      "inference": "本地ToolRouter应复用每次调用的可信策略上下文；不据此增加OAuth实现或新的审批流程。"
+    },
+    {
+      "id": "FASTIFY_SCHEMA",
+      "url": "https://fastify.dev/docs/latest/Reference/Validation-and-Serialization/",
+      "accessed": "2026-09-20",
+      "sections": [
+        "Core concepts",
+        "Adding a shared schema",
+        "Validation"
+      ],
+      "facts": "请求validator和响应serializer是不同职责，可共享注册的JSON Schema；数据库等异步工作应放在验证后的hook。",
+      "inference": "注册表复用schema定义，但schema验证与宿主/业务可执行性分别检查；不用新增Fastify/AJV依赖来重写现有runtime。"
+    },
+    {
+      "id": "FASTIFY_TYPES",
+      "url": "https://fastify.dev/docs/latest/Reference/Type-Providers/",
+      "accessed": "2026-09-20",
+      "sections": [
+        "Type Providers"
+      ],
+      "facts": "可由inline JSON Schema推导TypeScript类型，减少schema与类型的双维护。",
+      "inference": "Alembic应复用现有TOOL_REGISTRY和公共类型；实际需要共享的是定义/筛选语义，不是新框架。"
+    },
+    {
+      "id": "TYPESCRIPT",
+      "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions",
+      "accessed": "2026-09-20",
+      "facts": "类型断言编译后被移除，不能提供运行时检查。",
+      "inference": "宿主方法存在性仍需真实typeof检查；未知端口不能靠as SomePort宣布可执行。"
+    }
+  ],
+  "patterns": [
+    {
+      "id": "SCHEMA-1",
+      "recommendation": "在既有TOOL_REGISTRY上复用一个action选择/规范化逻辑，供provider schema、meta查询和执行许可判断使用；不要再维护第二份业务action表。",
+      "evidence": [
+        "agentRegistry",
+        "agentLightSchema",
+        "agentCatalogNormalize",
+        "tencentSkillDefinition",
+        "tencentStorageSchema",
+        "tencentStandaloneSchema"
+      ],
+      "official": [
+        "FASTIFY_SCHEMA",
+        "FASTIFY_TYPES"
+      ],
+      "adoption": "保留schema展示所需的轻量/完整差异，但允许的tool/action集合必须一致。优先规范化既有字符串数组/ActionAllowlist入口；查询返回的schema是DTO，不能把handler或可变注册表引用泄漏给调用者。",
+      "dontCopy": "腾讯skill tool()实现是定义/执行合置的正例，但本地FS与StorageAdapter分别手写相同schema，Proxy提示目录和endpoint集合也不是真正单源。不要把它描述成全仓统一registry已完成。",
+      "validation": [
+        "固定一个capability，比较轻量schema、meta.tools和实际execute可达动作；非法/禁止动作即使直接调用也拒绝。",
+        "读出的schema修改后不影响静态TOOL_REGISTRY或另一请求。",
+        "保留现有RuntimeCapabilityCatalog null/undefined entry及字符串tool-id数组的公开兼容语义，不静默改成另一套意思。"
+      ]
+    },
+    {
+      "id": "SCHEMA-2",
+      "recommendation": "发现、授权、宿主可用性分开表达；执行路径始终重查授权及真实能力，不能依赖模型看过哪个schema。",
+      "evidence": [
+        "tencentProxyComposition",
+        "tencentProxyProjection",
+        "tencentProxyEndpointGate",
+        "tencentProxyWriteGate",
+        "tencentProxyHttpEntry",
+        "agentExecution",
+        "agentMeta",
+        "agentExplain"
+      ],
+      "official": [
+        "MCP_TOOLS",
+        "MCP_AUTH"
+      ],
+      "adoption": "Router已有执行allowlist闸；meta.tools应投影该许可视图，explain应复用同一许可判断。宿主缺方法应给port-unavailable，和permission-denied/unknown-action区分。可用性检查保持只读，不执行I/O或创建资源来探测。",
+      "dontCopy": "Prompt中隐藏工具只是发现策略。腾讯Proxy的真正限制在skill-bridge路由；不能只抄injector分支。MCP的HTTP OAuth机制不是本地Agent增加鉴权壳的要求。",
+      "validation": [
+        "capability只准knowledge.detail时，meta/tools schema不得声称manage可用，直接manage也不得调用任何host方法。",
+        "同一tool在两个可信请求上下文的能力不同，展示/执行结果各自隔离。",
+        "schema/explain查询后宿主方法撤销或策略变化，实际execute仍重新检查，旧查询结果不是授权凭据。"
+      ]
+    },
+    {
+      "id": "SCHEMA-3",
+      "recommendation": "过滤应只缩小能力；显式空allowlist与缺省未限制必须分开，空集合不得触发默认工具fallback。",
+      "evidence": [
+        "tencentEmptyTools",
+        "tencentAttachTools",
+        "agentCatalogNormalize",
+        "agentLightSchema"
+      ],
+      "official": [
+        "MCP_TOOLS"
+      ],
+      "adoption": "明确undefined/null兼容含义、空对象/空数组、全是未知动作的行为；枚举投影与执行使用同一结果。过滤到0动作应省略该工具的模型schema或返回明确空列表，不能发invalid enum:[]后再回落全集。",
+      "dontCopy": "腾讯runner的params.tools={}且enableTools=true会经默认分支安装read/write/edit；这是源码可确定的装配行为，不把空对象当deny-all。这是本轮的反例而非建议修腾讯。",
+      "validation": [
+        "undefined、{}、[]、{knowledge:[]}、仅未知tool/action分别走确定分支；空集得到0业务handler调用。",
+        "显式none过滤后没有默认读写工具出现；不因兼容/重试/fallback扩权。"
+      ]
+    },
+    {
+      "id": "SCHEMA-4",
+      "recommendation": "schema只承载业务参数；真实身份、端口和最末业务权限继续由可信宿主与Core负责，接口签名不能代替真实接线。",
+      "evidence": [
+        "tencentSkillBinding",
+        "tencentSkillCall",
+        "tencentSkillCoreAuthority",
+        "tencentProxyIdentity",
+        "tencentProxyForward",
+        "tencentOpenClawHost",
+        "tencentOpenClawGap",
+        "agentKnowledgeCapability"
+      ],
+      "official": [
+        "TYPESCRIPT",
+        "FASTIFY_SCHEMA"
+      ],
+      "adoption": "保留本轮已有KnowledgeRead/ManagementPort与显式优先规则，在相同真实router入口检查方法。宿主声明可用性只能是提示或结构证据，调用前仍验证；Core真实受控服务负责身份/所有权/生命周期，Agent不复制。",
+      "dontCopy": "腾讯OpenClaw wrapper没有转发LLMRunParams.tools/enableTools/abortSignal等，即便同为LLMRunner也不等能力。不要从类型或factory存在推断工具已接通；也不搬运Proxy通过curl/提示文本承载协议的方式替换Alembic真实ToolRouter。",
+      "validation": [
+        "显式端口缺方法、异常、错误注入、缺可信身份均返回现有明确错误，不回落raw repo。",
+        "body中的伪造身份不覆盖宿主绑定；只有实际合法Core调用发生。",
+        "保留真实adapter/factory→handler/controlledCore路径测试，不用仅局部selector测试代替。"
+      ]
+    }
+  ],
+  "actualChains": [
+    {
+      "name": "MemoryCore domain-native tools",
+      "flow": [
+        "SkillExtractor.extract createSkillTools",
+        "AI SDK tool object contains schema+execute",
+        "StandaloneLLMRunner selects params.tools",
+        "execute invokes SkillCore with closure identity",
+        "SkillCore team/owner/version checks",
+        "successful result appended to auditSink"
+      ],
+      "refs": [
+        "tencentSkillCall",
+        "tencentSkillDefinition",
+        "tencentSkillBinding",
+        "tencentEmptyTools",
+        "tencentSkillCoreAuthority"
+      ]
+    },
+    {
+      "name": "MemoryProxy prompt-discovered HTTP bridge",
+      "flow": [
+        "injection registry registers SkillToolsInjector with allowLlmWrite",
+        "prompt projects allowed read/write descriptions",
+        "server registers bridge handler",
+        "request endpoint/write gates",
+        "session identity overrides model body",
+        "real upstream Core call"
+      ],
+      "refs": [
+        "tencentProxyComposition",
+        "tencentProxyProjection",
+        "tencentProxyHttpEntry",
+        "tencentProxyEndpointGate",
+        "tencentProxyWriteGate",
+        "tencentProxyIdentity",
+        "tencentProxyForward"
+      ]
+    },
+    {
+      "name": "External knowledge discovery, not local execution",
+      "flow": [
+        "knowledge injector capability-filters resources",
+        "injects tools/list and tools/call recipes",
+        "model delegates to existing host Bash/curl",
+        "external knowledge service owns actual tools and authorization"
+      ],
+      "refs": [
+        "tencentKnowledgeFilter",
+        "tencentKnowledgeDiscovery"
+      ],
+      "limit": "本地injector不实现远端knowledge tools/list或tools/call的handler/权限，不能据此宣称远端授权已审完。"
+    }
+  ],
+  "localReferences": {
+    "tencentSkillDefinition": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/core/skill/skill-tools.ts",
+      "line": 144,
+      "evidence": "skill_update inputSchema与execute在同一tool定义；155调用Core.update，156成功后记auditSink。"
+    },
+    "tencentSkillBinding": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/core/skill/skill-tools.ts",
+      "line": 55,
+      "evidence": "createSkillTools闭包绑定core/user/team/agent/task，readIds与writeIds分开。"
+    },
+    "tencentSkillCall": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/core/skill/skill-extractor.ts",
+      "line": 223,
+      "evidence": "创建该工具集并于235-240传入runner.run({tools,enableTools:true})。"
+    },
+    "tencentSkillCoreAuthority": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/core/skill/skill-core.ts",
+      "line": 310,
+      "evidence": "update真实执行时requireHead、assertOwnerWrap、assertVersionFreshWrap。"
+    },
+    "tencentProxyComposition": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/injection/index.ts",
+      "line": 309,
+      "evidence": "allowLlmWrite配置注入SkillToolsInjector。"
+    },
+    "tencentProxyProjection": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/injection/injectors/skill-tools-injector.ts",
+      "line": 176,
+      "evidence": "根据allowLlmWrite只投影允许的写工具说明。"
+    },
+    "tencentProxyHttpEntry": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/server.ts",
+      "line": 124,
+      "evidence": "createSkillBridgeHandler注册到实际POST /skill-bridge/*。"
+    },
+    "tencentProxyEndpointGate": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/skill/skill-bridge.ts",
+      "line": 464,
+      "evidence": "每次真实请求检查ALLOWED_SUBPATHS，非法endpoint直接403。"
+    },
+    "tencentProxyWriteGate": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/skill/skill-bridge.ts",
+      "line": 533,
+      "evidence": "同一allowLlmWrite配置在执行路由重新检查WRITE_SUBPATHS，不依赖模型是否看过说明。"
+    },
+    "tencentProxyIdentity": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/skill/skill-bridge.ts",
+      "line": 491,
+      "evidence": "从已初始化session绑定身份，缺失则401；715-720用绑定值覆盖inboundBody身份字段。"
+    },
+    "tencentProxyForward": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/skill/skill-bridge.ts",
+      "line": 861,
+      "evidence": "宿主service token与租户header在bridge生成，874才执行真实fetcher。"
+    },
+    "tencentHandLists": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/skill/skill-bridge.ts",
+      "line": 140,
+      "evidence": "ALLOWED_SUBPATHS与161 WRITE_SUBPATHS两张手工集合；和injector文字目录分开维护。"
+    },
+    "tencentEmptyTools": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/adapters/standalone/llm-runner.ts",
+      "line": 292,
+      "evidence": "params.tools非空才被视为callerProvided；空对象在enableTools=true时经317-325安装默认storage或本地FS工具。"
+    },
+    "tencentAttachTools": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/adapters/standalone/llm-runner.ts",
+      "line": 346,
+      "evidence": "仅非空实际tools附加到模型请求；为空时省略tools/stopWhen。"
+    },
+    "tencentStandaloneSchema": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/adapters/standalone/llm-runner.ts",
+      "line": 134,
+      "evidence": "本地FS read schema；158 write、184 edit在同文件另定义。"
+    },
+    "tencentStorageSchema": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/adapters/standalone/storage-tools.ts",
+      "line": 64,
+      "evidence": "StorageAdapter版read schema；92 write、117 edit与本地FS版重复维护。"
+    },
+    "tencentStorageRuntimeGate": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/adapters/standalone/storage-tools.ts",
+      "line": 72,
+      "evidence": "每次execute在实际readFile前再次resolveStorageKey检查路径边界；write于101同样检查。"
+    },
+    "tencentOpenClawHost": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/adapters/openclaw/host-adapter.ts",
+      "line": 53,
+      "evidence": "宿主adapter将api.runtime.agent注入OpenClawLLMRunnerFactory。"
+    },
+    "tencentOpenClawGap": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryCore/src/adapters/openclaw/llm-runner.ts",
+      "line": 43,
+      "evidence": "共享LLMRunParams只转发7个字段；未转发per-call tools/enableTools/abortSignal，factory固定enableTools于86-99。"
+    },
+    "tencentKnowledgeDiscovery": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/injection/injectors/knowledge-tools-injector.ts",
+      "line": 211,
+      "evidence": "真实实现是注入curl说明：先tools/list，再tools/call；不向body.tools注册本地native handler。"
+    },
+    "tencentKnowledgeFilter": {
+      "repo": "TencentDB-Agent-Memory",
+      "path": "MemoryProxy/src/injection/injectors/knowledge-tools-injector.ts",
+      "line": 87,
+      "evidence": "assetCapabilities只过滤prompt知识资源；实际外部知识服务权限不在该injector实现内。"
+    },
+    "agentRegistry": {
+      "repo": "AlembicAgent",
+      "path": "src/tools/runtime/registry.ts",
+      "line": 727,
+      "evidence": "既有TOOL_REGISTRY保有action params/handler等元信息，应继续作为定义单源。"
+    },
+    "agentLightSchema": {
+      "repo": "AlembicAgent",
+      "path": "src/tools/runtime/registry.ts",
+      "line": 870,
+      "evidence": "generateLightweightSchemas直接使用allowedTools的数组；actionParamsSchema按单动作展开、多个动作摘要。"
+    },
+    "agentCatalogNormalize": {
+      "repo": "AlembicAgent",
+      "path": "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts",
+      "line": 91,
+      "evidence": "另有normalizeAllowedTools；null/undefined entry意为该工具全部action，非法action过滤，空集合保留。"
+    },
+    "agentExecution": {
+      "repo": "AlembicAgent",
+      "path": "src/tools/runtime/router.ts",
+      "line": 65,
+      "evidence": "参数验证后70检查capability，93才进入handler。"
+    },
+    "agentMeta": {
+      "repo": "AlembicAgent",
+      "path": "src/tools/runtime/handlers/meta.ts",
+      "line": 38,
+      "evidence": "meta.tools直接消费ctx.toolRegistry；46/62列全tool/action，尚不投影当前capability。"
+    },
+    "agentExplain": {
+      "repo": "AlembicAgent",
+      "path": "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+      "line": 145,
+      "evidence": "explain仅解析/查注册存在，163返回allowed=true，没有复用router capability判断。"
+    },
+    "agentKnowledgeCapability": {
+      "repo": "AlembicAgent",
+      "path": "src/tools/runtime/handlers/knowledge/queries.ts",
+      "line": 14,
+      "evidence": "新KnowledgeReadPort有运行时getById函数检查，225-229保留显式端口优先且缺方法不能fallback。"
+    }
+  },
+  "independentDesignReviewChecklist": [
+    "同一规范化allowlist驱动provider schema/meta详情/execute/explain，入口兼容语义有明确测试。",
+    "注册存在、运行许可、宿主方法可用性、Core领域规则分别有owner；无第二份authority。",
+    "meta/explain只读，不能通过contextFactory探测执行或改变store/cache/账本。",
+    "空集合/未知条目/重复action/原型属性名边界不会扩大可用动作；查询结果可变时不会污染注册表。",
+    "按请求或run的策略/可用性缓存含完整身份与版本，不能复用其他上下文的可用结果。",
+    "主路径和直接router入口仍有permission/port检查；取消及已确认写入回执继续原语义。"
+  ],
+  "limitations": [
+    "未修改腾讯代码、未运行腾讯provider或HTTP服务；空工具fallback和OpenClaw字段丢失由实际分支/参数转发静态证明。",
+    "未对腾讯整个权限系统做安全审计；这里的正例仅限已追踪到的真实桥接/SkillCore路径。",
+    "只核对Alembic当前入口作为落点；root设计尚未提供，checklist不是已完成独立设计验收。",
+    "网络仅查询官方/原作者技术文档，建议明确标为由材料推导。"
+  ],
+  "noCommitReason": "只读研究；实现和最终独立设计复审由root后续指派。"
+}

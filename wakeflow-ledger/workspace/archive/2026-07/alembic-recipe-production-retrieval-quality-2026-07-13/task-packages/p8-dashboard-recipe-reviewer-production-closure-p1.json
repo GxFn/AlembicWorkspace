@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p8-dashboard-recipe-reviewer-production-closure-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "在已验收 Core 5106e8a9f47a12a52614d77cb5e3908462a4a49c 与 Alembic 849766b56a10c6e808a0a75ffbb2a8b8f938c791 合同上，只修改 AlembicDashboard，完成 Recipe reviewer 迁移。消费生成/真实 API 中 retrievalProfile、GET /knowledge/{id}/retrieval-readiness、现有合法 PATCH/lifecycle publish 与 recipe-index generation status/dry-run；在现有候选审阅/编辑工作流展示 profile schemaVersion、primaryLanguage、primarySummary、technicalSummaryEn、concepts、scenarios、exclusions、source-field provenance，展示 readiness ready、稳定 violations/warnings code、profileHash/documentSetHash，并展示 generation 状态/报告而不在前端复制 readiness 或索引维护逻辑。编辑只针对冷启动、增量、模块扫描、知识提交产生的 existing pending/staging Recipe ID；PATCH 必须完整 round-trip 保留未展示字段、retrievalProfile provenance 和未知扩展，不能用局部 payload 丢失数据。发布只由用户显式确认后调用现有合法 lifecycle endpoint；结构 readiness 失败显示稳定 code 并保持原状态，provider/vector/generation warning 只展示、不得禁用发布。删除 runtime UI 的 knowledgeCreate 调用、create payload builder 与 create 后 auto-publish 分支；模块扫描结果必须消费后端返回的现有 Recipe/candidate ID，不能发明第五个 producer。保留 loading/empty/error/partial/long-running 与失败恢复状态、现有视觉交互和基本可访问性。仅 AlembicDashboard；禁止修改 Alembic/Core/Agent/Plugin/Test/真实知识库，禁止本地计算 readiness、自动 rebuild/rollback、rank/provider gate、静态 mock 代替真实合同。先以旧实现补 RED，再实现 GREEN；覆盖 API/组件 contract、create-call absence scan、editor full round-trip + unknown extension preservation、readiness failure UI、provider warning non-gate、合法 publish confirmation、generation status/dry-run，以及 typecheck/build/lint/full tests；复杂 UI 必须浏览器验证并提供截图。提交一个基于当前 clean f26427682f45cce6ce5ce4304ce9dfde84c26f17 的单一干净 Dashboard commit。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "Review and repair retrieval profile/readiness on existing candidates without remaining a Recipe creation or auto-publish path.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "提供基于 AlembicDashboard f26427682f45cce6ce5ce4304ce9dfde84c26f17 的单一干净提交、parent、范围 diff 与 clean status；只改 AlembicDashboard。"
+      },
+      {
+        "kind": "tests",
+        "verify": "提供旧实现 RED 与 GREEN；API/组件 contract、knowledgeCreate/create payload/auto-publish absence、profile full round-trip/未知扩展保留、readiness failure、provider warning non-gate、显式合法 publish、generation status/dry-run；typecheck/build/lint/full tests 通过。"
+      },
+      {
+        "kind": "browser-screenshot",
+        "verify": "使用真实 Dashboard 页面/真实后端合同或可追溯 contract fixture 验证 profile/readiness/generation、loading/empty/error/partial/长任务与发布失败交互，并提供可审阅截图路径；mock 不得冒充后端连通性。"
+      },
+      {
+        "kind": "self-review",
+        "verify": "按严重级别复审最终 diff，证明没有前端 readiness 复制、第五 producer、自动 publish、字段丢失、provider/rank gate、跨仓修改或真实数据写。"
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "解释旧 knowledgeCreate→auto-publish 与 partial edit 如何绕过统一生产/丢失检索字段，以及新 existing-ID reviewer 链如何闭合。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green"
+      },
+      {
+        "kind": "api-contract"
+      },
+      {
+        "kind": "accessibility"
+      },
+      {
+        "kind": "scope-diff"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T19:48:27.917Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p8-dashboard-recipe-reviewer-production-closure-t1",
+      "taskPackageId": "p8-dashboard-recipe-reviewer-production-closure-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "实现 Dashboard reviewer 闭环：真实 profile/readiness/generation 审阅、无损编辑、显式合法发布，彻底删除 create/auto-publish 运行时路径。",
+      "status": "pending",
+      "createdAt": "2026-07-13T19:48:27.917Z"
+    }
+  ]
+}

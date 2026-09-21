@@ -1,0 +1,210 @@
+{
+  "title": "Dashboard语义索引入口改用独立embedding能力",
+  "recordedAt": "2026-09-21T07:03:34.341349+00:00",
+  "status": "implemented-verified-frozen",
+  "authority": "用户已授权两仓embedding/LLM解耦；Root补充授权HTTP composition唯一caller，沿用现有layer contract，不更改规则。",
+  "repo": "Alembic",
+  "baselineCommit": "999b60d294e35f196466394da8766e9cb140caae",
+  "editedFiles": [
+    "lib/tools/adapters/DashboardOperations.ts",
+    "lib/http/utils/dashboard-operation.ts",
+    "test/unit/CommandsFileRoutesAo3.test.ts"
+  ],
+  "noCommitReason": "Root执行最终聚合验证与Main提交；本子任务不提交。",
+  "changes": [
+    {
+      "path": "lib/tools/adapters/DashboardOperations.ts",
+      "line": 14,
+      "behavior": "在原DashboardOperationAiDeps保留既有LLM deps，新增必要的getEmbeddingProvider依赖。"
+    },
+    {
+      "path": "lib/tools/adapters/DashboardOperations.ts",
+      "line": 150,
+      "behavior": "rebuildSemanticIndex只以独立typed embedding端口为准；缺失/legacy-only时在任何container.get、clear、fullBuild或pipeline.run前抛Error，经既有Dashboard error envelope返回HTTP失败。无LLM但port已配置时允许原VectorService/IndexingPipeline分支。"
+    },
+    {
+      "path": "lib/http/utils/dashboard-operation.ts",
+      "line": 4,
+      "behavior": "HTTP composition静态相对import真实getEmbeddingProvider并注入；tools层不反向导入injection。"
+    },
+    {
+      "path": "lib/http/utils/dashboard-operation.ts",
+      "line": 45,
+      "behavior": "受影响handler的动态import改为相对路径，保持lazy且让Vitest源执行不再误用旧dist；编译ESM仍使用同目录关系。"
+    },
+    {
+      "path": "test/unit/CommandsFileRoutesAo3.test.ts",
+      "line": 75,
+      "behavior": "增加6个实际commandsRouter→Dashboard dispatch→handler回归；原2个文件路径安全用例保留。"
+    }
+  ],
+  "testFirst": [
+    {
+      "command": "Node22: node node_modules/vitest/vitest.mjs run test/unit/CommandsFileRoutesAo3.test.ts --reporter=dot",
+      "log": "tmp/dashboard-embedding-red.log",
+      "result": "RED:6 failed /2 existing passed",
+      "proof": "2个有独立embedding无LLM分支被AI gate挡住；4个LLM ready但无独立port或仅legacy embed分支返回成功并进入构建/清理。"
+    },
+    {
+      "log": "tmp/dashboard-embedding-green.log",
+      "result": "Intermediate failure:2 failed /6 passed",
+      "qualification": "新增#inject动态import找不到尚未build的dist。负向结果也可能是加载错，未将其认作GREEN。"
+    },
+    {
+      "log": "tmp/dashboard-embedding-diagnostic.log",
+      "result": "Intermediate targeted failure:2 failed /6 skipped",
+      "proof": "错误body明确Cannot find module #inject/EmbeddingProvider.js，促使改为HTTP层允许的静态相对import。"
+    },
+    {
+      "log": "tmp/dashboard-embedding-final-green.log",
+      "result": "Intermediate failure:6 failed /2 passed",
+      "qualification": "名称虽含green但实际仍失败；旧#tools动态import还在使用dist中的aiStatus gate。再改handler为相对动态import。"
+    },
+    {
+      "command": "Node22: node node_modules/vitest/vitest.mjs run test/unit/CommandsFileRoutesAo3.test.ts test/unit/ModuleScanExistingIdClosure.test.ts --reporter=dot",
+      "log": "tmp/dashboard-embedding-source-green.log",
+      "result": "GREEN:2 files /16 passed",
+      "proof": "源码handler已实际执行；负向断言匹配完整Independent embedding provider unavailable消息，且get/clear/build/run均0调用。其他Dashboard module-scan操作8例仍通过。"
+    }
+  ],
+  "verification": [
+    {
+      "command": "Node22: npm run typecheck",
+      "log": "tmp/dashboard-embedding-final-typecheck.log",
+      "exitCode": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "node scripts/lint-layer-contract.mjs",
+      "log": "tmp/dashboard-embedding-final-layer.log",
+      "exitCode": 0,
+      "result": "PASS:187 cross-area runtime imports;73 type-only bridges"
+    },
+    {
+      "command": "node scripts/lint-agent-extraction-boundary.mjs",
+      "log": "tmp/dashboard-embedding-agent-boundary.log",
+      "exitCode": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "node scripts/core-source-command.mjs lint-consumer-imports",
+      "log": "tmp/dashboard-embedding-core-boundary.log",
+      "exitCode": 0,
+      "result": "PASS:446 files,634 public Core imports"
+    },
+    {
+      "command": "node node_modules/@biomejs/biome/bin/biome check lib/tools/adapters/DashboardOperations.ts lib/http/utils/dashboard-operation.ts test/unit/CommandsFileRoutesAo3.test.ts test/unit/EmbeddingConfigurationRoute.test.ts",
+      "log": "tmp/dashboard-embedding-final-lint.log",
+      "exitCode": 0,
+      "result": "PASS:4 files/no changes"
+    },
+    {
+      "command": "git diff --check -- lib/tools/adapters/DashboardOperations.ts lib/http/utils/dashboard-operation.ts test/unit/CommandsFileRoutesAo3.test.ts",
+      "exitCode": 0,
+      "result": "PASS"
+    }
+  ],
+  "configurationRouteRecheck": {
+    "command": "Node22: node node_modules/vitest/vitest.mjs run test/unit/EmbeddingConfigurationRoute.test.ts --reporter=dot",
+    "log": "tmp/embedding-configuration-route-green.log",
+    "result": "7/7 passed",
+    "review": "只读核对当前GET/POST flags：按期望配置与当前固定实例比较空间/连接；部分model/key字段可保存，presave仅验证EMBED更新；配置/凭据hash不投影；LLM-only不被历史invalid embedding阻断。限定场景未发现新的已确认P1/P2。此步未修改该冻结测试或API产品代码。"
+  },
+  "setupServiceReadOnlyCheck": {
+    "path": "lib/cli/SetupService.ts",
+    "line": 761,
+    "finding": "实际gate为VectorService.getStats().embedProviderAvailable，不是LLM aiStatus.ready，因此没有本次同类功能阻断。",
+    "scope": "本子任务未编辑SetupService。Root另行仅修正原AI API Key提示文案；当前764能力gate和781 fullBuild逻辑保持。"
+  },
+  "selfReview": {
+    "passes": [
+      "真实路径和副作用前置：缺独立port在服务获取前失败；LLM状态不成为embedding授权；两个现有构建分支clear/force语义不变。",
+      "边界和兼容：唯一caller已接线，原AI deps保留，tools→injection只有type桥；旧非embed操作8回归通过；源与compiled ESM相对导入均可解析。"
+    ],
+    "knownP1P2": [],
+    "limits": [
+      "本闸验证已配置的独立typed端口，不执行远端健康探测。远端失败/代际迁移仍由既有向量服务处理。",
+      "测试的clear/fullBuild/run是可控服务端口；路由、dispatch、handler及embedding装配helper为真实实现，未请求模型或使用用户索引。",
+      "Core/规则/已冻结Isolation文件未修改。Root负责最终聚合check及build:self发布ESM验证。"
+    ]
+  },
+  "sourceSnapshot": [
+    {
+      "path": "lib/tools/adapters/DashboardOperations.ts",
+      "sha256": "e53532213003eb247de6d3c7ae9e0c0d1128b4e80d77baa5544dad4da385419e"
+    },
+    {
+      "path": "lib/http/utils/dashboard-operation.ts",
+      "sha256": "18174235e1153008f3ac7f4776e608aae5a651c3abe92c4ff2fb153339287257"
+    },
+    {
+      "path": "test/unit/CommandsFileRoutesAo3.test.ts",
+      "sha256": "c74335728856b8ec1322f4dbe827b9ad62d006d148a685afaecde19c512b8e8a"
+    }
+  ],
+  "evidenceLocators": [
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-red.log",
+      "sha256": "fa6ac688a1890ad1f9474275381245bb9f90d2217ed0803b7cd18c48259af408"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-green.log",
+      "sha256": "e7a25772358f760beabc3b86e6b5e94ef67791c56881cc552bf819ad625c02de"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-diagnostic.log",
+      "sha256": "823ba9cedb3b4ca2a80ac56e3590220a1fb7fd75251e31a126d9a07a50aeea7c"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-final-green.log",
+      "sha256": "518ec9edfc6c622df8b5f5476501b003aef779de3bb54422c63a894e7fd8a908"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-source-green.log",
+      "sha256": "e3eb099dfcc7e5b500f4602a39dce103a6fa2d369be0041b2849b2f07bdbbf6f"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-final-typecheck.log",
+      "sha256": "5c501382ae7a47415357264b4478e6c6c6504dcfba783edd6ec9e1f5a6d03f0c"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-final-layer.log",
+      "sha256": "6df0ee155d5627c85a787c6c5a8081c462d2bb8a21d774bf685db9f3de3158e8"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-final-lint.log",
+      "sha256": "d778912c028247c80a9f3b09b30afe587340ab301352c7497a84aaf10e4d7b56"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-agent-boundary.log",
+      "sha256": "672f6c776e841efae14b4da79b29505b6a73c288a8064f98f37507557034cb42"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/dashboard-embedding-core-boundary.log",
+      "sha256": "c53bc90dedbce62e74b1abf2ff4e3bb8e6b2ba4f87b730b94ac7cdc7970caa27"
+    },
+    {
+      "repo": "Alembic",
+      "ref": "tmp/embedding-configuration-route-green.log",
+      "sha256": "61e256da50fadcdc71a0fe53f4640915d456ded9a31659b5ebb41c7a3d63ccc7"
+    }
+  ],
+  "parentReportedFinalChecks": {
+    "source": "Root message, not independently rerun by subagent",
+    "buildSelf": "PASS",
+    "scoped": "9 files /84 tests passed",
+    "changedFilesLint": "PASS",
+    "compiledEsmProbe": "positive and negative entrypoints PASS",
+    "fullCheck": "Root comparing original19 failures plus one concurrent timeout; final audit remains Root-owned."
+  }
+}

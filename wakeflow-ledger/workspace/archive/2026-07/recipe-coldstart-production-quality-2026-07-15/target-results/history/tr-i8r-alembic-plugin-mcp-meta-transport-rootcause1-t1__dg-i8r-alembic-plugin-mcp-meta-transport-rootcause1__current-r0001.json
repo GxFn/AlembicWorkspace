@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-p1",
+  "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+  "status": "completed",
+  "summary": "Fixed the HostMcpServer tools/call boundary so EmbeddedToolExecutor publication provenance is explicitly moved from clean payload `_meta` into protocol-legal CallToolResult `_meta`, while all other payload fields remain subject to strict projectors. Added canonical legacy failure projection for Prime/Guard and repaired RecipeMap's current-schema failure envelope. Real SDK transport now passes Prime, Work, the formal five tools, route-null, and corrupt-publication paths.",
+  "evidenceRefs": [
+    "commit:1da4ef03ff988c8f99d864a470625e2d44fa8ea6",
+    "test/unit/McpCleanOutputContract.test.ts",
+    "test/unit/StrictPublicFiveToolCompatibility.test.ts",
+    "lib/host-runtime/mcp/output-contract.ts",
+    "lib/host-runtime/mcp/public-tools/output.ts",
+    "lib/host-runtime/mcp/knowledge-context-tools/recipe-map-output.ts"
+  ],
+  "verification": [
+    "RED: npx vitest run test/unit/StrictPublicFiveToolCompatibility.test.ts -t \"transports Prime and Work\" failed at HostMcpServer serialization with unrecognized `_meta` and SDK -32602.",
+    "GREEN focused: 6 files / 47 tests passed across clean-output, public-tool, schema-honesty, core/local tools, and strict public five compatibility.",
+    "npm run check passed.",
+    "npm run test:unit passed: 150 files / 1631 tests.",
+    "npm run build:check passed.",
+    "npm run build passed.",
+    "npm run smoke:codex-plugin passed, including runtime boundary/startup/install/shell/stdio.",
+    "npm run verify:codex-plugin passed.",
+    "npm run verify:plugin-distribution passed.",
+    "npm run verify:codex-runtime-package passed, including npm install and entrypoint probe.",
+    "Biome exact-file check and git diff --check passed; final worktree clean and main ahead by exactly one commit."
+  ],
+  "risks": [
+    "The currently loaded installed Alembic Guard runtime still reproduces the old `_meta` transport defect and could not review these files; no runtime reload was performed in this target window. Local fixed-source SDK transport and package probes passed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "1da4ef03ff988c8f99d864a470625e2d44fa8ea6",
+      "verify": "parent d901f6236843a43765297dda500e71aac80fe2c6; tree f3f03342f4216c3fd07511d36dbc30999fa29058"
+    },
+    {
+      "kind": "mcp-transport-red-green",
+      "value": "RED reproduced top-level `_meta` rejection through registered HostMcpServer tools/call; GREEN moves only protocol metadata to CallToolResult `_meta`.",
+      "verify": "npx vitest run test/unit/StrictPublicFiveToolCompatibility.test.ts -t \"transports all five\""
+    },
+    {
+      "kind": "prime-work-transport-tests",
+      "ref": "test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "verify": "Prime and Work passed real Client/InMemoryTransport/HostMcpServer calls; AgentPrimeOutputSchema and AgentWorkOutputSchema plus CallToolResultSchema accepted."
+    },
+    {
+      "kind": "public-five-transport-tests",
+      "ref": "test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "verify": "Search, Prime, RecipeMap, CodeGuard, and Graph passed registered tools/call with ready provenance; route-null and corrupt knowledge failures were schema-legal and Graph remained live."
+    },
+    {
+      "kind": "runtime-package",
+      "value": "Codex plugin/runtime packaging and distribution probes passed.",
+      "verify": "npm run build && npm run smoke:codex-plugin && npm run verify:codex-plugin && npm run verify:plugin-distribution && npm run verify:codex-runtime-package"
+    },
+    {
+      "kind": "tests",
+      "value": "Focused 47/47 and unit 1631/1631 passed; check/build gates passed.",
+      "verify": "npm run check; npm run test:unit; npm run build:check"
+    },
+    {
+      "kind": "boundary-scan",
+      "value": "Exactly five AlembicPlugin files changed; no cross-repository, Test, Wakeflow source, vendor, or state-doc product changes.",
+      "verify": "git show --stat HEAD; git status --short --branch"
+    },
+    {
+      "kind": "self-review",
+      "value": "Requirement review and code-quality review passed: no alternate protocol, no broad passthrough, only valid object `_meta` is moved, unrelated unknown payload fields remain strict, and legacy error conversion is gated to explicit failed/unavailable shapes.",
+      "verify": "Exact-file Biome check, git diff --check, focused transport/error regression suite, full package gates."
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean main at task baseline before edits.",
+      "verify": "HEAD d901f6236843a43765297dda500e71aac80fe2c6; tree 8317cc85ae6cf81803f41a1d716df70ebceb578e"
+    },
+    {
+      "kind": "test-first",
+      "value": "Added real transport regression and observed RED before production changes.",
+      "verify": "Failure contained unrecognized key `_meta` and SDK structured-content -32602."
+    },
+    {
+      "kind": "minimal-change",
+      "value": "Reused attachExecutionContext, registered projectors, serializeMcpToolResult, existing public output creators, and current RecipeMap failure schema.",
+      "verify": "Five-file commit; 121 production insertions and focused regression tests; no new transport or compatibility protocol."
+    },
+    {
+      "kind": "transport-sample",
+      "value": "CallToolResult keeps clean structuredContent without `_meta`, summary content, correct isError, and top-level `_meta.alembicPublication` for ready/unavailable/corrupt paths.",
+      "verify": "CallToolResultSchema.parse plus explicit structuredContent/top-level metadata assertions."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1.json",
+    "deliveryRunId": "run-host-retry-1",
+    "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 166,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-p1",
+    "targetTaskId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1",
+    "resultId": "tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "createdAt": "2026-07-26T07:29:17.515Z"
+  },
+  "createdAt": "2026-07-26T07:29:17.515Z",
+  "stateRevisionObserved": 166,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-retrieval-vector-projectcontext-integration-t1",
+  "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "taskPackageId": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+  "dispatchGroup": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-retrieval-vector-projectcontext-integration-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin completed the Core reader-only retrieval and request-scoped ProjectContext integration at commit b9832072dae7d11da098d351b0ebad9f3cb7c74e. Search/Prime now share Core canonical candidate ordering without query-side writer construction; Graph/Recipe Map use project-confined shared BuildSessions with deterministic continuation, cancellation, bounded cleanup, and public schemas. Full unit/static/build/package/smoke verification is green. Real BiliDili/AlembicWorkspace final acceptance remains controller-owned and is not claimed.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/host-runtime/mcp/host/read-only-search-executor.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/host/read-only-hnsw-vector-reader.ts",
+    "AlembicPlugin/lib/service/task/PrimeSearchPipeline.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/session/ProjectContextBuildSessionManager.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/handlers/structure.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/handlers/recipe-map.ts",
+    "AlembicPlugin/test/unit/SearchPrimeCandidateParity.test.ts",
+    "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+    "AlembicPlugin/test/unit/ProjectContextBuildSession.test.ts",
+    "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+    "AlembicPlugin/test/unit/RecipeMapTool.test.ts",
+    "AlembicPlugin/test/integration/ZodSchemas.test.ts",
+    "AlembicPlugin/test/integration/ZodToMcpSchema.test.ts",
+    "AlembicPlugin/dist/.build-manifest.json"
+  ],
+  "verification": [
+    "npm run test:unit — 145 files, 1567 tests passed",
+    "focused P1/P2/P3 unit/integration suite — 71 tests passed",
+    "Core compatibility suite — 140 tests passed",
+    "npm run check — passed (15 existing no-console warnings)",
+    "npm run build and npm run build:check — passed against AlembicCore 7ccddf2372ddaeac2dbcfc1f651157d753709cd7",
+    "npm run verify:codex-runtime-package — passed; no file dependencies, old shape rejected, entrypoint probe passed",
+    "npm run verify:plugin-distribution — passed",
+    "npm run verify:codex-plugin — passed",
+    "npm run smoke:codex-plugin — runtime boundary/startup/install/shell bootstrap/stdio passed",
+    "git diff --check — passed",
+    "dist public entry SHA256 e2ff192fb524532e90ee8ff2902c71dca13342fca22944da19f133f76ea48a0c matches dist/.build-manifest.json",
+    "Alembic Guard guard-public-mrirwvxm-1 covered 33/33 files; applicable Recipe review complete, with file-wide legacy/advisory findings recorded in risks"
+  ],
+  "risks": [
+    "Alembic Guard's file-wide engine reported 107 findings, mostly pre-existing sync-I/O/test-fixture warnings; its sole error is an unchanged fake password fixture in ZodSchemas.test.ts. New synchronous fingerprint/temp-spool I/O is task-required and bounded by excluded directories, content-hash caching, AbortSignal cancellation, owner-only temp storage, TTL, and cleanup.",
+    "Stable project fingerprinting still performs synchronous metadata/content reads on a cold cache; large repositories may incur latency before the cache is warm.",
+    "Final real-project BiliDili/AlembicWorkspace acceptance and any downstream consumer verdict are outside this target window and remain with the controller."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "b9832072dae7d11da098d351b0ebad9f3cb7c74e",
+      "verify": "git show and clean git status"
+    },
+    {
+      "kind": "tests",
+      "value": "145 test files / 1567 tests plus focused and Core compatibility suites passed",
+      "verify": "npm run test:unit and focused vitest commands"
+    },
+    {
+      "kind": "reader-only-proof",
+      "ref": "AlembicPlugin/lib/host-runtime/mcp/host/read-only-hnsw-vector-reader.ts",
+      "verify": "query-side scan found no IndexingPipeline, VectorService, VectorIndexWriter, SyncCoordinator, or LifecycleManager construction"
+    },
+    {
+      "kind": "retrieval-parity-proof",
+      "ref": "AlembicPlugin/test/unit/SearchPrimeCandidateParity.test.ts",
+      "verify": "frozen eight-query BiliDili candidate vector preserves Core canonical ordering for Search and Prime"
+    },
+    {
+      "kind": "build-session-proof",
+      "ref": "AlembicPlugin/test/unit/ProjectContextBuildSession.test.ts",
+      "verify": "stable identity, in-flight merge, cache, project confinement, owner-only spool, and request isolation tests passed"
+    },
+    {
+      "kind": "continuation-proof",
+      "ref": "AlembicPlugin/test/unit/ProjectContextBuildSession.test.ts",
+      "verify": "opaque project-confined cursors and deterministic accumulated page metadata verified"
+    },
+    {
+      "kind": "cancellation-cleanup-proof",
+      "ref": "AlembicPlugin/test/unit/ProjectContextBuildSession.test.ts",
+      "verify": "ref-count cancellation, terminal/error/TTL cleanup, and expired cursor behavior verified"
+    },
+    {
+      "kind": "self-review",
+      "value": "Requirement and quality reviews completed; no scope expansion, query write path, Git/revision/role gate, or Code Guard route change found",
+      "verify": "git diff review, forbidden-symbol scans, git diff --check, Alembic Guard guard-public-mrirwvxm-1"
+    },
+    {
+      "kind": "baseline",
+      "commit": "be7bc058fcd188f38b48ee551f912377c2d19f1d",
+      "verify": "clean Plugin baseline confirmed before implementation"
+    },
+    {
+      "kind": "plan",
+      "value": "P1 reader-only retrieval, then P2/P3 BuildSession/continuation/cancellation, then schema/runtime/package closure",
+      "verify": "implemented in dependency order"
+    },
+    {
+      "kind": "red",
+      "value": "focused Search/Prime parity, zero-write, session sharing, continuation, cancellation, and schema tests established failure/contract boundaries",
+      "verify": "targeted tests executed during implementation"
+    },
+    {
+      "kind": "green",
+      "value": "all focused, compatibility, full unit, static, build, package, and smoke gates passed",
+      "verify": "final command results recorded"
+    },
+    {
+      "kind": "debugging",
+      "value": "resolved logical-vs-canonical project identity, symlink confinement, deadline cleanup honesty, sparse fallback, schema default, and stale smoke assertion defects",
+      "verify": "regressions covered by tests"
+    },
+    {
+      "kind": "review-requirement",
+      "value": "All assigned acceptance points met; real-project final acceptance explicitly not claimed",
+      "verify": "task package comparison and evidence matrix"
+    },
+    {
+      "kind": "review-quality",
+      "value": "Promise rejection is handled; cold fingerprint I/O risk bounded and disclosed; temporary facts are owner-only and cleaned",
+      "verify": "manual code review plus Guard attribution"
+    },
+    {
+      "kind": "verification",
+      "value": "Runtime manifest binds Plugin b9832072dae7d11da098d351b0ebad9f3cb7c74e and Core 7ccddf2372ddaeac2dbcfc1f651157d753709cd7",
+      "verify": "dist/.build-manifest.json and public entry SHA256"
+    },
+    {
+      "kind": "scope",
+      "value": "Only AlembicPlugin source/tests/smoke assertion changed; no real user project, Code Guard product route, Wakeflow source, or downstream repository modified",
+      "verify": "git show --stat and workspace boundaries"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-retrieval-vector-projectcontext-integration-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-retrieval-vector-projectcontext-integration-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1.json",
+    "deliveryRunId": "run-delivery-p2-plugin-retrieval-vector-projectcontext-integration-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "dispatchGroup": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-retrieval-vector-projectcontext-integration-p1__AlembicPlugin__p2-plugin-retrieval-vector-projectcontext-integration-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+    "stateRevision": 8,
+    "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+    "taskPackageId": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+    "targetTaskId": "p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-retrieval-vector-projectcontext-integration-p1",
+    "resultId": "tr-p2-plugin-retrieval-vector-projectcontext-integration-t1",
+    "createdAt": "2026-07-13T05:25:13.846Z"
+  },
+  "createdAt": "2026-07-13T05:25:13.846Z",
+  "stateRevisionObserved": 8,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

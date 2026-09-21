@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "将已验收的 Agent 模块扫描持久化结果接入 Alembic `/api/v1/modules/scan-project`，只向 Dashboard 返回真实 pending/staging Recipe ID 与受控审阅摘要，闭合生产端到 reviewer 的现有 ID 链。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "模块扫描只传递生产端已创建的现有 Recipe ID；Alembic 后端保持唯一接线和故障语义，Dashboard 只做 reviewer，不创建或自动发布。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "Alembic clean commit limited to the assigned backend integration."
+      },
+      {
+        "kind": "test",
+        "verify": "Raw focused and relevant full-suite command output covers positive and all named failure paths."
+      },
+      {
+        "kind": "runtime",
+        "verify": "Reviewable service-to-Dashboard-operation-to-HTTP evidence proves returned IDs are persisted pending/staging results and create/publish have zero extra calls."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "diff"
+      },
+      {
+        "kind": "call-chain"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T21:12:25.583Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+      "taskPackageId": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+      "targetWindow": "Alembic",
+      "summary": "仅修改 Alembic 仓库。以上游已验收 AlembicAgent commit b3c4998de7264094bb32def4c904efcae768d477 的 ScanRunProjection 契约为唯一权威：检查 ModuleService.scanProject、#aiExtractRecipes、DashboardOperations.scanProject 与 POST /api/v1/modules/scan-project 的真实调用链，使响应 recipes 仅来自 knowledge.submit 已成功持久化且 id/candidateId 非空、lifecycle 为 pending/staging 的结果。不得从 provider 原始 JSON 重建 Recipe，不得二次 create，不得 publish，不得修改 Dashboard 前端；zero-submit、submit rejection/failure、空或非法 ID、非法 lifecycle 必须返回空 recipes，并保留可诊断但不伪装成功的 outcome/partial/error 信息。审查并收敛现有 #enrichRecipes：不得改写持久化 Recipe 身份或制造虚假质量真相，审阅摘要只能来自权威结果或明确可追溯的只读派生。为正向 existing-ID、zero-submit、失败/拒绝、malformed ID/lifecycle、部分超时补齐 Alembic 真实 service→Dashboard operation→HTTP seam 回归，并断言 create/publish 零额外调用；运行定向测试、类型/构建及相关全量测试，提交干净 Alembic commit 与原始命令证据。旧 p8 Dashboard accepted 事件不构成完成证据；本任务验收后由总控新建 Dashboard 真实后端消费闭合任务。",
+      "status": "pending",
+      "createdAt": "2026-07-13T21:12:25.583Z"
+    }
+  ]
+}

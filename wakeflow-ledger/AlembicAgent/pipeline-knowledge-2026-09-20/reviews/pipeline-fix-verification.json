@@ -1,0 +1,322 @@
+{
+  "title": "Pipeline lifecycle 修复与最小职责提炼交付记录",
+  "date": "2026-09-20",
+  "status": "implementation-frozen-after-returned-state-review",
+  "baseCommit": "230c635f281cb02f1cc7a1e9d4be3ce83450673b",
+  "sharedOperationDependencyCommit": "8cb0301",
+  "noCommitReason": "按root授权仅实施指定文件，提交由root统一执行；本代理未提交。",
+  "files": [
+    {
+      "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+      "sha256": "3584f5e073e1420e73893309685f56dfb565ca2f2730ee797ef459383111b6cf"
+    },
+    {
+      "path": "AlembicAgent/src/agent/strategies/pipeline/contracts.ts",
+      "sha256": "ee031b5c068f093bcea7d813ee58cf505ff8f5df8d069dcf4856e23b8baeffdd"
+    },
+    {
+      "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+      "sha256": "20e3692a08b8c35321cebab94ffea529b325f0a3ea412bbb320f4a9c1301c8fe"
+    },
+    {
+      "path": "AlembicAgent/test/pipeline-outcome-abandoned.test.ts",
+      "sha256": "e987d72fa71b4e39e465a62fd355bdf1bb0fb6cd451ab1549688bf62e8cde973"
+    },
+    {
+      "path": "AlembicAgent/test/agent-lifecycle.test.ts",
+      "sha256": "7275e164f89085c20d8666510be09f0d7ed16aefb4815912a8f29536b7a0ff0f"
+    }
+  ],
+  "changes": [
+    "新增内部pipeline/contracts与attempt模块，旧公开PipelineStrategy构造/execute入口保留；未机械拆分整个状态机。",
+    "在准备前捕获stage/retry budget，prepare与reactLoop共享runOperation的同一次期限，保留原timeoutMs+60s硬超时缓冲；新signal真实转发到现有prompt与runtime入口。",
+    "父取消结束prepare、reactLoop或gate等待；迟到准备不启动runtime，迟到gate不写Gate/strict receipt/后续阶段。",
+    "每个attempt独立DiagnosticsCollector，结束时仅merge一次；所有已知attempt成本在fast retry前累计，阶段phases结果仍保存最终尝试。",
+    "活跃工具回调优先匹配native toolCallHistory保留envelope，旧宿主回调内容作fallback；stage.onToolCall优先runtime.onToolCall并通知一次。结束后关闭回调与事件订阅，不再转发迟到用户钩子。",
+    "未知不合作宿主或已启动工具的硬中断不再冒充零输出自动重试；显式返回timedOut与native bus+history确认未启动工具的通路保留重试。",
+    "partial保存startedToolCalls（unknown为null）、completedToolCalls及requiresReadback；诊断保留中断类型与计数，不捏造未完成id/结果。",
+    "最终reply按outer main-stage追踪，不按phase字典插入顺序选旧微阶段。",
+    "回调/返回回执按明确callId优先匹配；无ID时用精确可序列化(name,args,result)及每次发生的索引匹配，不全局合并重复调用。",
+    "独立复审发现returned.aborted此前未完整消费：现在attempt把宿主aborted归一化为终态，PipelineContext.cancelled是明确控制真相；主循环、gate、repair/rewrite重评和最终outcome统一检查，诊断不反向驱动流程。",
+    "returned.partial也完整参与重试判断：requiresReadback、非零started/completed、unknown started均否决fast retry；明确0/0/false和未提供partial的旧显式timedOut路径保留。合并partial保留宿主已知计数，不因本地未观察到对应工具内容而清零或捏造工具结果。",
+    "native观测不会将宿主明确startedToolCalls=null折算为0；显式未知优先，缺少partial才可使用本地已确认零或旧返回合约。"
+  ],
+  "redGreen": [
+    {
+      "id": "PL-05",
+      "behavior": "summary rewrite重挖后返回最新主阶段reply",
+      "test": "returns the latest main-stage reply after rewrite falls back to analysis retry",
+      "red": "pipeline-results-red.log：此项失败；2 failed / 10 passed",
+      "green": "pipeline-results-green.log：12 passed；最终7份suite77 passed"
+    },
+    {
+      "id": "attempt-cost",
+      "behavior": "返回timedOut宿主的首attempt计量不被retry覆盖",
+      "test": "counts the cost of a returned timed-out attempt before successful fast retry",
+      "red": "pipeline-results-red.log：iterations 1 != 3",
+      "green": "input57/output13、iterations3，最终77 passed"
+    },
+    {
+      "id": "PL-01",
+      "behavior": "准备阶段纳入期限，父取消后不启动迟到runtime",
+      "tests": [
+        "settles parent cancellation during prepare and ignores late work",
+        "shares the hard deadline across asynchronous preparation and execution"
+      ],
+      "red": "pipeline-attempt-red.log：实际入口失败",
+      "green": "最终77 passed，30000ms准备+30010ms剩余执行在60010ms结束"
+    },
+    {
+      "id": "PL-02",
+      "behavior": "无timeout的不合作runtime响应父取消；迟到观测不改父账",
+      "tests": [
+        "settles parent cancellation during execute and ignores late work",
+        "isolates late diagnostics and tool callbacks from the parent attempt ledger"
+      ],
+      "red": "pipeline-attempt-red.log：实际入口未settled/未透传观察器",
+      "green": "最终77 passed"
+    },
+    {
+      "id": "PL-03",
+      "behavior": "部分工具/成本保留与未知副作用不重试",
+      "tests": [
+        "retains completed native tool envelopes and observed cost without replaying side effects",
+        "does not infer zero side effects from an interrupted unknown host",
+        "does not infer zero side effects from an interrupted native started tool"
+      ],
+      "red": "pipeline-attempt-red.log：重复attempt/丢首工具",
+      "green": "保留真实envelope、50/10成本、2轮；两个不确定中断反例不自动重试，最终77 passed"
+    },
+    {
+      "id": "PL-04",
+      "behavior": "cooperative resolve不能覆盖hard timeout",
+      "test": "classifies cooperative resolve-on-abort as a hard timeout",
+      "red": "pipeline-attempt-red.log：缺timedOut字段/诊断",
+      "green": "最终77 passed"
+    },
+    {
+      "id": "gate-cancel",
+      "behavior": "取消挂起gate后不写晚到gate/strictreceipt或producer",
+      "test": "cancels a pending gate without publishing its late verdict or starting repair/producer",
+      "red": "pipeline-attempt-red.log：settled=false",
+      "green": "最终77 passed"
+    },
+    {
+      "id": "observation-clone",
+      "behavior": "宿主返回克隆回执不重复计工具",
+      "test": "does not double-count callback observations copied into the returned stage result",
+      "red": "pipeline-observation-red.log：1 failed，出现两条相同观察",
+      "green": "最终77 passed"
+    },
+    {
+      "id": "observation-identity",
+      "behavior": "明确不同callId保留为不同调用",
+      "test": "retains distinct completed call identities even when arguments and outputs are identical",
+      "red": "pipeline-observation-identity-red.log：1 failed，first调用被合并掉",
+      "green": "最终77 passed"
+    },
+    {
+      "id": "returned-aborted",
+      "behavior": "宿主主动取消（父signal未取消）停止所有后续阶段、gate及repair重评",
+      "tests": [
+        "stops on host-reported cancellation even with timedOut=%s",
+        "stops host-reported cancellation during %s without reevaluating its gate"
+      ],
+      "red": "pipeline-host-aborted-red.log：4 failed，出现2/3次reactLoop或repair后继续执行",
+      "green": "pipeline-host-aborted-green.log：4 passed；pipeline-returned-state-green.log：10 passed；最终7 suites87 passed"
+    },
+    {
+      "id": "returned-partial",
+      "behavior": "宿主partial计数/读回要求不得被忽略或覆盖",
+      "test": "consumes host-reported partial evidence: $label",
+      "red": "pipeline-reported-partial-red.log：5 failed / 1 passed（明确zero路径已兼容）",
+      "green": "pipeline-returned-state-green.log：6个partial场景全部通过；最终87 passed",
+      "cases": [
+        "requiresReadback=true",
+        "known started>0",
+        "known completed>0但没有结果内容",
+        "unknown started=null",
+        "aborted与partial同时返回保留已知started",
+        "confirmed0/0/false仍可fast retry"
+      ]
+    },
+    {
+      "id": "native-explicit-unknown",
+      "behavior": "native bus/history存在但宿主明确报告未知启动数，仍禁止fast retry并保留null",
+      "test": "consumes host-reported partial evidence: unknown started count with native observation",
+      "red": "pipeline-native-unknown-partial-red.log：1 failed / 6 passed，错误调用reactLoop两次",
+      "green": "pipeline-native-unknown-partial-green.log：7 passed；最终7 suites88 passed"
+    }
+  ],
+  "verification": {
+    "focusedTests": {
+      "command": "npm test -- test/agent-lifecycle.test.ts test/pipeline-outcome-abandoned.test.ts test/evidence-recording-phase-chain.test.ts test/summary-rewrite-gate.test.ts test/strict-production-chain.test.ts test/strict-iterative-analysis.test.ts test/generate-analyze-budget.test.ts",
+      "status": "passed",
+      "testFiles": 7,
+      "tests": 88,
+      "log": "pipeline-native-unknown-focused-green.log"
+    },
+    "lint": {
+      "command": "node_modules/.bin/biome check src/agent/strategies/PipelineStrategy.ts src/agent/strategies/pipeline/attempt.ts src/agent/strategies/pipeline/contracts.ts test/agent-lifecycle.test.ts test/pipeline-outcome-abandoned.test.ts",
+      "status": "passed",
+      "files": 5,
+      "log": "pipeline-native-unknown-lint.log"
+    },
+    "diffWhitespace": {
+      "command": "git diff --check -- src/agent/strategies/PipelineStrategy.ts test/agent-lifecycle.test.ts test/pipeline-outcome-abandoned.test.ts",
+      "status": "passed"
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "log": "pipeline-native-unknown-typecheck.log",
+      "detail": "本轮最终全仓tsc --noEmit exit0；此前并行knowledge提取错误保留为历史日志，已不阻塞当前类型验证。"
+    },
+    "fullCheck": "本代理未启动全量check，root拥有最终集成验证。"
+  },
+  "testHarnessNote": {
+    "symptom": "业务断言均已通过，但vi.getTimerCount()剩余1。",
+    "probe": "pipeline-timer-probe.log记录仅60010ms attempt timer和30000ms准备timer，并确认其它任务为Core Winston Console的 () => this.emit('logged', info) setImmediate。",
+    "resolution": "仅在该fake-timer用例mock Logger.info，仍断言info被调用，并保留截止时间/返回timedOut/vi.getTimerCount()===0；没有删除生命周期断言。"
+  },
+  "compatibilityAudit": {
+    "gateProducersScanned": [
+      "src/agent/profiles/presets/insightPreset.ts",
+      "src/agent/profiles/presets/evolutionPreset.ts",
+      "src/agent/evaluation/stageBuilders.ts",
+      "src/agent/production/StrictProductionStages.ts",
+      "../Alembic/lib (evaluator注册扫描无额外命中)"
+    ],
+    "gateMutationFinding": "所有真实gate均无顶层strategyContext写回依赖；insightGateEvaluator只修改共享sharedState的_analystGraphEvidence/_analystGroundedRanges；scan inline rejection已自行{...ctx,submitToolNames}转发；Strict gate操作同一strictPort。新的局部gate视图保留嵌套引用，单独覆盖diagnostics/signal。",
+    "publicCaveat": "没有承诺未声明的外部自定义gate顶层context写回；既有artifact/sharedState通道保留。未为假想消费者引入Proxy或新的服务接口。",
+    "strict": "未编辑StrictProductionStages、StrictProductionPipeline或Core；epoch/hash/typedtransition验证继续原所有者负责；两个strict suite通过。",
+    "sharedState": "Pipeline execute最早预建_sessionCounters保留，stageSharedState仅沿既有浅拷贝路径，嵌套盒继续共享。"
+  },
+  "selfReview": {
+    "spec": "pass：5项确认缺陷、root的2项RED和partial/回调/strict边界均覆盖，产品变更仅3个授权source+2个授权test。",
+    "quality": "pass in owned scope：复用shared operation不复制Promise.race；无常驻timer，事件订阅/晚回调关闭，native envelope保留；回调与返回的序列化克隆/明确不同callId新增RED防重复或误合并。",
+    "openOwnedFindings": [],
+    "independentReviewFollowup": {
+      "returnedAborted": "同意独立复审的P2；原新增字段未完整影响控制状态，已用4个真实Pipeline RED→GREEN闭合。",
+      "returnedPartial": "同意独立复审；原fast retry错误只看toolCalls数组，且aborted分支覆盖宿主partial。新增6个回归并保留所有已有兼容路径。",
+      "controlTruth": "cancelled布尔+父AbortSignal共同决定停止；stage_aborted/abort_signal仅诊断投影。",
+      "newOpenOwnedFindings": [],
+      "nativeUnknown": "同意该同项缺口；??0吞掉显式null，已在计数归一化的事实来源处修复，而非只在下游补条件；native版本真实Pipeline参数化RED→GREEN。"
+    }
+  },
+  "risksAndLimits": [
+    "runOperation停止等待并取消signal，不能承诺已开始的外部副作用回滚；requiresReadback为true时调用方应读回现有事实。",
+    "未知旧宿主硬中断不会自动重试，这是明确批准的保守语义；宿主显式返回timedOut仍可在零工具时重试。",
+    "attempt终止后不再通知stage/runtime onToolCall，此语义已由root确认，防止晚钩子修改父账；活跃期通知优先级保持。",
+    "独立诊断和回调封口不等于冻结任意宿主持有的sharedState/Core对象；无法中断的gate/provider仍可能在自身边界继续运行。",
+    "宿主自报aborted会终止Pipeline但不篡改父AbortSignal；同时timedOut可作为历史事实保留，取消终态优先，绝不fast retry。",
+    "本代理只运行定向7份suite和类型/lint验证；root仍负责整仓最终check及提交。"
+  ],
+  "evidenceLocators": [
+    {
+      "kind": "test-first",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-results-red.log",
+      "digest": "sha256:2c243ea4aecc208406f53aaed3bfce0c35bc701a473d0cb9dd3a5a670c49274f"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-results-green.log",
+      "digest": "sha256:c579ee9a9b16cbf8c731afc94a6a54aa61ee57067ec7d870bcb2bd333fce4772"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-attempt-red.log",
+      "digest": "sha256:7b94daec756cfbb9dcf42024e9c12ee9d708ef483bf95d0a003e8cc290063cc4"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-observation-red.log",
+      "digest": "sha256:a08218b2d7c8dc1fc579cddf5ae62be1af6e10aa7586d48e13d6b2bfdbd09915"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-observation-identity-red.log",
+      "digest": "sha256:d8b75a81f19d662e381c79929cd8bcc4cc02e1cb53536f3f850e4f857299e5c2"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-focused-green.log",
+      "digest": "sha256:3dbb199452db97400aa7315e8f1d57319fa1d2bd71a0145640101abd73197039"
+    },
+    {
+      "kind": "lint",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-lint.log",
+      "digest": "sha256:83340cc0a5f758a7572408ae01f51371029980e97edb7b79ca981004c97edd5a"
+    },
+    {
+      "kind": "typecheck",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-typecheck-concurrent.log",
+      "digest": "sha256:e66894cce4ff3ff81af95f2c1a56a7c510c3ba7ca1835be78c61116bb8753abb"
+    },
+    {
+      "kind": "repro",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-timer-probe.log",
+      "digest": "sha256:09168e6e670573ec594b8e19e4bb67ecc51b81badd5457c6f116cb33e74e617f"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-host-aborted-red.log",
+      "digest": "sha256:aeb417c309ef1830ff2a19fcf6e422548766b91b5f06a8165629798ae3b47550"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-host-aborted-green.log",
+      "digest": "sha256:c9900000a87c59d10f532b78e9a8a46a40d5fa3b4e62dc708866a73f714ba54d"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-reported-partial-red.log",
+      "digest": "sha256:32577a0d9ad6a35747569978e6f27b20dabffc5b3f9774a4453f47486824a547"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-returned-state-green.log",
+      "digest": "sha256:7f9ff4497fb8a14ab96dc780ec7b04696a810b09908f1e932aa35b589cd3d354"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-returned-state-focused-green.log",
+      "digest": "sha256:a25668b65b64d8c536f8a6c5bb682d7a6691605f78a809173d85b86f45a5ca8b"
+    },
+    {
+      "kind": "typecheck",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-returned-state-typecheck.log",
+      "digest": "sha256:eb1cbda7a26f50f2c9e72a2e7e25549d02e37014ba0fe00673a8f97bf964bdd0"
+    },
+    {
+      "kind": "lint",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-returned-state-lint.log",
+      "digest": "sha256:746930c1c63f96a2ad477b0bb5f7ad8fe3fe3dd4bf9fef5164ab4be888755cd3"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-native-unknown-partial-red.log",
+      "digest": "sha256:699374a3b1f80fc65071579a1042f77cb195c8347a14efef6aaa41f7518f1a7a"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-native-unknown-partial-green.log",
+      "digest": "sha256:3d650dc57f95ec0fc59d764089a888a085b8c6cefc2a5941243e1c79db4779d7"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-native-unknown-focused-green.log",
+      "digest": "sha256:7ea5a5c6e599a6faf7d2ab6ba24c4c0a38eab63a5ae4c39d99fccea715ca77a5"
+    },
+    {
+      "kind": "typecheck",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-native-unknown-typecheck.log",
+      "digest": "sha256:eb1cbda7a26f50f2c9e72a2e7e25549d02e37014ba0fe00673a8f97bf964bdd0"
+    },
+    {
+      "kind": "lint",
+      "ref": "tmp/pipeline-knowledge-2026-09-20/pipeline-native-unknown-lint.log",
+      "digest": "sha256:85f660850733e1d1361e66d77741e605f06152b8243f2fc879da61249f49e0c7"
+    }
+  ]
+}

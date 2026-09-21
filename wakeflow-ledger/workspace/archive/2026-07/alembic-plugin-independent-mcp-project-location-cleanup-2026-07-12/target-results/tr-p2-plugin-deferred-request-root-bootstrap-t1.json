@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-plugin-deferred-request-root-bootstrap-t1",
+  "demandKey": "alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+  "taskPackageId": "p2-plugin-deferred-request-root-bootstrap-p1",
+  "dispatchGroup": "p2-plugin-deferred-request-root-bootstrap-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p2-plugin-deferred-request-root-bootstrap-t1",
+  "status": "needs-review",
+  "summary": "Implemented and committed deferred MCP request-root bootstrap at AlembicPlugin commit 981d5e449af2a41a368faf82dd71636447f71ab5. HostMcpServer now starts transport/static tools without constructing a project location from a rejected plugin-cache/package cwd; explicit or trusted host roots are resolved per tool request through ProjectLocationService, while no valid root returns a structured PROJECT_ROOT_REQUIRED result without closing the stdio transport. The local reload probe now validates the actual alembic_status project/storage contract and retains child stderr on startup failure. Final HEAD focused/full/check/build/package/distribution/plugin gates and the real installed-cache reload all passed.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/host-runtime/mcp/HostMcpServer.ts",
+    "AlembicPlugin/scripts/dev-verify-codex-plugin.mjs",
+    "AlembicPlugin/scripts/dev-reload-codex-plugin.mjs",
+    "AlembicPlugin/test/unit/DeferredRequestRootBootstrap.test.ts",
+    "AlembicPlugin/test/unit/IndependentMcpProjectLocation.test.ts",
+    "AlembicPlugin/test/unit/CodexDevReloadScript.test.ts",
+    "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+    "AlembicPlugin/scratch/codex-plugin-dev-reload-probe-report.json"
+  ],
+  "verification": [
+    "Final HEAD git rev-parse — 981d5e449af2a41a368faf82dd71636447f71ab5; git cat-file -t HEAD — commit; git status --short — clean.",
+    "npx vitest run test/unit/DeferredRequestRootBootstrap.test.ts test/unit/IndependentMcpProjectLocation.test.ts test/unit/CodexDevReloadScript.test.ts — PASS: 3/3 files, 16/16 tests.",
+    "npm run test:unit -- --silent=passed-only --reporter=dot — PASS: 135/135 files, 1524/1524 tests, exit 0.",
+    "npm run check — PASS: typecheck/lint/import/layer/repo/scope/shared/cross-shell/doctrine/naming/retired/ring gates; 15 existing noConsole warnings, zero errors.",
+    "npm run build — PASS on final HEAD using AlembicCore f4275572282a24c45af282a2ef7b435108f74fdd.",
+    "npm run verify:codex-runtime-package — PASS: ok=true, 1346 files, noFileDependencies=true, forbiddenOldShapeRejected=true, npm-install, entrypointProbe=passed.",
+    "npm run verify:plugin-distribution — PASS: alembic-runtime@0.3.0.",
+    "npm run verify:codex-plugin — PASS: alembic-runtime@0.3.0 via ./bin/alembic-start.mjs.",
+    "npm run dev:codex-plugin:reload -- --project-root <workspace-root> — PASS: ok=true; fresh cache MCP probe status 0; marker/build provenance pluginCommit=981d5e449af2a41a368faf82dd71636447f71ab5; explicit projectRoot/dataRoot/databasePath readback; omittedRoot errorCode=PROJECT_ROOT_REQUIRED; explicitRootStillWorksAfterOmittedProbe=true.",
+    "Deliberate failing-probe fixture — expected exit 1 retained both MCP -32000 and child stderr sentinel, proving startup stderr attribution; fixture removed afterward.",
+    "Final nested worktrees clean: Codex 03ed6e6a6e2b676a9faecad5c6188b03ed1e7bc9; Claude 71839ae209de39f217f1647d28ca7e6de7033a5d; vendor Core edd79d26d9d539fd52e17cf67299ccdba20b4e5a."
+  ],
+  "risks": [
+    "This result is evidence for controller review; it does not itself accept the demand.",
+    "The reload flow rewrote installed caches and proved a fresh MCP process, but intentionally did not inspect, stop, or restart the current Codex host MCP process.",
+    "The explicit AlembicWorkspace probe truthfully reported projectId=null and databaseExists=false for the unregistered/no-database root while preserving the explicit root and confined storage paths.",
+    "No remote push or release promotion was performed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "HostMcpServer constructed ProjectLocationService state during process startup. From installed-cache cwd, ProjectRootResolver rejected the cache before MCP connect, so no explicit per-call root could ever arrive. Resolution was deferred to handleToolCall while static start/list remains project-free.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Pinned clean baseline and exact reload/raw startup failure; added subprocess RED for cache-cwd startup, explicit root and omitted-root transport survival; implemented minimal deferred resolution and probe stderr/readback repair; ran focused and real reload preflight; committed; reran every required gate and reload on exact final HEAD.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "change-scope",
+      "commit": "981d5e449af2a41a368faf82dd71636447f71ab5",
+      "value": "Five AlembicPlugin files only: HostMcpServer bootstrap/request dispatch, two local reload/probe scripts, one reload help assertion, and one new subprocess regression. No Core/main/Agent/Dashboard/BiliDili, static catalog, five-tool business logic, Recipe Git maintenance, confinement, destructive confirmation, or lifecycle-management change.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/DeferredRequestRootBootstrap.test.ts",
+      "value": "RED before implementation: 2/2 failed with Connection closed and cache-root startup stderr. GREEN final: three subprocess tests pass for explicit root, omitted-root same-transport survival, and trusted host workspace fallback.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "full-suite",
+      "value": "Final HEAD: focused 16/16; full unit 135/135 files and 1524/1524 tests; check/build and all three package/plugin verifiers passed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "runtime-probe",
+      "ref": "AlembicPlugin/scratch/codex-plugin-dev-reload-probe-report.json",
+      "value": "Final installed-cache probe is ok=true and reads commit 981d5e449af2a41a368faf82dd71636447f71ab5 with explicit request identity/storage, PROJECT_ROOT_REQUIRED on omission, and successful explicit probe afterward.",
+      "verify": "artifact-present"
+    },
+    {
+      "kind": "commit",
+      "commit": "981d5e449af2a41a368faf82dd71636447f71ab5",
+      "value": "Raw git object verified as commit; parent and nested worktrees clean.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 spec: all required startup/list, explicit-root, trusted-host-root, omitted-root, no-cache-write, stderr and real reload behaviors are covered without reopening accepted architecture. Stage 2 quality: no blocking findings; request identity remains centralized in ProjectLocationService, error is structured/tool-level, probe assertions now match actual public output, no process lifecycle management or cross-project persistence was added.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "startup-before-after",
+      "value": "Before: exact reload ended MCP -32000 Connection closed and raw cache-cwd startup printed 'Project root points inside the Codex plugin cache.' After: exact final reload ok=true, fresh probe status 0."
+    },
+    {
+      "kind": "explicit-root-json",
+      "ref": "AlembicPlugin/scratch/codex-plugin-dev-reload-probe-report.json",
+      "value": "explicit={ok:true, projectRoot:<workspace-root>, dataRoot:<workspace-root>, databasePath:<workspace-root>/.asd/alembic.db, projectId:null, databaseExists:false, status:ready}."
+    },
+    {
+      "kind": "omitted-root-transport-survival",
+      "ref": "AlembicPlugin/test/unit/DeferredRequestRootBootstrap.test.ts",
+      "value": "The same stdio Client receives PROJECT_ROOT_REQUIRED for omitted root, then succeeds with an explicit projectRoot without reconnecting."
+    },
+    {
+      "kind": "reload-report",
+      "ref": "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+      "value": "Final reload report ok=true and records cache rewrite, fresh-process probe, final commit provenance, and no current-host MCP lifecycle management."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-plugin-deferred-request-root-bootstrap-p1__AlembicPlugin__p2-plugin-deferred-request-root-bootstrap-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-deferred-request-root-bootstrap-p1__AlembicPlugin__p2-plugin-deferred-request-root-bootstrap-t1.json",
+    "deliveryRunId": "run-delivery-p2-plugin-deferred-request-root-bootstrap-p1__AlembicPlugin__p2-plugin-deferred-request-root-bootstrap-t1",
+    "dispatchGroup": "p2-plugin-deferred-request-root-bootstrap-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-plugin-deferred-request-root-bootstrap-p1__AlembicPlugin__p2-plugin-deferred-request-root-bootstrap-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+    "stateRevision": 17,
+    "demandKey": "alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+    "taskPackageId": "p2-plugin-deferred-request-root-bootstrap-p1",
+    "targetTaskId": "p2-plugin-deferred-request-root-bootstrap-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p2-plugin-deferred-request-root-bootstrap-p1",
+    "resultId": "tr-p2-plugin-deferred-request-root-bootstrap-t1",
+    "createdAt": "2026-07-12T12:23:13.362Z"
+  },
+  "createdAt": "2026-07-12T12:23:13.362Z",
+  "stateRevisionObserved": 17,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

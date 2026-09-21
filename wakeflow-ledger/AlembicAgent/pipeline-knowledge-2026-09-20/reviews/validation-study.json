@@ -1,0 +1,603 @@
+{
+  "title": "PipelineStrategy / knowledge handler 验证边界与拆分门禁",
+  "date": "2026-09-20",
+  "baseline": "230c635f281cb02f1cc7a1e9d4be3ce83450673b",
+  "scope": {
+    "mode": "只读源码与测试审查；只写本报告，不修改产品/测试/配置，不提交。",
+    "source": [
+      "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge.ts"
+    ],
+    "methods": "阅读目标分支及真实消费链；相关测试按行为定位并阅读断言。未执行竞争性全量检查，也未运行真实 API 或邻仓写入。",
+    "testExecution": "本轮未运行测试，下面的 covered 表示存在实际测试断言，并不冒充本轮执行结果。",
+    "noCommitReason": "root 独立维护基线、编辑、验收和提交。"
+  },
+  "findings": [
+    {
+      "id": "PV-01",
+      "severity": "P1",
+      "status": "confirmed-by-code; regression-missing",
+      "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+      "line": 991,
+      "issue": "异步 promptBuilder 在阶段 abort/硬超时保护建立前被等待；准备挂起时阶段无法通过当前超时保护结束，取消后准备才完成还会继续调用 reactLoop。",
+      "evidence": [
+        "execute 只在阶段循环入口检查 signal（346）；#executeStage 先 await #buildStagePrompt（991）；#buildStagePrompt await 宿主 promptBuilder（1168）；#runWithTimeout（1370）才创建 child AbortController 和硬计时器。",
+        "builder 会收到 strategyContext（含已有 parent abortSignal），但不合作的 builder 不会被等待边界截断。build 完成后没有再次检查取消。",
+        "reactLoop 可以看到已中止 child signal，但调用本身已经发生；不能依赖所有宿主自己退出来证明策略边界正确。"
+      ],
+      "existingCoverage": "pipeline-outcome-abandoned:54 的 before/during 取消发生在 execute 前或 reactLoop 返回时；agent-lifecycle:36 从 reactLoop 启动后测试硬超时，均不覆盖准备等待。",
+      "minimalRegression": "在现有 agent-lifecycle 或 pipeline-outcome-abandoned 中用 deferred promptBuilder：准备期间取消/计时到期，策略应可结束且 reactLoop 为0；释放迟到 builder 后仍为0，无下游 gate/stage。使用 fake timers，不用真实等待。",
+      "note": "具体准备超时如何计入现有 budget/60s 缓冲应由 root 的实现合同明确，不引入第二套随意 timeout。"
+    },
+    {
+      "id": "PV-02",
+      "severity": "P1",
+      "status": "confirmed-by-code; regression-missing",
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "line": 800,
+      "issue": "Core 已创建候选后，evaluateReadiness 或同步 sessionStore.save 抛错会进入最外层 catch，返回 Submit failed 且丢失 created id/lifecycle。",
+      "evidence": [
+        "createOrStage 在778返回真实 persisted entry；801等待readiness；821同步调用SessionStoreLike.save（接口返回void）；最外层catch在914将任何异常折叠成fail。",
+        "下游真实提交归一与 scan projection 依赖 created/id/lifecycle 事实；吞掉身份会把已落库提交误记为失败，并可能引发重复提交。"
+      ],
+      "existingCoverage": "recipe-production-profile-adapter:672 验证 readiness.ready=false 保持 created/pending；351 验证的是 manage.publish 的异常，不是 submit 创建后的 readiness 查询异常。",
+      "minimalRegression": "复用该文件 makeProject/submitParams 的 gate-clean fixture；createOrStage 返回合法created后，分别令evaluateReadiness reject和sessionStore.save throw。断言create仅1次、身份/lifecycle保留、失败以明确附加诊断可见、publish为0。ready:false 原测试继续保留。"
+    },
+    {
+      "id": "PV-03",
+      "severity": "P2",
+      "status": "confirmed-wiring-risk; regression-missing",
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "line": 651,
+      "issue": "提交中的 style repair await 不接收 ctx.abortSignal，等待完成后没有取消检查就可以进入新的 createOrStage。",
+      "evidence": [
+        "repairStyleViolations 的 chat 调用只带 maxTokens/temperature（submitEvidenceExpansion.ts:390），没有signal；knowledge.ts全文件不读取abortSignal。",
+        "ToolRouterAdapter 在入口检查预取消，但对已经进入的handler不创建提交前第二道取消检查。"
+      ],
+      "minimalRegression": "可控style provider开始等待后取消ctx.abortSignal，再返回合法修复；断言gateway.createOrStage未被启动。若create已经完成，则必须保留PV-02的持久化事实，不能声称回滚。",
+      "scopeNote": "只建议覆盖当前实际等待→新副作用边界；不追求取消已完成的Core写入。"
+    },
+    {
+      "id": "PV-04",
+      "severity": "P2",
+      "status": "coverage-gap; distinguish-host-shapes",
+      "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+      "line": 1101,
+      "issue": "fast retry 只保留重试 stageResult 并在末尾累计它；现有测试只检查 attempts/status/timeout诊断，没有固定reply、phase result和usage语义。",
+      "actualReachability": "本仓 AgentRuntime 的 LoopContext.buildResult（258）不设置timedOut；内部快重试由 #runWithTimeout 的 synthetic timedOut/零usage结果触发。因而不能据此声称本仓真实首轮带usage结果已被丢失。公开宿主 reactLoop 若返回 timedOut:true 且非零usage，则覆盖首轮usage/iterations的风险确实存在。",
+      "minimalRegression": "扩充agent-lifecycle:36：不同的第一/二轮结果，检查phase最终reply、timedOut标记、累计usage/iterations和无意外第三次调用；另外明确是否支持宿主带usage的timedOut结果，再为该输入固定累加合同。",
+      "note": "不把合成超时结果的0usage变成伪造估计，也不把历史timedOutStages诊断误当最终失败。"
+    },
+    {
+      "id": "PV-05",
+      "severity": "P2",
+      "status": "coverage-gap",
+      "path": "AlembicAgent/test/summary-rewrite-gate.test.ts",
+      "line": 9,
+      "issue": "summary_rewrite 全文件只调用质量分流函数和prompt builder，没有实例化 PipelineStrategy；微阶段执行、reply替换、重评和回退暂无测试。",
+      "minimalRegression": "两个策略级场景即可：rewrite成功→只替换analyze.reply并保留原toolCalls、usage累计一次、produce可达；rewrite空/仍不通过→analysis_retry且受既有次数/预算限制，ContextWindow不因微阶段误重置。"
+    }
+  ],
+  "existingTestsToRetain": [
+    {
+      "file": "AlembicAgent/test/agent-lifecycle.test.ts",
+      "tests": [
+        {
+          "line": 36,
+          "name": "reports the final pipeline timeout attempt (retry=%s)",
+          "actual": "真实PipelineStrategy + fake timer +可控reactLoop；首轮永不resolve触发60001ms硬超时，重试或不重试的AgentService最终状态与timedOutStages。",
+          "doesNotProve": "准备阶段取消/超时；返回reply/usage/iterations；迟到首轮回写。"
+        },
+        {
+          "line": 85,
+          "name": "does not accept a late provider reply after cancellation or emit duplicate abort events",
+          "actual": "真实SingleStrategy runtime/service +可控provider；迟到模型结果不接受且abort事件一次。",
+          "doesNotProve": "PipelineStrategy准备、gate evaluator或knowledge.submit取消。"
+        },
+        {
+          "line": 121,
+          "name": "distinguishes stage-timeout propagation from explicit pipeline cancellation: %s",
+          "actual": "service结果分类fixture；_pipelineOutcome优先于旧cancelReason。"
+        },
+        {
+          "line": 179,
+          "name": "aborts the in-flight provider and reports cancellation through the service",
+          "actual": "真实runtime/provider signal转发与service aborted。"
+        }
+      ],
+      "migration": "保留原文件与测试入口，增强现有fast-retry断言，准备阶段表征放同一生命周期文件即可。"
+    },
+    {
+      "file": "AlembicAgent/test/pipeline-outcome-abandoned.test.ts",
+      "tests": [
+        {
+          "line": 54,
+          "name": "stops stages and gates when aborted %s execution",
+          "actual": "策略循环入口/阶段结束取消后不进下游gate/produce。"
+        },
+        {
+          "line": 92,
+          "name": "gate degrade → outcome=abandoned 携带 stage/action/reason，且下游执行阶段被跳过",
+          "actual": "真实策略+可控gate，保留abandon原因。"
+        },
+        {
+          "line": 125,
+          "name": "record_repair 救不回 → degraded_no_findings 同样进入一等结局(第二个降级点)",
+          "actual": "修复后再次失败的终态。"
+        },
+        {
+          "line": 174,
+          "name": "sharedState._sessionCounters 盒里的修复计数投影为 submitRepairs(repair-hit-rate 观测面)",
+          "actual": "有界正数统计投影。"
+        },
+        {
+          "line": 198,
+          "name": "execute 入口预建计数盒；运行中经\"每调用一次性 runtime 投影\"写入的计数被收尾投影读到",
+          "actual": "嵌套盒跨两阶段累计；不是handler自身在此执行。"
+        },
+        {
+          "line": 316,
+          "name": "analysis_retry 耗尽 → outcome=abandoned(action=retry_exhausted)，degraded 保持 false",
+          "actual": "不把重试耗尽降格为completed，也不改变degraded布尔原义。"
+        }
+      ],
+      "migration": "保留原入口PipelineStrategy导入；parent merger用例保留在该文件，不能被只测stage helper替代。"
+    },
+    {
+      "file": "AlembicAgent/test/evidence-recording-phase-chain.test.ts",
+      "tests": [
+        {
+          "line": 373,
+          "name": "runs a note_finding-only repair stage and rechecks the gate from ActiveContext",
+          "actual": "真实策略调度analyze→quality_gate_record_repair→produce；可控reactLoop和memoryCoordinator。断言memory/evidence工具面、recordRepairOnly、toolChoice、PCV map身份及真实memory状态变化触发重评。",
+          "limit": "memory由stub端口写入，不是完整ToolRouter/ledger授权集成。"
+        },
+        {
+          "line": 464,
+          "name": "does not accept JSON text as a note_finding substitute after repair timeout",
+          "actual": "stub返回timedOut:true与JSON文本；不能当已写finding，必须degraded_no_findings。",
+          "limit": "没有驱动真实计时器超时。"
+        },
+        {
+          "line": 503,
+          "name": "suppresses full analysis retry when session input budget is already exhausted",
+          "actual": "返回95input/100上限后禁止重挖，产degraded_budget_exhausted。"
+        },
+        {
+          "line": 553,
+          "name": "blocks exploration and non-finding memory writes during record repair",
+          "actual": "真实createToolPipeline调用门禁；允许有限finding/evidence，拒探索。"
+        }
+      ],
+      "migration": "保留阶段调度与真实tool gate两类独立边界；不把二者合成只测predicate。"
+    },
+    {
+      "file": "AlembicAgent/test/summary-rewrite-gate.test.ts",
+      "tests": [
+        {
+          "line": 32,
+          "name": "coherence 唯一短板 + findings 充足 → summary_rewrite(不整段重挖)",
+          "actual": "质量决策函数。"
+        },
+        {
+          "line": 38,
+          "name": "coherence 短板但 findings 不足 → 仍走 analysis_retry(证据真缺，必须重挖)",
+          "actual": "证据不足不误分流纯写作。"
+        },
+        {
+          "line": 72,
+          "name": "深度接地不足 + findings 充足 → summary_rewrite(写作问题：组织已有发现)",
+          "actual": "深度分流函数。"
+        },
+        {
+          "line": 98,
+          "name": "注入已验证发现与文件，明确禁止新引用与探索",
+          "actual": "prompt文本合同。"
+        }
+      ],
+      "migration": "保留这些低成本决策测试；补PV-05策略级测试而不是将现有测试重命名成集成覆盖。"
+    },
+    {
+      "file": "AlembicAgent/test/strict-production-chain.test.ts",
+      "tests": [
+        {
+          "line": 650,
+          "name": "blocks Producer submit/review/persist tools at the existing production strategy boundary"
+        },
+        {
+          "line": 670,
+          "name": "turns a strict non-pass into a typed failed owner/resume return and never degrades to success"
+        },
+        {
+          "line": 714,
+          "name": "rejects an Analyst query that did not pass the expansion enrollment port"
+        },
+        {
+          "line": 742,
+          "name": "fails before any model call when a strict run receives a legacy role stage"
+        },
+        {
+          "line": 765,
+          "name": "routes the real generateDimensionPipeline factory through the existing strict stage chain"
+        }
+      ],
+      "actual": "使用真实PipelineStrategy/StageFactory与可控strict port；strict不能接管legacy repair/degrade，不可仅以普通pipeline测试代替。",
+      "migration": "严格路径与普通路径一起跑；保留role marker、typed owner/resume与tool authority断言。"
+    },
+    {
+      "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+      "tests": [
+        {
+          "line": 182,
+          "name": "enrolls and executes a discovered counterquery, then reruns Analyst to a stable fixpoint"
+        },
+        {
+          "line": 586,
+          "name": "fails closed when a retry does not advance the append-only epoch state"
+        },
+        {
+          "line": 636,
+          "name": "fails closed when a typed retry would exceed the explicit epoch bound"
+        },
+        {
+          "line": 828,
+          "name": "rejects an untyped analysis_retry instead of entering the strict retry loop"
+        },
+        {
+          "line": 852,
+          "name": "preserves the existing non-strict analysis_retry behavior"
+        }
+      ],
+      "actual": "已存在严格epoch/fixpoint的独立合同；非严格重试仍执行analyze两次再produce。"
+    },
+    {
+      "file": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+      "tests": [
+        {
+          "line": 200,
+          "name": "refreshes retrieval provenance after a style repair changes authored fields",
+          "actual": "真实handler + mock style provider/gateway；repair后stored.doClause与Core sourceContentHash吻合。"
+        },
+        {
+          "line": 244,
+          "name": "%s active transition uses Core readiness and publish only",
+          "actual": "approve/publish真实handler，只调Core port，不走legacy repo approve/publish。"
+        },
+        {
+          "line": 282,
+          "name": "invalid Core readiness blocks publish with structured evidence and no lifecycle mutation",
+          "actual": "readiness=false不调用publish且结构化保留违规。"
+        },
+        {
+          "line": 333,
+          "name": "active transition fails closed when the Core production port is unavailable",
+          "actual": "无Core port时不走legacy后门。"
+        },
+        {
+          "line": 351,
+          "name": "Core publish exceptions retain structured readiness evidence",
+          "actual": "发布边界重新校验失败，保留changedReadiness。"
+        },
+        {
+          "line": 400,
+          "name": "%s submit reaches Core production port with equivalent profile semantics",
+          "actual": "opportunistic/session/dimension/cold-start四上下文；create唯一入口、profile哈希、source字段及submit不publish。"
+        },
+        {
+          "line": 452,
+          "name": "real Agent call reaches Core production port and persists/project the native profile",
+          "actual": "真实Core DatabaseConnection/Repository/Service/Gateway；验证DB、markdown文件和profile哈希。"
+        },
+        {
+          "line": 541,
+          "name": "real Core port persists and evaluates $name independently from code admission",
+          "actual": "直接prepare +真实Core port，不是handler；保留独立code admission/profile语义。"
+        },
+        {
+          "line": 603,
+          "name": "real Core readiness block leaves persisted lifecycle unchanged through knowledge.manage",
+          "actual": "真实持久化条目的readiness禁止active变更。"
+        },
+        {
+          "line": 672,
+          "name": "surfaces Core readiness violations structurally while the candidate remains pending",
+          "actual": "真实handler，mock port返回created pending/readiness false；result仍created且submit不publish。"
+        },
+        {
+          "line": 714,
+          "name": "provider availability does not change production input or Core readiness truth",
+          "actual": "provider缺席/offline不改变已合法候选的输入与readiness。"
+        },
+        {
+          "line": 772,
+          "name": "%s cannot inject code but preserves an independently grounded profile",
+          "actual": "whole-file/不相关/document/out-of-range/bare片段被移除但profile可独立入库。"
+        }
+      ],
+      "migration": "保留真实Core持久化与mock错误边界两组，PV-02/03可复用本文件gate-clean fixture，不需要新建大型fixture层。"
+    },
+    {
+      "file": "AlembicAgent/test/SubmissionSanitize.test.ts",
+      "tests": [
+        {
+          "line": 358,
+          "name": "软违规（非祈使 doClause）不再阻断：advisory 随候选入库",
+          "actual": "真实handler/evidence ledger +fakeCore port；无provider时soft advisory仍入库。"
+        },
+        {
+          "line": 369,
+          "name": "refs 缺席但 sources 命中台账文件：机械自推断回填后收录（2026-07-05 拒收治理）"
+        },
+        {
+          "line": 382,
+          "name": "维度运行缺 evidenceRefs 且 sources 均不在台账：EVIDENCE_REFS_REQUIRED 硬拒（核心保证）"
+        },
+        {
+          "line": 395,
+          "name": "硬违规（捏造引用）仍全力度拒绝"
+        }
+      ],
+      "migration": "保留gateway调用0次/1次断言；不能只验证字符串repair helper。"
+    },
+    {
+      "file": "AlembicAgent/test/scan-run-production-integration.test.ts",
+      "tests": [
+        {
+          "line": 151,
+          "name": "projects the persisted pending Recipe through the real handler and Core gateway seam",
+          "actual": "真实handler/Core持久化 +scan run projection；createOrStage/create/readiness各1次，publish0次，identity和review字段来自同一persisted raw。"
+        }
+      ],
+      "migration": "这是提交结果到用户扫描结果的接通证据，helper搬动不能删掉。"
+    },
+    {
+      "file": "AlembicAgent/test/recipe-authoring-inprocess-flatten.test.ts",
+      "tests": [
+        {
+          "line": 633,
+          "name": "opportunistic: wrapper verdict is byte-identical to direct Core validateAgainst (per item, full corpus)"
+        },
+        {
+          "line": 655,
+          "name": "the wrapper actually selects the opportunistic profile (dimensionless) — it never silently runs cold-start"
+        },
+        {
+          "line": 668,
+          "name": "cold-start (dimension-bearing): wrapper verdict equals direct Core validateAgainst with the cold-start profile"
+        },
+        {
+          "line": 680,
+          "name": "reuses the Core style waiver authority without a second rule implementation"
+        }
+      ],
+      "migration": "保留真实wrapper和Core引用身份两层检验；knowledge.ts移成facade仍原样重导出同一Core绑定。"
+    }
+  ],
+  "resultBoundaryMatrix": [
+    {
+      "result": "created + pending/staging + readiness false",
+      "owner": "Core已持久化；Agent展示ready=false",
+      "covered": "profile-adapter:672和scan integration",
+      "required": "必须仍计真实提交，绝不能等同发布或失败。"
+    },
+    {
+      "result": "duplicate_blocked",
+      "owner": "Core查重，未新建",
+      "covered": "scan-run-projection/ExplorationStrategies只给归一器造结果；未定位到真实handler的该分支测试",
+      "required": "ok可为true但不能计submit成功；建议复用handlerfixture补一次结果表格。"
+    },
+    {
+      "result": "rejected / blocked / createOrStage throws",
+      "owner": "Core提交裁决/接口错误",
+      "covered": "证据前置拒绝有handler测试；没有定位到gateway三类非created与异常的handler表格",
+      "required": "不输出created身份；unsafe coreCode被移除时结构化codeEvidence仍保留。"
+    },
+    {
+      "result": "merged/supersede/空集合 processed",
+      "owner": "Core返回且无新created",
+      "covered": "当前最终fallback为ok({status:processed,result})，没有定位到handler断言",
+      "required": "维持非新建事实；若要改结果合同另做显式变更。"
+    },
+    {
+      "result": "readiness lookup/save exception after created",
+      "owner": "Agent后处理；Core创建事实已成立",
+      "covered": "缺失，PV-02",
+      "required": "保留id/lifecycle和一次写入，不以重试掩盖。"
+    },
+    {
+      "result": "manage approve/publish readiness false/throw",
+      "owner": "Core publish权威边界",
+      "covered": "mock+真实Core用例充足",
+      "required": "不走KnowledgeRepository的旧直接active变更。"
+    },
+    {
+      "result": "evolution proposal-created/upgraded vs immediately-executed",
+      "owner": "proposalGateway",
+      "covered": "tool-v2-contract:557只验证source默认与兼容；归一器另有状态测试",
+      "required": "提案不等于发布；同一次返回保留outcome/proposalId/真实状态。"
+    }
+  ],
+  "publicAndCallChain": {
+    "pipeline": [
+      {
+        "path": "AlembicAgent/src/agent/profiles/AgentProfileCompiler.ts",
+        "line": 169,
+        "role": "stageFactoryRegistry.build产出声明式stages"
+      },
+      {
+        "path": "AlembicAgent/src/agent/profiles/presets/index.ts",
+        "line": 34,
+        "role": "resolveStrategy(type:pipeline)创建PipelineStrategy"
+      },
+      {
+        "path": "AlembicAgent/src/agent/service/AgentRuntimeBuilder.ts",
+        "line": 92,
+        "role": "把preset.strategyInstance注入真实AgentRuntime"
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+        "line": 295,
+        "role": "execute→stage/gate/repair/retry→runtime.reactLoop→结果/outcome"
+      },
+      {
+        "path": "AlembicAgent/src/agent/index.ts",
+        "line": 91,
+        "role": "公开PipelineStrategy；src/index.ts转导出，所以@alembic/agent与@alembic/agent/agent均需保留"
+      }
+    ],
+    "pipelineCompatibility": "构造参数{stages,maxRetries}、name='pipeline'、execute(runtime,message,opts)及返回reply/toolCalls/tokenUsage/iterations/phases/degraded/outcome/diagnostics保持；不要新增内部Gate/Stage helper的公共export。strategies/index.ts本来不导出PipelineStrategy，不要因拆分扩大它。",
+    "knowledge": [
+      {
+        "path": "AlembicAgent/src/tools/runtime/registry.ts",
+        "line": 14,
+        "role": "静态导入handle，五个ActionSpec的handler仍分发prime/search/submit/detail/manage"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/adapter/ToolRouterAdapter.ts",
+        "line": 75,
+        "role": "入口abort→parse→宿主contextFactory→ToolRouter→结果envelope"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 170,
+        "role": "handle(action,params,ctx)是稳定源文件兼容入口"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 778,
+        "role": "ctx.recipeGateway.createOrStage是唯一候选创建端，evaluateReadiness随后只读"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 1188,
+        "role": "approve/publish只经Core readiness + publish；evolution独立proposalGateway"
+      }
+    ],
+    "knowledgeCompatibility": "knowledge.ts当前仅export handle、applyStyleWaiver、isSoftAuthoringViolation；后两者必须保持同一Core函数身份。它们并未由tools/runtime/index.ts公开，不新建package subpath或wildcard导出。",
+    "toolRegistryContract": "保留prime/search的只读parallel/session cache、detail只读parallel、submit/manage写single的既有spec；调度/权限不搬进helper。",
+    "hostPorts": "只消费ctx.searchEngine/knowledgeRepo/recipeGateway/stagingManager/proposalGateway/sessionStore/runtime；不把Core Repository/SQLite实现复制入Agent。",
+    "stateContract": "_sessionCounters嵌套盒由PipelineStrategy预建，handler经同一sharedState写入；重试/recordRepair的浅拷贝必须保留盒身份。_producerSubmitLedger及shared Sets的真实提交记账仍属toolPipeline后处理。",
+    "normalizationCaution": "pickString会trim返回值；stringValue与normalizeStringArray只过滤空值、保留原字节。不能因为名字相近而机械合并改变标题/原因/引用内容。"
+  },
+  "smallestRegressionPlan": [
+    {
+      "priority": 1,
+      "id": "R1",
+      "target": "test/agent-lifecycle.test.ts",
+      "cases": "deferred准备期间取消与准备超时，迟到完成不启动reactLoop；扩充当前fast-retry测试的phase reply/usage/iterations断言。",
+      "reason": "固定等待边界与最终成功状态，不为私有函数搬动写镜像测试。"
+    },
+    {
+      "priority": 1,
+      "id": "R2",
+      "target": "test/recipe-production-profile-adapter.test.ts",
+      "cases": "create成功后readiness reject / sessionStore.save throw；style等待期间取消后不create。",
+      "reason": "只需要现有合法submit fixture +可控外部端口，验证真实副作用次数与持久化身份。"
+    },
+    {
+      "priority": 2,
+      "id": "R3",
+      "target": "test/summary-rewrite-gate.test.ts",
+      "cases": "真实PipelineStrategy：成功rewrite只换reply并保留证据；空/再次失败rewrite转有限analysis_retry并保持ContextWindow重试语义。",
+      "reason": "现有文件完全没有执行微阶段的覆盖。"
+    },
+    {
+      "priority": 2,
+      "id": "R4",
+      "target": "test/recipe-production-profile-adapter.test.ts",
+      "cases": "最小gateway返回表格：duplicate、rejected/blocked、throw；只断真实输出归一与create一次，不重测Core规则。",
+      "reason": "迁移handleSubmit前锁住非created出口；下游伪造结果测试不能代替此边界。"
+    }
+  ],
+  "knowledgeModulePlan": {
+    "status": "候选职责设计；具体文件名由root选择，本报告未创建源码目录。",
+    "directory": "src/tools/runtime/handlers/knowledge/",
+    "modules": [
+      {
+        "file": "knowledge.ts（原入口）",
+        "role": "只分发五个action并保留两个Core重导出，不承载规则实现。"
+      },
+      {
+        "file": "knowledge/queries.ts",
+        "role": "search/prime/detail与其截断/格式化；只消费read ports。"
+      },
+      {
+        "file": "knowledge/submit.ts",
+        "role": "完整准备→证据展开/归一→Core authoring gate→waiver/repair/advisory→createOrStage→readiness/结果；既有3个authoring/evidence/profile helper继续复用。"
+      },
+      {
+        "file": "knowledge/manage.ts",
+        "role": "review-queue/review、approve/publish、repo管理和evolution proposal；保留不同权威端口。"
+      },
+      {
+        "file": "knowledge/normalization.ts",
+        "role": "明确的标量/数组/候选输入归一、title前缀、sourceRefs投影、sessionCounterBox；不调用gateway或反向导入action模块。bounded源码片段诊断读取留在submit专属路径。"
+      },
+      {
+        "file": "knowledge/contracts.ts（仅需要时）",
+        "role": "复用Core RecipeProductionPort与ToolContext的类型桥；共享Search/Repo的本地端口类型，不创造第二套运行时注册器。"
+      }
+    ],
+    "notRequested": "不为每个单行helper拆文件，不新增知识服务/流程总线，不重写Core gateRules/styleWaiver/readiness，也不拆分TOOL_REGISTRY注册与宿主调度。"
+  },
+  "reuseFileBoundaries": {
+    "linter": "AlembicAgent/scripts/lint-layer-contract.mjs",
+    "config": "AlembicAgent/config/layer-contract.json",
+    "operation": "保留现有toolPipeline条目，requiredUnder追加knowledge新目录，并给原knowledge.ts显式文件规则。使用现有AST解析/type-only豁免/relative与#alias归一/直接require与dynamic规则，不开发新linter。",
+    "proposedAdditions": {
+      "requiredUnder": [
+        "src/tools/runtime/handlers/knowledge/"
+      ],
+      "runtimeImports": {
+        "src/tools/runtime/handlers/knowledge.ts": [
+          "@alembic/core/knowledge",
+          "src/tools/kernel/registry.ts",
+          "src/tools/runtime/handlers/knowledge/queries.ts",
+          "src/tools/runtime/handlers/knowledge/submit.ts",
+          "src/tools/runtime/handlers/knowledge/manage.ts"
+        ],
+        "src/tools/runtime/handlers/knowledge/queries.ts": [
+          "src/tools/kernel/registry.ts"
+        ],
+        "src/tools/runtime/handlers/knowledge/submit.ts": [
+          "node:fs",
+          "node:path",
+          "@alembic/core/dimensions",
+          "@alembic/core/knowledge",
+          "@alembic/core/logging",
+          "src/shared/projectPath.ts",
+          "src/tools/kernel/registry.ts",
+          "src/tools/runtime/handlers/recipeAuthoringGate.ts",
+          "src/tools/runtime/handlers/recipeProductionAdapter.ts",
+          "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+          "src/tools/runtime/handlers/knowledge/normalization.ts"
+        ],
+        "src/tools/runtime/handlers/knowledge/manage.ts": [
+          "src/tools/kernel/registry.ts",
+          "src/tools/runtime/handlers/knowledge/normalization.ts"
+        ],
+        "src/tools/runtime/handlers/knowledge/normalization.ts": [
+          "node:path",
+          "@alembic/core/logging"
+        ],
+        "src/tools/runtime/handlers/knowledge/contracts.ts": []
+      }
+    },
+    "ruleNotes": [
+      "候选列表必须随最终实际函数归属缩到真实依赖，不因本表存在而保留未使用许可；若不建contracts，删除该key。",
+      "queries/manage/normalization不允许倒引旧facade、submit或完整src/tools/runtime/registry.ts；kernel/registry是工具合同/helpers，两个registry不可混淆。",
+      "tools→agent依赖仍被顶层矩阵禁止；共享计数应经数据port，不让tools helper import PipelineStrategy。",
+      "同文件白名单校验先于同area跳过，可直接限制tools内部的反向边；type-only保留豁免，Core包入口仍受已有core-import-boundary补充检查。",
+      "新目录未登记的文件自动失败；非字面动态import/require在范围内失败。无需为知识目录再复制AST扫描实现。",
+      "验收使用现有layer-contract.test反例和真实npm run lint:layer-contract。可加一个新目录normalization→facade的临时fixture作为配置落地反例，不能用源码字符串快照代替门禁运行。"
+    ]
+  },
+  "suggestedValidationCommands": [
+    "Node22 vitest run test/agent-lifecycle.test.ts test/pipeline-outcome-abandoned.test.ts test/evidence-recording-phase-chain.test.ts test/summary-rewrite-gate.test.ts",
+    "Node22 vitest run test/strict-production-chain.test.ts test/strict-iterative-analysis.test.ts",
+    "Node22 vitest run test/recipe-production-profile-adapter.test.ts test/SubmissionSanitize.test.ts test/recipe-authoring-inprocess-flatten.test.ts test/scan-run-production-integration.test.ts test/tool-v2-contract.test.ts",
+    "npm run build:check && npm run lint:layer-contract && npm run lint:core-import-boundary",
+    "npm run smoke:public-signatures && npm run smoke:strict-consumer（由root总门禁执行）"
+  ],
+  "nextStep": "root据确定缺陷先补真实RED；再做行为保持拆分并更新现有fileBoundaries，保留原测试入口、公开签名与真实Core持久化覆盖。"
+}

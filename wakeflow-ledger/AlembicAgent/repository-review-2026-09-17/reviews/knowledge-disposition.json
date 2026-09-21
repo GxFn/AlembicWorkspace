@@ -1,0 +1,370 @@
+{
+  "scope": "Disposition only for original knowledge/maintenance findings and the three final maintenance follow-ups. No new review scope or product edits.",
+  "observedAtUtc": "2026-09-18T07:41:52.885783+00:00",
+  "counts": {
+    "fixed": 27,
+    "retained-with-reason": 0,
+    "still-open": 0
+  },
+  "originalFindings": 24,
+  "followUpFindings": 3,
+  "dispositions": [
+    {
+      "id": "KNOW-01",
+      "severity": "P1",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/evaluation/MiningJudge.ts",
+      "disposition": "fixed",
+      "reason": "MiningJudge uses resolveProjectPath with lexical/realpath containment and validates absolute paths, caps and ranges. Normal and escaping slice tests retained.",
+      "evidence": [
+        "src/agent/evaluation/MiningJudge.ts",
+        "src/shared/projectPath.ts",
+        "test/mining-eval-harness.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-02",
+      "severity": "P2",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/evidence/EvidenceCapture.ts",
+      "disposition": "fixed",
+      "reason": "EvidenceCapture unwraps nested params and derives source ranges from actual contiguous numbered output; declared derived views no longer inherit requested ranges.",
+      "evidence": [
+        "src/agent/evidence/EvidenceCapture.ts",
+        "test/EvidenceCapture.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-03",
+      "severity": "P1",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/evidence/EvidenceCollector.ts",
+      "disposition": "fixed",
+      "reason": "EvidenceCollector recognizes anchored tool-error prefixes instead of rejecting arbitrary Error/failed words in source/search content.",
+      "evidence": [
+        "src/agent/evidence/EvidenceCollector.ts",
+        "test/evidence-collector-fidelity.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-04",
+      "severity": "P2",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/runs/relation/RelationAgentRun.ts",
+      "disposition": "fixed",
+      "reason": "Relation projection guards null/non-object JSON, validates nonnegative safe analyzed counts and relation member types, and exposes invalidRelationCount.",
+      "evidence": [
+        "src/agent/runs/relation/RelationAgentRun.ts",
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-05",
+      "severity": "P2",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/prompts/insightGate.ts",
+      "disposition": "fixed",
+      "reason": "Record-repair evidence renderer uses CodeSnippet.startLine/endLine and keeps a path fallback.",
+      "evidence": [
+        "src/agent/prompts/insightGate.ts",
+        "test/evidence-recording-phase-chain.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-06",
+      "severity": "P1",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/prompts/insightAnalyst.ts",
+      "disposition": "fixed",
+      "reason": "Analyst/retry/repair examples now use evidenceRefs and optional excerpt/depth fields. Repair instructions allow querying already captured evidence.",
+      "evidence": [
+        "src/agent/prompts/insightAnalyst.ts",
+        "src/agent/prompts/insightGate.ts",
+        "test/llm-input-layering.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-07",
+      "severity": "P2",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/runs/evolution/EvolutionAgentRun.ts",
+      "disposition": "fixed",
+      "reason": "Evolution gate and run share collectSuccessfulEvolutionIds/evolutionOutcome; duplicate_blocked submit cannot mark a replacement complete, absent result is not success, explicit Core outcome overrides compatibility status.",
+      "evidence": [
+        "src/agent/utils/toolOutcomes.ts",
+        "src/agent/runs/evolution/EvolutionAgentRun.ts",
+        "src/agent/evaluation/gateEvaluators.ts"
+      ]
+    },
+    {
+      "id": "KNOW-08",
+      "severity": "P2",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/evaluation/gateEvaluators.ts",
+      "disposition": "fixed",
+      "reason": "Rejection gate identifies knowledge action=submit and accepts only validated persisted candidates; reads and failed envelopes cannot dilute rejection counts.",
+      "evidence": [
+        "src/agent/utils/toolOutcomes.ts",
+        "src/agent/evaluation/gateEvaluators.ts",
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-09",
+      "severity": "P2",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/evaluation/analysisArtifact.ts",
+      "disposition": "fixed",
+      "reason": "Artifact snippet grounding now resolves the physical path through shared containment before source reads; symlink escape test passed.",
+      "evidence": [
+        "src/agent/evaluation/analysisArtifact.ts",
+        "src/shared/projectPath.ts",
+        "test/evidence-collector-fidelity.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-10",
+      "severity": "P3",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/evaluation/qualityGates.ts",
+      "disposition": "fixed",
+      "reason": "Retired graph-retry private constants and unused Core import removed; current module coverage gate remains.",
+      "evidence": [
+        "src/agent/evaluation/qualityGates.ts"
+      ]
+    },
+    {
+      "id": "KNOW-11",
+      "severity": "P1",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "test/durable-semantic-review-runtime.test.ts",
+      "disposition": "fixed",
+      "reason": "Durable semantic review test imports createProjectContextFileRef from the actual @alembic/core/project-context facade.",
+      "evidence": [
+        "test/durable-semantic-review-runtime.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-12",
+      "severity": "P1",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "scripts/eval-mining.mjs",
+      "disposition": "fixed",
+      "reason": "eval-mining injects shared createEvaluationRecipeGateway with createOrStage/evaluateReadiness and pending/id/raw records. No legacy create-only port remains.",
+      "evidence": [
+        "scripts/eval-mining.mjs",
+        "scripts/lib/mining-eval-runtime.mjs",
+        "test/mining-eval-harness.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-13",
+      "severity": "P2",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "src/agent/runtime/AgentRuntime.ts",
+      "disposition": "fixed",
+      "reason": "Repair stage adds evidence; RECORD/repair schema projection retains evidence alongside note_finding. Runtime restriction still blocks unrelated exploration and writes.",
+      "evidence": [
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/llm-input-layering.test.ts",
+        "test/evidence-recording-phase-chain.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-14",
+      "severity": "P2",
+      "originalReport": "knowledge-review.json",
+      "originalPath": "scripts/eval-judge-calibration.mjs",
+      "disposition": "fixed",
+      "reason": "Calibration receipt collection records missing/unreadable/outside evidence as null hash/error rows instead of aborting report generation. The introduced malformed-sources regression is also closed by MAINT-03.",
+      "evidence": [
+        "scripts/eval-judge-calibration.mjs",
+        "scripts/lib/mining-eval-runtime.mjs",
+        "test/mining-eval-harness.test.ts"
+      ]
+    },
+    {
+      "id": "MT-01",
+      "severity": "P2",
+      "originalReport": "maintenance-review.json",
+      "originalPath": ".github/workflows/ci.yml",
+      "disposition": "fixed",
+      "reason": "CI invokes check:ci for the full Agent/Core-compatible gate chain and retains public import smoke. Real Alembic host consumer remains in full local check and is explicitly documented as a separate environment requirement.",
+      "evidence": [
+        ".github/workflows/ci.yml",
+        "package.json",
+        "README.md",
+        "README.zh-CN.md"
+      ]
+    },
+    {
+      "id": "MT-02",
+      "severity": "P1",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "test/ai-provider.test.ts",
+      "disposition": "fixed",
+      "reason": "Missing-credential tests clear the four provider key environments and install a fail-if-called fetch stub; afterEach restores both.",
+      "evidence": [
+        "test/ai-provider.test.ts"
+      ]
+    },
+    {
+      "id": "MT-03",
+      "severity": "P2",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "scripts/codemod-rename.mjs",
+      "disposition": "fixed",
+      "reason": "Codemod dry-run prints each specifier/path-string plan plus rename rows without applying changes; the new temp-root test asserts visible plan and unchanged source bytes.",
+      "evidence": [
+        "scripts/codemod-rename.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MT-04",
+      "severity": "P2",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "scripts/codemod-rename.mjs",
+      "disposition": "fixed",
+      "reason": "Codemod computes imports from final importer/dependency positions, including dependencies not renamed. Original-offset reverse application also closes the subsequent cascading regression MAINT-02.",
+      "evidence": [
+        "scripts/codemod-rename.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MT-05",
+      "severity": "P2",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "scripts/stage-agent-publish-package.mjs",
+      "disposition": "fixed",
+      "reason": "package build now clears generated dist before tsc, and release:stage calls build before copying. The cleanup target is now a no-trailing-slash path and MAINT-01 symlink regression is covered.",
+      "evidence": [
+        "package.json",
+        "scripts/build-agent.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MT-06",
+      "severity": "P3",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "README.zh-CN.md",
+      "disposition": "fixed",
+      "reason": "Chinese README removes the nonexistent capabilities directory, lists evidence/toolsets/current presets and all 15 exports, and documents strict host-consumer validation and host wiring. No API was changed to match outdated docs.",
+      "evidence": [
+        "README.zh-CN.md",
+        "README.md"
+      ]
+    },
+    {
+      "id": "MT-07",
+      "severity": "P3",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "docs/entrypoint-effects.md",
+      "disposition": "fixed",
+      "reason": "Current effects text now describes MemoryStore reads/writes through injected DB and distinguishes explicit build/release/codemod writes from checks. Dated Census is preserved with an explicit current reconciliation section.",
+      "evidence": [
+        "docs/entrypoint-effects.md",
+        "docs/side-effect-doctrine-census.md"
+      ]
+    },
+    {
+      "id": "MT-08",
+      "severity": "P2",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "scripts/verify-agent-validation-floor.mjs",
+      "disposition": "fixed",
+      "reason": "Validation-floor declaration count uses TypeScript AST and recognizes it.each/test.each outer invocations without double-counting the each builder. Frozen floors were not lowered.",
+      "evidence": [
+        "scripts/verify-agent-validation-floor.mjs"
+      ]
+    },
+    {
+      "id": "MT-09",
+      "severity": "P3",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "scripts/stage-agent-publish-package.mjs",
+      "disposition": "fixed",
+      "reason": "README.zh-CN.md is now included in root package files, the staged manifest, and staging copy operations; the local README language link has a packaged target. Root will verify an actual release staging run separately.",
+      "evidence": [
+        "scripts/stage-agent-publish-package.mjs",
+        "package.json",
+        "README.md"
+      ]
+    },
+    {
+      "id": "MT-10",
+      "severity": "P3",
+      "originalReport": "maintenance-review.json",
+      "originalPath": "config/side-effect-doctrine.json",
+      "disposition": "fixed",
+      "reason": "The obsolete RuntimeCapability reach-up exception was removed from the current machine companion record. Historical Census remains intact and its current reconciliation explicitly records that the reach-up was already resolved.",
+      "evidence": [
+        "config/side-effect-doctrine.json",
+        "docs/side-effect-doctrine-census.md"
+      ]
+    },
+    {
+      "id": "MAINT-01",
+      "severity": "P1",
+      "originalReport": "final-maintenance-review.json",
+      "originalPath": "scripts/build-agent.mjs",
+      "disposition": "fixed",
+      "reason": "build-agent now passes fileURLToPath(new URL(../dist,...)) without trailing slash to rmSync; new temp-root test asserts external symlink target sentinel survives and dist link is removed.",
+      "evidence": [
+        "scripts/build-agent.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MAINT-02",
+      "severity": "P2",
+      "originalReport": "final-maintenance-review.json",
+      "originalPath": "scripts/codemod-rename.mjs",
+      "disposition": "fixed",
+      "reason": "Codemod collects edits against original source offsets, avoids overlaps and applies descending offsets; the regression asserts ./b and ../b remain distinct after moving the importer.",
+      "evidence": [
+        "scripts/codemod-rename.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MAINT-03",
+      "severity": "P2",
+      "originalReport": "final-maintenance-review.json",
+      "originalPath": "scripts/lib/mining-eval-runtime.mjs",
+      "disposition": "fixed",
+      "reason": "Receipt helper restores Array.isArray normalization; regression table covers object, number, string and null source lists.",
+      "evidence": [
+        "scripts/lib/mining-eval-runtime.mjs",
+        "test/mining-eval-harness.test.ts"
+      ]
+    }
+  ],
+  "verification": {
+    "method": "Read current source and exact regression assertions. No new test run in this final read-only turn.",
+    "rootReportedEvidence": "Root reports 13 RED before fixes, then 3 files / 66 tests GREEN including dist symlink preservation, moved-importer noncascading rewrite and malformed source-list cases.",
+    "previousIndependentEvidence": "This agent previously reproduced all three maintenance failures in isolated temp roots/pure probes and ran 53 focused evidence/style tests before the final follow-up patches.",
+    "finalAcceptance": "Root retains final test and acceptance authority.",
+    "releaseStaging": "MT-09 inspected in manifest/copy source; actual staging execution is reserved for root as explicitly requested."
+  },
+  "retainedReviewAdvice": [
+    {
+      "topic": "public facade and compatibility exports",
+      "disposition": "retained-with-reason",
+      "reason": "Real adjacent consumers were found; no deletion is authorized merely because an entrypoint has no in-repository caller."
+    },
+    {
+      "topic": "historical doctrine Census",
+      "disposition": "retained-with-reason",
+      "reason": "It is explicitly a 2026-06-12 baseline. A 2026-09-18 reconciliation now distinguishes current implementation, so historical entries are not current defects."
+    },
+    {
+      "topic": "unconfirmed seed-ledger / lax legacy judge / hash-helper observations",
+      "disposition": "retained-with-reason",
+      "reason": "They were not promoted to confirmed findings; there is no additional verified fix scope in this closing pass."
+    }
+  ]
+}

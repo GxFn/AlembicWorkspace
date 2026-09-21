@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "status": "completed",
+  "scope": "direct-user AlembicAgent single-repository configuration consolidation",
+  "commit": "8f58bdedfe1ce31c52779f3805c40f026f765197",
+  "baseCommit": "f863c52496026558cf0133910fc1053b9dc89827",
+  "branch": "codex/llm-sdk-adapters",
+  "files": [
+    "config/layer-contract.json",
+    "docs/llm-adapters.md",
+    "src/ai/AiFactory.ts",
+    "src/ai/AiProvider.ts",
+    "src/ai/configuration.ts",
+    "src/ai/contracts.ts",
+    "src/ai/gateway/LLMGateway.ts",
+    "src/ai/providers/ClaudeProvider.ts",
+    "src/ai/providers/DeepSeekProvider.ts",
+    "src/ai/providers/GoogleGeminiProvider.ts",
+    "src/ai/providers/OllamaProvider.ts",
+    "src/ai/providers/OpenAiProvider.ts",
+    "src/ai/shared/concurrency.ts",
+    "src/ai/shared/reliability.ts",
+    "src/ai/transport/ClaudeTransport.ts",
+    "src/ai/transport/DeepSeekTransport.ts",
+    "src/ai/transport/GoogleTransport.ts",
+    "src/ai/transport/LLMTransport.ts",
+    "src/ai/transport/OpenAiTransport.ts",
+    "test/LLMGateway.test.ts",
+    "test/ai-configuration.test.ts",
+    "test/embedding-capacity-hint.test.ts",
+    "test/provider-facades.test.ts"
+  ],
+  "verification": {
+    "command": "npm run check",
+    "node": "22.23.2",
+    "exitCode": 0,
+    "testFiles": 75,
+    "tests": 1200,
+    "publicEntrypoints": 15,
+    "runtimeBindings": 451,
+    "existingLintWarnings": 17,
+    "warningFiles": [
+      "scripts/eval-judge-calibration.mjs",
+      "scripts/eval-mining.mjs",
+      "scripts/lint-provider-neutral-kernel.mjs",
+      "scripts/smoke-agent-public-signatures.mjs",
+      "scripts/verify-agent-validation-floor.mjs",
+      "test/mining-e2e-pipeline.test.ts",
+      "test/runtime-terminal-safety.test.ts"
+    ],
+    "warningsInChangedFiles": false,
+    "liveModelCalls": false,
+    "coreDependency": "file:../AlembicCore",
+    "coreSymlink": "../../../AlembicCore"
+  },
+  "baseline": {
+    "command": "npm test -- test/AiFactory.test.ts test/LLMGateway.test.ts test/provider-facades.test.ts test/embedding-capacity-hint.test.ts test/transport-proxy.test.ts",
+    "exitCode": 0,
+    "files": 5,
+    "tests": 62
+  },
+  "regressions": [
+    {
+      "id": "endpoint",
+      "behavior": "显式 endpoint 配环境 key 的 HTTP 路由",
+      "red": {
+        "ref": "endpoint-red.log",
+        "digest": "sha256:b1ce8678dbc30babe2351f10b0b78dd21bce33e5b334c7fbdd6f417b9536d9ce"
+      },
+      "green": {
+        "ref": "endpoint-green.log",
+        "digest": "sha256:527ab836a5582fad00e1839dc1288e900a3828b5621eb74670a111c3682d2210"
+      }
+    },
+    {
+      "id": "snapshot",
+      "behavior": "创建时连接/协议快照与显式空 key",
+      "red": {
+        "ref": "snapshot-red.log",
+        "digest": "sha256:42f8e01e8377069dc5e14a810591d6738b912ea4222850e0bd24230cbe956b42"
+      },
+      "green": {
+        "ref": "snapshot-green.log",
+        "digest": "sha256:09ae9a1aacecf8724a25845d57fd8eb598fd444624eef901b0da9bc9e9c08ef7"
+      }
+    },
+    {
+      "id": "assembly",
+      "behavior": "多入口 URL、模型、fallback 和 embedding 实际装配",
+      "red": {
+        "ref": "assembly-red.log",
+        "digest": "sha256:548a68813f231fe1e507695930373d14ea2f3db7e0cee88e91866b7b986d7414"
+      },
+      "green": {
+        "ref": "assembly-green.log",
+        "digest": "sha256:a14c53b0b5023c6632f2d6b39ff8ea2c99d7746295f245608a4f80640f464bdd"
+      }
+    },
+    {
+      "id": "concurrency",
+      "behavior": "无效并发拒绝与 Gateway 环境快照",
+      "red": {
+        "ref": "concurrency-red.log",
+        "digest": "sha256:0201753a5d60d52c16ee24f9e705d0cd440003298d159fa39cb2779351b19aa7"
+      },
+      "green": {
+        "ref": "concurrency-green.log",
+        "digest": "sha256:bd32970b350790a2a16732130bcaff5da101af0ca8f19b819f70c4730e67c87b"
+      }
+    },
+    {
+      "id": "identity",
+      "behavior": "别名路由及清理后的配置覆盖",
+      "red": {
+        "ref": "identity-red.log",
+        "digest": "sha256:4ff66eaa466ee049c48bf04b673c48827f43a0563f853097d9efc93de04ab65f"
+      },
+      "green": {
+        "ref": "identity-cleanup-green.log",
+        "digest": "sha256:01d7c5fc60fcd0dd0259c93ac3d96387d6e6d70f34919a49a08aa7d3d90ee803"
+      }
+    },
+    {
+      "id": "receipt",
+      "behavior": "公开 DeepSeek endpoint 回执和 embedding 拼接",
+      "red": {
+        "ref": "receipt-red.log",
+        "digest": "sha256:fa745b2305592654e8be444f9a4d157d3cb7c626730370b79160759a6cd621a7"
+      },
+      "green": {
+        "ref": "receipt-green.log",
+        "digest": "sha256:37df6aa3d9c1a431cb6bc9f20ca931b2ab96f97817965cd7fd0ada240b1e28f1"
+      }
+    },
+    {
+      "id": "input-defaults",
+      "behavior": "输入类型拒绝、原默认值保留",
+      "red": {
+        "ref": "input-defaults-red.log",
+        "digest": "sha256:32f8bc06c2542b56e1376a49f1d22421adf08eefec3cc79c1491ece5bc5e4666"
+      },
+      "green": {
+        "ref": "input-defaults-green.log",
+        "digest": "sha256:6c1c09820ca3f8a0ce5888845d5ed69e5040b8d9d3a90a31070a4028b16fac45"
+      }
+    },
+    {
+      "id": "metadata",
+      "behavior": "厂商回执字段与执行路径一致",
+      "red": {
+        "ref": "metadata-red.log",
+        "digest": "sha256:a5e574a67816308c271d1c2522483d517ee076983c404e42031933439750a63d"
+      },
+      "green": {
+        "ref": "metadata-green.log",
+        "digest": "sha256:ea83287b6588aa76124a6d8a788d34ee90a72de92a85eb1d98d73a3b73d77f76"
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "ref": "assembly-green.log",
+      "digest": "sha256:a14c53b0b5023c6632f2d6b39ff8ea2c99d7746295f245608a4f80640f464bdd"
+    },
+    {
+      "ref": "assembly-red.log",
+      "digest": "sha256:548a68813f231fe1e507695930373d14ea2f3db7e0cee88e91866b7b986d7414"
+    },
+    {
+      "ref": "baseline.log",
+      "digest": "sha256:db5d8551534fbe082c9b7107f25f92935c1795982a40a36308226ae62792fd4c"
+    },
+    {
+      "ref": "concurrency-green.log",
+      "digest": "sha256:bd32970b350790a2a16732130bcaff5da101af0ca8f19b819f70c4730e67c87b"
+    },
+    {
+      "ref": "concurrency-red.log",
+      "digest": "sha256:0201753a5d60d52c16ee24f9e705d0cd440003298d159fa39cb2779351b19aa7"
+    },
+    {
+      "ref": "consumer-scan.txt",
+      "digest": "sha256:df4f3149c64cbf09de7c8b2bc1ac43f1977ba2275823300bb58ca5540ce8e003"
+    },
+    {
+      "ref": "endpoint-green.log",
+      "digest": "sha256:527ab836a5582fad00e1839dc1288e900a3828b5621eb74670a111c3682d2210"
+    },
+    {
+      "ref": "endpoint-red.log",
+      "digest": "sha256:b1ce8678dbc30babe2351f10b0b78dd21bce33e5b334c7fbdd6f417b9536d9ce"
+    },
+    {
+      "ref": "full-check-final.log",
+      "digest": "sha256:3b2d354bd75ec093e4444399ac1025adb0da45ba00ca44e5093904bfbfda858f"
+    },
+    {
+      "ref": "full-check-first.log",
+      "digest": "sha256:f4a2025360a67103b41d47ac33b58fff6032796f2992018621bd37a4164aebaf"
+    },
+    {
+      "ref": "identity-cleanup-green.log",
+      "digest": "sha256:01d7c5fc60fcd0dd0259c93ac3d96387d6e6d70f34919a49a08aa7d3d90ee803"
+    },
+    {
+      "ref": "identity-red.log",
+      "digest": "sha256:4ff66eaa466ee049c48bf04b673c48827f43a0563f853097d9efc93de04ab65f"
+    },
+    {
+      "ref": "input-defaults-green.log",
+      "digest": "sha256:6c1c09820ca3f8a0ce5888845d5ed69e5040b8d9d3a90a31070a4028b16fac45"
+    },
+    {
+      "ref": "input-defaults-red.log",
+      "digest": "sha256:32f8bc06c2542b56e1376a49f1d22421adf08eefec3cc79c1491ece5bc5e4666"
+    },
+    {
+      "ref": "metadata-green.log",
+      "digest": "sha256:ea83287b6588aa76124a6d8a788d34ee90a72de92a85eb1d98d73a3b73d77f76"
+    },
+    {
+      "ref": "metadata-red.log",
+      "digest": "sha256:a5e574a67816308c271d1c2522483d517ee076983c404e42031933439750a63d"
+    },
+    {
+      "ref": "plan.md",
+      "digest": "sha256:a9601608e72d286d4c1f507c78c706110198de4095712d601b84dab455789fd2"
+    },
+    {
+      "ref": "receipt-green.log",
+      "digest": "sha256:37df6aa3d9c1a431cb6bc9f20ca931b2ab96f97817965cd7fd0ada240b1e28f1"
+    },
+    {
+      "ref": "receipt-red.log",
+      "digest": "sha256:fa745b2305592654e8be444f9a4d157d3cb7c626730370b79160759a6cd621a7"
+    },
+    {
+      "ref": "review.md",
+      "digest": "sha256:bf6a5834f8594f9d758953ff85f5bcb86ccd0fd1b89dd12151b1c539ca229f1f"
+    },
+    {
+      "ref": "snapshot-green.log",
+      "digest": "sha256:09ae9a1aacecf8724a25845d57fd8eb598fd444624eef901b0da9bc9e9c08ef7"
+    },
+    {
+      "ref": "snapshot-red.log",
+      "digest": "sha256:42f8e01e8377069dc5e14a810591d6738b912ea4222850e0bd24230cbe956b42"
+    },
+    {
+      "ref": "types-first.log",
+      "digest": "sha256:8ab682c844bb97d9b5bef9a5b964b6ee6ff8d575a813314f27c65645ceb81b0b"
+    }
+  ],
+  "preexistingUncommittedFiles": [
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "evidenceNormalization": "Only local absolute paths replaced with portable repository/home markers; assertions and test outcomes unchanged.",
+  "sources": [
+    "https://ai-sdk.dev/docs/ai-sdk-core/provider-management",
+    "https://ai-sdk.dev/providers/ai-sdk-providers/openai"
+  ],
+  "risks": [
+    "Explicit empty apiKey now stays empty; callers inheriting environment should omit it or pass undefined.",
+    "No live model/provider interoperability checks; fake HTTP only.",
+    "Network proxy configuration intentionally remains per-request."
+  ],
+  "nextStep": "Continue in-scope review of AiProviderManager switching, token callbacks and dependent invalidation."
+}

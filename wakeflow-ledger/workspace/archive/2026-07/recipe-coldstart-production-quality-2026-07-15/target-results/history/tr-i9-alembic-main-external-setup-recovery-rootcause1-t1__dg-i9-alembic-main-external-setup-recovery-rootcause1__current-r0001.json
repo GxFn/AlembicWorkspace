@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i9-alembic-main-external-setup-recovery-rootcause1-p1",
+  "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i9-alembic-main-external-setup-recovery-rootcause1-t1",
+  "status": "completed",
+  "summary": "Alembic Main now consumes an exact versioned external setup authority/action pair before config, logging, database migration, or strict production mutation. Pristine setup preserves physical absence until the external lease and fsynced journal header are durable; rebuild setup snapshots and probes the complete target root outside the target, performs the existing allowlisted reset, and crash-safely restores/reselects the exact pre-reset observation on authorized pre-CAS failure. The request/authority/topology/state/recovery contracts reject unknown keys, path overlap, symlink/special-file traversal, credentials in the snapshot root, hash drift, unauthorized phase recovery, missing external journal headers, and live-owner contention. The existing Plan→Analysis→private corpus→G1/G2/G3/G4→tool-neutral serving→CAS chain remains the only production orchestrator. Clean Alembic commit f5d32020aea4e2bfd69bcb3212300aad6263618d.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/task-packages/i9-alembic-main-external-setup-recovery-rootcause1-p1.json",
+    "Test/scratch/chain-runs/pcv-20260717-0422-recipe-coldstart-i9/attachments/n1-entry-contract-evidence.json",
+    "Alembic/lib/Bootstrap.ts",
+    "Alembic/lib/http/routes/jobs.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictAuthorization.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictColdStartOrchestrator.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictProductionContracts.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictProductionJournal.ts",
+    "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+    "Alembic/test/unit/StrictProductionJournal.test.ts",
+    "Alembic/test/unit/StrictProductionBoundaryStatic.test.ts",
+    "Alembic/test/unit/RecipePipelineFacadeStrict.test.ts"
+  ],
+  "verification": [
+    "Clean commit f5d32020aea4e2bfd69bcb3212300aad6263618d has parent d019f1467efdd00b7408b4cde9c2aa9449af449d and tree 011bebb8503dda9ac7bee5fe8568ac9eaf568a55; git status --short is empty.",
+    "RED baseline: the focused strict test command could not load the absent StrictExternalSetupRecovery module, and the old request parser did not preserve setupAuthority or reject the unknown-key case.",
+    "Focused GREEN: npx vitest run test/unit/StrictExternalSetupRecovery.test.ts test/unit/StrictProductionJournal.test.ts test/unit/StrictProductionBoundaryStatic.test.ts test/unit/RecipePipelineFacadeStrict.test.ts passed 4 files and 26 tests.",
+    "Final npm run check exited 0: typecheck, Biome, repository/layer/doctrine/naming/Core/Agent boundaries, unit, integration, coverage, shared-asset drift, retired-symbol, and ring-direction checks passed; only five existing noExplicitAny warnings remain in unchanged files.",
+    "Final npm run build exited 0 against the configured local AlembicCore source.",
+    "npm run release:package-guard and npm run release:staging:pack both exited 0; the staging dry-run packaged 2193 entries.",
+    "git diff --cached --check and the commit hook's Biome check/format both passed; the final commit contains exactly 11 Alembic files and no sibling-product changes.",
+    "Boundary scans found no new AlembicPlugin, plugin/MCP dependency, arbitrary root override, user absolute path, private key, or runtime secret literal in changed production sources."
+  ],
+  "risks": [
+    "Per task boundary, no real Test/Ghost root was run or modified; controller-owned cold-start matrix validation remains downstream.",
+    "The external lease fails closed on a live PID and safely reclaims a dead unchanged inode, but this patch does not add periodic heartbeat renewal or process-start identity beyond the initial heartbeat/PID record.",
+    "Alembic Guard could not produce a guard receipt because the installed tool rejected its own unexpected _meta field; repository validation, boundary scans, and two-stage manual review passed and this verification degradation is reported rather than hidden."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "baseline",
+      "commit": "d019f1467efdd00b7408b4cde9c2aa9449af449d",
+      "value": {
+        "tree": "b4082a7e5f8a27cf6c060b5ee09405a31d1a41a0",
+        "clean": true
+      },
+      "verify": "git -C Alembic rev-parse HEAD HEAD^{tree}; git -C Alembic status --short captured before edits"
+    },
+    {
+      "kind": "test-first",
+      "ref": "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+      "value": "The initial focused command failed on the missing setup module and exposed request-schema gaps; the same four-file command is now green with 26 tests.",
+      "verify": "npx vitest run test/unit/StrictExternalSetupRecovery.test.ts test/unit/StrictProductionJournal.test.ts test/unit/StrictProductionBoundaryStatic.test.ts test/unit/RecipePipelineFacadeStrict.test.ts"
+    },
+    {
+      "kind": "commit",
+      "commit": "f5d32020aea4e2bfd69bcb3212300aad6263618d",
+      "value": {
+        "parent": "d019f1467efdd00b7408b4cde9c2aa9449af449d",
+        "tree": "011bebb8503dda9ac7bee5fe8568ac9eaf568a55",
+        "changedFileCount": 11,
+        "worktreeClean": true
+      },
+      "verify": "git -C Alembic show --stat --oneline f5d32020aea4e2bfd69bcb3212300aad6263618d; git -C Alembic status --short"
+    },
+    {
+      "kind": "setup-authority-call-chain",
+      "ref": "Alembic/lib/Bootstrap.ts",
+      "value": {
+        "order": [
+          "WorkspaceResolver",
+          "external authority/action load",
+          "external lease",
+          "fsynced journal header",
+          "pristine initialize or rebuild snapshot/probe",
+          "config/logger",
+          "database connect",
+          "exact reset",
+          "migrations",
+          "existing strict production chain"
+        ],
+        "recoveryPort": "recover/complete are startup-only; execute failures recover before public CAS when authorized"
+      },
+      "verify": "Review AppRuntime.initialize/initializeDatabase and dispatchStrictExternalSetupStartup; StrictProductionBoundaryStatic asserts the pre-mutation order."
+    },
+    {
+      "kind": "external-recovery-contract",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+      "value": {
+        "scenarios": [
+          "pristine physical absence/discard",
+          "rebuild whole-root snapshot/probe/restore"
+        ],
+        "durableArtifacts": [
+          "StrictRunJournalHeaderV1",
+          "StrictExternalTopologyReceiptV1",
+          "StrictExternalSetupStateV1",
+          "StrictRecoveryTransactionV1",
+          "StrictExternalRecoveryReceiptV1"
+        ],
+        "failClosed": [
+          "exact schemas",
+          "hash bindings",
+          "non-overlap",
+          "no symlink/special files",
+          "credential sentinel rejection",
+          "live lease",
+          "phase policy",
+          "exact restore observation"
+        ]
+      },
+      "verify": "StrictExternalSetupRecovery.test.ts covers pristine absence, fresh resume, complete rebuild restore, drift, secret rejection, crash after quarantine, malformed observation, finalized recovery denial, overlap/symlink, and live/dead leases."
+    },
+    {
+      "kind": "tests",
+      "ref": "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+      "value": {
+        "focused": "4 files, 26 passed",
+        "fullCheck": "exit 0",
+        "unit": "154 files, 1155 passed",
+        "integration": "32 files, 467 passed, 10 skipped"
+      },
+      "verify": "Run the focused vitest command and npm run check."
+    },
+    {
+      "kind": "package-gates",
+      "ref": "Alembic/package.json",
+      "value": {
+        "build": "passed",
+        "packageGuard": "passed",
+        "stagingPack": "passed",
+        "stagingEntries": 2193
+      },
+      "verify": "npm run build && npm run release:package-guard && npm run release:staging:pack"
+    },
+    {
+      "kind": "boundary-scan",
+      "ref": "Alembic/test/unit/StrictProductionBoundaryStatic.test.ts",
+      "value": "No Plugin/MCP/Test adapter or arbitrary path override was introduced; existing strict orchestration remains singular and all repository boundary gates pass.",
+      "verify": "npm run lint:repo-boundary && npm run lint:layer-contract && npm run lint:core-import-boundary && npm run lint:agent-extraction-boundary && npm run check:shared-asset-drift && npm run lint:ring-direction"
+    },
+    {
+      "kind": "self-review",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+      "value": {
+        "stage1": "Contract review verified pre-mutation authority, pristine absence, whole-root restore/reselection, fail-closed topology/header/lease/schema boundaries, and unchanged strict chain.",
+        "stage2": "Quality review removed formatter churn, verified a minimal 11-file diff, reran focused tests/build/full check, and recorded Guard degradation plus residual lease risk."
+      },
+      "verify": "git -C Alembic diff d019f1467efdd00b7408b4cde9c2aa9449af449d..f5d32020aea4e2bfd69bcb3212300aad6263618d --check; npm run check"
+    },
+    {
+      "kind": "change-scope",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictColdStartOrchestrator.ts",
+      "value": "Exactly 11 files changed inside Alembic; AlembicCore, AlembicAgent, AlembicPlugin, Test, Design, Wakeflow, vendor, and Ghost roots were not modified.",
+      "verify": "git -C Alembic diff --name-only d019f1467efdd00b7408b4cde9c2aa9449af449d..f5d32020aea4e2bfd69bcb3212300aad6263618d"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i9-alembic-main-external-setup-recovery-rootcause1__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i9-alembic-main-external-setup-recovery-rootcause1__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i9-alembic-main-external-setup-recovery-rootcause1__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i9-alembic-main-external-setup-recovery-rootcause1__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 143,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i9-alembic-main-external-setup-recovery-rootcause1-p1",
+    "targetTaskId": "i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause1",
+    "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "createdAt": "2026-07-16T21:52:07.784Z"
+  },
+  "createdAt": "2026-07-16T21:52:07.784Z",
+  "stateRevisionObserved": 143,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

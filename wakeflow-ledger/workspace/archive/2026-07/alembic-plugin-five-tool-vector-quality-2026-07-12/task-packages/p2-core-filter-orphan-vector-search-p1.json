@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p2-core-filter-orphan-vector-search-p1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "summary": "Phase P2: make shared SearchEngine results truthful when a vector index contains orphan/stale entry ids.\n\nIncluded mainline:\n- Add a RED/GREEN Core regression where vector search returns both live and orphan entry ids while findByIdsDetailSync returns only the live database row.\n- Filter semantic and hybrid/auto vector candidates against non-deprecated request-database rows before they can reach Search, Prime, ranking, or public projection. Preserve candidate order and scores for surviving live rows; refill up to the requested limit from over-retrieved live candidates when possible.\n- Return a stable diagnostic/searchMeta signal or bounded count for filtered orphan vector candidates if the existing Core contract supports this without leaking provider internals; do not turn it into a readiness gate.\n- Keep keyword/weighted behavior, vector fallback, filters, budgets, source-ref drift annotations, read-only database behavior, and existing SyncCoordinator reconciliation semantics unchanged.\n\nNon-goals:\n- Do not mutate or rebuild the live vector index during a query.\n- Do not add Git revision/checkpoint, host-project, role/admin, intent, knowledge-state, or tool-visibility gates.\n- Do not change Plugin MCP schemas, Graph, Recipe Map, Prime projection, Alembic main, vendor snapshots, or real project data in this package.\n\nBoundary/dependency:\n- Repository is AlembicCore; expected primary surface is src/service/search/SearchEngine.ts plus focused Core tests. AlembicPlugin integration waits for the accepted Core commit.\n\nValidation and backfill:\n- Commit the Core change in AlembicCore.\n- Run focused SearchEngine tests, full Core test suite, npm run check, and npm run build.\n- Return the commit, exact changed files/symbols, RED/GREEN orphan-vector proof, live-row ordering/limit proof, no-write proof, compatibility/failure-path review, command output summaries, and two-stage self-review.\n\nCompletion advances the demand to the Plugin consumer package; it does not complete the demand and does not dispatch Test.",
+  "status": "pending",
+  "sourceRef": "User continuation command plus controller raw runtime/SQLite/code evidence on 2026-07-12.",
+  "designIntent": "Use the request-scoped knowledge repository as the read-only truth set at the SearchEngine retrieval seam, filtering orphan vector candidates before ranking/projection rather than mutating the index or adding a policy gate.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "orphan-vector-red-green-proof"
+      },
+      {
+        "kind": "live-result-order-limit-proof"
+      },
+      {
+        "kind": "read-only-no-write-proof"
+      },
+      {
+        "kind": "search-meta-diagnostic-proof"
+      }
+    ]
+  },
+  "continuation": {
+    "continuationId": "continuation-0011",
+    "type": "verified-bug",
+    "reason": "The user explicitly asked to continue resolving the quality problems discovered by controller real-tool acceptance. These are inside the existing five-tool retrieval-quality completion definition: semantic/Prime currently surface vector-index entries that the request-scoped knowledge database cannot retrieve; the same acceptance also proved Plugin Graph candidate preselection misses exact identifiers and Recipe Map misclassifies Core status=drifted as unresolved. The continuation preserves all prior accepted vector-default work and fixes only these evidenced truth/quality defects.",
+    "evidenceRefs": [
+      "user-command:continue-resolving-discovered-quality-problems-2026-07-12",
+      "runtime:BiliDili-semantic-returned-d165b798-and-4112efa7",
+      "runtime:BiliDili-search-get-d165b798-found=false",
+      "db:BiliDili-knowledge_entries-missing-d165b798-and-4112efa7",
+      "runtime:AlembicWorkspace-graph-excludes-HostMcpServer-and-ProjectLocationService",
+      "db:BiliDili-recipe_source_refs-status=drifted",
+      "code:AlembicCore/SearchEngine._supplementDetails-does-not-filter-missing-rows",
+      "code:AlembicPlugin-Graph-preselection-slices-alphabetical-candidates",
+      "code:AlembicPlugin-RecipeRefStatus-omits-drifted"
+    ],
+    "priorCompletionEventId": "evt-20260712135428-0010",
+    "priorCompletionRevision": 10,
+    "createdAt": "2026-07-12T15:14:42.160Z"
+  },
+  "createdAt": "2026-07-12T15:14:42.160Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p2-core-filter-orphan-vector-search-t1",
+      "taskPackageId": "p2-core-filter-orphan-vector-search-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Implement and commit Core SearchEngine filtering so orphan vector ids absent from the request-scoped knowledge database can never be returned as live knowledge; prove surviving live results keep ordering, budgets, filters, and read-only behavior.",
+      "status": "pending",
+      "createdAt": "2026-07-12T15:14:42.160Z",
+      "continuationId": "continuation-0011"
+    }
+  ]
+}

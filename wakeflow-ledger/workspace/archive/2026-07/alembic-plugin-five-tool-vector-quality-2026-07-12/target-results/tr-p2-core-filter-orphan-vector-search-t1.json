@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p2-core-filter-orphan-vector-search-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p2-core-filter-orphan-vector-search-p1",
+  "dispatchGroup": "p2-core-filter-orphan-vector-search-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p2-core-filter-orphan-vector-search-t1",
+  "status": "completed",
+  "summary": "AlembicCore now projects all semantic, auto/hybrid, and legacy vector candidates through the request-scoped non-deprecated knowledge repository before filters, ranking, slicing, or public projection. Missing/deprecated vector IDs are filtered read-only; surviving candidates retain order and scores and refill from the existing over-retrieved pool. Added bounded optional searchMeta.filteredOrphanVectorCount and fail-closed weighted fallback when truth lookup fails. Commits: 4476b3f (RED tests), 9e499809b3721a0d49e78853db4e115515b281ac (implementation).",
+  "evidenceRefs": [
+    "AlembicCore/test/SearchEngine.test.ts",
+    "commit:4476b3f:test(search)-expose-orphan-vector-leakage",
+    "commit:9e499809b3721a0d49e78853db4e115515b281ac:fix(search)-filter-orphan-vector-candidates",
+    "command:npm-test:177-files-1649-tests-passed",
+    "command:npm-run-build:passed",
+    "command:npm-run-lint:731-files-passed",
+    "command:npm-run-lint-naming:passed",
+    "command:npm-run-lint-retired-symbols:passed",
+    "check:npm-run-check:stopped-at-preexisting-ASTChunker-doctrine-violation"
+  ],
+  "verification": [
+    "Baseline: npm test -- test/SearchEngine.test.ts test/SearchPipeline.test.ts => 2 files, 63 tests passed.",
+    "RED: semantic/auto orphan-vector focused tests failed because orphan candidates reached detail lookup/ranking; legacy test failed because pre-truth slice queried only the orphan.",
+    "GREEN: npm test -- test/SearchEngine.test.ts => 45/45 passed, including semantic, auto/hybrid, legacy, truth-lookup failure, order/score/limit, no-write, and searchMeta cases.",
+    "Full suite: npm test => 177 files, 1649 tests passed.",
+    "npm run build => passed.",
+    "npm run lint => 731 files passed; npm run lint:naming and npm run lint:retired-symbols passed.",
+    "npm run check ran: build plus public API, layer, consumer imports, scope, smoke, output budget, and space-edge gates passed; it stopped at lint:doctrine for src/infrastructure/vector/ASTChunker.ts:32. That file is outside this task diff and its blob hash 6e88dab655821ed72e9389a7c274b87d07fbecde exactly matches start HEAD f427557.",
+    "Read-only proof: SearchEngine vector projection only calls findByIdsDetailSync and source-ref reads; mutation spies for repository insert/update/delete and vector upsert/remove/clear/reconcileIndex were never called.",
+    "Worktree clean after commits; final HEAD 9e499809b3721a0d49e78853db4e115515b281ac."
+  ],
+  "risks": [
+    "Repository-wide npm run check is not green because of the pre-existing ASTChunker doctrine violation at the task-start blob; this package did not alter that unrelated AST lifetime surface.",
+    "Refill uses the existing fixed over-retrieval pool, so results can remain below limit when orphan/filter removals exhaust that pool; no orphan can leak.",
+    "Very large caller-supplied limits can enlarge the batched truth lookup; current normal search limits are safe, while a future cap/chunking change would be separate scope.",
+    "The truth projection validates row existence and non-deprecated lifecycle without replacing nonempty vector metadata fields, preserving current filter/ranking compatibility."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "SearchEngine deduplicated then sliced/supplemented vector hits; _supplementDetails enriched found rows but retained missing IDs, so orphan shells reached filters/ranking/public results. Both production detail queries also admitted deprecated rows."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Baseline focused tests; commit public-entry RED tests for semantic/auto/legacy; implement shared request-DB projection and optional meta; run focused/full/check/build; two-stage spec and quality review; commit and return evidence."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Only AlembicCore SearchEngine, SearchTypes, the two knowledge detail repository queries, and SearchEngine tests changed. No Plugin/Alembic/Agent/Dashboard/vendor/live-data/index mutation or SyncCoordinator changes."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/SearchEngine.test.ts",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "full-suite",
+      "value": "npm test => 177 files, 1649 tests passed",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "commit",
+      "commit": "9e499809b3721a0d49e78853db4e115515b281ac",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 verified all three vector paths filter before filters/ranking/slice, preserve budgets/order/scores, and remain read-only. Stage 2 independent read-only diff review found no blocking issue; optional bounded meta and live-only repository predicates are backward-compatible. Pre-existing AST doctrine failure recorded separately.",
+      "verify": "self-attested"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p2-core-filter-orphan-vector-search-p1__AlembicCore__p2-core-filter-orphan-vector-search-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-filter-orphan-vector-search-p1__AlembicCore__p2-core-filter-orphan-vector-search-t1.json",
+    "deliveryRunId": "run-delivery-p2-core-filter-orphan-vector-search-p1__AlembicCore__p2-core-filter-orphan-vector-search-t1",
+    "dispatchGroup": "p2-core-filter-orphan-vector-search-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-filter-orphan-vector-search-p1__AlembicCore__p2-core-filter-orphan-vector-search-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 12,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p2-core-filter-orphan-vector-search-p1",
+    "targetTaskId": "p2-core-filter-orphan-vector-search-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p2-core-filter-orphan-vector-search-p1",
+    "resultId": "tr-p2-core-filter-orphan-vector-search-t1",
+    "createdAt": "2026-07-12T15:33:20.164Z"
+  },
+  "createdAt": "2026-07-12T15:33:20.164Z",
+  "stateRevisionObserved": 12,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-p2-core-filter-orphan-vector-search-t1",
+    "dispatchGroup": "p2-core-filter-orphan-vector-search-p1",
+    "historyFile": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12/target-results/history/tr-p2-core-filter-orphan-vector-search-t1__p2-core-filter-orphan-vector-search-p1__current-r0001.json"
+  }
+}

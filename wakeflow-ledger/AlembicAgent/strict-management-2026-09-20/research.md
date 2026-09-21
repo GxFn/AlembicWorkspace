@@ -1,0 +1,11 @@
+# 参考与不采用的合并
+
+本轮持续以本地实际调用链为依据。对TencentDB hook/context/observer分层的参考沿用上一轮固定commit记录，不复制其HTTP或数据库交付层。
+
+[JSON Canonicalization Scheme — RFC 8785](https://www.rfc-editor.org/rfc/rfc8785)强调哈希依赖不变的表示、确定的字段排序；其3.2.3规定了具体排序方式。这是信息性RFC，不意味着任意名为canonical的本地实现都符合JCS。
+
+本地检查发现：Agent Strict V1的hashCanonical使用localeCompare排序，带前缀的hashCoreCanonical仍复用该排序；Core自身canonical helper采用不同排序。对包含大小写属性名的同一对象，字节表示不一定相等。因此本轮只移动现有实现，不以函数名字相似为由合并或替换hash算法，也不宣称两者等价。若需统一，必须另行核对实际生产/消费回执和版本迁移，不能在纯分层commit中改变既有指纹。
+
+Core canonicalize/create/validate调用多数属于跨阶段或跨进程的重新验证。尤其Analyst epoch的重建会重跑人口、归纳、证伪与review守恒；外层hash对得上不能替代这一链路，故保留。
+
+本轮采用的职责结构由源码符号依赖证明：analysisLoop与analyst各消费内部primitive，lineage消费二者，expressions消费lineage与Analyst类型，gates独立消费primitive和Core typed-return。94个具名声明包含类型边的依赖图无环。原StrictProductionPipeline保留精确兼容出口，内部helper不扩成包公共接口。

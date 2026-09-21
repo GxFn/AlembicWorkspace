@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i7-core-private-revision-rehydrate-rootcause3-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i7-core-private-revision-rehydrate-rootcause3-p1",
+  "dispatchGroup": "dg-i3-i7-core-private-revision-rehydrate-rootcause3",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i7-core-private-revision-rehydrate-rootcause3-t1",
+  "status": "completed",
+  "summary": "AlembicCore 在 accepted 6b6341f 基线上新增正式 @alembic/core/workspace rehydratePrivateCorpusRevisionV1：仅重开 receipt 严格绑定、existing、未 revoked 的同一 private revision leaf，不创建 root、不运行 migrations；复用既有 resolver、openAlembicDatabase、durable revocation marker、私有 Handle authority 和 repository stack。提交 737ac265dc50b8ccf788c1b9103ead537d94ff06（tree 386679d2bd8ccb55236436222c30de76dc78dee7，parent 6b6341f05332a1d15f79c19a0251d41b962b71d1），工作区干净。fresh-process built-package probe 证明两个独立 Node 进程恢复同一 dataRoot/DB bytes 与 durable session；负向矩阵、PC-F、公共 API、消费者和全量测试通过。npm run check 只在未改动 ASTChunker.ts:32 的既有 doctrine 基线上停止，parent/current blob 均为 6e88dab655821ed72e9389a7c274b87d07fbecde。",
+  "evidenceRefs": [
+    "AlembicCore@737ac265dc50b8ccf788c1b9103ead537d94ff06",
+    "AlembicCore/src/service/production/ProductionPersistenceContracts.ts",
+    "AlembicCore/src/service/production/PrivateCorpusRevisionResolver.ts",
+    "AlembicCore/src/infrastructure/database/DatabaseConnection.ts",
+    "AlembicCore/src/workspace.ts",
+    "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+    "AlembicCore/scripts/probe-private-revision-rehydrate.mjs",
+    "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json"
+  ],
+  "verification": [
+    "Baseline: clean HEAD 6b6341f05332a1d15f79c19a0251d41b962b71d1 / tree 84c094ee01052c91df5c9e94a50862dc61652f15; focused 14/14 and build:check passed; PC-F receipt sha256 ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6.",
+    "RED: public workspace call failed with TypeError rehydratePrivateCorpusRevisionV1 is not a function; GREEN: ProductionPersistenceContracts 18/18.",
+    "Built-package fresh-process probe: distinctProcesses=true, public initialize/rehydrate/repositoryFactory=true, sameDataRootIdentity=true, sameDatabaseBytes=true, durable session PERSIST_PREPARED recovered; probeReceiptHash sha256:72808270946fb431db3baa59983d6a3084da1cf8adb158aa33b75ab77cf98428; productionPersistence dist hash sha256:4b45662a2eb386f08fb432ca3604dfa116a3bbb6b680ef72a2ec65aa8b25c8fa.",
+    "Negative coverage: missing receipt, tampered config/scope/migration receipt, wrong project scope, missing leaf, symlinked leaf, migration-ledger drift, revoked root, existing-leaf initializer, old-root post-replace, double-connect; all fail closed.",
+    "Focused boundaries/public API: 7 files / 47 tests passed; build:check passed; public API boundary 67 classified / 60 exact / 7 wildcard; smoke imported 60 exact entrypoints.",
+    "PC-F regression: 16 files / 142 tests passed. Full npm test: 190 files / 1853 tests passed.",
+    "Consumer imports: AlembicAgent 73 refs/0 issues; Alembic 497/0; AlembicPlugin 456/0. Biome 771 files, layer, scope, naming, retired-symbols, output budgets, space edges and git diff --check passed.",
+    "npm run check reaches lint:doctrine and stops only at unchanged src/infrastructure/vector/ASTChunker.ts:32; HEAD/current blob identity is 6e88dab655821ed72e9389a7c274b87d07fbecde. No waiver or unrelated fix added."
+  ],
+  "risks": [
+    "The repository-wide npm run check remains red solely because of the pre-existing ASTChunker.ts:32 doctrine baseline explicitly excluded by the task; all checks after that gate were run independently and passed.",
+    "Rehydrate intentionally trusts the sealed init receipt as the accepted config/lineage authority and verifies its canonical hash against current filesystem, migration bundle/ledger and SQLite facts; it does not introduce a second configuration or receipt store."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "737ac265dc50b8ccf788c1b9103ead537d94ff06",
+      "verify": "single clean Core next commit; parent 6b6341f05332a1d15f79c19a0251d41b962b71d1; tree 386679d2bd8ccb55236436222c30de76dc78dee7"
+    },
+    {
+      "kind": "public-api",
+      "ref": "AlembicCore/scripts/probe-private-revision-rehydrate.mjs",
+      "verify": "built @alembic/core/workspace and /repositories imports succeeded; 60-entry public smoke and consumer scan passed; productionPersistence dist sha256:4b45662a2eb386f08fb432ca3604dfa116a3bbb6b680ef72a2ec65aa8b25c8fa"
+    },
+    {
+      "kind": "fresh-process-runtime",
+      "ref": "AlembicCore/scripts/probe-private-revision-rehydrate.mjs",
+      "verify": "process A init/write/close then distinct process B base-resolver+sealed-receipt rehydrate; same root identity and DB bytes, durable repository session recovered; probe sha256:72808270946fb431db3baa59983d6a3084da1cf8adb158aa33b75ab77cf98428"
+    },
+    {
+      "kind": "negative-tests",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "receipt/config/scope/migration/missing/symlink/revoked/existing-init and post-replace fences fail closed; focused 18/18"
+    },
+    {
+      "kind": "tests",
+      "value": "focused 7 files/47; PC-F 16/142; full 190/1853; build:check, public API, consumers, Biome/layer/scope/naming/retired/budgets/space/diff checks passed",
+      "verify": "npm run check only unchanged ASTChunker doctrine baseline"
+    },
+    {
+      "kind": "compatibility",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "absent-before-create initializer, ordinary root, same-object close/reconnect, one-native-handle, replacement revocation, next revision and PC-F receipt preserved"
+    },
+    {
+      "kind": "baseline",
+      "value": "clean 6b6341f / tree 84c094e; focused 14/14; build:check pass; PC-F receipt ee67374b"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "baseline and authority read -> public RED -> strict existing-leaf rehydrate -> negative/fresh-process/public probes -> focused/PC-F/full gates -> two-stage review -> one commit"
+    },
+    {
+      "kind": "test-first",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "interactive RED was missing public function; final single-commit constraint preserved; GREEN 18/18"
+    },
+    {
+      "kind": "two-stage-self-review",
+      "value": "Stage 1: all six completion clauses and non-goals matched. Stage 2: resolved duplicate revoked-root authority by reading the existing durable marker instead of adding state; no blocker/high/medium residual findings; no cross-repo or second-platform changes."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": null,
+    "deliveryFile": null,
+    "deliveryRunId": null,
+    "dispatchGroup": null,
+    "deliveryEnvelopeFile": null,
+    "deliveryEnvelopeFound": false,
+    "resolution": "state-only-result",
+    "returnRoute": null,
+    "returnPolicy": null,
+    "controllerWindow": null,
+    "controllerReturnRequired": false
+  },
+  "controllerActionRequired": false,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 84,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i7-core-private-revision-rehydrate-rootcause3-p1",
+    "targetTaskId": "i3-i7-core-private-revision-rehydrate-rootcause3-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "dg-i3-i7-core-private-revision-rehydrate-rootcause3",
+    "resultId": "tr-i3-i7-core-private-revision-rehydrate-rootcause3-t1",
+    "createdAt": "2026-07-16T08:24:21.021Z"
+  },
+  "createdAt": "2026-07-16T08:24:21.021Z",
+  "stateRevisionObserved": 84,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

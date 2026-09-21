@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-20",
+  "status": "green-frozen-for-root-review",
+  "followupTo": "knowledge-fix-verification.json",
+  "scope": {
+    "files": [
+      "src/tools/runtime/handlers/knowledge.ts",
+      "test/recipe-production-profile-adapter.test.ts"
+    ],
+    "productOrTestEditsOutsideScope": false,
+    "splitFiles": false,
+    "commitCreated": false,
+    "noCommitReason": "Root 负责后续复审、职责拆分与提交。"
+  },
+  "rootCause": "前次 style 测试先直接使用 base，因此提前创建了顶层题目字典；没有覆盖从第一轮开始每次都只传 {...base} 的实际阶段投影。_submitTitleAttempts 顶层懒创建随后丢在临时投影中。",
+  "implementation": {
+    "source": {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "line": 519
+    },
+    "behavior": "题目字典归属稳定 sessionCounterBox._submitTitleAttempts；旧 sharedState._submitTitleAttempts 字典按原引用接入，当前投影保留兼容别名。3次提交尝试/2次style修复、原型名称自有键防护保持。",
+    "compatibility": "旧顶层普通字典的对象身份不变，constructor/__proto__ 的既有计数继续读取/写回自有属性。"
+  },
+  "red": {
+    "command": "Node22 vitest run test/recipe-production-profile-adapter.test.ts -t \"fresh shallow projection|prototype-shaped title\"",
+    "result": "3 failures before product change: fourth fresh projection incorrectly created; two legacy dictionaries had no stable-box alias.",
+    "test": {
+      "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+      "line": 488
+    },
+    "seam": "public handle(submit), actual Core gate, fake persistence/provider; base only contains pre-created _sessionCounters and every call receives a new shallow projection."
+  },
+  "green": [
+    {
+      "command": "Node22 vitest run test/recipe-production-profile-adapter.test.ts -t \"fresh shallow projection|prototype-shaped title\"",
+      "result": "3 pass, 44 skipped"
+    },
+    {
+      "command": "Node22 vitest run test/recipe-production-profile-adapter.test.ts",
+      "result": "47 tests pass",
+      "durationSeconds": 3.65
+    },
+    {
+      "command": "Node22 node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+      "result": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "biome check src/tools/runtime/handlers/knowledge.ts test/recipe-production-profile-adapter.test.ts",
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check -- src/tools/runtime/handlers/knowledge.ts test/recipe-production-profile-adapter.test.ts",
+      "result": "PASS"
+    }
+  ],
+  "selfReview": {
+    "scope": "Only the two authorized files changed in this follow-up. No new strategy, permission, Core API or budget amount.",
+    "coverage": "Fresh projection from first call; fourth call zero additional creates; style<=2; stable _sessionCounters identity; unchanged legacy dictionary identity; prototype titles still safe."
+  },
+  "files": [
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "sha256": "b67092f05d471f3f59f5f99ad3cec5991218532bbe89426a4f68f8130e05f6cf"
+    },
+    {
+      "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+      "sha256": "4a6f87cb0837fd1f688f0d525c7cb25d2507a2d1f85e1713fc9d48a3e3ad85cd"
+    }
+  ],
+  "nextStep": "Root 接手复审；本子任务冻结上述两文件，不继续拆分或提交。"
+}

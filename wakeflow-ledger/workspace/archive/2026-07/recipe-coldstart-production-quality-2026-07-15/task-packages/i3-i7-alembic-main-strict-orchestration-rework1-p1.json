@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i7-alembic-main-strict-orchestration-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "基线与边界\n- 只修改 Alembic；开工必须为 clean HEAD 32578dc3d5fe02eb8c6d24d854066d780ffb668d / tree 945b99963919bb273793c15001a1f845df5964ba。\n- 实际本地依赖必须解析到已接受 AlembicCore 737ac265dc50b8ccf788c1b9103ead537d94ff06、AlembicAgent b2888aab463ae996341f9eeaba6d2bf91a6a11c0 与 PC-F receipt ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6；不一致立即阻塞。\n- 复用原 Main package 的完整目标。本轮只解除已复现的上游公共面阻塞，不缩小、不扩展需求，也不修改 Core/Agent/Plugin/Design/Test/Wakeflow 或真实 Ghost/data roots。\n\n合法上游入口\n- Core 只经 @alembic/core 及已接受的精确公共子路径消费，私有 revision fresh-process 恢复必须调用 @alembic/core/workspace 的 rehydratePrivateCorpusRevisionV1，不得 deep import、内联复制或伪造 receipt。\n- Agent Plan 只经 @alembic/agent/runs 的 runStrictPlanAgent；analysis/expansion/epoch/fixpoint/Producer lineage/expression-set 只经 @alembic/agent/production；独立 reviewer 只经 @alembic/agent/evaluation。\n- Main 向既有 AgentService/profile 注入 StrictProductionRuntimePortV1，让 Agent 内部 stage registry/PipelineStrategy 持有 stage/gate/repair authority；不得 deep import Agent 私有 builder、prompt、fixture/eval runner或重造并行 orchestrator。\n\n必须完成\n1. 在现有 RecipePipelineFacade、ColdStartWorkflow、PlanSelectionGate、Generate session/runner/finalizer 接入 authorization→observed pointers→snapshot/restore probe→exact allowlist reset→blank；strict 禁止 fullReset，失败不可前进，legacy 保持兼容。\n2. blank 后只 capture/reopen 一次 certified ProjectContext artifact；调用 Agent strict Plan cognition，再由 Core compiler生成 required universe、lens、fact-query catalog、baseline schedule及完整保留 question/tool/priority/budget 的 execution projection。旧 executable PlanSelection、top-N/floor、二次采集、raw/synthetic fallback 为零。\n3. 在现有外层 pipeline 增加唯一 append-only strict durable journal，记录确定状态、typed owner/resume 与补偿；fresh process 从精确 durable substate恢复。generic skip/degrade、asyncFill、completed_with_errors 不得成为 strict success。\n4. 执行 frozen dimension-free direct/derived facts、完整 population、已登记 expansion/counterquery、Analyst cluster/induction/falsification/disposition并封印 analysis fixpoint；未登记 query、缺 backend、partial/error、live reread或 schema-only edge 均 fail closed。\n5. 对 survived/narrowed hypotheses 接收 Agent 0/1/N expression sets，按 canonical serial row 执行 G1→non-persisting admission→disposition review或独立G2→journal-authorized prepared ID persist→refs→contentReady→expression-set closure；Producer 无 submit/persist/review 权限，无 filler/数量 proxy，semantic repair 深度最多2。\n6. 每个 fixpoint 使用 confined、absent-before-create private corpus root和同一受支持 Repository/Gateway/KnowledgeService 栈。semantic re-fixpoint 必须封存旧root、fresh-process rehydrate验证后在新物理空root完整重放，旧root后续 open/read=0，旧 Recipe 不参与 dedup/coverage/snapshot。\n7. 完成 G3、durability、candidate assembly/ACTIVE、sparse、首个 explicit vector generation、immutable seal、G4、serving reconciliation、FinalCoverageBinding、candidate five-tool oracle、ServingSnapshotManifest，最后 lock-inside-compare 单一 public route CAS；query-time 不补数据。\n8. canonical module resolver、refs/binding/source vector/manifest 守恒；source root与private revision root分离；IncrementalRescan/legacy readers/hooks逐项 applicable 或 typed-unreachable。\n9. strict 终态独立于 generic bootstrap；本包仅产出后续 Plugin 可消费的 candidate/public handle 和 runtime provenance，不实现 Plugin 五 MCP serving，不启动 Test。\n\n关键验证\n- 保留 fullReset、旧 Plan、二次 facts、fire-and-forget、required-null/fallback、direct persistence、旧 coverage closure 的 RED，再证明同链 GREEN。\n- 覆盖单capture/顺序、snapshot/reset/blank、Plan+compile、fact/population/query/fixpoint、0/1/N、serial admission、prepared-ID crash、refs、双 private roots、fresh-process rehydrate、G3/G4、sparse/vector、seal、candidate oracle、public CAS、resume/idempotency/concurrency/故障矩阵。\n- 关键 fixture：先持久化 row A，再由后续 row 触发 semantic re-fixpoint；两个root/DB hash不同但 migration semantic hash一致且 BiliDili含017，旧A对新dedup/coverage/snapshot为零，完整重放且无重复 Recipe。\n- 运行 build:check、目标测试、check、完整 test、必要 integration/e2e、git diff --check；仅一个干净 Alembic commit，回填 parent/commit/tree、依赖/包/dist/load hashes、runtime/journal/fault JSON与SHA-256、命令计数、RED/GREEN、兼容性和两阶段自审。\n- 不使用真实 DeepSeek/API key、不触碰真实数据根；如果已接受公共入口仍不足，返回精确 blocker，不得复制上游源码或改相邻仓库。",
+  "status": "pending",
+  "sourceRef": "Original Main package i3-i7-alembic-main-strict-orchestration-p1；accepted Core@737ac265dc50b8ccf788c1b9103ead537d94ff06；accepted Agent@b2888aab463ae996341f9eeaba6d2bf91a6a11c0；PC-F receipt ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6；controller accept evt-20260716090658-0090",
+  "designIntent": "在现有 Facade/Workflow/session/finalizer 内串联 authorization→blank→one facts→Agent Plan+Core compile→fact/Analyst/Producer→G1/G2/private persistence→coverage/index/seal→candidate oracle→CAS；只通过已接受 Core/Agent 公共入口。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "单一 clean Alembic commit on 32578dc3；parent/commit/tree/changed symbols。"
+      },
+      {
+        "kind": "dependency-provenance",
+        "verify": "实际加载 Core 737ac265、Agent b2888aab、PC-F receipt和对应合法 package/dist/load hashes。"
+      },
+      {
+        "kind": "runtime-report",
+        "verify": "RecipePipelineFacade 真实入口完整状态/receipt链到唯一 public CAS；不是平行测试壳。"
+      },
+      {
+        "kind": "journal-recovery",
+        "verify": "fresh-process 精确 durable substate resume、prepared-ID crash、typed owner/resume、无skip/degrade success。"
+      },
+      {
+        "kind": "revision-isolation",
+        "verify": "semantic re-fixpoint 双root、Core rehydrate、旧root零读、完整重放、无重复Recipe。"
+      },
+      {
+        "kind": "negative-tests",
+        "verify": "拒绝 fullReset/旧Plan/二次facts/fallback/未登记query/partial事实/Producer越权/第三次repair/旧root读取/CAS竞争与Agent deep import。"
+      },
+      {
+        "kind": "tests",
+        "verify": "build:check、focused、check、full test及必要integration/e2e均给命令、结果、计数。"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "legacy非strict保持；无相邻仓库/真实root/Plugin/Test变更；上游能力不复制。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "execution-plan"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "two-stage-self-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T09:08:38.344Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i7-alembic-main-strict-orchestration-rework1-t1",
+      "taskPackageId": "i3-i7-alembic-main-strict-orchestration-rework1-p1",
+      "targetWindow": "Alembic",
+      "summary": "在已接受 Core rehydrate 与 Agent strict public facades 上，完成 Alembic 现有 RecipePipelineFacade 的 strict 冷启动生产主链、可恢复 journal、私有 revision、内容门禁与单一公开 CAS；不复制上游实现。",
+      "status": "pending",
+      "createdAt": "2026-07-16T09:08:38.344Z"
+    }
+  ]
+}

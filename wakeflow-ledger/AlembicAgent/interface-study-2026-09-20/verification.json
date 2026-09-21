@@ -1,0 +1,136 @@
+{
+  "date": "2026-09-20",
+  "kind": "architecture-interface-study",
+  "status": "research-complete-proposal-not-implemented",
+  "repositories": {
+    "AlembicAgent": "69ee567624bc119bf05edcc739d890056e297c9c",
+    "AlembicCore": "4a0b27786775f7c8568a21823a6ef6217d9146b9",
+    "Alembic": "4dc86fbb95ae67a86ddf215406ae4767901f3dd8",
+    "TencentDB-Agent-Memory": "06414ac10766b9bd61e4a69f3cf0ea414afb6d4f"
+  },
+  "productSourceChanged": false,
+  "productCommitCreated": false,
+  "noCommitReason": "本轮用户要求了解架构、联网/本地参考并思考对接层整理，交付源码证据与可执行迁移方案；研究文档按规则归档ledger。",
+  "existingWorktreeChanges": [
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "readOnlyChecks": [
+    {
+      "command": "git status/log; source/caller scans",
+      "result": "Agent69ee567；仅原有治理文件修改；相关Main/Tencent源码无未提交差异"
+    },
+    {
+      "command": "node scripts/lint-layer-contract.mjs --report",
+      "result": "63 runtime cross-area edges;24 type-only bridges"
+    },
+    {
+      "command": "scope-probe.mjs (Node22)",
+      "result": "真实Main factory；不同fixture身份共享SessionStore/DeltaCache，second read unchanged；仅内存，未证明运行中产品跨用户泄露"
+    },
+    {
+      "command": "context-probe.mjs (Node22)",
+      "result": "真实AgentService/Pipeline +受控RuntimeLike；flat state未送达，nested state送达；两个Main compact函数AST相同"
+    },
+    {
+      "command": "verify-probe-inputs.mjs",
+      "result": "5个Probe使用的Agent dist模块与当前源码转译AST一致"
+    },
+    {
+      "command": "Tencent codec probes",
+      "result": "未知OpenAI block与Anthropic cache_control丢失，见报告；未运行Tencent服务/SDK"
+    }
+  ],
+  "fullTestSuiteRunThisStudy": false,
+  "baselineFullCheck": {
+    "source": "../strict-management-2026-09-20/verification.json",
+    "testFiles": 66,
+    "tests": 938,
+    "note": "前轮69ee567基线，仅作为已有证据，不冒充本轮执行"
+  },
+  "interfaceFamilies": 12,
+  "proposalPriority": {
+    "AgentOnly": [
+      "schema query port + action allowlist",
+      "AI leaf contracts/errors with compatibility re-exports"
+    ],
+    "JointAgentMain": [
+      "controlled knowledge ports",
+      "scope-aware factory resources",
+      "one effective run context and shared compactor"
+    ]
+  },
+  "authorityLimits": [
+    "Main/Core/Tencent只读，跨仓实现需要明确授权",
+    "V1/public兼容删除需消费者/替代路径/决策和验证证据",
+    "合同单源不是把所有协议、状态或结果压为同一个对象"
+  ],
+  "primaryWebSources": [
+    {
+      "title": "Hexagonal architecture original article",
+      "url": "https://alistair.cockburn.us/hexagonal-architecture"
+    },
+    {
+      "title": "Microsoft architectural principles",
+      "url": "https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/architectural-principles"
+    },
+    {
+      "title": "Fastify Decorators",
+      "url": "https://fastify.dev/docs/latest/Reference/Decorators/"
+    },
+    {
+      "title": "Building Effective Agents",
+      "url": "https://www.anthropic.com/engineering/building-effective-agents"
+    },
+    {
+      "title": "TypeScript Type Assertions",
+      "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions"
+    },
+    {
+      "title": "Node Packages",
+      "url": "https://nodejs.org/api/packages.html#package-entry-points"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "architecture.md",
+      "sha256": "b0920ffbbe0546a10f36d857abeb485d71e08cba98a59261088905dfa90b58ff"
+    },
+    {
+      "path": "interface-map.json",
+      "sha256": "d96ee4af9619f8ff4ced1eccc2d2c275a137a5baee2eb74753b95ec52a85560b"
+    },
+    {
+      "path": "interface-map.csv",
+      "sha256": "3620e590a17ff829b8b422035f7971888c33564ece19b6fd8e44fd0eacf7f365"
+    },
+    {
+      "path": "reports/ai-ports.json",
+      "sha256": "cd92c6f61781c5dd7c3125caf204372602d88e18963b1584e32b7869d1eb69d2"
+    },
+    {
+      "path": "reports/context-probe.json",
+      "sha256": "865e976d971d6c532a93b0dfd156eb9551d848d7f84a2bc46f2023e4c19a5c4d"
+    },
+    {
+      "path": "reports/layer-census.txt",
+      "sha256": "3fb1a004dffd0ee6d84a98dc95b59ec64ff9f089519d9403dd5bb257675681eb"
+    },
+    {
+      "path": "reports/probe-input-verification.json",
+      "sha256": "6254d8c76ac9af7c9f9d9ccb2e95b91089d49a1e589e70d68823fdd75f03d77c"
+    },
+    {
+      "path": "reports/scope-probe.json",
+      "sha256": "e5cf3bb66b05361619c722c00b1e1453faae470ea99576249f72772f6e4b5b4a"
+    },
+    {
+      "path": "reports/tencent-ports.json",
+      "sha256": "865d8464e7440c16f5ff7bd1fe99582c44e9906a63320e61cf1e56b2da3dc7b3"
+    },
+    {
+      "path": "reports/tool-ports.json",
+      "sha256": "76e4ef5bf82cd8a66faf82fccde5db9a5ae3e375c2aa5464a8f24701ba7e4ca6"
+    }
+  ]
+}

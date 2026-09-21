@@ -1,0 +1,55 @@
+> @alembic/agent@0.3.0 check
+> npm run build:check && npm run lint && npm run lint:agent-import-boundary && npm run lint:public-api-boundary && npm run lint:core-import-boundary && npm run lint:space-edges && npm run lint:layer-contract && npm run lint:doctrine && npm run lint:naming && npm run lint:provider-neutral-kernel && npm run smoke:public-signatures && npm run smoke:strict-consumer && npm run verify:validation-floor && npm run test && npm run lint:retired-symbols
+> @alembic/agent@0.3.0 build:check
+> tsc -p tsconfig.json --noEmit
+> @alembic/agent@0.3.0 lint
+> biome check src scripts test
+    85 │   'provider-neutral kernel lint passed (runtime/evaluation/strategies code paths are provider-name free).'
+    85    │ - ··'provider-neutral·kernel·lint·passed·(runtime/evaluation/strategies·code·paths·are·provider-name·free).'
+    144 │     `Agent public signature smoke OK: ${checkedExports} exports, ${checkedBindings} bindings`
+    144     │ - ····`Agent·public·signature·smoke·OK:·${checkedExports}·exports,·${checkedBindings}·bindings`
+    150 │       'Agent validation floor OK:',
+    150     │ - ······'Agent·validation·floor·OK:',
+> @alembic/agent@0.3.0 lint:agent-import-boundary
+> node scripts/lint-agent-import-boundary.mjs
+AlembicAgent import boundary check passed.
+> @alembic/agent@0.3.0 lint:public-api-boundary
+> node scripts/lint-agent-public-api-boundary.mjs
+AlembicAgent public API boundary OK: 15 exact exports, no wildcard exports.
+> @alembic/agent@0.3.0 lint:core-import-boundary
+> node ../AlembicCore/scripts/lint-consumer-core-imports.mjs . --config config/core-import-boundary.json
+Core import boundary OK: scanned 353 files and 109 @alembic/core imports.
+> @alembic/agent@0.3.0 lint:space-edges
+> node scripts/check-agent-space-edges.mjs
+Space-edge gate OK: @alembic/agent space edges equal [@alembic/core] (config: node_modules/@alembic/core/config/space-allowed-edges.json), source scan clean across src/test/scripts (353 files), toolchain floor met (node 22.23.2, tsc 5.9.3, biome 2.4.6, vitest 4.1.6).
+> @alembic/agent@0.3.0 lint:layer-contract
+> node scripts/lint-layer-contract.mjs
+Layer contract OK: 63 cross-area runtime imports within the allowed matrix; 25 type-only bridges exempt.
+> @alembic/agent@0.3.0 lint:doctrine
+> node scripts/lint-doctrine.mjs
+Doctrine lint OK: 254 src files clean (null-slot idiom honored; 2 exemptions consumed from config/side-effect-doctrine.json).
+> @alembic/agent@0.3.0 lint:naming
+> node scripts/lint-naming.mjs
+naming lint passed (254 files checked; 0 exceptions; x.profile.ts family exempt by pattern).
+> @alembic/agent@0.3.0 lint:provider-neutral-kernel
+> node scripts/lint-provider-neutral-kernel.mjs
+provider-neutral kernel lint passed (runtime/evaluation/strategies code paths are provider-name free).
+> @alembic/agent@0.3.0 smoke:public-signatures
+> npm run build && node scripts/smoke-agent-public-signatures.mjs
+> @alembic/agent@0.3.0 build
+> node scripts/build-agent.mjs
+Agent public signature smoke OK: 15 exports, 451 bindings
+> @alembic/agent@0.3.0 smoke:strict-consumer
+> npm run build && node scripts/probe-agent-public-strict-consumer.mjs
+> @alembic/agent@0.3.0 build
+> node scripts/build-agent.mjs
+> @alembic/agent@0.3.0 verify:validation-floor
+> node scripts/verify-agent-validation-floor.mjs
+Agent validation floor OK: testFiles=68 declaredTestCases=774 stablePublicExportCount=15 coreReferenceLimitTotal=52 packEntryCount=511
+> @alembic/agent@0.3.0 test
+> vitest run
+ Test Files  68 passed (68)
+      Tests  979 passed (979)
+   Duration  31.39s (transform 19.47s, setup 0ms, import 145.07s, tests 50.98s, environment 9ms)
+> @alembic/agent@0.3.0 lint:retired-symbols
+> node ../AlembicCore/scripts/lint-retired-symbols.mjs . --dirs=src,test

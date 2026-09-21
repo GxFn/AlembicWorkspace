@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1",
+  "dispatchGroup": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1",
+  "status": "completed",
+  "summary": "AlembicCore commit f6e3f1956d67fa1d7a0a3440c2931196d9549d06 restores the frozen PC-F five-file capability contract byte-for-byte by removing only the later createProjectContextFileRef re-export from project-context-foundation and exposing the single existing helper through @alembic/core/project-context. Built package imports, explicit forbidden old-surface checks, strict production probe, V5 regressions, full tests and public boundary gates pass. Main remains a separately authorized pending consumer and was not modified.",
+  "evidenceRefs": [
+    "AlembicCore commit f6e3f1956d67fa1d7a0a3440c2931196d9549d06 (parent c0a6633d9570178494cb208b42a268f2f3899911; tree 792d6f987d1b5e78f5e63e2b5a2ff7863a016e79)",
+    "<workspace-root>/.wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/controller-runtime-artifact-manifest/pcf-final-artifact-drift-diagnosis.json",
+    "<workspace-root>/wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json",
+    "<workspace-root>/AlembicCore/src/project-context.ts",
+    "<workspace-root>/AlembicCore/src/projectContextFoundation.ts",
+    "<workspace-root>/AlembicCore/test/ProjectContextContract.test.ts",
+    "<workspace-root>/AlembicCore/test/ProjectContextFoundation.test.ts",
+    "<workspace-root>/AlembicCore/scripts/smoke-public-api.mjs",
+    "<workspace-root>/AlembicCore/scripts/strict-production-authority-probe.mjs",
+    "Alembic lifecycle finish-public-ms5amwh6-1; Guard guard-public-ms5ao18a-2 and guard-public-ms5ao6g4-3"
+  ],
+  "verification": [
+    "Baseline on exact c0a6633d: build:check and 4 focused files / 74 tests passed; rebuilt five-file PC-F manifest was sha256:b2a8e3f4b28cc79571a2d1152b2d5dfec27139d182ad8f56470e391dcc647848 with only projectContextFoundation.js changed.",
+    "RED before production edit: ProjectContextContract and ProjectContextFoundation ran 61 tests; exactly the two new route assertions failed because project-context lacked createProjectContextFileRef and foundation still exposed it.",
+    "GREEN focused after final edit: build:check passed; 5 files / 85 tests passed, including PC-F foundation, public package, shared/cross-harvest V4/V5 and disposition authority.",
+    "Built contract: @alembic/core/project-context exports createProjectContextFileRef as a function; @alembic/core/project-context-foundation does not own it; smoke imported all 61 exact entrypoints.",
+    "Exact regression: all five receipt rows match, including projectContextFoundation.js sha256:08262be7..., and manifest equals sha256:4d3ecdc70227cd3cc613c9df26ca04107a6327aec7eebc5eae3a5856c614f008.",
+    "npm run probe:strict-production passed with the new project-context public subpath and all 11 fault mutations rejected.",
+    "Full regression: 194 files passed, 1 skipped; 1905 tests passed, 1 skipped. npm run lint, lint:naming, lint:retired-symbols, public/layer/consumer/scope/output-budget/space-edge gates passed.",
+    "npm run check reaches only the accepted-parent doctrine violation at unchanged src/infrastructure/vector/ASTChunker.ts:32; that file and scripts/lint-doctrine.mjs have zero task diff. All stages after that short-circuit were run independently and passed.",
+    "Alembic Guard: six task-scoped changed TypeScript files passed 0 violations; the exact two-line foundation negative assertion passed inline Guard. Initial whole-file scan exposed one unchanged method-length warning at ProjectContextFoundation.test.ts:2875, outside the task diff.",
+    "git diff HEAD^ --check passed; HEAD/parent/tree verified; worktree clean."
+  ],
+  "risks": [
+    "Alembic Main commit 602be240 still imports createProjectContextFileRef from @alembic/core/project-context-foundation. The authorized downstream interface is now: import { createProjectContextFileRef } from '@alembic/core/project-context'; Main migration remains controller-owned and was intentionally not patched here.",
+    "Composite npm run check remains red only on the unchanged accepted-parent doctrine baseline at src/infrastructure/vector/ASTChunker.ts:32; task-relevant and independently rerun remaining gates pass.",
+    "Alembic Guard's whole-file AST method-length warning at ProjectContextFoundation.test.ts:2875 is pre-existing and outside the changed lines; refactoring it would be unauthorized scope expansion."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "f6e3f1956d67fa1d7a0a3440c2931196d9549d06",
+      "verify": "One clean AlembicCore commit on exact parent c0a6633d9570178494cb208b42a268f2f3899911; tree 792d6f987d1b5e78f5e63e2b5a2ff7863a016e79; nine scoped files; no sibling edits."
+    },
+    {
+      "kind": "repro",
+      "ref": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/controller-runtime-artifact-manifest/pcf-final-artifact-drift-diagnosis.json",
+      "verify": "Exact clean rebuild produced sha256:b2a8e3f4...; the other four receipt rows matched and only dist/projectContextFoundation.js differed (7f5c0609... versus baseline 08262be7...)."
+    },
+    {
+      "kind": "regression",
+      "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json",
+      "verify": "Post-fix build recomputed all five listed rows exactly and restored manifest sha256:4d3ecdc70227cd3cc613c9df26ca04107a6327aec7eebc5eae3a5856c614f008."
+    },
+    {
+      "kind": "compatibility",
+      "ref": "AlembicCore/scripts/smoke-public-api.mjs",
+      "verify": "Built @alembic/core/project-context exports createProjectContextFileRef; foundation explicitly forbids it; all 61 exact public entrypoints import; accepted production/V5 exports remain present."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/ProjectContextContract.test.ts",
+      "verify": "Focused 5 files / 85 tests and full 194 files / 1905 tests passed (one environment-gated skip); strict production probe and V5 regressions passed."
+    },
+    {
+      "kind": "verification",
+      "ref": "guard-public-ms5ao18a-2",
+      "verify": "Guard passed six changed files with zero violations; inline changed foundation assertion passed guard-public-ms5ao6g4-3; lint, build, public boundaries, exact hash and git diff --check passed."
+    },
+    {
+      "kind": "two-stage-self-review",
+      "value": "Stage 1: exact PC-F authority, public route, frozen old facade, V5 preservation, no sibling changes and pending Main interface all match the task. Stage 2: no P0/P1/P2 findings; single implementation retained, ESM named export explicit, negative old-route test added, no fallback/state/performance changes. Unchanged doctrine and Guard baseline warnings recorded separately.",
+      "verify": "Reviewed the final nine-file diff against the task package and then for correctness, compatibility, fail-closed behavior and scope."
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The final-artifact gate drifted because commit 96655b9 placed a required semantic-review helper on the byte-frozen PC-F foundation aggregator. The helper itself is correct and already owned by ProjectContext shared contracts. Moving only its public re-export to the existing project-context facade restores the exact foundation bytes without weakening the baseline, duplicating truth, or altering V5 semantics; Main can migrate its one package import after controller acceptance.",
+      "verify": "Source diff removes exactly the added foundation line, preserves the single implementation, and the rebuilt five-file manifest matches the original PCFBaselineReceipt."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Pin parent and baseline/hash; add route RED; move one named export and consumers; verify exact hash/public/V5/full gates; self-review/Guard/commit/controller return.",
+      "verify": "Executed in order with baseline, RED, GREEN, final validation and one commit."
+    },
+    {
+      "kind": "change-scope",
+      "ref": "AlembicCore commit f6e3f1956d67fa1d7a0a3440c2931196d9549d06",
+      "verify": "Only nine AlembicCore facade, public-smoke/probe and regression-test files changed; no implementation duplication, package export expansion, sibling repository, vendor, Test or Wakeflow edits."
+    },
+    {
+      "kind": "negative-tests",
+      "ref": "AlembicCore/test/ProjectContextFoundation.test.ts",
+      "verify": "Source and built smoke explicitly reject createProjectContextFileRef on the frozen foundation facade; strict production probe retains all 11 fail-closed mutations."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1__AlembicCore__i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1__AlembicCore__i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1__AlembicCore__i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1",
+    "dispatchGroup": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1__AlembicCore__i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 310,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1",
+    "targetTaskId": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-p1",
+    "resultId": "tr-i3-i9-core-pcf-final-artifact-contract-restoration-rootcause13-t1",
+    "createdAt": "2026-07-28T23:37:40.982Z"
+  },
+  "createdAt": "2026-07-28T23:37:40.982Z",
+  "stateRevisionObserved": 310,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

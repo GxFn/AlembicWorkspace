@@ -1,0 +1,433 @@
+diff --git a/lib/injection/ServiceMap.ts b/lib/injection/ServiceMap.ts
+index 4f19e63..20d65d0 100644
+--- a/lib/injection/ServiceMap.ts
++++ b/lib/injection/ServiceMap.ts
+@@ -102,6 +102,7 @@ import type { SkillHooks } from '../service/skills/SkillHooks.js';
+ import type { ContextualEnricher } from '../service/vector/ContextualEnricher.js';
+ import type {
+   FileRecipeVectorGenerationStorage,
++  GenerationRoutingVectorStore,
+   RecipeVectorGenerationRuntime,
+ } from '../service/vector/RecipeVectorGenerationRuntime.js';
+ 
+@@ -161,7 +162,7 @@ export interface ServiceMap {
+   // ═══ KnowledgeRetrievalModule ═══
+   searchEngine: SearchEngine;
+   baseVectorStore: VectorStore;
+-  vectorStore: VectorStore;
++  vectorStore: GenerationRoutingVectorStore;
+   recipeVectorGenerationStorage: FileRecipeVectorGenerationStorage;
+   recipeVectorGenerationManager: RecipeVectorGenerationManager;
+   recipeVectorGenerationRuntime: RecipeVectorGenerationRuntime;
+diff --git a/lib/injection/modules/KnowledgeRetrievalModule.ts b/lib/injection/modules/KnowledgeRetrievalModule.ts
+index 3bf2a8f..d239e42 100644
+--- a/lib/injection/modules/KnowledgeRetrievalModule.ts
++++ b/lib/injection/modules/KnowledgeRetrievalModule.ts
+@@ -88,21 +88,12 @@ export function registerKnowledgeRetrieval(c: ServiceContainer) {
+   c.singleton('indexingPipeline', (ct: ServiceContainer) => {
+     const embedProvider = getEmbeddingProvider(ct);
+     const dataRoot = resolveDataRoot(ct);
+-    const pipeline = new ProfiledIndexingPipeline(
+-      {
+-        projectRoot: dataRoot,
+-        scanDirs: resolveKnowledgeScanDirs(ct),
+-        vectorStore: ct.get('vectorStore'),
+-        aiProvider: embedProvider ?? undefined,
+-      },
+-      async () => {
+-        const store = ct.get('vectorStore');
+-        if (!(store instanceof GenerationRoutingVectorStore)) {
+-          throw new Error('Indexing requires a profile-aware vector store');
+-        }
+-        await store.assertIndexingProfile();
+-      }
+-    );
++    const pipeline = new ProfiledIndexingPipeline({
++      projectRoot: dataRoot,
++      scanDirs: resolveKnowledgeScanDirs(ct),
++      vectorStore: ct.get('vectorStore'),
++      aiProvider: embedProvider ?? undefined,
++    });
+     pipeline.setContextualEnricher(createLiveContextualEnricher(ct));
+     return pipeline;
+   });
+@@ -122,17 +113,21 @@ export function registerKnowledgeRetrieval(c: ServiceContainer) {
+ 
+ /** 宿主迁移门禁；分块、增量算法及 embedding 批处理仍完整委托给 Core。 */
+ class ProfiledIndexingPipeline extends IndexingPipeline {
++  readonly #store: GenerationRoutingVectorStore;
++
+   constructor(
+-    options: ConstructorParameters<typeof IndexingPipeline>[0],
+-    private readonly assertProfile: () => Promise<void>
++    options: ConstructorParameters<typeof IndexingPipeline>[0] & {
++      vectorStore: GenerationRoutingVectorStore;
++    }
+   ) {
+     super(options);
++    this.#store = options.vectorStore;
+   }
+ 
+   override async run(options: NonNullable<Parameters<IndexingPipeline['run']>[0]> = {}) {
+     // force/clear 都由调用者明确请求重建，Core 在这两条路径不会复用历史向量。
+     if (!options.force && !options.clear) {
+-      await this.assertProfile();
++      await this.#store.assertIndexingProfile();
+     }
+     return super.run(options);
+   }
+diff --git a/lib/injection/modules/VectorModule.ts b/lib/injection/modules/VectorModule.ts
+index 5149fe1..7c9fd45 100644
+--- a/lib/injection/modules/VectorModule.ts
++++ b/lib/injection/modules/VectorModule.ts
+@@ -40,43 +40,27 @@ export function register(c: ServiceContainer) {
+         | Record<string, unknown>
+         | undefined) || {};
+ 
+-    return new ProfiledVectorService(
+-      {
+-        vectorStore: ct.get('vectorStore'),
+-        indexingPipeline: ct.get('indexingPipeline'),
+-        hybridRetriever: ct.services.hybridRetriever
+-          ? (ct.get('hybridRetriever') as ConstructorParameters<
+-              typeof VectorService
+-            >[0]['hybridRetriever'])
+-          : null,
+-        eventBus: ct.services.eventBus
+-          ? (ct.get('eventBus') as unknown as ConstructorParameters<
+-              typeof VectorService
+-            >[0]['eventBus'])
+-          : null,
+-        embedProvider,
+-        recipeGenerationManager: ct.get('recipeVectorGenerationManager'),
+-        recipeVectorTruthRemover: ct.get('recipeVectorGenerationStorage'),
+-        contextualEnricher: createLiveContextualEnricher(ct),
+-        autoSyncOnCrud: (config.autoSyncOnCrud as boolean) !== false,
+-        syncDebounceMs: (config.syncDebounceMs as number) || 2000,
+-        drizzle: ct.services.database
+-          ? ((ct.get('database') as unknown as { getDrizzle?(): unknown }).getDrizzle?.() as
+-              | import('@alembic/core/database').DrizzleDB
+-              | undefined)
+-          : undefined,
+-      },
+-      async () => {
+-        const store = ct.get('vectorStore');
+-        if (
+-          !('assertEmbeddingProfile' in store) ||
+-          typeof store.assertEmbeddingProfile !== 'function'
+-        ) {
+-          throw new Error('embedding-profile-migration-required');
+-        }
+-        await store.assertEmbeddingProfile();
+-      }
+-    );
++    return new ProfiledVectorService({
++      vectorStore: ct.get('vectorStore'),
++      indexingPipeline: ct.get('indexingPipeline'),
++      hybridRetriever: ct.services.hybridRetriever ? ct.get('hybridRetriever') : null,
++      eventBus: ct.services.eventBus
++        ? (ct.get('eventBus') as unknown as ConstructorParameters<
++            typeof VectorService
++          >[0]['eventBus'])
++        : null,
++      embedProvider,
++      recipeGenerationManager: ct.get('recipeVectorGenerationManager'),
++      recipeVectorTruthRemover: ct.get('recipeVectorGenerationStorage'),
++      contextualEnricher: createLiveContextualEnricher(ct),
++      autoSyncOnCrud: (config.autoSyncOnCrud as boolean) !== false,
++      syncDebounceMs: (config.syncDebounceMs as number) || 2000,
++      drizzle: ct.services.database
++        ? ((ct.get('database') as unknown as { getDrizzle?(): unknown }).getDrizzle?.() as
++            | import('@alembic/core/database').DrizzleDB
++            | undefined)
++        : undefined,
++    });
+   });
+ }
+ 
+diff --git a/lib/service/vector/ProfiledVectorService.ts b/lib/service/vector/ProfiledVectorService.ts
+index 044b4c3..069893d 100644
+--- a/lib/service/vector/ProfiledVectorService.ts
++++ b/lib/service/vector/ProfiledVectorService.ts
+@@ -1,6 +1,7 @@
+ /** 查询前的本地索引门禁；不把模型空间迁移误计为 embedding 服务熔断失败。 */
+ import Logger from '@alembic/core/logging';
+ import { VectorService } from '@alembic/core/vector';
++import type { GenerationRoutingVectorStore } from './RecipeVectorGenerationRuntime.js';
+ 
+ type Options = ConstructorParameters<typeof VectorService>[0];
+ type ProfileFailure = 'embedding-profile-migration-required' | 'vector-store-unavailable';
+@@ -8,14 +9,13 @@ type ProfileFailure = 'embedding-profile-migration-required' | 'vector-store-una
+ export class ProfiledVectorService extends VectorService {
+   readonly #hybrid: Options['hybridRetriever'];
+   readonly #configured: boolean;
++  readonly #store: GenerationRoutingVectorStore;
+ 
+-  constructor(
+-    options: Options,
+-    private readonly assertProfile: () => Promise<void>
+-  ) {
++  constructor(options: Options & { vectorStore: GenerationRoutingVectorStore }) {
+     super(options);
+     this.#hybrid = options.hybridRetriever;
+     this.#configured = !!options.embedProvider;
++    this.#store = options.vectorStore;
+   }
+ 
+   override async search(
+@@ -55,7 +55,7 @@ export class ProfiledVectorService extends VectorService {
+ 
+   async #profileFailure(): Promise<ProfileFailure | null> {
+     try {
+-      await this.assertProfile();
++      await this.#store.assertEmbeddingProfile();
+       return null;
+     } catch (err: unknown) {
+       // 本地索引不可读与模型空间变更分开报告；二者都不应给远端服务累计失败。
+diff --git a/lib/tools/adapters/DashboardOperations.ts b/lib/tools/adapters/DashboardOperations.ts
+index 1b376f2..538dd52 100644
+--- a/lib/tools/adapters/DashboardOperations.ts
++++ b/lib/tools/adapters/DashboardOperations.ts
+@@ -160,33 +160,10 @@ async function rebuildSemanticIndex(request: ToolExecutionRequest, deps: Dashboa
+ 
+   const clear = request.args.clear !== false;
+   const force = Boolean(request.args.force ?? false);
+-  const vectorService = container.services.vectorService
+-    ? (container.get('vectorService') as unknown as {
+-        clear(): Promise<void>;
+-        fullBuild(options: Record<string, unknown>): Promise<BuildResultLike>;
+-      })
+-    : null;
+-
+-  let result: Record<string, unknown>;
+-  if (vectorService) {
+-    if (clear) {
+-      await vectorService.clear();
+-    }
+-    const buildResult = await vectorService.fullBuild({ force });
+-    result = {
+-      scanned: buildResult.scanned,
+-      chunked: buildResult.chunked,
+-      embedded: buildResult.embedded,
+-      upserted: buildResult.upserted,
+-      skipped: buildResult.skipped,
+-      errors: buildResult.errors,
+-    };
+-  } else {
+-    const indexingPipeline = container.get('indexingPipeline') as {
+-      run(options: Record<string, unknown>): Promise<Record<string, unknown>>;
+-    };
+-    result = await indexingPipeline.run({ clear, force });
+-  }
++  // Core fullBuild 透传同一重建请求；清理次序由管线统一负责，宿主不另行清空。
++  const result = container.services.vectorService
++    ? await container.get('vectorService').fullBuild({ clear, force })
++    : await container.get('indexingPipeline').run({ clear, force });
+ 
+   logger.info('Semantic index rebuilt via dashboard router', { result });
+   return {
+@@ -307,12 +284,3 @@ function asRecord(value: unknown) {
+ function numberArg(value: unknown, fallback: number) {
+   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+ }
+-
+-interface BuildResultLike {
+-  scanned?: unknown;
+-  chunked?: unknown;
+-  embedded?: unknown;
+-  upserted?: unknown;
+-  skipped?: unknown;
+-  errors?: unknown;
+-}
+diff --git a/test/integration/IndexingPipeline.test.ts b/test/integration/IndexingPipeline.test.ts
+index c2ad2e8..c7c14eb 100644
+--- a/test/integration/IndexingPipeline.test.ts
++++ b/test/integration/IndexingPipeline.test.ts
+@@ -13,7 +13,7 @@
+ import fs from 'node:fs';
+ import os from 'node:os';
+ import path from 'node:path';
+-import { chunk, IndexingPipeline } from '@alembic/core/vector';
++import { chunk, IndexingPipeline, JsonVectorAdapter } from '@alembic/core/vector';
+ 
+ describe('Integration: Indexing Pipeline & Chunker', () => {
+   // ─── Chunker ──────────────────────────────────
+@@ -170,30 +170,46 @@ describe('Integration: Indexing Pipeline & Chunker', () => {
+     test('should skip unchanged files (incremental)', async () => {
+       const recipesDir = path.join(tmpDir, 'recipes');
+       fs.mkdirSync(recipesDir, { recursive: true });
+-      fs.writeFileSync(path.join(recipesDir, 'stable.md'), '# Stable Content');
+-
+-      const content = fs.readFileSync(path.join(recipesDir, 'stable.md'), 'utf-8');
++      const source = path.join(recipesDir, 'stable.md');
++      fs.writeFileSync(source, '# Stable Content');
++      const store = new JsonVectorAdapter(tmpDir);
++      store.initSync();
++      const upsert = vi.spyOn(store, 'batchUpsert');
++      const embed = vi.fn(async (texts: string | string[]) =>
++        Array.isArray(texts) ? texts.map(() => [1, 0]) : [1, 0]
++      );
+       const pipeline = new IndexingPipeline({
+         scanDirs: ['recipes'],
+         projectRoot: tmpDir,
++        vectorStore: store,
++        aiProvider: { embed },
+       });
+-      const hash = pipeline.hashContent(content);
+-
+-      const mockVectorStore = {
+-        listIds: async () => ['recipes_stable.md_0'],
+-        getById: async (id: string) => {
+-          if (id === 'recipes_stable.md_0') {
+-            return { metadata: { sourceHash: hash } };
+-          }
+-          return null;
+-        },
+-        batchUpsert: async () => {},
+-        remove: async () => {},
+-      };
+-
+-      pipeline.setVectorStore(mockVectorStore as any);
+-      const stats = await pipeline.run();
+-      expect(stats.skipped).toBeGreaterThanOrEqual(1);
++      try {
++        // 使用首次真实写入的 sourcePath/producer/完整分块事实，不伪造只有 hash 的旧行。
++        expect(await pipeline.run()).toMatchObject({ skipped: 0, embedded: 1, upserted: 1 });
++        const ids = await store.listIds();
++        expect(ids).toHaveLength(1);
++        expect(await store.getById(ids[0])).toMatchObject({
++          content: '# Stable Content',
++          vector: [1, 0],
++          metadata: { sourcePath: 'recipes/stable.md' },
++        });
++        embed.mockClear();
++        upsert.mockClear();
++
++        expect(await pipeline.run()).toMatchObject({ skipped: 1, embedded: 0, upserted: 0 });
++        expect(embed).not.toHaveBeenCalled();
++        expect(upsert).not.toHaveBeenCalled();
++        expect(await store.listIds()).toEqual(ids);
++
++        fs.writeFileSync(source, '# Changed Content');
++        expect(await pipeline.run()).toMatchObject({ skipped: 0, embedded: 1, upserted: 1 });
++        expect(embed).toHaveBeenCalledOnce();
++        expect(upsert).toHaveBeenCalledOnce();
++        expect(await store.getById(ids[0])).toMatchObject({ content: '# Changed Content' });
++      } finally {
++        upsert.mockRestore();
++      }
+     });
+ 
+     test('should run in dryRun mode without writing', async () => {
+diff --git a/test/unit/CommandsFileRoutesAo3.test.ts b/test/unit/CommandsFileRoutesAo3.test.ts
+index c5cdc8e..6505ace 100644
+--- a/test/unit/CommandsFileRoutesAo3.test.ts
++++ b/test/unit/CommandsFileRoutesAo3.test.ts
+@@ -112,9 +112,15 @@ describe('Dashboard semantic-index embedding boundary', () => {
+   }
+ 
+   test.each([
+-    true,
+-    false,
+-  ])('allows independently configured embedding with no LLM (vectorService=%s)', async (useVectorService) => {
++    { useVectorService: true, clear: undefined, force: true },
++    { useVectorService: false, clear: undefined, force: true },
++    { useVectorService: true, clear: false, force: false },
++    { useVectorService: false, clear: false, force: false },
++  ])('passes one explicit rebuild request with no LLM (vectorService=$useVectorService, clear=$clear)', async ({
++    useVectorService,
++    clear,
++    force,
++  }) => {
+     const { vector, pipeline, stats } = configuredBuild(useVectorService);
+     mocks.container.singletons._embedProvider = createEmbeddingProvider(
+       {},
+@@ -128,16 +134,16 @@ describe('Dashboard semantic-index embedding boundary', () => {
+       method: 'POST',
+       mountPath: '/api/v1/commands',
+       path: '/api/v1/commands/embed',
+-      body: { force: true },
++      body: { clear, force },
+     });
+     expect(response.status, JSON.stringify(response.body)).toBe(200);
+     expect(response.body).toMatchObject({ success: true, data: stats });
+     if (useVectorService) {
+-      expect(vector.clear).toHaveBeenCalledOnce();
+-      expect(vector.fullBuild).toHaveBeenCalledExactlyOnceWith({ force: true });
++      expect(vector.clear).not.toHaveBeenCalled();
++      expect(vector.fullBuild).toHaveBeenCalledExactlyOnceWith({ clear: clear !== false, force });
+       expect(pipeline.run).not.toHaveBeenCalled();
+     } else {
+-      expect(pipeline.run).toHaveBeenCalledExactlyOnceWith({ clear: true, force: true });
++      expect(pipeline.run).toHaveBeenCalledExactlyOnceWith({ clear: clear !== false, force });
+       expect(vector.clear).not.toHaveBeenCalled();
+       expect(vector.fullBuild).not.toHaveBeenCalled();
+     }
+diff --git a/test/unit/RecipeVectorGenerationRuntime.test.ts b/test/unit/RecipeVectorGenerationRuntime.test.ts
+index 1898e64..ed7a11a 100644
+--- a/test/unit/RecipeVectorGenerationRuntime.test.ts
++++ b/test/unit/RecipeVectorGenerationRuntime.test.ts
+@@ -47,34 +47,32 @@ describe('RecipeVectorGenerationRuntime', () => {
+     await first.runtime.rebuild('migration');
+     const provider = embeddingProvider({ model: 'embed-v2' });
+     const query = vi.spyOn(provider, 'embedQuery');
+-    let storageRecovered = mode === 'profile-migration';
+     const routed = new GenerationRoutingVectorStore(
+       jsonStore(path.join(root, 'base')),
+       first.storage,
+       () => provider.describeCapabilities()
+     );
+-    const service = new ProfiledVectorService(
+-      {
++    // 故障发生在真实存储的 profile 检查边界；不再给服务注入另一套检查回调。
++    const failedRead =
++      mode === 'storage-unavailable'
++        ? vi
++            .spyOn(routed, 'assertEmbeddingProfile')
++            .mockRejectedValue(new Error('Fixture index unavailable'))
++        : null;
++    const service = new ProfiledVectorService({
++      vectorStore: routed,
++      indexingPipeline: new IndexingPipeline({
++        projectRoot: root,
+         vectorStore: routed,
+-        indexingPipeline: new IndexingPipeline({
+-          projectRoot: root,
+-          vectorStore: routed,
+-          aiProvider: provider,
+-        }),
+-        hybridRetriever: new HybridRetriever({ vectorStore: routed }),
+-        embedProvider: provider,
+-        eventBus: null,
+-        contextualEnricher: null,
+-        autoSyncOnCrud: false,
+-        syncDebounceMs: 10,
+-      },
+-      async () => {
+-        if (!storageRecovered) {
+-          throw new Error('Fixture index unavailable');
+-        }
+-        await routed.assertEmbeddingProfile();
+-      }
+-    );
++        aiProvider: provider,
++      }),
++      hybridRetriever: new HybridRetriever({ vectorStore: routed }),
++      embedProvider: provider,
++      eventBus: null,
++      contextualEnricher: null,
++      autoSyncOnCrud: false,
++      syncDebounceMs: 10,
++    });
+     const sparseSearchFn = () => [{ id: 'lexical-fixture', score: 1 }];
+     for (let i = 0; i < 4; i++) {
+       const hits = await service.hybridSearch('recipe', { sparseSearchFn });
+@@ -92,7 +90,7 @@ describe('RecipeVectorGenerationRuntime', () => {
+     }
+     expect(query).not.toHaveBeenCalled();
+     await buildRuntime(root, provider).runtime.rebuild('migration');
+-    storageRecovered = true;
++    failedRead?.mockRestore();
+     await service.hybridSearch('recipe', { sparseSearchFn });
+     expect(query).toHaveBeenCalledOnce();
+     query.mockRestore();

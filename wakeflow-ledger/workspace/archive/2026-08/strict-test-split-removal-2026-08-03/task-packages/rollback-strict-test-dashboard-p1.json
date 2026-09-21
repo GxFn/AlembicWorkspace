@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rollback-strict-test-dashboard-p1",
+  "demandKey": "strict-test-split-removal-2026-08-03",
+  "summary": "移除 Dashboard 中被否决的 strict-test-dimension 消费者并保持冷启动入口 fail closed",
+  "status": "pending",
+  "sourceRef": null,
+  "contextVersion": 1,
+  "workType": "implementation",
+  "objective": "在 Alembic Main 回滚被接受后，精确逆向 Dashboard strict-test-dimension 消费者提交；删除 API adapter/controller/hook/status panel/测试/生成投影，并确保机械回滚不会重新启用 legacy bootstrap 网络调用。",
+  "contextSummary": [
+    "控制器已在干净临时克隆中模拟回滚 6562eb13e9ccc204021a8580a2045c25a9ad9697，无冲突且 git diff --check 通过。",
+    "机械回滚会恢复旧 Candidates 源；用户同时明确禁止恢复 legacy bootstrap，因此旧冷启动入口必须隐藏、禁用或 fail closed 且不发网络请求。",
+    "不设计正确测试模式，只删除已否决消费者并阻断 legacy 回退。"
+  ],
+  "requirementRefs": [
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#user-decision",
+      "role": "goal",
+      "label": "用户否决与删除授权"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#verified-rollback-authority",
+      "role": "evidence",
+      "label": "提交归因与无冲突回滚模拟"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#dependency-order",
+      "role": "constraint",
+      "label": "消费者优先的回滚顺序"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#completion-definition",
+      "role": "completion",
+      "label": "纯删除验收定义"
+    }
+  ],
+  "boundaries": {
+    "inScope": [
+      "revert 6562eb13e9ccc204021a8580a2045c25a9ad9697",
+      "删除 strict-test API adapter、controller、hook、status panel、focused tests 与 generated consumer projection",
+      "若机械回滚恢复 api.bootstrap/jobs/bootstrap 调用，以最小改动使冷启动入口不可用或 fail closed 且无网络调用",
+      "运行 Dashboard 全量检查、生成物一致性检查和入口无网络调用验证"
+    ],
+    "outOfScope": [
+      "设计或接入正确的新测试模式",
+      "Alembic Main、Agent、Core、Plugin、DaemonJob 代码",
+      "其他 Dashboard 功能或视觉重构"
+    ],
+    "forbidden": [
+      "设计或实现替代测试模式",
+      "恢复 legacy bootstrap、ALEMBIC_TEST_MODE、Plugin testMode 或 DaemonJob 路径",
+      "把历史 Wakeflow 证据改写成已接受或已完成",
+      "修改本任务包未列出的其他仓库",
+      "保留 strict-test-dimension 消费者的兼容别名或隐藏 fallback",
+      "让冷启动按钮、handler 或 effect 重新调用 legacy bootstrap"
+    ]
+  },
+  "completionExpectations": [
+    "提交回滚结果与必要的最小 no-legacy fail-closed 改动，报告 commit SHA。",
+    "报告全量检查、生成一致性、零残留扫描和冷启动交互无网络调用证据。",
+    "提供干净工作树与自审：未实现替代测试模式。"
+  ],
+  "dependsOnTaskIds": [
+    "rollback-strict-test-main-t1"
+  ],
+  "commitExpectation": "commit",
+  "acceptanceAnchors": [
+    {
+      "id": "dashboard-consumer-absent",
+      "claim": "Dashboard 中独立 strict-test-dimension 消费面全部删除",
+      "probe": "扫描 API adapter/controller/hook/status panel/generated operation/i18n/test/import 与页面调用图",
+      "expected": "strict-test-dimension 消费者符号和生成操作零残留，构建与类型检查通过"
+    },
+    {
+      "id": "dashboard-no-legacy-fallback",
+      "claim": "删除错误实现后不会重新走 legacy bootstrap",
+      "probe": "静态审查 Candidates 冷启动 handler 与交互测试/浏览器网络断言，搜索 api.bootstrap、jobs/bootstrap 和等价调用",
+      "expected": "入口隐藏、禁用或显式 fail closed；用户动作不会发起 legacy 或替代冷启动网络请求"
+    },
+    {
+      "id": "dashboard-exact-lineage",
+      "claim": "Dashboard 回滚只逆向已归因提交并保留其他历史",
+      "probe": "审查 revert commit、git show --name-status、git diff-check 与干净工作树",
+      "expected": "提交范围可追溯到 6562eb1；除必要的 no-legacy fail-closed 安全改动外无无关变化"
+    }
+  ],
+  "createdAt": "2026-08-03T14:46:34.119Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rollback-strict-test-dashboard-t1",
+      "taskPackageId": "rollback-strict-test-dashboard-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "移除 Dashboard 中被否决的 strict-test-dimension 消费者并保持冷启动入口 fail closed",
+      "status": "pending",
+      "createdAt": "2026-08-03T14:46:34.119Z",
+      "dependsOnTaskIds": [
+        "rollback-strict-test-main-t1"
+      ]
+    }
+  ]
+}

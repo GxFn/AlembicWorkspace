@@ -1,0 +1,930 @@
+[
+  {
+    "file": "src/service/search/FieldWeightedScorer.ts",
+    "reviewDepth": "manual-full",
+    "role": "结构化Recipe稀疏召回；按trigger/title/tags/description/content/facets和canonical roles确定性评分",
+    "findings": [
+      {
+        "id": "S-001",
+        "severity": "P2",
+        "status": "fixed-red-green",
+        "evidence": "search-public-review-probe.log; search-constructor-red.log; search-constructor-green.log"
+      }
+    ],
+    "disposition": [
+      "保留可独立实例化公开scorer和增量接口；属于真实SearchEngine生产链。已扫描exact-duplicate-functions.json，没有此文件精确重复函数项。"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/SearchEngine.test.ts",
+        "test/SearchRanking.test.ts",
+        "test/SearchPipeline.test.ts",
+        "test/PublicSearchVectorGuardEntrypoints.test.ts",
+        "test/KnowledgeRetrievalPolicy.test.ts"
+      ],
+      "testReadDepth": "relevant-case/manual-partial, except own new regressions fully read",
+      "executedSuites": [
+        "search-constructor-green.log (4 suites / 121 tests)",
+        "search-sync-lane-green.log (2 suites / 15 tests)",
+        "search-type-facets-green.log (6 suites / 100 tests)"
+      ],
+      "regressionProbe": "search-public-review-probe.mjs"
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        516
+      ]
+    ],
+    "consumers": [
+      "src/search.ts",
+      "src/service/search/SearchEngine.ts",
+      "src/service/search/index.ts"
+    ],
+    "imports": [
+      {
+        "specifier": "./SearchTypes.js",
+        "target": "src/service/search/SearchTypes.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "./tokenizer.js",
+        "target": "src/service/search/tokenizer.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 516,
+      "sha256": "d4f38e12a1a86a6b3963a165e8d0fdb4d8b9f915c31e69504f0412d808e1b749",
+      "baselineSha256": "0f1f09359206ee0d405a6e8865871708a5cabb34fa2c079632390c83afc1d019",
+      "changedSinceInventory": true,
+      "functionCount": 26,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "8个分配源码已逐句阅读全文；specific semanticReview记录实际函数、状态、错误、消费者。测试只对列明执行的suite宣称GREEN。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "search-supplement",
+      "role": "结构化Recipe稀疏召回；按trigger/title/tags/description/content/facets和canonical roles确定性评分",
+      "keyFunctions": [
+        "addDocument",
+        "removeDocument",
+        "updateDocument",
+        "clear",
+        "_compact",
+        "search",
+        "_stringMatchScore",
+        "_tokenOverlap",
+        "_idfWeightedOverlap",
+        "_tagScore",
+        "_semanticTopicCoverage",
+        "_corroboratedRoleOverlap"
+      ],
+      "notes": [
+        "索引同时维护documents tombstones、id→数组位置、全词和主题词DF、总词长与平均长；重复id先移除旧文档，空洞>30%且数组>100时压缩并重建id索引。",
+        "trigger/title取字符串匹配和token覆盖较大值；description/content用平滑IDF；tag精确匹配保留corpus specificity；kind+额外主题必须联合命中才获得语义主题分。canonical intent/boundary/support至少两种role共同出现才获得额外权重，避免单role重复制造证据。",
+        "S-001实证constructor合法token撞Object原型，造成频率string/NaN与命中消失。只将构造和clear中的两个频率字典改为无原型Record；不改变权重、IDF公式、排序、公开docFreq访问和Object.keys统计。"
+      ],
+      "preserveReason": "保留可独立实例化公开scorer和增量接口；属于真实SearchEngine生产链。已扫描exact-duplicate-functions.json，没有此文件精确重复函数项。",
+      "reviewedDigest": "sha256:d4f38e12a1a86a6b3963a165e8d0fdb4d8b9f915c31e69504f0412d808e1b749",
+      "verifiedConsumers": [
+        "src/service/search/SearchEngine.ts:174",
+        "src/search.ts:10"
+      ],
+      "boundaries": [
+        "本域产品仅按root授权修S-001..004；无外层修改、无commit、无Wakeflow状态变更；已冻结产品修改。"
+      ]
+    }
+  },
+  {
+    "file": "src/service/search/HybridRetriever.ts",
+    "reviewDepth": "manual-full",
+    "role": "旧公开dense+sparse的按rank加权RRF融合与并行召回器",
+    "findings": [],
+    "disposition": [
+      "保留现有构造、fuse/search导出和raw RRF语义；与canonical policy不是可直接合并的重复算法。"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/PublicSearchVectorGuardEntrypoints.test.ts",
+        "test/RecipeRetrievalProduction.test.ts"
+      ],
+      "testReadDepth": "relevant-case/manual-partial, except own new regressions fully read",
+      "executedSuites": [
+        "search-constructor-green.log (4 suites / 121 tests)",
+        "search-sync-lane-green.log (2 suites / 15 tests)",
+        "search-type-facets-green.log (6 suites / 100 tests)"
+      ],
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        165
+      ]
+    ],
+    "consumers": [
+      "src/search.ts",
+      "src/service/search/index.ts",
+      "src/service/vector/VectorService.ts"
+    ],
+    "imports": [],
+    "sourceScan": {
+      "lines": 165,
+      "sha256": "38fd87badfa05480d36e3e3145e5cda2461bcdf0a477713bb550b2dca7742f23",
+      "baselineSha256": "38fd87badfa05480d36e3e3145e5cda2461bcdf0a477713bb550b2dca7742f23",
+      "changedSinceInventory": false,
+      "functionCount": 5,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "8个分配源码已逐句阅读全文；specific semanticReview记录实际函数、状态、错误、消费者。测试只对列明执行的suite宣称GREEN。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "search-supplement",
+      "role": "旧公开dense+sparse的按rank加权RRF融合与并行召回器",
+      "keyFunctions": [
+        "constructor",
+        "fuse",
+        "search"
+      ],
+      "notes": [
+        "fuse以dense item.id/id和sparse id合并，两路rank从1起算，权重alpha/(k+rank)与(1-alpha)/(k+rank)累加；保留dense原数据、denseSimilarity、sparseScore及分路贡献。score是原RRF总量，不做页内最大值归一化。",
+        "search每路扩大topK×3，queryVector缺失时dense为空，sparse为可选回调；调用方VectorService负责embedding/熔断与外层失败诊断。这里使用Promise.all整体失败合同，与带truth/filter/refill诊断的新KnowledgeRetrievalPolicy职责不同。",
+        "没有Recipe真相读取器；不能把fuse结果本身宣称为已经去除orphan/deprecated的知识。真实VectorService和宿主DI仍消费该接口，不因新policy存在删除旧类。"
+      ],
+      "preserveReason": "保留现有构造、fuse/search导出和raw RRF语义；与canonical policy不是可直接合并的重复算法。",
+      "reviewedDigest": "sha256:38fd87badfa05480d36e3e3145e5cda2461bcdf0a477713bb550b2dca7742f23",
+      "verifiedConsumers": [
+        "src/service/vector/VectorService.ts:484",
+        "../Alembic/lib/injection/modules/KnowledgeModule.ts:221",
+        "../AlembicPlugin/lib/injection/modules/KnowledgeModule.ts:252"
+      ],
+      "boundaries": [
+        "本域产品仅按root授权修S-001..004；无外层修改、无commit、无Wakeflow状态变更；已冻结产品修改。"
+      ]
+    }
+  },
+  {
+    "file": "src/service/search/KnowledgeRetrieval.ts",
+    "reviewDepth": "manual-full",
+    "role": "统一候选检索、权威Recipe投影、逐窗补齐与Top-K稳定性判断",
+    "findings": [
+      {
+        "id": "S-002",
+        "severity": "P2",
+        "status": "fixed-red-green",
+        "evidence": "search-public-review-probe.log; search-sync-lane-red.log; search-sync-lane-green.log"
+      }
+    ],
+    "disposition": [
+      "保留分层ports与所有diagnostic/wire字段；bounds基于unique live recipe不是raw hit数，不能用结果数量够topK替代稳定性判断。"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/KnowledgeRetrievalPolicy.test.ts",
+        "test/KnowledgeTruthProjector.test.ts",
+        "test/RecipeRetrievalProduction.test.ts"
+      ],
+      "testReadDepth": "relevant-case/manual-partial, except own new regressions fully read",
+      "executedSuites": [
+        "search-constructor-green.log (4 suites / 121 tests)",
+        "search-sync-lane-green.log (2 suites / 15 tests)",
+        "search-type-facets-green.log (6 suites / 100 tests)"
+      ],
+      "regressionProbe": "search-public-review-probe.mjs"
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        702
+      ]
+    ],
+    "consumers": [
+      "src/recipe-context-capabilities.ts",
+      "src/search.ts",
+      "src/service/recipe-context/adapters/fromCore.ts",
+      "src/service/recipe-context/ports.ts",
+      "src/service/search/SearchEngine.ts",
+      "src/service/search/SearchTypes.ts",
+      "src/service/search/index.ts",
+      "test/KnowledgeRetrievalPolicy.test.ts",
+      "test/KnowledgeTruthProjector.test.ts"
+    ],
+    "imports": [
+      {
+        "specifier": "../vector/EmbeddingPort.js",
+        "target": "src/service/vector/EmbeddingPort.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "../vector/RecipeRegionVectorIndex.js",
+        "target": "src/service/vector/RecipeRegionVectorIndex.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "../vector/VectorIndexPorts.js",
+        "target": "src/service/vector/VectorIndexPorts.ts",
+        "typeOnly": true
+      }
+    ],
+    "sourceScan": {
+      "lines": 702,
+      "sha256": "46ba4c1b4abfa139daded53fb79424fd0d173aeabd943882ea35d6869575206d",
+      "baselineSha256": "957981a63b9c5c761aeb7993667319e0e4d65c9e299a687788730abb6d03fa34",
+      "changedSinceInventory": true,
+      "functionCount": 33,
+      "anyTokenLines": [],
+      "catchLines": [
+        159,
+        178,
+        491,
+        684
+      ],
+      "longFunctions": [
+        {
+          "name": "project",
+          "line": 254,
+          "lines": 139
+        },
+        {
+          "name": "retrieve",
+          "line": 448,
+          "lines": 107
+        }
+      ]
+    },
+    "reviewNote": "8个分配源码已逐句阅读全文；specific semanticReview记录实际函数、状态、错误、消费者。测试只对列明执行的suite宣称GREEN。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "search-supplement",
+      "role": "统一候选检索、权威Recipe投影、逐窗补齐与Top-K稳定性判断",
+      "keyFunctions": [
+        "HybridCandidateRetriever.prepare",
+        "HybridCandidateSession.collect",
+        "KnowledgeTruthProjector.project",
+        "assignAuthoritativeRanks",
+        "KnowledgeRetrievalPolicy.retrieve",
+        "hasStableTopKRanking",
+        "resolveRecipeId",
+        "matchesKnowledgeFilter",
+        "normalizeAbortError"
+      ],
+      "notes": [
+        "prepare只做query-purpose embedding，keyword模式/缺provider/缺reader/熔断各有fallback原因；连续embedding失败计数及冷却期保留，signal在prepare与每次collect边界检查。reader inventory只在无sparse时作为可选总预算提示。",
+        "project先把region/entry前缀映射成Recipe id，收集有界region evidence，再从truth读取并过滤missing/deprecated/metadata不匹配；live去重后重排每路rank，避免多region和失效项影响RRF贡献；分数相同按recipeId确定序。",
+        "policy从max(initialWindow,topK×4)受预算约束开始倍增召回，直到各Top-K前缀严格压过未见候选上界、耗尽或预算到达；truth读取失败保守清空并诊断，不能把原向量片段伪装成有效Recipe。",
+        "S-002同步port调用在Promise.allSettled创建前抛出，健康通道被丢失。最小修复把dense与sparse调用延迟进Promise.resolve().then，保持正常rank/预算/诊断、AbortSignal检查及异步错误语义。真实policy入口两通道分别同步失败已RED/GREEN。"
+      ],
+      "preserveReason": "保留分层ports与所有diagnostic/wire字段；bounds基于unique live recipe不是raw hit数，不能用结果数量够topK替代稳定性判断。",
+      "reviewedDigest": "sha256:46ba4c1b4abfa139daded53fb79424fd0d173aeabd943882ea35d6869575206d",
+      "verifiedConsumers": [
+        "src/service/search/SearchEngine.ts:1231",
+        "src/service/recipe-context/ports.ts:9",
+        "../AlembicPlugin/lib/host-runtime/mcp/host/read-only-search-executor.ts:123"
+      ],
+      "boundaries": [
+        "本域产品仅按root授权修S-001..004；无外层修改、无commit、无Wakeflow状态变更；已冻结产品修改。"
+      ]
+    }
+  },
+  {
+    "file": "src/service/search/MultiSignalRanker.ts",
+    "reviewDepth": "manual-full",
+    "role": "七类确定性信号和按使用场景配置的加权精排",
+    "findings": [
+      {
+        "id": "S-CLEANUP-001",
+        "severity": "cleanup-observation",
+        "status": "reported-no-change",
+        "evidence": "source scan: MultiSignalRanker.ts private fields have only set/add writes"
+      }
+    ],
+    "disposition": [
+      "信号类和ranker都是稳定公共导出；仅私有未读状态可另行清理，不能因相关性算法相似删除公开signal或seasonality兼容。"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/SearchRanking.test.ts",
+        "test/SearchEngine.test.ts"
+      ],
+      "testReadDepth": "relevant-case/manual-partial, except own new regressions fully read",
+      "executedSuites": [
+        "search-constructor-green.log (4 suites / 121 tests)",
+        "search-sync-lane-green.log (2 suites / 15 tests)",
+        "search-type-facets-green.log (6 suites / 100 tests)"
+      ],
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        347
+      ]
+    ],
+    "consumers": [
+      "src/search.ts",
+      "src/service/search/SearchEngine.ts",
+      "src/service/search/index.ts",
+      "test/SearchRanking.test.ts"
+    ],
+    "imports": [],
+    "sourceScan": {
+      "lines": 347,
+      "sha256": "1ca7ebf3d946482aea88cf54fee426cbc2be5676a3b5e50e15c3d4a37085b902",
+      "baselineSha256": "1ca7ebf3d946482aea88cf54fee426cbc2be5676a3b5e50e15c3d4a37085b902",
+      "changedSinceInventory": false,
+      "functionCount": 16,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "8个分配源码已逐句阅读全文；specific semanticReview记录实际函数、状态、错误、消费者。测试只对列明执行的suite宣称GREEN。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "search-supplement",
+      "role": "七类确定性信号和按使用场景配置的加权精排",
+      "keyFunctions": [
+        "RelevanceSignal.compute",
+        "AuthoritySignal.compute",
+        "RecencySignal.compute",
+        "PopularitySignal.compute",
+        "DifficultySignal.compute",
+        "ContextMatchSignal.compute",
+        "VectorSignal.compute",
+        "MultiSignalRanker.constructor",
+        "MultiSignalRanker.rank",
+        "#onSignal"
+      ],
+      "notes": [
+        "relevance用召回/标题/trigger/正文，authority按质量/权威/使用，recency兼容数值秒/毫秒及日期字符串，popularity对数缩放，difficulty按用户等级距离，contextMatch按语言族/类别/tag，vector使用vectorScore。保持所有固定权重和默认值。",
+        "自定义scenario整体覆盖对应预设场景，兼容旧seasonality键到contextMatch；rank附加signals与rankerScore后降序，不删除原候选字段。SearchEngine通过intent选择场景并在最终阶段施加source drift惩罚。",
+        "全仓扫描确认#realtimeWeights仅set、#recentlyUsed仅add，rank没有读取；signalBus订阅目前只累积未消费状态，不可声称实时quality/usage会改变得分。记录为可安全精简的私有死状态候选，不在两项授权修复外自行删除或实现新策略。"
+      ],
+      "preserveReason": "信号类和ranker都是稳定公共导出；仅私有未读状态可另行清理，不能因相关性算法相似删除公开signal或seasonality兼容。",
+      "reviewedDigest": "sha256:1ca7ebf3d946482aea88cf54fee426cbc2be5676a3b5e50e15c3d4a37085b902",
+      "verifiedConsumers": [
+        "src/service/search/SearchEngine.ts:184",
+        "src/service/search/SearchEngine.ts:559",
+        "src/search.ts:41"
+      ],
+      "boundaries": [
+        "本域产品仅按root授权修S-001..004；无外层修改、无commit、无Wakeflow状态变更；已冻结产品修改。"
+      ]
+    }
+  },
+  {
+    "file": "src/service/search/SearchEngine.ts",
+    "reviewDepth": "manual-full",
+    "role": "对宿主公开的SQLite/scorer/semantic搜索编排、metadata过滤、排序、结果补全、缓存及索引刷新",
+    "findings": [
+      {
+        "id": "S-003",
+        "severity": "P2",
+        "status": "fixed-red-green",
+        "evidence": "search-type-alias-probe.log; search-type-alias-red.log; search-type-facets-green.log"
+      },
+      {
+        "id": "S-004",
+        "severity": "P2",
+        "status": "fixed-red-green-in-producer",
+        "evidence": "search-facet-projection-red-2.log; search-type-facets-green.log; KnowledgeRepositoryImpl four SearchKnowledgeRepo projections"
+      }
+    ],
+    "disposition": [
+      "保留实际Main HTTP/Plugin search及recipe-context adapter生产入口；本次只修既有类型别名和生产者facet投影，不改变缓存/context/同秒水位/排序权重。"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/SearchEngine.test.ts",
+        "test/SearchPipeline.test.ts",
+        "test/PublicSearchVectorGuardEntrypoints.test.ts",
+        "test/RecipeContextAdapters.test.ts",
+        "test/DatabaseRepository.test.ts",
+        "test/PublicDatabaseRepositoryEntrypoints.test.ts"
+      ],
+      "testReadDepth": "relevant-case/manual-partial, except own new regressions fully read",
+      "executedSuites": [
+        "search-constructor-green.log (4 suites / 121 tests)",
+        "search-sync-lane-green.log (2 suites / 15 tests)",
+        "search-type-facets-green.log (6 suites / 100 tests)"
+      ],
+      "regressionProbe": "search-type-alias-probe.mjs"
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        1938
+      ]
+    ],
+    "consumers": [
+      "src/search.ts",
+      "src/service/search/index.ts",
+      "test/FailureSemanticsCO3.test.ts",
+      "test/KnowledgeRetrievalPolicy.test.ts",
+      "test/SearchEngine.test.ts",
+      "test/SearchPipeline.test.ts",
+      "test/SearchRanking.test.ts"
+    ],
+    "imports": [
+      {
+        "specifier": "../../domain/knowledge/RecipeRetrievalProfile.js",
+        "target": "src/domain/knowledge/RecipeRetrievalProfile.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "../../infrastructure/logging/Logger.js",
+        "target": "src/infrastructure/logging/Logger.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "../../repository/search/SearchRepoAdapter.js",
+        "target": "src/repository/search/SearchRepoAdapter.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "../../repository/search/SearchRepoAdapter.js",
+        "target": "src/repository/search/SearchRepoAdapter.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "../../shared/DiagnosticCodes.js",
+        "target": "src/shared/DiagnosticCodes.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "../knowledge/RecipeRetrieval.js",
+        "target": "src/service/knowledge/RecipeRetrieval.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "../vector/RecipeRegionVectorIndex.js",
+        "target": "src/service/vector/RecipeRegionVectorIndex.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./CoarseRanker.js",
+        "target": "src/service/search/CoarseRanker.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./contextBoost.js",
+        "target": "src/service/search/contextBoost.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "./contextBoost.js",
+        "target": "src/service/search/contextBoost.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./FieldWeightedScorer.js",
+        "target": "src/service/search/FieldWeightedScorer.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./KnowledgeRetrieval.js",
+        "target": "src/service/search/KnowledgeRetrieval.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "./MultiSignalRanker.js",
+        "target": "src/service/search/MultiSignalRanker.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./SearchTypes.js",
+        "target": "src/service/search/SearchTypes.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "./SearchTypes.js",
+        "target": "src/service/search/SearchTypes.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./FieldWeightedScorer.js",
+        "target": "src/service/search/FieldWeightedScorer.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./SearchTypes.js",
+        "target": "src/service/search/SearchTypes.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "./SearchTypes.js",
+        "target": "src/service/search/SearchTypes.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./tokenizer.js",
+        "target": "src/service/search/tokenizer.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 1938,
+      "sha256": "5452d49e1c9248de662b3d467b3d1a7147e658cd11c4c4d00f4291ddc4d4aebb",
+      "baselineSha256": "489b36ac3c688f6a83daaeba5cea26d93bd1b647c4efcf82c9563c21f2944b7a",
+      "changedSinceInventory": true,
+      "functionCount": 91,
+      "anyTokenLines": [],
+      "catchLines": [
+        105,
+        122,
+        212,
+        240,
+        360,
+        440,
+        598,
+        606,
+        657,
+        685,
+        823,
+        898,
+        1001,
+        1024,
+        1175,
+        1280,
+        1339,
+        1347,
+        1360,
+        1366,
+        1428,
+        1483,
+        1522,
+        1531,
+        1537,
+        1676,
+        1803
+      ],
+      "longFunctions": [
+        {
+          "name": "search",
+          "line": 257,
+          "lines": 273
+        },
+        {
+          "name": "_semanticSearch",
+          "line": 793,
+          "lines": 238
+        },
+        {
+          "name": "_supplementDetails",
+          "line": 1276,
+          "lines": 162
+        }
+      ]
+    },
+    "reviewNote": "8个分配源码已逐句阅读全文；specific semanticReview记录实际函数、状态、错误、消费者。测试只对列明执行的suite宣称GREEN。",
+    "implementation": {
+      "status": "changed-pending-independent-parent-review",
+      "currentDigest": "sha256:44a96cdde52113cdd2cfbeedabec87f738eaeba0303f4b50a4248c7f67aaf40a",
+      "record": "intelligence-implementation.json",
+      "baselineReviewPreserved": true
+    },
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "search-supplement",
+      "role": "对宿主公开的SQLite/scorer/semantic搜索编排、metadata过滤、排序、结果补全、缓存及索引刷新",
+      "keyFunctions": [
+        "constructor",
+        "buildIndex",
+        "ensureIndex",
+        "search",
+        "_applyRanking",
+        "_normalizeForRanking",
+        "_keywordSearch",
+        "_scorerSearch",
+        "_semanticSearch",
+        "#projectLiveVectorCandidates",
+        "#retrieveCanonical",
+        "_supplementDetails",
+        "refreshIndex",
+        "_buildDocText",
+        "_buildDocMeta",
+        "#normalizeMetadataFilters",
+        "#matchesMetadataRecord",
+        "_getCache",
+        "_setCache"
+      ],
+      "notes": [
+        "buildIndex使用repository非deprecated行生成canonical sparse文档和meta；缺表/加载失败记录稳定degraded原因。search拒绝退役bm25；空query+filter走metadata-only；keyword合并SQL LIKE与canonical sparse事实，weighted直接scorer，auto执行weighted confidence/可选RRF，canonical port成功保留其权威顺序。",
+        "语义旧路径从vectorService或embed+store读取，region id单源解析、按entry去重、request-scoped DB过滤missing/deprecated、补全细节后hard metadata过滤。失败降级weighted，response/searchMeta同时给actualMode/vectorUsed/fallback；provider实现留在外层。",
+        "正常排名经过可选crossEncoder、coarse、multi-signal、session context，再乘0.85漂移惩罚。本轮根线程最终score重新排序发生在limit切页前，真实SQLite漂移测试保证fresh优先；未改分数或惩罚系数。",
+        "共享LRU key包含query/type/limit/mode/rank/group/filter；任何非空ranking context都绕过共享cache，避免language/category/tags/扩展context间复用错误。metadata filter规范化去重排序后进入key，all类型哨兵被剔除。",
+        "增量refresh按id update/remove且先清cache；已核对两个repository cutoff均Unix秒floor后>=，保持同秒变更不漏，根线程真实SQLite两adapter测试覆盖新建/编辑/deprecated。失败回全量build。",
+        "_supplementDetails保留现有字段，补row内容/usage等并批量读取非stale source refs，renamed用newPath、drifted子集透传。最终group、slim及host包装仍是兼容面。",
+        "S-003经root裁定recipe/solution/knowledge均为V3全集别名：scorer与两旧semantic分支复用既有matchesTypeFilter，metadata type数组含任一全集别名即不施加该字段过滤（OR不缩窄），保留rule/未知type/其他字段与返回wire。真实双adapter、多mode、两semantic port RED→GREEN。",
+        "S-004在保留其他facet断言时暴露正式KnowledgeRepository四个搜索投影缺scope/dimensionId、keyword漏tags；经授权在producer补齐，真实双adapter验证scope+dimensionId+tag过滤和增量刷新后仍保留。根线程gte/Unix秒水位未改，同秒插入/更新/弃用回归通过。"
+      ],
+      "preserveReason": "保留实际Main HTTP/Plugin search及recipe-context adapter生产入口；本次只修既有类型别名和生产者facet投影，不改变缓存/context/同秒水位/排序权重。",
+      "reviewedDigest": "sha256:5452d49e1c9248de662b3d467b3d1a7147e658cd11c4c4d00f4291ddc4d4aebb",
+      "verifiedConsumers": [
+        "../Alembic/lib/injection/modules/KnowledgeModule.ts:130",
+        "../Alembic/lib/http/routes/search.ts:200",
+        "../AlembicPlugin/lib/injection/modules/KnowledgeModule.ts:168",
+        "../AlembicPlugin/lib/host-runtime/mcp/handlers/search.ts:67",
+        "src/service/recipe-context/adapters/searchPort.ts:44"
+      ],
+      "boundaries": [
+        "本域产品仅按root授权修S-001..004；无外层修改、无commit、无Wakeflow状态变更；已冻结产品修改。"
+      ]
+    }
+  },
+  {
+    "file": "src/service/search/SearchTypes.ts",
+    "reviewDepth": "manual-full",
+    "role": "共享搜索ports/DTO与response meta、workspace identity、slim result及kind分组投影",
+    "findings": [],
+    "disposition": [
+      "保留稳定wire/公开ports和slim投影，尤其dontClause与drift证据不应在精简时丢失。"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/SearchEngine.test.ts",
+        "test/PublicSearchVectorGuardEntrypoints.test.ts",
+        "test/unit/SlimSearchResultDrift.test.ts"
+      ],
+      "testReadDepth": "relevant-case/manual-partial, except own new regressions fully read",
+      "executedSuites": [
+        "search-constructor-green.log (4 suites / 121 tests)",
+        "search-sync-lane-green.log (2 suites / 15 tests)",
+        "search-type-facets-green.log (6 suites / 100 tests)"
+      ],
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        620
+      ]
+    ],
+    "consumers": [
+      "src/search.ts",
+      "src/service/search/FieldWeightedScorer.ts",
+      "src/service/search/SearchEngine.ts",
+      "src/service/search/index.ts",
+      "test/unit/SlimSearchResultDrift.test.ts"
+    ],
+    "imports": [
+      {
+        "specifier": "node:path",
+        "target": null,
+        "typeOnly": false
+      },
+      {
+        "specifier": "../../infrastructure/signal/SignalBus.js",
+        "target": "src/infrastructure/signal/SignalBus.ts",
+        "typeOnly": true
+      },
+      {
+        "specifier": "../../shared/ProjectRegistry.js",
+        "target": "src/shared/ProjectRegistry.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./KnowledgeRetrieval.js",
+        "target": "src/service/search/KnowledgeRetrieval.ts",
+        "typeOnly": true
+      }
+    ],
+    "sourceScan": {
+      "lines": 620,
+      "sha256": "ebbdd5ed29826e23ebd2f5e755d80fc42152dd3e623564314325b1f1b2705e08",
+      "baselineSha256": "ebbdd5ed29826e23ebd2f5e755d80fc42152dd3e623564314325b1f1b2705e08",
+      "changedSinceInventory": false,
+      "functionCount": 11,
+      "anyTokenLines": [],
+      "catchLines": [
+        391
+      ],
+      "longFunctions": []
+    },
+    "reviewNote": "8个分配源码已逐句阅读全文；specific semanticReview记录实际函数、状态、错误、消费者。测试只对列明执行的suite宣称GREEN。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "search-supplement",
+      "role": "共享搜索ports/DTO与response meta、workspace identity、slim result及kind分组投影",
+      "keyFunctions": [
+        "buildSearchResponseMeta",
+        "inferSearchSemanticUsage",
+        "inferSearchVectorUsage",
+        "resolveSearchWorkspaceIdentity",
+        "slimSearchResult",
+        "groupByKind"
+      ],
+      "notes": [
+        "Scorer/DbRow/DocMeta/SearchOptions/SearchResponse明确跨阶段字段；ranking context保留扩展Record，向量/embedding/crossEncoder等通过窄ports注入，不实现宿主provider。",
+        "buildSearchResponseMeta归一化有限时长、可选诊断和有界orphan count；显式semanticUsed/vectorUsed优先于按mode推断，避免sparse fallback假称真实vector。workspace identity先显式参数再只读ProjectRegistry inspect，失败返回缺省而不创建项目。",
+        "slimSearchResult保留id/title/trigger/kind/language、三位小数score、120字符description和when/do/dont actionHint；sourceRefs/drifted子集及status保留，供prime避免丢漂移诊断。groupByKind按rule/pattern/fact返回现有shape。",
+        "导出DTO与host slim消费真实存在，不能因类型定义多或与host接口形似删除；小helper职责不同，不合并mode推断函数以增加公共符号变动。"
+      ],
+      "preserveReason": "保留稳定wire/公开ports和slim投影，尤其dontClause与drift证据不应在精简时丢失。",
+      "reviewedDigest": "sha256:ebbdd5ed29826e23ebd2f5e755d80fc42152dd3e623564314325b1f1b2705e08",
+      "verifiedConsumers": [
+        "src/service/search/SearchEngine.ts",
+        "src/service/search/FieldWeightedScorer.ts",
+        "src/search.ts",
+        "../AlembicPlugin/lib/service/task/PrimeSearchPipeline.ts:15",
+        "../Alembic/lib/http/routes/search.ts:7"
+      ],
+      "boundaries": [
+        "本域产品仅按root授权修S-001..004；无外层修改、无commit、无Wakeflow状态变更；已冻结产品修改。"
+      ]
+    }
+  },
+  {
+    "file": "src/service/search/index.ts",
+    "reviewDepth": "manual-full",
+    "role": "搜索公共root转发链的barrel；通过service/index.ts间接进入src/index.ts",
+    "findings": [
+      {
+        "id": "S-CLEANUP-002",
+        "severity": "withdrawn-observation",
+        "status": "withdrawn-after-export-chain-verification",
+        "evidence": "src/index.ts:63 export * ./service/index.js -> src/service/index.ts:8 export * ./search/index.js",
+        "correction": "原直接import扫描遗漏export *转发；非公开/零消费者/可删除结论撤回。"
+      }
+    ],
+    "disposition": [
+      "保留公共root导出链必需barrel，不是零消费者删除候选。"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/CorePackage.test.ts",
+        "test/PublicSearchVectorGuardEntrypoints.test.ts"
+      ],
+      "testReadDepth": "relevant-case/manual-partial, except own new regressions fully read",
+      "executedSuites": [
+        "search-constructor-green.log (4 suites / 121 tests)",
+        "search-sync-lane-green.log (2 suites / 15 tests)",
+        "search-type-facets-green.log (6 suites / 100 tests)"
+      ],
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        9
+      ]
+    ],
+    "consumers": [
+      "src/service/index.ts:8 (export *)",
+      "src/index.ts:63 (indirect public root export *)"
+    ],
+    "imports": [
+      {
+        "specifier": "./CoarseRanker.js",
+        "target": "src/service/search/CoarseRanker.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./contextBoost.js",
+        "target": "src/service/search/contextBoost.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./FieldWeightedScorer.js",
+        "target": "src/service/search/FieldWeightedScorer.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./HybridRetriever.js",
+        "target": "src/service/search/HybridRetriever.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./KnowledgeRetrieval.js",
+        "target": "src/service/search/KnowledgeRetrieval.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./MultiSignalRanker.js",
+        "target": "src/service/search/MultiSignalRanker.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./SearchEngine.js",
+        "target": "src/service/search/SearchEngine.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./SearchTypes.js",
+        "target": "src/service/search/SearchTypes.ts",
+        "typeOnly": false
+      },
+      {
+        "specifier": "./tokenizer.js",
+        "target": "src/service/search/tokenizer.ts",
+        "typeOnly": false
+      }
+    ],
+    "sourceScan": {
+      "lines": 9,
+      "sha256": "ccd4543862202360cfa854743250d3965578396415e53c112acf34fd078f8e84",
+      "baselineSha256": "ccd4543862202360cfa854743250d3965578396415e53c112acf34fd078f8e84",
+      "changedSinceInventory": false,
+      "functionCount": 0,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "8个分配源码已逐句阅读全文；specific semanticReview记录实际函数、状态、错误、消费者。测试只对列明执行的suite宣称GREEN。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "search-supplement",
+      "role": "搜索公共root转发链的barrel；通过service/index.ts间接进入src/index.ts",
+      "keyFunctions": [],
+      "notes": [
+        "全文9行导出CoarseRanker/contextBoost/FieldWeightedScorer/HybridRetriever/KnowledgeRetrieval/MultiSignalRanker/SearchEngine/SearchTypes/tokenizer，无独立运行状态。",
+        "已核对真实root公开转发链：package.json exports[.] -> dist/index.js（src/index.ts:63） -> service/index.ts:8 -> search/index.ts。该barrel有直接export消费者和root间接公开消费者；没有专用./service/search包子路径不能推出非公开。",
+        "原只查直接import而漏读export *，导致错误清理建议；现撤回S-CLEANUP-002删除候选，未发生代码删除。稳定src/search.ts独立facade与root转发同时存在，均需兼容。"
+      ],
+      "preserveReason": "保留公共root导出链必需barrel，不是零消费者删除候选。",
+      "reviewedDigest": "sha256:ccd4543862202360cfa854743250d3965578396415e53c112acf34fd078f8e84",
+      "verifiedConsumers": [
+        "src/service/index.ts:8 (export *)",
+        "src/index.ts:63 (indirect public root export *)"
+      ],
+      "boundaries": [
+        "本域产品仅按root授权修S-001..004；无外层修改、无commit、无Wakeflow状态变更；已冻结产品修改。"
+      ]
+    }
+  },
+  {
+    "file": "src/service/search/tokenizer.ts",
+    "reviewDepth": "manual-full",
+    "role": "无词典的中英文混合技术词分词及去重",
+    "findings": [],
+    "disposition": [
+      "与shared/recipeTokens以及相似度tokenizer的用途/大小写/重复/stopword规则不同，无exact-duplicate条目，不合并破坏排序。"
+    ],
+    "tests": {
+      "directTestConsumers": [
+        "test/SearchEngine.test.ts",
+        "test/SearchPipeline.test.ts",
+        "test/PublicSearchVectorGuardEntrypoints.test.ts"
+      ],
+      "testReadDepth": "relevant-case/manual-partial, except own new regressions fully read",
+      "executedSuites": [
+        "search-constructor-green.log (4 suites / 121 tests)",
+        "search-sync-lane-green.log (2 suites / 15 tests)",
+        "search-type-facets-green.log (6 suites / 100 tests)"
+      ],
+      "regressionProbe": null
+    },
+    "manualReviewedRanges": [
+      [
+        1,
+        214
+      ]
+    ],
+    "consumers": [
+      "src/search.ts",
+      "src/service/search/FieldWeightedScorer.ts",
+      "src/service/search/SearchEngine.ts",
+      "src/service/search/contextBoost.ts",
+      "src/service/search/index.ts"
+    ],
+    "imports": [],
+    "sourceScan": {
+      "lines": 214,
+      "sha256": "edd4d4fc315e9bc0f2be6cea42012aecd8dcec606a1d6de7a6af7d0c291bc81a",
+      "baselineSha256": "edd4d4fc315e9bc0f2be6cea42012aecd8dcec606a1d6de7a6af7d0c291bc81a",
+      "changedSinceInventory": false,
+      "functionCount": 2,
+      "anyTokenLines": [],
+      "catchLines": [],
+      "longFunctions": []
+    },
+    "reviewNote": "8个分配源码已逐句阅读全文；specific semanticReview记录实际函数、状态、错误、消费者。测试只对列明执行的suite宣称GREEN。",
+    "reviewContributor": "boundaries_consumers",
+    "semanticReview": {
+      "batch": "search-supplement",
+      "role": "无词典的中英文混合技术词分词及去重",
+      "keyFunctions": [
+        "tokenize"
+      ],
+      "notes": [
+        "先在大小写存在时拆camelCase和大写前缀，再lowercase和Unicode字母/数字清洗；空格/横线/下划线切词。英文保留>=2字符且过滤停用词；CJK生成非停用单字、至少一字有意义的bigram及>=3字符完整片段。",
+        "中英混合token将CJK与剩余英文分别保留，最终Set去重。调用方依赖去重后的query覆盖而非TF重复数，不能为表面评分统一改成保留重复词。",
+        "停用词和BMP CJK范围是当前约定，未假称完整日韩分词或语言形态学；无I/O、状态或异常恢复流程，公开tokenize对空文本返回[]。"
+      ],
+      "preserveReason": "与shared/recipeTokens以及相似度tokenizer的用途/大小写/重复/stopword规则不同，无exact-duplicate条目，不合并破坏排序。",
+      "reviewedDigest": "sha256:edd4d4fc315e9bc0f2be6cea42012aecd8dcec606a1d6de7a6af7d0c291bc81a",
+      "verifiedConsumers": [
+        "src/service/search/FieldWeightedScorer.ts:18",
+        "src/service/search/contextBoost.ts:13",
+        "src/search.ts:96"
+      ],
+      "boundaries": [
+        "本域产品仅按root授权修S-001..004；无外层修改、无commit、无Wakeflow状态变更；已冻结产品修改。"
+      ]
+    }
+  }
+]

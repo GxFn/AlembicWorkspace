@@ -1,0 +1,285 @@
+{
+  "base": "8ab3783",
+  "head": "f39e139cb127a094caf052c68adbd6e0c88a0913",
+  "commits": [
+    "f39e139cb127a094caf052c68adbd6e0c88a0913 refactor: centralize search projections and result handling",
+    "688cbbb014f4ef9648bb0ba826f085a7a1a8c4a0 refactor: remove unused ranking state and duplicate index updates"
+  ],
+  "runtime": "Node 22.23.2",
+  "finalChecks": [
+    {
+      "label": "core-final",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 45.13,
+      "log": "core-final.log",
+      "sha256": "a2d93b028a1d42a57588e3ef7d49a54031962e99dd313a817592792e67cc03bb"
+    },
+    {
+      "label": "final-group-order",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "-t",
+        "groups supported and unknown kinds"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 1.19,
+      "log": "final-group-order.log",
+      "sha256": "524c88fc29490ec28d301d528d6dab372b6d3f9681314ae28d55fe3977a6d930"
+    },
+    {
+      "label": "final-build",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 0,
+      "seconds": 6.93,
+      "log": "final-build.log",
+      "sha256": "49da0f296ac796fbddf73a1051efe05a99d45fafa8f5ec47d9d220aaa7a56bc2"
+    },
+    {
+      "label": "main-types",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "Alembic",
+      "exitCode": 0,
+      "seconds": 8.01,
+      "log": "main-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "plugin-types",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "seconds": 8.14,
+      "log": "plugin-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "main-search-consumers",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/integration/SearchPipeline.test.ts",
+        "test/unit/SearchRouteTelemetry.test.ts"
+      ],
+      "cwd": "Alembic",
+      "exitCode": 0,
+      "seconds": 3.83,
+      "log": "main-search-consumers.log",
+      "sha256": "5a601bcb909ad7257d8f88a121a551b28509d3c4a0ed9cd4020db522fa41910c"
+    },
+    {
+      "label": "plugin-search-consumers",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/unit/SearchPrimeCandidateParity.test.ts",
+        "test/unit/SearchEnginePublicRoute.test.ts",
+        "test/unit/ReadOnlySearchFingerprint.test.ts",
+        "test/unit/SearchOutputDetach.test.ts",
+        "test/unit/PrimeSearchRouteEvidence.test.ts"
+      ],
+      "cwd": "AlembicPlugin",
+      "exitCode": 0,
+      "seconds": 5.17,
+      "log": "plugin-search-consumers.log",
+      "sha256": "ac99faaf4be7c79809e1c54db5cd3814bb470a8c28147be5eae9fe1e20621f03"
+    }
+  ],
+  "core": {
+    "passed": 2194,
+    "skipped": 1,
+    "suitesPassed": 193,
+    "suitesSkipped": 1
+  },
+  "consumers": {
+    "Alembic": 24,
+    "AlembicPlugin": 14
+  },
+  "exports": {
+    "count": 68,
+    "unchanged": true
+  },
+  "reviewedSourceRecords": 16,
+  "postFullCheckChanges": "one group ordering assertion (targeted pass) and comments/docs only; build regenerated before consumer verification",
+  "outerChanges": "none required; existing file:../AlembicCore wiring",
+  "failureHistory": [
+    {
+      "label": "red-unused-rank-subscription",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchRanking.test.ts",
+        "-t",
+        "unused bus subscriptions"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 0.55,
+      "log": "red-unused-rank-subscription.log"
+    },
+    {
+      "label": "red-search-read-boundary",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "-t",
+        "search repository read boundary"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.66,
+      "log": "red-search-read-boundary.log"
+    },
+    {
+      "label": "green-search-read-boundary",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "test/DatabaseRepository.test.ts",
+        "test/PublicDatabaseRepositoryEntrypoints.test.ts",
+        "test/SearchPipeline.test.ts",
+        "test/PublicSearchVectorGuardEntrypoints.test.ts"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 2.14,
+      "log": "green-search-read-boundary.log"
+    },
+    {
+      "label": "red-repository-literal-like",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "-t",
+        "escaped literal LIKE"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.9,
+      "log": "red-repository-literal-like.log"
+    },
+    {
+      "label": "red-duplicate-document-projection",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "-t",
+        "projects each indexed row once"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.74,
+      "log": "red-duplicate-document-projection.log"
+    },
+    {
+      "label": "green-single-document-projection",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "test/SearchRanking.test.ts",
+        "test/SearchPipeline.test.ts",
+        "test/RecipeRetrieval.test.ts",
+        "test/PublicSearchVectorGuardEntrypoints.test.ts"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 2.31,
+      "log": "green-single-document-projection.log"
+    },
+    {
+      "label": "red-duplicate-document-projection-valid",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "-t",
+        "projects each indexed row once"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.31,
+      "log": "red-duplicate-document-projection-valid.log"
+    },
+    {
+      "label": "red-ranking-config-keys",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchRanking.test.ts",
+        "-t",
+        "ordinary unknown configuration key|own __proto__ scenario"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 0.83,
+      "log": "red-ranking-config-keys.log"
+    },
+    {
+      "label": "red-detail-facet-parity",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "-t",
+        "keeps aliases on semantic"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.75,
+      "log": "red-detail-facet-parity.log"
+    },
+    {
+      "label": "red-shared-kind-grouping",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/SearchEngine.test.ts",
+        "-t",
+        "groups supported and unknown kinds"
+      ],
+      "cwd": "AlembicCore",
+      "exitCode": 1,
+      "seconds": 1.73,
+      "log": "red-shared-kind-grouping.log"
+    }
+  ]
+}

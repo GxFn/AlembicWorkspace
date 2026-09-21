@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1",
+  "dispatchGroup": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1",
+  "status": "completed",
+  "summary": "AlembicCore 已按锁定 controller contract 修复 strict-test failure causal lineage：Core 冻结并公开精确 14-stage authority matrix；failure creator/terminal/audit 统一接收单一 authority context 并派生 observed/nullable predecessor hashes；projection 新增 hash-bound projectedAt；失败链强制四层因果时间、stage authority、前驱 lineage 与 non-mutation；audit 按阶段保持 exact nullable shape、failure summary 和私有证据；无旧 overload/fallback，既有五项 completion 防伪回归与 strict-production 哈希保持不变。",
+  "evidenceRefs": [
+    "wakeflow-ledger/AlembicCore/recipe-coldstart-production-quality-2026-07-15/i3-i10-core-strict-test-failure-causal-lineage-rootcause2-evidence.md",
+    "commit:744616bde2322efa92aecd66b0b4f862f17fe69a",
+    "guard:guard-public-ms74xenp-6",
+    "AlembicCore/src/service/plan/intent/strictTestDimensionProfile.ts",
+    "AlembicCore/test/StrictTestDimensionProfile.test.ts"
+  ],
+  "verification": [
+    "npm run test -- --run test/StrictTestDimensionProfile.test.ts => 1 file / 19 tests passed",
+    "npx vitest run test/StrictTestDimensionProfile.test.ts test/ColdStartProductionPlanCompiler.test.ts test/ProductionPersistenceContracts.test.ts test/CorePackage.test.ts test/PublicApiInventory.test.ts --reporter=dot => 5 files / 66 tests passed",
+    "npm run test => 195 files passed, 1 skipped; 1924 tests passed, 1 skipped",
+    "npm run build:check => passed",
+    "npm run build => passed",
+    "npm run smoke:public-api => imported 61 exact public entrypoints",
+    "npm run lint => passed",
+    "public API boundary, layer, consumer imports, scope, output budgets, space edges, naming, retired symbols => passed",
+    "git diff --check => passed before commit; worktree clean after commit",
+    "Alembic Guard guard-public-ms74xenp-6 => 2 files checked, 0 violations",
+    "protected strict-production source/dist sha256 values equal accepted baseline"
+  ],
+  "risks": [
+    "npm run lint:doctrine retains the inherited unrelated finding at unchanged src/infrastructure/vector/ASTChunker.ts:32; all other composite sub-gates passed.",
+    "Downstream AlembicAgent/Alembic callers must migrate to StrictTestPrivateTerminalAuthorityContextV1 and supply projectedAt; the controller contract explicitly forbids an overload or compatibility fallback, and external integration was outside this Core-only task.",
+    "A discarded validation attempt raced clean-dist build against EntrypointEffects; the stable serial rerun passed the complete 1924-test suite and is the accepted evidence."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "744616bde2322efa92aecd66b0b4f862f17fe69a",
+      "verify": "git show --stat 744616b; implementation commit changes only the assigned Core source and focused test"
+    },
+    {
+      "kind": "tests",
+      "ref": "wakeflow-ledger/AlembicCore/recipe-coldstart-production-quality-2026-07-15/i3-i10-core-strict-test-failure-causal-lineage-rootcause2-evidence.md",
+      "verify": "Focused 19/19; compatibility 66/66; stable full Core 1924 passed, 1 skipped"
+    },
+    {
+      "kind": "build",
+      "ref": "wakeflow-ledger/AlembicCore/recipe-coldstart-production-quality-2026-07-15/i3-i10-core-strict-test-failure-causal-lineage-rootcause2-evidence.md",
+      "verify": "build:check, build, 61-entrypoint smoke and all non-doctrine boundary gates passed"
+    },
+    {
+      "kind": "implementation",
+      "ref": "AlembicCore/src/service/plan/intent/strictTestDimensionProfile.ts",
+      "verify": "Review frozen V1 matrix/resolver, exact authority context, derived failure receipt, projectedAt, terminal validation and stage-aware audit"
+    },
+    {
+      "kind": "causal-probe",
+      "ref": "AlembicCore/test/StrictTestDimensionProfile.test.ts",
+      "verify": "Table-driven 14-state probes accept exact early/late authority and reject missing/forbidden/undefined/mismatched/future predecessor contexts"
+    },
+    {
+      "kind": "baseline",
+      "value": "Accepted baseline 933920f focused suite was 12/12 before rootcause2 RED additions; protected strict-production source/dist hashes were pinned.",
+      "verify": "git show 933920f and compare hashes in the evidence document"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Sequence followed: pin exact matrix RED; implement shared matrix/context/time/hash derivation; make terminal/audit stage-aware; self-review; full verification; Guard; commit; Wakeflow evidence.",
+      "verify": "Current task plan and evidence document reflect the completed order"
+    },
+    {
+      "kind": "repro",
+      "commit": "cd295c7",
+      "verify": "Exact-contract focused suite before source implementation: 14 failed, 4 passed (18); failures reproduced stage-blind authority, timestamps and nullable audit gaps"
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicCore/test/StrictTestDimensionProfile.test.ts",
+      "verify": "The same exact public entrypoints now pass all 19 focused tests, including five preserved completion-forgery probes"
+    },
+    {
+      "kind": "test-first",
+      "value": "RED commits a12f0e5 and cd295c7 precede implementation commit 744616b.",
+      "verify": "git log --oneline 933920f..744616b"
+    },
+    {
+      "kind": "self-review",
+      "ref": "wakeflow-ledger/AlembicCore/recipe-coldstart-production-quality-2026-07-15/i3-i10-core-strict-test-failure-causal-lineage-rootcause2-evidence.md",
+      "verify": "Stage 1: every controller contract bullet mapped and covered. Stage 2: undefined authority and predecessor-hash/projectedAt probe gaps fixed; Guard complexity warning refactored; no remaining task-scoped findings."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Commit 744616b changes only src/service/plan/intent/strictTestDimensionProfile.ts and test/StrictTestDimensionProfile.test.ts; protected and external surfaces remain untouched.",
+      "verify": "git diff --name-only 933920f..744616b and per-commit stat"
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "wakeflow-ledger/AlembicCore/recipe-coldstart-production-quality-2026-07-15/i3-i10-core-strict-test-failure-causal-lineage-rootcause2-evidence.md",
+      "verify": "Root cause identifies stage-blind raw hash input, mandatory success preflight and absent projection timestamp/audit nullability"
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed on final source tree.",
+      "verify": "npm run build:check"
+    },
+    {
+      "kind": "lint",
+      "value": "npm run lint and all boundary/layer/consumer/scope/budget/space/naming/retired checks passed; only inherited unchanged doctrine finding remains.",
+      "verify": "Run commands listed in the evidence document"
+    },
+    {
+      "kind": "verification",
+      "ref": "wakeflow-ledger/AlembicCore/recipe-coldstart-production-quality-2026-07-15/i3-i10-core-strict-test-failure-causal-lineage-rootcause2-evidence.md",
+      "verify": "Final stable full suite/build/public smoke/Guard/hashes are captured with exact outcomes"
+    },
+    {
+      "kind": "guard",
+      "ref": "guard-public-ms74xenp-6",
+      "verify": "Alembic Guard reviewed both changed files with 0 violations"
+    },
+    {
+      "kind": "risk-analysis",
+      "ref": "wakeflow-ledger/AlembicCore/recipe-coldstart-production-quality-2026-07-15/i3-i10-core-strict-test-failure-causal-lineage-rootcause2-evidence.md",
+      "verify": "Documents inherited doctrine issue, intentional downstream API migration, strict-production hash preservation and discarded build/test race"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1__AlembicCore__i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1__AlembicCore__i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1.json",
+    "deliveryRunId": "run-delivery-i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1__AlembicCore__i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1",
+    "dispatchGroup": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1__AlembicCore__i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 330,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1",
+    "targetTaskId": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "i3-i10-core-strict-test-failure-causal-lineage-rootcause2-p1",
+    "resultId": "tr-i3-i10-core-strict-test-failure-causal-lineage-rootcause2-t1",
+    "createdAt": "2026-07-30T06:34:26.440Z"
+  },
+  "createdAt": "2026-07-30T06:34:26.440Z",
+  "stateRevisionObserved": 330,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

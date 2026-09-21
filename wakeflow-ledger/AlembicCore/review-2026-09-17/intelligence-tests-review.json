@@ -1,0 +1,700 @@
+[
+  {
+    "file": "test/AstGrammar.test.ts",
+    "lines": 38,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        38
+      ]
+    ],
+    "role": "真实打包WASM grammar资源发现/reload与TypeScript class解析烟测",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "语法资源分发与解析语义是不同层；MultiLanguageParsers实际覆盖构建manifest，不是WASM替代。与PublicProjectIntelligence首case才有资源/TS解析重复，合并须迁旧infer/ensure/reload/isAvailable断言。"
+      }
+    ],
+    "disposition": "consolidated-removed",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "Entire file removed after moving all unique legacy resource/reload/readiness/actual class parse assertions to PublicProjectIntelligenceEntrypoints first case."
+    ]
+  },
+  {
+    "file": "test/EmbeddingPort.test.ts",
+    "lines": 93,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        93
+      ]
+    ],
+    "role": "query/document purpose分离、显式能力与单文本legacy provider适配、BatchEmbedder调用路径",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "声明batchUnsupported和实际legacy批失败后的兼容是两条不同路径；四条输入虽相似，不是安全整块重复。"
+      }
+    ],
+    "disposition": "retain-port-contract",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/EnhancementGuardRules.test.ts",
+    "lines": 86,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        86
+      ]
+    ],
+    "role": "公开guard facade对registry初始化/语言框架筛选/frameworkAgnostic优先级的适配",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "部分与registry直接输出相等是有意的边界parity；agnostic当前空集，保留conditioned>0证明实际排除。末尾subset长度断言被严格相等+expected构造包含，可删但收益极小。"
+      }
+    ],
+    "disposition": "retain-facade-contract",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/GuardCheckEngine.test.ts",
+    "lines": 388,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        388
+      ]
+    ],
+    "role": "真实内存SQLite加载规则、内建多语言审计、AST callee/selector正负匹配、真实知识落库snake_case字段、批与信号去重",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "可接收GuardImmune首条独有collector实例/每file uncertainty数组断言，再删除后者重复烟测；最后signalEngine创建的临时内存DB未显式close是测试清理项。多语言callee表不能化成regex命中计数。"
+      }
+    ],
+    "disposition": "reviewed-and-consolidated",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "Real batch case now asserts UncertaintyCollector instance, per-file uncertainty arrays and nonnegative totalUncertain response field, preserving old smoke contract."
+    ]
+  },
+  {
+    "file": "test/GuardImmuneSystem.test.ts",
+    "lines": 80,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        80
+      ]
+    ],
+    "role": "真实Guard engine collector装配、反馈消失自动confirm、磁盘RuleLearner precision信号",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "第一条totalUncertain>=0不能证明uncertainty行为；需保留collector实例/报告形状独有断言，迁到GuardCheckEngine后才可删薄烟测。其余反馈/学习器是独立有断言的行为，不因mockDB删除。"
+      }
+    ],
+    "disposition": "reviewed-and-consolidated",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "Initial weak wiring test and its dead fake DB helper removed; unique collector/capability/uncertainty shape assertions reside in real SQLite GuardCheckEngine batch case."
+    ]
+  },
+  {
+    "file": "test/KnowledgeRetrievalPolicy.test.ts",
+    "lines": 649,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        649
+      ]
+    ],
+    "role": "真实retriever/projector策略+受控dense/sparse语料：RRF稳定性边界、refill预算、truth过滤、取消、稀疏降级、冻结query矩阵与circuit",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "多处构造端口样板可用本文件小helper减少，但每种窗口/停止/metadata过滤/circuit条件独立。冻结8-query矩阵使用实际FieldWeightedScorer并以不同dense region ranks建模，不是恒定mock Top3；不应当成无效重复测试删除。"
+      }
+    ],
+    "disposition": "retain-ranking-budget-regressions",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/KnowledgeTruthProjector.test.ts",
+    "lines": 84,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        84
+      ]
+    ],
+    "role": "region聚合后每Recipe每lane只贡献一次RRF，以及真实truth seam的orphan/deprecated过滤",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "数值61/62 rank公式和distinct Recipe排序独立于实现helper，是有意义回归；不以搜索大套件存在为由删除。"
+      }
+    ],
+    "disposition": "retain-ranking-invariants",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/MultiLanguageParsers.test.ts",
+    "lines": 794,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        794
+      ]
+    ],
+    "role": "Starlark/Gradle/CMake/JSON/YAML构建清单解析、CustomConfigDiscoverer真实目录marker检测及Bazel/Gradle/CMake加载targets",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "Bazel load组beforeAll最后new d + detect/load结果被丢弃，唯一it重新new d再detect/load；源码load只写实例状态，故删beforeAll这三行与async修饰无独有断言损失。inferConventionRole四个小case可表驱动。antiMarkers是拒绝高置信误判而非强制match=false；CMake最后case可补app/core名字，现仅count>=3+main不足证明每子目录。"
+      }
+    ],
+    "disposition": "reviewed-and-consolidated",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "Discarded Bazel beforeAll discoverer detect/load and unnecessary async callback marker removed; real test still independently detects, loads and asserts targets."
+    ]
+  },
+  {
+    "file": "test/PlanFactsProjectContextErrors.test.ts",
+    "lines": 89,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        89
+      ]
+    ],
+    "role": "真实临时项目+WASM parse故障注入，核验plan facts保留fatal错误/partial gap且不把unsupported语言当fatal",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "两条区分必要facts失败与非支持能力，不能合并成仅toThrow；与ProjectContext底层错误测试是不同消费边界。"
+      }
+    ],
+    "disposition": "retain-error-aggregation",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/ProjectContextCancellation.test.ts",
+    "lines": 184,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        184
+      ]
+    ],
+    "role": "AbortSignal从wire分离、preabort/custom reason、in-flight worker/discoverer清理、真实DFS取消、typed capabilities转发",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "真实GenericDiscoverer路径与注入worker证明不同层；短setTimeout只是驱动取消时序，不是验收用固定sleep替代状态。需要保留实际timer清理和计数停止断言。"
+      }
+    ],
+    "disposition": "retain-cancellation-boundaries",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/ProjectContextContract.test.ts",
+    "lines": 307,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        307
+      ]
+    ],
+    "role": "包exports/九类有序dispatch、固定envelope、project权威冲突/无跨请求状态、接口层依赖边界",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "导出和kind精确白名单是刻意契约，不当作镜像实现删除；source文本禁词adapter等可能误伤说明注释，若清理应保留实际import边界与请求行为而缩窄词法扫描，不先删整个架构门。"
+      }
+    ],
+    "disposition": "retain-public-contract",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/ProjectContextEndToEnd.test.ts",
+    "lines": 868,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        868
+      ]
+    ],
+    "role": "真实文件/原生scope registry驱动space→repo→map→module→AST→slice及反向链路，九种provider、六种anchor入口、NodeNext解析与命令不执行",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "首两个top-down请求样板可用局部chain helper复用，但一个承载详细refs/boundary/不执行commands，另一个是权威project输入下九kind完整性，不宜直接删。它检查输出不泄漏HiddenProject，未直接监测所有FS读取，因此“无隐藏扫描”标题不能视为I/O完整追踪。"
+      }
+    ],
+    "disposition": "retain-full-ref-chain",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/ProjectContextModuleLayersModule.test.ts",
+    "lines": 184,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        184
+      ]
+    ],
+    "role": "真实多文件TS fixture验证module-layers与module所有权/入出流/公开符号/drilldown/稳定排序及missing语义",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "两个kind输出不同，各有独有层次/符号/ownedFiles字段；不能被project map的大体成功断言替代。通用withFixture可以复用但无需为此发明大test DSL。"
+      }
+    ],
+    "disposition": "retain-provider-behavior",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/ProjectContextProjectMap.test.ts",
+    "lines": 254,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        254
+      ]
+    ],
+    "role": "真实模块循环/层/hotspots/主要流、输入顺序稳定、coverage轴身份差异、缺所有权与external包降级",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "ProjectMap module IDs与coverage target IDs不同是明确锁定的当前兼容事实，不能凭统一命名愿望反转；重复fixture和多层查询不是重复断言。"
+      }
+    ],
+    "disposition": "retain-map-and-axis-contract",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/ProjectContextRepoContext.test.ts",
+    "lines": 365,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        365
+      ]
+    ],
+    "role": "repo package/build/entrypoint/sourceRoots投影、真实SwiftPM显式target path、本地包refs、map缺失和manifest损坏降级",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "SwiftPM无显式path的Shared→.是当前fallback断言；不要误删当成坏fixture。repo与map/space刻意不承载对方大字段的负断言保留，防输出不断膨胀。"
+      }
+    ],
+    "disposition": "retain-real-manifest-context",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/ProjectContextSourceSlice.test.ts",
+    "lines": 247,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        247
+      ]
+    ],
+    "role": "真实文件精确范围文本/全文件hash、ref再作为selector、includeText=false、无效范围/路径逃逸与interface统一redaction",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "真实存在的绝对scope外文件与../路径错误是不同入口；保留所有权/范围/ref闭环，不可用mock source reader替代。重复withFixture可提小helper但没有安全整文件删除空间。"
+      }
+    ],
+    "disposition": "retain-source-truth-boundary",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/PublicProjectIntelligenceEntrypoints.test.ts",
+    "lines": 104,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        104
+      ]
+    ],
+    "role": "Generic core/shared grammar/AST/discovery公开路径与废弃ProjectIntelligence facade撤销门禁",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "首case与AstGrammar使用相同TS class/grammar组合，可合并AstGrammar内容到这里：必须迁入inferLanguagesFromStats输出、ensureGrammars old API结果、reloadPlugins后isAvailable真值；当前isParserReady仅Function存在断言不能代替ready=true。保留exports负断言与CMake/Gradle语义。"
+      }
+    ],
+    "disposition": "reviewed-and-consolidated",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "First generic AST/grammar case now also exercises inferLanguagesFromStats, ensureGrammars, reloadPlugins, isAvailable and legacy analyzeFile using one real source fixture."
+    ]
+  },
+  {
+    "file": "test/PublicSourceGraphEntrypoints.test.ts",
+    "lines": 338,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        338
+      ]
+    ],
+    "role": "旧source-graph facade撤销、内部DTO/validator/state/diagnostic归属和operation-specific结果契约",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "方法toBeDefined一条较弱，可与facade撤销case合并保留其所有内部入口存在断言；其他DTO字段剔除/缺证据不ready/验证计划四桶是独有语义，不应随旧facade删除。"
+      }
+    ],
+    "disposition": "retain-boundary-and-dto-contract",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/RecipeContextService.test.ts",
+    "lines": 424,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        424
+      ]
+    ],
+    "role": "六类只读Recipe查询封装、诊断映射、search/prime共同候选顺序、vector降级、ref与relation展开",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "末尾lifecycle isolation测试只断言自己构造的fakeReadPort没有mutation键，再重复detail id读回；两点分别是fixture定义事实和首detail用例已有断言，无独有行为，可删最后describe而不用迁移断言。保留实际read-kind/diagnostic/prime排序用例。"
+      }
+    ],
+    "disposition": "reviewed-and-consolidated",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "Final self-authored fake-read-port non-mutation property check removed; its repeated r1 detail read was already covered by first detail case."
+    ]
+  },
+  {
+    "file": "test/RecipeVectorGeneration.test.ts",
+    "lines": 388,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        388
+      ]
+    ],
+    "role": "内存store/router承载真实generation manager：shadow验证/CAS激活/rollback、模型schema身份、故障保留旧代、损坏检查与repair",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "这是内存端口上的真实协议行为，不声称磁盘耐久验证；strict assembly包装入口、旧代可查询、model/schema变更、inspection各类异常各有独有断言。可复用constructor fixture，勿删失败/rollback场景。"
+      }
+    ],
+    "disposition": "retain-generation-protocol",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/SearchEngine.test.ts",
+    "lines": 1408,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        1408
+      ]
+    ],
+    "role": "tokenizer/scorer基本状态、搜索路由/metadata/filters、向量truth与legacy适配、缓存上下文/同秒索引刷新/漂移排序真实SQLite回归",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "可去掉仅CJK tokens.length>0弱case（SearchPipeline已精确断言中文单字/bigram）；URLSession与空token重复需保留undefined边界。缓存maxAge硬编码key曾被怀疑不匹配，probe否定：keyword默认rank=false，旧key准确；不要删除有效TTL断言。仅cacheSize不变不证明命中，可与TTL用fake clock+仓储spy合并。"
+      }
+    ],
+    "disposition": "reviewed-and-consolidated",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "Weak Chinese length check replaced with exact Chinese unigram/bigram and mixed-text assertions moved from SearchPipeline.",
+      "Duplicate scorer.clear case moved to SearchRanking final clear case.",
+      "Existing semantic missing-provider case now also proves r1 fallback result survives, replacing vacuous Pipeline length>=0."
+    ]
+  },
+  {
+    "file": "test/SearchPipeline.test.ts",
+    "lines": 384,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        384
+      ]
+    ],
+    "role": "独立SQLite corpus从SQL索引→关键词/加权/排序/分组/降级，含CJK/tokenizer与scorer重复单测",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "ensureIndex用例假设前一条已buildIndex，单独-t ensureIndex真实失败，见intelligence-test-order-probe.log；先在本case建立index再spy可保留幂等语义。semantic无AI用例只assert items.length>=0为真空断言，可删或合入SearchEngine既有完整fallback检查。cache两次ID相同只证结果稳定，不证命中。移中文/混合token独有断言到SearchEngine.tokenize后可删此重复tokenizer describe。"
+      },
+      {
+        "id": "IT-SEARCH-ORDER",
+        "severity": "P2",
+        "kind": "test-order-dependence",
+        "summary": "ensureIndex isolated execution assumes missing prior-case buildIndex state.",
+        "evidence": "intelligence-test-order-probe.log",
+        "status": "red-green-verified",
+        "green": "intelligence-test-order-green.log"
+      }
+    ],
+    "disposition": "reviewed-and-consolidated",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "Tokenizer group removed after unique CJK/mixed assertions moved to SearchEngine; URLSession/falsy inputs already covered there.",
+      "Duplicate scorer.clear query assertion moved to SearchRanking.",
+      "Vacuous semantic fallback case removed; substantive fallback mode/meta/live result covered in SearchEngine.",
+      "ensureIndex explicitly creates its precondition before installing the no-rebuild spy; isolated test is now green."
+    ]
+  },
+  {
+    "file": "test/SearchRanking.test.ts",
+    "lines": 530,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        530
+      ]
+    ],
+    "role": "CoarseRanker五信号、MultiSignal六信号/场景/旧seasonality兼容、contextBoost、FieldWeighted增删替换/tombstone/compact/frequency",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "保留各signal基线、时间Unix秒、旧键与增量索引不变量。可用本文件clear resets everything including _idIndex吸收SearchEngine.clear的avgLength/docFreq清零和SearchPipeline.clear的清后匹配为空断言，然后删除另外两条重复clear用例；查询应选beforeEach里实际存在的react。"
+      }
+    ],
+    "disposition": "reviewed-and-consolidated",
+    "tests": {
+      "executedByThisReview": true,
+      "logs": [
+        "intelligence-cleanup-before.log",
+        "intelligence-cleanup-after.log"
+      ]
+    },
+    "cleanupMapping": [
+      "Final clear case now verifies avgLength, docFreq and search result emptiness in addition to totals/id-index/document cleanup."
+    ]
+  },
+  {
+    "file": "test/VectorIndexPorts.test.ts",
+    "lines": 43,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        43
+      ]
+    ],
+    "role": "read-only adapter不暴露写方法、writer adapter的各操作调用入口",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "writer测试调用remove/clear却未断言其被委托；如果这两方法变no-op仍通过。应补其独有实参/次数断言，不能把整个写隔离入口测试删除。"
+      }
+    ],
+    "disposition": "retain-strengthen-delegation",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/unit/DetectFrameworks.test.ts",
+    "lines": 216,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        216
+      ]
+    ],
+    "role": "真实项目清单→语言/框架→增强pack/规则筛选，含单行Go、坏JSON/非object与多生态保留",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "比EnhancementGuardRules单纯registry parity多一层真实manifest生产者；两文件不可直接二选一删除。新非object坏输入是Root修复回归，已读新增case。"
+      }
+    ],
+    "disposition": "retain-producer-consumer-chain",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/unit/ModuleMapNameJoin.test.ts",
+    "lines": 88,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        88
+      ]
+    ],
+    "role": "Swift裸模块名/ObjC框架头fallback join、本地external区分与自引用不造自环",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "小mock对象精准模拟file-flow unresolved关系；npm scope负案例是兼容边界，不应因另有package importer而删除。"
+      }
+    ],
+    "disposition": "retain-module-linking",
+    "tests": {
+      "executedByThisReview": false
+    }
+  },
+  {
+    "file": "test/unit/SlimSearchResultDrift.test.ts",
+    "lines": 51,
+    "reviewDepth": "manual-code-complete",
+    "reviewedRanges": [
+      [
+        1,
+        51
+      ]
+    ],
+    "role": "slim搜索投影的drifted/active/无refs三态，保护prime来源新鲜度",
+    "findings": [
+      {
+        "severity": "P3",
+        "kind": "test-review-advice",
+        "summary": "三个case断言互补：真漂移完整引用、健康省略空drifted、无来源不凭空active。可表驱动但不能减少三态。"
+      }
+    ],
+    "disposition": "retain-projection-regression",
+    "tests": {
+      "executedByThisReview": false
+    }
+  }
+]

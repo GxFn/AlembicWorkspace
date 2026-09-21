@@ -1,0 +1,5543 @@
+[
+  {
+    "file": "src/domain/dimension/BaseDimensions.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "UnifiedDimension 到旧 BaseDimension 的兼容投影及有序维度解析；身份分支避免重复目录数据。",
+      "exports": [
+        "BaseDimension",
+        "toBaseDimension",
+        "FirstStatement",
+        "resolvePlanDimensionDefinitions"
+      ],
+      "consumers": [
+        "src/service/plan/facts/collectProjectContext.ts",
+        "src/workflows/surfaces/planning/dimensions/BaseDimensions.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 108,
+    "reviewedRanges": [
+      [
+        1,
+        108
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/dimension/DimensionCatalogPayload.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "目录 payload 深拷贝冻结、语言框架适用性、SOP 和提交规范渲染。",
+      "exports": [
+        "ProjectLanguageFrameworkFacts",
+        "DimensionLanguageApplicability",
+        "DimensionAnalysisGuide",
+        "DimensionSubmissionSpec",
+        "DimensionCatalogPayloadItem",
+        "buildDimensionCatalogPayload",
+        "resolveDimensionLanguageApplicability",
+        "buildDimensionSubmissionSpec"
+      ],
+      "consumers": [
+        "src/domain/dimension/index.ts",
+        "src/domain/dimension/index.ts",
+        "src/workflows/surfaces/host-agent/briefing/MissionBriefingBuilder.ts",
+        "test/DimensionSubmissionSpecCollapse.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/DimensionSubmissionSpecCollapse.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 297,
+    "reviewedRanges": [
+      [
+        1,
+        297
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/dimension/DimensionCopy.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "提供稳定维度名称/概述/提示/质量卡片和本地化展示映射；getOverview/getPhaseLabel 等静态入口以 Registry 身份为准。",
+      "exports": [
+        "DimensionCopy"
+      ],
+      "consumers": [
+        "src/domain/dimension/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 417,
+    "reviewedRanges": [
+      [
+        1,
+        416
+      ]
+    ],
+    "notes": [
+      "全文已读，包括文字数据表及 fallback；提示文案虽较大，是真实 briefing/catalog 输出，不属于死代码。"
+    ]
+  },
+  {
+    "file": "src/domain/dimension/DimensionRegistry.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "统一维度注册表；getDimension/getDimensionsByLayer、resolvePlanDimensionDefinitions、buildTierPlan 和 classifyRecipeToDimension 供规划/迁移/coverage 使用。",
+      "exports": [
+        "PlanDimensionDefinitionResolution",
+        "getDimension",
+        "getDimensionsByLayer",
+        "resolvePlanDimensionDefinitions",
+        "buildTierPlan",
+        "classifyRecipeToDimension"
+      ],
+      "consumers": [
+        "src/domain/dimension/BaseDimensions.ts",
+        "src/domain/dimension/DimensionCatalogPayload.ts",
+        "src/domain/dimension/DimensionCopy.ts",
+        "src/domain/dimension/RecipeDimension.ts",
+        "src/domain/dimension/index.ts",
+        "src/domain/dimension/index.ts",
+        "src/infrastructure/database/migrations/009_knowledge_dimension_id.ts",
+        "src/service/plan/intent/planIntent.ts",
+        "src/workflows/surfaces/coverage/CoverageLedgerAdvisor.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 754,
+    "reviewedRanges": [
+      [
+        1,
+        753
+      ]
+    ],
+    "notes": [
+      "全文已读，26 项含 synthesis；文件旧注释写 25 属文案陈旧。保留 registry 顺序、unknown fallback 和旧 BaseDimensions 投影兼容。"
+    ]
+  },
+  {
+    "file": "src/domain/dimension/DimensionSop.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "26 个维度的完整探索 SOP、PRE_SUBMIT_CHECKLIST，以及 getDimensionSOP/focusKeywords/compact text 的确定性 briefing 资料。",
+      "exports": [
+        "FullSopStep",
+        "FullSop",
+        "getDimensionSOP",
+        "getDimensionFocusKeywords",
+        "sopToCompactText"
+      ],
+      "consumers": [
+        "src/domain/dimension/DimensionCatalogPayload.ts",
+        "src/domain/dimension/index.ts",
+        "src/workflows/surfaces/host-agent/briefing/MissionBriefingBuilder.ts",
+        "src/workflows/surfaces/host-agent/briefing/MissionBriefingSupport.ts",
+        "src/workflows/surfaces/planning/dimensions/generateDimensionConfigs.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 1865,
+    "reviewedRanges": [
+      [
+        1,
+        1864
+      ]
+    ],
+    "notes": [
+      "全文分块阅读，含所有 prompt 数据及 compact 转换；不是 Core 内置 Agent runtime。宿主 briefing/planning 真实消费，不能因静态长数据删除。"
+    ]
+  },
+  {
+    "file": "src/domain/dimension/RecipeDimension.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "维度归属解析：显式维度、notes、自定义维度、旧 category/type/tag、topic 推断；保持历史知识可分类。",
+      "exports": [
+        "RecipeDimensionFields",
+        "RecipeDimensionResolveOptions",
+        "isKnownDimensionId",
+        "resolveRecipeDimensionId",
+        "recipeBelongsToDimension",
+        "recipeDimensionIdOrUnknown",
+        "recipeStorageBucket",
+        "dimensionTags"
+      ],
+      "consumers": [
+        "src/dimensions.ts",
+        "src/domain/dimension/index.ts",
+        "src/service/knowledge/KnowledgeFileWriter.ts",
+        "src/workflows/surfaces/host-agent/session/HostAgentDimensionCompletionWorkflow.ts",
+        "src/workflows/surfaces/planning/knowledge/EvolutionPrescreen.ts",
+        "src/workflows/surfaces/planning/knowledge/KnowledgeRescanPlanBuilder.ts",
+        "src/workflows/surfaces/planning/knowledge/RescanEvidenceProjectors.ts",
+        "test/RecipeDimension.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeDimension.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 184,
+    "reviewedRanges": [
+      [
+        1,
+        184
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/dimension/UnifiedDimension.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "统一维度只读类型及通用/语言/框架/综合维度 ID 权威。",
+      "exports": [
+        "UnifiedDimension",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "UniversalDimId",
+        "LanguageDimId",
+        "FrameworkDimId",
+        "SynthesisDimId",
+        "DimensionId",
+        "FirstStatement"
+      ],
+      "consumers": [
+        "src/dimensions.ts",
+        "src/domain/dimension/BaseDimensions.ts",
+        "src/domain/dimension/DimensionCatalogPayload.ts",
+        "src/domain/dimension/DimensionRegistry.ts",
+        "src/domain/dimension/index.ts",
+        "src/domain/dimension/index.ts",
+        "src/service/plan/intent/coldStartProductionPlan.ts",
+        "src/workflows/surfaces/coverage/CoverageLedgerAdvisor.ts",
+        "test/unit/CoverageLedgerAdvisor.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/unit/CoverageLedgerAdvisor.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 123,
+    "reviewedRanges": [
+      [
+        1,
+        123
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/dimension/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/dimensions.ts",
+        "src/dimensions.ts",
+        "src/service/plan/facts/projectInfoTree.ts",
+        "src/service/plan/intent/coldStartProductionPlan.ts",
+        "src/service/project-context/dimensionPlanning/dimensionPlanning.ts",
+        "src/workflows/surfaces/planning/dimensions/TierScheduler.ts",
+        "src/workflows/surfaces/planning/dimensions/generateDimensionConfigs.ts",
+        "test/CorePackage.test.ts",
+        "test/DimensionCatalogPayload.test.ts",
+        "test/PlanFactsDimensionDensity.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/CorePackage.test.ts",
+        "test/DimensionCatalogPayload.test.ts",
+        "test/PlanFactsDimensionDensity.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 58,
+    "reviewedRanges": [
+      [
+        1,
+        58
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/evolution/EvolutionPolicy.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "无 I/O 的进化门禁：update/merge/drift repair、弃用、pending 过期和观察期策略。",
+      "exports": [
+        "RiskTier",
+        "RelevanceVerdict",
+        "UpdateVerdict",
+        "DeprecateVerdict",
+        "EvolutionPolicy"
+      ],
+      "consumers": [
+        "src/repository/evolution/ProposalRepository.ts",
+        "src/service/sustain/ProposalExecutor.ts",
+        "src/service/sustain/ProposalGateway.ts",
+        "src/sustain.ts",
+        "src/sustain.ts",
+        "src/workflows/surfaces/planning/knowledge/KnowledgeRescanPlanner.ts",
+        "test/CorePackage.test.ts",
+        "test/EvolutionPolicy.test.ts",
+        "test/unit/AuditDeadDeprecate.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/CorePackage.test.ts",
+        "test/EvolutionPolicy.test.ts",
+        "test/unit/AuditDeadDeprecate.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 210,
+    "reviewedRanges": [
+      [
+        1,
+        210
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/FieldSpec.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "创作字段/级别/示例说明权威表与宿主必填字段投影。",
+      "exports": [
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "getRequiredFieldNames",
+        "getAllRequiredFieldNames",
+        "getExpectedFieldNames",
+        "getExternalAgentRequiredFields",
+        "getInternalAgentRequiredFields",
+        "getSystemInjectedFields",
+        "getRequiredFieldsDescription",
+        "getFieldDef",
+        "getAgentAdapterFieldSpec",
+        "FirstStatement",
+        "getFieldsByLevel"
+      ],
+      "consumers": [
+        "src/domain/dimension/DimensionCatalogPayload.ts",
+        "src/domain/knowledge/StyleGuide.ts",
+        "src/domain/knowledge/UnifiedValidator.ts",
+        "src/domain/knowledge/recipe-authoring-spec/fields.ts",
+        "src/knowledge.ts",
+        "src/service/knowledge/validation/recipe/RecipeCandidateValidator.ts",
+        "src/workflows/project-index/ColdStartPresenters.ts",
+        "src/workflows/surfaces/host-agent/briefing/MissionBriefingSupport.ts",
+        "test/CorePackage.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-REDUNDANT-FIELD-BRANCH",
+        "severity": "P3",
+        "line": 330,
+        "status": "source-confirmed",
+        "summary": "getRequiredFieldsDescription 条件两个分支完全相同，可压成直接 map 字符串。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/CorePackage.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 385,
+    "reviewedRanges": [
+      [
+        1,
+        385
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/KnowledgeEntry.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "知识聚合根；六态、值对象、历史、Guard 规则及 wire 序列化。",
+      "exports": [
+        "KnowledgeEntryProps",
+        "KnowledgeEntry"
+      ],
+      "consumers": [
+        "src/domain/knowledge/KnowledgeRepository.ts",
+        "src/domain/knowledge/index.ts",
+        "src/knowledge.ts",
+        "src/repository/knowledge/KnowledgeFileStore.ts",
+        "src/repository/knowledge/KnowledgeUnitOfWork.ts",
+        "src/service/knowledge/ConfidenceRouter.ts",
+        "src/service/knowledge/KnowledgeFileWriter.ts",
+        "src/service/knowledge/KnowledgeService.ts",
+        "test/DatabaseRepository.test.ts",
+        "test/DomainLifecycle.test.ts",
+        "test/FailureSemanticsCO3.test.ts",
+        "test/KnowledgeEntry.test.ts",
+        "test/KnowledgeFileWriter.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/PublicCapabilityOutputEntrypoints.test.ts",
+        "test/RecipeAuthoringGroundedPaths.test.ts",
+        "test/RecipeContextAdapters.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts",
+        "test/unit/KnowledgeService.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-DOC-LIFECYCLE",
+        "severity": "P3",
+        "line": 19,
+        "status": "source-confirmed",
+        "summary": "顶部仍写三状态；实际六态，isActive 仅 active，不能混同 isConsumable。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/DatabaseRepository.test.ts",
+        "test/DomainLifecycle.test.ts",
+        "test/FailureSemanticsCO3.test.ts",
+        "test/KnowledgeEntry.test.ts",
+        "test/KnowledgeFileWriter.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/PublicCapabilityOutputEntrypoints.test.ts",
+        "test/RecipeAuthoringGroundedPaths.test.ts",
+        "test/RecipeContextAdapters.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts",
+        "test/unit/KnowledgeService.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 464,
+    "reviewedRanges": [
+      [
+        1,
+        464
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/KnowledgeRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "历史可实例化仓储基类（方法 throw Not implemented）；类型面被 KnowledgeService 消费，公共值导出需兼容。",
+      "exports": [
+        "PaginationOptions",
+        "PaginatedResult",
+        "KnowledgeRepository"
+      ],
+      "consumers": [
+        "src/domain/index.ts",
+        "src/domain/knowledge/index.ts",
+        "src/service/knowledge/KnowledgeService.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 90,
+    "reviewedRanges": [
+      [
+        1,
+        90
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/Lifecycle.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "六态转换表和消费者状态集合；兼容别名及 SQL IN helper。",
+      "exports": [
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "FirstStatement",
+        "LifecycleFilter",
+        "normalizeLifecycle",
+        "isValidTransition",
+        "isValidLifecycle",
+        "isCandidate",
+        "isConsumable",
+        "isDegraded",
+        "lifecycleInSql",
+        "inferKind"
+      ],
+      "consumers": [
+        "src/domain/knowledge/KnowledgeEntry.ts",
+        "src/domain/knowledge/index.ts",
+        "src/domain/knowledge/index.ts",
+        "src/repository/knowledge/KnowledgeRepositoryImpl.ts",
+        "src/service/guard/GuardCheckEngine.ts",
+        "src/service/knowledge/KnowledgeService.ts",
+        "src/service/sustain/ConsolidationAdvisor.ts",
+        "src/service/sustain/EnhancementSuggester.ts",
+        "src/service/sustain/LifecycleStateMachine.ts",
+        "src/service/sustain/RecipeImpactPlanner.ts",
+        "src/service/sustain/RedundancyAnalyzer.ts",
+        "test/DomainLifecycle.test.ts",
+        "test/KnowledgeEntry.test.ts",
+        "test/KnowledgeFileWriter.test.ts",
+        "test/Lifecycle.test.ts",
+        "test/WireTypeManifest.test.ts",
+        "test/unit/KnowledgeService.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/DomainLifecycle.test.ts",
+        "test/KnowledgeEntry.test.ts",
+        "test/KnowledgeFileWriter.test.ts",
+        "test/Lifecycle.test.ts",
+        "test/WireTypeManifest.test.ts",
+        "test/unit/KnowledgeService.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 171,
+    "reviewedRanges": [
+      [
+        1,
+        171
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/RecipeRetrievalProfile.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "KnowledgeWire 检索画像类型别名；阻止 domain 再复制 schema。",
+      "exports": [
+        "RecipeRetrievalSummary",
+        "RecipeRetrievalProvenance"
+      ],
+      "consumers": [
+        "src/domain/knowledge/KnowledgeEntry.ts",
+        "src/domain/knowledge/index.ts",
+        "src/knowledge.ts",
+        "src/service/knowledge/RecipeProductionGateway.ts",
+        "src/service/knowledge/RecipeRetrieval.ts",
+        "src/service/search/SearchEngine.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/RecipeVectorGeneration.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/RecipeVectorGeneration.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 16,
+    "reviewedRanges": [
+      [
+        1,
+        16
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/StyleGuide.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "由字段表渲染宿主创作说明并保留旧 Cursor 别名/提交文案。",
+      "exports": [
+        "getAgentAdapterFieldSpec",
+        "FirstStatement",
+        "buildProducerStyleGuide",
+        "FirstStatement"
+      ],
+      "consumers": [
+        "src/domain/dimension/DimensionCatalogPayload.ts",
+        "src/knowledge.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-DOC-SOURCE",
+        "severity": "P3",
+        "line": 99,
+        "status": "source-confirmed",
+        "summary": "SUBMIT_REQUIREMENTS 仍建议裸文件名，与真实 grounding 完整相对路径规则不一致；需确认此兼容文案消费者后统一。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 106,
+    "reviewedRanges": [
+      [
+        1,
+        106
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/UnifiedValidator.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "字段、内容和唯一性三层候选校验及跨提交缓存。",
+      "exports": [
+        "UnifiedValidator",
+        "createStatelessValidator"
+      ],
+      "consumers": [
+        "src/knowledge.ts",
+        "src/service/knowledge/RecipeProductionGateway.ts",
+        "src/service/knowledge/validation/candidate/CandidateValidationFacade.ts",
+        "test/CandidateValidationFacade.test.ts",
+        "test/CandidateValidationFloor.test.ts",
+        "test/UnifiedValidatorStage3ByteIdentical.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-VALIDATOR-TYPE",
+        "severity": "P1",
+        "line": 150,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "错误类型候选已产生 validation error 后仍直接调用 startsWith/toLowerCase/trim，会抛 TypeError 中断整批。",
+        "red": "RecipeProductionGateway.create 首条 trigger=123 后接合法 fixture，应首条 rejected 且合法条仍创建。"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/CandidateValidationFacade.test.ts",
+        "test/CandidateValidationFloor.test.ts",
+        "test/UnifiedValidatorStage3ByteIdentical.test.ts"
+      ],
+      "declaredCases": [],
+      "evidence": [
+        "knowledge-validator-red.log",
+        "knowledge-validator-green.log"
+      ]
+    },
+    "lines": 369,
+    "reviewedRanges": [
+      [
+        1,
+        369
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ],
+    "verificationLogs": [
+      "knowledge-format.log"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/evidence-ledger/EvidenceLedgerContract.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "证据工具白名单、ID/范围解析和证据条目运行时校验。",
+      "exports": [
+        "FirstStatement",
+        "EvidenceToolId",
+        "isEvidenceToolId",
+        "EvidenceRange",
+        "EvidenceEntry",
+        "FirstStatement",
+        "FirstStatement",
+        "makeEvidenceId",
+        "ParsedEvidenceRef",
+        "parseEvidenceRef",
+        "isValidEvidenceEntry"
+      ],
+      "consumers": [
+        "src/domain/knowledge/evidence-ledger/index.ts",
+        "src/service/production/SemanticDispositionReviewExecution.ts",
+        "src/service/production/StrictAnalysisContracts.ts",
+        "src/service/production/StrictAnalysisContracts.ts",
+        "src/service/production/StrictFactExecution.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 150,
+    "reviewedRanges": [
+      [
+        1,
+        150
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/evidence-ledger/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/knowledge.ts",
+        "test/EvidenceLedgerContract.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/EvidenceLedgerContract.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 15,
+    "reviewedRanges": [
+      [
+        1,
+        15
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/domain/index.ts",
+        "src/knowledge.ts",
+        "src/repository/knowledge/KnowledgeRepositoryImpl.ts",
+        "src/service/sustain/EnhancementSuggester.ts",
+        "test/StrictKnowledgePersistenceFaults.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/StrictKnowledgePersistenceFaults.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 39,
+    "reviewedRanges": [
+      [
+        1,
+        39
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/contentContract.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "项目特写、深度价值量规和文档评分目标共享契约。",
+      "exports": [
+        "FirstStatement",
+        "FirstStatement",
+        "DocScoreTextTarget",
+        "DocScoreTargets",
+        "contentContract"
+      ],
+      "consumers": [
+        "src/domain/knowledge/StyleGuide.ts",
+        "src/domain/knowledge/recipe-authoring-spec/guidanceGenerator.ts",
+        "src/domain/knowledge/recipe-authoring-spec/index.ts",
+        "test/RecipeAuthoringDepthGuidance.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeAuthoringDepthGuidance.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 107,
+    "reviewedRanges": [
+      [
+        1,
+        107
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/depthContract.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "深度五维定义、写作推理脚手架和自评文案。",
+      "exports": [
+        "DepthDimension",
+        "FirstStatement",
+        "buildDepthScaffold",
+        "buildDepthSelfReviewChecklist"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/depthReview.ts",
+        "src/domain/knowledge/recipe-authoring-spec/guidanceGenerator.ts",
+        "src/domain/knowledge/recipe-authoring-spec/index.ts",
+        "test/RecipeAuthoringDepthGuidance.test.ts",
+        "test/RecipeAuthoringDepthReview.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeAuthoringDepthGuidance.test.ts",
+        "test/RecipeAuthoringDepthReview.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 107,
+    "reviewedRanges": [
+      [
+        1,
+        107
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/depthReview.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "接地深度维度/段落信号统计，供质量评分使用。",
+      "exports": [
+        "DepthReviewInput",
+        "DepthReviewResult",
+        "reviewRecipeDepth"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/index.ts",
+        "test/RecipeAuthoringDepthGuidance.test.ts",
+        "test/RecipeAuthoringDepthReview.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-DEPTH-ALIASES",
+        "severity": "P2",
+        "line": 160,
+        "status": "root-fix-observed-not-independently-validated",
+        "summary": "同一源码长短别名曾按原文路径被计成多来源；root已独立修canonical去重。validRanges是源码正文片段而非坐标，原建议直接作行号门禁不成立，已更正。",
+        "red": "同一已解析源码的完整路径与basename应只计一个文件；歧义basename不应盲目接地。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeAuthoringDepthGuidance.test.ts",
+        "test/RecipeAuthoringDepthReview.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 221,
+    "reviewedRanges": [
+      [
+        1,
+        221
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/dimensionCompletion.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "维度完成最小候选/发现/分析/文件引用数权威常量。",
+      "exports": [
+        "FirstStatement"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 26,
+    "reviewedRanges": [
+      [
+        1,
+        26
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/examples/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "多语言 Recipe worked examples 和 example(language) 深拷贝入口；为引导生成和 gate-positive fixtures 提供真实规范样本。",
+      "exports": [
+        "WorkedExample",
+        "example"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/guidanceGenerator.ts",
+        "src/domain/knowledge/recipe-authoring-spec/index.ts",
+        "test/RecipeAuthoringDepthGuidance.test.ts",
+        "test/RecipeAuthoringSpecExamplesGatePassing.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeAuthoringDepthGuidance.test.ts",
+        "test/RecipeAuthoringSpecExamplesGatePassing.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 420,
+    "reviewedRanges": [
+      [
+        1,
+        419
+      ]
+    ],
+    "notes": [
+      "全文已读，包括模板主体和未知语言兼容 fallback；模板不是直接生产持久化结果，需保留 examples gate-passing 套件。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/failureModes.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "从 gateRules 的 rejectCodes 派生失败模式说明。",
+      "exports": [
+        "FailureMode",
+        "failureModes"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 34,
+    "reviewedRanges": [
+      [
+        1,
+        34
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/fields.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "历史 FieldSpec 的 canonical re-export，避免重复字段表。",
+      "exports": [],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/guidanceGenerator.ts",
+        "src/domain/knowledge/recipe-authoring-spec/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 30,
+    "reviewedRanges": [
+      [
+        1,
+        30
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/gateRules.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "组合稳定 Stage3 规则、profile/evidence floor、resolveGroundedSourcePaths 与 validateAgainst；UnifiedValidator 的统一入场门禁。",
+      "exports": [
+        "GateRule",
+        "gateRules",
+        "gateRule",
+        "getImperativeVerbAllowlist",
+        "getEvidenceFloorPolicy",
+        "Stage3FieldPolicy",
+        "getStage3FieldPolicy",
+        "ValidateAgainstOptions",
+        "resolveAuthoringProfile",
+        "validateAgainst",
+        "resolveGroundedSourcePaths"
+      ],
+      "consumers": [
+        "src/domain/knowledge/UnifiedValidator.ts",
+        "src/domain/knowledge/recipe-authoring-spec/failureModes.ts",
+        "src/domain/knowledge/recipe-authoring-spec/guidanceGenerator.ts",
+        "src/domain/knowledge/recipe-authoring-spec/index.ts",
+        "test/RecipeAuthoringGroundedPaths.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeAuthoringGroundedPaths.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 979,
+    "reviewedRanges": [
+      [
+        1,
+        978
+      ]
+    ],
+    "notes": [
+      "全文已读；validRanges 是源码文本片段，不能误当数字行区间。首个 fence 检查等仅列未证实边界，不擅自收紧既有拒绝政策。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/guidanceGenerator.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "规则表派生提交工具字段说明、清单与宿主 guidance。",
+      "exports": [
+        "GuidanceBlock",
+        "renderGuidance",
+        "SubmissionSpec",
+        "buildSubmissionSpec",
+        "SubmitContract",
+        "buildSubmitKnowledgeContract",
+        "buildPreSubmitChecklist",
+        "describeSubmitToolFields"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/index.ts",
+        "test/RecipeAuthoringDepthGuidance.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeAuthoringDepthGuidance.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 215,
+    "reviewedRanges": [
+      [
+        1,
+        215
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/domain/dimension/DimensionCatalogPayload.ts",
+        "src/domain/knowledge/index.ts",
+        "src/knowledge.ts",
+        "src/knowledge.ts",
+        "src/service/knowledge/validation/quality/QualityScorer.ts",
+        "src/workflows/surfaces/host-agent/briefing/MissionBriefingBuilder.ts",
+        "test/RecipeAuthoringGraphNarrowing.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeAuthoringGraphNarrowing.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 101,
+    "reviewedRanges": [
+      [
+        1,
+        101
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/pipelineEventPayloads.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "按 completion 模式区分 payload 与旧 HostAgent 类型别名。",
+      "exports": [
+        "DimensionSkippedPayload",
+        "DimensionRestoredPayload",
+        "DimensionCheckpointRestoredPayload",
+        "DimensionErrorPayload",
+        "DimensionPipelineCompletePayload",
+        "DimensionSkillPayload",
+        "DimensionHostCompletePayload",
+        "DimensionHostAgentCompletePayload",
+        "DimensionCompletePayload",
+        "ProgressPayload"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/index.ts",
+        "src/knowledge.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 89,
+    "reviewedRanges": [
+      [
+        1,
+        89
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/pipelineEvents.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "流水线稳定事件名称表，属于公共 transport contract。",
+      "exports": [
+        "FirstStatement",
+        "RecipePipelineEventName"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 32,
+    "reviewedRanges": [
+      [
+        1,
+        32
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/recipe-authoring-spec/styleWaiver.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "软风格违规的一次申辩，保留硬证据约束。",
+      "exports": [
+        "FirstStatement",
+        "FirstStatement",
+        "isSoftAuthoringViolation",
+        "applyStyleWaiver"
+      ],
+      "consumers": [
+        "src/domain/knowledge/recipe-authoring-spec/index.ts",
+        "test/StyleWaiver.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/StyleWaiver.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 74,
+    "reviewedRanges": [
+      [
+        1,
+        74
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/values/Constraints.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "结构化 Guard、边界、前置条件、副作用值对象。",
+      "exports": [
+        "Guard",
+        "Constraints"
+      ],
+      "consumers": [
+        "src/domain/index.ts",
+        "src/domain/knowledge/KnowledgeEntry.ts",
+        "src/domain/knowledge/index.ts",
+        "src/domain/knowledge/values/index.ts",
+        "test/KnowledgeEntry.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/KnowledgeEntry.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 121,
+    "reviewedRanges": [
+      [
+        1,
+        121
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/values/Content.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "知识正文/模式/解释/步骤/代码变化/验证内容值对象。",
+      "exports": [
+        "Content"
+      ],
+      "consumers": [
+        "src/domain/index.ts",
+        "src/domain/knowledge/index.ts",
+        "src/domain/knowledge/values/index.ts",
+        "test/KnowledgeEntry.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/KnowledgeEntry.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 80,
+    "reviewedRanges": [
+      [
+        1,
+        80
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/values/Quality.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "持久化兼容质量三维/overall/grade 值对象；不可误替换成五维评分输入。",
+      "exports": [
+        "Quality"
+      ],
+      "consumers": [
+        "src/domain/index.ts",
+        "src/domain/knowledge/index.ts",
+        "src/domain/knowledge/values/index.ts",
+        "test/KnowledgeEntry.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/KnowledgeEntry.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 94,
+    "reviewedRanges": [
+      [
+        1,
+        94
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/values/Reasoning.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "来源、置信度、备选、证据及风格申辩值对象。",
+      "exports": [
+        "Reasoning"
+      ],
+      "consumers": [
+        "src/domain/index.ts",
+        "src/domain/knowledge/index.ts",
+        "src/domain/knowledge/values/index.ts",
+        "test/KnowledgeEntry.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/KnowledgeEntry.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 96,
+    "reviewedRanges": [
+      [
+        1,
+        96
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/values/Relations.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "关系桶与旧 flat array 兼容转换、增删和遍历。",
+      "exports": [
+        "FirstStatement",
+        "RelationEntry",
+        "Relations"
+      ],
+      "consumers": [
+        "src/domain/index.ts",
+        "src/domain/knowledge/index.ts",
+        "src/domain/knowledge/values/index.ts",
+        "src/service/knowledge/RecipeProductionGateway.ts",
+        "test/KnowledgeEntry.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/KnowledgeEntry.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 152,
+    "reviewedRanges": [
+      [
+        1,
+        152
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/values/Stats.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "使用计数、时间戳、authority/版本/误报率持久化值对象。",
+      "exports": [
+        "Stats"
+      ],
+      "consumers": [
+        "src/domain/index.ts",
+        "src/domain/knowledge/index.ts",
+        "src/domain/knowledge/values/index.ts",
+        "test/KnowledgeEntry.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-STATS-META",
+        "severity": "P1",
+        "line": 56,
+        "status": "red-green-verified-with-approved-whitelist",
+        "summary": "加入已见生产者的stagingReview/状态时间/evolvingProposalId/lastVerifiedAt/primeAdoptions白名单，缺省键不输出；未开放任意metadata。decayScore生产权威尚未扩大审查。"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/KnowledgeEntry.test.ts"
+      ],
+      "declaredCases": [],
+      "evidence": [
+        "knowledge-evolution-file-first-green-2.log"
+      ]
+    },
+    "lines": 142,
+    "reviewedRanges": [
+      [
+        1,
+        142
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ],
+    "verificationLogs": [
+      "knowledge-evolution-format.log"
+    ]
+  },
+  {
+    "file": "src/domain/knowledge/values/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/domain/knowledge/KnowledgeEntry.ts",
+        "src/knowledge.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 9,
+    "reviewedRanges": [
+      [
+        1,
+        9
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/domain/snippet/Snippet.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "知识投影代码片段 DTO；保留旧 installed→targets.xcode 兼容。",
+      "exports": [
+        "SnippetProps",
+        "Snippet"
+      ],
+      "consumers": [
+        "src/domain/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 134,
+    "reviewedRanges": [
+      [
+        1,
+        134
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/repository/evolution/GitDiffCheckpointRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "project/scope/folder 复合键 checkpoint 持久化。",
+      "exports": [
+        "GitDiffCheckpointRouteStatus",
+        "GitDiffCheckpointScope",
+        "GitDiffCheckpointRecord",
+        "UpsertGitDiffCheckpointInput",
+        "GitDiffCheckpointRepository"
+      ],
+      "consumers": [
+        "src/repositories.ts",
+        "src/repository/evolution/index.ts",
+        "src/service/sustain/GitDiffCheckpointService.ts",
+        "src/service/sustain/GitDiffCheckpointService.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 178,
+    "reviewedRanges": [
+      [
+        1,
+        178
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/repository/evolution/LifecycleEventRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "生命周期不可变事件写入、历史、统计；毫秒时间。",
+      "exports": [
+        "RecordEventInput",
+        "TransitionEventRow",
+        "LifecycleEventRepository"
+      ],
+      "consumers": [
+        "src/repositories.ts",
+        "src/repository/evolution/index.ts",
+        "src/service/sustain/LifecycleStateMachine.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-DUP-EVENT-MAP",
+        "severity": "P3",
+        "line": 94,
+        "status": "source-confirmed",
+        "summary": "findRecent 内联映射与 #mapRow 完全同字段/默认语义，可复用 #mapRow 不改输出接口。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 196,
+    "reviewedRanges": [
+      [
+        1,
+        196
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/repository/evolution/ProposalRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "进化提案两类状态机持久化、活跃去重、排序、观察期、证据更新。",
+      "exports": [
+        "ProposalType",
+        "LegacyProposalType",
+        "ProposalStatus",
+        "ProposalRecord",
+        "CreateProposalInput",
+        "ProposalFilter",
+        "ProposalRepository"
+      ],
+      "consumers": [
+        "src/repositories.ts",
+        "src/repository/evolution/index.ts",
+        "src/service/sustain/LifecycleStateMachine.ts",
+        "src/service/sustain/ProposalExecutor.ts",
+        "src/service/sustain/ProposalGateway.ts",
+        "src/service/sustain/RecipeImpactPlanner.ts",
+        "src/workflows/surfaces/planning/knowledge/KnowledgeRescanPlanner.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/ProposalRepository.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/ProposalRepository.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 468,
+    "reviewedRanges": [
+      [
+        1,
+        468
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/repository/evolution/WarningRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "contradiction/redundancy warning 去重 upsert、解决/忽略和查询。",
+      "exports": [
+        "WarningType",
+        "WarningStatus",
+        "WarningRecord",
+        "CreateWarningInput",
+        "WarningFilter",
+        "WarningRepository"
+      ],
+      "consumers": [
+        "src/repositories.ts",
+        "src/repository/evolution/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 293,
+    "reviewedRanges": [
+      [
+        1,
+        293
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/repository/evolution/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/repository/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 5,
+    "reviewedRanges": [
+      [
+        1,
+        5
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/repository/knowledge/KnowledgeEdgeRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "知识/代码实体关系边的Drizzle upsert/查询/删除、拓扑聚合与批写；公开repository方法保留，不因内部消费者稀少删除。",
+      "exports": [
+        "KnowledgeEdge",
+        "EdgeInsert",
+        "EdgeStats",
+        "KnowledgeEdgeRepositoryImpl"
+      ],
+      "consumers": [
+        "src/repositories.ts",
+        "src/repository/knowledge/index.ts",
+        "src/service/knowledge/CodeEntityGraph.ts",
+        "src/service/knowledge/KnowledgeGraphService.ts",
+        "src/service/sustain/DecayDetector.ts",
+        "src/service/sustain/ProposalExecutor.ts",
+        "test/ProposalExecutorBounding.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-BULK-COUNT",
+        "severity": "P3",
+        "line": 665,
+        "status": "withdrawn-compatibility-preserved",
+        "summary": "没有Edge实际插入数消费者；同族CodeEntityRepository的floor明确processed。probe证明数值差异不足构成缺陷，保留返回值，只澄清私有命名/注释。"
+      }
+    ],
+    "disposition": "retain",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/ProposalExecutorBounding.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 694,
+    "reviewedRanges": [
+      [
+        1,
+        693
+      ]
+    ],
+    "notes": [
+      "人工阅读全部可执行代码/类型；对疑点未复现者不作已确认缺陷/删除结论。"
+    ],
+    "verificationLogs": [
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "src/repository/knowledge/KnowledgeFileStore.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "文件优先写/扫描 port；返回 null/false 是契约失败信号。",
+      "exports": [
+        "KnowledgeFileStore",
+        "KnowledgeFileScanner"
+      ],
+      "consumers": [
+        "src/knowledge.ts",
+        "src/repository/knowledge/KnowledgeUnitOfWork.ts",
+        "src/repository/knowledge/index.ts",
+        "src/service/knowledge/KnowledgeFileWriter.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 56,
+    "reviewedRanges": [
+      [
+        1,
+        56
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/repository/knowledge/KnowledgeRepositoryImpl.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "知识SQLite CRUD/值对象hydration、分页安全列检查、六态查询、同步Guard/search投影与计数；已读所有方法。",
+      "exports": [
+        "KnowledgeRepositoryImpl"
+      ],
+      "consumers": [
+        "src/repositories.ts",
+        "src/repository/knowledge/index.ts",
+        "src/service/guard/GuardCheckEngine.ts",
+        "src/service/knowledge/RecipePathRewriter.ts",
+        "src/service/knowledge/SourceRefReconciler.ts",
+        "src/service/sustain/ConsolidationAdvisor.ts",
+        "src/service/sustain/ContentPatcher.ts",
+        "src/service/sustain/DecayDetector.ts",
+        "src/service/sustain/EnhancementSuggester.ts",
+        "src/service/sustain/LifecycleStateMachine.ts",
+        "src/service/sustain/ProposalExecutor.ts",
+        "src/service/sustain/ProposalGateway.ts",
+        "src/service/sustain/RecipeImpactPlanner.ts",
+        "src/service/sustain/RedundancyAnalyzer.ts",
+        "src/service/sustain/StagingManager.ts",
+        "src/workflows/surfaces/planning/knowledge/KnowledgeRescanPlanner.ts",
+        "test/DatabaseRepository.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-TAG-ESCAPE",
+        "severity": "P2",
+        "line": 282,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "真实public list+SQLite已复现并修复：JSON词条编码后SQL LIKE显式ESCAPE，保留排序/大小写政策。",
+        "red": "knowledge-tag-filter-red.log",
+        "green": "knowledge-tag-filter-green.log"
+      },
+      {
+        "id": "K-GUARD-CODE-FIELD",
+        "severity": "P3",
+        "line": 848,
+        "status": "needs-consumer-confirmation",
+        "summary": "findActiveRulesWithContentSync从content JSON取coreCode，实体实际为顶层字段；未发现当前直接消费者，保留公开方法，先确认历史contract。"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/DatabaseRepository.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 1317,
+    "reviewedRanges": [
+      [
+        1,
+        1317
+      ]
+    ],
+    "notes": [
+      "人工阅读全部可执行代码/类型；对疑点未复现者不作已确认缺陷/删除结论。"
+    ],
+    "verificationLogs": [
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "src/repository/knowledge/KnowledgeUnitOfWork.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "收集文件变更与 DB 事务，文件先写，DB 失败保留真相并抛 DivergenceError。",
+      "exports": [
+        "PendingFileOp",
+        "UnitOfWorkResult",
+        "FileWriteError",
+        "KnowledgeUnitOfWork"
+      ],
+      "consumers": [
+        "src/repository/knowledge/index.ts",
+        "test/FailureSemanticsCO3.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-UOW-RETURN",
+        "severity": "P1",
+        "line": 163,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "文件存储以 null/false 表示失败，但 executeFileOp 不检查返回值，DB 事务仍可提交。",
+        "red": "real KnowledgeFileWriter persist 缺少 title 返回 null；UoW.commit 应抛 FileWriteError 且 DB mutation callback 未调用。"
+      },
+      {
+        "id": "K-UOW-PARTIAL-TRUTH",
+        "severity": "P1",
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "已完成write不能作为补偿直接remove；真实已存在文件更新与新文件两场景现保留文件、阻断DB并显式诊断partial truth。",
+        "red": "knowledge-uow-partial-truth-red.log",
+        "green": "knowledge-uow-partial-truth-green.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/FailureSemanticsCO3.test.ts"
+      ],
+      "declaredCases": [],
+      "evidence": [
+        "knowledge-uow-red.log",
+        "knowledge-uow-green.log",
+        "knowledge-uow-partial-truth-red.log",
+        "knowledge-uow-partial-truth-green.log"
+      ],
+      "verificationLogs": [
+        "knowledge-uow-partial-truth-green.log"
+      ]
+    },
+    "lines": 211,
+    "reviewedRanges": [
+      [
+        1,
+        211
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ],
+    "verificationLogs": [
+      "knowledge-format.log",
+      "knowledge-final-format.log"
+    ]
+  },
+  {
+    "file": "src/repository/knowledge/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/index.ts",
+        "src/repository/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 5,
+    "reviewedRanges": [
+      [
+        1,
+        5
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/repository/sourceref/RecipeSourceRefRepository.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "Recipe 源码引用和 region 指纹/漂移状态持久化。",
+      "exports": [
+        "RecipeSourceRefEntity",
+        "RecipeSourceRefInsert",
+        "RecipeSourceRefRepositoryImpl"
+      ],
+      "consumers": [
+        "src/knowledge.ts",
+        "src/repositories.ts",
+        "src/repository/sourceref/index.ts",
+        "src/service/knowledge/RecipeFreshnessService.ts",
+        "src/service/knowledge/SourceRefReconciler.ts",
+        "src/service/sustain/ContentPatcher.ts",
+        "src/service/sustain/DecayDetector.ts",
+        "src/service/sustain/RecipeImpactPlanner.ts",
+        "src/workflows/surfaces/planning/knowledge/KnowledgeRescanPlanner.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeContextAdapters.test.ts",
+        "test/RecipeFreshnessService.test.ts",
+        "test/RecipeSourceRefRepositoryFloor.test.ts",
+        "test/unit/SourceRefContentFingerprint.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeContextAdapters.test.ts",
+        "test/RecipeFreshnessService.test.ts",
+        "test/RecipeSourceRefRepositoryFloor.test.ts",
+        "test/unit/SourceRefContentFingerprint.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 273,
+    "reviewedRanges": [
+      [
+        1,
+        273
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ],
+    "verificationLogs": [
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "src/repository/sourceref/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/repository/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 2,
+    "reviewedRanges": [
+      [
+        1,
+        2
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/CodeEntityGraph.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "从AST/SPM/候选关系/调用图建立实体和边，提供继承、BFS、影响范围、宿主上下文及增量清理；与现代source-graph不同，仍有真实兼容消费者。",
+      "exports": [
+        "CodeEntityGraph"
+      ],
+      "consumers": [
+        "src/service/knowledge/index.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-GRAPH-DIAMOND",
+        "severity": "P2",
+        "line": 689,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "真实SQLite菱形+循环已复现并修复；getDescendants/getImpactRadius在入队时标记visited，保持首见顺序/最短depth/根排除。",
+        "red": "knowledge-graph-diamond-red.log",
+        "green": "knowledge-graph-diamond-green.log"
+      },
+      {
+        "id": "K-GRAPH-PROJECT-CLEAR",
+        "severity": "P2",
+        "line": 1056,
+        "status": "needs-contract-review",
+        "summary": "实体清理按projectRoot，边清理仅metadata source pattern；共享DB多project场景需确认支持边界，禁止直接改身份/持久化兼容。"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 1233,
+    "reviewedRanges": [
+      [
+        1,
+        1232
+      ]
+    ],
+    "notes": [
+      "人工阅读全部可执行代码/类型；对疑点未复现者不作已确认缺陷/删除结论。"
+    ],
+    "verificationLogs": [
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/ConfidenceRouter.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "按内容、reasoning、质量和来源置信度决定 pending/staging/deprecated。",
+      "exports": [
+        "ConfidenceRouter"
+      ],
+      "consumers": [
+        "src/service/knowledge/KnowledgeService.ts",
+        "src/service/knowledge/index.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/unit/KnowledgeService.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-DOC-QUALITY",
+        "severity": "P3",
+        "line": 166,
+        "status": "source-confirmed",
+        "summary": "已注入评分器时 score<0.3 会阻止自动 staging（降 pending），README never a gate 需精确限定为 Gateway 后置评分。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/unit/KnowledgeService.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 219,
+    "reviewedRanges": [
+      [
+        1,
+        219
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/FsSourceRefResolver.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "真实文件存在和行范围接地校验 port，返回范围文本或结构化 violation。",
+      "exports": [
+        "createFsSourceRefResolver"
+      ],
+      "consumers": [
+        "src/knowledge.ts",
+        "test/RecipeAuthoringGraphNarrowing.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-SOURCE-SYMLINK",
+        "severity": "P2",
+        "line": 52,
+        "status": "hypothesis-needs-red",
+        "summary": "仅词法包含检查，stat/read 跟随 symlink；指向仓库外的 symlink 可能被接受为当前项目证据。",
+        "red": "临时 project 中创建指向兄弟目录文件的 symlink，调用公开 resolver；期待 SOURCE_REF_INVALID。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeAuthoringGraphNarrowing.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 103,
+    "reviewedRanges": [
+      [
+        1,
+        103
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/KnowledgeFileWriter.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "知识文件 scalar/JSON frontmatter 序列化、atomic durable persist、迁移/删除/解析/hash。",
+      "exports": [
+        "KnowledgeFileWriter",
+        "computeKnowledgeHash",
+        "parseKnowledgeMarkdown"
+      ],
+      "consumers": [
+        "src/service/knowledge/KnowledgeService.ts",
+        "src/service/knowledge/KnowledgeSyncService.ts",
+        "src/service/knowledge/index.ts",
+        "test/KnowledgeFileWriter.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/unit/SourceRefContentFingerprint.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-HASH-NEWLINE",
+        "severity": "P1",
+        "line": 168,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "serialize 删除 placeholder 文本后留下空行，computeKnowledgeHash(md) 却删除整行；合法序列化文件实际 hash 与内嵌 hash 不同。",
+        "red": "parseKnowledgeMarkdown(writer.serialize(entry)).contentHash === computeKnowledgeHash(md)，并验证正常 sync 无 manual edit violation。"
+      },
+      {
+        "id": "K-FILENAME-COLLISION",
+        "severity": "P1",
+        "line": 703,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "trigger 清洗/截断或 title slug 碰撞会覆盖其他 id 的真相文件，随后 sync orphan 弃用原知识。",
+        "red": "不同 id/title 的 @a.b 和 @a:b 写入同 bucket 后需共存或第二次可感知拒绝，不能静默覆盖。"
+      },
+      {
+        "id": "K-SCALAR-ESCAPE",
+        "severity": "P2",
+        "line": 647,
+        "status": "hypothesis-needs-red",
+        "summary": "scalar parser 手工处理 quote/newline，但未完整反解 serializer 的 backslash 转义；含反斜杠/regex 的 coreCode 存在 roundtrip 风险。"
+      },
+      {
+        "id": "K-WRITER-OWNER",
+        "severity": "P1",
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "旧路径清理/显式remove/id扫描以顶层frontmatter完整id确认所有权，不再删clone原文件或短id前缀相同的文件。",
+        "red": "knowledge-writer-ownership-red.log",
+        "green": "knowledge-writer-ownership-green.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/KnowledgeFileWriter.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/unit/SourceRefContentFingerprint.test.ts"
+      ],
+      "declaredCases": [],
+      "evidence": [
+        "knowledge-hash-red.log",
+        "knowledge-hash-green.log",
+        "knowledge-collision-red.log",
+        "knowledge-collision-green.log"
+      ],
+      "verificationLogs": [
+        "knowledge-writer-ownership-green.log"
+      ]
+    },
+    "lines": 774,
+    "reviewedRanges": [
+      [
+        1,
+        774
+      ]
+    ],
+    "notes": [
+      "人工读完实现；未运行测试，风险按源码推导而非执行结论。"
+    ],
+    "verificationLogs": [
+      "knowledge-format.log",
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/KnowledgeGraphService.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "知识边增删、BFS 路径、反向影响分析及兼容 singleton facade。",
+      "exports": [
+        "KnowledgeGraphService",
+        "initKnowledgeGraphService",
+        "getKnowledgeGraphService"
+      ],
+      "consumers": [
+        "src/service/knowledge/KnowledgeService.ts",
+        "src/service/knowledge/index.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-EDGE-ZERO",
+        "severity": "P2",
+        "line": 51,
+        "status": "source-confirmed-needs-red",
+        "summary": "metadata.weight=0 经 || 1.0 改写为 1，与仓储可接受的数值权重不符。",
+        "red": "real edge repo addEdge weight:0 后读回保持 0；先核对 0 是否允许的领域约束。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 231,
+    "reviewedRanges": [
+      [
+        1,
+        231
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/KnowledgeService.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "统一CRUD、实体生命周期和发布就绪门禁、质量/使用计数、关系图同步、审计/事件及file-first写入。已逐方法核读，并用真实公开入口复现三个手动编辑/计数缺陷。",
+      "exports": [
+        "KnowledgeService"
+      ],
+      "consumers": [
+        "src/service/knowledge/index.ts",
+        "test/FailureSemanticsCO3.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/RecipeAuthoringGroundedPaths.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/unit/KnowledgeService.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-UPDATE-VALUE-OBJECT",
+        "severity": "P1",
+        "line": 503,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "update(content/reasoning/constraints/relations)将普通对象直接Object.assign到实体，破坏值对象toJSON，真实fileWriter序列化报错。",
+        "evidence": "knowledge-read-service-red.log"
+      },
+      {
+        "id": "K-UPDATE-USAGE-GUIDE",
+        "severity": "P2",
+        "line": 429,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "usageGuide在白名单但switch漏处理，单字段更新被当无可更新字段。",
+        "evidence": "knowledge-read-service-red.log"
+      },
+      {
+        "id": "K-USAGE-COUNTER",
+        "severity": "P1",
+        "line": 807,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "默认及真实外层adoption/application单数直接cast为StatsCounter，未更新adoptions/applications。",
+        "evidence": "knowledge-read-service-red.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/FailureSemanticsCO3.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/RecipeAuthoringGroundedPaths.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/unit/KnowledgeService.test.ts"
+      ],
+      "declaredCases": [],
+      "evidence": [
+        "knowledge-read-service-red.log",
+        "knowledge-service-mutations-red.log",
+        "knowledge-service-mutations-green-2.log",
+        "knowledge-service-typecheck.log"
+      ],
+      "recommendation": "把真实持久计数和结构化编辑回归迁入现有SQLite集成套件；当前unit只断update调用，不足。"
+    },
+    "lines": 1468,
+    "reviewedRanges": [
+      [
+        1,
+        1467
+      ]
+    ],
+    "notes": [
+      "全部实现/类型已人工核读；是否运行见tests字段；保留真实外层调用和公开兼容接口。"
+    ],
+    "verificationLogs": [
+      "knowledge-service-format.log"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/KnowledgeSyncService.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "递归扫描知识文件、文件→DB upsert、手改审计、孤儿弃用及向量刷新边界。",
+      "exports": [
+        "ReconcileReport",
+        "RepairReport",
+        "ApplyReport",
+        "SourceRefReconciler",
+        "KnowledgeVectorMaintenance",
+        "SyncAllReport",
+        "KnowledgeSyncService"
+      ],
+      "consumers": [
+        "src/service/knowledge/index.ts",
+        "src/service/knowledge/index.ts",
+        "test/FailureSemanticsCO3.test.ts",
+        "test/KnowledgeFileWriter.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-SYNC-ERROR-ORPHAN",
+        "severity": "P2",
+        "line": 230,
+        "status": "hypothesis-needs-red",
+        "summary": "read/parse 失败被 skip，后续 orphan 集合以 syncedIds 判定；不可读但仍存在的 .md 可能被当作删除而弃用 DB entry。",
+        "red": "真实存在知识文件，令读访问失败后 sync；应报告阻塞/跳过而不判 deleted orphan。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/FailureSemanticsCO3.test.ts",
+        "test/KnowledgeFileWriter.test.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 480,
+    "reviewedRanges": [
+      [
+        1,
+        480
+      ]
+    ],
+    "notes": [
+      "人工读完实现；未运行测试，风险按源码推导而非执行结论。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/RecipeExtractor.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "历史Markdown元数据/代码块/语言/标签/质量摘要提取，与持久化完整KnowledgeFileWriter解析有不同输出语义。",
+      "exports": [
+        "RecipeExtractor"
+      ],
+      "consumers": [
+        "src/service/knowledge/index.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-EXTRACTOR-UNUSED-OPTION",
+        "severity": "P3",
+        "line": 32,
+        "status": "source-observation",
+        "summary": "computeQualityScore仅保存未读取；公开选项尚不能删除，应先确认历史消费者和预期是否是兼容no-op。"
+      }
+    ],
+    "disposition": "retain-compatibility-option",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 349,
+    "reviewedRanges": [
+      [
+        1,
+        348
+      ]
+    ],
+    "notes": [
+      "全部实现/类型已人工核读；是否运行见tests字段；保留真实外层调用和公开兼容接口。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/RecipeFreshnessService.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "有界单条/多条sourceRef→向量新鲜度刷新，返回明确failed/degraded与桥接可用性；可选向量配置保持兼容。",
+      "exports": [
+        "RecipeFreshnessEntry",
+        "RecipeFreshnessSourceRefSummary",
+        "RecipeFreshnessVectorSummary",
+        "RecipeFreshnessRecipeResult",
+        "RecipeFreshnessRefreshResult",
+        "RecipeFreshnessVectorService",
+        "RecipeFreshnessServiceDeps",
+        "RefreshRecipeFreshnessOptions",
+        "RecipeFreshnessService"
+      ],
+      "consumers": [
+        "src/service/knowledge/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 317,
+    "reviewedRanges": [
+      [
+        1,
+        316
+      ]
+    ],
+    "notes": [
+      "全部实现/类型已人工核读；是否运行见tests字段；保留真实外层调用和公开兼容接口。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/RecipePathRewriter.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "rename 后重写 reasoning.sources、markdown、coreCode 及源知识文件。",
+      "exports": [
+        "PathRename",
+        "RewriteResult",
+        "rewriteRecipePaths"
+      ],
+      "consumers": [
+        "src/service/knowledge/SourceRefReconciler.ts",
+        "src/service/knowledge/index.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-REWRITE-PERSISTENCE",
+        "severity": "P2",
+        "line": 117,
+        "status": "source-confirmed-needs-red",
+        "summary": "DB-first 后直接 writeFileSync，并未更新 _contentHash；与 KnowledgeFileWriter 持久写策略不统一。sources exact match 也不会匹配 file:range。",
+        "red": "rename 含范围引用的真实 Recipe，再 syncAll 检查 refs/hash/正文一致；失败注入确认不可把更新报告为完整成功。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 150,
+    "reviewedRanges": [
+      [
+        1,
+        150
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/RecipeProductionGateway.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "普通批量准入/去重/融合/生产/关系回填及strict G1-admission-G2冻结投影授权与prepared ID恢复；已读全链，不删legacy入口或strict独立语义。",
+      "exports": [
+        "CreateRecipeItem",
+        "createStrictRecipePersistedPayloadV1",
+        "CreateRecipeRequest",
+        "CreatedRecipeInfo",
+        "RejectedRecipeInfo",
+        "MergedRecipeInfo",
+        "BlockedRecipeInfo",
+        "SimilarRecipeInfo",
+        "CreateRecipeResult",
+        "RecipeProducerCapability",
+        "RecipeProductionSource",
+        "RecipeProductionInput",
+        "ProducerContext",
+        "PublishContext",
+        "RecipeProductionRecord",
+        "RecipeProductionEvidence",
+        "RecipeProductionResult",
+        "RecipeProductionPort",
+        "StrictPreparedRecipePersistenceContextV1",
+        "StrictCandidateAdmissionContextV1",
+        "StrictCandidateAdmissionResultV1",
+        "StrictPreparedRecipePersistenceResultV1",
+        "StrictPreparedRecipePersistencePortV1",
+        "GatewayDeps",
+        "PreparedRecipeInspectionV1",
+        "RecipeProductionGateway"
+      ],
+      "consumers": [
+        "src/service/knowledge/index.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StrictPreparedRecipeGateway.test.ts",
+        "test/unit/RecipeProductionGateway.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-GATEWAY-PROPOSAL-PROJECTION",
+        "severity": "P2",
+        "line": 1481,
+        "status": "needs-probe",
+        "summary": "ProposalGateway分支硬编码observing/72h，实际ProposalRepository可能pending/expiresAt0；应通过真实提案状态回归再定修。"
+      },
+      {
+        "id": "K-GATEWAY-PRIVATE-ARGS",
+        "severity": "P3",
+        "line": 1183,
+        "status": "source-confirmed-cleanup-candidate",
+        "summary": "#prepareCreateData只有一处私有调用，_userId未用且preparedRecipeId从未提供；可删两个私有参数/死spread，不动public producer ports。"
+      }
+    ],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StrictPreparedRecipeGateway.test.ts",
+        "test/unit/RecipeProductionGateway.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 2023,
+    "reviewedRanges": [
+      [
+        1,
+        2022
+      ]
+    ],
+    "notes": [
+      "人工阅读全部可执行代码/类型；对疑点未复现者不作已确认缺陷/删除结论。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/RecipeRetrieval.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "规范化 compatibility/native retrieval profile，计算 canonical source hash，投影四类检索文档和稀疏字段，并按 profile/hash/文档完备性决定 retrieval readiness。",
+      "exports": [
+        "RecipeRetrievalDocumentRole",
+        "RecipeRetrievalSource",
+        "RecipeRetrievalDocument",
+        "RecipeRetrievalDocumentSet",
+        "RecipeRetrievalSparseProjection",
+        "RetrievalReadinessViolation",
+        "RetrievalReadinessReport",
+        "RetrievalReadinessDiagnostics",
+        "computeRecipeSourceContentHash",
+        "projectCompatibilityRecipeRetrievalProfile",
+        "projectRecipeRetrievalDocumentSet",
+        "projectRecipeRetrievalSparseProjection",
+        "serializeRecipeRetrievalDocumentSetForSparse",
+        "evaluateRecipeRetrievalReadiness"
+      ],
+      "consumers": [
+        "src/service/knowledge/KnowledgeService.ts",
+        "src/service/knowledge/RecipeProductionGateway.ts",
+        "src/service/knowledge/index.ts",
+        "src/service/search/SearchEngine.ts",
+        "src/service/sustain/LifecycleStateMachine.ts",
+        "src/service/vector/RecipeRegionVectorIndex.ts",
+        "src/service/vector/RecipeVectorGeneration.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/RecipeVectorGeneration.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/RecipeVectorGeneration.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 941,
+    "reviewedRanges": [
+      [
+        1,
+        940
+      ]
+    ],
+    "notes": [
+      "全文已读；Graph/guard exception 与普通 Recipe 发布不同是正式兼容分支。source hash 与 file hash 目的不同，不合并；真实生产/readiness/vector 测试保留。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/SourceRefReconciler.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "reasoning.sources 到引用表的权威同步、region 指纹漂移、Git rename 修复和质量信号。",
+      "exports": [
+        "ReconcileReport",
+        "ReconcileRecipeSourceRefsInput",
+        "RepairReport",
+        "ApplyReport",
+        "SourceRefReconciler",
+        "computeSourceRegionFingerprint",
+        "parseSourceLineRange",
+        "stripSourceRangeSuffix"
+      ],
+      "consumers": [
+        "src/service/knowledge/RecipeFreshnessService.ts",
+        "src/service/knowledge/index.ts",
+        "src/service/sustain/ContentPatcher.ts",
+        "test/unit/SourceRefContentFingerprint.test.ts",
+        "test/unit/SourceRefReconcilerSignal.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-DRIFT-ACK",
+        "severity": "P2",
+        "line": 489,
+        "status": "needs-semantics-review",
+        "summary": "drift 检出时立即更新 contentFp=current；下一次 force reconcile 内容不再变化就改 active，未要求 Recipe 修复/重审。需澄清 drift status 是事件还是持续失效状态。"
+      },
+      {
+        "id": "K-RENAME-RANGE",
+        "severity": "P2",
+        "line": 633,
+        "status": "source-confirmed-needs-red",
+        "summary": "repairRenames 用带 :N-M 的 sourcePath exact 查 Git renameMap 裸路径，真实范围引用不能自动匹配文件 rename。",
+        "red": "真实 git rename src/a.ts→src/b.ts，引用 src/a.ts:1-3；repair+apply 应更新引用并保留范围。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/unit/SourceRefContentFingerprint.test.ts",
+        "test/unit/SourceRefReconcilerSignal.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 887,
+    "reviewedRanges": [
+      [
+        1,
+        887
+      ]
+    ],
+    "notes": [
+      "人工读完实现；未运行测试，风险按源码推导而非执行结论。",
+      "本轮后续授权修复：坏候选title只取真实string供去重；Reconciler新增可选identity provider按调用捕获index，歧义/provider失败不写stale，见supplement报告。"
+    ],
+    "verificationLogs": [
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/driftClassifier.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "确定性比较引用文本块，区分行位移、内容变化、不可解析。",
+      "exports": [
+        "RegionDriftKind",
+        "RegionDriftClassification",
+        "classifyRegionDrift"
+      ],
+      "consumers": [
+        "src/service/knowledge/SourceRefReconciler.ts",
+        "src/service/knowledge/index.ts",
+        "test/unit/DriftClassifier.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/unit/DriftClassifier.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 88,
+    "reviewedRanges": [
+      [
+        1,
+        88
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/knowledge.ts",
+        "src/service/index.ts",
+        "test/StrictKnowledgePersistenceFaults.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/StrictKnowledgePersistenceFaults.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 15,
+    "reviewedRanges": [
+      [
+        1,
+        15
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/candidate/CandidateAggregator.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "批内标题 Jaccard 去重，稳定保留最先条目。",
+      "exports": [
+        "aggregateCandidates"
+      ],
+      "consumers": [
+        "src/service/knowledge/validation/candidate/CandidateValidationFacade.ts",
+        "src/service/knowledge/validation/candidate/index.ts",
+        "test/CandidateValidationFacade.test.ts",
+        "test/CandidateValidationFloor.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/CandidateValidationFacade.test.ts",
+        "test/CandidateValidationFloor.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 60,
+    "reviewedRanges": [
+      [
+        1,
+        60
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。",
+      "本轮后续授权修复：坏候选title只取真实string供去重；Reconciler新增可选identity provider按调用捕获index，歧义/provider失败不写stale，见supplement报告。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/candidate/CandidateValidationFacade.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "批内去重、V3 校验和 UnifiedValidator 组合入口。",
+      "exports": [
+        "UnifiedCandidateValidationOptions",
+        "UnifiedCandidateValidationItem",
+        "UnifiedCandidateValidationResult",
+        "validateCandidatesUnified"
+      ],
+      "consumers": [
+        "src/knowledge.ts",
+        "test/CandidateValidationFacade.test.ts",
+        "test/CandidateValidationFloor.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/CandidateValidationFacade.test.ts",
+        "test/CandidateValidationFloor.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 78,
+    "reviewedRanges": [
+      [
+        1,
+        78
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/candidate/SimilarityService.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "限定目录深度的 Markdown 语料磁盘相似度检索。",
+      "exports": [
+        "findSimilarRecipes"
+      ],
+      "consumers": [
+        "src/service/knowledge/validation/candidate/index.ts",
+        "test/FailureSemanticsCO3.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-UNUSED-FM",
+        "severity": "P3",
+        "line": 91,
+        "status": "source-confirmed",
+        "summary": "_fmMatch 计算后未使用，可删除这一局部绑定及正则计算，不改变接口/行为。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/FailureSemanticsCO3.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 158,
+    "reviewedRanges": [
+      [
+        1,
+        158
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/candidate/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/service/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 3,
+    "reviewedRanges": [
+      [
+        1,
+        3
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/quality/FeedbackCollector.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "反馈 JSON 读写/迁移、计数统计和可感知持久化失败。",
+      "exports": [
+        "FeedbackCollector"
+      ],
+      "consumers": [
+        "src/service/knowledge/validation/quality/index.ts",
+        "test/FailureSemanticsCO3.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/FailureSemanticsCO3.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 219,
+    "reviewedRanges": [
+      [
+        1,
+        219
+      ]
+    ],
+    "notes": [
+      "已人工阅读完整可执行代码及类型；本轮未运行测试。保留注释/公开别名按兼容语义判断。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/quality/QualityScorer.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "五维渐进评分，接地模式与legacy评分兼容分支；质量分供排序和路由，不等于内容验证器。",
+      "exports": [
+        "RecipeInput",
+        "QualityScorer"
+      ],
+      "consumers": [
+        "src/service/knowledge/ConfidenceRouter.ts",
+        "src/service/knowledge/validation/quality/index.ts",
+        "test/QualityScorerDepthCoverage.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/QualityScorerDepthCoverage.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 407,
+    "reviewedRanges": [
+      [
+        1,
+        406
+      ]
+    ],
+    "notes": [
+      "全部实现/类型已人工核读；是否运行见tests字段；保留真实外层调用和公开兼容接口。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/quality/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/service/index.ts",
+        "test/PublicResidualReadinessEntrypoints.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/PublicResidualReadinessEntrypoints.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 3,
+    "reviewedRanges": [
+      [
+        1,
+        3
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/recipe/RecipeCandidateValidator.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "V3 候选结构/类别/语言/来源验证与批次汇总。",
+      "exports": [
+        "RecipeCandidateValidator"
+      ],
+      "consumers": [
+        "src/service/knowledge/validation/candidate/CandidateValidationFacade.ts",
+        "src/service/knowledge/validation/recipe/index.ts",
+        "test/CandidateValidationFacade.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-VALIDATOR-TYPE",
+        "severity": "P1",
+        "line": 118,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "category/language/whyStandard 未守卫字符串就调用方法，Facade 畸形输入可直接抛错。",
+        "evidence": [
+          "knowledge-candidate-malformed-red.log",
+          "knowledge-candidate-malformed-green.log",
+          "foundation-scope-core-green.log"
+        ]
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/CandidateValidationFacade.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 241,
+    "reviewedRanges": [
+      [
+        1,
+        241
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/recipe/RecipeParser.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "历史 Recipe Markdown/frontmatter/代码块解析及纯源码降级提取。",
+      "exports": [
+        "ParsedRecipe",
+        "RecipeParser"
+      ],
+      "consumers": [
+        "src/service/knowledge/validation/recipe/index.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-PARSER-RAW-LOSS",
+        "severity": "P1",
+        "line": 121,
+        "status": "root-fix-observed-not-independently-validated",
+        "summary": "parseAll 对任意非空文本返回 ParsedRecipe，阻断 extractFromPath/extractFromText 原始源码 fallback；无代码围栏时 code 为空且语言可能 undefined。外层 extract/path 将空代码交 AI。",
+        "red": "公开 RecipeParser.extractFromText 对原始 TS 源码应返回原代码和指定语言；extractFromPath 对真实临时 .ts 应保留文件内容。"
+      },
+      {
+        "id": "K-UNUSED-SNIPPET-REGEX",
+        "severity": "P3",
+        "line": 38,
+        "status": "root-fix-observed-not-independently-validated",
+        "summary": "_SNIPPET_HEADING_RE 未引用，可移除局部常量。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 311,
+    "reviewedRanges": [
+      [
+        1,
+        311
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/knowledge/validation/recipe/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/service/index.ts",
+        "test/PublicResidualReadinessEntrypoints.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/PublicResidualReadinessEntrypoints.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 3,
+    "reviewedRanges": [
+      [
+        1,
+        3
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/ConsolidationAdvisor.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "对候选进行实质质量、与 DB/session corpus 相似度和 merge direction 评估，返回 create/insufficient/merge/reorganize 建议与 merge patch。",
+      "exports": [
+        "CandidateForConsolidation",
+        "ConsolidationAction",
+        "MergeDirection",
+        "ConsolidationAdvice",
+        "BatchConsolidationResult",
+        "RecipeSummary",
+        "ConsolidationAdvisor"
+      ],
+      "consumers": [
+        "src/service/sustain/index.ts",
+        "test/StrictPreparedRecipeGateway.test.ts",
+        "test/unit/ConsolidationAdvisor.test.ts",
+        "test/unit/EmbeddingSimIdFlow.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/StrictPreparedRecipeGateway.test.ts",
+        "test/unit/ConsolidationAdvisor.test.ts",
+        "test/unit/EmbeddingSimIdFlow.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 803,
+    "reviewedRanges": [
+      [
+        1,
+        802
+      ]
+    ],
+    "notes": [
+      "全文已读；analyzeAgainstAcceptedCorpus 使 strict 生产在已接受语料上判重，不可用旧 DB 查询入口替代。嵌入 provider 可选，确定性词法后备需兼容。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/ContentImpactAnalyzer.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "从 Git diff 或现文件 token 覆盖比判定 reference/pattern 影响。",
+      "exports": [
+        "DiffImpactResult",
+        "assessFileImpact",
+        "assessDiffImpact",
+        "assessImpactUnified"
+      ],
+      "consumers": [
+        "src/service/sustain/RecipeImpactPlanner.ts",
+        "src/service/sustain/index.ts",
+        "test/unit/DiffRevisionRange.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/unit/DiffRevisionRange.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 166,
+    "reviewedRanges": [
+      [
+        1,
+        166
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/ContentPatcher.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "结构化白名单补丁、before/after快照，内容及reasoning.sources持久化后刷新桥接表和指纹。",
+      "exports": [
+        "ContentPatcher"
+      ],
+      "consumers": [
+        "src/service/sustain/ProposalExecutor.ts",
+        "src/service/sustain/index.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/unit/ContentPatcher.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-PATCH-SOURCE-TRUTH",
+        "severity": "P1",
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "通过内部file-first helper写完整reasoning.sources+其他reasoning，桥接表指纹重建使用毫秒verifiedAt；patch→sync→reconcile不回退。",
+        "red": "knowledge-patch-truth-red.log",
+        "green": "knowledge-evolution-file-first-green-2.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/ProposalExecutorBounding.test.ts",
+        "test/unit/ContentPatcher.test.ts"
+      ],
+      "declaredCases": [],
+      "evidence": [
+        "knowledge-evolution-file-first-red.log",
+        "knowledge-patch-truth-red.log",
+        "knowledge-evolution-file-first-green-2.log",
+        "knowledge-mutation-readback-red.log",
+        "knowledge-mutation-readback-green.log"
+      ],
+      "verificationLogs": [
+        "knowledge-evolution-file-first-green-2.log"
+      ]
+    },
+    "lines": 509,
+    "reviewedRanges": [
+      [
+        1,
+        521
+      ]
+    ],
+    "notes": [
+      "已读全部状态/补丁分支并实现授权的文件优先写和元数据保真；没有声称整体文件+多表事务原子化。"
+    ],
+    "verificationLogs": [
+      "knowledge-evolution-format.log"
+    ]
+  },
+  {
+    "file": "src/service/sustain/DecayDetector.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "多因子衰退评分、新条目豁免、有限扫描与生命周期迁移/信号。",
+      "exports": [
+        "DecaySignal",
+        "DecayStrategy",
+        "DecayScoreResult",
+        "DecayDetector"
+      ],
+      "consumers": [
+        "src/service/sustain/index.ts",
+        "test/unit/DecayDetector.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-SWEEP-STARVATION",
+        "severity": "P2",
+        "line": 141,
+        "status": "hypothesis-needs-red",
+        "summary": "固定 createdAt 最旧 cap，无游标且 healthy 未移出 active，会反复占预算使后续 active 永不扫描；StagingManager waiting 条目同类风险。",
+        "red": "最旧 cap 条健康 active 与其后 dead 条目，重复 bounded sweep 后 dead 应被处理；需定义公平扫描契约。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/unit/DecayDetector.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 448,
+    "reviewedRanges": [
+      [
+        1,
+        448
+      ]
+    ],
+    "notes": [
+      "人工读完实现；未运行测试，风险按源码推导而非执行结论。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/EnhancementSuggester.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "从使用/采纳/权威/弃用关联生成只读增强建议。",
+      "exports": [
+        "EnhancementType",
+        "EnhancementSuggestion",
+        "EnhancementSuggester"
+      ],
+      "consumers": [
+        "src/service/sustain/index.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-ENHANCEMENT-RELATIONS",
+        "severity": "P2",
+        "line": 190,
+        "status": "root-fix-observed-not-independently-validated",
+        "summary": "Relations 实体只有 _b 自有桶容器，Object.entries(entry.relations) 不产出数组，弃用引用检测跳过全部真实关系。",
+        "red": "真实 repo active entry 引用 deprecated entry 后 analyzeAll 应含 deprecated_reference。"
+      },
+      {
+        "id": "K-UNUSED-SIGNAL",
+        "severity": "P3",
+        "line": 43,
+        "status": "root-fix-observed-not-independently-validated",
+        "summary": "私有 #signalBus 只赋值未读取，可移除私有字段/赋值，保留 options.signalBus 兼容参数面。"
+      }
+    ],
+    "disposition": "retain-with-findings",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 235,
+    "reviewedRanges": [
+      [
+        1,
+        235
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/GitDiffCheckpointService.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "当前 Git HEAD 基线及按路由结果推进 checkpoint。",
+      "exports": [
+        "GitDiffCheckpointInitializationSource",
+        "GitDiffCheckpointBaselineProvider",
+        "GitDiffCheckpointServiceRepositories",
+        "CurrentGitHeadBaselineProviderOptions",
+        "CurrentGitHeadBaselineProvider",
+        "createCurrentGitHeadBaselineProvider",
+        "BuildGitDiffCheckpointScopeInput",
+        "buildGitDiffCheckpointScope",
+        "EnsureGitDiffCheckpointInput",
+        "EnsureGitDiffCheckpointResult",
+        "RecordGitDiffCheckpointRouteInput",
+        "RecordGitDiffCheckpointRouteResult",
+        "GitDiffCheckpointService"
+      ],
+      "consumers": [
+        "src/service/sustain/index.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 252,
+    "reviewedRanges": [
+      [
+        1,
+        252
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/LifecycleStateMachine.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "自动演化guard、文件优先整合写、事件/信号、超时与健康统计。完成所有方法阅读；timeout/health共用秒/ms年龄归一。",
+      "exports": [
+        "LifecycleStateMachine"
+      ],
+      "consumers": [
+        "src/service/sustain/DecayDetector.ts",
+        "src/service/sustain/ProposalExecutor.ts",
+        "src/service/sustain/ProposalGateway.ts",
+        "src/service/sustain/index.ts",
+        "src/workflows/surfaces/planning/knowledge/KnowledgeRescanPlanner.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-TIMEOUT-UNITS",
+        "severity": "P1",
+        "line": 494,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "读取年龄归一化Unix秒/旧毫秒；真实新建中间态不再被立即过期。"
+      },
+      {
+        "id": "K-FILE-FIRST-EVOLUTION",
+        "severity": "P1",
+        "line": 169,
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "用内部helper一次持久化状态及出入metadata；两个真实宿主注入现fileStore，sync不回滚状态。"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/LifecycleStateMachineTimeouts.test.ts",
+        "test/ProposalExecutorBounding.test.ts",
+        "test/RecipeRetrievalProduction.test.ts",
+        "test/StagingManager.test.ts"
+      ],
+      "declaredCases": [],
+      "evidence": [
+        "knowledge-timeout-red.log",
+        "knowledge-timeout-green.log",
+        "knowledge-evolution-file-first-red.log",
+        "knowledge-evolution-file-first-green-2.log"
+      ]
+    },
+    "lines": 512,
+    "reviewedRanges": [
+      [
+        1,
+        505
+      ]
+    ],
+    "notes": [
+      "全部实现/类型已人工核读；是否运行见tests字段；保留真实外层调用和公开兼容接口。"
+    ],
+    "verificationLogs": [
+      "knowledge-format.log",
+      "knowledge-evolution-format.log",
+      "knowledge-final-format.log",
+      "knowledge-service-format.log"
+    ]
+  },
+  {
+    "file": "src/service/sustain/ProposalExecutor.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "消费 proposal ready/expiry/signal 入口，有界执行 update/deprecate/版本替换，结合 gates、metrics、similarity、patcher 和 LSM；处理过旧 pending 与重入。",
+      "exports": [
+        "ProposalExecutionResult",
+        "ProposalExecutor"
+      ],
+      "consumers": [
+        "src/service/sustain/index.ts",
+        "test/ProposalExecutorBounding.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/ProposalExecutorBounding.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 794,
+    "reviewedRanges": [
+      [
+        1,
+        793
+      ]
+    ],
+    "notes": [
+      "全文已读；本次 file-first 通过现有 LSM/ContentPatcher 真实依赖生效。容量和旧提案清理不能因测试精简丢弃；固定页饥饿仅为未复现疑点。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/ProposalGateway.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "将 valid/update/deprecate 决策归到即时状态变化或有审计记录的低/中/高风险 proposal，升级已有提案并清理冲突决策。",
+      "exports": [
+        "EvolutionAction",
+        "RiskTier",
+        "EvolutionDecision",
+        "EvolutionResult",
+        "ProposalGateway"
+      ],
+      "consumers": [
+        "src/service/sustain/RecipeImpactPlanner.ts",
+        "src/service/sustain/index.ts",
+        "src/workflows/surfaces/planning/knowledge/KnowledgeRescanPlanner.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain-public-behavior",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 325,
+    "reviewedRanges": [
+      [
+        1,
+        324
+      ]
+    ],
+    "notes": [
+      "全文已读；实际 pending/observing 返回与 Gateway 的硬编码合并响应可能不同，尚未以全真实链路复现，不标确认缺陷。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/RecipeImpactPlanner.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "把 deleted/modified/stale source refs 汇成按首次出现顺序的候选与统计，导出 audit DTO 和 rescan 决策提交入口。",
+      "exports": [
+        "EvolutionCandidateReason",
+        "EvolutionCandidate",
+        "IgnoredChange",
+        "EvolutionCandidatePlan",
+        "DiffInput",
+        "RescanImpactSubmissionResult",
+        "EvolutionAuditRecipe",
+        "RecipeImpactPlanner",
+        "toEvolutionAuditRecipe",
+        "toRescanImpactDecision",
+        "submitRescanImpactDecisions"
+      ],
+      "consumers": [
+        "src/service/sustain/index.ts",
+        "src/workflows/surfaces/planning/knowledge/KnowledgeRescanPlanner.ts",
+        "test/unit/AuditDeadDeprecate.test.ts",
+        "test/unit/RecipeImpactPlanner.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-RANGE-REF-LOOKUP",
+        "severity": "P1",
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "裸diff路径与range来源精确绑定，排除整个deleted集；drifted/真实rename目标仍存活时保持partial，activeRefCount健康计数兼容。",
+        "red": "knowledge-range-refs-red.log",
+        "green": "knowledge-range-refs-green-2.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/unit/AuditDeadDeprecate.test.ts",
+        "test/unit/RecipeImpactPlanner.test.ts"
+      ],
+      "declaredCases": [],
+      "verificationLogs": [
+        "knowledge-range-refs-green-2.log"
+      ]
+    },
+    "lines": 433,
+    "reviewedRanges": [
+      [
+        1,
+        434
+      ]
+    ],
+    "notes": [
+      "全文已读；已以真实文件+SQLite+reconciler 复现带行号 refs 裸文件删除漏匹配；修复保留 sourcePath 原值、精确大小写和显式 range 查询兼容。全批删除分类旧断言待父线程确认。"
+    ],
+    "verificationLogs": [
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "src/service/sustain/RedundancyAnalyzer.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "五维相似度检测重复 Recipe，持久报告并发出汇总信号。",
+      "exports": [
+        "RedundancyResult",
+        "RedundancyAnalyzer"
+      ],
+      "consumers": [
+        "src/service/sustain/index.ts",
+        "test/unit/EmbeddingSimProviderConduit.test.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [
+        "test/unit/EmbeddingSimProviderConduit.test.ts"
+      ],
+      "declaredCases": []
+    },
+    "lines": 187,
+    "reviewedRanges": [
+      [
+        1,
+        187
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "src/service/sustain/StagingManager.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "staging进入/复核/回滚/晋级及发布metadata；通过共同内部helper文件优先写。",
+      "exports": [
+        "StagingEntry",
+        "StagingCheckResult",
+        "StagingReviewQueueItem",
+        "LifecycleTransitionExecutor",
+        "StagingManagerOptions",
+        "StagingManager"
+      ],
+      "consumers": [
+        "src/service/sustain/index.ts",
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/StagingManager.test.ts"
+      ]
+    },
+    "findings": [
+      {
+        "id": "K-FILE-FIRST-STAGING",
+        "severity": "P1",
+        "status": "red-green-verified-awaiting-root-review",
+        "summary": "enter/review/rollback/晋升发布metadata共用file-first；正式两宿主writer接线，失败复核sync后仍拒绝晋升。",
+        "red": "knowledge-evolution-file-first-red.log",
+        "green": "knowledge-evolution-file-first-green-2.log"
+      }
+    ],
+    "disposition": "implemented-awaiting-root-review",
+    "tests": {
+      "executed": true,
+      "related": [
+        "test/KnowledgeProductizationLifecycle.test.ts",
+        "test/StagingManager.test.ts"
+      ],
+      "declaredCases": [],
+      "evidence": [
+        "knowledge-evolution-file-first-red.log",
+        "knowledge-patch-truth-red.log",
+        "knowledge-evolution-file-first-green-2.log",
+        "knowledge-mutation-readback-red.log",
+        "knowledge-mutation-readback-green.log"
+      ],
+      "verificationLogs": [
+        "knowledge-evolution-file-first-green-2.log"
+      ]
+    },
+    "lines": 347,
+    "reviewedRanges": [
+      [
+        1,
+        380
+      ]
+    ],
+    "notes": [
+      "已读全部状态/补丁分支并实现授权的文件优先写和元数据保真；没有声称整体文件+多表事务原子化。"
+    ],
+    "verificationLogs": [
+      "knowledge-evolution-format.log",
+      "knowledge-final-format.log"
+    ]
+  },
+  {
+    "file": "src/service/sustain/index.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "模块出口聚合；内部依赖与 package public facade 仍引用，不能仅因无逻辑删除。",
+      "exports": [],
+      "consumers": [
+        "src/service/index.ts",
+        "src/sustain.ts",
+        "src/sustain.ts"
+      ]
+    },
+    "findings": [],
+    "disposition": "retain",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": []
+    },
+    "lines": 13,
+    "reviewedRanges": [
+      [
+        1,
+        13
+      ]
+    ],
+    "notes": [
+      "人工阅读完整可执行代码及类型；未运行测试；导入图见 role.consumers。"
+    ]
+  },
+  {
+    "file": "test/CandidateValidationFacade.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "CandidateValidationFacade (CO2 B3)",
+        "returns exactly the composed validators’ results — no enforcement change",
+        "deduplicates the batch identically to aggregateCandidates",
+        "fails a weak candidate through every composed validator"
+      ],
+      "recommendation": "现两条 parity 自比较可合成一条 facade contract case，但保留弱候选拒绝和批去重行为；补 malformed 输入跨批不崩溃，不将整文件删除。",
+      "verificationLogs": [
+        "knowledge-validator-green.log"
+      ]
+    },
+    "lines": 58,
+    "reviewedRanges": [
+      [
+        1,
+        58
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/CandidateValidationFloor.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "候选去重阈值/首见顺序/不变性和双 validator AND、共享跨批 uniqueness、skipUniqueness 选项传递。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "aggregateCandidates",
+        "returns empty result for empty or non-array input",
+        "near-identical titles dedup to the first occurrence with duplicateOf set",
+        "threshold=1 only removes exact-token matches; low threshold removes near matches",
+        "kept items preserve input order and are not mutated",
+        "untitled candidates are never treated as similar (empty token sets)",
+        "validateCandidatesUnified",
+        "a strong candidate passes both validators with valid=true",
+        "valid is the AND of both validators (recipe failure flips it)",
+        "aggregateThreshold option propagates to the dedup stage",
+        "a shared UnifiedValidator enforces cross-batch uniqueness statefully",
+        "skipUniqueness bypasses the cross-batch layer for the same duplicate",
+        "null/empty candidate batches return empty results without throwing",
+        "validator outputs are preserved verbatim (no filtering or re-ordering)"
+      ],
+      "verificationLogs": [
+        "knowledge-validator-green.log"
+      ]
+    },
+    "lines": 201,
+    "reviewedRanges": [
+      [
+        1,
+        200
+      ]
+    ],
+    "notes": [
+      "保留行为 floor；同名 Facade parity 套件可合并到本文件，不能删弱输入拒绝/状态复用语义。wrong-type 批隔离尚需 legacy candidate 层独立验证。"
+    ]
+  },
+  {
+    "file": "test/DimensionSubmissionSpecCollapse.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "P2.1 submissionSpec collapse — D-B ≥3 floor, guidance==gate",
+        "states the module ≥3 floor (no ",
+        "lists the real imperative-verb allowlist + the ≥3 distinct-files evidence floor",
+        "P3/C6: contentStyle 不再被 slice(0,12) 截断——深度要求 + 来源标注格式规则同时到达 host",
+        "P3/C6: contentQuality 的 markdown 下限从门禁同一常量派生(消除手写 floor literal)",
+        "every catalog-payload dimension uses the collapsed builder (no draft "
+      ],
+      "recommendation": "保留：验证公开行为/兼容输出或关键规则边界，不能仅因相近名称删除。"
+    },
+    "lines": 72,
+    "reviewedRanges": [
+      [
+        1,
+        72
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/DomainLifecycle.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "consolidated-by-root",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "Integration: KnowledgeEntry & Lifecycle",
+        "Lifecycle constants",
+        "should have three states",
+        "Valid transitions",
+        "Invalid transitions",
+        "normalizeLifecycle",
+        "should pass through valid lifecycle values",
+        "should default invalid values to pending",
+        "isValidLifecycle",
+        "should accept valid states",
+        "should reject invalid states",
+        "isCandidate",
+        "should identify pending as candidate",
+        "should not identify active/deprecated as candidate",
+        "inferKind",
+        "should infer rule kind",
+        "should infer pattern kind",
+        "should infer fact kind",
+        "should default to pattern for unknown types",
+        "KnowledgeEntry construction",
+        "should create with defaults",
+        "should create with provided values",
+        "should normalize invalid lifecycle to pending",
+        "should auto-infer kind from knowledgeType",
+        "KnowledgeEntry lifecycle transitions",
+        "should track lifecycle transitions",
+        "should preserve lifecycle history",
+        "KnowledgeEntry value objects",
+        "should initialize Content value object",
+        "should initialize Relations value object",
+        "should initialize Constraints value object",
+        "should initialize Quality value object",
+        "should initialize Stats value object",
+        "KnowledgeEntry metadata",
+        "should have timestamp fields",
+        "should support source tracking"
+      ],
+      "recommendation": "可迁移后删文件：三状态常量/转换/normalize 与 Lifecycle 重复；构造/value-object/source/history 与 KnowledgeEntry 重复或更弱。先把这里覆盖更全的 inferKind 表及 invalid lifecycle constructor cases 迁入保留套件，再删，不丢唯一断言。"
+    },
+    "lines": 248,
+    "reviewedRanges": [
+      [
+        1,
+        248
+      ]
+    ],
+    "notes": [
+      "完整测试正文人工核读，未执行。",
+      "根线程已将独有inferKind/invalid constructor断言并入其他domain tests后删除该基线文件。"
+    ]
+  },
+  {
+    "file": "test/EvidenceLedgerContract.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "EvidenceLedgerContract",
+        "makeEvidenceId：正整数序号→E-<n>，非法序号抛错",
+        "parseEvidenceRef：整条与子区间两种合法形态（含首尾空白容忍）",
+        "parseEvidenceRef：非法形态一律 null（含 file:line——捏造引用的典型形态）",
+        "isEvidenceToolId：证据类工具白名单，memory/meta/knowledge 不属证据源",
+        "isValidEvidenceEntry：合法条目通过，缺字段/坏区间/未知工具拒绝",
+        "单条内容上限常量为正且量级合理（CG-1 初值 8000）"
+      ],
+      "recommendation": "保留：验证公开行为/兼容输出或关键规则边界，不能仅因相近名称删除。"
+    },
+    "lines": 82,
+    "reviewedRanges": [
+      [
+        1,
+        82
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/EvolutionPolicy.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "EvolutionPolicy",
+        "assessRisk",
+        "deprecate is always high risk",
+        "update with high confidence is low risk",
+        "update with lower confidence is medium risk",
+        "observationWindow",
+        "returns 24h for low risk",
+        "returns 72h for medium risk",
+        "returns 7d for high risk",
+        "shouldImmediateExecute",
+        "returns true for high-confidence deprecate from agent",
+        "returns false for metabolism source even with high confidence",
+        "returns false for low-confidence deprecate",
+        "returns false for update action",
+        "resolveInitialStatus",
+        "update >= 0.7 starts as observing",
+        "update < 0.7 starts as pending",
+        "deprecate always starts as observing (threshold 0.0)",
+        "evaluateUpdate",
+        "passes when FP rate is low and has usage",
+        "fails when FP rate is too high",
+        "fails when no usage during observation",
+        "passes with search hits only",
+        "evaluateDeprecate",
+        "rejects when decay recovered significantly",
+        "returns deprecated for dead scores (<=19)",
+        "returns decaying for severe scores (20-40)",
+        "rejects when decay only slowed (>40, no recovery)",
+        "boundary: exactly 19 is deprecated",
+        "boundary: exactly 40 is decaying",
+        "classifyRelevance",
+        "healthy (>=80)",
+        "watch (60-79)",
+        "decay (40-59)",
+        "severe (20-39)",
+        "dead (<20)",
+        "boundary: exactly 80 is healthy",
+        "boundary: exactly 60 is watch",
+        "boundary: exactly 40 is decay",
+        "boundary: exactly 20 is severe",
+        "shouldExpirePending",
+        "returns true after 14 days",
+        "returns false within 14 days",
+        "returns false at exactly 14 days",
+        "evaluateMerge (U5 #3 — 门禁分流)",
+        "passes with low FP even when usage=0 (merge 不要求 hasUsage)",
+        "fails when FP rate is too high (复用 0.4 FP 护栏)",
+        "fails when explicitly no structured patch is present",
+        "contrast: evaluateUpdate 仍因 usage=0 fail（aging 门禁未放松）"
+      ],
+      "recommendation": "保留策略边界含 0.4、0.7、19/40 和人工/漂移/融合使用率豁免；可 it.each 合并阈值 case，不能删公开纯函数边界。"
+    },
+    "lines": 243,
+    "reviewedRanges": [
+      [
+        1,
+        243
+      ]
+    ],
+    "notes": [
+      "完整测试正文人工核读，未执行。"
+    ]
+  },
+  {
+    "file": "test/FailureSemanticsCO3.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "WRITE STRICT/READ TOLERANT 契约回归，覆盖 UoW、审计、feedback、lifecycle 白名单、搜索降级、vector orphan、walk上界和listener销毁。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "W1 SyncRepoAdapter audit-insert failure",
+        "prepare failure throws PersistenceError instead of returning null",
+        "audit insert run failure throws PersistenceError instead of warn-and-continue",
+        "W2 KnowledgeUnitOfWork file/DB divergence",
+        "DB transaction failure after file success throws DivergenceError, keeps files",
+        "successful commit reports dbCommitted with completed file ops",
+        "W3 KnowledgeService.update lifecycle bypass",
+        "passing lifecycle directly is rejected with ValidationError",
+        "every lifecycle-managed field is guarded",
+        "whitelisted fields still update (no over-blocking)",
+        "FeedbackCollector failure semantics",
+        "W4: save loss surfaces as PersistenceError instead of silent drop",
+        "C9: malformed inputs are rejected with ValidationError before any write",
+        "R2: corrupt feedback store degrades to empty-but-usable with stable diagnostic",
+        "R1 SearchEngine degraded index",
+        "missing knowledge table yields degraded searchMeta with stable reason, not a silent empty list",
+        "healthy index does not mark responses degraded",
+        "V1 SyncCoordinator reconcile",
+        "orphan removal failures are counted in errors and logged with stable code",
+        "unavailable DB degrades reconcile with stable diagnostic instead of silent return",
+        "C8: destroy unbinds both EventBus listeners (knowledge:deleted no longer leaks)",
+        "C6 SimilarityService walk guards",
+        "symlink cycles do not hang the walk and real recipes are still found",
+        "walk truncates at the depth limit with a stable diagnostic"
+      ],
+      "verificationLogs": [
+        "knowledge-uow-green.log",
+        "knowledge-uow-partial-truth-green.log",
+        "knowledge-mutation-readback-green.log",
+        "knowledge-service-mutations-green-2.log",
+        "knowledge-writer-ownership-green.log"
+      ]
+    },
+    "lines": 488,
+    "reviewedRanges": [
+      [
+        1,
+        568
+      ]
+    ],
+    "notes": [
+      "保留独立失败边界；本轮 UoW 新增真实writer null/false和partial-file-truth场景。不可把整个文件用若干 happy path 合并替代。"
+    ],
+    "verificationLogs": [
+      "knowledge-format.log",
+      "knowledge-final-format.log"
+    ]
+  },
+  {
+    "file": "test/KnowledgeEntry.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "Content value object",
+        "from(null) returns empty content",
+        "from(props) preserves fields",
+        "toJSON → fromJSON round-trip",
+        "Relations value object",
+        "from(null) returns empty",
+        "from(buckets) preserves structure",
+        "from(flat array) converts array to buckets",
+        "add deduplicates by target",
+        "toFlatArray returns type-annotated list",
+        "toJSON → from round-trip",
+        "Constraints value object",
+        "from(null) returns empty",
+        "normalizes guard with regex type",
+        "normalizes guard with ast type",
+        "handles sideEffects",
+        "toJSON uses camelCase",
+        "Reasoning value object",
+        "from(null) returns empty",
+        "accepts camelCase input",
+        "toJSON outputs camelCase",
+        "Quality value object",
+        "from(null) returns zeros",
+        "calcGrade boundaries",
+        "recalculate updates overall+grade",
+        "Stats value object",
+        "from(null) returns zeros",
+        "accepts camelCase input",
+        "increment",
+        "toJSON uses camelCase",
+        "Lifecycle",
+        "inferKind maps correctly",
+        "valid transitions (3-state model)",
+        "invalid transitions (3-state model)",
+        "KnowledgeEntry",
+        "construction",
+        "creates with defaults",
+        "infers kind from knowledgeType",
+        "isValid checks title + content",
+        "lifecycle transitions",
+        "publish: pending → active",
+        "publish invalid content fails",
+        "deprecate: active → deprecated",
+        "reactivate: deprecated → pending",
+        "invalid transition returns error",
+        "lifecycle history tracks all transitions",
+        "predicates",
+        "isCandidate for pending state",
+        "isCandidate false for active/deprecated",
+        "isActive",
+        "isRule",
+        "getGuardRules",
+        "returns empty for non-active non-rule",
+        "returns regex guards for active rule",
+        "returns ast guards",
+        "serialization",
+        "toJSON → fromJSON round-trip preserves all fields",
+        "fromJSON handles empty/null input"
+      ],
+      "recommendation": "保留 value object roundtrip 与 entity行为；:215-237 Lifecycle 重复组迁入 Lifecycle.test 后删除；构造的 instanceOf 已强于 DomainLifecycle 的 toBeDefined。",
+      "verificationLogs": [
+        "knowledge-evolution-file-first-green-2.log"
+      ]
+    },
+    "lines": 453,
+    "reviewedRanges": [
+      [
+        1,
+        453
+      ]
+    ],
+    "notes": [
+      "完整测试正文人工核读，未执行。"
+    ]
+  },
+  {
+    "file": "test/KnowledgeFileWriter.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "知识实体↔Markdown的标量/JSON对象/正文/hash/roundtrip，真实persist/remove/move，以及wire→sync DB row。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "KnowledgeFileWriter",
+        "serialize",
+        "应生成包含 frontmatter 和 body 的有效 .md",
+        "should include all scalar fields in frontmatter",
+        "should persist staging deadline for auto-approvable staging entries",
+        "should include array fields as inline JSON",
+        "should include value objects as _ prefixed JSON",
+        "should include content hash",
+        "should build structured body when no markdown",
+        "should output markdown body directly when content.markdown is set",
+        "should handle special characters in title by quoting",
+        "should skip empty/null fields",
+        "parseKnowledgeMarkdown",
+        "should parse scalar fields from frontmatter",
+        "should parse array fields",
+        "should parse _ prefixed JSON value objects",
+        "should extract code from body when content.pattern is missing",
+        "should extract title from body heading when missing in frontmatter",
+        "should handle boolean and numeric values",
+        "should parse quoted string values",
+        "round-trip",
+        "serialize → parse → fromJSON should preserve all fields",
+        "应在 serialize → parse → serialize 中保持 hash 稳定",
+        "candidate entry 的 round-trip 也应正常",
+        "computeKnowledgeHash",
+        "should produce 16 char hex hash",
+        "should strip _contentHash line before hashing",
+        "应对不同内容产生不同 hash",
+        "persist",
+        "should write active entry to recipes directory",
+        "should write candidate entry to candidates directory",
+        "should update sourceFile on entry after persist",
+        "should use trigger as filename when available",
+        "should use title slug when no trigger",
+        "should return null for entry without id or title",
+        "remove",
+        "should remove persisted file",
+        "should return false for entry without file",
+        "moveOnLifecycleChange",
+        "应在 lifecycle 从 pending → active 时移动文件",
+        "KnowledgeSyncService",
+        "does not report direct orphan deprecation failures as successful maintenance",
+        "_buildDbRow",
+        "should map parsed wire format to DB row correctly",
+        "should use defaults for missing fields"
+      ],
+      "verificationLogs": [
+        "knowledge-hash-green.log",
+        "knowledge-collision-green.log",
+        "knowledge-writer-ownership-green.log"
+      ]
+    },
+    "lines": 717,
+    "reviewedRanges": [
+      [
+        1,
+        804
+      ]
+    ],
+    "notes": [
+      "保留真实文件拥有权、冲突和hash回归。serialize/parse的小型字段测试部分与大roundtrip重叠，但分别约束人可读wire语法与domain恢复，不建议整段删除；roundtrip中description完全重复断言可删一行。"
+    ],
+    "verificationLogs": [
+      "knowledge-format.log",
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "test/KnowledgeProductizationLifecycle.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "Knowledge productization lifecycle",
+        "keeps staging deadlines through file sync and promotes due entries through lifecycle events",
+        "deprecates an orphan for an empty corpus and awaits authoritative vector maintenance",
+        "emits current DB truth for publish, deprecate, and reactivate vector maintenance"
+      ],
+      "recommendation": "保留真实SQLite/Markdown与故障边界；新增测试复现生产数据丢失/回退，不按文件数量硬删。",
+      "verificationLogs": [
+        "knowledge-evolution-file-first-green-2.log",
+        "knowledge-mutation-readback-green.log",
+        "knowledge-service-mutations-green-2.log",
+        "knowledge-writer-ownership-green.log",
+        "knowledge-tag-filter-green.log",
+        "knowledge-range-refs-green-2.log"
+      ]
+    },
+    "lines": 263,
+    "reviewedRanges": [
+      [
+        1,
+        474
+      ]
+    ],
+    "notes": [
+      "全文阅读并执行相关套件；公共入口事实来源保留真实实现。"
+    ],
+    "verificationLogs": [
+      "knowledge-evolution-format.log",
+      "knowledge-postreview-format.log",
+      "knowledge-service-format.log",
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "test/Lifecycle.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "Lifecycle — 六态状态机",
+        "should define 6 states",
+        "should validate all 6 states",
+        "should normalize unknown states to pending",
+        "transition table",
+        "CANDIDATE_STATES includes pending and staging",
+        "CONSUMABLE_STATES includes staging, active, evolving",
+        "DEGRADED_STATES includes only decaying",
+        "isCandidate returns true for pending and staging",
+        "isConsumable returns true for staging, active, evolving",
+        "isDegraded returns true only for decaying"
+      ],
+      "recommendation": "作为六态单一完整矩阵保留；补 evolving→staging 和全部 self-transition 不合法，再吸收 DomainLifecycle 的 inferKind mapping。"
+    },
+    "lines": 126,
+    "reviewedRanges": [
+      [
+        1,
+        126
+      ]
+    ],
+    "notes": [
+      "完整测试正文人工核读，未执行。"
+    ]
+  },
+  {
+    "file": "test/LifecycleStateMachineTimeouts.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "LifecycleStateMachine.checkTimeouts cap bounding (P2)",
+        "无 cap：evolving>7d→active、pending/decaying>30d→deprecated、staging 不被触碰、记 transition 事件",
+        "cap：单 tick 扫描+迁移 ≤cap，多 tick 按最旧优先(createdAt 升序)排空",
+        "cap：预算跨 timeout 状态共享，总扫描+迁移 ≤cap（evolving 先、pending 后）",
+        "spy seam：cap 模式把剩余预算作为 limit 透传，无 cap 透传 undefined，staging 从不被查询",
+        "无 cap 仍无界：一次处理全部到期项"
+      ],
+      "recommendation": "保留真实SQLite/Markdown与故障边界；新增测试复现生产数据丢失/回退，不按文件数量硬删。",
+      "verificationLogs": [
+        "knowledge-timeout-green.log",
+        "knowledge-evolution-file-first-green-2.log",
+        "knowledge-health-clock-green.log"
+      ]
+    },
+    "lines": 223,
+    "reviewedRanges": [
+      [
+        1,
+        261
+      ]
+    ],
+    "notes": [
+      "全文阅读并执行相关套件；公共入口事实来源保留真实实现。"
+    ],
+    "verificationLogs": [
+      "knowledge-format.log",
+      "knowledge-service-format.log"
+    ]
+  },
+  {
+    "file": "test/ProposalExecutorBounding.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "真实 proposal/knowledge/LSM/patcher 集成：观察期限、usage 闸、人工/drift 豁免、cap共享预算、GC、多轨重入及空 merge 补丁拒绝。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "consolidate-specific-duplicate-cases",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "ProposalExecutor.checkAndExecute cap bounding (P3)",
+        "决策①双豁免-b:drifted 修复型提案(evidence 带 sourceStatus:drifted)免 hasUsage 闸",
+        "决策①双豁免-a:人工 executeOne 免 hasUsage(0-usage 目标不再被机器否决)",
+        "P-E 观察窗口闸：窗口未满的 observing 提案 skipped 且留在 observing(BiliDili 32 秒处决回归)",
+        "cap：单 tick 处理 ≤cap 条（最旧优先 proposedAt 升序），多 tick 排空",
+        "spy seam：cap 模式对 observing 查询透传 {limit, oldestFirst:true}；无 cap 不传（默认 desc 无界）",
+        "cap 模式不绕过判定门禁：无 usage 的 update proposal 仍被 reject、未流转",
+        "cap 模式不破坏正常流转：合格 update（有 usage）经 transition 执行",
+        "checkAndExecute() 无 cap 仍无界：一次处理全部 observing",
+        "P3-Core-2 cap：pending GC 单 tick 仅 markExpired ≤budget（最旧优先），多 tick 排空",
+        "P3-Core-2 cap：observing + pending 共享单一 remaining 预算，整 tick 总处理 ≤cap",
+        "P3-Core-2 spy seam：cap 模式 pending GC 透传 {limit:remaining, oldestFirst}；无 cap 不传",
+        "P3-Core-2 无 cap 时 pending GC 仍无界（字节一致）",
+        "P3-Core-2 cap 不绕过过期判定：未到期 pending 不被 markExpired",
+        "F-A：dual-track 下合格 UPDATE 不被自身 lifecycle 信号 re-entrancy 误标 rejected",
+        "F-A：守卫不误伤——合法 usage 信号仍能驱动 not-in-flight 的合格 UPDATE 执行",
+        "U5 #3 退伪成功：consolidation 提案空 suggestedChanges → rejected（非 executed+reverted）"
+      ],
+      "verificationLogs": [
+        "knowledge-evolution-file-first-green-2.log"
+      ]
+    },
+    "lines": 447,
+    "reviewedRanges": [
+      [
+        1,
+        446
+      ]
+    ],
+    "notes": [
+      "保留文件。可删除较早仅 observing 的 spy seam 单测：后面的 P3-Core-2 spy seam 已用相同空DB分别断言 observing+pending 的 cap/undefined 路径。其他真实状态转移不合并丢失。"
+    ]
+  },
+  {
+    "file": "test/QualityScorerDepthCoverage.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "QualityScorer #scoreContentDepth (C8) — 接地 port 未就位 → legacy 零回归",
+        "groundingAvailable 缺省 → 长 markdown 仍靠长度拿高分(历史行为不变)",
+        "QualityScorer #scoreContentDepth (C8) — 接地 port 就位 → 只认接地深度",
+        "防刷分：长 + 塞满维度关键词但无真实 file:line → depthCoverage=0，contentDepth 被长度及格线封顶",
+        "真接地深度：挂真实 file:line 覆盖多个维度 → contentDepth 显著高于刷分样本",
+        "防编造：深度分节挂的 file:line 指向未接地文件 → 不计 depthCoverage",
+        "结构化字段接地也计分(boundaries[] 挂真实 ref)"
+      ],
+      "recommendation": "保留：验证公开行为/兼容输出或关键规则边界，不能仅因相近名称删除。"
+    },
+    "lines": 104,
+    "reviewedRanges": [
+      [
+        1,
+        104
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/RecipeAuthoringDepthGuidance.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "renderGuidance 深度契约段 (C2) — 从 DEPTH_DIMENSIONS 单源渲染",
+        "text 含深度契约标题 + 深挖自问引导(2026-07-02：自选角度真挖，非逐维填表)",
+        "明说这是价值要求非门槛、评分只认接地深度不认长度",
+        "结构化 depthContract/valueRubric 字段随 block 返回(活过 host 压缩阶梯)",
+        "深度契约段不重新注入 confidence 硬门槛(与 D-A 负向不变量一致)",
+        "styleGuide 深度要求落在 slice(0,12) 预算内(host contentStyle 不截断深度)",
+        "注入的 typescript worked-example (C5) — 是真接地深度范本，非仅 gate-clean",
+        "depthReview 判定五维全接地 + 多来源跨 ≥2 文件(synthesis)",
+        "若两文件都解析不到 → 五维退化为未接地(证明接地不是靠关键词，是靠真 file:line)"
+      ],
+      "recommendation": "保留 guidance 与 worked-example 接地回归；:48 的 slice(0,12) 预算测试针对已取消的宿主截断，可核对无现消费者后删除，DimensionSubmissionSpecCollapse :44 已覆盖真实 builder 完整传递。"
+    },
+    "lines": 95,
+    "reviewedRanges": [
+      [
+        1,
+        95
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/RecipeAuthoringDepthReview.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "depthContract (C3)",
+        "暴露 5 个稳定深度维度(含 multiSourceCorroboration)",
+        "scaffold 是深挖自问引导(自选角度非逐维填表)、self-review 覆盖接地断言与跨文件自检",
+        "叙述信号双轨(2026-07-02) — 自由叙述与小节组织同等获得深度认可",
+        "无 ## 小节的自由叙述：含信号词且同段挂已解析 ref 的段落计入 groundedSignalCount",
+        "纯信号词无接地 ref 不计(anti-gaming 口径不变)",
+        "reviewRecipeDepth (C4) — 只认接地深度",
+        "接地：深度分节挂命中 validSourcePaths 的 file:line → grounded + 多来源",
+        "防刷分：塞维度关键词但无 file:line → 不算 grounded",
+        "防编造：file:line 指向未解析文件 → 不算 grounded",
+        "多来源：仅 1 个文件 → multiSourceCorroboration missing",
+        "结构化字段：boundaries[] 挂真实 ref 也算该维度接地"
+      ],
+      "recommendation": "保留 anti-gaming、自由叙述、结构化字段；补 alias+validRanges 回归，可表驱动合并非法接地 case。"
+    },
+    "lines": 123,
+    "reviewedRanges": [
+      [
+        1,
+        123
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/RecipeAuthoringGraphNarrowing.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "真实文件 resolver 下的 graph 措辞收窄、markdown 模板豁免、coreCode 精确证据和占位代码拒绝。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "特写模板豁免（markdown 代码块退出逐字校验，coreCode 证据位仍逐字）",
+        "markdown 范式模板（非项目原文）不触发 SNIPPET_MISMATCH",
+        "coreCode 证据位仍逐字校验：凭空 coreCode 被拒，真实片段放行",
+        "markdown 模板的防伪底线仍在：占位代码触发 PLACEHOLDER_EVIDENCE",
+        "graph-evidence 关系词收窄（架构描述放行，调用链断言仍拦）",
+        "「依赖/分层/边界/上下游」架构描述不再触发 GRAPH_REF_INVALID",
+        "具体调用链断言（中/英）无 graphRefs 仍被拦",
+        "调用链断言附 graphRefs 即放行（正向通道语义不变）"
+      ]
+    },
+    "lines": 206,
+    "reviewedRanges": [
+      [
+        1,
+        205
+      ]
+    ],
+    "notes": [
+      "保留用户已定门禁政策；不能因为看似放松 graph/markdown 检查而删除或反转这些兼容断言。"
+    ]
+  },
+  {
+    "file": "test/RecipeAuthoringGroundedPaths.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "resolveGroundedSourcePaths 过滤失败来源，以及 updateQuality grounding port→scorer 的真实转译。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "resolveGroundedSourcePaths (C7) — 只回真解析成功的接地",
+        "只保留 resolver 命中的 ref，拒绝的被剔除(anti-fabrication)",
+        "缺行号的 ref 不进接地集",
+        "无 resolver / 无 projectRoot → 空集(保持纯函数、不触 fs)",
+        "KnowledgeService.updateQuality (C7) — port→scorer 断路闭合",
+        "注入 grounding port → scorer 收到 groundedSourcePaths + 深度字段",
+        "不注入 port → 退化为空接地集(旧评分路径不变、不崩)"
+      ]
+    },
+    "lines": 168,
+    "reviewedRanges": [
+      [
+        1,
+        167
+      ]
+    ],
+    "notes": [
+      "保留；resolver/scorer 使用显式 seam 是为检验输入是否断链，和 filesystem resolver 的内容检查非重复。"
+    ]
+  },
+  {
+    "file": "test/RecipeAuthoringSpecExamplesGatePassing.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "RecipeAuthoringSpec worked examples are gate-passing (P3 tripwire)",
+        "covers the real primary-corpus languages + _default",
+        "example(lang) resolves known languages and falls back to _default — both gate-passing"
+      ],
+      "recommendation": "保留：验证公开行为/兼容输出或关键规则边界，不能仅因相近名称删除。"
+    },
+    "lines": 57,
+    "reviewedRanges": [
+      [
+        1,
+        57
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/RecipeDimension.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "RecipeDimension resolver",
+        "uses explicit dimensionId as the canonical owner",
+        "lets runtime dimensions disambiguate legacy knowledgeType before registry category fallback",
+        "does not count broad artifact types across explicitly owned dimensions",
+        "falls back to dimension knowledgeTypes only when no owner was resolved",
+        "recovers legacy dimension tags and agent notes"
+      ],
+      "recommendation": "保留：验证公开行为/兼容输出或关键规则边界，不能仅因相近名称删除。"
+    },
+    "lines": 63,
+    "reviewedRanges": [
+      [
+        1,
+        63
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/RecipeRetrievalProduction.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "native/compatibility profile、raw malformed事实诊断/索引、provider离线不影响确定性、legacy hash、sparse/dense同源，以及真实SQLite/file/production port/readiness发布链。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "Recipe retrieval profile truth and readiness",
+        "round-trips the additive profile through domain, Markdown and API wire without loss",
+        "never invents English facts while projecting a legacy primary-language Recipe",
+        "keeps default-only topic, category, and module labels out of retrieval facts",
+        "reports stable hard violations when default-only labels masquerade as native concepts",
+        "reports stable hard violations at raw source indices for blank and placeholder concepts",
+        "reports indexed structural violations across every raw fact bucket",
+        "rejects non-array raw fact buckets before normalization can erase them",
+        "allows meaningful phrases that merely contain placeholder or default-label words",
+        "keeps readiness deterministic when the provider is offline",
+        "accepts the first-generation source hash that included persisted Recipe identity",
+        "reports stable hard violations for ungrounded facts and whole-file code evidence",
+        "projects one canonical, distinct document set for sparse and dense generation",
+        "preserves intent, boundary and support roles for native and compatibility sparse ranking",
+        "Recipe retrieval profile persistence and active transition",
+        "round-trips the profile through real SQLite persistence",
+        "updates a legacy null profile through SQLite, Markdown, API wire, readiness, and projection",
+        "updates a staging profile with another field while preserving unseen truth and lifecycle",
+        "rejects malformed or unsupported profiles before Markdown, SQLite, audit, or events change",
+        "edits an active profile without a new active transition or automatic publish",
+        "preserves malformed authored facts but blocks publish and filters them from projection",
+        "runs the consumer-facing production port through real persistence, projection, and publish",
+        "allows repairable pending truth but blocks every active transition on the same readiness report",
+        "uses the same readiness evaluator on offline lifecycle promotion paths"
+      ],
+      "verificationLogs": [
+        "knowledge-service-mutations-green-2.log"
+      ]
+    },
+    "lines": 944,
+    "reviewedRanges": [
+      [
+        1,
+        948
+      ]
+    ],
+    "notes": [
+      "全文读取后保留；大量断言分别防止事实凭空生成、坏数据被归一抹掉、profile-only更改影响生命周期、发布绕过readiness。对正常/异常标量的较弱重复案例没有明显独立可删整块。"
+    ],
+    "verificationLogs": [
+      "knowledge-service-format.log"
+    ]
+  },
+  {
+    "file": "test/StagingManager.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "真实 SQLite 下复核三态、队列字段、到期自动晋升/event、cap 最旧优先/跨 tick 排空/旧无界路径。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "StagingManager lifecycle promotion",
+        "promotes only due auto-approvable staging recipes through lifecycle events",
+        "review outcome fail rolls a due auto-approvable entry back to pending instead of promoting",
+        "listReviewQueue returns staging entries awaiting review with assertion content + sources, excluding reviewed",
+        "recordReview rejects entries that are not in staging",
+        "(a) checkAndPromote(N) 在 >N 条到期 staging 下只晋级 ≤N（取最旧 N）",
+        "(b) 重复 checkAndPromote(N) 按最旧优先跨 tick 排空积压",
+        "(c) checkAndPromote() 不传 cap 时仍无界（晋级全部到期项，保留现行行为）",
+        "(d-seam) checkAndPromote 把 cap 作为 limit 透传给仓储查询（capped 路径不做全表读取）",
+        "(d-sql) findAllByLifecycles(limit) 用 SQL ORDER BY createdAt + LIMIT 取最旧 N（非 JS 全表切片）"
+      ],
+      "verificationLogs": [
+        "knowledge-evolution-file-first-green-2.log"
+      ]
+    },
+    "lines": 300,
+    "reviewedRanges": [
+      [
+        1,
+        299
+      ]
+    ],
+    "notes": [
+      "保留；这组特意无 fileStore 验证旧构造仍可运行，新 productization file-first 测试不能取代。spy/sql 约束分别锁定读取预算和可见结果。"
+    ]
+  },
+  {
+    "file": "test/StrictKnowledgePersistenceFaults.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "strict knowledge persistence fault boundaries",
+        "keeps the old file when durable lifecycle replacement fails",
+        "rejects a traversal-shaped storage bucket before creating a file",
+        "does not advance lifecycle DB state when file movement fails",
+        "does not advance quality DB state when file persistence fails"
+      ],
+      "recommendation": "保留真实SQLite/Markdown与故障边界；新增测试复现生产数据丢失/回退，不按文件数量硬删。",
+      "verificationLogs": [
+        "knowledge-collision-green.log",
+        "knowledge-writer-ownership-green.log"
+      ]
+    },
+    "lines": 128,
+    "reviewedRanges": [
+      [
+        1,
+        127
+      ]
+    ],
+    "notes": [
+      "全文阅读并执行相关套件；公共入口事实来源保留真实实现。"
+    ]
+  },
+  {
+    "file": "test/StrictPreparedRecipeGateway.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "完整accepted corpus admission、不写入约束、G1/admission/G2身份链、prepared ID授权/恢复/崩溃重放、指纹篡改阻断。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "strict prepared Recipe Gateway path",
+        "admits against a complete accepted corpus without invoking any write path",
+        "runs the real consolidation algorithm only against the inspected complete corpus",
+        "returns an immutable duplicate receipt for validator-level exact matches",
+        "fails closed when corpus inspection or consolidation authority is unavailable",
+        "rejects an incomplete or truncated accepted-corpus inspection",
+        "authorizes the internal prepared ID, reads it back, and reports zero UUID allocation",
+        "recovers an exact persist-before-consumed row without creating a duplicate",
+        "replays a persist-before-journal-consumed crash without a second Recipe",
+        "fails closed for unauthorized or mismatched revision readback",
+        "rejects an item changed after G1 review before journal authorization or write",
+        "rejects a mismatched G1 → Admission → G2 chain before recovery inspection or write"
+      ]
+    },
+    "lines": 735,
+    "reviewedRanges": [
+      [
+        1,
+        734
+      ]
+    ],
+    "notes": [
+      "保留；端口mocks验证正式Gateway边界和零UUID分配，另有SQLite故障floor。immutable fixture链与指纹字段表不可因体积大而删减。"
+    ]
+  },
+  {
+    "file": "test/StyleWaiver.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "isSoftAuthoringViolation — 软硬分级",
+        "风格类是软规则(可申辩)",
+        "接地/伪造/重复/必填结构是硬规则(不可申辩)",
+        "applyStyleWaiver — 一次申辩判定",
+        "全软违规 + 充分理由 → 放行，理由随 reasoning.styleWaiver 落库",
+        "混有硬违规 → 申辩无效(先修事实错误)",
+        "理由不足 20 字 → 视同无理由，不放行",
+        "会话 waiver 已达上限(5) → 不再放行",
+        "零违规或纯硬违规 → 不触发 waiver 语义"
+      ],
+      "recommendation": "保留：验证公开行为/兼容输出或关键规则边界，不能仅因相近名称删除。"
+    },
+    "lines": 122,
+    "reviewedRanges": [
+      [
+        1,
+        122
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/UnifiedValidatorStage3ByteIdentical.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "测试用例及公开行为回归",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-test",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "UnifiedValidator stage-3 re-point is byte-identical (P1.3)",
+        "corpus covers every stage-3 path + a passing base"
+      ],
+      "recommendation": "保留：验证公开行为/兼容输出或关键规则边界，不能仅因相近名称删除。",
+      "verificationLogs": [
+        "knowledge-validator-green.log"
+      ]
+    },
+    "lines": 70,
+    "reviewedRanges": [
+      [
+        1,
+        70
+      ]
+    ],
+    "notes": [
+      "已读完整测试正文；未执行。"
+    ]
+  },
+  {
+    "file": "test/unit/AuditDeadDeprecate.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "rescan audit 的 drift→update、dead→metabolism deprecate 和缺 gateway 降级计数。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "U6 ⑤ audit dead→deprecate",
+        "drifted source refs → submit update(source=metabolism)，并不误走 dead→deprecate",
+        "dead → submit deprecate(source=metabolism→观察窗口)，proposalsCreated 反映真实数",
+        "无 proposalGateway/deps → 降级：proposalsCreated=0，不抛"
+      ]
+    },
+    "lines": 184,
+    "reviewedRanges": [
+      [
+        1,
+        183
+      ]
+    ],
+    "notes": [
+      "保留；fake Gateway 只证明工作流决策/source 映射，观察窗口落库依赖真实 proposal 集成测试，不把此文件称为端到端。"
+    ]
+  },
+  {
+    "file": "test/unit/ConsolidationAdvisor.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "覆盖实质质量、create/merge/reorganize、新增维度、方向和可应用 mergePatch 的确定性建议。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "consolidate-specific-duplicate-cases",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "ConsolidationAdvisor",
+        "create — no related recipes",
+        "should advise create when no related recipes exist",
+        "insufficient — insufficient substance",
+        "should flag candidates with minimal content as insufficient",
+        "should flag candidates without trigger and whenClause as insufficient",
+        "should include coveredBy when related recipes exist",
+        "merge — high overlap with single recipe",
+        "should advise merge when candidate overlaps with existing recipe",
+        "U5 #2 — merge advice carries a non-empty applicable mergePatch",
+        "upgrades the added-dimension label into a StructuredPatch (dontClause)",
+        "reorganize — high overlap with multiple recipes",
+        "should advise merge or reorganize when candidate overlaps with 2+ recipes",
+        "create — moderate overlap but new dimensions",
+        "should allow create when candidate provides new dimensions",
+        "create — low overlap",
+        "should advise create for genuinely different topics",
+        "merge direction analysis",
+        "should suggest merge when candidate adds nothing new",
+        "should allow create when candidate adds new dimensions to partial recipe",
+        "substance scoring",
+        "should pass substance check for well-formed candidates",
+        "should pass substance check with long clauses even without code"
+      ]
+    },
+    "lines": 379,
+    "reviewedRanges": [
+      [
+        1,
+        378
+      ]
+    ],
+    "notes": [
+      "可删除 substance scoring/well-formed 那个测试：与第一条 create/no related 使用完全相同 makeCandidate+空repo，且只断言更弱的非insufficient。reorganize/partial 两条接受多种行动，建议未来固定有效边界fixture，不能当成严格算法契约。"
+    ]
+  },
+  {
+    "file": "test/unit/ContentPatcher.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "旧无fileStore构造的结构化字段/section/append/sourceRefs/非法字段过滤及非结构化建议跳过、快照和repo写入。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "consolidate-specific-duplicate-cases",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "ContentPatcher",
+        "applyProposal — structured JSON patch",
+        "applies coreCode replacement",
+        "applies multiple field changes",
+        "applies content.markdown replacement",
+        "applies content.markdown section replacement",
+        "applies sourceRefs replacement",
+        "applies append action",
+        "applyProposal — unstructured text is skipped (U5 #5)",
+        "does NOT replace markdown with non-JSON natural-language text (retired destructive fallback)",
+        "applyProposal — skip conditions",
+        "skips when recipe not found",
+        "skips when no suggestedChanges in evidence",
+        "skips when suggestedChanges is empty string",
+        "skips when suggestedChanges JSON has empty changes array",
+        "skips when suggestedChanges text is too short",
+        "applyProposal — field whitelist",
+        "skips non-patchable fields",
+        "applyProposal — snapshots",
+        "creates before and after snapshots",
+        "applyProposal — DB persistence",
+        "persists updated recipe to repo"
+      ],
+      "verificationLogs": [
+        "knowledge-evolution-file-first-green-2.log"
+      ]
+    },
+    "lines": 449,
+    "reviewedRanges": [
+      [
+        1,
+        448
+      ]
+    ],
+    "notes": [
+      "可将最后 snapshots + DB persistence 两条的独有 beforeSnapshot字段/update实参断言合到第一条 coreCode replacement；三者调用相同makeProposal。short/long非JSON可参数化。真实source reasoning/file sync由productization覆盖。"
+    ]
+  },
+  {
+    "file": "test/unit/CoverageLedgerAdvisor.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "D2 tier/environment/plan优先级、panorama覆盖/健康/缺口投影，以及三种停止条件与继续时价值排序。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "CoverageLedgerAdvisor — D2 resolvers",
+        "K = S1/M2/L3，maxRounds = S2/M3/L5；env 覆盖 + guard",
+        "CoverageLedgerAdvisor — Panorama rollup",
+        "rolls coverage ledger cells into DimensionRegistry-backed coverage, health radar, and gaps",
+        "keeps empty ledgers and partial coverage deterministic without fabricating recipe counts",
+        "CoverageLedgerAdvisor — 三类停止",
+        "① 收敛：无 blank/thin 格（全 covered + exhausted-with-reason）→ stop converged",
+        "② 收益递减：有空白 + 上一轮 new_recipes(1) < K(2) → stop diminishing-returns",
+        "③ 轮次上限：有空白 + new_recipes(9) ≥ K 但 last_round(3) ≥ maxRounds(3) → stop round-cap",
+        "continue：有空白 + 产出充足 + 未达上限 → 不停，给价值排序 + 建议",
+        "plan 显式 K/maxRounds 优先于 D2[tier]"
+      ]
+    },
+    "lines": 373,
+    "reviewedRanges": [
+      [
+        1,
+        372
+      ]
+    ],
+    "notes": [
+      "保留；fixture虽长但断言输出预算/排序/无伪造counts，不是实现快照。未发现可直接删去而不失独立语义的案例。"
+    ]
+  },
+  {
+    "file": "test/unit/DecayDetector.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "新旧stats外形、authority0-5、cold-start、usage/FP/superseded/source stale信号、grace与cap/lifecycle接线。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "DecayDetector",
+        "should score a healthy recipe with recent usage",
+        "should detect no_recent_usage when lastHitAt > 90d",
+        "should detect no_recent_usage for never-used old recipes",
+        "should detect high_false_positive when rate > 0.4 and triggers >= 10",
+        "should NOT flag high_false_positive with insufficient triggers",
+        "should detect superseded from deprecated_by edge",
+        "should classify score levels correctly",
+        "should set grace period to 15d for severe",
+        "should detect source_ref_stale from recipe_source_refs",
+        "should NOT flag source_ref_stale when no stale refs",
+        "should penalize quality dimension based on staleRatio",
+        "should recover quality when stale ratio drops to zero (self-repair)",
+        "should apply partial penalty for partial staleness",
+        "scanAll emits decay signals for non-healthy recipes",
+        "U4 authority 归一在 0-5 域 (4→0.8, 0→0, 5→1, 缺 key→0.5)",
+        "U4 cold-start：健康新 recipe (lastHitAt=null, createdAt=now, authority=4) 直接走新条目豁免",
+        "U4 scanAll(cap) 把 limit 透传给 findAllByLifecycles；undefined 保持无界",
+        "U4 scanAll 经注入 lifecycle 直接驱动 active→decaying（仅 non-healthy；不依赖信号订阅）"
+      ]
+    },
+    "lines": 406,
+    "reviewedRanges": [
+      [
+        1,
+        405
+      ]
+    ],
+    "notes": [
+      "保留独立衰减策略；部分quality penalty 0/half/all可参数化减少模板。mock healthy ref使用valid而正式active，当前只检查stale比例，不据此扩大状态枚举。"
+    ]
+  },
+  {
+    "file": "test/unit/DriftClassifier.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "漂移纯函数的行移/实变/空范围/换行符，以及真实 Git commit 文件读取和坏路径降级。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "classifyRegionDrift(纯函数)",
+        "line-shift:旧区间的代码块在新文件整块出现在别处 → 给出新区间",
+        "content-change:被引区间的代码本身改了、在新文件找不到原块 → content-change",
+        "unresolved:旧区间越界截空 → 不判定(调用方维持粗粒度 drifted)",
+        "CRLF/LF 归一:仅换行符不同不算内容变(line-shift 命中同块)",
+        "readFileAtCommit(真临时 git 仓)",
+        "读回指定 commit 的文件逐字内容;工作树后续改动不影响历史读取",
+        "commit/path 不存在或非 git 仓 → 一律 null(保守降级)",
+        "形态防御:空 commit/path、绝对路径、路径逃逸 → null(不喂给 git)"
+      ]
+    },
+    "lines": 105,
+    "reviewedRanges": [
+      [
+        1,
+        104
+      ]
+    ],
+    "notes": [
+      "保留；git 历史读取与内存漂移分类不同边界，暂无同输入/同断言冗余。"
+    ]
+  },
+  {
+    "file": "test/unit/KnowledgeService.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "KnowledgeService白名单/legacy生命周期alias/钩子/审计/graph与confidence路由策略的单元seam；内存repo只局部模拟DB。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "KnowledgeService",
+        "create()",
+        "创建条目 — 无 ConfidenceRouter 时默认进入 pending",
+        "创建条目 — ConfidenceRouter auto_approve 时标记 autoApprovable",
+        "创建条目 — ConfidenceRouter reject 时保持 pending 等待人工审核",
+        "创建条目 — ConfidenceRouter pending 时进入人工审核",
+        "创建条目 — 缺少 title 抛出 ValidationError",
+        "创建条目 — 缺少 content 抛出 ValidationError",
+        "创建条目 — SkillHooks block 时抛出 ValidationError",
+        "创建条目 — 同步 relations 到 graph",
+        "创建条目 — 同步 knowledge:UUID relation refs 到 graph",
+        "get()",
+        "获取存在的条目",
+        "获取不存在的条目抛出 NotFoundError",
+        "update()",
+        "更新白名单字段",
+        "persist 返回 null 时 fail-fast — 不写 DB（file-first 防更新静默丢失）",
+        "更新 knowledgeType 联动更新 kind",
+        "无可更新字段抛出 ValidationError",
+        "更新不存在的条目抛出 NotFoundError",
+        "delete()",
+        "删除条目 + 文件 + edges",
+        "删除不存在的条目抛出 NotFoundError",
+        "lifecycle transitions",
+        "submit: pending → pending (no-op, returns entry)",
+        "approve: pending → active (alias for publish)",
+        "autoApprove: pending → pending (no-op)",
+        "reject: pending → deprecated (需要 reason)",
+        "reject: 空 reason 抛出 ValidationError",
+        "publish: pending → active",
+        "deprecate: active → deprecated (需要 reason)",
+        "deprecate: 空 reason 抛出 ValidationError",
+        "reactivate: deprecated → pending",
+        "toDraft: deprecated → pending (alias for reactivate)",
+        "fastTrack: pending → active (alias for publish)",
+        "非法状态转换抛出 ConflictError",
+        "query operations",
+        "list 返回分页结果",
+        "list 传递 filters",
+        "search 返回搜索结果",
+        "getStats 返回统计",
+        "incrementUsage",
+        "增加 adoption 计数",
+        "updateQuality",
+        "无 QualityScorer 时抛出 ValidationError",
+        "有 QualityScorer 时计算并更新",
+        "ConfidenceRouter",
+        "高置信度 → auto_approve",
+        "低置信度 → reject",
+        "中等置信度 → pending",
+        "置信度 = 0 且无 reasoning → pending (不 reject)",
+        "可信来源使用更低阈值",
+        "host-agent 默认可信但仍经过 reasoning 和内容门",
+        "内容不完整 → pending",
+        "内容过短 → pending",
+        "有 QualityScorer 且质量过低 → 降级为 pending",
+        "有 QualityScorer 且质量 OK → auto_approve",
+        "默认配置值",
+        "自定义配置覆盖",
+        "高置信度 auto_approve 返回 gracePeriod",
+        "confidence >= 0.90 使用 24h grace",
+        "confidence 0.85-0.89 非可信来源使用 72h grace",
+        "reject 时 targetState = deprecated",
+        "自定义 grace period 配置"
+      ],
+      "verificationLogs": [
+        "knowledge-service-mutations-green-2.log"
+      ]
+    },
+    "lines": 886,
+    "reviewedRanges": [
+      [
+        1,
+        885
+      ]
+    ],
+    "notes": [
+      "保留公开legacy方法的alias覆盖，勿因实现转发删除；incrementUsage旧测试只检验调用/字段存在，本轮已增真实计数+sync floor。mockFileWriter返回undefined，按旧容忍语义保留，但不能把它当file-first落盘证据。confidence高分grace可把弱defined断言并入24h用例。"
+    ]
+  },
+  {
+    "file": "test/unit/RecipeImpactPlanner.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "Planner deleted/modified/stale/null 分支、候选合并/摘要、rescan 决策和重复 proposal 计数。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": true,
+      "related": [],
+      "declaredCases": [
+        "RecipeImpactPlanner",
+        "should return empty plan for empty diff",
+        "should detect source-deleted when all refs are deleted",
+        "should detect source-deleted-partial when some refs remain active",
+        "should ignore deleted file with no recipe reference",
+        "should detect modified pattern changes for staging recipes",
+        "should ignore modified changes for deprecated recipes",
+        "should return stale-only plan when diff is null",
+        "should merge multiple affected files for same recipe",
+        "should produce correct summary",
+        "rescan impact decisions",
+        "converts modified-pattern candidates to update decisions",
+        "leaves source-missing candidates for Evolution Agent verification",
+        "submits only deterministic impact decisions through the gateway",
+        "treats duplicate deterministic impact proposals as already processed"
+      ],
+      "verificationLogs": [
+        "knowledge-range-refs-green-2.log"
+      ]
+    },
+    "lines": 535,
+    "reviewedRanges": [
+      [
+        1,
+        536
+      ]
+    ],
+    "notes": [
+      "保留；原多文件全删的 partial 断言经父线程按文档语义判定为旧bug并更新，已有单删仍partial保留；真实 range/case/surviving-source floor 新落 productization/repository 测试。"
+    ],
+    "verificationLogs": [
+      "knowledge-query-ownership-format.log"
+    ]
+  },
+  {
+    "file": "test/unit/SourceRefReconcilerSignal.test.ts",
+    "reviewDepth": "manual-code-complete",
+    "role": {
+      "summary": "reconcile stale ratio→quality 信号、无 signalBus 兼容、ProjectScope 清理过期 refs。",
+      "exports": [],
+      "consumers": []
+    },
+    "findings": [],
+    "disposition": "retain-behavior-floor",
+    "tests": {
+      "executed": false,
+      "related": [],
+      "declaredCases": [
+        "SourceRefReconciler SignalBus Integration",
+        "should emit quality signals when stale refs are found",
+        "should NOT emit signals when all refs are active",
+        "should work without signalBus (backward compatible)",
+        "should emit staleRatio as signal value",
+        "does not reinsert ProjectScope refs removed from sanitized reasoning.sources"
+      ]
+    },
+    "lines": 218,
+    "reviewedRanges": [
+      [
+        1,
+        217
+      ]
+    ],
+    "notes": [
+      "保留信号协议断言；最后真实目录 fixture 缺清理是测试卫生改进项，repo mocks 不能替代当前 SQLite/source fingerprint floor。"
+    ]
+  }
+]

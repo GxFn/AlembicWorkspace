@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-v2-agent-same-run-strict-test-receipt-t1",
+  "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+  "taskPackageId": "v2-agent-same-run-strict-test-receipt-p1",
+  "dispatchGroup": "v2-agent-same-run-strict-test-receipt-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-v2-2026-07-31",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "v2-agent-same-run-strict-test-receipt-t1",
+  "status": "completed",
+  "summary": "现有 AgentService→generate-dimension→AgentStageFactoryRegistry→PipelineStrategy 单链已直接返回同 run canonical StrictTestDimensionAgentExecutionReceiptV1；run/authority/selected-cell lineage、实际 G1/G2 stage hashes 与 per-cell fact/analysis/producer/review conservation 均 fail closed。",
+  "changedRepos": [
+    "AlembicAgent"
+  ],
+  "commits": [
+    "077f4f6f08da731a40547c90f085460f434087f1"
+  ],
+  "commitDisposition": "committed",
+  "evidenceRefs": [
+    "wakeflow-ledger/AlembicAgent/recipe-coldstart-production-quality-v2-2026-07-31/v2-agent-same-run-strict-test-receipt-evidence.md",
+    "AlembicAgent/src/agent/production/StrictTestDimensionAgentContract.ts",
+    "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+    "AlembicAgent/test/strict-test-dimension-agent-contract.test.ts",
+    "AlembicAgent/scripts/probe-strict-test-dimension-agent.mjs"
+  ],
+  "verification": [
+    "npm run build:check => passed",
+    "focused strict-test suite => 4 files / 57 tests passed",
+    "npm run probe:strict-test-dimension-agent => passed; 2 model calls; receipt returned; actual stage hashes match",
+    "npm run lint => passed with 21 pre-existing warnings",
+    "all import/public/Core/space-edge/layer/doctrine/naming/provider-neutral/retired-symbol boundaries => passed",
+    "public signatures/imports => 15 exports, 461 bindings; 15 subpaths imported, 11 forbidden rejected",
+    "npm test => 619 passed / 20 failed only in unchanged durable-semantic-review-runtime due missing Core createProjectContextFileRef facade"
+  ],
+  "risks": [
+    "当前 Core facade 缺少 createProjectContextFileRef，导致未修改的 durable-semantic-review-runtime 全量测试 20 个既有失败；本任务无相邻仓库修改授权。",
+    "离线序列化 receipt 仅能做防篡改回放验证；真实执行证明由在线 PipelineStrategy 同 run phases/runtime id/stage hashes 提供。"
+  ],
+  "craftEvidence": [
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-agent-same-run",
+      "red": "初始 acceptance probe 8 failed/19 passed，真实成功执行与 receipt 不连续；旧 probe 以 empty facts 后置合成。",
+      "green": "公开 AgentService 单次 runtime/单次 PipelineStrategy/两次既有 stage 调用直接返回 receipt；runtimeId、authorityHash、selectedCellSetHash 与实际 phases 完全匹配。",
+      "ref": "wakeflow-ledger/AlembicAgent/recipe-coldstart-production-quality-v2-2026-07-31/v2-agent-same-run-strict-test-receipt-evidence.md#v2-agent-same-run"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-agent-cell-conservation",
+      "red": "coherent cross-cell fact assignment 连同 analysis/G2/下游 hashes 重算时旧实现错误返回 success。",
+      "green": "canonicalSubjectRef→PlanCell.scopeId 精确绑定每个 cell 的全部 terminal fact receipts；missing/extra/duplicate/reorder/cross-run/unselected/cross-cell 均 exact-code fail closed。",
+      "ref": "wakeflow-ledger/AlembicAgent/recipe-coldstart-production-quality-v2-2026-07-31/v2-agent-same-run-strict-test-receipt-evidence.md#v2-agent-cell-conservation"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "v2-agent-existing-chain",
+      "red": "旧 probe 在真实模型调用结束后从空 facts 独立合成 receipt，未连接既有 pipeline phases。",
+      "green": "调用计数 runtimeBuild=1、pipelineExecute=1、strict Analyst=1、strict Producer=1、legacy=0；PipelineStrategy 直接消费同 run G1/G2 gate artifacts。",
+      "ref": "wakeflow-ledger/AlembicAgent/recipe-coldstart-production-quality-v2-2026-07-31/v2-agent-same-run-strict-test-receipt-evidence.md#v2-agent-existing-chain"
+    }
+  ],
+  "resultMapping": {
+    "contract": "target-result-envelope-v2",
+    "compatibility": "enforced",
+    "status": "complete",
+    "acceptanceAnchorIds": [
+      "v2-agent-same-run",
+      "v2-agent-cell-conservation",
+      "v2-agent-existing-chain"
+    ],
+    "testPlanIndices": []
+  },
+  "deliveryContext": {
+    "deliveryId": "delivery-v2-agent-same-run-strict-test-receipt-p1__AlembicAgent__v2-agent-same-run-strict-test-receipt-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-agent-same-run-strict-test-receipt-p--9ee9725be515.json",
+    "deliveryRunId": "run-delivery-v2-agent-same-run-strict-test-receipt-p1__AlembicAgent__v2-agent-same-run-strict-test-receipt-t1",
+    "dispatchGroup": "v2-agent-same-run-strict-test-receipt-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-agent-same-run-strict-test-receipt-p--9ee9725be515.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-v2-2026-07-31",
+    "stateRevision": 4,
+    "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+    "taskPackageId": "v2-agent-same-run-strict-test-receipt-p1",
+    "targetTaskId": "v2-agent-same-run-strict-test-receipt-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "v2-agent-same-run-strict-test-receipt-p1",
+    "resultId": "tr-v2-agent-same-run-strict-test-receipt-t1",
+    "createdAt": "2026-07-31T17:11:19.521Z"
+  },
+  "createdAt": "2026-07-31T17:11:19.521Z",
+  "stateRevisionObserved": 4,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

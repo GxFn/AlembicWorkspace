@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p9-agent-scan-created-recipe-id-projection-closure-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+  "dispatchGroup": "p9-agent-scan-created-recipe-id-projection-closure-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "p9-agent-scan-created-recipe-id-projection-closure-t1",
+  "status": "completed",
+  "summary": "AlembicAgent rework1 已完成。逐点接受 controller 裁决：保留上一轮已验证的 knowledge.submit created existing-ID 与真实 RecipeProductionGateway seam，删除生产扫描零 submit 时将 provider JSON recipes 投影为成功结果的兼容旁路。projectScanRunResult 现在在没有有效 created pending/staging envelope 时始终返回 fallback 空 recipes，并以 persistenceOutcome=no-submit-attempt 或 submit-without-created-recipe、projectionAuthority=persisted-knowledge-submit-results-only、knowledgeSubmitCallCount 和 ignoredUnpersistedOutput 明确诊断。新增 runScanAgentTask 入口级零-submit 回归；未创建独立 preview 入口。返工提交 b3c4998de7264094bb32def4c904efcae768d477，父提交为上一轮 725aecae1a2b949a034e660a004d907c267b0a88。",
+  "evidenceRefs": [
+    "AlembicAgent commit b3c4998de7264094bb32def4c904efcae768d477",
+    "AlembicAgent/src/agent/runs/scan/ScanRunProjection.ts",
+    "AlembicAgent/test/scan-run-projection.test.ts",
+    "AlembicAgent/test/scan-run-production-integration.test.ts"
+  ],
+  "verification": [
+    "baseline: npx vitest run test/scan-run-projection.test.ts test/scan-run-production-integration.test.ts test/recipe-production-profile-adapter.test.ts -> 3 files, 31 tests passed; npm run build:check -> passed",
+    "RED: npx vitest run test/scan-run-projection.test.ts -> 2 failures; zero-submit provider JSON produced extracted=1 Recipe, and failed-submit diagnostics lacked persistence reason",
+    "GREEN focused: npx vitest run test/scan-run-projection.test.ts test/scan-run-production-integration.test.ts test/recipe-production-profile-adapter.test.ts -> 3 files, 32 tests passed",
+    "npm run build:check -> passed",
+    "npm run check -> passed; 67 test files and 526 tests passed; import/public API/Core/space/layer/doctrine/naming/provider-neutral/signature/validation-floor/retired-symbol gates passed (only pre-existing non-blocking Biome warnings)",
+    "git diff --cached --check -> passed; final diff confined to 1 production projection file and 2 scan test files; worktree clean after commit"
+  ],
+  "risks": [
+    "The optional onParseError option remains for source compatibility but is no longer invoked for scan Recipe JSON because production projection no longer parses provider output; callers should use persistenceOutcome and runtime diagnostics.",
+    "No preview capability was implemented. Any future preview mode requires a separately authorized typed entrypoint and proven caller; the production recipes contract remains persisted-ID-only."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "execution-plan",
+      "value": "Read rework verdict -> pin baseline -> change zero-submit regression and observe RED -> remove provider JSON projection fallback -> add explicit persistence diagnostics -> add runScanAgentTask entry regression -> focused/full verification -> two-stage self-review."
+    },
+    {
+      "kind": "baseline",
+      "value": "31 focused tests passed and build:check passed at parent 725aecae1a2b949a034e660a004d907c267b0a88 before rework edits."
+    },
+    {
+      "kind": "repro",
+      "ref": "AlembicAgent/test/scan-run-projection.test.ts",
+      "verify": "Before implementation, provider-only JSON with zero knowledge.submit produced extracted=1 and an unpersisted Recipe."
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicAgent/test/scan-run-projection.test.ts",
+      "verify": "Zero submit and rejected/failed submit now return empty recipes with distinct persistenceOutcome diagnostics."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicAgent/test/scan-run-production-integration.test.ts",
+      "verify": "runScanAgentTask entry rejects provider-only Recipe JSON with no tool calls, while the existing real handler/Core gateway test still projects the repository-matching pending ID."
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed."
+    },
+    {
+      "kind": "verification",
+      "value": "npm run check passed: 67 files, 526 tests, all repository boundary and signature gates passed."
+    },
+    {
+      "kind": "change-scope",
+      "value": "3-file Agent-only diff: ScanRunProjection plus its unit and integration tests; no sibling repository, handler/gateway positive path, preview API, or state-machine code changes."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: agreed with controller rework and removed the unauthorized zero-submit success path; retained created existing-ID behavior and added required diagnostics. Stage 2: no high/medium findings. Low compatibility note: optional onParseError remains in the public option shape but no longer parses Recipe JSON; diagnostics are authoritative."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p9-agent-scan-created-recipe-id-projection-closure-rework1-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-agent-scan-created-recipe-id-projection-closure-rework1-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1.json",
+    "deliveryRunId": "run-delivery-p9-agent-scan-created-recipe-id-projection-closure-rework1-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "dispatchGroup": "p9-agent-scan-created-recipe-id-projection-closure-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-agent-scan-created-recipe-id-projection-closure-rework1-p1__AlembicAgent__p9-agent-scan-created-recipe-id-projection-closure-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 65,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+    "targetTaskId": "p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "p9-agent-scan-created-recipe-id-projection-closure-rework1-p1",
+    "resultId": "tr-p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "createdAt": "2026-07-13T21:08:29.139Z"
+  },
+  "createdAt": "2026-07-13T21:08:29.139Z",
+  "stateRevisionObserved": 65,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-p9-agent-scan-created-recipe-id-projection-closure-t1",
+    "dispatchGroup": "p9-agent-scan-created-recipe-id-projection-closure-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p9-agent-scan-created-recipe-id-projection-closure-t1__p9-agent-scan-created-recipe-id-projection-closure-p1__current-r0001.json"
+  }
+}

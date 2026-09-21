@@ -1,0 +1,105 @@
+{
+  "scope": "Read-only classification of pre-existing Main tests exposed by the embedding-boundary full check; no production fixes",
+  "baselines": {
+    "Alembic": "999b60d",
+    "AlembicAgent": "b303b35",
+    "AlembicCore": "516e05a"
+  },
+  "method": {
+    "mainTestSource": "All six inspected test files are byte-identical to Main 999b60d (git diff --quiet exit 0).",
+    "agentSourceProbe": "baseline-agent-contract-probe.mjs loads actual Agent source from git show b303b35, transpiles it in memory, and uses fixture HTTP plus a no-op logger. All 41 loaded Agent modules were byte-identical to the working tree at probe time.",
+    "limits": "The representative baseline-source probe is not a clean-checkout run of the entire Main suite. Isolated current-package reruns reproduce the same failures and the source/provenance comparison identifies the relevant baseline behavior.",
+    "network": "No real model or API calls; no operator credentials read or printed.",
+    "mutations": "Only these authorized ledger artifacts were written during classification. Product and test files were not changed. Test runner uses its existing temporary sandbox."
+  },
+  "artifacts": {
+    "probeSource": "baseline-agent-contract-probe.mjs",
+    "probeResult": "baseline-agent-contract-probe.json",
+    "unitRerun": "baseline-existing-unit-rerun.json",
+    "unitLog": "baseline-existing-unit-rerun.log",
+    "integrationRerun": "baseline-existing-integration-rerun.json",
+    "integrationLog": "baseline-existing-integration-rerun.log"
+  },
+  "probeCommand": {
+    "cwd": "AlembicAgent",
+    "node": ">=22.15 (observed v22.23.2)",
+    "command": "node ../wakeflow-ledger/Alembic/embedding-boundary-2026-09-20/baseline-agent-contract-probe.mjs > ../wakeflow-ledger/Alembic/embedding-boundary-2026-09-20/baseline-agent-contract-probe.json"
+  },
+  "failures": [
+    {
+      "file": "Alembic/test/unit/LlmGatewayTransport.test.ts",
+      "count": 6,
+      "classification": "Baseline fixture incompatible with the already-integrated provider SDK, unrelated to embedding changes",
+      "evidence": [
+        "Fetch stubs at lines 192, 229, 274, 305, 335, 370 return plain objects without iterable Response.headers.",
+        "Agent SDK provider-utils extractResponseHeaders reads [...response.headers]; OpenAI SDK integration is already present in commits 36d34a6/f863c52 before b303b35.",
+        "The baseline-source Gateway probe produces response.headers is not iterable for the legacy fixture and Hello! for a real fixture Response."
+      ],
+      "futureRepairBoundary": "Update controlled HTTP fixtures to the documented Response/SDK shape; do not weaken SDK or embedding production behavior. Not implemented here."
+    },
+    {
+      "file": "Alembic/test/unit/v2/ToolRegistryV2.test.ts",
+      "count": 1,
+      "classification": "Baseline identity assertion contradicts the immutable registry-view contract",
+      "evidence": [
+        "Line 229 requires passedCtx.toolRegistry === TOOL_REGISTRY.",
+        "Agent src/tools/runtime/router.ts:193-199 has injected createToolRegistryView since 94df98f.",
+        "Agent src/tools/runtime/selection.ts:75 returns a new frozen registry while preserving actual handler references.",
+        "Baseline probe: sameIdentity=false, frozen=true, sameHandler=true."
+      ],
+      "futureRepairBoundary": "Assert projected contents, restrictions and handler identity rather than global object identity. Not implemented here."
+    },
+    {
+      "file": "Alembic/test/unit/evolution-gate-evaluator.test.ts",
+      "count": 10,
+      "classification": "Baseline fixtures count requested operations as completed without business receipts",
+      "evidence": [
+        "makeToolCall at lines 18-20 only returns tool/name/args; several legacy knowledge cases also omit an explicit submit/manage action.",
+        "Agent src/agent/evaluation/gateEvaluators.ts:270 uses collectSuccessfulEvolutionIds since 1b394ce.",
+        "Agent src/agent/utils/toolOutcomes.ts:17 requires a result/envelope; lines 75-114 classify confirmed operation outcomes.",
+        "Baseline probe: request-only skip_evolution yields processed=0/retry; result.status=evolution_skipped yields processed=1/pass."
+      ],
+      "futureRepairBoundary": "Model actual accepted operation/action and success receipts; retain failed/unknown-result negative cases. Do not relax the success gate. Not implemented here."
+    },
+    {
+      "file": "Alembic/test/unit/InsightGate.test.ts",
+      "count": 2,
+      "classification": "Baseline expectations omit the record_repair branch",
+      "evidence": [
+        "Lines 74-77 and 197-199 expect analysis_retry for missing note_finding calls.",
+        "Agent src/agent/evaluation/qualityGates.ts:243-250 selects record_repair when depth/breadth/coherence are adequate; these lines blame to 6f04514 and exist in b303b35.",
+        "Baseline probe returns pass=false/action=record_repair with the same missing-note reason."
+      ],
+      "futureRepairBoundary": "Align expectations with record repair versus renewed analysis; do not alter fact/quality thresholds. Not implemented here."
+    },
+    {
+      "file": "Alembic/test/integration/AgentEventBus.test.ts",
+      "count": 1,
+      "classification": "Deterministic baseline request/reply contract mismatch, not a timing flake",
+      "evidence": [
+        "Lines 118-137 deliberately expect request() to resolve from its own published request, with no reply subscriber.",
+        "Agent src/agent/runtime/AgentEventBus.ts:125 excludes the original request event type; the fix is from 1b394ce.",
+        "Agent test/hook-system.test.ts:6-19 already requires no-reply timeout and matching external reply success.",
+        "Baseline probe: no subscriber times out at a shortened 10ms budget; a matching reply subscriber resolves test:reply. Isolated original Main test still times out at its unchanged 5000ms budget."
+      ],
+      "futureRepairBoundary": "Test real reply correlation and separately assert no-reply timeout. Do not restore self-acknowledgement. Not implemented here."
+    },
+    {
+      "file": "Alembic/test/integration/StrategyPolicy.test.ts",
+      "count": 2,
+      "classification": "Baseline request-only knowledge fixtures do not meet persisted-submission requirements",
+      "evidence": [
+        "Lines 335-339 and 349-353 supply only tool/name=knowledge and expect file-reference checks to be bypassed.",
+        "Agent src/agent/policies/QualityGatePolicy.ts:42 uses isPersistedSubmission since 1b394ce.",
+        "Agent src/agent/utils/toolOutcomes.ts:54-71 requires knowledge.submit plus status=created, nonempty id and pending/staging lifecycle.",
+        "Baseline probe: request-only fixture is rejected for 0/3 file refs; a persisted submission receipt passes."
+      ],
+      "futureRepairBoundary": "Supply an actual submit receipt for positive cases and preserve request-only negative coverage. Not implemented here."
+    }
+  ],
+  "observedReruns": {
+    "fourUnitFiles": { "failed": 19, "passed": 49, "exitCode": 1 },
+    "twoIntegrationFiles": { "failed": 3, "passed": 36, "exitCode": 1 }
+  },
+  "conclusion": "The classified 22 failures already follow the specified baseline contracts and do not traverse the new independent embedding assembly. This does not make the full Main check green; unrelated Core IndexingPipeline and database-lock failures are handled separately by the root agent."
+}

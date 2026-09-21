@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i6-agent-plan-analysis-authoring-review-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "目标与基线\n- 仅修改 AlembicAgent；基线必须为 clean HEAD b3c4998de7264094bb32def4c904efcae768d477 / tree bb5cadee07ac78c4134fc18cd120ecb0f5787c41。\n- 本地 @alembic/core 依赖必须实际解析到已验收 Core commit 6b6341f05332a1d15f79c19a0251d41b962b71d1 / tree 84c094ee01052c91df5c9e94a50862dc61652f15；PC-F receipt hash 为 ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6。若不一致先停止回填 blocker。\n- 这是一个 combined package，必须落在现有真实生产入口；禁止拆成类型、prompt、空 adapter 或未消费模块。\n\n必须完成\n1. Plan：扩展现有 PlanAgentRun/PlanIntent/PlanNextAction/PlanCognitionReceipt，生成一次初始计划并最多两次有父链的因果 repair；计划包含 question DAG、anatomy/subject/scale、冻结 capability/query ids、优先级、容量内分配、证据/反证 stop/escalate。移除 strict 路径的 top-N/top20、固定数量、executable selection 与补齐 floor；Plan 不执行工具。\n2. 上下文：通过现有白名单端到端传递 manifest/plan/question/lens/fact-query/population/cluster/hypothesis/revision/evidence。扩展 analysisArtifact/ActiveContext 为结构化语义投影，只引用 Core 不可变 Evidence Ledger/PC-F ids；derivedFindingCount 必须为 0，禁止 post-hoc live reread。\n3. 策略：在现有 PipelineStrategy 中实现 stage/epoch/gate、bounded expansion、fixpoint、disposition review、typed owner/resume；strict 路径禁止 skipOnFail、degrade-to-success 和未经登记的探索/counterquery。\n4. Analyst：真实消费多尺度 population 与 evidence，拥有 cluster membership、归纳/反证/窄化/淘汰 disposition；保留 variants/outliers；提出 exploration/counterquery 时必须先经已验证 port 登记，再允许后续执行；不得发明事实。\n5. Producer：只消费已接受且 survived/narrowed 的 hypothesis，输出 typed 0/1/N expression set；0 结果必须有 investigated-empty disposition。Producer 只提案，不得 fact-query、submit、persist、review 或直接调用任何知识写入工具；同一对象 repair 深度最多 2，第三次明确拒绝。\n6. 独立评审：把可复用 mining judge 逻辑放到生产模块，由 eval script 调用，而不是脚本私有实现；实现 IndependentValueReviewer 与 InvestigatedEmptyReviewer，检查完整 authored projection、引用有效性、漂移、校准、价值与空结果 rubric，且与 Producer 职责隔离。\n7. 全链去 filler/floor：覆盖实际 analyst/producer/exploration/nudge/scan/generate strict 路径；旧行为仅可留在明确的 legacy/non-strict 兼容路径，不能影响本需求链。\n8. 接线与兼容：新增对象必须有真实调用者、输入输出、状态变化、失败路径和导出；保留既有 V1/public compatibility，禁止第二套 orchestrator/store/graph。\n\n验证与证据\n- 先写/更新针对真实入口的测试，再实现；至少覆盖正常链、0/1/N、多尺度/outlier、反证窄化、enrolled counterquery、fixpoint、两次 repair、第三次拒绝、漂移引用、越权工具、strict skip/degrade、filler/floor 与 legacy compatibility。\n- 跑目标测试、npm run build、npm run check、完整 npm test。\n- 使用仓库已有确定性 frozen fixture/mock provider 跑 AlembicWorkspace 与 BiliDili 双项目 golden、mining eval 和 judge calibration；记录 provider/model/config/golden hashes、命令、计数与报告路径。不得读取真实 API key 或联网。\n- 回填真实 runtime JSON/receipt 样例，证明 Plan→Analyst→Producer→Independent Reviewer 的链路与 Core contract 消费；给出 commit/parent/tree、diff、clean 状态和两阶段自审。\n\n禁止\n- 不改 AlembicCore、Alembic、AlembicPlugin、Dashboard、Test、Design、Wakeflow 或 controller state。\n- 不实现 Main 的队列/编排、数据库/日志/公有 CAS、Recipe 持久化、MCP serving、真实 LLM/API 调用。\n- 不以类型存在、mock-only 未接线、静态 fixture、测试数量或分数替代生产链完成；不得声称整个冷启动需求完成。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §18.2, §§10.7, 11.1-11.6; Design/docs/current/recipe-coldstart-production-quality-original-plan-2026-07-15.md I3-I6; accepted Core event evt-20260716055714-0072",
+  "designIntent": "在 AlembicAgent 现有 PlanAgentRun、PipelineStrategy、Analyst、Producer 与 mining judge 生产入口上扩展统一的计划、语义分析、0/1/N 表达和独立价值评审链路；复用 Core 的 canonical PC-F/plan/receipt/evidence contracts，保留既有兼容面，不新建旁路编排器或存储。",
+  "evidenceContract": {
+    "version": "1",
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "单一 AlembicAgent 提交；回填 commit/parent/tree、changed files 与 clean worktree。"
+      },
+      {
+        "kind": "runtime-report",
+        "verify": "展示真实 Plan→Analyst→Producer→Independent Reviewer 调用链、状态/receipt 演进及 Core contract 的实际消费，不接受仅类型或 prompt 证据。"
+      },
+      {
+        "kind": "tests",
+        "verify": "目标测试、npm run check、完整 npm test 均通过并给出命令与计数。"
+      },
+      {
+        "kind": "negative-tests",
+        "verify": "证明 strict 模式拒绝 skip/degrade、未登记 counterquery、第三次 repair、漂移引用、越权 Producer 工具和 filler/floor。"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "证明既有 V1/legacy public surface 在非 strict 路径保持兼容，且没有修改 Core/Main/Plugin/Dashboard/Test/Wakeflow。"
+      },
+      {
+        "kind": "evaluation",
+        "verify": "用确定性 frozen fixture/mock provider 跑双项目 golden 与 judge calibration，给出 provider/model/config/golden hashes 和报告；不使用真实 API key/network。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "execution-plan"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "two-stage-self-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T05:59:56.566Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i6-agent-plan-analysis-authoring-review-t1",
+      "taskPackageId": "i3-i6-agent-plan-analysis-authoring-review-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "在 AlembicAgent 内完成一个不可拆分的真实生产包：扩展现有 PlanAgentRun、上下文投影、PipelineStrategy、Analyst、Producer 与独立 reviewer/eval，使 Core 已验收的 PC-F/plan/evidence contracts 能被后续 Main 编排真实消费。",
+      "status": "pending",
+      "createdAt": "2026-07-16T05:59:56.566Z"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Alembic 单仓最小 rework，父提交 f281f8ca196d7381554c7f314a823f58ce0767d9。保持已确认的 authority→lease→V2 header→authenticated graceful quiesce→post-quiesce receipt→snapshot/restore 时序和现有 daemon/HTTP/journal/snapshot 平台不变，只闭合 fresh-process 幂等恢复：一是 receipt 已持久化但 QUIESCED_OBSERVED 尚未写入时，新进程必须补齐同一 hash-bound journal 事件后才能进入 SNAPSHOT_COPY_STARTED；二是 not-running progress 已持久化但 daemon.json/daemon.pid 尚未删完时，新进程必须按精确控制文件策略幂等补删、sync、复验，再封印 receipt。为 header 前、request-unaccepted、accepted-draining、old-PID-exited/receipt-missing、receipt-written/event-missing、snapshot/probe、reset/quarantine、restore 各阶段加入可复现的进程重启/fault matrix，证明同一 request/hash/receipt/snapshot authority 延续、未知 delta/checkpoint failure 仍 fail closed、无 SIGKILL 后继续、无 stale control identity。普通非 strict daemon 语义不变；不改 Core/Agent/Plugin/Dashboard；不创建、修改、准备或派发 Test。提交一个新的干净 Alembic commit并返回逐阶段原始运行证据。",
+  "status": "pending",
+  "sourceRef": "controller revision 160 rework decision; i8r-alembic-main-two-stage-quiesced-observation-redesign2-p1; Design requirement §§2.3/8/17/18.3",
+  "designIntent": "沿用现有外部 authority/lease、V2 journal、daemon strict-quiesce 和 whole-root snapshot；只把已落盘 receipt/control-removal 与 journal/progress 的恢复动作做成可重放。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "fresh-process-stage-matrix-artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-17T02:05:29.230Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1",
+      "taskPackageId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-p1",
+      "targetWindow": "Alembic",
+      "summary": "修复 strict 两阶段链路的两个已证实 crash-resume 断点，并用完整 fresh-process fault matrix 证明恢复幂等；Test 保持暂停。",
+      "status": "pending",
+      "createdAt": "2026-07-17T02:05:29.230Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

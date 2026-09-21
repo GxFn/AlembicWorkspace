@@ -1,0 +1,507 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "recipe-coldstart-production-quality-v2-2026-07-31",
+  "title": "Recipe 冷启动生产质量 V2：从 AlembicAgent 同 run strict-test 回执链继续",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "controllerWindow": "AlembicWorkspace",
+  "testDecision": "Required but paused. 当前不创建、不派发 Test；只有全部 required non-Test 目标 accepted、exact artifacts 经 Controller 验证，且用户明确启动 MR-ALEMBIC / SP-BILIDILI Test 后，才可执行真实场景 Test。strict-test 通过不得冒充 production finalized。",
+  "state": "archived",
+  "stateReason": "Archive the user-rejected independent strict-test-dimension demand after honest cancellation, preserve its audit history, and release the mainline lane for the explicitly authorized removal demand.",
+  "revision": 34,
+  "activeStageId": null,
+  "updatedAt": "2026-08-03T14:43:24.154Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "v2-agent-same-run-strict-test-receipt-p1",
+      "summary": "修复 AlembicAgent 真实成功管线与 canonical execution receipt 的断裂，保留现有主链，不新增第二条 Agent pipeline。",
+      "status": "accepted",
+      "sourceRef": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#v2-entry-scope",
+      "contextVersion": 1,
+      "workType": "implementation",
+      "objective": "把现有 AgentService/PipelineStrategy 的真实 strict-test 自动选维度成功执行，直接连接为一个由实际 selected-cell stage/gate 输出生成的 canonical StrictTestDimensionAgentExecutionReceiptV1，并对 cross-run 或 cell-set 偏差 fail closed。",
+      "contextSummary": [
+        "已接受的 AlembicCore automatic-selection authority 基线为 0815eb24944ea0ab3d4f4e2390205fbfe35f59f0；AlembicAgent 待修基线为 7dfb4bada72d78a5bc9e65cafa54574cb36ae698。",
+        "Controller 已证明当前 runtime probe 先完成真实两次模型调用，再从空 facts 单独合成失败 receipt；成功执行对象与返回 receipt 没有同 run 连续性。",
+        "必须复用 AgentService → generate-dimension → AgentStageFactoryRegistry → PipelineStrategy；测试模式自动选择适用维度，不要求用户手选或确认。"
+      ],
+      "requirementRefs": [
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#v2-entry-scope",
+          "role": "goal",
+          "label": "V2 首包与自动选择权威"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#completion-definition",
+          "role": "completion",
+          "label": "V2 完成定义"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#test-boundary",
+          "role": "constraint",
+          "label": "Test 暂停边界"
+        },
+        {
+          "ref": "Design/docs/current/recipe-coldstart-strict-test-profile-supplement-requirement-design-2026-07-30.md#8-strict-test-execution-chain",
+          "role": "design",
+          "label": "复用 strict 执行链"
+        },
+        {
+          "ref": "Design/docs/current/recipe-coldstart-strict-test-profile-supplement-requirement-design-2026-07-30.md#12-acceptance-criteria",
+          "role": "validation",
+          "label": "strict-test 验收标准"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/i3-i10-agent-strict-test-automatic-selection-integration-controller-review-rework1.md#controller-acceptance",
+          "role": "evidence",
+          "label": "已验证的链路断裂"
+        }
+      ],
+      "boundaries": {
+        "inScope": [
+          "现有 AgentService/PipelineStrategy 真实结果返回路径",
+          "canonical receipt builder/validator 与 same-run、authority、selected-cell lineage",
+          "针对真实主链的聚焦单测、负向测试、runtime probe 和可复核证据"
+        ],
+        "outOfScope": [
+          "Alembic Main、Dashboard、DaemonJob、Plugin、持久化、serving、生产 UI 或 public CAS",
+          "Test 派发、下游实现包或 legacy bootstrap"
+        ],
+        "forbidden": [
+          "新增第二条 Agent pipeline，或在真实成功运行后再以空 facts / 独立运行后置合成 synthetic receipt",
+          "把用户手选/确认维度或 legacy bootstrap 重新引入测试模式",
+          "接受 cross-run、额外、缺失、重复、重排或未选择 cell 的终态结果"
+        ]
+      },
+      "completionExpectations": [
+        "真实 AgentService/PipelineStrategy 成功运行直接返回 canonical receipt，runId、authorityHash、selectedCellSetHash 与该次实际执行完全一致。",
+        "每个 selected eligible cell 恰有一个真实 terminal fact/analysis/producer/review disposition，额外、缺失、重复、重排、cross-run 或未选择 cell 均 fail closed。",
+        "聚焦测试与单链 runtime probe 证明成功路径和上述负向路径；相关 build/check 通过。",
+        "AlembicAgent 形成干净提交并返回 commit、命令输出、runtime JSON/日志摘要及关键文件证据。"
+      ],
+      "dependsOnTaskIds": [],
+      "commitExpectation": "commit",
+      "designIntent": "在现有 AgentService/PipelineStrategy 成功结果对象上建立唯一 canonical execution result/receipt builder；沿用已有 pipeline 与 Core automatic-selection authority，不建立并行实现。",
+      "acceptanceAnchors": [
+        {
+          "id": "v2-agent-same-run",
+          "claim": "真实成功执行与 canonical receipt 必须是同一次运行、同一 automatic-selection authority 和同一 selected-cell set。",
+          "probe": "先用 RED probe 证明当前成功执行与 receipt 不连续；修复后运行真实 AgentService/PipelineStrategy probe，并逐字段比对 runId、authorityHash、selectedCellSetHash 与实际 stage/gate 输出。",
+          "expected": "同一次真实成功运行直接返回 matching canonical receipt；不存在第二次运行或后置 synthetic receipt。"
+        },
+        {
+          "id": "v2-agent-cell-conservation",
+          "claim": "selected-cell slice 必须守恒且每个 cell 只有一个终态。",
+          "probe": "分别注入额外、缺失、重复、重排、cross-run 和未选择 cell 的结果，验证在成功终态前拒绝。",
+          "expected": "所有偏差均 fail closed；仅 exact selected-cell set 的真实终态结果可进入 canonical receipt。"
+        },
+        {
+          "id": "v2-agent-existing-chain",
+          "claim": "修复必须复用现有 AgentService → generate-dimension → AgentStageFactoryRegistry → PipelineStrategy 主链。",
+          "probe": "用调用计数/trace 运行公开 AgentService 入口，证明一条既有主链完成自动选择后的实际 stage/gate 执行并生成 receipt。",
+          "expected": "只执行一条现有 Agent pipeline；测试模式无需用户确认，也不经过 legacy bootstrap。"
+        }
+      ],
+      "createdAt": "2026-07-31T16:23:43.317Z"
+    },
+    {
+      "taskPackageId": "v2-alembic-main-strict-test-private-pipeline-p1",
+      "summary": "在 Alembic Main 建立唯一显式 strict-test-dimension 后端，复用现有严格主链并保持 production/public 非变更。",
+      "status": "accepted",
+      "sourceRef": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/v2-alembic-main-strict-test-private-pipeline-controller-contract.md#authority-and-outcome",
+      "contextVersion": 1,
+      "workType": "implementation",
+      "objective": "让 Alembic Main 的独立 strict-test-dimension API 从真实全量 preflight 自动选择一个适用维度，将已接受的 AlembicAgent same-run canonical receipt 直接消费进现有私有 corpus/ref/index/G4/tool-neutral serving 链，并持久生成 Core canonical terminal/report；全过程不得经过 legacy bootstrap/DaemonJob 或修改 production/public 状态。",
+      "contextSummary": [
+        "Controller 已接受 AlembicAgent 8688311c3970054c68a74b0ce30d8f3db4f15be6：真实 AgentService/PipelineStrategy 单链可在同一 run 直接返回 exact authority/selected-cell canonical receipt。",
+        "Alembic Main c95dccb87bdc5a8412792f97917aed6992024b7e 当前没有任何 strict-test backend consumer；现有 strict production 固定获取发布锁、reset 并 public CAS，不能直接作为测试模式。",
+        "本包是当前 demand 唯一 Alembic 合并包：自动选择替代旧手工确认；Dashboard、Plugin、Test、DaemonJob 重构和前端切换保持后续/范围外。"
+      ],
+      "requirementRefs": [
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/v2-alembic-main-strict-test-private-pipeline-controller-contract.md#authority-and-outcome",
+          "role": "goal",
+          "label": "Main strict-test observable outcome"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/v2-alembic-main-strict-test-private-pipeline-controller-contract.md#completion-definition",
+          "role": "completion",
+          "label": "Main package completion"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/legacy-flow-closure-and-v2-restart-decision.md#test-boundary",
+          "role": "constraint",
+          "label": "Real Test remains paused"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/i3-i10-strict-test-automatic-selection-user-decision-2026-07-30.md#correct-user-scenario",
+          "role": "design",
+          "label": "Automatic selection overrides manual confirmation"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/v2-alembic-main-strict-test-private-pipeline-controller-contract.md#required-redgreen-probes",
+          "role": "validation",
+          "label": "Five controller-authored probes"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/v2-agent-same-run-strict-test-receipt-controller-review-rework2.md#controller-acceptance",
+          "role": "evidence",
+          "label": "Accepted upstream Agent producer"
+        }
+      ],
+      "boundaries": {
+        "inScope": [
+          "Alembic Main 独立 exact strict-test-dimension request/API、durable status/report 与唯一 orchestrator",
+          "真实全量 Main preflight、Core automatic selection/projection、现有 AgentService 单链 same-run receipt 消费",
+          "run-scoped 私有 workspace、selected-cell corpus/ref/index/G4/tool-neutral serving、Core terminal/audit report 与 production non-mutation"
+        ],
+        "outOfScope": [
+          "AlembicCore、AlembicAgent、AlembicDashboard、AlembicPlugin、Test 或 BiliDili 源码修改",
+          "Dashboard 接线、DaemonJob 重构、legacy bootstrap UI 和 production UI 切换",
+          "真实 BiliDili Test、public MCP 暴露或完整 26 维 production finalization"
+        ],
+        "forbidden": [
+          "调用 legacy bootstrap/DaemonJob、生产 fullReset/setup/publication lock/public CAS 或修改 production root/official Recipe/public route",
+          "重新引入用户手选/确认、环境 testMode、legacy dimensions、第二条 Agent pipeline 或后置 synthetic receipt",
+          "用 Core 单测、Agent 自测、手写 AgentService.run fixture、Dashboard 状态或静态报告冒充 Main 全链证据"
+        ]
+      },
+      "completionExpectations": [
+        "独立 /api/v1/strict-test-dimension preflight/start/status/report 从真实 Main 入口可达；exact parser 与 production/legacy 双向隔离，测试维度由 backend recommendation 自动选择。",
+        "一次真实 AgentService → generate-dimension → PipelineStrategy 运行返回并被 Main 直接验证/消费 same-run canonical receipt；所有 full-universe 与 selected-cell lineage 守恒，任何 receipt/authority/cell/stage drift 在私有写入前 fail closed。",
+        "selected cells 经现有严格 private corpus、independent review、refs、sparse/vector、seal、G4、final coverage 和 tool-neutral serving validation，durable reopen 得到 Core canonical completed/failed terminal 与 audit report。",
+        "私有 root 物理隔离且 absent/valid-resume；production DB/Recipe/ref/index/session/config/public bundle/route before-after 等价，reset/publication/CAS 调用计数为零。",
+        "五个 acceptance anchors 的 RED/GREEN、真实 Main probe、聚焦/回归/full check 均可复核；Alembic 形成干净提交并回填 commit/parent/tree、命令输出、runtime JSON 与 clean-worktree 证据。"
+      ],
+      "dependsOnTaskIds": [
+        "v2-agent-same-run-strict-test-receipt-t1"
+      ],
+      "commitExpectation": "commit",
+      "designIntent": "新增一个 Main-owned strict-test orchestrator 和独立 exact HTTP surface；参数化复用现有 strict analysis/private corpus/finalization 的真实部件，在 Agent/私有 resolver/无-public-route 三个边界接入 accepted Core+Agent authority。",
+      "acceptanceAnchors": [
+        {
+          "id": "v2-main-explicit-profile-entry",
+          "claim": "strict-test 只能由独立 exact Main API 显式进入，不能由 production、legacy bootstrap、环境 testMode 或调用者维度/确认激活。",
+          "probe": "对 preflight/start/status/report 跑公开 HTTP/服务测试，并分别注入 strictProduction 字段、legacy bootstrap/env testMode、dimension、confirmation 与混合 profile。",
+          "expected": "只有独立 strict-test-dimension contract 可进入；所有模糊/legacy 激活 fail closed，production V1 行为不变且不创建 bootstrap DaemonJob。"
+        },
+        {
+          "id": "v2-main-automatic-selection-authority",
+          "claim": "Main 必须冻结真实完整 26 维权威并自动选择 backend recommendation 的唯一适用维度及其全部 eligible cells。",
+          "probe": "由真实 Main facts/compiled Plan 构造 preflight→automatic selection→projection，核对 26 个 dimension states/full hashes；注入 unknown、empty、stale、binding/runtime drift。",
+          "expected": "无需用户确认即可选择一个非空维度并守恒 full authority；无效权威在第一次 Agent 模型调用前失败。"
+        },
+        {
+          "id": "v2-main-same-run-agent-receipt",
+          "claim": "Main 只消费同一次现有真实 Agent pipeline 直接返回的 completed canonical receipt。",
+          "probe": "用公开真实 AgentService 与可控 provider 运行一次并逐字段比对 Main authority/stage evidence；删除或篡改 receipt、run、cell set、stage hashes 并统计私有写入。",
+          "expected": "exact same-run receipt 才可进入持久化；missing/partial/synthetic/cross-run/extra/missing/reordered/rehashed 结果均零私有持久化。"
+        },
+        {
+          "id": "v2-main-private-chain-nonmutation",
+          "claim": "selected-cell 后续必须走真实私有 corpus/ref/index/G4/serving 链且 production/public 完全不变。",
+          "probe": "在 absent-before 非别名 private root 运行全链，比较生产 DB/WAL/SHM、Recipe/ref/index/session/config/bundle/route before-after，spy reset/publication/CAS，并注入各阶段故障。",
+          "expected": "写入仅在私有 root；生产/public hashes 等价且 reset/publication/CAS 调用为零；任一阶段失败不能产生 completed terminal。"
+        },
+        {
+          "id": "v2-main-durable-terminal-report",
+          "claim": "成功/失败必须持久生成并可重启回读 Core canonical terminal 与 audit report，而非进程内或 UI 状态。",
+          "probe": "分别执行成功和代表性失败，重新打开 status/report，验证 phase/authority/hash/full-versus-selected lineage 与 failure stage。",
+          "expected": "成功为 STRICT_TEST_COMPLETED_PRIVATE，失败为准确 STRICT_TEST_FAILED；两者均 productionFinalized=false、publicRouteChanged=false 且无 legacy fallback。"
+        }
+      ],
+      "createdAt": "2026-08-01T09:40:31.549Z"
+    },
+    {
+      "taskPackageId": "v2-dashboard-strict-test-entry-consumer-p1",
+      "summary": "把 Candidates 页面冷启动入口从 legacy bootstrap 切换到 Main strict-test-dimension 的 preflight→自动选维→private run/status/report 真链路。",
+      "status": "needs-rework",
+      "sourceRef": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/dashboard-strict-test-entry-trigger-decision.md#user-goal",
+      "contextVersion": 1,
+      "workType": "implementation",
+      "objective": "让用户在 AlembicDashboard Candidates 页面点击冷启动或再次运行 strict 测试时，唯一调用已接受 Alembic Main strict-test-dimension API，自动选择一个适用维度，持续展示同 run 的权威 phase/terminal/report，并且不创建 DaemonJob、不调用 legacy bootstrap、不宣称 production finalized。",
+      "contextSummary": [
+        "Controller 已接受 Alembic Main commit b50bff157448b4986064ddbe20d8d2ad9305c738；它提供 /api/v1/strict-test-dimension/preflight、/runs、/runs/{runId}、/runs/{runId}/report，精确矩阵分别为 200/400/422、202/400/404/422、200/400/404/422、200/400/404/409/422。",
+        "Dashboard 当前 App.handleColdStart 仍调用 api.bootstrap()→POST /api/v1/modules/bootstrap，并把 legacy bootstrapSession 接到 Socket/DaemonJob；Candidates 的冷启动和“清理重建”共用该 handler。",
+        "Dashboard 当前 generated api-types copy 已被 npm run check:api-types-drift 证明落后于 Main canonical：Dashboard sha256 5545fc9c...，Main canonical sha256 8dc8d0da...；必须机械同步 artifact+pin 后再消费生成 types/validators。",
+        "V2 strict-test 已由后端自动选择适用维度，不需要用户选择或确认；成功终点严格为 STRICT_TEST_COMPLETED_PRIVATE，productionFinalized=false 且 publicRouteChanged=false。",
+        "Dashboard runtime/project-info 已向 App 提供 provider-issued data.projectRoot；浏览器不得猜 Main Node path dialect，只允许用这个原始非空值注入 generated canonical-path format validator。"
+      ],
+      "requirementRefs": [
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/dashboard-strict-test-entry-trigger-decision.md#user-goal",
+          "role": "goal",
+          "label": "用户触发的 Dashboard 下一消费者目标"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/dashboard-strict-test-entry-trigger-decision.md#controller-implementation-decision",
+          "role": "design",
+          "label": "Controller 精确实现决策"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/dashboard-strict-test-entry-trigger-decision.md#completion-and-evidence",
+          "role": "completion",
+          "label": "Dashboard 完成与证据定义"
+        },
+        {
+          "ref": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-v2-2026-07-31/v2-alembic-main-strict-test-private-pipeline-controller-acceptance-rework4.md#controller-acceptance",
+          "role": "evidence",
+          "label": "已接受 Main strict-test HTTP/consumer authority"
+        },
+        {
+          "ref": "Design/docs/current/recipe-coldstart-strict-test-profile-supplement-requirement-design-2026-07-30.md#10-api-and-dashboard-contract",
+          "role": "design",
+          "label": "Dashboard 只控制和展示真实后端合同"
+        },
+        {
+          "ref": "Design/docs/current/recipe-coldstart-strict-test-profile-supplement-requirement-design-2026-07-30.md#14-non-goals-and-forbidden-conclusions",
+          "role": "constraint",
+          "label": "非破坏、私有、无 legacy fallback"
+        },
+        {
+          "ref": "Design/docs/current/recipe-coldstart-production-quality-original-plan-2026-07-15.md#final-completion-definition",
+          "role": "validation",
+          "label": "原始最终完成定义边界"
+        }
+      ],
+      "boundaries": {
+        "inScope": [
+          "机械同步 Alembic/lib/generated/dashboard-api-types.ts 到 Dashboard src/generated/api-types.ts，并更新 api-types.sha256；生成文件禁止手改。",
+          "新增 Dashboard strict-test API family 并由 src/api/index.ts 聚合；使用 generated request/response operation validators 覆盖完整实际 status matrix。",
+          "以 provider-issued projectRoot 原值作为 canonical-path format authority；固定产品级 demandKey=dashboard-strict-test-dimension，使用 crypto.randomUUID 生成符合 contract 的唯一 runId。",
+          "实现 preflight→canAutoSelect gate→start，并在长运行 start 期间并行轮询同 run status；terminal 后读取 report；project-scoped sessionStorage 支持刷新后同 authority 幂等恢复。",
+          "Candidates 页面展示 preflight/full universe/recommendation、自动选中维度、phase、terminal、失败、report 与非生产声明；冷启动和原清理重建入口都进入同一 strict-test handler并采用非破坏文案。",
+          "聚焦 contract/adapter/hook/view-model/UI tests、npm run check、真实 Main 浏览器网络/截图证据和 Dashboard 本仓 commit/backfill。"
+        ],
+        "outOfScope": [
+          "Alembic、AlembicCore、AlembicAgent、AlembicPlugin 产品代码或生成器修改。",
+          "JobsView 通用 DaemonJob bootstrap、rescan、DaemonJob 过度设计或后续架构整改。",
+          "production strict 冷启动、正式 root reset/cleanup、Recipe publication、public CAS/active route 或完整 26 维执行。",
+          "Test task/card/dispatch、真实 BiliDili Test 窗口执行或全需求最终验收。"
+        ],
+        "forbidden": [
+          "Candidates 冷启动链路调用或回退 /api/v1/modules/bootstrap、/api/v1/jobs/bootstrap、ALEMBIC_TEST_MODE、Plugin testMode/briefing 或创建/消费 DaemonJob。",
+          "让用户选择/确认维度，或在 request body 中发送 dimension、confirmation、testMode、profile、privateRoot 等 Main exact contract 禁止字段。",
+          "在 UI 猜测/补写 backend phase、terminal、report、productionFinalized/publicRouteChanged，或把候选数量/前端进度/通知当作 pass。",
+          "手改生成 API types、直接 import sibling Alembic source、增加 @alembic runtime dependency，或绕过 generated request/response validator。",
+          "把 mock/fixture 当作真实 Main 连通性证据，暴露 private checkpoint/executionContext/path/provider secret，或在失败时静默启动第二 run。"
+        ]
+      },
+      "completionExpectations": [
+        "Candidates 两类可见冷启动入口均只进入一个 strict-test handler；静态/运行时探针和真实浏览器网络记录证明调用顺序为 preflight→runs/status→report，且 legacy bootstrap/DaemonJob 调用计数为零。",
+        "Dashboard generated artifact 与 Main b50bff1 canonical byte-identical、SHA-256 pin 更新，generated drift gate 与全部 npm run check 通过；新 API adapter 对每个请求和 200/202/400/404/409/422 实际响应 fail-closed 验证。",
+        "UI 自动执行后端推荐维度，没有选择器/确认门；缺失 projectRoot、canAutoSelect=false、schema drift、ordinary problem、durable 422 failure 和 report-not-ready 都显示安全可诊断状态且不 fallback。",
+        "长运行 start 与 status polling 使用同 demandKey/runId/preflightHash；重复点击被抑制，刷新页面从 project-scoped 最小 authority 恢复同 run，terminal 后读取/展示 canonical report，不生成第二 run。",
+        "页面清楚展示 full universe、自动选中维度、phase、terminal/failure/evidence refs/report，并固定呈现 private-only、productionFinalized=false、publicRouteChanged=false；原“清理重建”改成非破坏 strict-test 重跑语义。",
+        "AlembicDashboard 提交本仓变更并回填 commit、RED/GREEN 映射、npm run check 输出、真实 Main 浏览器请求摘要与终态截图；明确 Jobs/DaemonJob、production/public 与 Test 均未变。"
+      ],
+      "dependsOnTaskIds": [
+        "v2-alembic-main-strict-test-private-pipeline-t1"
+      ],
+      "commitExpectation": "commit",
+      "designIntent": "在既有 api 单一 normalizer seam 下新增 strict-test route family，并用一个 project-scoped hook/view-model 串联 exact generated contract、长运行 start、并行 status polling、刷新恢复和 Candidates 权威状态面板；只替换 Candidates 冷启动 handler，不改 Jobs/rescan。",
+      "acceptanceAnchors": [
+        {
+          "id": "v2-dashboard-strict-entry-no-legacy",
+          "claim": "Candidates 冷启动和再次运行入口只触发 Main strict-test API，不触发 legacy bootstrap 或 DaemonJob。",
+          "probe": "在点击两种 Candidates 入口的 adapter/UI test 与真实浏览器网络记录中统计 endpoint 和 job 创建；搜索 handler 调用图。",
+          "expected": "观察到 preflight→runs/status→report，同一次点击对 /modules/bootstrap、/jobs/bootstrap、bootstrap socket init 与 DaemonJob 创建均为 0。"
+        },
+        {
+          "id": "v2-dashboard-generated-exact-contract",
+          "claim": "Dashboard 机械消费已接受 Main exact request/response contract 并对 drift fail closed。",
+          "probe": "先让旧 artifact drift RED，再同步 canonical+pin；对四 operation 的 request keys 和完整 200/202/400/404/409/422 response matrix 运行 generated validator contract tests。",
+          "expected": "artifact byte/hash 与 Main b50bff1 相同；合法矩阵全过，extra/missing keys、错误 status/schema、非 provider-issued projectRoot 全拒绝。"
+        },
+        {
+          "id": "v2-dashboard-automatic-selection",
+          "claim": "测试模式自动选择后端推荐的一个适用维度，Dashboard 不建立人工选择或确认权威。",
+          "probe": "点击冷启动并捕获 preflight/start payload 与 UI；用 canAutoSelect=false 和 recommendation/selection mismatch fixtures 做负向测试。",
+          "expected": "preflight body 精确为 demandKey/projectRoot/runId，start body 精确为 demandKey/preflightHash/runId；无 dimension/confirmation 字段或选择器，选中维度只来自 status.automaticSelection。"
+        },
+        {
+          "id": "v2-dashboard-same-run-durable-ui",
+          "claim": "长运行、失败和刷新恢复始终绑定同一个 run authority，并从 durable status/report 显示终态。",
+          "probe": "以可控延迟模拟 start，同时轮询 status；刷新/重挂 hook，覆盖 success、422 durable failure、404、409 report-not-ready、重复点击。",
+          "expected": "同 demandKey/runId/preflightHash 保持不变，非 terminal 不建第二 run，terminal 后恰好读取同 run report；错误可诊断且无 fallback。"
+        },
+        {
+          "id": "v2-dashboard-private-semantics",
+          "claim": "UI 不把 strict-test 私有完成表达为 production 完成或 destructive rebuild。",
+          "probe": "渲染成功/失败 report 并检查文案、字段与旧清理重建入口；浏览器截图复核。",
+          "expected": "页面明确 private-only、productionFinalized=false、publicRouteChanged=false，展示未执行维度/禁止推断；重跑入口无清理/删除语义。"
+        }
+      ],
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "test",
+            "verify": "RED/GREEN contract, adapter, hook/view-model and UI tests plus full npm run check."
+          },
+          {
+            "kind": "runtime",
+            "verify": "Real Alembic Main HTTP/browser request sequence with zero legacy endpoints and durable terminal/report readback."
+          },
+          {
+            "kind": "screenshot",
+            "verify": "Candidates page preflight/running and terminal private report states, including non-production declaration."
+          }
+        ],
+        "advisory": []
+      },
+      "createdAt": "2026-08-03T12:52:25.163Z"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "v2-agent-same-run-strict-test-receipt-t1",
+      "taskPackageId": "v2-agent-same-run-strict-test-receipt-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "修复 AlembicAgent 真实成功管线与 canonical execution receipt 的断裂，保留现有主链，不新增第二条 Agent pipeline。",
+      "status": "accepted",
+      "createdAt": "2026-07-31T16:23:43.317Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 3,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-v2-agent-same-run-strict-test-receipt-rework2-p1__AlembicAgent__v2-agent-same-run-strict-test-receipt-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-agent-same-run-strict-test-receipt-r--d25b6ab34923.json",
+        "deliveryRunId": "run-delivery-v2-agent-same-run-strict-test-receipt-rework2-p1__AlembicAgent__v2-agent-same-run-strict-test-receipt-t1",
+        "dispatchGroup": "v2-agent-same-run-strict-test-receipt-rework2-p1",
+        "sentAt": "2026-07-31T17:59:26.728Z",
+        "readbackOk": false,
+        "readbackStatus": "pending",
+        "transportStatus": "accepted"
+      },
+      "resultId": "tr-v2-agent-same-run-strict-test-receipt-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "v2-alembic-main-strict-test-private-pipeline-t1",
+      "taskPackageId": "v2-alembic-main-strict-test-private-pipeline-p1",
+      "targetWindow": "Alembic",
+      "summary": "接入 Alembic Main 严格测试私有全链：自动选维、同轮 Agent receipt、隔离持久化/G4/serving 与 durable report。",
+      "status": "accepted",
+      "createdAt": "2026-08-01T09:40:31.549Z",
+      "dependsOnTaskIds": [
+        "v2-agent-same-run-strict-test-receipt-t1"
+      ],
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 5,
+        "reworkCount": 4
+      },
+      "delivery": {
+        "deliveryId": "delivery-v2-alembic-main-strict-test-private-pipeline-rework4-p1__Alembic__v2-alembic-main-strict-test-private-pipeline-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-alembic-main-strict-test-private-pip--cf8cef2f23c3.json",
+        "deliveryRunId": "run-delivery-v2-alembic-main-strict-test-private-pipeline-rework4-p1__Alembic__v2-alembic-main-strict-test-private-pipeline-t1",
+        "dispatchGroup": "v2-alembic-main-strict-test-private-pipeline-rework4-p1",
+        "sentAt": "2026-08-01T14:56:02.100Z",
+        "readbackOk": true,
+        "readbackStatus": "confirmed",
+        "transportStatus": "accepted"
+      },
+      "resultId": "tr-v2-alembic-main-strict-test-private-pipeline-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "v2-dashboard-strict-test-entry-consumer-t1",
+      "taskPackageId": "v2-dashboard-strict-test-entry-consumer-p1",
+      "targetWindow": "AlembicDashboard",
+      "summary": "同步 Main 生成合同并实现 Candidates strict-test 冷启动控制/观察状态机，禁止 legacy fallback。",
+      "status": "needs-rework",
+      "createdAt": "2026-08-03T12:52:25.163Z",
+      "dependsOnTaskIds": [
+        "v2-alembic-main-strict-test-private-pipeline-t1"
+      ],
+      "reviewDecision": "rework",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-v2-dashboard-strict-test-entry-consumer-p1__AlembicDashboard__v2-dashboard-strict-test-entry-consumer-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/recipe-coldstart-production-quality-v2-2026-07-3--1d32eefab672__delivery-v2-dashboard-strict-test-entry-consumer--60bd437d309b.json",
+        "deliveryRunId": "run-delivery-v2-dashboard-strict-test-entry-consumer-p1",
+        "dispatchGroup": "v2-dashboard-strict-test-entry-consumer-p1",
+        "sentAt": "2026-08-03T12:53:33.247Z",
+        "readbackOk": true,
+        "readbackStatus": "confirmed",
+        "transportStatus": "accepted"
+      },
+      "resultId": "tr-v2-dashboard-strict-test-entry-consumer-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicAgent",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "v2-agent-same-run-strict-test-receipt-p1"
+      ],
+      "targetTaskIds": [
+        "v2-agent-same-run-strict-test-receipt-t1"
+      ]
+    },
+    {
+      "windowName": "Alembic",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "v2-alembic-main-strict-test-private-pipeline-p1"
+      ],
+      "targetTaskIds": [
+        "v2-alembic-main-strict-test-private-pipeline-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicDashboard",
+      "windowState": "needs-rework",
+      "taskPackageIds": [
+        "v2-dashboard-strict-test-entry-consumer-p1"
+      ],
+      "targetTaskIds": [
+        "v2-dashboard-strict-test-entry-consumer-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-cancelled",
+    "readyResultIds": [
+      "tr-v2-dashboard-strict-test-entry-consumer-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-07-31T16:23:43.371Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "executionPlacement": {
+    "mode": "main",
+    "podId": null,
+    "selection": "mainline-default",
+    "authorizationRef": null
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-v2-dashboard-strict-test-entry-consumer-p1__AlembicDashboard__v2-dashboard-strict-test-entry-consumer-t1",
+    "lastDeliveryRunId": "run-delivery-v2-dashboard-strict-test-entry-consumer-p1",
+    "lastDispatchGroup": "v2-dashboard-strict-test-entry-consumer-p1",
+    "lastTargetTaskId": "v2-dashboard-strict-test-entry-consumer-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-08-03T12:53:33.256Z"
+  }
+}

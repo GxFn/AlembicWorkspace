@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i6-agent-iterative-analysis-rootcause2-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i6-agent-iterative-analysis-rootcause2-p1",
+  "dispatchGroup": "i3-i8-upstream-failclosed-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "i3-i6-agent-iterative-analysis-rootcause2-t1",
+  "status": "completed",
+  "summary": "Rework 完成并保持既有 public boundary：strict analysis_retry 现在以 before/after epoch 的真实 factQueryObligationIds 差集作为唯一新增集合，要求它与 typed enrolledObligationIds 精确相等；真实 terminalObligationIds 差集与 executedObligationIds 精确相等；重试不得并行改写旧 outstanding 集；每个真实新增 obligation（包括 outcome 未声明的影子项）都必须通过 expansion port 授权。真实 AgentStageFactoryRegistry -> PipelineStrategy -> strict fixpoint gate 回归覆盖预授权影子项、未注册影子项及并行 terminal/outstanding 漂移，均在 Producer 前 fail closed。提交 846e93d39c0e34b501ae4a357aa4d373b15de0d0，工作树干净。",
+  "evidenceRefs": [
+    "AlembicAgent@846e93d39c0e34b501ae4a357aa4d373b15de0d0",
+    "parent:e16c7173e9874155de077c2aba1fe82d015a6087",
+    "tree:dc06f903a4472ae9ff1ba689ea44b5517c742100",
+    "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+    "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+    "AlembicAgent/test/strict-iterative-analysis.test.ts",
+    "alembic-guard:guard-public-ms1y8wvf-1",
+    "alembic-guard:guard-public-ms1y95dh-2",
+    "red:strict-iterative-analysis-3-failed-7-passed",
+    "green:strict-iterative-analysis-10-passed",
+    "green:focused-6-files-61-tests",
+    "green:full-check-71-files-565-tests"
+  ],
+  "verification": [
+    "Baseline before rework: npm test -- test/strict-iterative-analysis.test.ts test/strict-production-chain.test.ts && npm run build:check => 2 files / 21 tests passed; typecheck passed.",
+    "RED: npm test -- test/strict-iterative-analysis.test.ts => 3 failed / 7 passed; malformed retries were incorrectly completed and reached Producer.",
+    "Focused GREEN: npm test -- test/strict-iterative-analysis.test.ts test/strict-production-chain.test.ts test/strict-production-rework.test.ts test/pipeline-outcome-abandoned.test.ts test/public-strict-facades.test.ts test/mining-eval-harness.test.ts => 6 files / 61 tests passed.",
+    "Boundary probes: npm run lint:public-api-boundary => exactly 15 exports; npm run smoke:strict-consumer => runtimeBindings=13, forbidden=7, types=resolved.",
+    "npm run check => exit 0; 71 test files / 565 tests; typecheck, Biome, import/layer/doctrine/naming/provider-neutral, public signature/consumer, validation-floor and retired-symbol gates passed.",
+    "npm run build => tsc -p tsconfig.json passed.",
+    "git diff --cached --check before commit => passed; post-commit git status --short => clean."
+  ],
+  "risks": [
+    "Downstream Alembic Main must continue to append only expansion-port-authorized obligations and report exact enrolled/executed declarations; the tightened contract deliberately fails closed on any hidden or parallel epoch mutation.",
+    "Alembic Guard reports advisory complexity/length warnings in pre-existing validateStrictAnalystEpochV1, outside this rework diff. Focused Guard on the changed authorization path and regressions is clean; npm run check and build pass."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "846e93d39c0e34b501ae4a357aa4d373b15de0d0",
+      "verify": "artifact-present"
+    },
+    {
+      "kind": "test",
+      "ref": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+      "verify": "RED: 3 failed / 7 passed before fix; GREEN: 10 passed; focused integration: 6 files / 61 passed; npm run check: 71 files / 565 passed"
+    },
+    {
+      "kind": "diff-review",
+      "value": "Stage 1 spec review: exact after-before fact-query set equals enrolled declarations, exact terminal set difference equals executed declarations, old outstanding set is conserved, and authorization iterates the real appended set. Stage 2 quality review: existing success behavior and 15-export public boundary are unchanged; no fallback, skip, mock-only production path, cross-repository edit, or new authority surface was introduced. The only Guard findings are pre-existing complexity/length warnings in untouched validateStrictAnalystEpochV1.",
+      "verify": "changed-files-and-real-control-flow"
+    },
+    {
+      "kind": "runtime-evidence",
+      "ref": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+      "verify": "actual AgentStageFactoryRegistry -> PipelineStrategy runtime rejects a pre-authorized hidden append with STRICT_ANALYSIS_RETRY_ENROLLMENT_DIFF_MISMATCH, rejects an unenrolled hidden append with STRICT_ANALYSIS_QUERY_UNENROLLED, and rejects parallel prior-outstanding resolution with STRICT_ANALYSIS_RETRY_TERMINAL_DIFF_MISMATCH; Producer is never reached"
+    },
+    {
+      "kind": "test-first",
+      "value": "RED probe against the real pipeline produced 3 failures / 7 passes because all three malformed retries completed and reached Producer. After the smallest transition/authorization change, the same file passed 10/10.",
+      "verify": "failing-before-passing-after"
+    },
+    {
+      "kind": "failure-path-review",
+      "ref": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+      "verify": "new regressions cover hidden appended obligations in both authorized and unenrolled forms plus parallel terminal/outstanding mutation; prior non-progress, bounds, seal mismatch, untyped retry, and Producer denial cases remain green"
+    },
+    {
+      "kind": "compatibility-review",
+      "value": "Existing strict and non-strict flows remain green; public API boundary remains exactly 15 exports and strict consumer probe resolves runtimeBindings=13, forbidden=7, types=resolved.",
+      "verify": "legacy-and-public-consumer-gates"
+    },
+    {
+      "kind": "guard",
+      "ref": "guard-public-ms1y95dh-2",
+      "verify": "StrictProductionStages.ts and strict-iterative-analysis.test.ts: 2 files, 0 violations; full changed-file guard guard-public-ms1y8wvf-1 only reports two pre-existing warnings in untouched validateStrictAnalystEpochV1"
+    },
+    {
+      "kind": "build",
+      "value": "npm run build",
+      "verify": "tsc -p tsconfig.json passed"
+    },
+    {
+      "kind": "verification",
+      "value": "npm run check",
+      "verify": "all repository gates passed; 71 test files / 565 tests; validation floor and retired-symbol scan passed"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i8-upstream-failclosed-rework1-p1__AlembicAgent__i3-i6-agent-iterative-analysis-rootcause2-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i8-upstream-failclosed-rework1-p1__AlembicAgent__i3-i6-agent-iterative-analysis-rootcause2-t1.json",
+    "deliveryRunId": "run-delivery-i3-i8-upstream-failclosed-rework1-p1__AlembicAgent__i3-i6-agent-iterative-analysis-rootcause2-t1",
+    "dispatchGroup": "i3-i8-upstream-failclosed-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i8-upstream-failclosed-rework1-p1__AlembicAgent__i3-i6-agent-iterative-analysis-rootcause2-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 195,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i6-agent-iterative-analysis-rootcause2-p1",
+    "targetTaskId": "i3-i6-agent-iterative-analysis-rootcause2-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "i3-i8-upstream-failclosed-rework1-p1",
+    "resultId": "tr-i3-i6-agent-iterative-analysis-rootcause2-t1",
+    "createdAt": "2026-07-26T15:28:17.527Z"
+  },
+  "createdAt": "2026-07-26T15:28:17.527Z",
+  "stateRevisionObserved": 195,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i3-i6-agent-iterative-analysis-rootcause2-t1",
+    "dispatchGroup": "i3-i8-core-fact-admission-authority-rootcause4-p1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i3-i6-agent-iterative-analysis-rootcause2-t1__i3-i8-core-fact-admission-authority-rootcause4-p1__current-r0001.json"
+  }
+}

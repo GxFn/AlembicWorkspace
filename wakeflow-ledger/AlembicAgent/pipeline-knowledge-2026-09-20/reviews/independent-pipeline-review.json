@@ -1,0 +1,432 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-20",
+  "baseline": "84aed5c",
+  "status": "review-complete-all-confirmed-findings-closed",
+  "scope": {
+    "readOnly": true,
+    "productEdits": false,
+    "testEdits": false,
+    "commitCreated": false,
+    "sourceFiles": [
+      "src/agent/strategies/PipelineStrategy.ts",
+      "src/agent/strategies/pipeline/attempt.ts",
+      "src/agent/strategies/pipeline/contracts.ts"
+    ],
+    "testFiles": [
+      "test/agent-lifecycle.test.ts",
+      "test/pipeline-outcome-abandoned.test.ts"
+    ],
+    "coverage": "Read complete new attempt/contracts files, entire changed Pipeline/test hunks, and bounded gate/strict/runtime call chains. No unrelated architectural expansion."
+  },
+  "findings": [
+    {
+      "id": "IP-01",
+      "severity": "P2",
+      "status": "fixed-independently-verified",
+      "title": "Returned aborted terminal state does not stop the pipeline or fast retry",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 157,
+          "endLine": 161
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 203,
+          "endLine": 209
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 328,
+          "endLine": 361
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 380,
+          "endLine": 390
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 1110,
+          "endLine": 1121
+        }
+      ],
+      "evidence": {
+        "seam": "Current PipelineStrategy.execute with supported StageResult fields and controlled non-strict runtime; actual Pipeline/attempt/shared modules transpiled in memory.",
+        "cases": [
+          {
+            "returned": {
+              "aborted": true
+            },
+            "observed": {
+              "stages": [
+                "analyze",
+                "produce"
+              ],
+              "outcome": "completed",
+              "finalReply": "unexpected producer"
+            }
+          },
+          {
+            "returned": {
+              "aborted": true,
+              "timedOut": true
+            },
+            "observed": {
+              "attempts": 2,
+              "outcome": "completed",
+              "finalReply": "retry executed"
+            }
+          }
+        ]
+      },
+      "suggestion": "Normalize returned aborted as an attempt terminal, deny fast retry, and propagate Pipeline cancellation across primary/gate/microstage paths without requiring the parent signal to have been cancelled.",
+      "referenceNote": "Original refs identify the initial frozen patch; current fix refs are in closure."
+    },
+    {
+      "id": "IP-02",
+      "severity": "P2",
+      "status": "fixed-independently-verified",
+      "title": "Fast retry ignores explicit returned partial/readback evidence",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 175,
+          "endLine": 209
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 1110,
+          "endLine": 1119
+        }
+      ],
+      "evidence": {
+        "seam": "Current PipelineStrategy.execute, first controlled runtime result reports pending tool truth.",
+        "returned": {
+          "timedOut": true,
+          "toolCalls": [],
+          "partial": {
+            "startedToolCalls": 1,
+            "completedToolCalls": 0,
+            "requiresReadback": true
+          }
+        },
+        "observed": {
+          "reactLoopCalls": 2,
+          "finalReply": "unexpected replay",
+          "finalPhaseLosesOriginalPartial": true
+        }
+      },
+      "suggestion": "Explicit requiresReadback=true or any known positive started/completed count must veto zero-tool fast retry; retain partial evidence. Preserve existing zero-tool timedOut compatibility when no partial evidence exists.",
+      "referenceNote": "Original refs identify the initial frozen patch; current fix refs are in closure.",
+      "additionalBoundary": "Root follow-up: native observation plus explicit returned startedToolCalls:null must preserve unknown rather than coalesce to zero. Independently reverified after the final null-priority guard was added."
+    }
+  ],
+  "verifiedAreas": [
+    {
+      "area": "Actual parent cancellation / deadline ownership",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 105,
+          "endLine": 128
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 1030,
+          "endLine": 1060
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 711,
+          "endLine": 729
+        }
+      ],
+      "assessment": "Shared operation owns terminal choice and child signal. Stage preparation and execution share captured hard deadline; late preparation cannot enter the loop; gate verdict is not committed after parent cancellation."
+    },
+    {
+      "area": "Late callbacks and diagnostics",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 86,
+          "endLine": 103
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 125,
+          "endLine": 128
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 197,
+          "endLine": 198
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 710,
+          "endLine": 720
+        }
+      ],
+      "assessment": "Callback guarded by active/signal; per-attempt and per-gate diagnostics snapshot merged once. No additional P1/P2 found in real runtime callback ordering."
+    },
+    {
+      "area": "Partial tool merge and repeated occurrence counts",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 28,
+          "endLine": 55
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 90,
+          "endLine": 98
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 130,
+          "endLine": 146
+        }
+      ],
+      "assessment": "Both-known call IDs take precedence; otherwise canonical args/result matching is occurrence-aware. A separate probe with two identical callbacks and a cloned two-item returned list retains exactly two calls, without double counting."
+    },
+    {
+      "area": "Fast retry and costs",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 147,
+          "endLine": 156
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+          "line": 160,
+          "endLine": 172
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 1094,
+          "endLine": 1117
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 1149,
+          "endLine": 1154
+        }
+      ],
+      "assessment": "Known token usage uses max(returned, diagnostics) within one attempt; each attempt cost is accumulated once. Interrupted unknown hosts or native started tools do not qualify for retry. Exceptions are the two explicit returned-state gaps above."
+    },
+    {
+      "area": "Primary final reply",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 328,
+          "endLine": 368
+        },
+        {
+          "path": "AlembicAgent/test/pipeline-outcome-abandoned.test.ts",
+          "line": 51,
+          "endLine": 97
+        }
+      ],
+      "assessment": "Tracking the latest main stage avoids microstage insertion order choosing an older rewrite. Retry costs remain separate from the final reply selection."
+    },
+    {
+      "area": "Strict production context view",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 711,
+          "endLine": 718
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 1245,
+          "endLine": 1278
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 46,
+          "endLine": 92
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 120,
+          "endLine": 164
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 177,
+          "endLine": 225
+        }
+      ],
+      "assessment": "Only signal/diagnostics are overridden; strictProduction nested object remains the same port. readStrictPort, epoch validation, role guards and typed gate returns remain in the actual chain. Strict Producer remains proposal-only; this review does not claim a database persistence test."
+    }
+  ],
+  "validation": {
+    "noRealApi": true,
+    "noProductWrite": true,
+    "probes": [
+      {
+        "case": "returned aborted flag",
+        "result": "RED IP-01"
+      },
+      {
+        "case": "returned aborted+timedOut flags",
+        "result": "RED IP-01"
+      },
+      {
+        "case": "returned partial requiresReadback",
+        "result": "RED IP-02"
+      },
+      {
+        "case": "two identical occurrences with cloned returned tool list",
+        "result": "PASS; output toolCalls length2"
+      }
+    ],
+    "tests": [
+      {
+        "command": "Node22 vitest run test/strict-production-chain.test.ts test/strict-iterative-analysis.test.ts",
+        "result": "PASS",
+        "files": 2,
+        "tests": 24,
+        "durationSeconds": 4.88
+      }
+    ],
+    "actualStrictFactoryAnchor": {
+      "path": "AlembicAgent/test/strict-production-chain.test.ts",
+      "line": 765,
+      "endLine": 816
+    },
+    "strictIterativeAnchor": {
+      "path": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+      "line": 155,
+      "endLine": 178
+    },
+    "parentReportedBaseline": "7 suites77 PASS; prior fullcheck859 PASS (not independently rerun)."
+  },
+  "closure": {
+    "verifiedAt": "2026-09-20T09:31:11.720Z",
+    "productOrTestEditsByReviewer": false,
+    "openP1": 0,
+    "openP2": 0,
+    "currentRefs": [
+      {
+        "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+        "line": 333
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+        "line": 383
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+        "line": 1098
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+        "line": 1154
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+        "line": 159
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+        "line": 164
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+        "line": 220
+      }
+    ],
+    "results": [
+      {
+        "case": "Original returned aborted reproducer",
+        "status": "GREEN",
+        "reactLoopCalls": 1,
+        "pipelineOutcome": "aborted"
+      },
+      {
+        "case": "Original returned aborted + timedOut reproducer",
+        "status": "GREEN",
+        "reactLoopCalls": 1,
+        "pipelineOutcome": "aborted",
+        "fastRetry": false
+      },
+      {
+        "case": "Original returned partial pending-tool reproducer",
+        "status": "GREEN",
+        "reactLoopCalls": 1,
+        "partial": {
+          "startedToolCalls": 1,
+          "completedToolCalls": 0,
+          "requiresReadback": true
+        },
+        "fastRetry": false
+      },
+      {
+        "case": "Native bus/history + explicit null started count",
+        "status": "GREEN",
+        "startedToolCalls": null,
+        "fastRetry": false
+      },
+      {
+        "case": "No-partial legacy explicit timedOut + zero tools",
+        "status": "GREEN",
+        "compatibilityRetryPreserved": true,
+        "costPreserved": true
+      },
+      {
+        "case": "Self-aborted record_repair/summary_rewrite microstages",
+        "status": "GREEN",
+        "gateReevaluation": false,
+        "producerStart": false
+      }
+    ],
+    "tests": [
+      {
+        "command": "Node22 vitest run test/agent-lifecycle.test.ts -t host-reported",
+        "result": "PASS",
+        "tests": 10,
+        "note": "Initial terminal/partial fix before native-null follow-up."
+      },
+      {
+        "command": "Node22 vitest run test/agent-lifecycle.test.ts test/pipeline-outcome-abandoned.test.ts -t \"host-reported|final pipeline timeout attempt|cost of a returned timed-out attempt\"",
+        "result": "PASS",
+        "files": 2,
+        "tests": 14,
+        "skipped": 30,
+        "durationSeconds": 3.56,
+        "note": "Final closure includes native observation + explicit null case."
+      }
+    ],
+    "files": [
+      {
+        "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+        "sha256": "3584f5e073e1420e73893309685f56dfb565ca2f2730ee797ef459383111b6cf"
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/pipeline/attempt.ts",
+        "sha256": "20e3692a08b8c35321cebab94ffea529b325f0a3ea412bbb320f4a9c1301c8fe"
+      },
+      {
+        "path": "AlembicAgent/src/agent/strategies/pipeline/contracts.ts",
+        "sha256": "ee031b5c068f093bcea7d813ee58cf505ff8f5df8d069dcf4856e23b8baeffdd"
+      },
+      {
+        "path": "AlembicAgent/test/agent-lifecycle.test.ts",
+        "sha256": "7275e164f89085c20d8666510be09f0d7ed16aefb4815912a8f29536b7a0ff0f"
+      },
+      {
+        "path": "AlembicAgent/test/pipeline-outcome-abandoned.test.ts",
+        "sha256": "e987d72fa71b4e39e465a62fd355bdf1bb0fb6cd451ab1549688bf62e8cde973"
+      }
+    ],
+    "conclusion": "Both confirmed P2 findings and the explicit-null/native observation boundary are closed. No additional P1/P2 identified in the scoped changes and actual call chains."
+  },
+  "nextStep": "Root may run the final global checks and review/commit. This reviewer performed no product/test modifications or commits."
+}

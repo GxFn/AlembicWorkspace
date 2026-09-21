@@ -1,0 +1,103 @@
+../Alembic/test/unit/LlmGatewayTransport.test.ts:6:  ClaudeTransport,
+../Alembic/test/unit/LlmGatewayTransport.test.ts:7:  DeepSeekTransport,
+../Alembic/test/unit/LlmGatewayTransport.test.ts:8:  GoogleTransport,
+../Alembic/test/unit/LlmGatewayTransport.test.ts:11:  OpenAiTransport,
+../Alembic/test/unit/LlmGatewayTransport.test.ts:24:  describe('OpenAiTransport', () => {
+../Alembic/test/unit/LlmGatewayTransport.test.ts:26:      const t = new OpenAiTransport({ apiKey: 'test' });
+../Alembic/test/unit/LlmGatewayTransport.test.ts:31:      const t = new OpenAiTransport({ apiKey: '' });
+../Alembic/test/unit/LlmGatewayTransport.test.ts:38:  describe('ClaudeTransport', () => {
+../Alembic/test/unit/LlmGatewayTransport.test.ts:40:      const t = new ClaudeTransport({ apiKey: 'test' });
+../Alembic/test/unit/LlmGatewayTransport.test.ts:45:      const t = new ClaudeTransport({ apiKey: '' });
+../Alembic/test/unit/LlmGatewayTransport.test.ts:52:  describe('DeepSeekTransport', () => {
+../Alembic/test/unit/LlmGatewayTransport.test.ts:54:      const t = new DeepSeekTransport({ apiKey: 'test' });
+../Alembic/test/unit/LlmGatewayTransport.test.ts:59:      const t = new DeepSeekTransport({ apiKey: 'test' });
+../Alembic/test/unit/LlmGatewayTransport.test.ts:64:  describe('GoogleTransport', () => {
+../Alembic/test/unit/LlmGatewayTransport.test.ts:66:      const t = new GoogleTransport({ apiKey: 'test' });
+src/ai/gateway/LLMGateway.ts:32:import { ClaudeTransport } from '../transport/ClaudeTransport.js';
+src/ai/gateway/LLMGateway.ts:33:import { DeepSeekTransport } from '../transport/DeepSeekTransport.js';
+src/ai/gateway/LLMGateway.ts:34:import { GoogleTransport } from '../transport/GoogleTransport.js';
+src/ai/gateway/LLMGateway.ts:41:import { OpenAiTransport } from '../transport/OpenAiTransport.js';
+src/ai/gateway/LLMGateway.ts:437:        return new OpenAiTransport(config);
+src/ai/gateway/LLMGateway.ts:439:        return new ClaudeTransport(config);
+src/ai/gateway/LLMGateway.ts:441:        return new DeepSeekTransport(config);
+src/ai/gateway/LLMGateway.ts:443:        return new GoogleTransport(config);
+src/ai/gateway/LLMGateway.ts:445:        return new OpenAiTransport(
+src/ai/gateway/LLMGateway.ts:457:        return new OpenAiTransport(config);
+test/transport-proxy.test.ts:3:import { OpenAiTransport } from '../src/ai/transport/OpenAiTransport.js';
+test/transport-proxy.test.ts:24:function resolveProxy(transport: OpenAiTransport): string {
+test/transport-proxy.test.ts:49:    const transport = new OpenAiTransport({ apiKey: 'k' });
+test/transport-proxy.test.ts:57:    const transport = new OpenAiTransport({ apiKey: 'k' });
+test/transport-proxy.test.ts:64:    const transport = new OpenAiTransport({ apiKey: 'k' });
+test/transport-proxy.test.ts:70:    const transport = new OpenAiTransport({ apiKey: 'k' });
+test/transport-proxy.test.ts:76:    const transport = new OpenAiTransport({ apiKey: 'k' });
+test/transport-proxy.test.ts:115:    const transport = new OpenAiTransport({ apiKey: 'k' });
+test/transport-proxy.test.ts:135:    const transport = new OpenAiTransport({ apiKey: 'k' });
+src/ai/providers/GoogleGeminiProvider.ts:5: * 由 LLMGateway + GoogleTransport 统一承担：
+src/ai/providers/GoogleGeminiProvider.ts:13: * 嵌入模型经 _transportExtras 透传，由 GoogleTransport 统一补 'models/' 前缀并兜底默认。
+src/ai/providers/GoogleGeminiProvider.ts:52:    // 嵌入模型透传给 GoogleTransport（transport 内部统一补 'models/' 前缀并兜底默认）。
+src/ai/providers/DeepSeekProvider.ts:5: * 由 LLMGateway + DeepSeekTransport 统一承担：
+src/ai/providers/DeepSeekProvider.ts:12: * DeepSeek 专属的 reasoning_effort（high/max）通过 _transportExtras 透传给 DeepSeekTransport。
+src/ai/providers/DeepSeekProvider.ts:13: * embed 由 DeepSeekTransport 固定使用 deepseek-embedding 模型，无需在此透传。
+src/ai/providers/DeepSeekProvider.ts:40:    // V4 推理力度 high(默认)/max；透传给 DeepSeekTransport 决定 thinking 模式下的 reasoning_effort。
+src/ai/providers/OllamaProvider.ts:6: * 由 LLMGateway 选用 OpenAiTransport 完成协议拼装、响应解析与横切能力。
+src/ai/providers/OllamaProvider.ts:68:    // 透传嵌入模型给 OpenAiTransport（Ollama 走 OpenAI 兼容 /embeddings）。
+src/ai/providers/ClaudeProvider.ts:5: * 由 LLMGateway + ClaudeTransport 统一承担：
+src/ai/providers/OpenAiProvider.ts:5: * Chat Completions / Responses 协议分支全部下沉到 OpenAiTransport，重试 / 熔断 /
+src/ai/providers/OpenAiProvider.ts:46:    // 透传 provider 特有配置给 OpenAiTransport（协议风格与嵌入模型）。
+src/ai/transport/DeepSeekTransport.ts:25:export class DeepSeekTransport extends LLMTransport {
+src/ai/transport/DeepSeekTransport.ts:55:        `[DeepSeekTransport] normalized ${normalized.normalizedCount} incomplete tool transcript messages before request`
+src/ai/transport/DeepSeekTransport.ts:66:        `[DeepSeekTransport] compat_reasoning_budget requested=${request.maxTokens ?? 0} effective=${maxTokens} effort=${effort}`
+src/ai/transport/DeepSeekTransport.ts:113:          `[DeepSeekTransport] compatibility_text_tool_calls count=${compatCalls.length}; validating translated arguments`
+src/ai/transport/DeepSeekTransport.ts:136:      '[DeepSeekTransport] compatibility_embedding_endpoint model=deepseek-embedding; SDK embedding unavailable'
+src/ai/transport/DeepSeekTransport.ts:140:        '[DeepSeekTransport] embedding_input_truncated limit=8000; legacy input boundary preserved'
+src/ai/transport/index.ts:1:export { ClaudeTransport } from './ClaudeTransport.js';
+src/ai/transport/index.ts:2:export { DeepSeekTransport } from './DeepSeekTransport.js';
+src/ai/transport/index.ts:3:export { GoogleTransport } from './GoogleTransport.js';
+src/ai/transport/index.ts:11:export { OpenAiTransport } from './OpenAiTransport.js';
+src/ai/transport/OpenAiTransport.ts:26:export class OpenAiTransport extends LLMTransport {
+src/ai/transport/ClaudeTransport.ts:13:export class ClaudeTransport extends LLMTransport {
+src/ai/transport/GoogleTransport.ts:15:export class GoogleTransport extends LLMTransport {
+test/openai-sdk.test.ts:10:import { OpenAiTransport } from '../src/ai/transport/OpenAiTransport.js';
+test/openai-sdk.test.ts:97:    const error = await new OpenAiTransport({ apiKey: 'test-key' })
+test/openai-sdk.test.ts:186:      new OpenAiTransport({ apiKey: 'test-key' }).embed(['first', 'second'])
+test/openai-sdk.test.ts:341:    const transport = new OpenAiTransport({ apiKey: 'test-key' });
+test/transport-protocols.test.ts:2:import { ClaudeTransport } from '../src/ai/transport/ClaudeTransport.js';
+test/transport-protocols.test.ts:3:import { DeepSeekTransport } from '../src/ai/transport/DeepSeekTransport.js';
+test/transport-protocols.test.ts:4:import { GoogleTransport } from '../src/ai/transport/GoogleTransport.js';
+test/transport-protocols.test.ts:5:import { OpenAiTransport } from '../src/ai/transport/OpenAiTransport.js';
+test/transport-protocols.test.ts:9: * ClaudeTransport is the protocol-translation layer for the *primary* provider,
+test/transport-protocols.test.ts:38:describe('ClaudeTransport Anthropic protocol translation', () => {
+test/transport-protocols.test.ts:46:    const transport = new ClaudeTransport({ apiKey: 'k' });
+test/transport-protocols.test.ts:85:    const transport = new ClaudeTransport({ apiKey: 'k' });
+test/transport-protocols.test.ts:110:    const transport = new ClaudeTransport({ apiKey: 'k' });
+test/transport-protocols.test.ts:133:    const transport = new ClaudeTransport({ apiKey: 'k' });
+test/transport-protocols.test.ts:152:    const transport = new ClaudeTransport({ apiKey: 'secret-key' });
+test/transport-protocols.test.ts:167: * GoogleTransport carries the Gemini REST contract, which diverges sharply from
+test/transport-protocols.test.ts:184:describe('GoogleTransport Gemini protocol translation', () => {
+test/transport-protocols.test.ts:192:    const transport = new GoogleTransport({ apiKey: 'k' });
+test/transport-protocols.test.ts:228:    const transport = new GoogleTransport({ apiKey: 'k' });
+test/transport-protocols.test.ts:268:    const transport = new GoogleTransport({ apiKey: 'gem-key' });
+test/transport-protocols.test.ts:297:    const transport = new GoogleTransport({ apiKey: 'k' });
+test/transport-protocols.test.ts:329:describe('DeepSeekTransport tool transcript preflight', () => {
+test/transport-protocols.test.ts:337:    const transport = new DeepSeekTransport({ apiKey: 'test-key' });
+test/transport-protocols.test.ts:357:    const transport = new DeepSeekTransport({ apiKey: 'test-key' });
+test/transport-protocols.test.ts:381:    const transport = new DeepSeekTransport({ apiKey: 'test-key' });
+test/transport-protocols.test.ts:399:    const transport = new DeepSeekTransport({ apiKey: 'test-key' });
+test/transport-protocols.test.ts:439:    const transport = new DeepSeekTransport({ apiKey: 'test-key' });
+test/transport-protocols.test.ts:475:    const transport = new DeepSeekTransport({ apiKey: 'test-key' });
+test/transport-protocols.test.ts:507:    const transport = new DeepSeekTransport({ apiKey: 'test-key' });
+test/transport-protocols.test.ts:525:describe('OpenAiTransport apiStyle=chat (default)', () => {
+test/transport-protocols.test.ts:536:      new OpenAiTransport({ apiKey: 'test-key' }).chat({
+test/transport-protocols.test.ts:560:      new OpenAiTransport({ apiKey: 'test-key', timeout: 5 }).chat({
+test/transport-protocols.test.ts:573:    const transport = new OpenAiTransport({ apiKey: 'k' });
+test/transport-protocols.test.ts:584:describe('OpenAiTransport apiStyle=responses', () => {
+test/transport-protocols.test.ts:594:    const transport = new OpenAiTransport({ apiKey: 'k', apiStyle: 'responses' });
+test/transport-protocols.test.ts:623:    const transport = new OpenAiTransport({ apiKey: 'k', apiStyle: 'responses' });
+test/transport-protocols.test.ts:643:    const transport = new OpenAiTransport({ apiKey: 'k', apiStyle: 'responses' });
+test/transport-protocols.test.ts:673:    const transport = new OpenAiTransport({ apiKey: 'k', apiStyle: 'responses' });
+test/structured-output-validation.test.ts:5:import { OpenAiTransport } from '../src/ai/transport/OpenAiTransport.js';
+test/structured-output-validation.test.ts:32:      new OpenAiTransport(config).chatStructured({
+test/native-provider-sdk.test.ts:12:import { GoogleTransport } from '../src/ai/transport/GoogleTransport.js';
+test/native-provider-sdk.test.ts:13:import { OpenAiTransport } from '../src/ai/transport/OpenAiTransport.js';
+test/native-provider-sdk.test.ts:382:      Transport: GoogleTransport,
+test/native-provider-sdk.test.ts:388:      Transport: OpenAiTransport,

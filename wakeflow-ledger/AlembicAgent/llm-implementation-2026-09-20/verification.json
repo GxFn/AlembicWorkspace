@@ -1,0 +1,280 @@
+{
+  "date": "2026-09-20",
+  "scope": "AlembicAgent AI call contracts and first SDK provider migration",
+  "baselineCommit": "94df98fcffb8b57b8e9913fc4e2377ff730951d6",
+  "commit": "36d34a66a46cddf3229b8356127965c8f8265faf",
+  "branch": "codex/llm-sdk-adapters",
+  "changedFiles": [
+    "README.md",
+    "README.zh-CN.md",
+    "config/agent-validation-floor.json",
+    "config/layer-contract.json",
+    "docs/llm-adapters.md",
+    "package-lock.json",
+    "package.json",
+    "src/agent/context/ContextWindow.ts",
+    "src/agent/runtime/AgentRuntime.ts",
+    "src/agent/runtime/AgentRuntimeTypes.ts",
+    "src/agent/runtime/LLMInputMeasurement.ts",
+    "src/agent/runtime/MessageAdapter.ts",
+    "src/ai/AiProvider.ts",
+    "src/ai/contracts.ts",
+    "src/ai/deepseekToolCallCompat.ts",
+    "src/ai/errors.ts",
+    "src/ai/gateway/LLMGateway.ts",
+    "src/ai/providers/ClaudeProvider.ts",
+    "src/ai/providers/DeepSeekProvider.ts",
+    "src/ai/providers/GoogleGeminiProvider.ts",
+    "src/ai/providers/OllamaProvider.ts",
+    "src/ai/providers/OpenAiProvider.ts",
+    "src/ai/shared/errorClassify.ts",
+    "src/ai/shared/reliability.ts",
+    "src/ai/shared/schemaValidation.ts",
+    "src/ai/shared/usage.ts",
+    "src/ai/transport/ClaudeTransport.ts",
+    "src/ai/transport/DeepSeekTransport.ts",
+    "src/ai/transport/GoogleTransport.ts",
+    "src/ai/transport/LLMTransport.ts",
+    "src/ai/transport/OpenAiTransport.ts",
+    "src/ai/transport/sdkErrors.ts",
+    "test/LLMGateway.test.ts",
+    "test/entrypoint-effects.test.ts",
+    "test/helpers/mockFetch.ts",
+    "test/openai-sdk.test.ts",
+    "test/provider-facades.test.ts",
+    "test/reliability.test.ts",
+    "test/structured-output-validation.test.ts",
+    "test/transport-protocols.test.ts",
+    "test/transport-proxy.test.ts"
+  ],
+  "testFirstPairs": [
+    {
+      "behavior": "cancellation Error reason",
+      "red": "red-error-cancellation.log",
+      "green": "green-error-cancellation.log"
+    },
+    {
+      "behavior": "structured cancellation",
+      "red": "red-structured-cancellation.log",
+      "green": "green-structured-cancellation.log"
+    },
+    {
+      "behavior": "embedding cancellation",
+      "red": "red-embedding-cancellation.log",
+      "green": "green-embedding-cancellation.log"
+    },
+    {
+      "behavior": "late response cancellation",
+      "red": "red-late-cancelled-body.log",
+      "green": "green-cancellation-entrypoints.log"
+    },
+    {
+      "behavior": "probe and summary cancellation",
+      "red": "red-probe-summary-cancellation.log",
+      "green": "green-cancellation-entrypoints.log"
+    },
+    {
+      "behavior": "schema validation",
+      "red": "red-structured-schema.log",
+      "green": "green-schema-matrix.log"
+    },
+    {
+      "behavior": "SDK result and tool arguments",
+      "red": "red-sdk-result-contract.log",
+      "green": "green-sdk-existing-contracts.log"
+    },
+    {
+      "behavior": "multi-turn continuation",
+      "red": "red-sdk-tool-continuation.log",
+      "green": "green-sdk-tool-continuation.log"
+    },
+    {
+      "behavior": "rejected output usage",
+      "red": "red-sdk-rejected-usage.log",
+      "green": "green-sdk-runtime-and-usage.log"
+    },
+    {
+      "behavior": "logical provider identity",
+      "red": "red-sdk-identity-and-reliability.log",
+      "green": "green-sdk-identity-and-reliability.log"
+    },
+    {
+      "behavior": "SDK error payload boundary",
+      "red": "red-sdk-error-payload-boundary.log",
+      "green": "green-sdk-error-payload-boundary.log"
+    },
+    {
+      "behavior": "connection-scoped continuation",
+      "red": "red-sdk-continuation-scope.log",
+      "green": "green-sdk-continuation-scope.log"
+    }
+  ],
+  "verification": {
+    "command": "npm run check",
+    "node": "22.23.2",
+    "exitCode": 0,
+    "testFiles": 74,
+    "testsPassed": 1129,
+    "publicExports": 15,
+    "runtimeBindings": 451,
+    "strictConsumer": "passed",
+    "sourceBoundaries": "passed",
+    "lintWarnings": 17,
+    "lintWarningFilesUnchangedByCommit": true,
+    "fullOutput": "full-check-verified.log",
+    "lintWarningFiles": [
+      "scripts/eval-judge-calibration.mjs",
+      "scripts/eval-mining.mjs",
+      "scripts/lint-provider-neutral-kernel.mjs",
+      "scripts/smoke-agent-public-signatures.mjs",
+      "scripts/verify-agent-validation-floor.mjs",
+      "test/mining-e2e-pipeline.test.ts",
+      "test/runtime-terminal-safety.test.ts"
+    ]
+  },
+  "dependencyPins": {
+    "@ai-sdk/openai": "4.0.71",
+    "@ai-sdk/provider": "4.0.17",
+    "zod": "4.6.5",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "@alembic/core": "file:../AlembicCore"
+  },
+  "modelCalls": "All provider verification used fake HTTP or controlled test providers; no live model call or credential provisioning.",
+  "evidenceLocators": [
+    {
+      "ref": "baseline-ai.log",
+      "digest": "sha256:a1ebece16de9a007c1b7171dd55a1a1daff77dc9effcfb42129fe7c96373ec79"
+    },
+    {
+      "ref": "baseline-typecheck.log",
+      "digest": "sha256:eb1cbda7a26f50f2c9e72a2e7e25549d02e37014ba0fe00673a8f97bf964bdd0"
+    },
+    {
+      "ref": "full-check-verified.log",
+      "digest": "sha256:3352ef32800250ba98f7438c23c24f26e26dcce564371ec4ad86f584237fbf2e"
+    },
+    {
+      "ref": "green-cancellation-entrypoints.log",
+      "digest": "sha256:95fe83a2fd8b5bc7e1949bf1fe51584d9d9a3be55a5e1696cccaf0263d0513e6"
+    },
+    {
+      "ref": "green-embedding-cancellation.log",
+      "digest": "sha256:000877ef72f6c526beaf62f02f584c85f261f5e23a9ef186b9fe6b59765e53fb"
+    },
+    {
+      "ref": "green-error-cancellation.log",
+      "digest": "sha256:a0fcd1b0fa9d00ec60a4065cdcbda8272cb546848820c1c3205cc8453bd441fd"
+    },
+    {
+      "ref": "green-schema-matrix.log",
+      "digest": "sha256:3b303e26ae23263f43c890a81e512a4a4c83fcfe2fb3f7435f4c4fa175254168"
+    },
+    {
+      "ref": "green-sdk-continuation-scope.log",
+      "digest": "sha256:2dcc0c281cce318bcbdd3b5e9c0307870e2d8371619a836d747fc76a52c16915"
+    },
+    {
+      "ref": "green-sdk-error-payload-boundary.log",
+      "digest": "sha256:013eaf34a59fe92e9abb788355df106ccfff384149ba662c774a7863179506c8"
+    },
+    {
+      "ref": "green-sdk-existing-contracts.log",
+      "digest": "sha256:f11cfa8f4c28a012de0b52de75eba8cdee0f7311ea44ddb041ecd5ac35e95330"
+    },
+    {
+      "ref": "green-sdk-identity-and-reliability.log",
+      "digest": "sha256:8dfe9b04af289cda081eeba1ad12d1087b9c7932317542f25bba7f2865686076"
+    },
+    {
+      "ref": "green-sdk-runtime-and-usage.log",
+      "digest": "sha256:35f85892554010c43232c37fd81d7c81777015d87337fed1788cfadaac5daeda"
+    },
+    {
+      "ref": "green-sdk-tool-continuation.log",
+      "digest": "sha256:2fef313bb2426f31b375b9a66d19d986a08150351c9b0d18e580fd6b55b62ea2"
+    },
+    {
+      "ref": "green-structured-cancellation.log",
+      "digest": "sha256:6e1446efeb0d4a0af61c2ac82652ffd8614d2707edfb7afcfce29cdc29b9c338"
+    },
+    {
+      "ref": "red-embedding-cancellation.log",
+      "digest": "sha256:df469b2e19a842258416e06f29de4879f20e036b4786f5289d28d269a9a489db"
+    },
+    {
+      "ref": "red-error-cancellation.log",
+      "digest": "sha256:ede75fdf52f8088f2bf9546866e5d5e84fd0fb8d5bcb4c614560923b7985ae8a"
+    },
+    {
+      "ref": "red-late-cancelled-body.log",
+      "digest": "sha256:f553656223ea0c9e790f6f655913e3fb70697ad3a33bcb96b8a9ccd53fe1608e"
+    },
+    {
+      "ref": "red-probe-summary-cancellation.log",
+      "digest": "sha256:a4735274bcc2493dee8fb28e9878e96a8b209c856e3eaa3c3d6795a8265c73de"
+    },
+    {
+      "ref": "red-sdk-continuation-scope.log",
+      "digest": "sha256:0144441bb0e055260785454a67b21b43393dc1cf2e8940ab272f1e1ad6e92a1c"
+    },
+    {
+      "ref": "red-sdk-error-payload-boundary.log",
+      "digest": "sha256:550771e0d6bc3facea91e316bef6df0c0af2eccdb551ef8d93ad5dac520a4908"
+    },
+    {
+      "ref": "red-sdk-identity-and-reliability.log",
+      "digest": "sha256:7b36e8882857e4b2966b170c1d8fd2f314389e8e5dfffa1a708f4bce59423ae7"
+    },
+    {
+      "ref": "red-sdk-rejected-usage.log",
+      "digest": "sha256:cc696952d310ef9e35dda6766d9e42835f7dc4e530fb89aa008661b824071e85"
+    },
+    {
+      "ref": "red-sdk-result-contract.log",
+      "digest": "sha256:7c891c8c1b2c5b8e9fcf11cb0bb1e6e5496cd3c75266c620468b888e631f9742"
+    },
+    {
+      "ref": "red-sdk-tool-continuation.log",
+      "digest": "sha256:a362ffa163c8ada878da197eaf1fbfdf126c61e718b6fec906aa38f2f95a16d8"
+    },
+    {
+      "ref": "red-structured-cancellation.log",
+      "digest": "sha256:aab5cbb7cd470bb4249cb61053bc6e962d6ea7be28952552659f8a93667ab2aa"
+    },
+    {
+      "ref": "red-structured-schema.log",
+      "digest": "sha256:82ee61a02b6e6cf2c2b01d3513789054768e555d24fb99b6e31ecccfd656f41b"
+    }
+  ],
+  "preservedExistingChanges": [
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "completed": [
+    "AI DTO/error leaf contracts with compatible exports",
+    "Provider cancellation and terminal behavior",
+    "Shared non-mutating schema validation",
+    "OpenAI/Ollama SDK single-attempt generation and embedding",
+    "Runtime tool round with stored reasoning continuation",
+    "Gateway retry/usage/error integration",
+    "Layer guard and reusable protocol fixtures"
+  ],
+  "remainingAuthorizedRoadmap": [
+    "Google/Claude/DeepSeek SDK migration with vendor-specific contracts",
+    "Further effective configuration consolidation and provider-by-provider cleanup"
+  ],
+  "discoveredOutsideScope": [
+    "Main RuntimeInitializer drops the embedding call options argument",
+    "Main Strict job/HTTP background-session cancellation needs explicit parent/session lifecycle wiring",
+    "Core LegacyEmbedProviderAdapter and batch/search consumers do not propagate cancellation context into legacy embed calls"
+  ],
+  "limits": [
+    "No live provider or custom relay interoperability claim",
+    "Responses stored-item continuation requires server retention; no new stateless encrypted reasoning support",
+    "Streaming/multimodal and external LiteLLM deployment not implemented",
+    "Legacy facade empty-vector behavior preserved for ordinary embedding failure",
+    "Google internal embedding batch retry granularity remains for its provider migration"
+  ],
+  "reviewDigest": "sha256:f4fb312f23b7e05bd158626c8638cb739276bea8943d5c9b8b7b119ee4bf0ebe"
+}

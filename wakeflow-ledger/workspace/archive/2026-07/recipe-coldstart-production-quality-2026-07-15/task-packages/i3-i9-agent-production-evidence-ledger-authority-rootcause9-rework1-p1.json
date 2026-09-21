@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Repair the accepted-shape Agent production Evidence Ledger authority so its new public capture facet validates every runtime draft before sequence allocation or JSONL mutation. The controller reproduced that commit 8284aa7 accepts tool='caller.fake' and range={start:0,end:-1}, writes both to the real JSONL, and only later fails strictSnapshot; eliminate this durable-poisoning path while preserving the same public factory/facets, private EvidenceLedgerStore, redaction, strict snapshot, AgentRuntime sharing, and fresh-process reopen chain. Rejected inputs must have zero durable/in-memory side effects and the next valid capture must use the unconsumed E-n. Agent-only; Core d0d33e49 and Main 1c16269 are read-only context; no Test or Design.",
+  "status": "pending",
+  "sourceRef": "controller-decision:evt-20260728151529-0264",
+  "designIntent": "保持已实现的单一 opaque production authority 与同一 EvidenceLedgerStore/JSONL 链路，只修复公开 capture 边界的持久化前运行时校验：非法 draft 必须在 seq 分配和任何文件写入前稳定失败，不能污染后续 snapshot/reopen。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "One clean AlembicAgent follow-up commit based exactly on 8284aa7ef175135f39f5130c09b880173073ebbf; report parent, commit, tree and changed files. No Core/Main/Plugin/Test/Wakeflow/vendor edits."
+      },
+      {
+        "kind": "command",
+        "verify": "Run build:check/build, focused production-evidence-ledger-authority + EvidenceLedgerStore + durable semantic runtime + AgentRuntime tests, fresh-process public consumer, full npm run check/full tests, public import/signature/Core import/layer/provider-neutral/retired/naming gates, and git diff --check. Report exact counts and distinguish pre-existing warnings."
+      },
+      {
+        "kind": "runtime-fixture",
+        "verify": "Prove the valid public @alembic/agent/production authority path is unchanged: capture valid strict evidence, read/reopen the same JSONL in a fresh process, and verify the same store/snapshot/evidence identity and serialized V3 attestation."
+      },
+      {
+        "kind": "negative-probe",
+        "verify": "Through the built public export, reject malformed capture drafts before any mutation, including unknown tool, invalid/extra/missing fields, non-string content/callId/file, invalid 1-based range, and any boundary cases defined by the public contract. For each rejection prove stable Agent error, JSONL bytes/file existence unchanged, store stats/strict snapshot unchanged, and the next valid capture receives the next unconsumed E-n. Retain prior corrupt/rebound/path-escape/different-store failures."
+      },
+      {
+        "kind": "boundary",
+        "verify": "Repair only AlembicAgent's public capture validation on the existing single private EvidenceLedgerStore authority. Do not add a second store/database, export the private store, change Core contracts, implement downstream Main composition, or weaken strict snapshot/hydration failures."
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "Explain why TypeScript-only EvidenceEntryDraft typing did not protect the runtime public facade, why validating after append is too late for append-only JSONL, where validation now executes before sequence allocation/write, and how tests prove rejected calls leave durable state unchanged."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "self-review"
+      },
+      {
+        "kind": "guard"
+      },
+      {
+        "kind": "compatibility"
+      }
+    ]
+  },
+  "createdAt": "2026-07-28T15:16:30.870Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1",
+      "taskPackageId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "Fix the public production ledger capture pre-write validation defect and return raw zero-side-effect proof plus the unchanged fresh-process authority chain.",
+      "status": "pending",
+      "createdAt": "2026-07-28T15:16:30.870Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

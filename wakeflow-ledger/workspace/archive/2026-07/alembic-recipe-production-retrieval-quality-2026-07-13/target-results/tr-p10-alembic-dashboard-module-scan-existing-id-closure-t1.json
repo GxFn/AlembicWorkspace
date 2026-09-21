@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+  "dispatchGroup": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+  "status": "completed",
+  "summary": "Alembic module scan now treats the Agent ScanRunProjection as the sole Recipe identity authority, returns only created pending/staging Recipes with equal non-empty id/candidateId through ModuleService -> Dashboard operation -> POST /api/v1/modules/scan-project, preserves diagnostics and partial/failure outcomes, removes synthetic quality enrichment, and performs no second create/publish. RED contract commit 3ff157a; implementation commit e0cd0f0.",
+  "evidenceRefs": [
+    "Alembic/lib/service/module/ModuleService.ts",
+    "Alembic/lib/injection/modules/AppModule.ts",
+    "Alembic/lib/tools/adapters/DashboardOperations.ts",
+    "Alembic/test/unit/ModuleScanExistingIdClosure.test.ts",
+    "Alembic/test/unit/AiScanRecipeProductionBoundary.test.ts"
+  ],
+  "verification": [
+    "Post-commit: npm run build:check — passed.",
+    "Post-commit: npx vitest run test/unit/ModuleScanExistingIdClosure.test.ts test/unit/AiScanRecipeProductionBoundary.test.ts test/unit/ModulesScanStream.test.ts test/integration/HttpApi.test.ts — 4 files, 29 tests passed.",
+    "Full validation after refactor: npm run check — passed; 140 unit files / 1073 unit tests, 31 integration files / 462 passed and 10 skipped, coverage suite 11 passed, all repository boundary/layer/doctrine/naming/agent/Core/shared-asset/retired-symbol/ring gates passed.",
+    "git diff --check HEAD~2..HEAD — passed; git status --short — empty.",
+    "Alembic Guard final explicit five-file review — no errors and no task-introduced complexity warnings; 15 node-no-sync-io warnings are the same pre-existing ModuleService file-level/request-path debt observed before the refactor."
+  ],
+  "risks": [
+    "A per-batch Promise timeout cannot cancel an already-running upstream Agent operation because the accepted Agent API exposes no cancellation handle; timeout responses therefore set operationMayContinue=true while Alembic itself performs no create/publish.",
+    "ModuleService retains 15 pre-existing synchronous filesystem IO Guard warnings; converting that legacy scan subsystem is outside this identity-closure task and was not expanded here.",
+    "Alembic Prime was unavailable due an internal public-output schema mismatch, so no project knowledge package was consumed; explicit Guard, raw source review, focused HTTP seam tests, and the full repository check supplied the validation evidence."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "e0cd0f0",
+      "verify": "Implementation commit fix: preserve module scan recipe identities; RED contract tests are in preceding commit 3ff157a."
+    },
+    {
+      "kind": "test",
+      "ref": "Alembic/test/unit/ModuleScanExistingIdClosure.test.ts",
+      "verify": "Post-commit focused suite passed 29/29; full npm run check passed 1073 unit tests, 462 integration tests with 10 skipped, and 11 coverage tests."
+    },
+    {
+      "kind": "runtime",
+      "ref": "Alembic/test/unit/ModuleScanExistingIdClosure.test.ts",
+      "verify": "Exercises actual ModuleService -> DashboardOperations -> Express modules router HTTP seam; persisted pending/staging IDs remain unchanged and knowledge create/publish spies remain at zero across success, empty, rejected, failed, malformed and timeout cases."
+    },
+    {
+      "kind": "diff",
+      "value": "849766b..e0cd0f0",
+      "verify": "Only Alembic ModuleService wiring/operation typing and task tests changed; no Dashboard frontend, Core, Agent, or HTTP route implementation changes."
+    },
+    {
+      "kind": "call-chain",
+      "ref": "Alembic/lib/tools/adapters/DashboardOperations.ts",
+      "verify": "POST /api/v1/modules/scan-project delegates to Dashboard scanProject, which returns ModuleService.scanProject without identity reconstruction."
+    },
+    {
+      "kind": "baseline",
+      "value": "RED 8/8 failures before implementation; relevant baseline suite had one stale dry-run preview expectation and otherwise passed.",
+      "verify": "RED failures pinned missing outcome/errors/partial contract before production edits; stale expectation was aligned with accepted upstream zero-submit semantics."
+    },
+    {
+      "kind": "self-review",
+      "value": "Two-stage spec and code review completed.",
+      "verify": "Confirmed sole upstream authority, no provider JSON rehydration, no second create/publish, no synthetic quality, stable partial/error semantics, clean task diff, and explicit uncancellable-timeout boundary."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p10-alembic-dashboard-module-scan-existing-id-closure-p1__Alembic__p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-dashboard-module-scan-existing-id-closure-p1__Alembic__p10-alembic-dashboard-module-scan-existing-id-closure-t1.json",
+    "deliveryRunId": "run-delivery-p10-alembic-dashboard-module-scan-existing-id-closure-p1__Alembic__p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+    "dispatchGroup": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-alembic-dashboard-module-scan-existing-id-closure-p1__Alembic__p10-alembic-dashboard-module-scan-existing-id-closure-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 69,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+    "targetTaskId": "p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p10-alembic-dashboard-module-scan-existing-id-closure-p1",
+    "resultId": "tr-p10-alembic-dashboard-module-scan-existing-id-closure-t1",
+    "createdAt": "2026-07-13T21:37:06.017Z"
+  },
+  "createdAt": "2026-07-13T21:37:06.017Z",
+  "stateRevisionObserved": 69,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

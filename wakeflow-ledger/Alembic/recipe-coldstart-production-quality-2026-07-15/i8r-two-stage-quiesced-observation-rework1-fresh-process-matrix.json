@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "kind": "StrictExternalSetupFreshProcessMatrixEvidenceV1",
+  "taskId": "i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1-t1",
+  "dispatchGroup": "dg-i8r-alembic-main-two-stage-quiesced-observation-redesign2-rework1",
+  "generatedAt": "2026-07-17T02:34:54Z",
+  "repository": "Alembic",
+  "parentCommit": "f281f8ca196d7381554c7f314a823f58ce0767d9",
+  "commit": "c84c51952fe119efb89360a08adffa335322b886",
+  "tree": "13d64c2bbdeecfd5bf1d6f53d694c94d446c39fd",
+  "changedFiles": [
+    "lib/recipe-pipeline/generate/strict/StrictExternalSetupRecovery.ts",
+    "lib/recipe-pipeline/generate/strict/StrictProductionJournal.ts",
+    "test/unit/StrictExternalSetupRecovery.test.ts"
+  ],
+  "reworkClosure": [
+    {
+      "gap": "quiesced observation receipt durable before QUIESCED_OBSERVED event",
+      "result": "fresh-process resume verifies the exact receipt-bound root and idempotently appends the exact receipt payload before snapshot progression",
+      "test": "fresh-process resume backfills QUIESCED_OBSERVED from the durable receipt before snapshot"
+    },
+    {
+      "gap": "terminal not-running progress durable before daemon control deletion",
+      "result": "fresh-process resume binds daemon.json and daemon.pid to the pre-inventory, rejects live or changed identity, removes both controls, fsyncs the parent, and rereads absence",
+      "test": "fresh-process resume completes exact stale control removal persisted after not-running progress"
+    }
+  ],
+  "freshProcessStages": [
+    {
+      "stage": "header-before",
+      "test": "fresh-process stage matrix reclaims a dead pre-header lease before target mutation",
+      "result": "passed"
+    },
+    {
+      "stage": "request-unaccepted",
+      "test": "fresh-process stage matrix replays the same request-unaccepted hash to the live daemon",
+      "result": "passed"
+    },
+    {
+      "stage": "accepted-draining",
+      "test": "fresh-process stage matrix resumes accepted-draining after the old daemon exits",
+      "result": "passed"
+    },
+    {
+      "stage": "old-pid-exited/receipt-missing",
+      "test": "fresh-process resume completes exact stale control removal persisted after not-running progress",
+      "result": "passed"
+    },
+    {
+      "stage": "receipt-written/event-missing",
+      "test": "fresh-process resume backfills QUIESCED_OBSERVED from the durable receipt before snapshot",
+      "result": "passed"
+    },
+    {
+      "stage": "snapshot/probe",
+      "prefixes": [
+        "observed-before-copy",
+        "snapshot-before-probe",
+        "probe-before-verified-event",
+        "verified-event-before-state"
+      ],
+      "result": "passed"
+    },
+    {
+      "stage": "reset",
+      "prefixes": [
+        "initialized-before-reset",
+        "reset-started-before-mutation",
+        "reset-mutation-before-receipt",
+        "reset-receipt-before-blank-event"
+      ],
+      "result": "passed"
+    },
+    {
+      "stage": "quarantine/restore",
+      "tests": [
+        "fresh-process recovery resumes a crash after target quarantine without normal initialization",
+        "fresh-process stage matrix completes setup-state cleanup after a durable recovery receipt"
+      ],
+      "result": "passed"
+    }
+  ],
+  "negativeGates": [
+    {
+      "test": "fresh-process resume still fails closed on an unknown post-progress root delta",
+      "result": "passed"
+    },
+    {
+      "test": "fresh-process reset resume rejects a non-authorized phase delta",
+      "result": "passed"
+    },
+    {
+      "test": "built strict replacement fails closed when a live reader prevents terminal checkpoint",
+      "result": "passed"
+    }
+  ],
+  "oldWriterTermination": {
+    "productionPath": "graceful strict-quiesce only",
+    "testCoordinatorFaultInjection": [
+      "SIGKILL independent setup coordinator",
+      "SIGSTOP/SIGCONT old daemon only to make accepted-draining durable and reproducible"
+    ],
+    "oldDaemonHardKillInPassingPath": false
+  },
+  "verification": [
+    {
+      "command": "npm run check",
+      "exitCode": 0,
+      "results": {
+        "unit": "156 files, 1189 passed",
+        "integration": "32 files, 467 passed, 10 skipped",
+        "coverage": "3 files, 11 passed",
+        "sharedAssetDrift": "17 checks, 0 drift, 0 pending-sync",
+        "retiredSymbols": "clean",
+        "ringDirection": "clean"
+      },
+      "notes": "Lint completed with five pre-existing warnings in unrelated files and no errors."
+    },
+    {
+      "command": "npm run typecheck && npm run build:self && npm run test:unit -- test/unit/StrictExternalSetupRecovery.test.ts test/unit/StrictProductionJournal.test.ts",
+      "exitCode": 0,
+      "results": {
+        "typecheck": "passed",
+        "build": "passed",
+        "targeted": "2 files, 39 passed"
+      },
+      "timing": "post-commit"
+    },
+    {
+      "command": "git diff --check && git show --check --stat --oneline HEAD && git status --short",
+      "exitCode": 0,
+      "results": {
+        "diffCheck": "passed",
+        "commitCheck": "passed",
+        "workingTree": "clean"
+      }
+    }
+  ],
+  "selfReview": {
+    "stageOne": "The two controller-identified crash gaps are closed by exact durable replay and verified by independent-process tests. All required stage prefixes are represented without changing the two-stage authority, lease, observation, snapshot, reset, or recovery design.",
+    "stageTwo": "Receipt hashes, journal header hashes, authority hashes, pre-inventory identities, reset allowlists, protected bindings, fsync boundaries, and readback checks remain fail-closed. Unknown root or reset deltas are rejected. No sibling repository or ordinary non-strict path changed."
+  },
+  "toolDegradation": [
+    {
+      "tool": "Alembic prime/work/code-guard",
+      "status": "degraded",
+      "error": "non-retryable response schema validation rejected injected _meta",
+      "fallbackEvidence": "explicit source review plus targeted and full repository validation"
+    }
+  ]
+}

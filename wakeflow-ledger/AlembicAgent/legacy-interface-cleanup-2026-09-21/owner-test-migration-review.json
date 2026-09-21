@@ -1,0 +1,141 @@
+{
+  "objective": "Move duplicated Agent behavior tests from Main into existing Agent owners without changing production gates or contracts",
+  "baseline": {
+    "Agent": "c5bc99b",
+    "Main": "615e4c4",
+    "ownerTests": {
+      "files": 7,
+      "passed": 112,
+      "failed": 0,
+      "log": "owner-baseline.log"
+    },
+    "mainKnownRed": "../../Alembic/legacy-interface-cleanup-2026-09-21/baseline.log"
+  },
+  "orderedWork": [
+    "Inspected all five Main suites and compared existing Agent behavior/real Main consumers",
+    "Ran seven owner files before editing: 112 passed",
+    "Merged unique event/tool behavior: 74 passed",
+    "Merged policy and evolution receipt behavior: 46 passed",
+    "Merged actual artifact and scope-projection behavior: 19 passed",
+    "Formatted six owner files and ran seven files together: 157 passed",
+    "Added retained budget defaults/custom values and sender allow/deny/default assertions to existing cases; final policy owner 46 passed",
+    "Deleted the five mapped Main copies only after owner GREEN; final limited lint passed"
+  ],
+  "scope": {
+    "agentFiles": [
+      "test/evidence-recording-phase-chain.test.ts",
+      "test/agent-surface-floor.test.ts",
+      "test/hook-system.test.ts",
+      "test/pipeline-context-projection.test.ts",
+      "test/tool-v2-contract.test.ts",
+      "test/tool-availability.test.ts"
+    ],
+    "mainDeleted": [
+      "test/unit/InsightGate.test.ts",
+      "test/unit/evolution-gate-evaluator.test.ts",
+      "test/unit/v2/ToolRegistryV2.test.ts",
+      "test/integration/AgentEventBus.test.ts",
+      "test/integration/StrategyPolicy.test.ts"
+    ],
+    "productionChanged": false,
+    "coreChanged": false,
+    "controlStateChanged": false,
+    "userInstructionFilesChanged": false
+  },
+  "mapping": "../../Alembic/legacy-interface-cleanup-2026-09-21/owner-test-migration-map.json",
+  "coverage": {
+    "oldMainCases": 84,
+    "oldMainLines": 1446,
+    "ownerCasesAdded": 45,
+    "ownerFinalCases": 157,
+    "existingSchemaOwnerUnchanged": "test/tool-schema-projection.test.ts",
+    "mainHostSuitesPreserved": true
+  },
+  "validation": [
+    {
+      "command": "node node_modules/vitest/vitest.mjs run test/evidence-recording-phase-chain.test.ts test/agent-surface-floor.test.ts test/hook-system.test.ts test/pipeline-context-projection.test.ts test/tool-v2-contract.test.ts test/tool-availability.test.ts test/tool-schema-projection.test.ts",
+      "log": "owner-migration-green.log",
+      "exitCode": 0,
+      "passed": 157
+    },
+    {
+      "command": "node node_modules/vitest/vitest.mjs run test/agent-surface-floor.test.ts",
+      "log": "owner-policy-final-green.log",
+      "exitCode": 0,
+      "passed": 46,
+      "note": "Runs after the final retained budget/sender assertions; case count unchanged"
+    },
+    {
+      "command": "biome check test/evidence-recording-phase-chain.test.ts test/agent-surface-floor.test.ts test/hook-system.test.ts test/pipeline-context-projection.test.ts test/tool-v2-contract.test.ts test/tool-availability.test.ts",
+      "log": "owner-final-lint.log",
+      "exitCode": 0
+    }
+  ],
+  "selfReview": {
+    "spec": "Unique behavior mapped to owner matrices or existing tests; obsolete self-reply/request-only-success/global-registry-identity expectations replaced with real contracts. No threshold or runtime edits.",
+    "quality": "No new fixture framework or test file. Negative cases retained and expanded for receipts, permissions and cancellation. New pipeline test uses real ContextWindow/SystemRunContext/MemoryCoordinator and an explicitly typed PipelineRuntime seam; only reactLoop is substituted.",
+    "newP1P2": [],
+    "testSelection": "No failing test is skipped or hidden; Main pure-library copies are removed after mapping. Existing host wiring/HTTP/tool context suites stay in Main."
+  },
+  "statistics": [
+    {
+      "path": "test/agent-surface-floor.test.ts",
+      "added": 263,
+      "removed": 2
+    },
+    {
+      "path": "test/evidence-recording-phase-chain.test.ts",
+      "added": 83,
+      "removed": 1
+    },
+    {
+      "path": "test/hook-system.test.ts",
+      "added": 56,
+      "removed": 2
+    },
+    {
+      "path": "test/pipeline-context-projection.test.ts",
+      "added": 85,
+      "removed": 1
+    },
+    {
+      "path": "test/tool-availability.test.ts",
+      "added": 18,
+      "removed": 0
+    },
+    {
+      "path": "test/tool-v2-contract.test.ts",
+      "added": 70,
+      "removed": 0
+    }
+  ],
+  "fingerprints": [
+    {
+      "path": "test/evidence-recording-phase-chain.test.ts",
+      "sha256": "3ec361f8ed5e29e79ca1b34e33b2b3093e0e8d496d0a0db8c51204c81ea37fcb"
+    },
+    {
+      "path": "test/agent-surface-floor.test.ts",
+      "sha256": "63f425c0dcd00aa4e635a0841efb69af943a15c3aa3dd383dbf7f379ddb2fd56"
+    },
+    {
+      "path": "test/hook-system.test.ts",
+      "sha256": "9a264eb5e34638d76a7399b4f64f347b0386cc5d3b90ed23beb3fc023cfc89e9"
+    },
+    {
+      "path": "test/pipeline-context-projection.test.ts",
+      "sha256": "56d081fb0b28bb7f0ffa9186013464621204a9c9b37b495f76c79b5ab245bff4"
+    },
+    {
+      "path": "test/tool-v2-contract.test.ts",
+      "sha256": "17dd424b266006a744fda0464e488cbe0f1cf5dd84eb66f6730f944f9d13644d"
+    },
+    {
+      "path": "test/tool-availability.test.ts",
+      "sha256": "b979f459bb36587fa08a022d00de49e93e62a95ba09d05ad90a555ae74f76f20"
+    }
+  ],
+  "noCommitReason": "Root owns the final independent Agent/Main commits and full checks; this subtask does not build or commit",
+  "handoff": "Source/test changes are frozen. Root can run the full Agent check and then Main build/check sequentially.",
+  "recordedAgentHead": "9bda075"
+}

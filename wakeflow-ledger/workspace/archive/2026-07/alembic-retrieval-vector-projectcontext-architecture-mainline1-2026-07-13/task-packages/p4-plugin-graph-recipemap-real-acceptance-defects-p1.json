@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+  "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "summary": "修复总控真实 BiliDili Graph/Recipe Map 验收暴露的同一 ProjectContext continuation 链缺陷：Graph 不得向 Core 发送不存在或大小写失真的 modulePath；Recipe Map rollup 必须按 nodeId 唯一；continuation 必须在 inline-byte 裁剪之前保存完整 bounded 结果，使多页 union 无重复、无缺失，并让 terminal status/conservation/region.truncated 反映完整分页后的真实状态。保持 shared fact session、5/5 repo progressive coverage、opaque cursor、只读快照、120 秒 deadline、清理与零写入边界。不要修改 Core、Recipe 数据、检索排名或插件外仓库。",
+  "status": "pending",
+  "sourceRef": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13/task-packages/p2-plugin-retrieval-vector-projectcontext-integration-p1.json",
+  "designIntent": "Keep Core strict, reconcile Plugin module seeds to existing canonical source paths, dedupe rollups by stable node id, and paginate the complete bounded Recipe Map before applying per-page inline budgets.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "One clean AlembicPlugin commit only; report exact parent and changed files."
+      },
+      {
+        "kind": "tests",
+        "verify": "Focused RED/GREEN tests prove invalid module seeds are not emitted, root rollup is unique, and 3+ Recipe Map pages reconstruct the full bounded baseline exactly once; run relevant Graph/Map/session/schema tests plus build:check."
+      },
+      {
+        "kind": "real-repro",
+        "verify": "Run the BiliDili full-space source-path probe: Graph reaches 5/5 with no project-context-invalid-scope; Recipe Map shares factSessionRef and terminal multi-page union has zero duplicate/missing stable IDs."
+      },
+      {
+        "kind": "reader-only-proof",
+        "verify": "BiliDili DB/WAL/SHM fingerprints remain unchanged and continuation artifacts clean after terminal consumption."
+      },
+      {
+        "kind": "self-review",
+        "verify": "Review failure paths, status/conservation honesty, cursor confinement, and no Core/data/ranking scope drift."
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "full-unit-suite"
+      },
+      {
+        "kind": "runtime-package-entry-proof"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T08:47:05.248Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+      "taskPackageId": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "合并修复 Graph invalid module seed、Recipe Map 重复 root rollup、pre-pagination budget 丢失三项真实验收缺陷，并返回一个 AlembicPlugin 提交与聚焦回归证据。",
+      "status": "pending",
+      "createdAt": "2026-07-13T08:47:05.248Z"
+    }
+  ]
+}

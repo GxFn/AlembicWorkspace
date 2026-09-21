@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8r-alembic-plugin-host-neutral-mcp-errors-p1",
+  "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+  "status": "completed",
+  "summary": "rework1 完成：在 60dc367 上修复 shared HostMcpServer 外层 failure 经 Search projector 丢失 TOOL_TIMEOUT 的真实断链，并审计/修复 Graph 与 Recipe Map 的同类 projector 缺口。三个 knowledge projector 仅允许 INTERNAL_ERROR、TOOL_TIMEOUT 与注册过的 STRICT_PUBLICATION_*，保持未知码 fail closed；timeout 现在具有顶层 publication _meta、isError=true、diagnostic/error TOOL_TIMEOUT 与 core.failure.timeout。error-registry adoption 已把 INTERNAL_ERROR 标为 canonical active mapping、CODEX_MCP_ERROR 标为 deprecated read-only alias。新增提交 66b661fcba81647968b104224138a99a134401c4，tree 8e29eff75db807d31d811e07edf4ebf47390c742；仓库干净。",
+  "evidenceRefs": [
+    "AlembicPlugin@66b661fcba81647968b104224138a99a134401c4",
+    "rework-parent:60dc367264059f9fe8eef7e09d12f874278936bd",
+    "original-base:2a36c9b6c61ec765f54c8660f510c779b2bbc05c",
+    "tree:8e29eff75db807d31d811e07edf4ebf47390c742",
+    "runtime-package:sha256:0ae60dd195929f87efa1f074a0a9e185f03406ed0562eb45e00fafe657b415f8",
+    "alembic-guard:guard-public-ms1nkf3p-2",
+    "red:vitest-real-sdk-search-timeout-contract-mismatch",
+    "green:focused-48-unit-1661-integration-665"
+  ],
+  "verification": [
+    "RED: npm exec vitest -- run test/unit/HostNeutralMcpErrors.test.ts -t 'preserves a real SDK Search timeout through the search projector' exited 1; actual diagnostic was alembic-search-output-contract-mismatch/retryable=false instead of TOOL_TIMEOUT/retryable=true, and top-level _meta was absent.",
+    "GREEN after implementation and again after commit: 5 focused files, 48/48 tests passed; includes real SDK Search/Graph/Recipe Map timeout, dual-host parity, strict-code preservation, fake strict-token rejection, legacy normalization, registry adoption, and local output.",
+    "npm run test:unit: 152 files, 1661/1661 passed.",
+    "npm run test:integration: 26 files, 665/665 passed.",
+    "npm run build:check passed before and after commit.",
+    "npm run check passed before and after commit; only 15 pre-existing console warnings in unchanged scripts.",
+    "npm run build; verify:plugin-distribution; verify:codex-runtime-package; verify:codex-plugin; smoke:codex-plugin all passed after commit.",
+    "Runtime package alembic-runtime-0.3.0.tgz: 1408 files, unpackedSize 45930399, install/entrypoint/no-file-dependency/forbidden-old-shape/startup/stdio gates passed; SHA-256 0ae60dd195929f87efa1f074a0a9e185f03406ed0562eb45e00fafe657b415f8.",
+    "Boundary scan: runtime CODEX_MCP_ERROR appears only in error-taxonomy deprecated decoder/alias; shared runtime generic text remains Plugin-owned; no cross-repository files changed.",
+    "Alembic Guard guard-public-ms1nkf3p-2 covered all 8 files; 5 warnings are pre-existing whole-file findings (one /var false positive, existing sync path resolution, and existing test fixture sync I/O), with no hit in new projector/taxonomy/registry/transport lines.",
+    "git status --short empty at 66b661fcba81647968b104224138a99a134401c4."
+  ],
+  "risks": [
+    "Advisory Guard remains failed only on five pre-existing whole-file warnings unrelated to this rework; no code was changed to silence them.",
+    "No Test-window dispatch was authorized or used."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "66b661fcba81647968b104224138a99a134401c4",
+      "ref": "parent=60dc367264059f9fe8eef7e09d12f874278936bd tree=8e29eff75db807d31d811e07edf4ebf47390c742 8 files +266/-38 clean",
+      "verify": "git log -2, git show --stat, git diff HEAD^..HEAD --check, git status --short"
+    },
+    {
+      "kind": "test-first",
+      "ref": "red-real-sdk-search-timeout",
+      "value": "exit=1 actual diagnostic alembic-search-output-contract-mismatch retryable=false; missing top-level _meta",
+      "verify": "npm exec vitest -- run test/unit/HostNeutralMcpErrors.test.ts -t 'preserves a real SDK Search timeout through the search projector'"
+    },
+    {
+      "kind": "mcp-transport-red-green",
+      "ref": "test/unit/HostNeutralMcpErrors.test.ts",
+      "value": "real SDK Client + InMemoryTransport + HostMcpServer validates Search/Graph/Recipe Map timeout as legal CallToolResult, top-level _meta, isError=true, diagnostic/error TOOL_TIMEOUT, core.failure.timeout",
+      "verify": "focused suite 48/48 passed after commit"
+    },
+    {
+      "kind": "dual-host-parity",
+      "ref": "test/unit/HostNeutralMcpErrors.test.ts",
+      "value": "Codex and Claude Code shared HostMcpServer generic failure outputs remain behaviorally identical and host-neutral",
+      "verify": "HostNeutralMcpErrors 6/6 passed"
+    },
+    {
+      "kind": "boundary-scan",
+      "ref": "lib/host-runtime/mcp",
+      "value": "CODEX_MCP_ERROR runtime occurrences limited to deprecated error-taxonomy decoder/alias; no Codex-labelled shared generic text",
+      "verify": "rg scans recorded; no cross-repo changes"
+    },
+    {
+      "kind": "runtime-package",
+      "ref": "runtime-package:sha256:0ae60dd195929f87efa1f074a0a9e185f03406ed0562eb45e00fafe657b415f8",
+      "value": "alembic-runtime@0.3.0, 1408 files, unpackedSize=45930399",
+      "verify": "distribution/runtime boundary/plugin/smoke gates passed after commit"
+    },
+    {
+      "kind": "tests",
+      "ref": "focused=48 unit=1661 integration=665",
+      "value": "build:check, check, build, full unit, full integration, and named package gates all green",
+      "verify": "raw command summaries recorded in verification"
+    },
+    {
+      "kind": "self-review",
+      "ref": "requirements-and-engineering-review",
+      "value": "Requirement review: all rework points directly covered. Engineering review: no high/medium findings; five unrelated advisory Guard warnings documented as low residual noise.",
+      "verify": "diff review, boundary scan, Guard guard-public-ms1nkf3p-2, post-commit reruns"
+    },
+    {
+      "kind": "minimal-change",
+      "ref": "AlembicPlugin-only 8-file commit",
+      "value": "No new protocol/framework; no Core/Main/Agent/Dashboard/Test/Wakeflow/vendor/cache/cold-start/CAS/Recipe changes; true host-specific CODEX_* codes untouched.",
+      "verify": "git show --stat and repository boundary check"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1.json",
+    "deliveryRunId": "run-dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1-20260726t1010",
+    "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 182,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8r-alembic-plugin-host-neutral-mcp-errors-p1",
+    "targetTaskId": "i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors-rework1",
+    "resultId": "tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "createdAt": "2026-07-26T10:31:27.294Z"
+  },
+  "createdAt": "2026-07-26T10:31:27.294Z",
+  "stateRevisionObserved": 182,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1__dg-i8r-alembic-plugin-host-neutral-mcp-errors__current-r0001.json"
+  }
+}

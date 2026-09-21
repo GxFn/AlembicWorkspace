@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "AlembicCore I3–I9 root-cause12 combined package。以干净 accepted Core HEAD 8602b9e6dd03a362736118a92cfd4ae24e35661e 为唯一 Core 基线，修复控制器在真实 Main Facade/Generate/ColdStart 链中独立证明的公共 semantic evidence authority 缺口：一个物理 Evidence Ledger occurrence / EvidenceEntry 在完整 final schedule 的 15 个 receipt obligations 中合法覆盖 8 个不同 harvest groups；当前 V4 canonicalizer、expected-execution binding helper 与 durable gateway 却要求该 evidence 的全部 receipt 共享单一 harvestKey、harvestReceiptHash、fileExecutionHash，导致真实 Main 在进入 Agent 前失败。此包不是普通 point-fix，也不得通过缩减 final schedule、复制 EvidenceEntry、改变 evidenceEntryId、拆分不完整 semantic request、跳过 receipt 或放宽防伪来绕过。\n\n必须完成的最小闭环：\n1. 在 Core 公共 production contract 中建立一个 evidence authority 对多个 canonical harvest groups 的版本化表达（可在单 authority 内嵌 canonical groups，或等价且更小的公开模型）；每组仍绑定 exact harvestKey/harvestReceiptHash/sourceVectorHash/canonicalSubjectRef，并保留组内 exact fileExecutionHash、witness、blob/path/range 与 receipt membership。一个物理 occurrence/EvidenceEntry/witness 只出现一次作为 authority root，不因 query family、lens、parent 或 analysis scale 被复制。\n2. Core canonicalizer/constructor/expected-binding/durable store-load-consume/request validators 必须共同接受同一 evidence root 下的多个合法 harvest groups，且完整 receipt union 与 finalExpandedSchedule receipt universe 精确相等。相同 harvest 下的多 scale receipt 要继续复用一次 physical file/witness；不同 harvest group 可以有各自合法 fileExecutionHash，但不能伪装成同一 harvest。\n3. 保持并加强失败关闭：拒绝缺失/重复 receipt、遗漏某个 harvest group、非 canonical group/order、receipt 从其他 session/evidence/source/subject/path/blob/witness 混入、组内 harvest/hash/file execution 不一致、跨组错误复用、tampered authority/load/attestation，以及 partial request 或 authority union 与完整 semantic request 不相等。现有 V4 未授权 mixing 负向语义不能简单删除；应改成区分“同一受信 evidence root 的完整多组集合”与真正跨 authority/source 的混入。\n4. 公共 API/production exports 与 fresh-process consumer 必须可由后续 Agent 和 Main 使用；版本迁移需明确，旧 contract 如保留只能兼容旧单组输入，不能成为真实链 fallback 或第二 truth。不得在 Core 包修改 AlembicAgent、Alembic、AlembicPlugin、Dashboard 或 Wakeflow。\n5. 正向 fixture 必须至少包含：一个 EvidenceEntry/物理文件；至少两个不同 harvest groups；其中至少一个 harvest group 含两个不同 analysis scales；完整 schedule/request/authority/store-load/attestation-consumption 闭环。输出并断言 evidenceRootCount=1、harvestGroupCount>=2、receipt union/count、各组 receipt/hash/fileExecution membership、physical occurrence/witness de-duplication。另保留对应对抗矩阵。\n6. 先在 8602b9e6… 留下真实 RED，证明当前 V4 对该合法形状抛出 SEMANTIC_DISPOSITION_REVIEW_EVIDENCE_EXECUTION_SET_INVALID 或 V3 mismatch；实现 GREEN 后运行 focused、build/check、public exports/boundary、fresh-process 真实 consumer 与完整仓库回归。两阶段自审先逐条回答本包 1–5，再审 authority 完整性、canonicalization、replay/tamper、兼容性、性能与范围。\n\n交付必须是一个干净 AlembicCore commit，返回 parent/commit/tree、changed files/symbols、RED→GREEN 原始命令摘要、可复核 runtime JSON/Markdown evidence、public export/consumer 证据、完整验证、兼容性与残余风险。完成后按 wakeflow-target 记录 TargetResultEnvelope 并 controller-return；不得自行派发 Agent/Main，也不得把本包完成等同于需求完成。后续严格顺序是 Core 被总控接受 → Agent 消费新 contract → Main 真实完整链重连 → 非 Test 全部接受后才允许 Test。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§3, 5, 11.2, 11.8（同一 direct occurrence 跨 lens/scale 保持单一 fact identity；MiningWorkSchedule 每个 harvest obligation 各一 terminal receipt；完整 schedule/population 守恒）；controller decision tc-20260728191941-0287 / revision 288；Alembic blocker i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1",
+  "designIntent": "在一个物理 evidence authority root 下规范化多个 harvest groups；组内保留 shared-harvest exact execution，组间守恒完整 receipt union，不复制 evidence truth。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-28T19:21:15.788Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1",
+      "taskPackageId": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "修复 Core 公共 semantic evidence authority，使一个真实 EvidenceEntry 能在完整语义请求中守恒地覆盖多个 canonical harvest groups，同时保留组内 exact execution 与全量防混入/防篡改验证。",
+      "status": "pending",
+      "createdAt": "2026-07-28T19:21:15.788Z"
+    }
+  ]
+}

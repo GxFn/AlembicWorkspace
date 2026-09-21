@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-rollback-strict-test-agent-t1",
+  "demandKey": "strict-test-split-removal-2026-08-03",
+  "taskPackageId": "rollback-strict-test-agent-p1",
+  "dispatchGroup": "rollback-strict-test-agent-p1",
+  "stateRoot": ".wakeflow-active/current/strict-test-split-removal-2026-08-03",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "rollback-strict-test-agent-t1",
+  "status": "needs-review",
+  "summary": "已按指定顺序分别精确回滚四个 AlembicAgent strict-test-dimension 产品提交，保留 248d1ed 文档提交；专用 authority/receipt/runtime/prompt/public/probe/fixture/test 表面零残留，普通生产管线聚焦测试 50/50 无回归。全量检查仍被任务前已存在的相邻 @alembic/core/project-context-foundation 缺少 createProjectContextFileRef 导出阻断，因此按 acceptance anchor 字面要求回传 needs-review。",
+  "changedRepos": [
+    "AlembicAgent"
+  ],
+  "commits": [
+    "a47bc2fcd7752b8cf2f4c26c6e42612028a88c00",
+    "81a40fdde802e9c547824a4b32a34ef0e20fcb87",
+    "00169b3ca5925c84a0e0cc149878afb2419cb79b",
+    "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05"
+  ],
+  "commitDisposition": "committed",
+  "evidenceRefs": [
+    "wakeflow-ledger/AlembicAgent/strict-test-split-removal-2026-08-03/rollback-strict-test-agent-evidence.md",
+    "a47bc2fcd7752b8cf2f4c26c6e42612028a88c00",
+    "81a40fdde802e9c547824a4b32a34ef0e20fcb87",
+    "00169b3ca5925c84a0e0cc149878afb2419cb79b",
+    "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05"
+  ],
+  "verification": [
+    "PASS npm run build",
+    "PASS npm run build:check",
+    "PASS npm run lint (21 pre-existing warnings only)",
+    "PASS all repository boundary/layer/doctrine/naming/provider-neutral/retired-symbol checks",
+    "PASS npm run smoke:public-signatures (15 exports, 451 bindings)",
+    "PASS npm run verify:validation-floor",
+    "PASS focused ordinary production suite (5 files, 50 tests)",
+    "PASS source/test/script/config/package/dist zero-residue scans",
+    "PASS git diff --check origin/main..HEAD and clean tracked worktree",
+    "BASELINE FAIL unchanged: npm run smoke:strict-consumer and full npm test because @alembic/core/project-context-foundation lacks createProjectContextFileRef; pre/post both have the same 20 test failures"
+  ],
+  "risks": [
+    "Full-check acceptance anchor is not literally green because an adjacent local Core facade export failure predates and remains after this rollback; resolving it is outside this task and repository boundary.",
+    "Two stale ignored dist artifacts from the reverted source were deleted and dist was rebuilt; no tracked file or commit was affected by that cleanup."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "execution-plan",
+      "ref": "wakeflow-ledger/AlembicAgent/strict-test-split-removal-2026-08-03/rollback-strict-test-agent-evidence.md",
+      "verify": "任务包三个 acceptance anchors 均在编码前映射为 RED/GREEN 探针；只执行四个指定 revert。"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "agent-exact-revert-lineage",
+      "red": "HEAD=8688311，四个产品提交均在祖先链且没有对应 revert；248d1ed 为必须保留的交错文档提交。",
+      "green": "四个 full-SHA 一对一 revert 提交均含精确 This reverts commit 关联；248d1ed 仍为祖先，当前净 patch-id 等于 248d1ed patch-id，AGENTS/CLAUDE 内容未回滚，git diff --check 通过。",
+      "ref": "wakeflow-ledger/AlembicAgent/strict-test-split-removal-2026-08-03/rollback-strict-test-agent-evidence.md#agent-exact-revert-lineage"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "agent-strict-receipt-lane-absent",
+      "red": "src/test/scripts/package.json 中 14 个文件、642 个专用 authority/receipt/runtime/prompt/probe/fixture/test 命中。",
+      "green": "源码、测试、脚本、配置、package.json、文件名及重建后的 dist 专用符号扫描均为零；build/typecheck/import/API/layer/doctrine/naming/provider-neutral/retired-symbol 检查通过。",
+      "ref": "wakeflow-ledger/AlembicAgent/strict-test-split-removal-2026-08-03/rollback-strict-test-agent-evidence.md#agent-strict-receipt-lane-absent"
+    },
+    {
+      "kind": "acceptance-anchor",
+      "anchorId": "agent-production-preserved",
+      "red": "回滚前普通生产聚焦测试 5 files/50 tests 通过；全量基线 631 passed/20 failed，20 个失败均来自相邻 Core facade 缺失导出。",
+      "green": "回滚后同一普通生产聚焦测试仍 5 files/50 tests 通过；全量仍为同一 20 个外部 Core facade 失败，减少的 42 个 pass 仅为被回滚的专用 strict-test 测试。因锚点要求全量通过但外部基线仍红，结果标记 needs-review。",
+      "ref": "wakeflow-ledger/AlembicAgent/strict-test-split-removal-2026-08-03/rollback-strict-test-agent-evidence.md#agent-production-preserved"
+    },
+    {
+      "kind": "change-scope",
+      "ref": "git diff --name-status origin/main..HEAD",
+      "verify": "仅四个指定产品分叉的逆向差异；没有替代模式、相邻仓库修改或普通生产管线设计变更。"
+    },
+    {
+      "kind": "self-review",
+      "ref": "wakeflow-ledger/AlembicAgent/strict-test-split-removal-2026-08-03/rollback-strict-test-agent-evidence.md#self-review",
+      "verify": "P0-P3 自审无回滚引入缺陷；唯一风险为任务前后相同的外部 Core facade 基线故障。"
+    },
+    {
+      "kind": "typecheck",
+      "ref": "npm run build:check",
+      "verify": "PASS"
+    },
+    {
+      "kind": "lint",
+      "ref": "npm run lint and repository boundary/layer/doctrine/naming/provider-neutral/retired-symbol checks",
+      "verify": "PASS；Biome 仅报告 21 个任务前已存在 warnings。"
+    },
+    {
+      "kind": "regression",
+      "ref": "npm test -- --run test/strict-production-chain.test.ts test/strict-production-rework.test.ts test/agent-surface-floor.test.ts test/pipeline-outcome-abandoned.test.ts test/mining-e2e-pipeline.test.ts",
+      "verify": "PASS，5 files / 50 tests。"
+    }
+  ],
+  "resultMapping": {
+    "contract": "target-result-envelope-v2",
+    "compatibility": "enforced",
+    "status": "partial",
+    "acceptanceAnchorIds": [
+      "agent-exact-revert-lineage",
+      "agent-strict-receipt-lane-absent",
+      "agent-production-preserved"
+    ],
+    "testPlanIndices": [],
+    "partialIssues": []
+  },
+  "deliveryContext": {
+    "deliveryId": "delivery-rollback-strict-test-agent-p1__AlembicAgent__rollback-strict-test-agent-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/strict-test-split-removal-2026-08-03__delivery-rollback-strict-test-agent-p1__AlembicA--47aba042e014.json",
+    "deliveryRunId": "run-delivery-rollback-strict-test-agent-p1",
+    "dispatchGroup": "rollback-strict-test-agent-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/strict-test-split-removal-2026-08-03__delivery-rollback-strict-test-agent-p1__AlembicA--47aba042e014.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/strict-test-split-removal-2026-08-03",
+    "stateRevision": 13,
+    "demandKey": "strict-test-split-removal-2026-08-03",
+    "taskPackageId": "rollback-strict-test-agent-p1",
+    "targetTaskId": "rollback-strict-test-agent-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "rollback-strict-test-agent-p1",
+    "resultId": "tr-rollback-strict-test-agent-t1",
+    "createdAt": "2026-08-03T15:38:32.117Z"
+  },
+  "createdAt": "2026-08-03T15:38:32.117Z",
+  "stateRevisionObserved": 13,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

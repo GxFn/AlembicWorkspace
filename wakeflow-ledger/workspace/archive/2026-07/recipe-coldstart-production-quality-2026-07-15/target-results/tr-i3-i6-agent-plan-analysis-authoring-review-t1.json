@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i6-agent-plan-analysis-authoring-review-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i6-agent-plan-analysis-authoring-review-p1",
+  "dispatchGroup": "dg-i3-i6-agent-plan-analysis-authoring-review-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "i3-i6-agent-plan-analysis-authoring-review-t1",
+  "status": "completed",
+  "summary": "AlembicAgent rework1 已完成并提交：以实际 strict semantic receipts（cluster/induction/hypothesis/fixpoint/evidence/fingerprint）派生不可替换 lineage root，完整验证 repair 父链并覆盖替换/伪造/reset negatives；将 mining judge 迁入生产模块并让 eval/calibration 加载构建产物与冻结模型 receipt；以 AlembicWorkspace 单文件价值源和 BiliDili 三文件通用源运行真实 mining→judge 双 fixture；strict 路由 receipt 证明 Analyst/Producer 各 1 次、legacy 各 0 次，同时保留非 strict 兼容。提交 e2aa051500cc9fc5c43f1085afd5072c5981f26f，工作树干净。此结果仅供总控审查，不声称需求验收或全局冷启动完成。",
+  "evidenceRefs": [
+    "AlembicAgent@e2aa051500cc9fc5c43f1085afd5072c5981f26f",
+    "AlembicAgent/test-reports/strict-production/report.json",
+    "AlembicAgent/test-reports/strict-production/mining/report.json",
+    "AlembicAgent/test-reports/strict-production/judge-calibration/calibration.json",
+    "AlembicAgent/test/fixtures/strict-production/golden.json",
+    "AlembicAgent/test/strict-production-rework.test.ts",
+    "AlembicAgent/test/strict-production-chain.test.ts"
+  ],
+  "verification": [
+    "npm run check passed on the committed tree: 69 test files / 552 tests, plus build, lint, import/public/core/space/layer/doctrine/naming/provider-neutral/smoke/validation-floor/retired-symbol guards.",
+    "Post-commit npm run build:check passed and focused strict regression passed: 2 files / 23 tests.",
+    "npm run eval:strict-production passed with report passed=true, reportHash=sha256:28cb0b6a6e10c40d574cff4eb8a8afa3eb69b9f732b29e1de3a3cdf7a8698a58, apiKeyReadCount=0, networkRequestCount=0.",
+    "Mining evaluation ran both executable source fixtures through the actual AgentService/PipelineStrategy strict route: value fixture candidate=1 and recall/precision/judgePrecision=1; generic fixture candidate=0 and negative result passed.",
+    "Judge calibration ran 30 frozen samples: agreement=1, kappa=1, negative recall=1, selfBiasSignal=false, promotionEligible=true; model receipt=sha256:b4ffb28c4c481feb0234428e88a2a69f7d48d27573d9164ab3cccc750ac1bcae.",
+    "git diff --check passed before commit; HEAD=e2aa051500cc9fc5c43f1085afd5072c5981f26f, parent=c6fc1f81fba20ffd380169850495dcb28723acc7, tree=459723c2ecf2919f95b2dccbaae6e4e51d46f61b, committed worktree clean."
+  ],
+  "risks": [
+    "Evaluation is intentionally deterministic and offline; it proves the frozen production/eval path and explicitly does not claim external-model behavior.",
+    "Recipe persistence/admission and Main orchestration remain downstream boundaries outside this AlembicAgent package."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "e2aa051500cc9fc5c43f1085afd5072c5981f26f",
+      "value": "parent=c6fc1f81fba20ffd380169850495dcb28723acc7; tree=459723c2ecf2919f95b2dccbaae6e4e51d46f61b; 25 files; worktree clean",
+      "verify": "git rev-parse HEAD HEAD^ HEAD^{tree} && git status --porcelain=v1 && git show --stat --oneline --summary HEAD"
+    },
+    {
+      "kind": "runtime-report",
+      "ref": "AlembicAgent/test-reports/strict-production/report.json",
+      "value": "file sha256=5e20438bb8d8e32b288a5c7bc60947d4a419b640309d9f8be57ae08a5b599e9e; semantic reportHash=sha256:28cb0b6a6e10c40d574cff4eb8a8afa3eb69b9f732b29e1de3a3cdf7a8698a58; passed=true; Plan→Analyst→Producer→Independent Reviewer; Core commit/tree/PC-F receipt loaded; 1-result and investigated-empty cases; key/network=0",
+      "verify": "shasum -a 256 test-reports/strict-production/report.json && npm run eval:strict-production"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicAgent/test/strict-production-rework.test.ts",
+      "value": "npm run check passed with 69 files/552 tests and all repository guards; post-commit build:check plus focused strict suite passed 2 files/23 tests",
+      "verify": "npm run check && npm run build:check && npm test -- --run test/strict-production-rework.test.ts test/strict-production-chain.test.ts"
+    },
+    {
+      "kind": "negative-tests",
+      "ref": "AlembicAgent/test/strict-production-rework.test.ts",
+      "value": "Rejects cluster-id/set, hypothesis, fixpoint, evidence, fake-root substitutions; forged/incomplete parents; old caller reset shape; third repair; legacy strict routing; source/model/config drift; generic fixture over-generation",
+      "verify": "npm test -- --run test/strict-production-rework.test.ts test/strict-production-chain.test.ts"
+    },
+    {
+      "kind": "compatibility",
+      "ref": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+      "value": "Strict context fails before unmarked legacy Analyst/Producer calls; runtime route receipts show strictAnalystCalls=1 strictProducerCalls=1 legacyAnalystCalls=0 legacyProducerCalls=0 per fixture; non-strict path unchanged; public surface remains exactly 12 exports/432 bindings; only AlembicAgent changed",
+      "verify": "npm run check && git diff-tree --no-commit-id --name-only -r HEAD"
+    },
+    {
+      "kind": "evaluation",
+      "ref": "AlembicAgent/test-reports/strict-production/mining/report.json",
+      "value": "file sha256=8451bc1fbf5d6f2b4d8ebb73feb13987c82ac27f0249d2adcea296da3ad8f64c; golden=90329055f7792e8ac7cb5252ee218a0cec0d1ca93686fa789623ebefeb421bac; config=5c39f852cd2d5e15143f7120f43cb490e3eed1076268b31166459814ea2f422e; provider/judge=9654a9b5645d66f705a2c3ab010f430753b9a3529fcd079768b116ea002728fe; model receipt=sha256:b4ffb28c4c481feb0234428e88a2a69f7d48d27573d9164ab3cccc750ac1bcae; value fixture 1 candidate, generic fixture 0; key/network=0",
+      "verify": "npm run eval:mining -- --judge --judge-provider frozen-fixture --judge-model strict-production-fixture-v1"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Rework plan sequenced four findings: immutable semantic lineage; production-owned judge/model receipt; executable hashed fixtures and calibration; strict-vs-legacy reachability proof; then repository-wide validation and commit.",
+      "verify": "Compare controller event evt-20260716064940-0076 against commit diff and report receipts."
+    },
+    {
+      "kind": "test-first",
+      "ref": "AlembicAgent/test/strict-production-rework.test.ts",
+      "value": "Baseline runtime probe reproduced acceptance of replaced hypothesis/fixpoint/fake root; regression tests encoded substitution/reset/routing/eval failures before the production correction; GREEN is the committed 23-test focused suite plus 552-test repository check.",
+      "verify": "Inspect strict-production-rework test cases and rerun focused suite."
+    },
+    {
+      "kind": "two-stage-self-review",
+      "value": "Stage 1 requirement review mapped and closed all four controller findings. Stage 2 correctness/compatibility/scope review found and added evidence range/content/hash/duplicate validation, then reran full check and post-commit focused verification. No cross-repo, persistence, Main, Test, Design, Wakeflow, or controller-state implementation changes.",
+      "verify": "Review commit diff, report receipts, git diff-tree scope, and validation commands."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i3-i6-agent-plan-analysis-authoring-review-rework1__AlembicAgent__i3-i6-agent-plan-analysis-authoring-review-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i6-agent-plan-analysis-authoring-review-rework1__AlembicAgent__i3-i6-agent-plan-analysis-authoring-review-t1.json",
+    "deliveryRunId": "run-delivery-dg-i3-i6-agent-plan-analysis-authoring-review-rework1__AlembicAgent__i3-i6-agent-plan-analysis-authoring-review-t1",
+    "dispatchGroup": "dg-i3-i6-agent-plan-analysis-authoring-review-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i6-agent-plan-analysis-authoring-review-rework1__AlembicAgent__i3-i6-agent-plan-analysis-authoring-review-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 77,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i6-agent-plan-analysis-authoring-review-p1",
+    "targetTaskId": "i3-i6-agent-plan-analysis-authoring-review-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "dg-i3-i6-agent-plan-analysis-authoring-review-rework1",
+    "resultId": "tr-i3-i6-agent-plan-analysis-authoring-review-t1",
+    "createdAt": "2026-07-16T07:28:04.123Z"
+  },
+  "createdAt": "2026-07-16T07:28:04.123Z",
+  "stateRevisionObserved": 77,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i3-i6-agent-plan-analysis-authoring-review-t1",
+    "dispatchGroup": "dg-i3-i6-agent-plan-analysis-authoring-review",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i3-i6-agent-plan-analysis-authoring-review-t1__dg-i3-i6-agent-plan-analysis-authoring-review__current-r0001.json"
+  }
+}

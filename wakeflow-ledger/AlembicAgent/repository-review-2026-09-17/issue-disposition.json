@@ -1,0 +1,1126 @@
+{
+  "notes": [
+    "原始报告与复审补充可能描述同一缺陷的不同分支，保留 ID 用于可追溯，不将行数解释为独立 bug 数。",
+    "最终状态由实际补丁、回归及总门禁复核；原始 source-review 不代表测试通过。"
+  ],
+  "items": [
+    {
+      "id": "TOOLS-001",
+      "severity": "P1",
+      "path": "src/tools/runtime/handlers/terminalSafety.ts",
+      "issue": "只读命令白名单可被换行及子程序执行选项绕过。",
+      "status": "fixed",
+      "resolution": "只读命令检查拒绝CR/LF/变量展开，并禁止find子程序/写文件、rg --pre等已复现绕过参数。",
+      "evidence": [
+        "src/tools/runtime/handlers/terminalSafety.ts",
+        "test/runtime-terminal-safety.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-002",
+      "severity": "P1",
+      "path": "src/tools/runtime/handlers/code.ts",
+      "issue": "delta cache unchanged 在显式读取范围之前短路，阻止第二段源码与大文件 outline 后的补读。",
+      "status": "fixed",
+      "resolution": "unchanged短路仅用于无显式范围请求；startLine/endLine/maxLines补读返回真实范围并继续维护指纹。",
+      "evidence": [
+        "src/tools/runtime/handlers/code.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-003",
+      "severity": "P1",
+      "path": "src/tools/runtime/router.ts",
+      "issue": "exclusive 锁只互斥其他 exclusive，parallel/single 均不等待，实际并非全局独占。",
+      "status": "fixed",
+      "resolution": "统一scheduler计入parallel/single活动，exclusive形成队列屏障；已验证取消屏障、异常和handler前取消释放。",
+      "evidence": [
+        "src/tools/runtime/router.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-004",
+      "severity": "P1",
+      "path": "src/tools/runtime/handlers/code.ts",
+      "issue": "文件和 cwd 边界只检查词法路径，符号链接可越过项目根或别名绕过受保护路径。",
+      "status": "fixed",
+      "resolution": "resolveProjectPath统一校验词法与realpath，新增文件校验最近存在祖先；code/terminal cwd/authoring和证据引用接入，保护路径使用真实相对路径。",
+      "evidence": [
+        "src/shared/projectPath.ts",
+        "src/tools/runtime/handlers/code.ts",
+        "src/tools/runtime/handlers/terminal.ts",
+        "src/tools/runtime/handlers/recipeAuthoringGate.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-005",
+      "severity": "P2",
+      "path": "src/tools/runtime/handlers/code.ts",
+      "issue": "搜索 cache key 缺影响结果的 maxResults/contextLines，窄查询污染后续扩容查询。",
+      "status": "fixed",
+      "resolution": "code.search缓存键加入projectRoot、pattern、glob、regex、maxResults和contextLines，窄结果不再污染扩容请求。",
+      "evidence": [
+        "src/tools/runtime/handlers/code.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-006",
+      "severity": "P1",
+      "path": "src/tools/runtime/compressor/parsers/TestOutputParser.ts",
+      "issue": "pytest 正则的计数组全部可选，先匹配 session 标题并伪造零测试零失败。",
+      "status": "fixed",
+      "resolution": "pytest仅匹配真实结果计数摘要并取最后一条，支持failed/pass顺序和error/errors，session标题不再伪造0测试。",
+      "evidence": [
+        "src/tools/runtime/compressor/parsers/TestOutputParser.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-007",
+      "severity": "P1",
+      "path": "src/tools/runtime/compressor/parsers/GitStatusParser.ts",
+      "issue": "已匹配的 unmerged git 状态未入任何 bucket，冲突可被压缩为空输出。",
+      "status": "fixed",
+      "resolution": "七种unmerged状态统一进入conflicted桶，UU等不再被丢成空字符串。",
+      "evidence": [
+        "src/tools/runtime/compressor/parsers/GitStatusParser.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-008",
+      "severity": "P1",
+      "path": "src/tools/runtime/handlers/knowledge.ts",
+      "issue": "retrievalProfile sourceContentHash 在 style repair 前计算，修复改变事实字段后未重建而提交过期 hash。",
+      "status": "fixed",
+      "resolution": "采用风格修复后重新prepare candidate/profile hash，并使用共同authoring评估入口；不覆盖首次unsafe-code诊断。",
+      "evidence": [
+        "src/tools/runtime/handlers/knowledge.ts",
+        "test/recipe-production-profile-adapter.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-009",
+      "severity": "P1",
+      "path": "src/tools/kernel/result.ts",
+      "issue": "ordinary output 仅清理 structuredContent，adapter 的 JSON text 仍保留被禁止的私有字段。",
+      "status": "fixed",
+      "resolution": "ordinary output的可解析JSON text与structuredContent使用同一字段清理，合并redacted字段摘要。",
+      "evidence": [
+        "src/tools/kernel/result.ts",
+        "test/tool-system.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-010",
+      "severity": "P2",
+      "path": "src/tools/catalog/UnifiedToolCatalog.ts",
+      "issue": "继承 unregister 仅删 manifest，handler definitions/expanded 状态仍保留，且 registerDefinition 先写 defs 后注册 manifest 会在重复失败后留下半注册。",
+      "status": "fixed",
+      "resolution": "unregister同步清除manifest/definition/expanded状态；registerDefinition在manifest成功后写defs，失败不会留下半注册。",
+      "evidence": [
+        "src/tools/catalog/UnifiedToolCatalog.ts",
+        "test/tool-system.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-011",
+      "severity": "P1",
+      "path": "src/tools/runtime/router.ts",
+      "issue": "通用执行入口和等待锁后均未检查 abortSignal，已取消/排队期间取消的有副作用 handler 仍可执行。",
+      "status": "fixed",
+      "resolution": "router调度前、排队取消、获得slot后handler前均处理取消；adapter明确投影aborted，已执行partial输出保留。",
+      "evidence": [
+        "src/tools/runtime/router.ts",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-012",
+      "severity": "P2",
+      "path": "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+      "issue": "局部 JSON 提取器按每个花括号计深度，不识别 JSON 字符串/转义，拒绝合法风格修复输出。",
+      "status": "fixed",
+      "resolution": "风格修复委托shared structuredOutput JSON提取器，消除不识别字符串花括号的局部扫描器。",
+      "evidence": [
+        "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+        "src/shared/structuredOutput.ts",
+        "test/SubmissionSanitize.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-013",
+      "severity": "P2",
+      "path": "src/tools/runtime/compressor/OutputCompressor.ts",
+      "issue": "首次并发调用在 parser import 完成前把 loaded 设 true，后来者跳过实际加载。",
+      "status": "fixed",
+      "resolution": "异步首次parser初始化共享Promise，compress等待后复用compressSync处理逻辑。",
+      "evidence": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-014",
+      "severity": "P2",
+      "path": "src/tools/runtime/router.ts",
+      "issue": "参数校验忽略已声明的基础类型，错误形状能持久写入宿主会话 store 并破坏后续调用。",
+      "status": "fixed",
+      "resolution": "参数根形状及已声明基础类型在handler前校验，数字/数组/对象memory key不再进入store；未擅自把静态sources要求应用于evidenceRefs-only有效提交。",
+      "evidence": [
+        "src/tools/runtime/router.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "id": "TOOLS-X01",
+      "severity": "P1",
+      "path": "src/tools/runtime/toolsets/Evolution.ts",
+      "issue": "Evolution commandAllowlist 只在直接给 ToolRouter 配 capability 的单测中兑现；真实宿主无此接线。",
+      "status": "fixed",
+      "resolution": "runtimeSafetyGate在调用host router前使用当前LoopContext capability命令白名单；不再依赖宿主单例ToolRouter配置。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "test/runtime-efficiency.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-001",
+      "severity": "P1",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "issue": "abort() 只改状态/发事件，无法取消execute中的局部AbortController，在途provider/tool继续运行。",
+      "status": "fixed",
+      "resolution": "当前execute controller保存在实例，abort真实触发signal；provider迟到响应被丢弃，完成分支统一取消状态，abort事件不重复。",
+      "evidence": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/agent-lifecycle.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-002",
+      "severity": "P1",
+      "path": "src/agent/service/AgentService.ts",
+      "issue": "正常返回仅按reply非空判success，取消、policy拒绝、strict失败、fallback错误文本被误报成功。",
+      "status": "fixed",
+      "resolution": "Service消费终止诊断/管线结局，明确aborted最优先；policy拒绝、provider终止、fallback、strict失败正确区分；历史timeout仅在最终阶段未恢复时决定timeout。",
+      "evidence": [
+        "src/agent/service/AgentService.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/agent-lifecycle.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-003",
+      "severity": "P1",
+      "path": "src/agent/service/AgentService.ts",
+      "issue": "execution.timeoutMs 在buildRuntimeOptions完全丢弃，公开运行时选项也无对应字段。",
+      "status": "fixed",
+      "resolution": "AgentRuntimeRunOptions加入timeoutMs，Service透传，Runtime execute实际建立相应timeout保护。",
+      "evidence": [
+        "src/agent/service/AgentRunContracts.ts",
+        "src/agent/service/AgentService.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/agent-lifecycle.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-004",
+      "severity": "P1",
+      "path": "src/agent/policies/BudgetPolicy.ts",
+      "issue": "非tracker首轮iteration先加到1，Policy用>=maxIterations提前终止；translation-json配置1会零模型调用。",
+      "status": "fixed",
+      "resolution": "ExitController把已完成轮数iteration-1传给Policy；真实BudgetPolicy最大1轮时允许首个model调用。",
+      "evidence": [
+        "src/agent/runtime/ExitController.ts",
+        "test/agent-lifecycle.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-005",
+      "severity": "P1",
+      "path": "src/agent/profiles/AgentProfileCompiler.ts",
+      "issue": "声明式SafetyPolicy编译时所有约束字段丢失。",
+      "status": "fixed",
+      "resolution": "声明式safety policy去掉type后透传完整构造配置。",
+      "evidence": [
+        "src/agent/profiles/AgentProfileCompiler.ts",
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-006",
+      "severity": "P1",
+      "path": "src/agent/policies/PolicyEngine.ts",
+      "issue": "工具安全策略仅识别terminal args.bin旧形态，当前action/params.command不触发自定义命令黑名单。",
+      "status": "fixed",
+      "resolution": "PolicyEngine识别params.command和旧bin形式；runtimeSafetyGate在host前执行策略，代码相对路径基于runtime.projectRoot归一化。",
+      "evidence": [
+        "src/agent/policies/PolicyEngine.ts",
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "test/runtime-efficiency.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-007",
+      "severity": "P2",
+      "path": "src/agent/runtime/BudgetController.ts",
+      "issue": "无ContextWindow的工具配额返回值与内部remaining状态不一致。",
+      "status": "fixed",
+      "resolution": "无ContextWindow分支同样初始化和重置roundMaxChars/used/maxMatches。",
+      "evidence": [
+        "src/agent/runtime/BudgetController.ts",
+        "test/BudgetController.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-008",
+      "severity": "P1",
+      "path": "src/agent/coordination/AgentRunCoordinator.ts",
+      "issue": "按tier排序执行后的结果数组与原输入顺序不一致，merger按下标将结果归错dim/module。",
+      "status": "fixed",
+      "resolution": "tier执行结果按原始child对象保存并按原输入顺序重建，merger下标归属保持正确。",
+      "evidence": [
+        "src/agent/coordination/AgentRunCoordinator.ts",
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-009",
+      "severity": "P1",
+      "path": "src/agent/coordination/AgentRunCoordinator.ts",
+      "issue": "parent合并只识别error/aborted，timeout和blocked均提升为success。",
+      "status": "fixed",
+      "resolution": "parent聚合覆盖error/aborted/timeout/blocked全部非成功状态。",
+      "evidence": [
+        "src/agent/coordination/AgentRunCoordinator.ts",
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-010",
+      "severity": "P1",
+      "path": "src/agent/runtime/AgentEventBus.ts",
+      "issue": "request发布的请求自身因同correlationId被当作reply，未响应也立即成功。",
+      "status": "fixed",
+      "resolution": "pending request记录requestType，同type请求发布不再自解；真正不同类型response可响应，无人回复会timeout。",
+      "evidence": [
+        "src/agent/runtime/AgentEventBus.ts",
+        "test/hook-system.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-011",
+      "severity": "P1",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "issue": "直呼note_finding桥接丢弃schema公开的所有深度槽，RECORD阶段无法保存深度发现。",
+      "status": "fixed",
+      "resolution": "直呼note_finding按DEPTH_SLOT_PROPS单源key透传全部可选深度槽。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "test/runtime-efficiency.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-012",
+      "severity": "P1",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "issue": "Producer阶段gate未允许evidence.get/search，阻断capability已声明的证据自救通道。",
+      "status": "fixed",
+      "resolution": "Producer gate允许既有evidence.get/search；RECORD schema和record-repair工具集同步保留证据只读入口。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "test/runtime-efficiency.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-013",
+      "severity": "P1",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "issue": "可变状态读取被默认session缓存永久短路，绕开真实重读与写前新鲜度恢复。",
+      "status": "fixed",
+      "resolution": "code/memory/knowledge/evidence及meta.review退出外层缓存；其它工具仅在明确只读manifest及真实snapshot下复用，移除session/文件长度伪snapshot。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "test/runtime-efficiency.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-014",
+      "severity": "P1",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "issue": "公开可阻断tool:execute:before hook被Runtime用emitSync调用，false返回值完全无效。",
+      "status": "fixed",
+      "resolution": "Runtime await可阻断hook并消费false，记录blocked且不调用router；await后复查signal。",
+      "evidence": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/agent-lifecycle.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-015",
+      "severity": "P2",
+      "path": "src/agent/runtime/LLMInputMeasurement.ts",
+      "issue": "provider预算估计把system/runtime sections重复计入，导致未超预算的请求被误拒。",
+      "status": "fixed",
+      "resolution": "总input估算只计systemPrompt/providerMessages/tools一次；sections保留作分项和重复分析。",
+      "evidence": [
+        "src/agent/runtime/LLMInputMeasurement.ts",
+        "test/llm-input-layering.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-016",
+      "severity": "P2",
+      "path": "src/agent/runtime/forcedSummary.ts",
+      "issue": "强制摘要仍消费旧扁平参数并将所有knowledge调用计为已提交候选。",
+      "status": "fixed",
+      "resolution": "forcedSummary统一解包当前params/path形态，并通过toolOutcomes只统计真实created/id/lifecycle提交；scan finalize同样使用该语义。",
+      "evidence": [
+        "src/agent/runtime/forcedSummary.ts",
+        "src/agent/utils/toolOutcomes.ts",
+        "src/agent/runtime/AgentRuntime.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-017",
+      "severity": "P1",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "issue": "两条强制摘要provider调用未传abortSignal，取消/timeout后摘要HTTP仍继续。",
+      "status": "fixed",
+      "resolution": "两条强制摘要provider调用均透传abortSignal；execute取消收束会覆盖迟到/降级摘要，防止取消提升为success。",
+      "evidence": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/forcedSummary.ts",
+        "test/agent-lifecycle.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-018",
+      "severity": "P2",
+      "path": "src/agent/policies/QualityGatePolicy.ts",
+      "issue": "任何knowledge查询都被当成submit，从而跳过文件证据数量门。",
+      "status": "fixed",
+      "resolution": "QualityGatePolicy仅以isPersistedSubmission成功提交绕过文件引用门，knowledge查询/失败提交不再视为持久化。",
+      "evidence": [
+        "src/agent/policies/QualityGatePolicy.ts",
+        "src/agent/utils/toolOutcomes.ts",
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-019",
+      "severity": "P2",
+      "path": "src/agent/runtime/HookSystem.ts",
+      "issue": "emitSync调用async观察者但不处理其rejected Promise，可能产生unhandled rejection。",
+      "status": "fixed",
+      "resolution": "emitSync对async Promise附加reject处理并记录HOOK_HANDLER_FAILED。",
+      "evidence": [
+        "src/agent/runtime/HookSystem.ts",
+        "test/hook-system.test.ts"
+      ]
+    },
+    {
+      "id": "RUNTIME-020",
+      "severity": "P1",
+      "path": "src/agent/strategies/PipelineStrategy.ts",
+      "issue": "Pipeline循环不检查父取消，已取消stage正常返回停止文本后仍运行后续gate/promptBuilder/stage。",
+      "status": "fixed",
+      "resolution": "每个stage/gate入口检查父signal，取消后不调后续stage/gate；管线和Runtime最终都记录aborted outcome，Service明确优先消费。",
+      "evidence": [
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/service/AgentService.ts",
+        "test/pipeline-outcome-abandoned.test.ts"
+      ]
+    },
+    {
+      "id": "FINAL-RUNTIME-01",
+      "severity": "P1",
+      "path": "src/agent/service/AgentService.ts",
+      "issue": "成功fast-retry仍被历史timedOutStages判为timeout，最终业务状态与管线完成结果相反。",
+      "status": "fixed",
+      "resolution": "Service核对每个超时阶段的最终非超时非空输出且pipeline completed才认恢复；明确outcome=aborted最先返回，已恢复后的用户取消不再被历史timeout覆盖。",
+      "evidence": [
+        "src/agent/service/AgentService.ts:240",
+        "src/agent/runtime/AgentRuntime.ts:357",
+        "test/agent-lifecycle.test.ts:36",
+        "test/agent-lifecycle.test.ts:118"
+      ]
+    },
+    {
+      "id": "FINAL-RUNTIME-02",
+      "severity": "P2",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "issue": "trackerSignal只在envelope.ok===false时传信封，丢失失败status的权威性，与共享normalizer和submitDedup的结果不一致。",
+      "status": "fixed",
+      "resolution": "Tracker根据完整观察的ok与meta.blocked决定失败wrapper，成功仍传raw业务结果；envelope失败status不再丢失。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts:977",
+        "test/runtime-efficiency.test.ts:135"
+      ]
+    },
+    {
+      "id": "FINAL-RUNTIME-03",
+      "severity": "P2",
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "issue": "submitDedup忽略metadata.blocked，已知被中间件拦截的调用仍可被正向payload登记为真实提交。",
+      "status": "fixed",
+      "resolution": "submitDedup在meta.blocked时最先返回，不登记title/isSubmit/ledger。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts:1010",
+        "test/runtime-efficiency.test.ts:135"
+      ]
+    },
+    {
+      "id": "FINAL-RUNTIME-04",
+      "severity": "P2",
+      "path": "src/agent/evaluation/gateEvaluators.ts",
+      "issue": "Producer gate保留旧窄ToolCallRecord类型，与新normalizer需要的args/action/id/lifecycle/envelope不一致。",
+      "status": "fixed",
+      "resolution": "producer gate的toolCalls输入改为readonly unknown[]并统一交normalizer验证，旧窄结果壳已移除。",
+      "evidence": [
+        "src/agent/evaluation/gateEvaluators.ts:293"
+      ]
+    },
+    {
+      "id": "PC-01",
+      "severity": "P1",
+      "path": "src/agent/context/ConversationStore.ts",
+      "issue": "conversationId 未校验，默认无 WriteZone 时可逃逸 conversations 目录读写/删除其他 JSONL；真实 HTTP chat 的 conversationId 仅校验为 string。",
+      "status": "fixed",
+      "resolution": "集中校验id；append/delete的WriteZone与普通fs分支均先走同一校验。",
+      "evidence": {
+        "path": "test/memory-context.test.ts",
+        "line": 523,
+        "needle": "rejects conversation ids that escape the store"
+      }
+    },
+    {
+      "id": "PC-02",
+      "severity": "P1",
+      "path": "src/agent/utils/Redaction.ts",
+      "issue": "通用凭证正则不支持带引号 JSON key，证据持久化和开发者事件会留下普通格式的密码/token。",
+      "status": "fixed",
+      "resolution": "JSON整值先脱敏，保留合法JSON及后续既有厂商/普通赋值规则。",
+      "evidence": {
+        "path": "test/Redaction.test.ts",
+        "line": 15,
+        "needle": "redacts JSON-encoded"
+      }
+    },
+    {
+      "id": "PC-03",
+      "severity": "P1",
+      "path": "src/agent/context/ContextWindow.ts",
+      "issue": "L2 去重只删 assistant.toolCalls 中的重复 knowledge call，没有删对应 tool result，破坏原子轮次。",
+      "status": "fixed",
+      "resolution": "移除按标题单独删除tool call的去重分支，保留每次调用及其对应结果。",
+      "evidence": {
+        "path": "test/ContextWindow.test.ts",
+        "line": 5,
+        "needle": "keeps repeated tool calls paired"
+      }
+    },
+    {
+      "id": "PC-04",
+      "severity": "P1",
+      "path": "src/ai/shared/structuredOutput.ts",
+      "issue": "JSON 修复在解析前全局删除围栏/尾逗号，静默修改合法字符串内容；截断回收也有同类问题。",
+      "status": "fixed",
+      "resolution": "共用字符串感知修复；AI旧入口保留re-export，字符串内逗号/围栏不再被删除。",
+      "evidence": {
+        "path": "test/shared-ai-utils.test.ts",
+        "line": 17,
+        "needle": "preserves JSON string content"
+      }
+    },
+    {
+      "id": "PC-05",
+      "severity": "P2",
+      "path": "src/ai/AiProvider.ts",
+      "issue": "首次并发 _getGateway 调用会各建一个 gateway，拆开 concurrency/rate-limit/circuit state。",
+      "status": "fixed",
+      "resolution": "await动态import后第二次检查gateway实例，首次并发共享同一闸门。",
+      "evidence": {
+        "path": "test/OpenAiProvider.test.ts",
+        "line": 34,
+        "needle": "shares the concurrency gate"
+      }
+    },
+    {
+      "id": "PC-06",
+      "severity": "P2",
+      "path": "src/ai/AiProvider.ts",
+      "issue": "maxRetries:0 被 || 默认值改成3，宿主不能关闭 OpenAI/DeepSeek/Gemini 的重试。",
+      "status": "fixed",
+      "resolution": "nullish缺省保留显式零次重试。",
+      "evidence": {
+        "path": "test/OpenAiProvider.test.ts",
+        "line": 30,
+        "needle": "honors an explicit zero retry limit"
+      }
+    },
+    {
+      "id": "PC-07",
+      "severity": "P2",
+      "path": "src/ai/transport/LLMTransport.ts",
+      "issue": "内部请求超时与主动取消都被归成 AbortError，timeout 不会走现有 ETIMEDOUT 的重试/熔断路径。",
+      "status": "fixed",
+      "resolution": "内部超时独立记录并抛ETIMEDOUT；外部取消继续保留AbortError路径。",
+      "evidence": {
+        "path": "test/OpenAiTransportResponses.test.ts",
+        "line": 41,
+        "needle": "classifies a transport deadline"
+      }
+    },
+    {
+      "id": "PC-08",
+      "severity": "P2",
+      "path": "src/ai/transport/LLMTransport.ts",
+      "issue": "post 只监听未来 abort，没有检查已取消 signal；直接 transport 调用仍会发请求。",
+      "status": "fixed",
+      "resolution": "请求发出前检查已取消signal。",
+      "evidence": {
+        "path": "test/OpenAiTransportResponses.test.ts",
+        "line": 27,
+        "needle": "does not fetch when the caller signal"
+      }
+    },
+    {
+      "id": "PC-09",
+      "severity": "P2",
+      "path": "src/agent/context/ContextWindow.ts",
+      "issue": "resetToPromptOnly/resetForNewStage 未清 collapseThreshold，旧投影下标会重新作用于新消息。",
+      "status": "fixed",
+      "resolution": "两种reset都清collapseThreshold，避免旧投影索引作用于新阶段。",
+      "evidence": {
+        "path": "test/ContextWindow.test.ts",
+        "line": 33,
+        "needle": "clears stale compression projections"
+      }
+    },
+    {
+      "id": "PC-10",
+      "severity": "P1",
+      "path": "src/agent/context/ConversationStore.ts",
+      "issue": "summarize await AI 后使用旧快照重写文件，会永久丢掉等待期间 append 的新消息。",
+      "status": "fixed",
+      "resolution": "摘要写回前重读快照；有新增/删除/替换则放弃旧摘要而不覆盖。",
+      "evidence": {
+        "path": "test/memory-context.test.ts",
+        "line": 536,
+        "needle": "does not overwrite messages appended"
+      }
+    },
+    {
+      "id": "PC-11",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "issue": "公开工具缓存 key 未包含查询作用域/参数；read 仅识别 filePath 且不区分行区间。当前 V2 code handler 自有缓存已包含更多参数，此问题属于 SessionStore 组件接口。",
+      "status": "fixed",
+      "resolution": "完整稳定请求key，兼容params/扁平和path/filePath；顶层action权威，维持只读缓存。",
+      "evidence": {
+        "path": "test/memory-context.test.ts",
+        "line": 317,
+        "needle": "keys cached reads and searches"
+      }
+    },
+    {
+      "id": "PC-12",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "issue": "JSON/checkpoint 往返丢失 evidenceStore，恢复后已有维度报告无法经 searchEvidence 找到。",
+      "status": "fixed",
+      "resolution": "序列化真实Finding列表；新快照以显式evidenceStore为准，缺字段才重建旧报告索引。",
+      "evidence": {
+        "path": "test/memory-context.test.ts",
+        "line": 377,
+        "needle": "preserves evidence through JSON and checkpoint"
+      }
+    },
+    {
+      "id": "PC-13",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "issue": "loadCheckpoint 没有调用现有形状校验，且解析中直接逐字段改状态；坏快照可返回成功或留下部分状态。",
+      "status": "fixed",
+      "resolution": "统一深度校验/clone后恢复；load用纯归一化结果原子替换，不创建临时带timer实例。",
+      "evidence": {
+        "path": "test/memory-context.test.ts",
+        "line": 301,
+        "needle": "rejects malformed nested session data"
+      }
+    },
+    {
+      "id": "PC-14",
+      "severity": "P2",
+      "path": "src/ai/providers/ClaudeProvider.ts",
+      "issue": "Claude embed 返回空数组，但继承 supportsEmbedding()=true；宿主认为支持 embedding，跳过真实 fallback。",
+      "status": "fixed",
+      "resolution": "Claude明确声明embedding不支持，宿主可继续走既有fallback。",
+      "evidence": {
+        "path": "test/ai-provider.test.ts",
+        "line": 60,
+        "needle": "reports Claude embedding as unsupported"
+      }
+    },
+    {
+      "id": "PC-15",
+      "severity": "P2",
+      "path": "src/ai/AiFactory.ts",
+      "issue": "fallback 排除对象取环境原值而非实际探测到 provider；auto/别名/缺钥回退时可能重新选择同一个失败厂商。",
+      "status": "fixed",
+      "resolution": "fallback排除基于实际primary标准身份，不用auto/别名环境原文。",
+      "evidence": {
+        "path": "test/AiFactory.test.ts",
+        "line": 47,
+        "needle": "excludes the actual auto-detected provider"
+      }
+    },
+    {
+      "id": "PC-16",
+      "severity": "P2",
+      "path": "src/ai/gateway/LLMGateway.ts",
+      "issue": "chat/chatStructured 的 transport.chat 返回 string，完全绕开 #emitUsage；Provider structured output 调用也没有 token recorder 事件。",
+      "status": "fixed",
+      "resolution": "chat复用完整响应通道并提取text；JSON格式/schema随工具请求路径透传，usage只报一次。",
+      "evidence": {
+        "path": "test/LLMGateway.test.ts",
+        "line": 16,
+        "needle": "records usage once for %s"
+      }
+    },
+    {
+      "id": "PC-17",
+      "severity": "P2",
+      "path": "src/agent/memory/ActiveContext.ts",
+      "issue": "scratchpad 整体超预算就整段舍弃，低重要长发现可让最高重要短发现也消失，反而给低优先观察日志留预算。",
+      "status": "fixed",
+      "resolution": "按重要性逐条选择能放入的发现，不再因整个scratchpad超限全丢弃。",
+      "evidence": {
+        "path": "test/ActiveContext.test.ts",
+        "line": 43,
+        "needle": "keeps a high-priority finding"
+      }
+    },
+    {
+      "id": "PC-18",
+      "severity": "P2",
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "issue": "configure 只改 totalBudget 不重算 allocation；静态 PM/SS 注入也未传实际预算，名义预算与真实输入脱节。",
+      "status": "fixed",
+      "resolution": "重算既有profile并清surplus；预算传PM/SS，实际PM/SS渲染使用token预算且含裁剪footer。",
+      "evidence": {
+        "path": "test/memory-context.test.ts",
+        "line": 197,
+        "needle": "recomputes the active allocation profile"
+      }
+    },
+    {
+      "id": "PC-19",
+      "severity": "P2",
+      "path": "src/agent/context/ExplorationTracker.ts",
+      "issue": "所有非 rejected 的 knowledge 动作都会计为提交，detail/search 及部分失败形状可使状态机过早收敛。",
+      "status": "fixed",
+      "resolution": "统一持久化提交判定，knowledge读取/重复/未创建不计数，仅真实created+id+lifecycle计生产进度。",
+      "evidence": {
+        "path": "test/ExplorationStrategies.test.ts",
+        "line": 13,
+        "needle": "counts only persisted candidate submissions"
+      }
+    },
+    {
+      "id": "PC-20",
+      "severity": "P2",
+      "path": "src/agent/memory/MemoryRetriever.ts",
+      "issue": "PersistentMemory.append 忽略调用者 importance；MemoryCoordinator 写入 decision 明确传7，最终 SQLite 永远5。",
+      "status": "fixed",
+      "resolution": "AppendEntry可选importance透传新记忆，去重时显式更高重要性可提升已有值。",
+      "evidence": {
+        "path": "test/memory-context.test.ts",
+        "line": 64,
+        "needle": "preserves explicit importance"
+      }
+    },
+    {
+      "id": "PC-21",
+      "severity": "P2",
+      "path": "src/agent/memory/MemoryConsolidator.ts",
+      "issue": "冲突替换发生在 transaction 外，后续普通候选写入失败时，冲突更新已永久生效而整个 consolidate 抛错。",
+      "status": "fixed",
+      "resolution": "冲突更新、普通合并、capacity在同一事务；冲突写错误传播触发回滚。",
+      "evidence": {
+        "path": "test/memory-context.test.ts",
+        "line": 37,
+        "needle": "rolls back conflict replacements"
+      }
+    },
+    {
+      "id": "PC-22",
+      "severity": "P2",
+      "path": "src/ai/gateway/LLMGateway.ts",
+      "issue": "显式 apiKey 存在时提前 return config，使 GatewayConfig.timeout 全局覆盖配置失效。",
+      "status": "fixed",
+      "resolution": "显式凭证分支同样执行global timeout override，保留其他transport配置。",
+      "evidence": {
+        "path": "test/LLMGateway.test.ts",
+        "line": 42,
+        "needle": "applies the global timeout"
+      }
+    },
+    {
+      "id": "KNOW-01",
+      "severity": "P1",
+      "path": "src/agent/evaluation/MiningJudge.ts",
+      "issue": "sliceEvidenceForJudge 对模型 reasoning.sources 直接 join + readFileSync，允许 ../ 及 symlink 读取 projectRoot 外文件；judgeCandidate 再将切片发送给 chat。",
+      "status": "fixed",
+      "resolution": "MiningJudge uses resolveProjectPath with lexical/realpath containment and validates absolute paths, caps and ranges. Normal and escaping slice tests retained.",
+      "evidence": [
+        "src/agent/evaluation/MiningJudge.ts",
+        "src/shared/projectPath.ts",
+        "test/mining-eval-harness.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-02",
+      "severity": "P2",
+      "path": "src/agent/evidence/EvidenceCapture.ts",
+      "issue": "extractRequestedRange 只读顶层 args，真实 args.params 范围被忽略；单文件展示态范围 10..11 被记成 1..2，破坏引用与 freshness。派生视图 fallback 又附 requestedRange，与 file-only 注释矛盾。",
+      "status": "fixed",
+      "resolution": "EvidenceCapture unwraps nested params and derives source ranges from actual contiguous numbered output; declared derived views no longer inherit requested ranges.",
+      "evidence": [
+        "src/agent/evidence/EvidenceCapture.ts",
+        "test/EvidenceCapture.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-03",
+      "severity": "P1",
+      "path": "src/agent/evidence/EvidenceCollector.ts",
+      "issue": "isErrorString 在整个源码和搜索正文匹配 error/failed 等词；正常错误处理源码被丢弃，命中的搜索被反记为 not_found。",
+      "status": "fixed",
+      "resolution": "EvidenceCollector recognizes anchored tool-error prefixes instead of rejecting arbitrary Error/failed words in source/search content.",
+      "evidence": [
+        "src/agent/evidence/EvidenceCollector.ts",
+        "test/evidence-collector-fidelity.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-04",
+      "severity": "P2",
+      "path": "src/agent/runs/relation/RelationAgentRun.ts",
+      "issue": "JSON.parse 结果未经 object/schema 校验即作为 RelationDiscoveryResult；合法 JSON null 抛 TypeError，malformed relation 成员原样透传。",
+      "status": "fixed",
+      "resolution": "Relation projection guards null/non-object JSON, validates nonnegative safe analyzed counts and relation member types, and exposes invalidRelationCount.",
+      "evidence": [
+        "src/agent/runs/relation/RelationAgentRun.ts",
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-05",
+      "severity": "P2",
+      "path": "src/agent/prompts/insightGate.ts",
+      "issue": "record repair 的 evidenceMap renderer 读取 snippet.line，但生产 CodeSnippet 字段是 startLine/endLine；已采集的行号变为一个空列表项。",
+      "status": "fixed",
+      "resolution": "Record-repair evidence renderer uses CodeSnippet.startLine/endLine and keeps a path fallback.",
+      "evidence": [
+        "src/agent/prompts/insightGate.ts",
+        "test/evidence-recording-phase-chain.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-06",
+      "severity": "P1",
+      "path": "src/agent/prompts/insightAnalyst.ts",
+      "issue": "Analyst 与 retry/record-repair 提示仍明确要求 note_finding({finding,evidence,importance})；真实 memory handler 已硬切 evidenceRefs，旧 evidence 必拒。",
+      "status": "fixed",
+      "resolution": "Analyst/retry/repair examples now use evidenceRefs and optional excerpt/depth fields. Repair instructions allow querying already captured evidence.",
+      "evidence": [
+        "src/agent/prompts/insightAnalyst.ts",
+        "src/agent/prompts/insightGate.ts",
+        "test/llm-input-layering.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-07",
+      "severity": "P2",
+      "path": "src/agent/runs/evolution/EvolutionAgentRun.ts",
+      "issue": "collectEvolutionDecisionIds 与 evolutionGateEvaluator 重复按工具请求计决策，ok=true 的 duplicate_blocked submit(supersedes) 仍令旧 Recipe 被标已处理；没有产生持久化替代仍可通过完成门。",
+      "status": "fixed",
+      "resolution": "Evolution gate and run share collectSuccessfulEvolutionIds/evolutionOutcome; duplicate_blocked submit cannot mark a replacement complete, absent result is not success, explicit Core outcome overrides compatibility status.",
+      "evidence": [
+        "src/agent/utils/toolOutcomes.ts",
+        "src/agent/runs/evolution/EvolutionAgentRun.ts",
+        "src/agent/evaluation/gateEvaluators.ts"
+      ]
+    },
+    {
+      "id": "KNOW-08",
+      "severity": "P2",
+      "path": "src/agent/evaluation/gateEvaluators.ts",
+      "issue": "producerRejectionGateEvaluator 只按 knowledge 工具名计 submit，总数混入 search/detail/manage，查询会稀释拒绝率；还忽略 envelope.ok=false 的失败。",
+      "status": "fixed",
+      "resolution": "Rejection gate identifies knowledge action=submit and accepts only validated persisted candidates; reads and failed envelopes cannot dilute rejection counts.",
+      "evidence": [
+        "src/agent/utils/toolOutcomes.ts",
+        "src/agent/evaluation/gateEvaluators.ts",
+        "test/agent-surface-floor.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-09",
+      "severity": "P2",
+      "path": "src/agent/evaluation/analysisArtifact.ts",
+      "issue": "createFsSnippetRangeReader 仅词法拒绝 ..，statSync/readFileSync 仍跟随项目内 symlink 读取仓外；与明确的 projectRoot 内限定契约矛盾。",
+      "status": "fixed",
+      "resolution": "Artifact snippet grounding now resolves the physical path through shared containment before source reads; symlink escape test passed.",
+      "evidence": [
+        "src/agent/evaluation/analysisArtifact.ts",
+        "src/shared/projectPath.ts",
+        "test/evidence-collector-fidelity.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-10",
+      "severity": "P3",
+      "path": "src/agent/evaluation/qualityGates.ts",
+      "issue": "applyGraphRetryGate 删除后 GRAPH_RELATIONSHIP_CN_RE、GRAPH_GAP_REASON 与 RELATIONSHIP_CN_RE import 遗留零消费者。",
+      "status": "fixed",
+      "resolution": "Retired graph-retry private constants and unused Core import removed; current module coverage gate remains.",
+      "evidence": [
+        "src/agent/evaluation/qualityGates.ts"
+      ]
+    },
+    {
+      "id": "KNOW-11",
+      "severity": "P1",
+      "path": "test/durable-semantic-review-runtime.test.ts",
+      "issue": "测试从 @alembic/core/project-context-foundation 导入 createProjectContextFileRef，真实当前 Core export 在 @alembic/core/project-context；造成 20 个 durable review 用例初始化失败。",
+      "status": "fixed",
+      "resolution": "Durable semantic review test imports createProjectContextFileRef from the actual @alembic/core/project-context facade.",
+      "evidence": [
+        "test/durable-semantic-review-runtime.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-12",
+      "severity": "P1",
+      "path": "scripts/eval-mining.mjs",
+      "issue": "评估普通模块路径的 fake gateway 仅实现 create，真实 knowledge.submit 调 createOrStage/evaluateReadiness，普通 eval fixture 提交全部因接线不匹配失败；严格 fixture 由 capturedCandidates 旁路掩盖。",
+      "status": "fixed",
+      "resolution": "eval-mining injects shared createEvaluationRecipeGateway with createOrStage/evaluateReadiness and pending/id/raw records. No legacy create-only port remains.",
+      "evidence": [
+        "scripts/eval-mining.mjs",
+        "scripts/lib/mining-eval-runtime.mjs",
+        "test/mining-eval-harness.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-13",
+      "severity": "P2",
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "issue": "record repair / Analyst RECORD 虽在运行闸门允许 evidence.get/search，实际 advertised schema 无条件只剩 note_finding；repairStage 本身也只注入 memory。模型无法使用提示承诺的台账自救工具。",
+      "status": "fixed",
+      "resolution": "Repair stage adds evidence; RECORD/repair schema projection retains evidence alongside note_finding. Runtime restriction still blocks unrelated exploration and writes.",
+      "evidence": [
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/llm-input-layering.test.ts",
+        "test/evidence-recording-phase-chain.test.ts"
+      ]
+    },
+    {
+      "id": "KNOW-14",
+      "severity": "P2",
+      "path": "scripts/eval-judge-calibration.mjs",
+      "issue": "judge 评审阶段允许缺失证据并捕获单样本错误，但最终 collectSourceFileReceipts 对每个声明 source 无条件 readFileSync；任一旧路径/缺失文件让报告阶段整体 ENOENT，丢失已完成评审结果。",
+      "status": "fixed",
+      "resolution": "Calibration receipt collection records missing/unreadable/outside evidence as null hash/error rows instead of aborting report generation. The introduced malformed-sources regression is also closed by MAINT-03.",
+      "evidence": [
+        "scripts/eval-judge-calibration.mjs",
+        "scripts/lib/mining-eval-runtime.mjs",
+        "test/mining-eval-harness.test.ts"
+      ]
+    },
+    {
+      "id": "MT-01",
+      "severity": "P2",
+      "path": ".github/workflows/ci.yml",
+      "issue": "CI没有运行多数已声明的阻断门禁，PR可在public/Core/layer/doctrine/provider-neutral/signature/floor/retirement发生回归时通过。",
+      "status": "fixed",
+      "resolution": "CI invokes check:ci for the full Agent/Core-compatible gate chain and retains public import smoke. Real Alembic host consumer remains in full local check and is explicitly documented as a separate environment requirement.",
+      "evidence": [
+        ".github/workflows/ci.yml",
+        "package.json",
+        "README.md",
+        "README.zh-CN.md"
+      ]
+    },
+    {
+      "id": "MT-02",
+      "severity": "P1",
+      "path": "test/ai-provider.test.ts",
+      "issue": "缺钥测试未隔离真实环境凭证且不mock fetch；apiKey空字符串会回退读取ALEMBIC_*_API_KEY，测试可能产生真实计费请求。",
+      "status": "fixed",
+      "resolution": "Missing-credential tests clear the four provider key environments and install a fail-if-called fetch stub; afterEach restores both.",
+      "evidence": [
+        "test/ai-provider.test.ts"
+      ]
+    },
+    {
+      "id": "MT-03",
+      "severity": "P2",
+      "path": "scripts/codemod-rename.mjs",
+      "issue": "dry-run宣称打印完整改名计划，但文件计划输出循环为空，成功dry-run无可审阅结果。",
+      "status": "fixed",
+      "resolution": "Codemod dry-run prints each specifier/path-string plan plus rename rows without applying changes; the new temp-root test asserts visible plan and unchanged source bytes.",
+      "evidence": [
+        "scripts/codemod-rename.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MT-04",
+      "severity": "P2",
+      "path": "scripts/codemod-rename.mjs",
+      "issue": "跨目录移动未按importer的新位置计算相对import，移动文件对未移动依赖的import也完全跳过，apply后可破坏模块解析。",
+      "status": "fixed",
+      "resolution": "Codemod computes imports from final importer/dependency positions, including dependencies not renamed. Original-offset reverse application also closes the subsequent cascading regression MAINT-02.",
+      "evidence": [
+        "scripts/codemod-rename.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MT-05",
+      "severity": "P2",
+      "path": "scripts/stage-agent-publish-package.mjs",
+      "issue": "构建未清理旧dist，发布staging整目录复制dist，会携带源码已删除/重命名后的旧JS和声明。",
+      "status": "fixed",
+      "resolution": "package build now clears generated dist before tsc, and release:stage calls build before copying. The cleanup target is now a no-trailing-slash path and MAINT-01 symlink regression is covered.",
+      "evidence": [
+        "package.json",
+        "scripts/build-agent.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MT-06",
+      "severity": "P3",
+      "path": "README.zh-CN.md",
+      "issue": "中文目录地图和出口列表落后当前实现：不存在agent/capabilities；未标evidence/evaluation拆分；缺./runs、./production、./evaluation及strict-consumer门禁。",
+      "status": "fixed",
+      "resolution": "Chinese README removes the nonexistent capabilities directory, lists evidence/toolsets/current presets and all 15 exports, and documents strict host-consumer validation and host wiring. No API was changed to match outdated docs.",
+      "evidence": [
+        "README.zh-CN.md",
+        "README.md"
+      ]
+    },
+    {
+      "id": "MT-07",
+      "severity": "P3",
+      "path": "docs/entrypoint-effects.md",
+      "issue": "当前入口副作用说明将所有scripts/*.mjs称为read-only，并将MemoryStore写成只读；与实际codemod --apply、release staging、SQLite CRUD/schema初始化不符。",
+      "status": "fixed",
+      "resolution": "Current effects text now describes MemoryStore reads/writes through injected DB and distinguishes explicit build/release/codemod writes from checks. Dated Census is preserved with an explicit current reconciliation section.",
+      "evidence": [
+        "docs/entrypoint-effects.md",
+        "docs/side-effect-doctrine-census.md"
+      ]
+    },
+    {
+      "id": "MT-08",
+      "severity": "P2",
+      "path": "scripts/verify-agent-validation-floor.mjs",
+      "issue": "declared test计数只识别it(/test(，完全忽略it.each，安全表驱动重构会被误记成覆盖减少。",
+      "status": "fixed",
+      "resolution": "Validation-floor declaration count uses TypeScript AST and recognizes it.each/test.each outer invocations without double-counting the each builder. Frozen floors were not lowered.",
+      "evidence": [
+        "scripts/verify-agent-validation-floor.mjs"
+      ]
+    },
+    {
+      "id": "MT-09",
+      "severity": "P3",
+      "path": "scripts/stage-agent-publish-package.mjs",
+      "issue": "staged发布包仅复制英文README，而英文README顶部链接本地README.zh-CN.md，导致发布包内链接悬空。",
+      "status": "fixed",
+      "resolution": "README.zh-CN.md is now included in root package files, the staged manifest, and staging copy operations; the local README language link has a packaged target. Root will verify an actual release staging run separately.",
+      "evidence": [
+        "scripts/stage-agent-publish-package.mjs",
+        "package.json",
+        "README.md"
+      ]
+    },
+    {
+      "id": "MT-10",
+      "severity": "P3",
+      "path": "config/side-effect-doctrine.json",
+      "issue": "standingExceptionsOutOfScope仍指向不存在的runtime/capabilities/RuntimeCapability.ts及旧reach-up状态，而layer-contract已记录2026-06-19解决。",
+      "status": "fixed",
+      "resolution": "The obsolete RuntimeCapability reach-up exception was removed from the current machine companion record. Historical Census remains intact and its current reconciliation explicitly records that the reach-up was already resolved.",
+      "evidence": [
+        "config/side-effect-doctrine.json",
+        "docs/side-effect-doctrine-census.md"
+      ]
+    },
+    {
+      "id": "MAINT-01",
+      "severity": "P1",
+      "path": "scripts/build-agent.mjs",
+      "issue": "The recursive clean target is a file URL ending in dist/. On both Node 22 and Node 24 this follows a dist symlink and recursively deletes the external target directory, leaving the dangling link.",
+      "status": "fixed",
+      "resolution": "build-agent now passes fileURLToPath(new URL(../dist,...)) without trailing slash to rmSync; new temp-root test asserts external symlink target sentinel survives and dist link is removed.",
+      "evidence": [
+        "scripts/build-agent.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MAINT-02",
+      "severity": "P2",
+      "path": "scripts/codemod-rename.mjs",
+      "issue": "Sequential replaceAll applies later import rewrites to text produced by earlier rewrites; moving an importer can collapse distinct imports onto the wrong target.",
+      "status": "fixed",
+      "resolution": "Codemod collects edits against original source offsets, avoids overlaps and applies descending offsets; the regression asserts ./b and ../b remain distinct after moving the importer.",
+      "evidence": [
+        "scripts/codemod-rename.mjs",
+        "test/entrypoint-effects.test.ts"
+      ]
+    },
+    {
+      "id": "MAINT-03",
+      "severity": "P2",
+      "path": "scripts/lib/mining-eval-runtime.mjs",
+      "issue": "The new receipt helper removed the original Array.isArray guard for candidate.reasoning.sources. Object/number source lists now throw during final report generation instead of being skipped or reported.",
+      "status": "fixed",
+      "resolution": "Receipt helper restores Array.isArray normalization; regression table covers object, number, string and null source lists.",
+      "evidence": [
+        "scripts/lib/mining-eval-runtime.mjs",
+        "test/mining-eval-harness.test.ts"
+      ]
+    },
+    {
+      "id": "ROOT-01",
+      "severity": "P2",
+      "path": "src/agent/context/ContextWindow.ts",
+      "issue": "批量结果裁剪浅拷贝外壳后仍改写原 batchResults，污染调用方保留的原始工具结果。",
+      "status": "fixed",
+      "resolution": "批量搜索裁剪改为复制 batchResults 后处理，删除相邻不可达分支；原始工具结果不被污染。",
+      "evidence": [
+        "src/agent/context/ContextWindow.ts",
+        "test/ContextWindow.test.ts",
+        "batch-mutation-red.log",
+        "full-check-final.log"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,954 @@
+diff --git a/src/domain/knowledge/recipe-authoring-spec/depthReview.ts b/src/domain/knowledge/recipe-authoring-spec/depthReview.ts
+index fc0af09..24b750c 100644
+--- a/src/domain/knowledge/recipe-authoring-spec/depthReview.ts
++++ b/src/domain/knowledge/recipe-authoring-spec/depthReview.ts
+@@ -58,22 +58,27 @@ function normalizePath(value: string): string {
+   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+ }
+ 
+-/** prose 里的 path 是否命中 validSourcePaths(容错后缀匹配，兼容 repo-relative 与带前缀两种口径)。 */
+-function refIsGrounded(path: string, validSet: ReadonlySet<string>): boolean {
++/** 返回已解析来源的规范路径，防止短路径/带前缀路径把同一来源重复计数。 */
++function resolveGroundedPath(path: string, validSet: ReadonlySet<string>): string | null {
+   const normalized = normalizePath(path);
+   if (validSet.has(normalized)) {
+-    return true;
++    return normalized;
+   }
++  let matched: string | null = null;
+   for (const valid of validSet) {
+     if (
+       valid === normalized ||
+       valid.endsWith(`/${normalized}`) ||
+       normalized.endsWith(`/${valid}`)
+     ) {
+-      return true;
++      // 多仓同名文件的短路径有歧义；沿用未接地提示，不擅自选择一个证据来源。
++      if (matched !== null) {
++        return null;
++      }
++      matched = valid;
+     }
+   }
+-  return false;
++  return matched;
+ }
+ 
+ /** 从一段文本抽取内联 file:line 引用及其接地状态。 */
+@@ -85,7 +90,8 @@ function extractRefs(
+   for (const match of text.matchAll(PROSE_SOURCE_REF_RE)) {
+     const path = normalizePath(match[1] ?? '');
+     if (path) {
+-      refs.push({ path, grounded: refIsGrounded(path, validSet) });
++      const groundedPath = resolveGroundedPath(path, validSet);
++      refs.push({ path: groundedPath ?? path, grounded: groundedPath !== null });
+     }
+   }
+   return refs;
+@@ -132,6 +138,7 @@ function splitSections(markdown: string): Array<{ heading: string; text: string
+  *
+  * @param input recipe 的深度内容(markdown + 可选结构化字段)。
+  * @param resolved gate 侧已解析成功的证据：validSourcePaths(真实存在的源文件相对路径)。
++ * validRanges 保留兼容输入，其内容是源码正文片段，不是行号坐标，不能用于推断获准行区间。
+  * @returns 每个深度维度是否接地覆盖 + 疑似未接地论述 + 已接地文件数。
+  */
+ export function reviewRecipeDepth(
+diff --git a/src/domain/similarity/RecipeSimilarity.ts b/src/domain/similarity/RecipeSimilarity.ts
+index 07b9ea9..6f65904 100644
+--- a/src/domain/similarity/RecipeSimilarity.ts
++++ b/src/domain/similarity/RecipeSimilarity.ts
+@@ -25,6 +25,7 @@
+  */
+ 
+ import { extractRecipeTokens } from '../../shared/recipeTokens.js';
++import { ngramJaccardSimilarity } from '../../shared/similarity.js';
+ 
+ /* ────────────────────── Stop Words ────────────────────── */
+ 
+@@ -262,7 +263,7 @@ export class RecipeSimilarity {
+     if (a.length === 0 || b.length === 0) {
+       return 0;
+     }
+-    return RecipeSimilarity.#ngramJaccard(a, b, 3);
++    return ngramJaccardSimilarity(a, b, 3);
+   }
+ 
+   /** 维度 4: guardPattern 精确匹配 */
+@@ -324,30 +325,6 @@ export class RecipeSimilarity {
+     return union === 0 ? 0 : intersection / union;
+   }
+ 
+-  static #ngramJaccard(a: string, b: string, n: number): number {
+-    const gramsA = new Set<string>();
+-    const gramsB = new Set<string>();
+-
+-    for (let i = 0; i <= a.length - n; i++) {
+-      gramsA.add(a.slice(i, i + n));
+-    }
+-    for (let i = 0; i <= b.length - n; i++) {
+-      gramsB.add(b.slice(i, i + n));
+-    }
+-
+-    if (gramsA.size === 0 && gramsB.size === 0) {
+-      return 0;
+-    }
+-    let intersection = 0;
+-    for (const g of gramsA) {
+-      if (gramsB.has(g)) {
+-        intersection++;
+-      }
+-    }
+-    const union = gramsA.size + gramsB.size - intersection;
+-    return union === 0 ? 0 : intersection / union;
+-  }
+-
+   /**
+    * trigger 语义冲突检测：同一 @前缀命名空间下的不同 trigger
+    * 例如 @lazy-category-loading vs @lazy-tab-loading 都在 @lazy- 空间
+diff --git a/src/service/bootstrap/GenerateDedup.ts b/src/service/bootstrap/GenerateDedup.ts
+index 6f9c432..b303013 100644
+--- a/src/service/bootstrap/GenerateDedup.ts
++++ b/src/service/bootstrap/GenerateDedup.ts
+@@ -11,6 +11,8 @@
+  *   title 0.2 + clause 0.3 + code 0.3 + guard 0.2
+  */
+ 
++import { ngramJaccardSimilarity } from '../../shared/similarity.js';
++
+ /* ────────────────────── Types ────────────────────── */
+ 
+ export interface CandidateSummary {
+@@ -55,11 +57,12 @@ export class GenerateDedup {
+         best = {
+           existingId: existing.id,
+           existingTitle: existing.title,
+-          similarity: Math.round(sim * 100) / 100,
++          similarity: sim,
+         };
+       }
+     }
+-    return best;
++    // 排序只比较原始分数；两位小数是返回展示契约，提前舍入会让次优候选覆盖最优项。
++    return best ? { ...best, similarity: Math.round(best.similarity * 100) / 100 } : null;
+   }
+ 
+   /** 批量检查（返回所有匹配到重复的条目） */
+@@ -166,27 +169,5 @@ function codeSimilarity(codeA: string, codeB: string): number {
+   if (a.length === 0 || b.length === 0) {
+     return 0;
+   }
+-  return ngramJaccard(a, b, 3);
+-}
+-
+-function ngramJaccard(a: string, b: string, n: number): number {
+-  const gramsA = new Set<string>();
+-  const gramsB = new Set<string>();
+-  for (let i = 0; i <= a.length - n; i++) {
+-    gramsA.add(a.slice(i, i + n));
+-  }
+-  for (let i = 0; i <= b.length - n; i++) {
+-    gramsB.add(b.slice(i, i + n));
+-  }
+-  if (gramsA.size === 0 && gramsB.size === 0) {
+-    return 0;
+-  }
+-  let intersection = 0;
+-  for (const g of gramsA) {
+-    if (gramsB.has(g)) {
+-      intersection++;
+-    }
+-  }
+-  const union = gramsA.size + gramsB.size - intersection;
+-  return union === 0 ? 0 : intersection / union;
++  return ngramJaccardSimilarity(a, b, 3);
+ }
+diff --git a/src/service/knowledge/validation/recipe/RecipeParser.ts b/src/service/knowledge/validation/recipe/RecipeParser.ts
+index 424d552..5a53aeb 100644
+--- a/src/service/knowledge/validation/recipe/RecipeParser.ts
++++ b/src/service/knowledge/validation/recipe/RecipeParser.ts
+@@ -5,6 +5,7 @@
+ 
+ import fs from 'node:fs';
+ import path from 'node:path';
++import Logger from '../../../../infrastructure/logging/Logger.js';
+ import { LanguageService } from '../../../../shared/LanguageService.js';
+ 
+ interface CodeBlock {
+@@ -35,11 +36,12 @@ interface ExtractOpts {
+ }
+ 
+ const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---/;
+-const _SNIPPET_HEADING_RE = /^##\s+(?:Snippet|Code|代码)/im;
+ const USAGE_HEADING_RE = /^##\s+(?:Usage\s*Guide|用法|使用指南)/im;
+ const FENCED_CODE_RE = /```(\w*)\n([\s\S]*?)```/;
+ 
+ export class RecipeParser {
++  readonly #logger = Logger.getInstance();
++
+   /**
+    * 检查文本是否为完整 Recipe MD
+    * 需包含: frontmatter + 代码块 + Usage Guide
+@@ -118,8 +120,12 @@ export class RecipeParser {
+     if (!text) {
+       return [];
+     }
+-    const segments = text.split(/\n---\n/).filter((s: string) => s.trim().length > 0);
+-    return segments.map((s: string) => this.parse(s)).filter((r): r is ParsedRecipe => r !== null);
++    // YAML 的关闭标记、围栏内的分隔线和正文水平线都不是 Recipe 边界。
++    // 先识别文档，再筛选真正的 Markdown，原始源码才能进入提取兜底而不丢失 code。
++    return splitRecipeDocuments(text)
++      .filter((segment) => FRONTMATTER_RE.test(segment) || FENCED_CODE_RE.test(segment))
++      .map((segment) => this.parse(segment))
++      .filter((recipe): recipe is ParsedRecipe => recipe !== null);
+   }
+ 
+   /** 解析 frontmatter YAML */
+@@ -181,22 +187,25 @@ export class RecipeParser {
+     const ext = path.extname(fullPath).toLowerCase();
+     const language = LanguageService.langFromExt(ext);
+ 
+-    // 尝试解析为完整 Recipe Markdown
+-    if (this.isCompleteRecipe(content)) {
+-      const parsed = this.parse(content);
+-      if (parsed) {
+-        return { items: [parsed], isMarked: false };
+-      }
+-    }
+-
+-    // 尝试多段解析
+-    const allRecipes = this.parseAll(content);
++    // 已知源码中的注释/字符串也可含 Markdown 围栏，不能因此丢掉源码主体。
++    // 显式 frontmatter 仍表达 Recipe 文档意图；其余文档沿用单篇/多篇分段协议。
++    const preserveSourceFile =
++      LanguageService.isSourceExt(ext) &&
++      // 只统一文档标记检测的换行；源码 fallback 仍返回未经改写的原始 content。
++      !FRONTMATTER_RE.test(content.trim().replace(/\r\n/g, '\n'));
++    const allRecipes = preserveSourceFile ? [] : this.parseAll(content);
+     if (allRecipes.length > 0) {
+       return { items: allRecipes, isMarked: false };
+     }
+ 
+     // 回退: 将整个文件内容作为代码片段
+     const title = path.basename(fullPath, ext);
++    this.#logger.debug('[RecipeParser] Using complete file content for extraction', {
++      source: fullPath,
++      language,
++      bytes: Buffer.byteLength(content, 'utf8'),
++      reason: preserveSourceFile ? 'source-file-boundary' : 'no-recipe-markdown',
++    });
+     return {
+       items: [
+         {
+@@ -224,18 +233,10 @@ export class RecipeParser {
+       throw new Error('文本内容为空');
+     }
+ 
+-    // 尝试完整 Recipe 解析
+-    if (this.isCompleteRecipe(text)) {
+-      const parsed = this.parse(text);
+-      if (parsed) {
+-        return parsed;
+-      }
+-    }
+-
+-    // 尝试批量解析
++    // 保留单篇完整 Markdown 的对象返回契约；多篇即使首篇完整也返回独立条目数组。
+     const all = this.parseAll(text);
+     if (all.length > 0) {
+-      return all;
++      return all.length === 1 && this.isCompleteRecipe(text) ? all[0] : all;
+     }
+ 
+     throw new Error('文本不是有效的 Recipe Markdown 格式');
+@@ -254,7 +255,10 @@ export class RecipeParser {
+       const result = await this.parseFromText(text, opts);
+       return result;
+     } catch {
+-      /* 继续兜底逻辑 */
++      this.#logger.debug('[RecipeParser] Using snippet fallback after Recipe Markdown rejection', {
++        language,
++        bytes: Buffer.byteLength(text, 'utf8'),
++      });
+     }
+ 
+     // 提取代码块
+@@ -308,3 +312,72 @@ export class RecipeParser {
+       .slice(0, 30);
+   }
+ }
++
++function splitRecipeDocuments(text: string): string[] {
++  const documents: string[] = [];
++  const lines = text.split(/\r?\n/);
++  let current: string[] = [];
++  let inFrontmatter = false;
++  let fence: string | null = null;
++  const flush = () => {
++    const document = current.join('\n').trim();
++    if (document) {
++      documents.push(document);
++    }
++    current = [];
++  };
++
++  for (let index = 0; index < lines.length; index++) {
++    const line = lines[index];
++    const delimiter = line.trim() === '---';
++    const fenceMatch = line.match(/^\s*(`{3,}|~{3,})/);
++    if (fence) {
++      current.push(line);
++      if (
++        fenceMatch &&
++        fenceMatch[1][0] === fence[0] &&
++        fenceMatch[1].length >= fence.length &&
++        line.slice(fenceMatch[0].length).trim() === ''
++      ) {
++        fence = null;
++      }
++      continue;
++    }
++    if (inFrontmatter) {
++      current.push(line);
++      if (delimiter) {
++        inFrontmatter = false;
++      }
++      continue;
++    }
++    if (fenceMatch) {
++      fence = fenceMatch[1];
++      current.push(line);
++      continue;
++    }
++    if (delimiter) {
++      let nextIndex = index + 1;
++      while (nextIndex < lines.length && !lines[nextIndex].trim()) {
++        nextIndex++;
++      }
++      const next = lines[nextIndex]?.trim() ?? '';
++      const nextIsYaml = /^[A-Za-z_][\w-]*\s*:/.test(next);
++      if (current.every((candidate) => !candidate.trim())) {
++        current = [line];
++        inFrontmatter = true;
++        continue;
++      }
++      if (nextIsYaml || next === '---' || /^#\s+\S/.test(next) || /^`{3,}/.test(next)) {
++        flush();
++        if (nextIsYaml) {
++          current.push(line);
++          inFrontmatter = true;
++        }
++        continue;
++      }
++    }
++    current.push(line);
++  }
++  flush();
++  return documents;
++}
+diff --git a/src/service/plan/facts/projectInfoTree.ts b/src/service/plan/facts/projectInfoTree.ts
+index b982191..6aa99c8 100644
+--- a/src/service/plan/facts/projectInfoTree.ts
++++ b/src/service/plan/facts/projectInfoTree.ts
+@@ -740,7 +740,8 @@ export function buildProjectInfoTreeMeta(input: {
+       input.delivered.symbols > 0 ? 'symbols' : input.delivered.files > 0 ? 'files' : 'modules',
+     fullTreeRef,
+     omitted,
+-    truncated: fullTreeRef !== null,
++    // 截断由实际遗漏决定；完整树外置是后续步骤，ref 有无不能替代预算事实。
++    truncated: Object.keys(omitted).length > 0,
+   };
+ }
+ 
+diff --git a/src/service/plan/status/recipeStatus.ts b/src/service/plan/status/recipeStatus.ts
+index 525014c..2fb10a7 100644
+--- a/src/service/plan/status/recipeStatus.ts
++++ b/src/service/plan/status/recipeStatus.ts
+@@ -217,6 +217,29 @@ export function buildCoverage(
+   const byModule: Record<string, PlanCoverageBucket & { dimensions: readonly string[] }> = {};
+   const byModuleDimension: Record<string, Record<string, PlanCoverageBucket>> = {};
+   const uniqueGeneratedRecipes = new Set<string>();
++  const bucketRecipeIds = new WeakMap<
++    PlanCoverageBucket,
++    { generated: Set<string>; stale: Set<string> }
++  >();
++  const countMappingRecipes = (bucket: PlanCoverageBucket, mapping: PlanCodeRecipeMapping) => {
++    const status = mapping.status;
++    if (status !== 'generated' && status !== 'stale') {
++      return;
++    }
++    const seen = bucketRecipeIds.get(bucket) ?? {
++      generated: new Set<string>(),
++      stale: new Set<string>(),
++    };
++    bucketRecipeIds.set(bucket, seen);
++    // source refs 保留完整映射；预算计数的单位是当前 bucket 内的 Recipe，不能重复计每条引用。
++    // 各 bucket 独立计数，同一 Recipe 跨模块/维度时仍可在各自 bucket 中贡献一次。
++    for (const recipeId of mapping.recipeIds) {
++      if (!seen[status].has(recipeId)) {
++        seen[status].add(recipeId);
++        bucket[status] += 1;
++      }
++    }
++  };
+ 
+   for (const dimension of intent.dimensions) {
+     byDimension[dimension.dimensionId] = {
+@@ -250,11 +273,7 @@ export function buildCoverage(
+       const bucket =
+         byDimension[dimensionId] ??
+         (byDimension[dimensionId] = { planned: 0, generated: 0, stale: 0, missing: 0 });
+-      if (mapping.status === 'stale') {
+-        bucket.stale += mapping.recipeIds.length;
+-      } else if (mapping.status === 'generated') {
+-        bucket.generated += mapping.recipeIds.length;
+-      }
++      countMappingRecipes(bucket, mapping);
+     }
+     if (mapping.status === 'generated') {
+       for (const recipeId of mapping.recipeIds) {
+@@ -271,11 +290,7 @@ export function buildCoverage(
+           missing: 0,
+           dimensions: mapping.dimensionIds,
+         });
+-      if (mapping.status === 'stale') {
+-        moduleBucket.stale += mapping.recipeIds.length;
+-      } else if (mapping.status === 'generated') {
+-        moduleBucket.generated += mapping.recipeIds.length;
+-      }
++      countMappingRecipes(moduleBucket, mapping);
+       const moduleDimensions =
+         byModuleDimension[mapping.modulePath] ?? (byModuleDimension[mapping.modulePath] = {});
+       for (const dimensionId of mapping.dimensionIds) {
+@@ -287,11 +302,7 @@ export function buildCoverage(
+             stale: 0,
+             missing: 0,
+           });
+-        if (mapping.status === 'stale') {
+-          moduleDimensionBucket.stale += mapping.recipeIds.length;
+-        } else if (mapping.status === 'generated') {
+-          moduleDimensionBucket.generated += mapping.recipeIds.length;
+-        }
++        countMappingRecipes(moduleDimensionBucket, mapping);
+       }
+     }
+   }
+diff --git a/src/service/production/ProductionPersistenceContracts.ts b/src/service/production/ProductionPersistenceContracts.ts
+index f7f0a7b..8c7a1b0 100644
+--- a/src/service/production/ProductionPersistenceContracts.ts
++++ b/src/service/production/ProductionPersistenceContracts.ts
+@@ -2335,7 +2335,29 @@ export function createPrivateCorpusRevisionCheckpointV1(
+   assertPrivateCorpusRevisionHandleV1(handle);
+   handle.assertRuntime(runtime);
+   assertPrivateCorpusRevisionExpectedContextV1(handle.initReceipt, expectedCurrentContext);
+-  runtime.sqlite.pragma('wal_checkpoint(FULL)');
++  const checkpoint = (
++    runtime.sqlite.pragma('wal_checkpoint(FULL)') as Array<{
++      busy: number;
++      log: number;
++      checkpointed: number;
++    }>
++  )[0];
++  // SQLite 遇到旧读事务时返回 busy 而非抛错；此时主 DB 文件尚不含已提交 WAL 页，不能签发其 hash。
++  // 非 WAL 模式会返回 log=checkpointed=-1，仍保留该正常路径。
++  if (!checkpoint || checkpoint.busy !== 0 || checkpoint.log !== checkpoint.checkpointed) {
++    const code = 'PRIVATE_CORPUS_REVISION_WAL_CHECKPOINT_INCOMPLETE';
++    process.stderr.write(
++      `[Alembic] ${code} ${JSON.stringify({
++        runId: expectedCurrentContext.runId,
++        revisionId: expectedCurrentContext.revisionId,
++        busy: checkpoint?.busy ?? null,
++        logPages: checkpoint?.log ?? null,
++        checkpointedPages: checkpoint?.checkpointed ?? null,
++        nextAction: 'release active read transactions and retry checkpoint before sealing',
++      })}\n`
++    );
++    throw new Error(code);
++  }
+   if (runtime.sqlite.pragma('integrity_check', { simple: true }) !== 'ok') {
+     throw new Error('PRIVATE_CORPUS_REVISION_SQLITE_INTEGRITY_FAILED');
+   }
+diff --git a/src/service/production/SemanticDispositionReviewExecution.ts b/src/service/production/SemanticDispositionReviewExecution.ts
+index 1077d12..fd52aae 100644
+--- a/src/service/production/SemanticDispositionReviewExecution.ts
++++ b/src/service/production/SemanticDispositionReviewExecution.ts
+@@ -1537,7 +1537,8 @@ const SEMANTIC_DISPOSITION_HOST_AUTHORITIES_V2 = new WeakMap<
+ 
+ interface SemanticDispositionReviewHostAuthorityStateV3 {
+   readonly adapter: SemanticDispositionReviewAgentHostAdapterV3;
+-  readonly executions: Map<string, SemanticDispositionReviewExecutionV3>;
++  // durable 版本只用 hash 防重放；不保留包含完整 prompt/ledger 的执行大图。V2 仍需回读原记录。
++  readonly executionHashes: Set<string>;
+   readonly invocationCoordinates: Set<string>;
+   readonly outputHashes: Set<string>;
+ }
+@@ -1549,7 +1550,7 @@ const SEMANTIC_DISPOSITION_HOST_AUTHORITIES_V3 = new WeakMap<
+ 
+ interface SemanticDispositionReviewHostAuthorityStateV4 {
+   readonly adapter: SemanticDispositionReviewAgentHostAdapterV4;
+-  readonly executions: Map<string, SemanticDispositionReviewExecutionV4>;
++  readonly executionHashes: Set<string>;
+   readonly invocationCoordinates: Set<string>;
+   readonly outputHashes: Set<string>;
+ }
+@@ -1742,7 +1743,7 @@ export function createAgentSemanticDispositionReviewHostGatewayV3(
+       reviewerModelLoadReceipt: loadReceipt,
+       invoke: (call) => adapter.invoke(call),
+     },
+-    executions: new Map(),
++    executionHashes: new Set(),
+     invocationCoordinates: new Set(),
+     outputHashes: new Set(),
+   };
+@@ -1780,13 +1781,13 @@ async function executeAgentSemanticDispositionReviewV3(
+   const execution = buildSemanticDispositionReviewExecutionV3(authority, request, result);
+   const coordinate = `${execution.hostExecution.evaluatorRunId}\u0000${execution.hostExecution.invocationId}`;
+   if (
+-    state.executions.has(execution.executionHash) ||
++    state.executionHashes.has(execution.executionHash) ||
+     state.invocationCoordinates.has(coordinate) ||
+     state.outputHashes.has(execution.hostExecution.responseOutputHash)
+   ) {
+     fail('SEMANTIC_DISPOSITION_REVIEW_HOST_EXECUTION_REUSED');
+   }
+-  state.executions.set(execution.executionHash, execution);
++  state.executionHashes.add(execution.executionHash);
+   state.invocationCoordinates.add(coordinate);
+   state.outputHashes.add(execution.hostExecution.responseOutputHash);
+   return execution;
+@@ -1900,7 +1901,7 @@ export function createAgentSemanticDispositionReviewHostGatewayV4(
+       reviewerModelLoadReceipt: loadReceipt,
+       invoke: (call) => adapter.invoke(call),
+     },
+-    executions: new Map(),
++    executionHashes: new Set(),
+     invocationCoordinates: new Set(),
+     outputHashes: new Set(),
+   };
+@@ -1938,13 +1939,13 @@ async function executeAgentSemanticDispositionReviewV4(
+   const execution = buildSemanticDispositionReviewExecutionV4(authority, request, result);
+   const coordinate = `${execution.hostExecution.evaluatorRunId}\u0000${execution.hostExecution.invocationId}`;
+   if (
+-    state.executions.has(execution.executionHash) ||
++    state.executionHashes.has(execution.executionHash) ||
+     state.invocationCoordinates.has(coordinate) ||
+     state.outputHashes.has(execution.hostExecution.responseOutputHash)
+   ) {
+     fail('SEMANTIC_DISPOSITION_REVIEW_HOST_EXECUTION_REUSED');
+   }
+-  state.executions.set(execution.executionHash, execution);
++  state.executionHashes.add(execution.executionHash);
+   state.invocationCoordinates.add(coordinate);
+   state.outputHashes.add(execution.hostExecution.responseOutputHash);
+   return execution;
+@@ -3516,6 +3517,8 @@ function decisionFindingsInvalid(
+     findings.some(
+       (finding) =>
+         !finding.finding ||
++        // 模型 JSON 的 "false"/1 不能按 JavaScript 真值变成支持证据；非 pass 也须保留布尔契约。
++        typeof finding.supportsVerdict !== 'boolean' ||
+         finding.axisIds.length === 0 ||
+         finding.axisIds.some((axisId) => !expectedAxes.includes(axisId))
+     )
+diff --git a/src/service/production/StrictFactExecution.ts b/src/service/production/StrictFactExecution.ts
+index 872e974..914cab2 100644
+--- a/src/service/production/StrictFactExecution.ts
++++ b/src/service/production/StrictFactExecution.ts
+@@ -1657,7 +1657,7 @@ function assertStrictFactExecutionAuthorities(input: StrictFactScheduleExecution
+     new Set(subjectRefs).size !== subjectRefs.length,
+     input.subjectBindings.some((binding) => invalidSubjectBinding(input, binding)),
+     new Set(witnessKeys).size !== witnessKeys.length,
+-    input.witnessBindings.some(invalidWitnessBinding),
++    input.witnessBindings.some((binding) => invalidWitnessBinding(input, binding)),
+     input.registry.schemaVersion !== 1,
+     !witnessAuthority,
+     witnessAuthority?.sourceArtifactId !== input.artifact.artifactId,
+@@ -1693,10 +1693,35 @@ function invalidSubjectBinding(
+   }
+ }
+ 
+-function invalidWitnessBinding(binding: StrictFactDirectWitnessBindingV1): boolean {
++function invalidWitnessBinding(
++  input: StrictFactScheduleExecutionInputV1,
++  binding: StrictFactDirectWitnessBindingV1
++): boolean {
+   try {
++    const authority = STRICT_FACT_WITNESS_AUTHORITIES.get(input.witnessAuthority);
++    if (!authority) {
++      return true;
++    }
+     const { bindingHash, ...semantic } = binding;
+-    return hashCanonicalJson(semantic) !== bindingHash;
++    if (hashCanonicalJson(semantic) !== bindingHash) {
++      return true;
++    }
++    if (binding.evidenceLedgerSnapshotHash !== authority.evidenceLedgerSnapshotHash) {
++      // 已登记 resolver 只解析自己的 snapshot；不匹配时保留原有逐文件
++      // FACT_WITNESS_AUTHORITY_UNRESOLVED 失败回执和完整分母，不改成输入层异常。
++      return false;
++    }
++    // self hash 只能说明字段自洽：调用方可把另一文件的合法 entry 重绑后重新计算它。
++    // 重放既有工厂，以当前 frozen artifact 和已登记 ledger 复核 path/blob/range/ref 的完整关系。
++    const rebuilt = createStrictFactDirectWitnessBindingV1({
++      artifact: input.artifact,
++      repoId: binding.repoId,
++      relativePath: binding.relativePath,
++      evidenceEntry: binding.evidenceEntry,
++      evidenceLedgerSnapshot: authority.evidenceLedgerSnapshot,
++      projectContextRef: binding.projectContextRef,
++    });
++    return rebuilt.bindingHash !== bindingHash;
+   } catch {
+     return true;
+   }
+diff --git a/src/service/sustain/EnhancementSuggester.ts b/src/service/sustain/EnhancementSuggester.ts
+index 57e0ec5..1a40597 100644
+--- a/src/service/sustain/EnhancementSuggester.ts
++++ b/src/service/sustain/EnhancementSuggester.ts
+@@ -8,7 +8,7 @@
+  *   ④ 关联 Recipe 已 deprecated → 建议检查引用是否过时
+  */
+ 
+-import type { KnowledgeEntry } from '../../domain/knowledge/index.js';
++import { type KnowledgeEntry, Relations } from '../../domain/knowledge/index.js';
+ import { Lifecycle, PUBLISHED_LIFECYCLES } from '../../domain/knowledge/Lifecycle.js';
+ import Logger from '../../infrastructure/logging/Logger.js';
+ import type { ReportStore } from '../../infrastructure/report/ReportStore.js';
+@@ -187,17 +187,12 @@ export class EnhancementSuggester {
+     const suggestions: EnhancementSuggestion[] = [];
+ 
+     for (const entry of entries) {
+-      const relations = (entry.relations ?? {}) as unknown as Record<string, unknown>;
+-
+-      const relatedIds: string[] = [];
+-      for (const [bucket, ids] of Object.entries(relations)) {
+-        if (bucket === 'deprecated_by') {
+-          continue; // 自身的 deprecated_by 不算
+-        }
+-        if (Array.isArray(ids)) {
+-          relatedIds.push(...ids);
+-        }
+-      }
++      // Repository 返回 Relations 值对象；通过其规范视图读取 target，同时兼容旧分桶输入。
++      // 直接枚举实例只能看到 _b，且桶内元素是 RelationEntry，不是 recipe ID 字符串。
++      const relatedIds = Relations.from(entry.relations)
++        .toFlatArray()
++        .filter((relation) => relation.type !== 'deprecated_by' && relation.target)
++        .map((relation) => relation.target);
+ 
+       if (relatedIds.length === 0) {
+         continue;
+diff --git a/src/shared/index.ts b/src/shared/index.ts
+index dfc0907..6a360cd 100644
+--- a/src/shared/index.ts
++++ b/src/shared/index.ts
+@@ -74,7 +74,13 @@ export * from './recipeTokens.js';
+ export * from './resolveProjectRoot.js';
+ export * from './schemas/index.js';
+ export * from './shutdown.js';
+-export * from './similarity.js';
++// 保持既有四个公共符号；字符 n-gram 复用内核只供 Core 内部调用。
++export {
++  cosineSimilarity,
++  jaccardSimilarity,
++  textSimilarity,
++  tokenizeForSimilarity,
++} from './similarity.js';
+ export * from './sourceContracts.js';
+ export * from './TimerRegistry.js';
+ export * from './testMode.js';
+diff --git a/src/shared/similarity.ts b/src/shared/similarity.ts
+index ef96b20..278c074 100644
+--- a/src/shared/similarity.ts
++++ b/src/shared/similarity.ts
+@@ -67,6 +67,23 @@ export function jaccardSimilarity(a: Set<string>, b: Set<string>) {
+   return union > 0 ? intersection / union : 0;
+ }
+ 
++/**
++ * 内部字符 n-gram Jaccard；调用方保留各自的文本预处理和权重。
++ * 不复用 tokenizeForSimilarity：它会小写化并丢标点，改变原有代码结构相似度。
++ * 此符号不经 shared 公共门面导出，避免扩大稳定 API。
++ */
++export function ngramJaccardSimilarity(a: string, b: string, n: number): number {
++  const gramsA = new Set<string>();
++  const gramsB = new Set<string>();
++  for (let i = 0; i <= a.length - n; i++) {
++    gramsA.add(a.slice(i, i + n));
++  }
++  for (let i = 0; i <= b.length - n; i++) {
++    gramsB.add(b.slice(i, i + n));
++  }
++  return jaccardSimilarity(gramsA, gramsB);
++}
++
+ /**
+  * 余弦相似度 — 向量点积 / (||a|| * ||b||)
+  *
+diff --git a/src/types/SnapshotViews.ts b/src/types/SnapshotViews.ts
+index 657a938..fb93214 100644
+--- a/src/types/SnapshotViews.ts
++++ b/src/types/SnapshotViews.ts
+@@ -73,87 +73,7 @@ export interface PipelineFillView {
+   readonly skipTargetDelivery?: boolean;
+ }
+ 
+-// ─── 视图 1: toResponseData ──────────────────────────────────
+-
+-/**
+- * 从 ProjectSnapshot 提取通用的 MCP 响应数据摘要。
+- *
+- * 注意：这只包含通用字段。各 handler 需要的特有字段
+- * （如 cleanup、bootstrapSession、rescan 等）仍然需要在 handler 中单独拼装。
+- */
+-export function toResponseData(snapshot: ProjectSnapshot): Record<string, unknown> {
+-  return {
+-    filesScanned: snapshot.allFiles.length,
+-    targets: snapshot.targetsSummary,
+-    primaryLanguage: snapshot.language.primaryLang,
+-    languageStats: snapshot.language.stats,
+-    secondaryLanguages: snapshot.language.secondary,
+-    isMultiLang: snapshot.language.isMultiLang,
+-    astSummary: snapshot.ast
+-      ? {
+-          classes: snapshot.ast.classes?.length || 0,
+-          protocols: snapshot.ast.protocols?.length || 0,
+-          categories: snapshot.ast.categories?.length || 0,
+-          patterns: Object.keys(snapshot.ast.patternStats || {}),
+-          metrics: snapshot.ast.projectMetrics
+-            ? {
+-                totalMethods: snapshot.ast.projectMetrics.totalMethods,
+-                avgMethodsPerClass: snapshot.ast.projectMetrics.avgMethodsPerClass,
+-                maxNestingDepth: snapshot.ast.projectMetrics.maxNestingDepth,
+-                complexMethods: snapshot.ast.projectMetrics.complexMethods?.length || 0,
+-                longMethods: snapshot.ast.projectMetrics.longMethods?.length || 0,
+-              }
+-            : null,
+-        }
+-      : null,
+-    codeEntityGraph: snapshot.codeEntityGraph
+-      ? {
+-          totalEntities:
+-            snapshot.codeEntityGraph.entityCount ?? snapshot.codeEntityGraph.entitiesUpserted ?? 0,
+-          totalEdges:
+-            snapshot.codeEntityGraph.edgeCount ?? snapshot.codeEntityGraph.edgesCreated ?? 0,
+-        }
+-      : null,
+-    callGraph: snapshot.callGraph
+-      ? {
+-          entitiesUpserted: snapshot.callGraph.entitiesUpserted || 0,
+-          edgesCreated: snapshot.callGraph.edgesCreated || 0,
+-        }
+-      : null,
+-    guardSummary: snapshot.guardAudit
+-      ? {
+-          totalViolations: snapshot.guardAudit.summary?.totalViolations || 0,
+-          errors: snapshot.guardAudit.summary?.errors || 0,
+-          warnings: snapshot.guardAudit.summary?.warnings || 0,
+-        }
+-      : null,
+-    dependencyGraph: snapshot.dependencyGraph
+-      ? {
+-          nodes: (snapshot.dependencyGraph.nodes || []).map((n) => {
+-            if (typeof n === 'string') {
+-              return { id: n, label: n };
+-            }
+-            return { id: n.id, label: n.label };
+-          }),
+-          edges: snapshot.dependencyGraph.edges || [],
+-        }
+-      : null,
+-    dimensionCount: snapshot.activeDimensions.length,
+-    enhancementPacks:
+-      snapshot.enhancementPackInfo.length > 0
+-        ? {
+-            matched: snapshot.enhancementPackInfo,
+-            patterns: snapshot.enhancementPatterns,
+-            guardRules: snapshot.enhancementGuardRules.length,
+-          }
+-        : null,
+-    localPackageModules:
+-      snapshot.localPackageModules.length > 0 ? snapshot.localPackageModules : null,
+-    warnings: snapshot.warnings.length > 0 ? snapshot.warnings : undefined,
+-  };
+-}
+-
+-// ─── 视图 2: toSessionCache ──────────────────────────────────
++// ─── 视图 1: toSessionCache ──────────────────────────────────
+ 
+ /**
+  * 从 ProjectSnapshot 提取 GenerateSession 的 phase cache 数据。
+diff --git a/src/workflows/project-index/KnowledgeRescanIntent.ts b/src/workflows/project-index/KnowledgeRescanIntent.ts
+index f9c65ff..316fa3e 100644
+--- a/src/workflows/project-index/KnowledgeRescanIntent.ts
++++ b/src/workflows/project-index/KnowledgeRescanIntent.ts
+@@ -144,7 +144,8 @@ function normalizeKnowledgeRescanPositiveInteger(
+         ? Number(value)
+         : null;
+ 
+-  if (numericValue === null || !Number.isFinite(numericValue) || numericValue <= 0) {
++  // 小于 1 的正数取整后会变成 0，也按既有无效预算策略回退默认值。
++  if (numericValue === null || !Number.isFinite(numericValue) || numericValue < 1) {
+     return defaultValue;
+   }
+ 
+diff --git a/src/workflows/surfaces/host-agent/briefing/MissionBriefingBuilder.ts b/src/workflows/surfaces/host-agent/briefing/MissionBriefingBuilder.ts
+index 2e869d8..8219657 100644
+--- a/src/workflows/surfaces/host-agent/briefing/MissionBriefingBuilder.ts
++++ b/src/workflows/surfaces/host-agent/briefing/MissionBriefingBuilder.ts
+@@ -1001,18 +1001,27 @@ function summarizePanorama(
+     return null;
+   }
+   try {
+-    // PanoramaResult.layers: LayerHierarchy { levels: LayerLevel[] }
++    // ProjectContext/snapshot 已归一为数组；旧扫描结果仍使用 levels/Map/cycles。
++    // 在此统一形状再应用同一预算，避免已有结构事实被当作空结果。
+     const layerHierarchy = panoramaResult.layers as
+       | { levels?: Array<{ level: number; name: string; modules: string[] }> }
++      | Array<{ level: number; name: string; modules: string[] }>
+       | undefined;
+-    const layers = layerHierarchy?.levels ?? [];
++    const layers = Array.isArray(layerHierarchy) ? layerHierarchy : (layerHierarchy?.levels ?? []);
+ 
+     // PanoramaResult.modules: Map<string, PanoramaModule>
+     const modules = panoramaResult.modules as
+       | Map<string, { name: string; fanIn: number; fanOut: number }>
+       | undefined;
+-    const couplingHotspots: Array<{ module: string; fanIn: number; fanOut: number }> = [];
+-    if (modules instanceof Map) {
++    const normalizedHotspots = Array.isArray(panoramaResult.couplingHotspots)
++      ? (panoramaResult.couplingHotspots as Array<{
++          module: string;
++          fanIn: number;
++          fanOut: number;
++        }>)
++      : null;
++    const couplingHotspots = normalizedHotspots ? [...normalizedHotspots] : [];
++    if (!normalizedHotspots && modules instanceof Map) {
+       for (const [, mod] of modules) {
+         if (mod.fanIn >= 10 || mod.fanOut >= 10) {
+           couplingHotspots.push({ module: mod.name, fanIn: mod.fanIn, fanOut: mod.fanOut });
+@@ -1022,11 +1031,14 @@ function summarizePanorama(
+     }
+ 
+     // PanoramaResult.cycles: CyclicDependency[]
+-    const cycles = (panoramaResult.cycles as Array<{ cycle: string[]; severity: string }>) ?? [];
++    const cycles = (panoramaResult.cyclicDependencies ?? panoramaResult.cycles ?? []) as Array<{
++      cycle: string[];
++      severity: string;
++    }>;
+ 
+     // PanoramaResult.gaps: KnowledgeGap[] (dimension-based)
+     const gaps =
+-      (panoramaResult.gaps as Array<{
++      ((panoramaResult.knowledgeGaps ?? panoramaResult.gaps) as Array<{
+         dimension: string;
+         dimensionName: string;
+         recipeCount: number;
+@@ -1350,17 +1362,15 @@ function buildProjectContextLanguageStats(
+   input: ProjectContextPresenterInput
+ ): Record<string, number> {
+   const stats = new Map<string, number>();
+-  for (const language of input.repo?.languages ?? []) {
+-    stats.set(language.language, language.fileCount ?? 0);
+-  }
+   for (const file of input.files) {
+-    if (file.language && !stats.has(file.language)) {
+-      stats.set(file.language, 0);
+-    }
+     if (file.language) {
+       stats.set(file.language, (stats.get(file.language) ?? 0) + 1);
+     }
+   }
++  // repo 给的是同一 scope 的总量；files 常为已读子集，只补缺少统计的语言。
++  for (const language of input.repo?.languages ?? []) {
++    stats.set(language.language, language.fileCount ?? stats.get(language.language) ?? 0);
++  }
+   return Object.fromEntries(
+     [...stats.entries()].sort(([left], [right]) => left.localeCompare(right))
+   );
+diff --git a/src/workflows/surfaces/host-agent/briefing/MissionBriefingSupport.ts b/src/workflows/surfaces/host-agent/briefing/MissionBriefingSupport.ts
+index 06f08b3..8919eba 100644
+--- a/src/workflows/surfaces/host-agent/briefing/MissionBriefingSupport.ts
++++ b/src/workflows/surfaces/host-agent/briefing/MissionBriefingSupport.ts
+@@ -317,32 +317,38 @@ function buildExecutionTiers(activeDimensions: DimensionDef[]): ExecutionPlanTie
+     'agent-guidelines 应综合前序所有维度的发现。',
+   ];
+ 
+-  const plan = tiers
+-    .map((tierDimIds, index) => {
+-      const filteredDims = tierDimIds.filter((id) => activeDimIds.has(id));
+-      if (filteredDims.length === 0) {
+-        return null;
+-      }
+-      return {
+-        tier: index + 1,
+-        label: tierLabels[index] || `Tier ${index + 1}`,
+-        dimensions: filteredDims,
+-        note: tierNotes[index] || '',
+-      };
+-    })
+-    .filter((tier): tier is ExecutionPlanTier => tier !== null);
++  const plan = tiers.map((tierDimIds, index) => {
++    const filteredDims = tierDimIds.filter((id) => activeDimIds.has(id));
++    return {
++      tier: index + 1,
++      label: tierLabels[index] || `Tier ${index + 1}`,
++      dimensions: filteredDims,
++      note: tierNotes[index] || '',
++    };
++  });
+ 
+   const scheduledIds = new Set(tiers.flat());
+   const unscheduled = activeDimensions.filter((dimension) => !scheduledIds.has(dimension.id));
+-  if (unscheduled.length > 0 && plan.length > 0) {
+-    for (const dimension of unscheduled) {
+-      const hint = typeof dimension.tierHint === 'number' ? dimension.tierHint : 1;
+-      const targetIdx = Math.max(0, Math.min(hint - 1, plan.length - 1));
+-      plan[targetIdx]?.dimensions.push(dimension.id);
++  for (const dimension of unscheduled) {
++    const hint = dimension.tierHint;
++    const tier = typeof hint === 'number' && Number.isInteger(hint) && hint >= 1 ? hint : 1;
++    // 先按真实 tier 号分桶，再去掉空层；只选自定义维度也不能丢失执行任务。
++    const existing = plan.find((entry) => entry.tier === tier);
++    if (existing) {
++      existing.dimensions.push(dimension.id);
++    } else {
++      plan.push({
++        tier,
++        label: tierLabels[tier - 1] || `Tier ${tier}`,
++        dimensions: [dimension.id],
++        note: tierNotes[tier - 1] || '',
++      });
+     }
+   }
+ 
+-  return plan;
++  return plan
++    .filter((tier) => tier.dimensions.length > 0)
++    .sort((left, right) => left.tier - right.tier);
+ }
+ 
+ function buildWorkflowInstruction({
+diff --git a/src/workflows/surfaces/persistence/FileDiffSnapshotStore.ts b/src/workflows/surfaces/persistence/FileDiffSnapshotStore.ts
+index a8cc066..9bd606b 100644
+--- a/src/workflows/surfaces/persistence/FileDiffSnapshotStore.ts
++++ b/src/workflows/surfaces/persistence/FileDiffSnapshotStore.ts
+@@ -250,7 +250,8 @@ export class FileDiffSnapshotStore {
+     const fileHashes: Record<string, string> = {};
+     for (const f of allFiles) {
+       const rel = normalizeSnapshotPath(f, projectRoot);
+-      fileHashes[rel] = this.#computeContentHash(f.content || this.#readFileContent(f.path));
++      // 显式空内容也是扫描事实；仅缺失 content 时回读磁盘，与 computeDiff 保持同一来源规则。
++      fileHashes[rel] = this.#computeContentHash(f.content ?? this.#readFileContent(f.path));
+     }
+ 
+     // 构建维度-文件映射
+@@ -417,7 +418,7 @@ export class FileDiffSnapshotStore {
+     const newHashes: Record<string, string> = {};
+     for (const f of currentFiles) {
+       const rel = normalizeSnapshotPath(f, projectRoot);
+-      newHashes[rel] = this.#computeContentHash(f.content || '');
++      newHashes[rel] = this.#computeContentHash(f.content ?? this.#readFileContent(f.path));
+     }
+ 
+     const reconciled = reconcileSnapshotHashes(snapshot.fileHashes || {}, Object.keys(newHashes));

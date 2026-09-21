@@ -1,0 +1,85 @@
+configuration env reads
+$ rg -n process.env|_BASE =|_DEFAULT_BASE|_KEY_ENV src/ai
+src/ai/configuration.ts:132:  env: ConfigEnvironment = process.env
+src/ai/configuration.ts:183:  env: ConfigEnvironment = process.env
+src/ai/configuration.ts:216:  env: ConfigEnvironment = process.env
+src/ai/configuration.ts:227:  env: ConfigEnvironment = process.env
+src/ai/configuration.ts:259:  env: ConfigEnvironment = process.env
+src/ai/configuration.ts:267:export function embedProviderOptions(env: ConfigEnvironment = process.env) {
+src/ai/configuration.ts:284:export function aiConfigInfo(env: ConfigEnvironment = process.env) {
+src/ai/shared/concurrency.ts:8:  env: Readonly<Record<string, string | undefined>> = process.env
+src/ai/transport/LLMTransport.ts:245:        process.env[`ALEMBIC_${tag}_PROXY_HTTPS`] || process.env[`ALEMBIC_${tag}_PROXY_HTTP`];
+src/ai/transport/LLMTransport.ts:251:      process.env.ALEMBIC_AI_PROXY ||
+src/ai/transport/LLMTransport.ts:252:      process.env.HTTPS_PROXY ||
+src/ai/transport/LLMTransport.ts:253:      process.env.https_proxy ||
+src/ai/transport/LLMTransport.ts:254:      process.env.HTTP_PROXY ||
+src/ai/transport/LLMTransport.ts:255:      process.env.http_proxy ||
+src/ai/transport/LLMTransport.ts:256:      process.env.ALL_PROXY ||
+src/ai/transport/LLMTransport.ts:257:      process.env.all_proxy ||
+
+
+host receipt consumption
+$ rg -n baseUrl|reasoningEffort|readEmbeddingProvider|STRICT_RUNTIME_CONFIG_ENDPOINT_MISMATCH ../Alembic/lib/infrastructure/config/RuntimeConfigLoadReceipt.ts
+50:    readonly reasoningEffort: string | null;
+135:  const actualEmbedding = readEmbeddingProvider(input.actualEmbeddingProvider);
+156:    actualProvider.reasoningEffort &&
+157:    actualProvider.reasoningEffort !== expectedReasoning
+161:  if (isDeepSeek && actualProvider.baseUrl) {
+163:    if (actualProvider.baseUrl !== expectedEndpoint) {
+164:      throw new Error('STRICT_RUNTIME_CONFIG_ENDPOINT_MISMATCH');
+225:    reasoningEffort: expectedReasoning,
+393:  readonly baseUrl: string | null;
+394:  readonly reasoningEffort: string | null;
+400:    baseUrl: text(provider.baseUrl),
+401:    reasoningEffort: text(record(provider._transportExtras).reasoningEffort),
+405:function readEmbeddingProvider(value: unknown): {
+
+
+test/adapter references before consolidation
+$ git grep -n -E embedding-capacity-hint|normalizeOllamaBaseUrl f863c52 -- src test config scripts docs
+f863c52:scripts/probe-embedding-capacity-hint.mjs:6://   node scripts/probe-embedding-capacity-hint.mjs
+f863c52:src/ai/providers/OllamaProvider.ts:34:export function normalizeOllamaBaseUrl(rawUrl: string, logger?: AiLogger): string {
+f863c52:src/ai/providers/OllamaProvider.ts:62:    this.baseUrl = normalizeOllamaBaseUrl(
+f863c52:test/provider-facades.test.ts:5:import { normalizeOllamaBaseUrl, OllamaProvider } from '../src/ai/providers/OllamaProvider.js';
+f863c52:test/provider-facades.test.ts:411:describe('normalizeOllamaBaseUrl', () => {
+f863c52:test/provider-facades.test.ts:414:    expect(normalizeOllamaBaseUrl('http://127.0.0.1:11434', logger as never)).toBe(
+f863c52:test/provider-facades.test.ts:421:    expect(normalizeOllamaBaseUrl('http://localhost:11434/')).toBe('http://localhost:11434/v1');
+f863c52:test/provider-facades.test.ts:425:    expect(normalizeOllamaBaseUrl('http://localhost:11434/v1')).toBe('http://localhost:11434/v1');
+f863c52:test/provider-facades.test.ts:426:    expect(normalizeOllamaBaseUrl('http://localhost:11434/v1/')).toBe('http://localhost:11434/v1');
+f863c52:test/provider-facades.test.ts:430:    expect(normalizeOllamaBaseUrl('https://gw.example.com/ollama/v1')).toBe(
+f863c52:test/provider-facades.test.ts:433:    expect(normalizeOllamaBaseUrl('https://gw.example.com/custom-openai')).toBe(
+f863c52:test/provider-facades.test.ts:439:    expect(normalizeOllamaBaseUrl('not-a-url')).toBe('not-a-url');
+
+
+replacement test coverage
+$ rg -n ^describe|^  it test/ai-configuration.test.ts test/LLMGateway.test.ts
+test/ai-configuration.test.ts:36:describe('effective AI connection configuration', () => {
+test/ai-configuration.test.ts:37:  it('does not invent reasoning metadata for providers that do not use the DeepSeek adapter option', () => {
+test/ai-configuration.test.ts:46:  it.each([
+test/ai-configuration.test.ts:66:  it('preserves facade reliability and local-host defaults', () => {
+test/ai-configuration.test.ts:82:  it('preserves the DeepSeek public endpoint receipt while joining the embedding path once', async () => {
+test/ai-configuration.test.ts:100:  it('resolves a known provider alias at the gateway and rejects unknown explicit identities', async () => {
+test/ai-configuration.test.ts:128:  it.each([
+test/ai-configuration.test.ts:144:  it('validates environment concurrency and freezes a valid gateway limit at construction', async () => {
+test/ai-configuration.test.ts:171:  it.each([
+test/ai-configuration.test.ts:201:  it.each([
+test/ai-configuration.test.ts:241:  it('applies a selected Google model to both direct and factory construction', () => {
+test/ai-configuration.test.ts:252:  it.each([
+test/ai-configuration.test.ts:271:  it('excludes alias identities when listing fallback providers', () => {
+test/ai-configuration.test.ts:277:  it('uses the embedding model for both the wire request and the host receipt', async () => {
+test/ai-configuration.test.ts:297:  it('captures gateway connection and protocol settings before the first lazy request', async () => {
+test/ai-configuration.test.ts:319:  it.each([
+test/ai-configuration.test.ts:340:  it('uses an explicit endpoint with an inherited key instead of the environment endpoint', async () => {
+test/ai-configuration.test.ts:362:describe('embedding capacity configuration and public hints', () => {
+test/ai-configuration.test.ts:363:  it.each([
+test/ai-configuration.test.ts:387:  it('stays reachable on the exact object shape Core BatchEmbedder receives', () => {
+test/ai-configuration.test.ts:395:describe('public Ollama root compatibility helper', () => {
+test/ai-configuration.test.ts:396:  it.each([
+test/LLMGateway.test.ts:12:describe('LLMGateway horizontal capabilities', () => {
+test/LLMGateway.test.ts:13:  it('stops provider fallback when the caller cancels the probe chain', async () => {
+test/LLMGateway.test.ts:28:  it.each([
+test/LLMGateway.test.ts:66:  it('applies the global timeout even when provider credentials are explicit', async () => {
+test/LLMGateway.test.ts:94:  it('preserves provider-prefixed model ids after the first colon', async () => {
+test/LLMGateway.test.ts:120:  it('chatStructured robustly extracts JSON wrapped in markdown fences', async () => {
+test/LLMGateway.test.ts:134:  it('rebuilds the singleton when a new config is provided', () => {
+

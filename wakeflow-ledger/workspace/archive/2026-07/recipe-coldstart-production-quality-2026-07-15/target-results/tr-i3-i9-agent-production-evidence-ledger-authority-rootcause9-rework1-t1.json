@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1",
+  "dispatchGroup": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1",
+  "status": "completed",
+  "summary": "Fixed the reproduced public production Evidence Ledger durable-poisoning defect in one Agent-only follow-up commit. The capture facet now validates and normalizes every runtime draft before EvidenceLedgerStore.append, so unknown tools, non-object/array inputs, missing/extra fields, non-string tool/callId/content/file, empty/present-undefined file, and malformed 1-based ranges fail with stable ALEMBIC_AGENT_EVIDENCE_LEDGER_CAPTURE_INVALID reason codes before E-n allocation, store mutation, or JSONL creation. A 26-case source regression and the built @alembic/agent/production consumer both prove file bytes/existence, store stats, and strict snapshot state are unchanged; the next valid capture remains E-1. The existing opaque factory/facets, private store, redaction, strict hydration/snapshot, AgentRuntime sharing, fresh-process reopen identity, and serialized V3 attestation remain intact.",
+  "evidenceRefs": [
+    "commit:5d62e9e662eff045097f2da3707709cbd88f56ce",
+    "parent:8284aa7ef175135f39f5130c09b880173073ebbf",
+    "tree:507089ab9b79ee89ba0b603ff0216cdcfc21b70b",
+    "core-readonly:d0d33e49cab732ec541bcfc3fb35447b6e2ad58d",
+    "main-readonly:1c16269796f270ec95ab8a3b1ae9c129573b9ee6",
+    "src/agent/evidence/ProductionEvidenceLedgerAuthority.ts",
+    "test/production-evidence-ledger-authority.test.ts",
+    "scripts/fixtures/strict-public-connected-probe.mjs",
+    "scripts/probe-agent-public-strict-consumer.mjs",
+    "guard:guard-public-ms4tb9ek-1",
+    "alembic-finish:finish-public-ms4tb13n-1",
+    "public-probe:capture-validation-26-rejected-no-mutation-next-E-1",
+    "fresh-process:ledger-reopen-and-v3-attestation-verified"
+  ],
+  "verification": [
+    "Baseline: npm run build:check && npx vitest run test/production-evidence-ledger-authority.test.ts test/EvidenceLedgerStore.test.ts test/durable-semantic-review-runtime.test.ts test/AgentRuntime.test.ts -> 4 files, 55/55 passed at 8284aa7.",
+    "RED source regression: npx vitest run test/production-evidence-ledger-authority.test.ts -> unknown tool did not throw; 1 failed/12 passed before implementation.",
+    "RED built public probe: @alembic/agent/production accepted caller.fake as E-1 and range {start:0,end:-1} as E-2, created a 538-byte two-line JSONL, then strictSnapshot failed.",
+    "GREEN focused: npm run build:check && npm run build && npx vitest run test/production-evidence-ledger-authority.test.ts test/EvidenceLedgerStore.test.ts test/durable-semantic-review-runtime.test.ts test/AgentRuntime.test.ts -> 4 files, 56/56 passed.",
+    "Built public/fresh-process: npm run smoke:strict-consumer -> 26/26 capture cases rejected without file/snapshot mutation, next valid E-1, fresh-process reopen true, same store/snapshot/evidence identity and serialized V3 attestation verified, prior 11 fault cards retained.",
+    "Full: npm run check -> passed; 73 files, 604/604 tests; build/typecheck, 15-export/449-binding public signature, Core import scan 319 files/91 imports, layer, naming, provider-neutral, validation floor, strict consumer and retired-symbol gates passed. Biome reported the same 21 pre-existing unrelated warnings and no errors.",
+    "Public imports: npm run smoke:public-imports -> 15 subpaths imported, 11 forbidden subpaths rejected.",
+    "Scoped format/lint: npx biome check <four changed files> -> 4 files clean, no diagnostics.",
+    "Whitespace/scope: git diff --check passed before commit; post-commit git status clean.",
+    "Alembic Guard: guard-public-ms4tb9ek-1 -> 2 recommended core files checked, 0 violations."
+  ],
+  "risks": [
+    "No known in-scope residual defect. The 21 whole-repository Biome warnings pre-existed this change and remain outside the declared four-file scope.",
+    "Internal EvidenceLedgerStore.append remains an internal typed primitive; this rework intentionally validates the public production capture boundary only, preserving the task's single-store/public-facet design.",
+    "Core and Main were read-only context at the pinned heads; downstream Main composition remains controller-owned follow-on work from the original demand, not authorized scope for this rework."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "5d62e9e662eff045097f2da3707709cbd88f56ce",
+      "verify": "Single clean follow-up based exactly on parent 8284aa7ef175135f39f5130c09b880173073ebbf; tree 507089ab9b79ee89ba0b603ff0216cdcfc21b70b; exactly four AlembicAgent files changed; Core d0d33e49 and Main 1c16269 unchanged."
+    },
+    {
+      "kind": "command",
+      "value": "build:check/build; focused 56/56; npm run check 604/604; public import 15/11; public signature 15/449; Core import 319/91; layer/provider-neutral/naming/retired; strict fresh-process; local Biome; git diff --check all passed.",
+      "verify": "Full command outcomes are listed in verification; whole-repo lint has 21 pre-existing warnings and zero errors, while all four changed files are clean."
+    },
+    {
+      "kind": "runtime-fixture",
+      "ref": "scripts/fixtures/strict-public-connected-probe.mjs",
+      "verify": "Built @alembic/agent/production path retains real capture, Core witness bindings, durable semantic review, fresh-process JSONL reopen, identical store/snapshot/evidence identity, and serialized V3 attestation verification."
+    },
+    {
+      "kind": "negative-probe",
+      "ref": "scripts/probe-agent-public-strict-consumer.mjs",
+      "verify": "Built public export rejects 26 malformed drafts with stable Agent errors; every receipt records fileUnchanged=true and snapshotUnchanged=true, ledger remains absent, next valid evidence is E-1; prior 11 corrupt/rebound/fault cards remain passing."
+    },
+    {
+      "kind": "boundary",
+      "ref": "src/agent/evidence/ProductionEvidenceLedgerAuthority.ts",
+      "verify": "Only existing capture facet gained pre-append validation/normalization; same private EvidenceLedgerStore, WeakMap authority, redactor, public identity/facets, AgentRuntime route and strict snapshot behavior; no second store/export/Core/Main changes."
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The public TypeScript alias Readonly<EvidenceEntryDraft> was erased at runtime, so JavaScript/public-package callers could pass structurally invalid values directly to EvidenceLedgerStore.append. append allocated ++seq and wrote append-only JSONL before strictSnapshot performed Core entry validation; validating afterward could report corruption but could not remove poisoned immutable lines or reclaim E-n. validateCaptureInput now runs inside the public capture closure before store.append, checks exact fields/tool whitelist/string values/1-based integer ranges, copies and freezes the accepted draft, and converts unreadable inputs to a stable Agent error. The source regression proves all 26 rejections preserve file existence/bytes, private store stats, and strict snapshot state; the built public probe independently proves no JSONL is created and the first valid capture still receives E-1.",
+      "verify": "RED built probe showed E-1/E-2 plus 538-byte two-line JSONL; GREEN source and built probes show zero mutation and next E-1."
+    },
+    {
+      "kind": "baseline",
+      "value": "npm run build:check plus four focused files passed 55/55 at clean parent 8284aa7.",
+      "verify": "Pre-change baseline recorded before test/source edits."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "1) source/public RED matrix; 2) validate before append; 3) built fresh-process proof; 4) focused/full/boundary gates; 5) self-review/Guard/commit/return.",
+      "verify": "Executed in order without cross-repository edits."
+    },
+    {
+      "kind": "repro",
+      "value": "Built public @alembic/agent/production accepted caller.fake as E-1 and invalid range as E-2, created 538-byte two-line JSONL, then strictSnapshot failed.",
+      "verify": "Exact user-visible durable-poisoning chain reproduced before production edit."
+    },
+    {
+      "kind": "regression",
+      "ref": "test/production-evidence-ledger-authority.test.ts",
+      "verify": "Failed first because unknown tool did not throw; passes after fix and checks each invalid case against file bytes/existence, store.stats(), strictSnapshot state, and next E-1."
+    },
+    {
+      "kind": "test-first",
+      "ref": "test/production-evidence-ledger-authority.test.ts",
+      "verify": "Regression was added and observed failing before source implementation; one final commit was retained to satisfy the task's stricter single-follow-up-commit contract."
+    },
+    {
+      "kind": "tests",
+      "ref": "test/production-evidence-ledger-authority.test.ts",
+      "verify": "Focused 56/56 and full 604/604 passed."
+    },
+    {
+      "kind": "self-review",
+      "value": "Rework response: agree that accepted-shape authority lacked runtime validation; fixed at first fact-loss point before append. Stage 1: every required invalid category/zero-side-effect/unchanged valid reopen requirement covered, no forbidden repository or contract changes. Stage 2: found and fixed a potential repeated caller-property read/TOCTOU by validating local values and appending only a frozen copy; no remaining P0/P1/P2 findings.",
+      "verify": "Final four-file diff, tests, public probe, full gates and Guard reviewed."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Exactly four AlembicAgent files changed: one authority source, one unit regression, existing connected public fixture, existing strict-consumer driver; 570 insertions/3 deletions; no sibling files changed.",
+      "verify": "git show --stat 5d62e9e; clean status."
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed after final edits.",
+      "verify": "TypeScript NodeNext public signature unchanged."
+    },
+    {
+      "kind": "lint",
+      "value": "npm run check lint/gates passed; four changed files have zero Biome diagnostics; 21 unrelated pre-existing whole-repo warnings remain.",
+      "verify": "npx biome check on explicit four files passed."
+    },
+    {
+      "kind": "verification",
+      "value": "Full check, 604 tests, strict fresh-process, public import/signature, Core/layer/provider-neutral/naming/retired and git diff gates passed.",
+      "verify": "No required verification failure."
+    },
+    {
+      "kind": "guard",
+      "ref": "guard-public-ms4tb9ek-1",
+      "verify": "Alembic Guard passed 2 recommended files with 0 violations."
+    },
+    {
+      "kind": "compatibility",
+      "value": "Public factory, type signatures, frozen identity/capture/read facets, private store, valid redaction/snapshot/reopen behavior and existing 11 negative fault cards are unchanged.",
+      "verify": "Public import/signature smokes and strict consumer passed."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1__AlembicAgent__i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1__AlembicAgent__i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1__AlembicAgent__i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1",
+    "dispatchGroup": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1__AlembicAgent__i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 266,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1",
+    "targetTaskId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-p1",
+    "resultId": "tr-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework1-t1",
+    "createdAt": "2026-07-28T15:32:01.285Z"
+  },
+  "createdAt": "2026-07-28T15:32:01.285Z",
+  "stateRevisionObserved": 266,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

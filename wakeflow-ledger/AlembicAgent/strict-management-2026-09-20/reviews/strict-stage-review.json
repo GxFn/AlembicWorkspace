@@ -1,0 +1,456 @@
+{
+  "title": "StrictProductionStages 全文及真实port复审",
+  "date": "2026-09-20",
+  "baseline": "56900c50995ac6748d10040d27611f07ed838b49",
+  "scope": {
+    "source": {
+      "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+      "line": 1
+    },
+    "lineCount": 226,
+    "fullTextReviewed": true,
+    "sourceSha256": "183ae0eb7d3403d158f082d3263823d506d711dfac01d0d1a98b0c55fc0e9c1b",
+    "initialMode": "read-only-review",
+    "followupAuthorization": "root随后授权四项真实缺陷的Agent内修复；当前记录先保留RED事实与执行计划。"
+  },
+  "functions": [
+    {
+      "name": "buildStrictProductionPipelineStagesV1",
+      "line": 37,
+      "endLine": 104,
+      "role": "构造analyze/G1/produce/G2四阶段；保留immutable role marker、零tool capabilities和无legacy tracker。"
+    },
+    {
+      "name": "analyze.promptBuilder",
+      "line": 46,
+      "endLine": 52,
+      "role": "验证runtime port并规范化epoch后生成严格Analyst输入。"
+    },
+    {
+      "name": "G1.evaluator",
+      "line": 57,
+      "endLine": 61,
+      "role": "转到typed epoch gate adapter。"
+    },
+    {
+      "name": "produce.promptBuilder",
+      "line": 80,
+      "endLine": 83,
+      "role": "调用真实Main buildProducerInput，Producer不拥有持久化权限。"
+    },
+    {
+      "name": "G2.evaluator",
+      "line": 88,
+      "endLine": 92,
+      "role": "调用真实独立review port；当前未规范化返回值。"
+    },
+    {
+      "name": "invokeGatePort",
+      "line": 106,
+      "endLine": 118,
+      "role": "异常转reject；当前直接透传未知结果。"
+    },
+    {
+      "name": "invokeStrictAnalysisGate",
+      "line": 120,
+      "endLine": 165,
+      "role": "before→validateAnalystResult→after→expansion授权→transition验证与G1投影；当前校验/提交及取消边界有缺口。"
+    },
+    {
+      "name": "getAppendedAnalysisObligationIds",
+      "line": 167,
+      "endLine": 175,
+      "role": "按真实before/after差集验证新增obligation，不信任模型声明子集。"
+    },
+    {
+      "name": "readStrictPort",
+      "line": 177,
+      "endLine": 200,
+      "role": "检查必需方法及limits，返回原port身份。"
+    },
+    {
+      "name": "readStrictAnalysisEpoch",
+      "line": 202,
+      "endLine": 226,
+      "role": "重建snapshot验证hash，入口核对epoch/obligation边界。"
+    }
+  ],
+  "findings": [
+    {
+      "id": "STRICT-STAGE-01",
+      "severity": "P1",
+      "source": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+        "line": 92
+      },
+      "consumer": {
+        "path": "AlembicAgent/../Alembic/lib/recipe-pipeline/generate/strict/StrictAnalysisRuntime.ts",
+        "line": 502
+      },
+      "issue": "真实Main的G2成功回执{pass:true,action:continue}被strict Pipeline当非通过。",
+      "repro": "真实buildStrictProductionPipelineStagesV1+Pipeline+真实Core constructor构造合法G1，G2返回Main同形状。",
+      "observed": {
+        "outcome": "failed",
+        "modelCalls": 2,
+        "typedG2": "failed"
+      },
+      "impact": "Main executeStrictAnalysisAndProduction在549–556要求AgentService success，否则抛STRICT_PRODUCTION_AGENT_FAILED；合法独立review也被错误失败。",
+      "suggestion": "只明确兼容已存在的continue/true为pass，不泛化未知action。",
+      "disposition": "fixed-and-verified",
+      "fix": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+        "line": 137,
+        "commit": "2da01ef91e25e0bc9c0d1fa2f7978f7e93768cb3"
+      }
+    },
+    {
+      "id": "STRICT-STAGE-02",
+      "severity": "P2",
+      "source": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+        "line": 106
+      },
+      "issue": "G2冲突/非法truthy pass能穿透为Core typed pass。",
+      "observed": [
+        {
+          "input": {
+            "action": "pass",
+            "pass": false
+          },
+          "outcome": "completed",
+          "typedG2": "pass"
+        },
+        {
+          "input": {
+            "pass": "false"
+          },
+          "outcome": "completed",
+          "typedG2": "pass"
+        }
+      ],
+      "suggestion": "adapter先验证record、布尔pass与受支持action一致性，非法输入返回reject；不更改Core gate authority规则。",
+      "disposition": "fixed-and-verified",
+      "fix": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+        "line": 137,
+        "commit": "2da01ef91e25e0bc9c0d1fa2f7978f7e93768cb3"
+      }
+    },
+    {
+      "id": "STRICT-STAGE-03",
+      "severity": "P2",
+      "source": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+        "line": 127
+      },
+      "issue": "父Pipeline已因取消返回后，迟到validateAnalystResult触发Agent adapter自己的read/seal。",
+      "observed": {
+        "pipelineOutcome": "aborted",
+        "modelCalls": 1,
+        "gatePublishedAtReturn": false,
+        "sealedAtReturn": false,
+        "sealedAfterLateValidation": true,
+        "extraReadsAfterPipelineReturned": 1
+      },
+      "attribution": "probe的validateAnalystResult只等待再返回createStrictAnalysisGateOutcomeV1，没有调用expansionPort或修改epoch；最终seal由invokeStrictAnalysisGate发起，区别于不可回滚的外部port自身副作用。",
+      "suggestion": "factory调用前和await后检查真实context.abortSignal，取消后不继续read/assert/seal或返回通过。",
+      "disposition": "fixed-and-verified",
+      "fix": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+        "line": 130,
+        "commit": "2da01ef91e25e0bc9c0d1fa2f7978f7e93768cb3"
+      }
+    },
+    {
+      "id": "STRICT-STAGE-04",
+      "severity": "P2",
+      "source": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+        "line": 140
+      },
+      "issue": "seal在完整transition/outcome校验前提交，拒绝坏回执后端口已永久封口。",
+      "observed": {
+        "mutation": "仅篡改合法typed outcome的outcomeHash",
+        "action": "reject",
+        "reason": "STRICT_ANALYSIS_GATE_OUTCOME_HASH_MISMATCH",
+        "finalSchedulePresentAfterReject": true
+      },
+      "suggestion": "先用既有validator完成transition校验；seal新增可选expected hash，在Core计算receipt并核对预期后才设置finalSchedule，保持无参兼容。",
+      "disposition": "fixed-and-verified",
+      "fix": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+        "line": 412,
+        "commit": "2da01ef91e25e0bc9c0d1fa2f7978f7e93768cb3"
+      }
+    }
+  ],
+  "coreBoundary": [
+    {
+      "source": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+        "line": 292
+      },
+      "role": "真实transition校验：snapshot/outcome哈希、limits、identity、append-only及pass fixpoint约束。"
+    },
+    {
+      "source": {
+        "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+        "line": 411
+      },
+      "role": "Agent expansion port的seal缓存Core生成的receipt；它是本地有副作用的状态提交，不是纯读取。"
+    },
+    {
+      "source": {
+        "path": "AlembicAgent/../AlembicCore/src/service/production/StrictAnalysisContracts.ts",
+        "line": 2538
+      },
+      "role": "Core createFinalExpandedMiningScheduleReceiptV1执行hash链/obligation守恒并生成最终receipt；Agent不能复制算法。"
+    },
+    {
+      "source": {
+        "path": "AlembicAgent/../AlembicCore/src/service/production/StrictAnalysisContracts.ts",
+        "line": 2189
+      },
+      "role": "Core typedGateReturn检查gate/verdict/reasonCode与owner/resume边界；Agent只提供经过规范化的verdict。"
+    },
+    {
+      "source": {
+        "path": "AlembicAgent/../Alembic/lib/recipe-pipeline/generate/strict/StrictAnalysisRuntime.ts",
+        "line": 270
+      },
+      "role": "真实Main验证模型输出并产生typed outcome；其内部finalize也可能自行seal（329），Agent取消guard不能声称撤销该外部副作用。"
+    }
+  ],
+  "compatibility": {
+    "publicTypes": {
+      "path": "AlembicAgent/src/production.ts",
+      "line": 64
+    },
+    "factoryVisibility": "factory仍是Agent内部能力，正式production facade只导出RuntimePort/GateResult类型，不新增公共builder入口。",
+    "existingTests": "strict-production-chain与StrictProductionFixtureEvaluation使用action:pass/pass:true，解释为何未捕获Main continue成功语义。",
+    "retained": [
+      "四阶段顺序和role marker",
+      "epoch/limits/snapshot hash全验证",
+      "真实新增obligation差集授权",
+      "严格失败无legacy repair/degrade兜底",
+      "原port共享身份与无参seal行为"
+    ]
+  },
+  "probeMethod": {
+    "sourceEquivalence": "独立TypeScript擦除后AST打印确认6份dist模块与源码一致：StrictProductionStages/StrictProductionPipeline/StrictProductionPrompts/PipelineStrategy/pipeline-attempt/shared-operation。",
+    "execution": "运行这些真实构建模块与@alembic/core/production constructors；仅AI runtime与外部review callback用内存fixture；未mock或绕过Core validator。Logger只关闭当前进程输出，未配置文件transport。",
+    "realApi": false,
+    "productWritesDuringReview": false,
+    "extraCheck": "factory直接收到已aborted的signal仍调用validator一次并seal返回pass，支持同一取消缺口。"
+  },
+  "simplification": "226行仍可保持一个factory模块；增加小型取消检查与G2正规化私有helper即可。不要按函数机械拆文件；typed transition与Core constructors继续单源，seal只增加提交前期望hash校验。",
+  "implementationPlan": [
+    {
+      "step": 1,
+      "file": "test/strict-production-chain.test.ts",
+      "red": "真实Main continue/true目前outcome failed",
+      "implementation": "G2明确兼容到pass"
+    },
+    {
+      "step": 2,
+      "file": "test/strict-production-chain.test.ts",
+      "red": "action/pass冲突、truthy pass、未知action不得通过",
+      "implementation": "G2返回输入正规化"
+    },
+    {
+      "step": 3,
+      "file": "test/strict-iterative-analysis.test.ts",
+      "red": "父Pipeline已aborted后释放validator不得read/seal",
+      "implementation": "factory调用前/await后取消checkpoint"
+    },
+    {
+      "step": 4,
+      "file": "test/strict-iterative-analysis.test.ts",
+      "red": "坏outcomeHash与finalScheduleHash错配都不能新seal",
+      "implementation": "transition校验前置；仅修改StrictAnalysisExpansionPortV1.seal(expectedHash?)，不碰root的freeze"
+    }
+  ],
+  "status": "fixed-verified-frozen",
+  "committed": true,
+  "fixCommit": "2da01ef91e25e0bc9c0d1fa2f7978f7e93768cb3",
+  "commitOwner": "root；本子代理未执行git提交。",
+  "snapshotNote": "初始findings/函数行号固定于56900c5；修复引用与hash固定于2da01ef。root此后开始94声明纯迁移，当前工作区新路径不属于本报告的修复验收快照。",
+  "implementation": {
+    "files": [
+      {
+        "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+        "sha256": "c53ad2807fc40e2a22d5a843a15579a621ba586c450a2d752b1be58394f09136",
+        "ownerScope": "本轮授权gate修复与相应回归"
+      },
+      {
+        "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+        "sha256": "23a5a051cccb47872768590281f13cd2df5f4e96e17e51a28879d523584c6926",
+        "ownerScope": "仅StrictAnalysisExpansionPortV1.seal方法"
+      },
+      {
+        "path": "AlembicAgent/test/strict-production-chain.test.ts",
+        "sha256": "0be2f2b5ffedd51e56021a5da5cff6fe46bb1cc50f9fb782688fade12b1ab3df",
+        "ownerScope": "本轮授权gate修复与相应回归"
+      },
+      {
+        "path": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+        "sha256": "a33da30ab80ae46783acb22eafd8d278d320592b532547024c07627285bfb2f1",
+        "ownerScope": "本轮授权gate修复与相应回归"
+      }
+    ],
+    "changes": [
+      "G2严格正规化record/action/pass/reason：明确兼容Main continue/true，保留pass/reject及布尔明确判断；拒绝未知action、冲突、非法truthy pass、null action和null结果。",
+      "G2兼容路径有惰性Logger.info结构化记录：gate=G2、originalAction=continue、selectedAction=pass、reason=main-review-compatibility，不记录artifact正文；拒绝reason code保持明确。",
+      "G1/G2 adapter在调用前和await后检查真实abortSignal；G1在后续read、assert、seal前保持checkpoint，不因迟到外部回执继续发起本层副作用。",
+      "G1完整validateStrictAnalysisEpochTransitionV1在seal之前，仍由原有Agent/Core validators确认snapshot/outcome/epoch权限，不复制Core规则。",
+      "seal(expectedFinalScheduleHash?)用原Core构造器计算候选receipt，先比对预期hash再设置finalSchedule；不传参维持原行为，已sealed实例遇到错误expected不会清空或替换旧receipt。"
+    ],
+    "otherOwnerChangesInSameCommit": [
+      "root的freeze helper修复",
+      "root的knowledge_pipeline枚举修复及strict-production-rework回归"
+    ],
+    "noCrossRepositoryEdits": true,
+    "noRealApiCalls": true,
+    "finalReview": {
+      "spec": "pass：四项确认缺陷、Main真实成功形状、取消副作用边界、完整校验先于状态提交和可观测性均覆盖。",
+      "quality": "pass in owned scope：没有额外工厂/接口框架，保持单文件cohesive helper；seal只局部修改，未覆盖root freeze；无参/已封口兼容通过。",
+      "openOwnedFindings": []
+    }
+  },
+  "redGreen": [
+    {
+      "id": "STRICT-STAGE-01",
+      "test": "accepts the Main host continue/true review through the real strict stage factory",
+      "red": "strict-g2-main-red.log：1 failed，failed != completed",
+      "green": "strict-g2-main-green.log通过；最终3套63项通过"
+    },
+    {
+      "id": "STRICT-STAGE-02",
+      "test": "rejects an invalid strict reviewer result: $label",
+      "red": "strict-g2-invalid-red.log：5 failed；strict-g2-null-action-red.log：1 failed/5 passed",
+      "green": "六种非法reviewer输入通过，typed G2 failed而非Core pass；最终63项通过"
+    },
+    {
+      "id": "STRICT-STAGE-03",
+      "tests": [
+        "does not read or seal after a late validator response reaches a cancelled strict factory",
+        "does not invoke strict ports when the factory evaluator is already cancelled"
+      ],
+      "red": "strict-stage-cancel-red.log：2 failed（晚到read/seal与已取消仍返回pass）",
+      "green": "strict-stage-cancel-green.log：12 passed；最终63项通过"
+    },
+    {
+      "id": "STRICT-STAGE-04",
+      "tests": [
+        "does not seal the actual port before rejecting a corrupted typed outcome",
+        "checks an expected schedule hash before committing seal and keeps the no-argument contract",
+        "fails closed when a typed pass does not match the sealed expansion schedule"
+      ],
+      "red": "strict-seal-red.log：3 failed/1 passed；坏hash被拒绝但state已sealed，旧seal忽略expected参数",
+      "green": "strict-seal-green.log：14 passed；最终63项通过"
+    },
+    {
+      "id": "G2-observability",
+      "test": "Main成功回归同时检查兼容日志的完整metadata白名单",
+      "red": "strict-g2-diagnostic-red.log：1 failed，缺少转译日志",
+      "green": "最终63项通过；metadata不含artifact/模型正文"
+    }
+  ],
+  "verification": {
+    "focusedTests": {
+      "command": "npm test -- test/strict-production-chain.test.ts test/strict-iterative-analysis.test.ts test/mining-eval-harness.test.ts",
+      "status": "passed",
+      "files": 3,
+      "tests": 63,
+      "log": "strict-stage-focused-green.log"
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "log": "strict-stage-typecheck.log"
+    },
+    "lint": {
+      "command": "node_modules/.bin/biome check src/agent/production/StrictProductionStages.ts src/agent/production/StrictProductionPipeline.ts test/strict-production-chain.test.ts test/strict-iterative-analysis.test.ts",
+      "status": "passed",
+      "log": "strict-stage-lint.log"
+    },
+    "diffWhitespace": {
+      "command": "git diff --check -- src/agent/production/StrictProductionStages.ts src/agent/production/StrictProductionPipeline.ts test/strict-production-chain.test.ts test/strict-iterative-analysis.test.ts",
+      "status": "passed"
+    },
+    "fullCheck": "子代理未启动整仓check，root负责集成与后续纯迁移验收。"
+  },
+  "evidenceLocators": [
+    {
+      "kind": "test-first",
+      "ref": "tmp/strict-management-2026-09-20/strict-g2-main-red.log",
+      "digest": "sha256:8be2a82d74131b3baaa06d2b7ab469b13f3f4d42f58bb1fa4587405a5a43b4a6"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/strict-management-2026-09-20/strict-g2-main-green.log",
+      "digest": "sha256:bcf88cf0e06b5e00c5bdc66f49fc5d7eca68e7883c1917e01471f041c32f0b6b"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/strict-management-2026-09-20/strict-g2-invalid-red.log",
+      "digest": "sha256:d5d91bb82038e6b2f17f8406aab537e60f803263285c9a3fef30c76acb295dcb"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/strict-management-2026-09-20/strict-g2-null-action-red.log",
+      "digest": "sha256:9b5191c41beecb0a4c0e69d5ce7b9702830007502f69f9116e99e2f124ef079e"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/strict-management-2026-09-20/strict-g2-green.log",
+      "digest": "sha256:47a46c3442984f4daa34eff7eaa2191b69ce1f4276a2c604f376db17364688eb"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/strict-management-2026-09-20/strict-stage-cancel-red.log",
+      "digest": "sha256:ab23659f67bc46f08ea8b763c71c999daceb73890fba14c268281b67b56edb24"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/strict-management-2026-09-20/strict-stage-cancel-green.log",
+      "digest": "sha256:70326aac3dbcd4df7c1b2ca9bdfc4d34c3fd29530fe3fbfc4beaf3e27d141bdb"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/strict-management-2026-09-20/strict-seal-red.log",
+      "digest": "sha256:5da29b9eeee18c8980c015a0183d8f7ee7aa1cc4fa8c186988a565919b6e2ce9"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/strict-management-2026-09-20/strict-seal-green.log",
+      "digest": "sha256:dc7d9163e4d33318cac57de3ff23448802c89ad172aa3c5efd19fcdf12d231dd"
+    },
+    {
+      "kind": "test-first",
+      "ref": "tmp/strict-management-2026-09-20/strict-g2-diagnostic-red.log",
+      "digest": "sha256:242ab3586cad894c22a251797e4ed010bfc4c4577478d925217a6484e44620a6"
+    },
+    {
+      "kind": "tests",
+      "ref": "tmp/strict-management-2026-09-20/strict-stage-focused-green.log",
+      "digest": "sha256:a5f6fc969798d045ecb73762564b97bc41a59c3e8520b20a9645511260ca86d1"
+    },
+    {
+      "kind": "typecheck",
+      "ref": "tmp/strict-management-2026-09-20/strict-stage-typecheck.log",
+      "digest": "sha256:eb1cbda7a26f50f2c9e72a2e7e25549d02e37014ba0fe00673a8f97bf964bdd0"
+    },
+    {
+      "kind": "lint",
+      "ref": "tmp/strict-management-2026-09-20/strict-stage-lint.log",
+      "digest": "sha256:e9e20584d87ded4684d1f7409aa6f4f8dc4dab6287aea359727779a9e2bd2cbe"
+    }
+  ],
+  "retainedLimits": [
+    "外部validateAnalystResult/reviewProducerResult已经自行发起的操作不能由Agent回滚。本轮证明并修复的是adapter在取消后继续发起自身read/assert/seal；实际Main finalizeStrictAnalysisGate内部seal仍属于宿主边界。",
+    "无参seal保持兼容；对调用前已经seal的端口，错误expected hash只拒绝新调用，不撤销先前有效封口。",
+    "正式factory仍内部使用，未提升为production facade公共入口；RuntimePort/GateResult类型保持公开兼容。",
+    "G2诊断解释已知Main兼容转译，不把任意未知action视为通过；未复制或更改Core权威规则。"
+  ]
+}

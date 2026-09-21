@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i9-alembic-main-external-setup-recovery-rootcause1-p1",
+  "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause2",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i9-alembic-main-external-setup-recovery-rootcause1-t1",
+  "status": "completed",
+  "summary": "重新推导递归返工根因后，已将全部携带 ALEMBIC_STRICT_SETUP_AUTHORITY_PATH 的 execute/recover/complete 外部启动统一到无 supervisor target-root 生命周期写入的分支；existing dataRoot 与 pristine dataRoot 均由 child 先建立外部 lease、journal header 和 snapshot authority。普通非严格启动路径保持不变。真实 built daemon/API 入口分别以独立进程完成 recover/complete，未新增第二编排器、任意路径 API 或跨仓库变更。修复提交 43306622a06e2782381aa1aa257681f1f7aa8781。",
+  "evidenceRefs": [
+    "Alembic/lib/daemon/runtime/DaemonSupervisor.ts",
+    "Alembic/test/unit/DaemonSupervisor.test.ts",
+    "Alembic/test/unit/StrictExternalSetupRecovery.test.ts"
+  ],
+  "verification": [
+    "Clean baseline 8f0edfcb0d3807b9b3efb1d4795bdd482a9506d8: focused suite passed 5 files / 40 tests.",
+    "Valid RED: execute/recover/complete existing-dataRoot cases each observed supervisor-created .asd/jobs, daemon.lock owner, and daemon.log before child spawn; 3 product failures.",
+    "npm run typecheck passed.",
+    "npm run build passed, including build:core, TypeScript compilation, and postbuild.",
+    "Focused GREEN passed before and after commit: 5 files / 43 tests; built daemon recover and built API completion ran as fresh OS child processes.",
+    "npm run check passed on the exact committed content: 154 unit files / 1163 tests; 32 integration files / 467 passed with 10 existing skips; coverage thresholds, repository/layer/doctrine/naming/Core-import boundaries, shared-asset drift, and retired-symbol checks passed.",
+    "Biome changed-file check and git diff --check passed; commit 43306622a06e2782381aa1aa257681f1f7aa8781 has parent 8f0edfcb0d3807b9b3efb1d4795bdd482a9506d8, tree 13cd8b3c6b1eb80d035750989c849cda53c80a9d, and a clean worktree."
+  ],
+  "risks": [
+    "Alembic project-knowledge prime/work/Guard calls were unavailable because the installed MCP response includes a rejected _meta key; raw repository code and tests were used as authority. This is tool degradation, not a product blocker.",
+    "npm run check retained five pre-existing lint warnings in unchanged files; no new lint errors or warnings were introduced.",
+    "This TargetResultEnvelope is review evidence only; controller acceptance remains pending."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "baseline",
+      "commit": "8f0edfcb0d3807b9b3efb1d4795bdd482a9506d8",
+      "verify": "Clean tree; focused suite 5 files / 40 tests passed."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduce the existing-dataRoot first-write boundary, add action-matrix and real built-entry RED tests, make the smallest supervisor branch repair, then run focused and full validation."
+    },
+    {
+      "kind": "repro",
+      "ref": "Alembic/test/unit/DaemonSupervisor.test.ts",
+      "verify": "Before the product edit, execute/recover/complete each failed because target inventory gained .asd/jobs, daemon.lock/owner.json, and daemon.log before child authority."
+    },
+    {
+      "kind": "regression",
+      "ref": "Alembic/test/unit/DaemonSupervisor.test.ts",
+      "verify": "All three strict actions preserve a byte/path-identical existing target inventory through spawn and simulated child authority establishment."
+    },
+    {
+      "kind": "test-first",
+      "value": "A valid 3-failure product RED was captured before the single minimal production change; the same cases passed GREEN in the required one-commit task."
+    },
+    {
+      "kind": "tests",
+      "ref": "Alembic/test/unit/StrictExternalSetupRecovery.test.ts",
+      "verify": "Actual built daemon-server recover and api-server complete run as fresh OS processes against isolated ProjectScope registry fixtures."
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The previous fix bypassed target-local supervisor writes only when dataRoot did not physically exist. Authorized rebuild has an existing quarantined dataRoot, so it fell through ensureDaemonDirs and target lock/log/pid/state lifecycle before the child established external authority. Current server entry wiring was correct; previous proof was insufficient because it manually faked runtime initialization instead of executing built entries."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Only Alembic DaemonSupervisor plus two owning unit-test files changed; no AlembicCore, AlembicAgent/Plugin, Test, Wakeflow, or server-entry product file changed."
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run typecheck",
+      "verify": "passed"
+    },
+    {
+      "kind": "lint",
+      "value": "npm run check",
+      "verify": "passed with five pre-existing warnings in unchanged files"
+    },
+    {
+      "kind": "verification",
+      "value": "npm run build; focused vitest 43/43; npm run check unit 1163/1163 and integration 467 passed/10 existing skipped",
+      "verify": "all required checks passed"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 behavior review confirmed the same strict branch for all actions, unchanged non-strict behavior, real subprocess evidence, and no second orchestrator. Stage 2 diff review found a minimal product edit with separated inventory and built-entry regression coverage and no blocker/high issues."
+    },
+    {
+      "kind": "commit",
+      "commit": "43306622a06e2782381aa1aa257681f1f7aa8781",
+      "verify": "parent 8f0edfcb0d3807b9b3efb1d4795bdd482a9506d8; tree 13cd8b3c6b1eb80d035750989c849cda53c80a9d; clean worktree"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i9-alembic-main-external-setup-recovery-rootcause2__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i9-alembic-main-external-setup-recovery-rootcause2__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i9-alembic-main-external-setup-recovery-rootcause2__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause2",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i9-alembic-main-external-setup-recovery-rootcause2__Alembic__i9-alembic-main-external-setup-recovery-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 149,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i9-alembic-main-external-setup-recovery-rootcause1-p1",
+    "targetTaskId": "i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause2",
+    "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "createdAt": "2026-07-16T22:44:25.936Z"
+  },
+  "createdAt": "2026-07-16T22:44:25.936Z",
+  "stateRevisionObserved": 149,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 3,
+  "supersedes": {
+    "resultId": "tr-i9-alembic-main-external-setup-recovery-rootcause1-t1",
+    "dispatchGroup": "dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i9-alembic-main-external-setup-recovery-rootcause1-t1__dg-i9-alembic-main-external-setup-recovery-rootcause1-rework1__current-r0002.json"
+  }
+}

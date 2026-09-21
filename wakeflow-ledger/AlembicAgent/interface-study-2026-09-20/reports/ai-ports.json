@@ -1,0 +1,1464 @@
+{
+  "kind": "read-only-ai-interface-study",
+  "date": "2026-09-20",
+  "scope": {
+    "baseline": {
+      "AlembicAgent": "69ee567624bc119bf05edcc739d890056e297c9c",
+      "Alembic": "4dc86fbb95ae67a86ddf215406ae4767901f3dd8",
+      "AlembicCore": "4a0b27786775f7c8568a21823a6ef6217d9146b9"
+    },
+    "method": "逐段源码阅读、相邻仓实际消费者搜索、现有测试锚点核对；没有运行测试或动态探针，没有真实 API 请求，没有读取凭据值。",
+    "changes": "仅写此研究报告；没有修改源码、测试或相邻仓，也没有提交。",
+    "pathConvention": "所有 evidence.path 为对应 repo 根目录下的相对路径。",
+    "limits": "这是当前本地源码的结构研究，不是厂商线上协议验证，也不是允许删除所有无本地消费者公开 API 的授权。"
+  },
+  "conclusion": [
+    "当前主链已收敛：Main 注入具体 AiProvider；内置 Provider 经私有懒创建 LLMGateway，Gateway 做模型路由、参数门禁和一次可靠性包装，Transport 只做一个厂商 HTTP 尝试。不能把这些层判成三套独立推理执行器。",
+    "值得优先清理的是 DTO/错误工厂的依赖环、配置默认值与环境读取分散、每个 Transport 内 chat/chatWithTools 的重复请求构造，以及 usage 映射。建议保持现有入口，以小范围内聚替换实现。",
+    "厂商消息协议、runtime 的语义工具策略、全局使用量账本与单次运行预算、provider 对象热切换和 embedding 能力均有实际消费者；这些是保留边界。"
+  ],
+  "actualCallChains": [
+    {
+      "name": "Main 启动配置与注入",
+      "chain": "Bootstrap.initialize → WorkspaceSettingsStore.applyToProcessEnv(override:false) → AiModule.initialize/autoDetectProvider → AiProviderManager + DI → AgentRuntimeBuilder → AgentRuntime.aiProvider.chatWithTools",
+      "behavior": "显式进程环境优先于 workspace 设置；启动按 key 存在性选 provider，没有增加在线 probe。Main 接入的是 Provider 对象，不是全局 Gateway 单例。",
+      "evidence": [
+        {
+          "repo": "Alembic",
+          "path": "lib/Bootstrap.ts",
+          "line": 94,
+          "note": "先加载运行设置"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/Bootstrap.ts",
+          "line": 162,
+          "note": "workspace 设置写入 env，override:false"
+        },
+        {
+          "repo": "AlembicCore",
+          "path": "src/shared/WorkspaceSettingsStore.ts",
+          "line": 198,
+          "note": "仅填未设置变量，除非显式 override"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/modules/AiModule.ts",
+          "line": 29,
+          "note": "初始化时调用 autoDetectProvider；导入 @alembic/agent/ai"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiFactory.ts",
+          "line": 65,
+          "note": "autoDetectProvider 显式配置后依次 Google/OpenAI/Claude/DeepSeek；无 key 返回 null"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/agent/service/AgentRuntimeBuilder.ts",
+          "line": 84,
+          "note": "把已注入 provider 传入 runtime"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/agent/runtime/AgentRuntime.ts",
+          "line": 1130,
+          "note": "实际请求 chatWithTools，透传消息/工具/选择/预算/信号"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/ServiceContainer.ts",
+          "line": 110,
+          "note": "AiModule 初始化先于模块注册"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/modules/AiModule.ts",
+          "line": 179,
+          "note": "创建 manager 并绑定真实 DI 同步/依赖清理/embedding fallback"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/modules/AgentModule.ts",
+          "line": 93,
+          "note": "真实 provider 注入 AgentRuntimeBuilder"
+        }
+      ]
+    },
+    {
+      "name": "一次内置 Provider 请求",
+      "chain": "OpenAi/DeepSeek/Claude/GoogleGemini/OllamaProvider.chat* → AiProvider._gatewayChat* → AiProvider._getGateway → LLMGateway.chatWithTools → ParameterGuard → ReliabilityController.run → VendorTransport.chatWithTools → LLMTransport.post",
+      "behavior": "Provider.chat(history) 也走 Gateway.chatWithTools；Gateway.chat/structured 复用完整响应通道。每个 Provider 对象保存一个私有 Gateway，首次并发初始化会二次检查避免生成两套并发控制器。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 426,
+          "note": "私有 gateway 懒初始化与 await 后二次检查"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 458,
+          "note": "history 归一并走完整响应通道"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 478,
+          "note": "非空 opts.messages 优先，空数组回退 prompt"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 120,
+          "note": "唯一主请求编排路径"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 171,
+          "note": "chat 复用 chatWithTools"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/shared/reliability.ts",
+          "line": 202,
+          "note": "同一请求的排队、退避、重试和 circuit"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 227,
+          "note": "单次 HTTP 尝试和实际取消/超时"
+        }
+      ]
+    },
+    {
+      "name": "配置热切换、用量回调和运行预算",
+      "chain": "Main 新建 provider → ServiceContainer.reloadAiProvider → AiProviderManager.switchProvider → 重新绑定 token recorder/embedding fallback/DI 并清理 AI 依赖单例；Gateway usage → Provider hook → Manager → Main TokenUsageStore；返回 usage → AgentRuntime BudgetController",
+      "behavior": "全局 token 记录和本次 Agent 预算是两个消费方，不能删掉其中一个。Manager 回调捕获对应 provider 实例，使切换前的在途用量仍标为旧 provider。切换钩子不是事务回滚机制。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProviderManager.ts",
+          "line": 161,
+          "note": "switchProvider 更新 provider 并执行宿主同步钩子"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProviderManager.ts",
+          "line": 230,
+          "note": "回调捕获 provider 身份"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 164,
+          "note": "完整响应只发一次 usage"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 261,
+          "note": "桥接 usage observer"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/agent/runtime/AgentRuntime.ts",
+          "line": 1153,
+          "note": "返回 usage 写入本次运行预算与诊断"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/ServiceContainer.ts",
+          "line": 176,
+          "note": "reload 拒绝 null/mock，委托 manager.switchProvider"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/modules/AiModule.ts",
+          "line": 198,
+          "note": "provider 和 embed 引用同步，清理 AI 依赖单例"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/modules/AiModule.ts",
+          "line": 226,
+          "note": "Manager recorder 实际写 TokenUsageStore"
+        }
+      ]
+    },
+    {
+      "name": "独立 embedding 接线",
+      "chain": "Main AiModule 显式 embed provider/候选 provider → VectorModule → Core BatchEmbedder/LegacyEmbedProviderAdapter → provider.embed → Gateway.embed → transport.embed",
+      "behavior": "provider 的 embedding 服务能力不同于当前聊天 ModelDef.embedding 能力。scalar/batch 返回形态、容量提示和 unsupported/failure 的旧行为都是实际接入契约。Core 旧接口 adapter 只能在 await 前后检查取消，不能停止旧 provider 内部 HTTP。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiFactory.ts",
+          "line": 196,
+          "note": "独立 embedding provider 配置"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 323,
+          "note": "冻结的 embedding 容量提示"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 519,
+          "note": "scalar/batch 恢复及失败返回 []"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 200,
+          "note": "embed 经可靠性层但目前无 signal/usage 返回通道"
+        },
+        {
+          "repo": "AlembicCore",
+          "path": "src/infrastructure/vector/BatchEmbedder.ts",
+          "line": 25,
+          "note": "使用 legacy embed 与容量提示"
+        },
+        {
+          "repo": "AlembicCore",
+          "path": "src/infrastructure/vector/EmbeddingPort.ts",
+          "line": 28,
+          "note": "legacy embed 单参兼容口"
+        },
+        {
+          "repo": "AlembicCore",
+          "path": "src/infrastructure/vector/EmbeddingPort.ts",
+          "line": 68,
+          "note": "仅 await 前后取消检查"
+        },
+        {
+          "repo": "AlembicCore",
+          "path": "src/infrastructure/vector/EmbeddingPort.ts",
+          "line": 114,
+          "note": "串行 fallback 仍调用单参 embed"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/modules/AiModule.ts",
+          "line": 84,
+          "note": "优先创建独立 embedding provider"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/modules/AiModule.ts",
+          "line": 117,
+          "note": "embedding 候选按 key/能力选型，无在线 probe"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/modules/VectorModule.ts",
+          "line": 36,
+          "note": "embed fallback 或 primary provider 注入 VectorService"
+        }
+      ]
+    }
+  ],
+  "moduleRoles": [
+    {
+      "module": "AiFactory",
+      "role": "provider 名称别名、启动存在性选型、独立 embedding 配置、显式跨 provider fallback helper。",
+      "keep": "启动检测与显式 probe 分开；不要以合并为由给 Main 启动增加网络请求。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiFactory.ts",
+          "line": 39,
+          "note": "createProvider 入口"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiFactory.ts",
+          "line": 145,
+          "note": "geo/provider 错误触发的可选 fallback helper"
+        }
+      ]
+    },
+    {
+      "module": "AiProvider + built-in provider facades",
+      "role": "宿主消费契约、兼容 prompt/history/messages 调用形态、provider 默认配置、usage hook 与 scalar/batch 兼容；内置类委托 Gateway。",
+      "keep": "保留公开类、继承扩展点、构造入口与必要 vendor 默认值；可缩减文件职责但不空壳化 runtime。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 61,
+          "note": "chat context"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 94,
+          "note": "tool options"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/providers/OpenAiProvider.ts",
+          "line": 27,
+          "note": "配置 façade"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/providers/GoogleGeminiProvider.ts",
+          "line": 28,
+          "note": "Gemini 默认并发和容量来源"
+        }
+      ]
+    },
+    {
+      "module": "AiProviderManager",
+      "role": "宿主 lifecycle 接线、当前 provider 与 embedding fallback、token recorder、切换事件；不执行 LLM 请求。",
+      "keep": "其小型 ManagedAiProvider 管理口不应被强制扩大成完整推理接口。Main 实际调用 bindDI/clear/fallback 钩子。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProviderManager.ts",
+          "line": 23,
+          "note": "管理端口与推理端口分离"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProviderManager.ts",
+          "line": 271,
+          "note": "Main 宿主绑定钩子"
+        }
+      ]
+    },
+    {
+      "module": "ModelRegistry + ModelDefs + ModelQuirks",
+      "role": "已知模型能力/约束、自定义注册、动态模型退路、执行语义特征；ProviderConfig 则提供供应商 UI/默认配置元数据。",
+      "keep": "模型事实不等于 provider 服务能力；未知模型和含冒号本地模型需要动态兼容。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/registry/ModelRegistry.ts",
+          "line": 54,
+          "note": "resolve"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/registry/ModelRegistry.ts",
+          "line": 102,
+          "note": "允许自定义注册"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/registry/ModelRegistry.ts",
+          "line": 112,
+          "note": "动态模型默认"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/registry/ModelQuirks.ts",
+          "line": 51,
+          "note": "注册表优先、未知模型 regex 兼容"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/http/routes/ai.ts",
+          "line": 234,
+          "note": "UI 实际消费 ModelRegistry 和 ProviderConfig"
+        }
+      ]
+    },
+    {
+      "module": "LLMGateway + ParameterGuard",
+      "role": "统一对象请求、模型/provider 路由、参数可用性门禁、一次 reliability 包装和 usage dispatch；持有按 provider 缓存的 transport。",
+      "keep": "保留 filtered 与 omitted 的区分，不能把门禁去掉的参数再次用默认值补回。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 136,
+          "note": "wasFiltered 阻止重新填入不支持参数"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 312,
+          "note": "每个 gateway 内按 provider 隔离可靠性控制器"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/guard/ParameterGuard.ts",
+          "line": 35,
+          "note": "模型参数策略"
+        }
+      ]
+    },
+    {
+      "module": "Vendor transports + LLMTransport",
+      "role": "vendor 请求/响应编码、消息协议、单次 HTTP/代理/timeout/abort；无跨厂商选型与本地预算。",
+      "keep": "共用 HTTP shell；保留 vendor body/header/tool/result 编码。直接 transport API 当前仍由 public barrel 导出。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 169,
+          "note": "transport 公开方法"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 227,
+          "note": "HTTP shell"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/index.ts",
+          "line": 14,
+          "note": "transport 公共出口"
+        }
+      ]
+    }
+  ],
+  "conversionInventory": [
+    {
+      "area": "prompt/history → UnifiedMessage",
+      "assessment": "必要的兼容入口转换。Gateway.chat 是单轮 prompt；AiProvider.chat(history) 走 Gateway.chatWithTools，二者不是直接重复。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 458,
+          "note": "保留 history"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 171,
+          "note": "单轮入口"
+        }
+      ]
+    },
+    {
+      "area": "GatewayRequest → TransportRequest",
+      "assessment": "路由 modelRef → apiModelId、门禁和 usageSource 剥离是必要边界；共有字段类型可引用同一叶子 DTO，避免手写同步。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 46,
+          "note": "gateway request"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 139,
+          "note": "路由与 filtered 参数投影"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 108,
+          "note": "transport request"
+        }
+      ]
+    },
+    {
+      "area": "TransportFunctionCall/FunctionCallResult 与响应投影",
+      "assessment": "function call 字段实质相同，适合类型别名；response 投影大多是复制，仍需保留 usage optional/null 与 reasoning/finish nullable→undefined 兼容。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 106,
+          "note": "外部 call/result"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 128,
+          "note": "transport call/result"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 422,
+          "note": "response 归一"
+        }
+      ]
+    },
+    {
+      "area": "同一 Transport 的 chat/chatWithTools",
+      "assessment": "请求公共体、POST 和部分解析重复，可提取同厂商私有 request/parse helper；不能简单互调后取 text 而默改 direct chat 行为。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/OpenAiTransport.ts",
+          "line": 39,
+          "note": "chat"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/OpenAiTransport.ts",
+          "line": 79,
+          "note": "tool chat"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/ClaudeTransport.ts",
+          "line": 29,
+          "note": "direct chat 取首个 text block"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/ClaudeTransport.ts",
+          "line": 159,
+          "note": "full response 汇总 text blocks"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/DeepSeekTransport.ts",
+          "line": 162,
+          "note": "simple 与 tool-aware message 转换不同"
+        }
+      ]
+    },
+    {
+      "area": "OpenAI Chat 与 Responses",
+      "assessment": "同供应商的两个公开 wire 协议。Responses 的 function_call/function_call_output、instructions、text.format、max_output_tokens 不应与 Chat messages/tools body 混成同一 wire schema。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/OpenAiTransport.ts",
+          "line": 150,
+          "note": "Chat messages"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/OpenAiTransport.ts",
+          "line": 232,
+          "note": "Responses body"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/OpenAiTransport.ts",
+          "line": 274,
+          "note": "Responses input item 协议"
+        }
+      ]
+    },
+    {
+      "area": "DeepSeek thinking 与兼容 tool 解析",
+      "assessment": "必须保留 V4 tool-conditioned thinking、reasoning_content 回传、输出 token 下限、tool_choice 省略与声明工具范围内 text compat。可以只共享 OpenAI-compatible function schema 小编码器。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/DeepSeekTransport.ts",
+          "line": 67,
+          "note": "请求级 thinking 判定"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/DeepSeekTransport.ts",
+          "line": 101,
+          "note": "thinking 输出下限"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/DeepSeekTransport.ts",
+          "line": 224,
+          "note": "assistant reasoning_content 规则"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/DeepSeekTransport.ts",
+          "line": 295,
+          "note": "仅此 provider 的受限 text tool compat"
+        }
+      ]
+    },
+    {
+      "area": "Claude/Gemini 消息与工具 schema",
+      "assessment": "必要协议边界。Claude top-level system、相邻角色合并、tool_use/tool_result、input_schema 与 Gemini model/functionResponse/thoughtSignature/functionDeclarations/schema 清理不可搬成通用业务 DTO。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/ClaudeTransport.ts",
+          "line": 75,
+          "note": "Claude tools/choice"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/ClaudeTransport.ts",
+          "line": 98,
+          "note": "Claude messages"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/GoogleTransport.ts",
+          "line": 138,
+          "note": "Gemini contents"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/GoogleTransport.ts",
+          "line": 181,
+          "note": "thoughtSignature 保留"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/GoogleTransport.ts",
+          "line": 256,
+          "note": "Gemini schema 方言清理"
+        }
+      ]
+    },
+    {
+      "area": "structured output",
+      "assessment": "Gateway 与 Provider.extractJSON 已复用同一健壮 parser，不是多套重复实现。Transport.chatStructured 仍用 JSON.parse，是公开低层兼容路径；不能静默改变其错误/返回行为。schema 是请求提示/厂商格式能力，不是统一业务 schema 验证承诺。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 187,
+          "note": "主 structured 路径"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 712,
+          "note": "parser wrapper"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 179,
+          "note": "legacy low-level JSON.parse 路径"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/GoogleTransport.ts",
+          "line": 102,
+          "note": "Gemini native responseSchema"
+        }
+      ]
+    }
+  ],
+  "ownershipMatrix": [
+    {
+      "concern": "取消与 deadline",
+      "singleOwnerByConcern": {
+        "caller": "拥有任务意图及总期限；取消后拒绝迟到结果。",
+        "facadeAndGateway": "透传同一个 signal，不再实现独立取消状态机。",
+        "ReliabilityController": "拥有排队/限流/重试退避的取消与资源释放。",
+        "LLMTransport.post": "拥有每次 HTTP timeout、底层 AbortController 和 timer/listener 清理。"
+      },
+      "keepBoundary": "总任务 deadline 与每次 HTTP timeout 是不同期限，不能只留一个而使排队/重试时间不受调用者控制。",
+      "currentGaps": "StructuredOutputOptions 未公开 abortSignal；embed 为旧单参/双参数 Gateway 接口；基类非 native chatWithTools fallback 没有向 chat 转发 signal。内置 chat/chatWithTools 主链已有实际 HTTP signal；不要宣称所有入口都具备同等取消能力。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 136,
+          "note": "structured options 无 signal"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 359,
+          "note": "基类 legacy fallback"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/shared/reliability.ts",
+          "line": 107,
+          "note": "可取消排队"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/shared/reliability.ts",
+          "line": 152,
+          "note": "可取消限流等待"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 227,
+          "note": "HTTP deadline 和外部 signal"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/agent/runtime/AgentRuntime.ts",
+          "line": 1159,
+          "note": "拒绝取消后的回复"
+        }
+      ]
+    },
+    {
+      "concern": "重试与错误分类",
+      "singleOwnerByConcern": {
+        "ReliabilityController": "唯一同一 provider、同一逻辑请求的 retry/circuit/concurrency owner。",
+        "errorClassify": "统一 HTTP/网络/abort/programmer error 分类。",
+        "FactoryOrExplicitRouting": "跨 provider fallback 属于显式选型策略，不能偷偷叠在 transport HTTP retry 内。"
+      },
+      "keepBoundary": "ClaudeProvider 当前强制 maxRetries:0；Main autoDetect 并不调用 Factory fallback probe；公开 Gateway.resolveWithFallback 逐候选 probe 与 Factory geo-error fallback 也不是相同语义。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/shared/reliability.ts",
+          "line": 202,
+          "note": "重试唯一执行层"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/shared/errorClassify.ts",
+          "line": 1,
+          "note": "共享错误分类"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/providers/ClaudeProvider.ts",
+          "line": 28,
+          "note": "当前强制零重试"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiFactory.ts",
+          "line": 145,
+          "note": "可选跨 provider 策略"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 237,
+          "note": "显式按候选 probe 的 fallback"
+        }
+      ]
+    },
+    {
+      "concern": "usage",
+      "singleOwnerByConcern": {
+        "transport": "读懂 vendor 原始 usage 字段并形成统一 TokenUsage；纯字段归一可以共用一个 leaf helper。",
+        "Gateway": "完整成功响应中恰好 emit 一次；chat/structured 不另走丢用量通道。",
+        "ProviderAndManager": "兼容 observer 桥接及宿主 recorder 接线。",
+        "AgentRuntime": "使用返回 usage 更新本次运行预算；与全局持久账本不同。"
+      },
+      "keepBoundary": "移除重复字段映射可行；不能删任一业务消费方。当前 shared normalizer 不覆盖所有 DeepSeek nested reasoning/cache 字段，替换前须扩充测试。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/shared/usage.ts",
+          "line": 51,
+          "note": "共享纯归一"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/DeepSeekTransport.ts",
+          "line": 244,
+          "note": "额外 reasoning/cache 字段"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 164,
+          "note": "once emission"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProviderManager.ts",
+          "line": 230,
+          "note": "host callback wiring"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/agent/runtime/AgentRuntime.ts",
+          "line": 1153,
+          "note": "运行预算账本"
+        }
+      ]
+    },
+    {
+      "concern": "tool schema 与 tool choice",
+      "singleOwnerByConcern": {
+        "toolRegistryAndRuntime": "拥有工具业务输入 contract、权限及本轮可用工具/语义调用策略。",
+        "GatewayParameterGuard": "拥有模型参数可用性与数值范围 admission。",
+        "vendorTransport": "拥有工具 schema 的 wire 包装和厂商允许的 JSON schema 子集映射。"
+      },
+      "keepBoundary": "不要在 provider façades 再维护一套工具 schema 校验，也不要把 Gemini schema 清理全局化。DeepSeek 的 none 语义目前依赖 runtime 的模型特征策略，迁移不得因删除重复 toolChoice 判断重新开放工具。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/guard/ParameterGuard.ts",
+          "line": 119,
+          "note": "toolChoice admission"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/agent/runtime/AgentRuntime.ts",
+          "line": 998,
+          "note": "本轮工具策略/是否移除 schemas"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/registry/ModelQuirks.ts",
+          "line": 51,
+          "note": "模型语义特征"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/GoogleTransport.ts",
+          "line": 256,
+          "note": "vendor schema 转译"
+        }
+      ]
+    }
+  ],
+  "cleanupCandidates": [
+    {
+      "id": "AI-I01",
+      "priority": 1,
+      "title": "抽出 AI 叶子契约与 MissingApiKeyError，保留原路径 re-export",
+      "change": "把中立消息、工具、usage、request/result DTO 与 key-missing 错误放到不依赖 Provider/Gateway/Transport 的单一 contracts 模块；旧 AiProvider.ts export 继续可用。TransportFunctionCall 复用 FunctionCallResult 类型；必要 response nullability 转换保留。",
+      "why": "目前 LLMTransport runtime import AiProvider 的错误工厂，AiProvider 又需要 Gateway→Transport，形成真实环并促使懒动态 import。类型散布使相同字段容易不同步。",
+      "doNotChange": "不改变 Provider 公共类、构造器、返回 shape 或实例级 Gateway 生命周期；即使环解除，仍保留首次并发共享一个 gateway/reliability controller 的行为。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 15,
+          "note": "运行时依赖 AiProvider 错误工厂"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 32,
+          "note": "可独立的错误类型和 factory"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 71,
+          "note": "中立 DTO"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 426,
+          "note": "当前为打破循环而 lazy import"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/index.ts",
+          "line": 2,
+          "note": "公开兼容出口"
+        }
+      ],
+      "verification": [
+        "typecheck 与 public export/entrypoint contract 测试",
+        "并发首次 chat/mock transport：仍只共享一套并发限制",
+        "缺 key 错误保持 instanceof Error，并保持 name/code/provider/envVar/hostAction 形状"
+      ]
+    },
+    {
+      "id": "AI-I02",
+      "priority": 2,
+      "title": "集中解析有效 provider 配置，区分 provider 身份与 wire 协议",
+      "change": "建立小型纯配置 resolver，构造时解析 alias、显式配置、env、默认值和来源；Factory/Provider/Gateway 使用同一 resolved snapshot，保留现有 public constructors。ProviderConfig 可供元数据输入，transport 仍负责 endpoint 拼接和 wire encoding。",
+      "why": "模型/key/base/timeout/apiStyle/embedding/reasoning 默认值在 Factory、Provider、Gateway 和 Transport 多次读取。Ollama 使用 OpenAI wire 协议，却应保持 ollama 身份、默认 endpoint 和 embedding 模型。",
+      "doNotChange": "必须先固定入口 precedence 矩阵；按入口分别固定显式配置、环境变量和默认值的优先级矩阵；保留 Google 默认并发 2/chat 8192、Claude 零重试、Ollama bare-root /v1 归一与自定义路径、DeepSeek high/max 及请求级 thinking。保持启动检测顺序与 embedding 候选顺序，不能统一成会触网的新选型。",
+      "sourceVisibleSeams": [
+        "Google façade 读 key 而不自行读 GOOGLE_BASE_URL；Gateway 遇 truthy 显式 key 会直接返回配置，因此不同入口 base env 行为需锁定或明确修正。",
+        "ProviderConfig 的展示 base 与 transport 的完整 endpoint 前缀并非总相同。",
+        "Ollama 复用 OpenAiTransport 时 provider 身份与 transport.name 分开；环境 style/proxy/默认值解析不可无意继承为远程 OpenAI。"
+      ],
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiFactory.ts",
+          "line": 39,
+          "note": "工厂默认/alias"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/providers/OpenAiProvider.ts",
+          "line": 27,
+          "note": "配置/env/default 重复"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/providers/GoogleGeminiProvider.ts",
+          "line": 28,
+          "note": "特殊并发与默认值"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/providers/OllamaProvider.ts",
+          "line": 33,
+          "note": "base URL 归一"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 396,
+          "note": "显式与 env 分支"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/registry/ProviderConfig.ts",
+          "line": 1,
+          "note": "UI/provider 默认元数据"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/OpenAiTransport.ts",
+          "line": 30,
+          "note": "transport 再次默认"
+        }
+      ],
+      "verification": [
+        "逐入口 mock 矩阵：Factory/直接 Provider/直接 Gateway/Transport 的显式值、env、缺省值",
+        "Main 启动/配置 reload 没有新增 fetch",
+        "Ollama 自定义 path 与带冒号模型，Google 并发 hint、Claude retry、DeepSeek effort 回归"
+      ]
+    },
+    {
+      "id": "AI-I03",
+      "priority": 3,
+      "title": "在单一厂商内部合并 chat/chatWithTools 请求构造",
+      "change": "每个 transport 用私有 buildRequest/send/parse helper 去掉重复 body/headers/POST；必要时为 OpenAI-compatible function schema 与 args JSON 提供小纯 helper。不要引入跨全部厂商的通用 middleware 框架。",
+      "why": "主生产路径始终调用 chatWithTools，低层公开 chat 仍承担兼容；两者复制导致修 timeout/JSON/usage 时可能只改一处。",
+      "doNotChange": "保留 direct chat 取首 block 与 tool path 聚合文本的当前差异，或明确独立迁移；保留 DeepSeek simple/tool message 差异、Responses flat tools、Claude role merge、Gemini thoughtSignature。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/OpenAiTransport.ts",
+          "line": 39,
+          "note": "重复 body"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/ClaudeTransport.ts",
+          "line": 29,
+          "note": "重复请求"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/GoogleTransport.ts",
+          "line": 35,
+          "note": "重复 generation config"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/DeepSeekTransport.ts",
+          "line": 35,
+          "note": "simple chat 与 thinking tool 路径不同"
+        }
+      ],
+      "verification": [
+        "两种公开调用入口分别断言请求体与返回值",
+        "保留现有 transport-protocols 全部 vendor 协议回归",
+        "mock HTTP timeout/外部 abort/读取 response body 时取消仍正确分类，且无重复尝试"
+      ]
+    },
+    {
+      "id": "AI-I04",
+      "priority": 4,
+      "title": "统一 usage 字段归一，保留两个账本与一次发出语义",
+      "change": "完善现有 shared/usage 的 vendor field projection 或由各 transport 提供小 projection，再统一 finite/total/optional 字段处理。采用已有 helper，无需新 usage service。",
+      "why": "当前 OpenAI Responses 用公共 normalizer，其余多处手写。可消除机械转换，但 raw vendor 字段选择必须仍可追溯。",
+      "doNotChange": "保留 reasoningTokens/cacheHitTokens；兼容缺省/0/null；不删除 Gateway→Provider→Manager 的实际 observer 链和 runtime 返回用量。不要把 usage callback 失败转成 API 失败。embedding 暂无 usage 通道，不伪造。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/shared/usage.ts",
+          "line": 51,
+          "note": "现有 pure helper"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/OpenAiTransport.ts",
+          "line": 305,
+          "note": "Responses 使用 helper"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/DeepSeekTransport.ts",
+          "line": 244,
+          "note": "nested detail 映射"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 338,
+          "note": "隔离 observer 失败"
+        }
+      ],
+      "verification": [
+        "各 vendor raw fixture：无 usage、0、非有限值、缺 total、reasoning/cache",
+        "chat/structured/tools 各发出恰好一次",
+        "switch provider 后旧 in-flight 请求保持旧 provider/model 标记；runtime 预算仍收到同一数值"
+      ]
+    },
+    {
+      "id": "AI-I05",
+      "priority": 5,
+      "title": "有条件收敛公开旧尾部，而不是按无引用直接删除",
+      "change": "_detectLanguageProfile 可先移入 prompt helper 并留 wrapper；getProviderWithFallback、Gateway.resolveWithFallback、Transport.chatStructured 与 singleton 等先记录实际语义和兼容状态，必要时 deprecate 后再另批删除。",
+      "why": "语言 profile 主体约 160 行与当前 provider 请求无关，跨仓扫描无消费。其他 fallback/singleton 只见测试或定义，但仍从公共 barrel 暴露，且互不等价。",
+      "doNotChange": "不得把 Main 无 probe 的启动改成 fallback probe；不得删除公开构造器或 export；supportsNativeToolCalling 目前无 runtime getter 消费，仅说明其调用链注释过时。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 545,
+          "note": "旧 language profile 主体"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 335,
+          "note": "公开 native flag"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiFactory.ts",
+          "line": 145,
+          "note": "旧公开 fallback"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 237,
+          "note": "另一个显式 fallback"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 454,
+          "note": "全局 singleton 公开入口"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/index.ts",
+          "line": 1,
+          "note": "所有这些仍经 barrel 导出"
+        }
+      ],
+      "verification": [
+        "删除前需独立 export/消费者迁移清单与版本兼容决定",
+        "若只搬实现保留 wrapper：typecheck/public import 测试即可，避免镜像实现的新测试",
+        "本轮未授权删除，也未将无本地引用视为无外部消费者"
+      ]
+    }
+  ],
+  "mustPreserveCallShapes": [
+    {
+      "shape": "provider.chat(prompt, {history, systemPrompt, temperature, maxTokens, abortSignal})",
+      "reason": "Main 和 Agent summary 等既有文本消费者；history 不能在收敛到单轮 Gateway.chat 时丢失。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 61,
+          "note": "选项形状"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/agent/context/ConversationStore.ts",
+          "line": 255,
+          "note": "chat summary 消费"
+        }
+      ]
+    },
+    {
+      "shape": "provider.chatWithTools(prompt, {messages, toolSchemas, toolChoice, ...})",
+      "reason": "Agent 主路径；非空 messages 优先于 prompt，空 messages 则补 prompt；tool call id、toolCallId/name、reasoningContent、thoughtSignature 均有协议含义。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 71,
+          "note": "消息扩展字段"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 478,
+          "note": "入口归一"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/agent/runtime/AgentRuntime.ts",
+          "line": 1130,
+          "note": "真实主调用"
+        }
+      ]
+    },
+    {
+      "shape": "provider.chatWithStructuredOutput(prompt, {schema, openChar, closeChar, ...}) → unknown/null",
+      "reason": "schema/delimiter 选项与健壮解析兼容；不能宣称所有 vendor 原生验证 JSON schema。业务消费者仍须验证未知返回值。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 136,
+          "note": "公开 options"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 187,
+          "note": "实际返回与 parser"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/recipe-pipeline/generate/runtime/GenerateRefine.ts",
+          "line": 238,
+          "note": "宿主 refine 使用 structured output"
+        }
+      ]
+    },
+    {
+      "shape": "provider.embed(string|string[]) → number[]|number[][]；getEmbeddingCapacityHint()",
+      "reason": "Core legacy adapter 与 BatchEmbedder 实际消费；保留 scalar/batch、unsupported/failure [] 和容量来源；以后增加 options 必须兼容旧单参调用。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProvider.ts",
+          "line": 519,
+          "note": "scalar/batch"
+        },
+        {
+          "repo": "AlembicCore",
+          "path": "src/infrastructure/vector/EmbeddingPort.ts",
+          "line": 28,
+          "note": "邻仓旧端口"
+        },
+        {
+          "repo": "AlembicCore",
+          "path": "src/infrastructure/vector/BatchEmbedder.ts",
+          "line": 25,
+          "note": "容量消费"
+        }
+      ]
+    },
+    {
+      "shape": "new LLMGateway(config).chatWithTools({modelRef, messages, tools, ...})；modelRef 可为 provider:model:tag 或 bare model",
+      "reason": "公开低层 API；只分割第一个冒号，支持动态/自定义模型；不要强制全部经 factory/provider façade。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 248,
+          "note": "模型解析"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/registry/ModelRegistry.ts",
+          "line": 102,
+          "note": "自定义注册"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/index.ts",
+          "line": 4,
+          "note": "gateway 公开出口"
+        }
+      ]
+    },
+    {
+      "shape": "createProvider aliases、autoDetectProvider、直接 provider 构造、Manager switch hooks",
+      "reason": "Main UI/routes/DI 实际使用不同入口，不能合并成一个强制异步启动接口。Main ready 为有非 mock 配置对象，不代表 live probe 成功。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiFactory.ts",
+          "line": 39,
+          "note": "factory"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/AiProviderManager.ts",
+          "line": 161,
+          "note": "switch lifecycle"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/http/routes/ai.ts",
+          "line": 291,
+          "note": "用户显式 probe 路径独立于启动"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/http/routes/ai.ts",
+          "line": 360,
+          "note": "配置入口新建 provider 再 reload"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/http/routes/ai.ts",
+          "line": 889,
+          "note": "workspace 设置写入后同步 process.env 并 reload"
+        },
+        {
+          "repo": "Alembic",
+          "path": "lib/injection/AiRuntimeStatus.ts",
+          "line": 50,
+          "note": "ready 是配置对象状态，不是 live probe"
+        }
+      ]
+    },
+    {
+      "shape": "直接 Transport.chat/chatWithTools/chatStructured 与 getLLMGateway(config?)",
+      "reason": "虽然生产主链不使用全部方法，它们公开导出且有测试消费者；保留兼容包装，禁止只凭本仓引用计数删 API。",
+      "evidence": [
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/transport/LLMTransport.ts",
+          "line": 169,
+          "note": "低层公开方法"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "src/ai/gateway/LLMGateway.ts",
+          "line": 454,
+          "note": "singleton 显式 config 重建语义"
+        },
+        {
+          "repo": "AlembicAgent",
+          "path": "test/LLMGateway.test.ts",
+          "line": 140,
+          "note": "singleton 消费锚点"
+        }
+      ]
+    }
+  ],
+  "consumerScan": {
+    "roots": [
+      {
+        "repo": "AlembicAgent",
+        "paths": [
+          "src",
+          "test"
+        ]
+      },
+      {
+        "repo": "Alembic",
+        "paths": [
+          "lib"
+        ]
+      },
+      {
+        "repo": "AlembicPlugin",
+        "paths": [
+          "lib"
+        ]
+      },
+      {
+        "repo": "AlembicCore",
+        "paths": [
+          "src"
+        ]
+      },
+      {
+        "repo": "AlembicDashboard",
+        "paths": [
+          "src"
+        ]
+      }
+    ],
+    "symbols": [
+      {
+        "symbol": "_detectLanguageProfile",
+        "result": "只有定义，未发现当前本地消费者；public class 方法仍须兼容决策。"
+      },
+      {
+        "symbol": "supportsNativeToolCalling",
+        "result": "只有 base/具体 provider getter 定义，未发现 runtime 读取；注释中的 runtime 分叉描述不能当事实。"
+      },
+      {
+        "symbol": "getProviderWithFallback",
+        "result": "定义/出口及 test/AiFactory.test.ts 消费；Main 启动使用 autoDetectProvider。"
+      },
+      {
+        "symbol": "resolveWithFallback",
+        "result": "仅定义；语义为逐候选 probe，与 Factory helper 不同。"
+      },
+      {
+        "symbol": "getLLMGateway",
+        "result": "定义/出口及 test/LLMGateway.test.ts；内置 Provider 直接构造并缓存私有 Gateway。"
+      }
+    ],
+    "warning": "搜索结果只覆盖本地源码，不证明包的外部消费者不存在。"
+  },
+  "existingTestAnchors": [
+    {
+      "repo": "AlembicAgent",
+      "path": "test/LLMGateway.test.ts",
+      "line": 13,
+      "note": "chat/structured usage 一次发出"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/LLMGateway.test.ts",
+      "line": 42,
+      "note": "gateway timeout 配置"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/LLMGateway.test.ts",
+      "line": 70,
+      "note": "usage provider/model/source"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/LLMGateway.test.ts",
+      "line": 96,
+      "note": "首冒号分割和本地模型"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/LLMGateway.test.ts",
+      "line": 126,
+      "note": "structured parser"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/LLMGateway.test.ts",
+      "line": 140,
+      "note": "singleton 配置重建"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/provider-facades.test.ts",
+      "line": 16,
+      "note": "文本 chat signal 经 façade 实际透传"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 32,
+      "note": "Claude 协议"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 181,
+      "note": "Google 协议"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 270,
+      "note": "Google signature/usage"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 365,
+      "note": "DeepSeek V4 toolChoice"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 383,
+      "note": "DeepSeek reasoning passback"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 424,
+      "note": "DeepSeek text compat"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 514,
+      "note": "HTTP pre-abort"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 528,
+      "note": "timeout/abort 区别"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/transport-protocols.test.ts",
+      "line": 570,
+      "note": "OpenAI Responses"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/ai-provider.test.ts",
+      "line": 216,
+      "note": "Manager recorder 与切换"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "test/AiFactory.test.ts",
+      "line": 54,
+      "note": "Factory fallback helper"
+    }
+  ],
+  "suggestedMigrationOrder": [
+    "先做 AI-I01 叶子契约抽取，保持 re-export、实例生命周期和输出 nullable 行为；这是最少策略变化的步骤。",
+    "再给配置入口建立有限 mock 矩阵，实施 AI-I02；区分保持旧行为与明确修复不一致，不能在重构提交里默改。",
+    "分别按 vendor 实施 AI-I03 与 AI-I04，复用现有协议测试；每次只收敛一种转换，不建立新通用执行框架。",
+    "AI-I05 单独决定公开兼容与弃用；当前研究不授权删除。取消/structured/embed 能力补齐是可选后续增量，不伪装成已完成的纯接口搬移。"
+  ],
+  "verificationSummary": {
+    "testsRun": false,
+    "apiRequests": false,
+    "sourceChanged": false,
+    "testChanged": false,
+    "adjacentRepoChanged": false,
+    "committed": false,
+    "noCommitReason": "只读接口研究，仅输出临时报告；由 root 决定后续实施。"
+  },
+  "hostConsumerEvidence": [
+    {
+      "repo": "Alembic",
+      "path": "lib/infrastructure/config/RuntimeConfigLoadReceipt.ts",
+      "line": 99,
+      "note": "中立 reasoning effort 对齐 DeepSeek 专用环境字段，专用显式值优先"
+    },
+    {
+      "repo": "Alembic",
+      "path": "lib/infrastructure/config/RuntimeConfigLoadReceipt.ts",
+      "line": 132,
+      "note": "运行 receipt 读取实际 provider/env 并校验 strict 配置"
+    },
+    {
+      "repo": "Alembic",
+      "path": "lib/injection/modules/AgentModule.ts",
+      "line": 133,
+      "note": "strict semantic review 工厂也要求真实 chatWithTools provider"
+    },
+    {
+      "repo": "Alembic",
+      "path": "lib/http/routes/candidates.ts",
+      "line": 341,
+      "note": "实际 structured 消费者"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "src/agent/context/ContextWindow.ts",
+      "line": 216,
+      "note": "模型 context window 先 registry 后未知模型 fallback"
+    },
+    {
+      "repo": "AlembicAgent",
+      "path": "src/agent/context/ContextWindow.ts",
+      "line": 508,
+      "note": "上下文压缩实际消费 chatWithTools"
+    }
+  ],
+  "referenceValidation": {
+    "allReferencedFilesExist": true,
+    "allLinesWithinFile": true,
+    "relativeReferencesChecked": 177,
+    "note": "源文件路径/行号存在性已自动核对；语义来自上述只读阅读，未运行行为测试。"
+  }
+}

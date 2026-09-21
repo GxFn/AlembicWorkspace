@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8-i9-alembic-runtime-config-artifact-load-boundary-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8-i9-alembic-runtime-config-artifact-load-boundary-p1",
+  "dispatchGroup": "dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rootcause2",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i8-i9-alembic-runtime-config-artifact-load-boundary-t1",
+  "status": "blocked",
+  "summary": "Rootcause2 product repair is implemented and committed in Alembic commit d019f1467efdd00b7408b4cde9c2aa9449af449d. RuntimeArtifactLoadReceiptV1 now recomputes canonical full-dist hashes for accepted archives and loaded Main/Core/Agent roots, recomputes Main embedded Core/Agent and Plugin embedded Core content, verifies actual Node package resolution converges on the same physical Core, and binds sanitized dist hashes/counts into the receipt. The finalized replay branch now awaits rejection before asynchronous cleanup, eliminating the intermittent unhandled STRICT_FINALIZED_PUBLIC_ROUTE_DIVERGENCE rejection. Status remains blocked exactly as required because the controller's accepted Main archive is the parent snapshot (sha256:e6c2360cda6d14f0dc81508d858d492a3d34c43b29a102433806dece3bc94cf8, 404 dist files), while this commit builds sha256:5aa4996da6610b95ac1a6da83df465104fb6b846e5b4eb5f2c6a8d4ac127d9ff with 408 files; the unchanged Bootstrap entrypoint hash alone is no longer accepted. The unmodified controller manifest now correctly fails closed with STRICT_RUNTIME_ARTIFACT_STALE_DIST. Controller must rebuild the exact Main artifact/manifest from this commit before acceptance.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/controller-runtime-artifact-manifest/runtime-artifact-manifest.json",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictRuntimeArtifacts.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictColdStartOrchestrator.ts",
+    "Alembic/test/helpers/RuntimeArtifactManifestFixture.ts",
+    "Alembic/test/unit/RuntimeArtifactLoadReceipt.test.ts",
+    "Alembic/test/unit/RuntimeConfigLoadReceipt.test.ts",
+    "Alembic/test/unit/StrictAuthorization.test.ts",
+    "Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts"
+  ],
+  "verification": [
+    "Git baseline/commit/tree: parent 41f471438d01ad2c141081d7e7056bde51568f65; commit d019f1467efdd00b7408b4cde9c2aa9449af449d; tree b4082a7e5f8a27cf6c060b5ee09405a31d1a41a0; final worktree clean.",
+    "RED full-dist evidence: before implementation, RuntimeArtifactLoadReceipt unit run failed the two new non-entry drift cases because both promises resolved; 2 failed / 5 passed. GREEN after implementation is 10/10, covering extra, changed, and missing dist files, embedded Core recomputation, nested and physically distinct identical Core copies.",
+    "RED rejection evidence: delayed StrictProductionJournal.close deterministically produced an unhandled STRICT_FINALIZED_PUBLIC_ROUTE_DIVERGENCE and exit 1 before return-await; the same scenario passed after the one-line await fix with no unhandled rejection.",
+    "The exact focused command passed three consecutive pre-final runs and one post-commit run; final result 4 files / 24 tests. The strict integration file passed 5/5 and the divergence path remained stable.",
+    "Final npm run check passed: 153 unit files / 1140 tests; 32 integration files / 467 passed, 10 skipped; coverage 11/11; all boundary, drift, retired-symbol, and ring-direction gates passed. Only five pre-existing lint warnings in untouched files remained non-failing.",
+    "Final npm test passed 186 files / 1629 tests, 10 skipped. npm run build passed. npm run release:package-guard and npm run release:staging:pack passed; staged and source Main dist hashes were identical.",
+    "Unmodified controller manifest probe after the final build returned the expected STRICT_RUNTIME_ARTIFACT_STALE_DIST: accepted Main full-dist sha256:e6c2360cda6d14f0dc81508d858d492a3d34c43b29a102433806dece3bc94cf8 / 404 files versus current sha256:5aa4996da6610b95ac1a6da83df465104fb6b846e5b4eb5f2c6a8d4ac127d9ff / 408 files; Bootstrap entrypoint hash is unchanged at 99138a965745e757981e0439157a1eaef8769ed457bb0556755350bf50cc9d9a.",
+    "git diff --check, staged diff check, changed-file format, no absolute-path/secret scan, two-stage self-review, and clean-worktree checks passed."
+  ],
+  "risks": [
+    "Unique acceptance blocker: the controller-owned exact Main archive/RuntimeArtifactManifest still describes the parent snapshot. It must be rebuilt from commit d019f1467efdd00b7408b4cde9c2aa9449af449d and then re-reviewed; Alembic correctly refuses to mint or weaken controller authority.",
+    "Alembic prime/work/Guard could not return usable envelopes because the installed plugin response includes an unsupported root _meta key. This is a tool-surface residual risk; raw source, targeted/full tests, type/lint, build, package, and exact-manifest probes all passed.",
+    "Controller acceptance and Test remain pending. No Test task, real Ghost, Dashboard startup, Plugin/MCP runtime dependency, or cross-repository product change was performed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "baseline",
+      "commit": "41f471438d01ad2c141081d7e7056bde51568f65",
+      "value": "Clean starting Alembic tree 7d32f0e6c2ccc0188f976276b05fe4f810f3bfad.",
+      "verify": "git status --short; git rev-parse HEAD; git rev-parse HEAD^{tree}"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduce the exact manifest false pass, establish non-entry full-dist and cleanup-race REDs, implement archive/loaded/embedded/physical-resolution checks, repeat focused stability, run full/package gates, and return blocked if only the controller manifest remains stale.",
+      "verify": "Dispatch packet dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rootcause2"
+    },
+    {
+      "kind": "test-first",
+      "ref": "Alembic/test/unit/RuntimeArtifactLoadReceipt.test.ts",
+      "value": "Two full-dist regression cases first failed because verification resolved instead of rejecting; the delayed-cleanup integration scenario separately failed with the captured unhandled divergence rejection.",
+      "verify": "Initial unit RED: 2 failed / 5 passed; initial focused divergence RED: exit 1 with PromiseRejectionHandledWarning"
+    },
+    {
+      "kind": "regression",
+      "ref": "Alembic/test/unit/RuntimeArtifactLoadReceipt.test.ts; Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts",
+      "value": "Covers extra/changed/missing non-entry dist files, recomputed embedded dependencies, identical bytes at another physical Core root, existing nested Core duplication, and no unhandled finalized replay rejection.",
+      "verify": "RuntimeArtifactLoadReceipt 10/10; strict integration 5/5"
+    },
+    {
+      "kind": "tests",
+      "ref": "Alembic/test/unit/RuntimeArtifactLoadReceipt.test.ts; Alembic/test/unit/RuntimeConfigLoadReceipt.test.ts; Alembic/test/unit/StrictAuthorization.test.ts; Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts",
+      "value": "Focused 24/24 post-commit; npm run check and npm test fully green.",
+      "verify": "npx vitest run test/unit/RuntimeArtifactLoadReceipt.test.ts test/unit/RuntimeConfigLoadReceipt.test.ts test/unit/StrictAuthorization.test.ts test/integration/StrictRecipePipelineFacade.integration.test.ts; npm run check; npm test"
+    },
+    {
+      "kind": "typecheck",
+      "value": "No-emit TypeScript and final production build passed.",
+      "verify": "npx tsc --noEmit; npm run build"
+    },
+    {
+      "kind": "lint",
+      "value": "Biome formatting/checks and all repository boundary/layer/doctrine/naming checks passed; five untouched-file any warnings were pre-existing and non-failing.",
+      "verify": "npm run check; git diff --check"
+    },
+    {
+      "kind": "verification",
+      "commit": "d019f1467efdd00b7408b4cde9c2aa9449af449d",
+      "value": "Full check/test/build/package gates passed, repeated focused runs were stable, source and staging dist hashes matched, and the stale controller manifest failed closed before mutation.",
+      "verify": "npm run check; npm test; npm run build; npm run release:package-guard; npm run release:staging:pack; exact manifest Node probe"
+    },
+    {
+      "kind": "change-scope",
+      "value": "Exactly five Alembic Main/test files changed; no AlembicCore, AlembicAgent, Plugin, Dashboard, Ghost, Test, or cross-repository product files changed.",
+      "verify": "git show --stat --name-only d019f1467efdd00b7408b4cde9c2aa9449af449d"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 checked every controller root-cause requirement and added missing-file plus embedded-dependency negative coverage. Stage 2 checked tar/path ambiguity, physical resolution, receipt sanitization, scope, error ordering, and secret/path leakage; no remaining product P0/P1 was found.",
+      "verify": "Final diff audit; focused/full/package gates; exact manifest probe; clean worktree"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "Prior implementation authenticated whole tgz bytes and package entrypoints but never recomputed complete archive/loaded dist trees; its embedded hashes were only declared-value comparisons, and its second-Core check only inspected one nested path. The intermittent nonzero focused run was a separate Promise adoption race caused by returning verifyFinalizedReplay without await across asynchronous finally cleanup. The repair hashes every regular dist file canonically, recomputes embedded subtrees, uses Node findPackageJSON plus realpath for actual Main/Agent resolution, and awaits finalized replay rejection before cleanup.",
+      "verify": "Controller rework evidence; deterministic REDs; source diff in StrictRuntimeArtifacts.ts and StrictColdStartOrchestrator.ts"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rootcause2__Alembic__i8-i9-alembic-runtime-config-artifact-load-boundary-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rootcause2__Alembic__i8-i9-alembic-runtime-config-artifact-load-boundary-t1.json",
+    "deliveryRunId": "run-delivery-dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rootcause2__Alembic__i8-i9-alembic-runtime-config-artifact-load-boundary-t1",
+    "dispatchGroup": "dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rootcause2",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rootcause2__Alembic__i8-i9-alembic-runtime-config-artifact-load-boundary-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 135,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8-i9-alembic-runtime-config-artifact-load-boundary-p1",
+    "targetTaskId": "i8-i9-alembic-runtime-config-artifact-load-boundary-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rootcause2",
+    "resultId": "tr-i8-i9-alembic-runtime-config-artifact-load-boundary-t1",
+    "createdAt": "2026-07-16T19:56:57.147Z"
+  },
+  "createdAt": "2026-07-16T19:56:57.147Z",
+  "stateRevisionObserved": 135,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 3,
+  "supersedes": {
+    "resultId": "tr-i8-i9-alembic-runtime-config-artifact-load-boundary-t1",
+    "dispatchGroup": "dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rework1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i8-i9-alembic-runtime-config-artifact-load-boundary-t1__dg-i8-i9-alembic-runtime-config-artifact-load-boundary-rework1__current-r0002.json"
+  }
+}

@@ -1,0 +1,1101 @@
+{
+  "title": "knowledge职责迁移独立等价性与架构复审",
+  "date": "2026-09-20",
+  "baseline": "84aed5c",
+  "verdict": "原49个具名声明均保留且唯一；48个正文一致，handleSubmit的三个抽取块经受限AST归一均等价。发现1项迁移引入的取消窗口，root已修复并留下真实handle RED→GREEN；当前无未闭合P1/P2。",
+  "scope": {
+    "baselineSource": "git show 84aed5c:src/tools/runtime/handlers/knowledge.ts",
+    "currentFiles": [
+      "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/authoring.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/operation.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/queries.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/sessionState.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts",
+      "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts"
+    ],
+    "method": "直接读取Git基线、当前11文件；独立TypeScript AST声明映射/正文比较/内部块结构比较及runtime依赖图，加手工检查调用顺序、返回、catch、引用身份。未执行或依赖3个临时extract生成器作为正确性证明。",
+    "writes": "仅本报告；未修改产品/测试/配置、未提交。",
+    "tests": "本轮由root负责实际入口回归及全量check。本子代理阅读取消窗口的真实RED/GREEN日志，未并行再运行全量检查。",
+    "noCommitReason": "独立复审意见由root纳入统一提交。"
+  },
+  "findings": [
+    {
+      "id": "KEX-01",
+      "severity": "P2",
+      "status": "fixed-with-real-handle-red-green",
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts",
+      "line": 34,
+      "issue": "迁移把提交前最后一次取消检查移入async prepareSubmission；caller await准备后直接启动Core写入，新增了取消检查与副作用之间的microtask窗口。",
+      "repro": "先queueMicrotask(()=>controller.abort())，再用无需style子调用的合法候选调用原handle('submit',...,{abortSignal})。prepare同步读到未取消后返回ready；queued取消先于caller恢复执行，但原迁移版仍create成功。",
+      "userImpact": "已取消的操作仍可能启动新的Core持久化；这是迁移引入的行为变化，不能被具名函数正文保持所掩盖。",
+      "fix": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts",
+        "line": 40,
+        "description": "在await prepareSubmission恢复并确认ready之后、紧邻gateway.createOrStage之前重新调用abortedKnowledgeResult。authoring的末尾检查暂保留，不替代真实写口检查。"
+      },
+      "evidence": [
+        {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 200,
+          "name": "checks cancellation after preparation yields and before starting the Core write",
+          "assertions": "真实handle入口、合法无AI修复候选、queueMicrotask取消；结果aborted且fake Core create=0。"
+        },
+        {
+          "path": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/knowledge-preparation-cancel-red.log",
+          "result": "root暂移新guard时1 failed/47 skipped；实得ok=true。"
+        },
+        {
+          "path": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/knowledge-preparation-cancel-green.log",
+          "result": "恢复guard后1 passed/47 skipped。"
+        }
+      ],
+      "independentVerification": "独立先于读取测试发现该窗口；读取当前guard位于await之后、create之前，且两者间无await。root与本子代理独立发现一致。",
+      "followup": "无残留修复需求。保留这条入口回归。"
+    }
+  ],
+  "namedDeclarations": {
+    "baselineCount": 49,
+    "uniqueMatchedCount": 49,
+    "identicalBodyCount": 48,
+    "missing": [],
+    "duplicate": [],
+    "reshaped": [
+      "handleSubmit"
+    ],
+    "bodyComparison": "函数body、变量initializer、interface成员、type alias正文逐个用TypeScript printer去注释比较；不存在同名多份或未迁移声明。",
+    "signatureChanges": [
+      {
+        "name": "abortedKnowledgeResult",
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/operation.ts",
+        "line": 12,
+        "change": "ctx: ToolContext → Pick<ToolContext,'abortSignal'>",
+        "assessment": "内部函数的上下文类型收窄；body/返回类型/async标记均不变。"
+      },
+      {
+        "name": "completedMutationMeta",
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/operation.ts",
+        "line": 24,
+        "change": "ctx: ToolContext → Pick<ToolContext,'abortSignal'>",
+        "assessment": "内部函数的上下文类型收窄；body/返回类型/async标记均不变。"
+      },
+      {
+        "name": "evaluatePreparedItem",
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts",
+        "line": 132,
+        "change": "ctx: ToolContext → Pick<ToolContext,'projectRoot'>",
+        "assessment": "内部函数的上下文类型收窄；body/返回类型/async标记均不变。"
+      }
+    ],
+    "mapping": [
+      {
+        "name": "AGENT_RUNTIME_SOURCE",
+        "kind": "variable",
+        "beforeLine": 48,
+        "newLine": 4,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts"
+      },
+      {
+        "name": "LEGACY_IDE_AGENT_SOURCE",
+        "kind": "variable",
+        "beforeLine": 49,
+        "newLine": 6,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts"
+      },
+      {
+        "name": "SNIPPET_REPAIR_MAX_LINES",
+        "kind": "variable",
+        "beforeLine": 57,
+        "newLine": 12,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts"
+      },
+      {
+        "name": "readRefRangeCode",
+        "kind": "function",
+        "beforeLine": 63,
+        "newLine": 18,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts"
+      },
+      {
+        "name": "normalizeBareSourceRefs",
+        "kind": "function",
+        "beforeLine": 124,
+        "newLine": 79,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts"
+      },
+      {
+        "name": "buildSnippetRepairHint",
+        "kind": "function",
+        "beforeLine": 165,
+        "newLine": 120,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts"
+      },
+      {
+        "name": "abortedKnowledgeResult",
+        "kind": "function",
+        "beforeLine": 174,
+        "newLine": 12,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": false,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/operation.ts"
+      },
+      {
+        "name": "completedMutationMeta",
+        "kind": "function",
+        "beforeLine": 183,
+        "newLine": 24,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": false,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/operation.ts"
+      },
+      {
+        "name": "handle",
+        "kind": "function",
+        "beforeLine": 200,
+        "newLine": 10,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts"
+      },
+      {
+        "name": "handleSearch",
+        "kind": "function",
+        "beforeLine": 229,
+        "newLine": 16,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/queries.ts"
+      },
+      {
+        "name": "handlePrime",
+        "kind": "function",
+        "beforeLine": 282,
+        "newLine": 69,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/queries.ts"
+      },
+      {
+        "name": "PERSISTED_RECIPE_REVIEW_FIELDS",
+        "kind": "variable",
+        "beforeLine": 375,
+        "newLine": 126,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts"
+      },
+      {
+        "name": "projectPersistedRecipeReview",
+        "kind": "function",
+        "beforeLine": 400,
+        "newLine": 151,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts"
+      },
+      {
+        "name": "handleSubmit",
+        "kind": "function",
+        "beforeLine": 411,
+        "newLine": 12,
+        "count": 1,
+        "bodyEqual": false,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts"
+      },
+      {
+        "name": "pickString",
+        "kind": "function",
+        "beforeLine": 1042,
+        "newLine": 7,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "readTitleAttempt",
+        "kind": "function",
+        "beforeLine": 1047,
+        "newLine": 5,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sessionState.ts"
+      },
+      {
+        "name": "writeTitleAttempt",
+        "kind": "function",
+        "beforeLine": 1051,
+        "newLine": 9,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sessionState.ts"
+      },
+      {
+        "name": "sessionCounterBox",
+        "kind": "function",
+        "beforeLine": 1071,
+        "newLine": 33,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sessionState.ts"
+      },
+      {
+        "name": "bumpSubmitRepairStat",
+        "kind": "function",
+        "beforeLine": 1097,
+        "newLine": 59,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sessionState.ts"
+      },
+      {
+        "name": "DimensionMetaLike",
+        "kind": "interface",
+        "beforeLine": 1110,
+        "newLine": 8,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts"
+      },
+      {
+        "name": "stripProjectNamePrefix",
+        "kind": "function",
+        "beforeLine": 1116,
+        "newLine": 11,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "normalizeStringArray",
+        "kind": "function",
+        "beforeLine": 1132,
+        "newLine": 27,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "uniqueStrings",
+        "kind": "function",
+        "beforeLine": 1139,
+        "newLine": 34,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "buildDefaultUsageGuide",
+        "kind": "function",
+        "beforeLine": 1143,
+        "newLine": 38,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "validateSubmitParams",
+        "kind": "function",
+        "beforeLine": 1150,
+        "newLine": 45,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "handleDetail",
+        "kind": "function",
+        "beforeLine": 1223,
+        "newLine": 165,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/queries.ts"
+      },
+      {
+        "name": "ManageOperation",
+        "kind": "type",
+        "beforeLine": 1258,
+        "newLine": 17,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "VALID_OPERATIONS",
+        "kind": "variable",
+        "beforeLine": 1271,
+        "newLine": 30,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "EvolutionProposalSource",
+        "kind": "type",
+        "beforeLine": 1285,
+        "newLine": 44,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "EvolutionAction",
+        "kind": "type",
+        "beforeLine": 1295,
+        "newLine": 54,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "ProposalGatewayLike",
+        "kind": "interface",
+        "beforeLine": 1297,
+        "newLine": 56,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "EVOLUTION_SOURCES",
+        "kind": "variable",
+        "beforeLine": 1316,
+        "newLine": 75,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "handleActiveTransition",
+        "kind": "function",
+        "beforeLine": 1327,
+        "newLine": 86,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "handleManage",
+        "kind": "function",
+        "beforeLine": 1405,
+        "newLine": 164,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "handleEvolutionManage",
+        "kind": "function",
+        "beforeLine": 1542,
+        "newLine": 301,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "resolveEvolutionSource",
+        "kind": "function",
+        "beforeLine": 1605,
+        "newLine": 364,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "defaultEvolutionDescription",
+        "kind": "function",
+        "beforeLine": 1612,
+        "newLine": 371,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "evolutionStatus",
+        "kind": "function",
+        "beforeLine": 1622,
+        "newLine": 381,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "buildEvolutionEvidence",
+        "kind": "function",
+        "beforeLine": 1635,
+        "newLine": 394,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "collectInlineEvidence",
+        "kind": "function",
+        "beforeLine": 1662,
+        "newLine": 421,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      },
+      {
+        "name": "recordValue",
+        "kind": "function",
+        "beforeLine": 1683,
+        "newLine": 114,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "stringValue",
+        "kind": "function",
+        "beforeLine": 1689,
+        "newLine": 120,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "numberValue",
+        "kind": "function",
+        "beforeLine": 1693,
+        "newLine": 124,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts"
+      },
+      {
+        "name": "SearchResult",
+        "kind": "interface",
+        "beforeLine": 1701,
+        "newLine": 18,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts"
+      },
+      {
+        "name": "SearchEngineLike",
+        "kind": "interface",
+        "beforeLine": 1710,
+        "newLine": 27,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts"
+      },
+      {
+        "name": "RecipeGatewayLike",
+        "kind": "type",
+        "beforeLine": 1717,
+        "newLine": 34,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts"
+      },
+      {
+        "name": "KnowledgeRepoLike",
+        "kind": "interface",
+        "beforeLine": 1719,
+        "newLine": 36,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts"
+      },
+      {
+        "name": "truncateText",
+        "kind": "function",
+        "beforeLine": 1727,
+        "newLine": 196,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": true,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/queries.ts"
+      },
+      {
+        "name": "evaluatePreparedItem",
+        "kind": "function",
+        "beforeLine": 1735,
+        "newLine": 132,
+        "count": 1,
+        "bodyEqual": true,
+        "signatureEqual": false,
+        "returnTypeEqual": true,
+        "asyncEqual": true,
+        "newFile": "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts"
+      }
+    ],
+    "newInternalDeclarations": [
+      {
+        "name": "SubmissionInput",
+        "kind": "type",
+        "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/authoring.ts",
+        "line": 36
+      },
+      {
+        "name": "SubmissionPreparation",
+        "kind": "type",
+        "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/authoring.ts",
+        "line": 37
+      },
+      {
+        "name": "prepareSubmission",
+        "kind": "function",
+        "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/authoring.ts",
+        "line": 48
+      },
+      {
+        "name": "buildSubmissionInput",
+        "kind": "function",
+        "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+        "line": 129
+      },
+      {
+        "name": "ProductionResult",
+        "kind": "type",
+        "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts",
+        "line": 14
+      },
+      {
+        "name": "CreatedSubmission",
+        "kind": "interface",
+        "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts",
+        "line": 15
+      },
+      {
+        "name": "completeCreatedSubmission",
+        "kind": "function",
+        "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts",
+        "line": 23
+      }
+    ]
+  },
+  "submissionBlockChecks": [
+    {
+      "name": "gateway and validation before outer try",
+      "beforeStatements": 4,
+      "afterStatements": 4,
+      "equal": true
+    },
+    {
+      "name": "normalized input statements",
+      "beforeStatements": 18,
+      "afterStatements": 18,
+      "equal": true,
+      "method": "AST结构比较；唯一白名单归一是输入helper的const item经引用返回后由authoring的let item继续绑定。"
+    },
+    {
+      "name": "authoring statements and early returns",
+      "beforeStatements": 25,
+      "afterStatements": 25,
+      "equal": true,
+      "method": "AST结构比较；仅解包恰含status:'rejected'/result的6个早退包装，不忽略其他表达式/分支顺序。"
+    },
+    {
+      "name": "Core createOrStage statement",
+      "beforeStatements": 1,
+      "afterStatements": 1,
+      "equal": true
+    },
+    {
+      "name": "created block with named input references",
+      "beforeStatements": 8,
+      "afterStatements": 8,
+      "equal": true
+    },
+    {
+      "name": "non-created result branches",
+      "beforeStatements": 4,
+      "afterStatements": 4,
+      "equal": true
+    },
+    {
+      "name": "outer submit catch",
+      "beforeStatements": 2,
+      "afterStatements": 2,
+      "equal": true
+    }
+  ],
+  "blockNormalizationRules": [
+    "输入块共18条顶层语句：stripProjectNamePrefix仍直接修改params.title；其后dimension/type/language/reasoning/tags/item构建顺序不变。input.const item被返回为同一引用，authoring.let item承担原后续rebind。",
+    "authoring原25条顶层语句顺序全部保留。6处原早退仅包装成{status:'rejected',result:<原ToolResult>}；submission原样return preparation.result，不把内部status:'rejected'暴露为业务结果。",
+    "created块原8条顶层语句与completeCreatedSubmission一致；受限替换result.production→production、preparedProduction.codeEvidence→codeEvidence并归一同义shorthand property写法。",
+    "原gateway检查/前置validation的4条语句仍在outer try之前；Core createOrStage语句、4条非created出口、2条outer catch语句均原样保留。",
+    "没有通过忽略任意控制语句或字符串来得出等价。初次printer产生的换行/const绑定区别已进一步用AST节点结构、literal text和declaration flags检查。"
+  ],
+  "manualExecutionReview": [
+    {
+      "boundary": "入口与错误路径",
+      "paths": [
+        "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts"
+      ],
+      "verified": "handle(action,params,ctx)正文/签名/async与基线一致。提交gateway缺失和validation早退保持；prepareSubmission与completeCreatedSubmission都在原try内被await，拒绝或抛错仍进入同一Submit failed catch，不丢catch覆盖。",
+      "importantLine": 70,
+      "note": "created helper必须保留return await，当前已保留。"
+    },
+    {
+      "boundary": "准备与Core调用顺序",
+      "paths": [
+        "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+        "AlembicAgent/src/tools/runtime/handlers/knowledge/authoring.ts",
+        "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts"
+      ],
+      "verified": "顺序仍是输入构造→稳定标题预算→evidence展开/推断→sanitize→prepare profile/code→统一authoring gate→graph补证据重评→waiver→有界style repair重prepare→soft advisory/硬拒绝→取消检查→Core create。",
+      "invariants": [
+        "title3/style2/waiver5未上调",
+        "graph重评仍使用同一prepared shell，不复活unsafe coreCode",
+        "style后的prepare仍刷新authored hash",
+        "失败早退不进入Core"
+      ]
+    },
+    {
+      "boundary": "唯一持久化与发布归属",
+      "verified": "新submission.ts只有一个gateway.createOrStage调用；authoring/input/sources没有生产写口调用。已创建分支调用submissionResult一次；管理发布仍只有management的readiness→publish路径。",
+      "callSites": [
+        {
+          "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 99,
+          "call": "gateway.evaluateReadiness"
+        },
+        {
+          "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+          "line": 127,
+          "call": "gateway.publish"
+        },
+        {
+          "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts",
+          "line": 47,
+          "call": "gateway.createOrStage"
+        },
+        {
+          "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts",
+          "line": 37,
+          "call": "gateway.evaluateReadiness"
+        },
+        {
+          "file": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts",
+          "line": 84,
+          "call": "ctx.sessionStore.save"
+        }
+      ],
+      "note": "Core参数与source/userId/capability、systemInjectedFields、dedup Sets等构造经AST比较保持。"
+    },
+    {
+      "boundary": "created回执与readiness unknown",
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts",
+      "verified": "created为同一result.created[0]对象，production/codeEvidence/item传引用而非clone。readiness/save失败仍只附诊断；created/id/candidateId/lifecycle来自persisted回执，readiness缺席仍是unavailable。query/helper未新增再次create或publish。",
+      "invariants": [
+        "gateway对象直接传入，evaluateReadiness仍以gateway为receiver，不丢this",
+        "ctx对象只在类型层Pick，没有运行时重建",
+        "sessionStore.save仍await且在同一post-commit try/catch",
+        "projectPersistedRecipeReview原字段列表和数组浅复制行为不变"
+      ]
+    },
+    {
+      "boundary": "共享状态身份",
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/sessionState.ts",
+      "verified": "4个计数helper正文完全相同；会话盒/兼容title字典引用不重建。authoring写入原ctx.runtime.sharedState的同一_sessionCounters，任何只读类型收窄均没有复制runtime或Sets。",
+      "note": "按原边界保留无sharedState时不造全局状态。"
+    },
+    {
+      "boundary": "查询与管理",
+      "paths": [
+        "AlembicAgent/src/tools/runtime/handlers/knowledge/queries.ts",
+        "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts"
+      ],
+      "verified": "search/prime/detail、review-queue/review、approve/publish、reject/update/score/validate、evolution的全部原具名正文逐一相同；排序/截断、取消后读不消费、已确认mutation诊断、proposal与发布状态没有被归并。",
+      "note": "未把Core deterministic实现搬入这些模块。"
+    }
+  ],
+  "apiAndExports": {
+    "originalSourceValues": [
+      "handle",
+      "applyStyleWaiver",
+      "isSoftAuthoringViolation"
+    ],
+    "currentSourceValues": [
+      "handle",
+      "applyStyleWaiver",
+      "isSoftAuthoringViolation"
+    ],
+    "waiverChange": "从先import再export，改为从同一@alembic/core/knowledge入口直接re-export；绑定来源未变，保持Core函数identity。",
+    "publicBarrelsChanged": false,
+    "packageExportsChanged": false,
+    "registryWiringChanged": false,
+    "evidence": "只读git diff确认src/index.ts、src/agent/index.ts、src/tools/runtime/index.ts、package.json、src/tools/runtime/registry.ts均未改；注册表仍通过原knowledge.ts handle。",
+    "internalExports": "新模块为跨文件复用增加内部具名export；未由包barrel或package exports新增公开路径，不要求消费者迁移。",
+    "originalSignatures": "handle/action/params/ToolContext/Promise<ToolResult>不变；原source-only waiver函数没有包装成新函数。"
+  },
+  "architecture": {
+    "modules": [
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "role": "五action路由与source兼容出口"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/queries.ts",
+        "role": "只读查询投影"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+        "role": "生命周期与proposal适配"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts",
+        "role": "提交串联、唯一create及非created出口"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/authoring.ts",
+        "role": "提交前证据与authoring质量流程"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+        "role": "输入校验/归一及候选构造"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts",
+        "role": "bounded来源诊断与统一gate adapter"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/sessionState.ts",
+        "role": "稳定会话预算状态"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts",
+        "role": "已创建后的readiness与会话投影"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/operation.ts",
+        "role": "知识取消政策与已确认mutation诊断"
+      },
+      {
+        "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts",
+        "role": "原内部端口类型与来源常量"
+      }
+    ],
+    "localRuntimeGraph": {
+      "src/tools/runtime/handlers/knowledge.ts": [
+        "src/tools/runtime/handlers/knowledge/management.ts",
+        "src/tools/runtime/handlers/knowledge/operation.ts",
+        "src/tools/runtime/handlers/knowledge/queries.ts",
+        "src/tools/runtime/handlers/knowledge/submission.ts"
+      ],
+      "src/tools/runtime/handlers/knowledge/authoring.ts": [
+        "src/tools/runtime/handlers/knowledge/input.ts",
+        "src/tools/runtime/handlers/knowledge/operation.ts",
+        "src/tools/runtime/handlers/knowledge/sessionState.ts",
+        "src/tools/runtime/handlers/knowledge/sources.ts"
+      ],
+      "src/tools/runtime/handlers/knowledge/contracts.ts": [],
+      "src/tools/runtime/handlers/knowledge/input.ts": [
+        "src/tools/runtime/handlers/knowledge/contracts.ts"
+      ],
+      "src/tools/runtime/handlers/knowledge/management.ts": [
+        "src/tools/runtime/handlers/knowledge/contracts.ts",
+        "src/tools/runtime/handlers/knowledge/input.ts",
+        "src/tools/runtime/handlers/knowledge/operation.ts"
+      ],
+      "src/tools/runtime/handlers/knowledge/operation.ts": [],
+      "src/tools/runtime/handlers/knowledge/queries.ts": [
+        "src/tools/runtime/handlers/knowledge/operation.ts"
+      ],
+      "src/tools/runtime/handlers/knowledge/sessionState.ts": [
+        "src/tools/runtime/handlers/knowledge/input.ts"
+      ],
+      "src/tools/runtime/handlers/knowledge/sources.ts": [],
+      "src/tools/runtime/handlers/knowledge/submission.ts": [
+        "src/tools/runtime/handlers/knowledge/authoring.ts",
+        "src/tools/runtime/handlers/knowledge/contracts.ts",
+        "src/tools/runtime/handlers/knowledge/input.ts",
+        "src/tools/runtime/handlers/knowledge/operation.ts",
+        "src/tools/runtime/handlers/knowledge/submissionResult.ts"
+      ],
+      "src/tools/runtime/handlers/knowledge/submissionResult.ts": [
+        "src/tools/runtime/handlers/knowledge/sessionState.ts"
+      ]
+    },
+    "cycles": [],
+    "conclusion": "新11文件内部运行时图无环；input/sessionState/sources不反向引用facade/submission，authoring不调用Core生产写口，submissionResult只持有readiness接口；共享runOperation继续单源。",
+    "enforcement": "fileBoundaries由root负责落地和实际lint。本审查不新增linter、不修改配置、不以类型Pick声称运行时安全沙箱。"
+  },
+  "validationEvidence": {
+    "performed": [
+      "Git基线直接读取",
+      "49声明AST映射与正文比较",
+      "18输入语句/25准备语句/8created语句等7组受限AST块比较",
+      "新11文件内部runtime import图和Core/readiness/save调用点扫描",
+      "手工确认await/catch/取消检查/receiver与共享引用"
+    ],
+    "generatorDependence": false,
+    "rootOwnedTestsRead": [
+      {
+        "path": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/knowledge-preparation-cancel-red.log",
+        "result": "RED 1 fail"
+      },
+      {
+        "path": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/knowledge-preparation-cancel-green.log",
+        "result": "GREEN 1 pass"
+      }
+    ],
+    "notPerformed": "没有独立重跑root负责的真实入口全组、Core持久化集成、public signatures、fileBoundaries或全量check；AST等价不替代这些验收。",
+    "rootReportedFullCheck": {
+      "files": 66,
+      "tests": 859,
+      "result": "passed",
+      "source": "root消息提供；不作为本子代理亲自运行的结果。"
+    }
+  },
+  "stillOpen": [],
+  "nextStep": "root完成既定fileBoundaries、实际入口回归和全量check后统一提交；保留KEX-01取消窗口回归与修复记录。",
+  "snapshots": [
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "sha256": "b567126f47b70ab3d56cceafa800364b3377cd2619918b70edfa75742c682658"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/authoring.ts",
+      "sha256": "d42852b5825d87ce513ffb18c79f26c09897b295060e1753b523c17d8b7991c3"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/contracts.ts",
+      "sha256": "373d70be1f8c97ba030190c520fec77a446aff990ee78986228eb2a72aff30cd"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/input.ts",
+      "sha256": "f991d8c9edc100f3aacf9882135219e5767317faee7ae48167417162a4e7fffe"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/management.ts",
+      "sha256": "7dc54cb7a38334c064ddbe342d497b4a50b41c09286e284d9e598c16c85969a9"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/operation.ts",
+      "sha256": "299dcc27b91734ad20deb3a180f703435787cd095ca4e6465232986b6061ceb9"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/queries.ts",
+      "sha256": "c6b833fd6c5f77f12d874a88d67140b57bb861d2a34165fde351334f2b4f1b90"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/sessionState.ts",
+      "sha256": "358e7db80cafb759d239bd2ed6a78c57543ef3e2ed6b8f025852c5c1944c71ef"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/sources.ts",
+      "sha256": "6e3c906af930c1d995da25dc65c1b9687522baad26e204ee14f5624ca7db1848"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/submission.ts",
+      "sha256": "a18be626caa02f1d1a2d3bd001b0c2cadc3ad15e96f02a4e8bd587a09e8dfc65"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/submissionResult.ts",
+      "sha256": "371b52e6e0393679b7d258f583598585860862448e13c7545d942cc1b2c2d5e7"
+    }
+  ],
+  "preexistingCleanupCandidates": [
+    {
+      "id": "KEX-CLEANUP-01",
+      "status": "confirmed-preexisting-dead-branch; root-to-clean-separately",
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge/authoring.ts",
+      "line": 347,
+      "conclusion": "appealEligible在此处恒false，appealHint恒为空字符串；这是基线已有死分支，不是本次迁移引入。",
+      "proof": [
+        "314行相同all-soft谓词成立时325行清空gateViolations。",
+        "能进入327行length>0分支就必须至少含一个硬违规。",
+        "327至348之间只做format/map/some、bounded snippet/evidence hint构造，没有await或gateViolations写入；formatRecipeAuthoringViolations只map/join。",
+        "348行再次调用同一纯Core分类谓词，其every必为false。"
+      ],
+      "safeCleanup": "单独删除appealEligible、appealHint及其不可达文案，并去掉390行模板中的空插值；保留上方Core applyStyleWaiver调用和兼容重导出，不改变软违规advisory与硬拒绝合同。",
+      "consumerScan": "rg在src/test只找到authoring.ts这4处，无测试或消费方依赖该文案。",
+      "editPerformed": false
+    }
+  ],
+  "rootPostReviewCleanup": {
+    "status": "implemented-and-targeted-tests-passed",
+    "deadBranch": {
+      "file": "src/tools/runtime/handlers/knowledge/authoring.ts",
+      "change": "Removed always-false appealEligible, always-empty appealHint and its interpolation; retained Core waiver/advisory flow.",
+      "independentProof": "preexistingCleanupCandidates KEX-CLEANUP-01 in this report",
+      "testLog": "tmp/pipeline-knowledge-2026-09-20/knowledge-cleanup-final.log",
+      "tests": 91,
+      "testFiles": 3
+    },
+    "internalExports": {
+      "file": "src/tools/runtime/handlers/knowledge/input.ts",
+      "removedExportModifiers": [
+        "stripProjectNamePrefix",
+        "normalizeStringArray",
+        "buildDefaultUsageGuide"
+      ],
+      "reason": "Only local consumers remain after buildSubmissionInput extraction; original facade exports unchanged."
+    },
+    "snapshots": [
+      {
+        "file": "src/tools/runtime/handlers/knowledge/authoring.ts",
+        "sha256": "532dcacaa2078d73e709c8dca9ad61caf93ad9f66623ba0fec097bc5c6fa54a2"
+      },
+      {
+        "file": "src/tools/runtime/handlers/knowledge/input.ts",
+        "sha256": "2a5f1bc3929cc056e0c0485afadc346254565d8e11ecd519311d3dd4e91b15f0"
+      }
+    ]
+  }
+}

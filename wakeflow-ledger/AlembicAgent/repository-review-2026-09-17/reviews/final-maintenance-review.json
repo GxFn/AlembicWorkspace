@@ -1,0 +1,169 @@
+{
+  "scope": "Bounded maintenance review of repaired evidence paths, style re-prepare provenance, mining evaluation runtime and two CLI entries, codemod/build scripts, current CI and README/effects doc edits. Historical Census descriptions were not treated as current implementation.",
+  "reviewedAtUtc": "2026-09-18T07:33:17.173935+00:00",
+  "verdict": "needs-rework",
+  "findings": [
+    {
+      "id": "MAINT-01",
+      "severity": "P1",
+      "path": "scripts/build-agent.mjs",
+      "line": 7,
+      "issue": "The recursive clean target is a file URL ending in dist/. On both Node 22 and Node 24 this follows a dist symlink and recursively deletes the external target directory, leaving the dangling link.",
+      "repro": "Copied the script into an isolated temporary project; fake tsc exits 0. project/dist symlinked to sibling outside/ containing sentinel. Script exits 0, outside/ and sentinel are gone, and dist remains a symlink. Repeated on v22.23.2 and v24.19.0. All directories were temporary and cleaned.",
+      "suggestion": "lstat the dist entry without a trailing separator; unlink a symlink itself and recursively remove only an actual repository dist directory. Add a sentinel-preservation symlink probe before accepting the new clean build.",
+      "certainty": "reproduced on supported Node 22 and host Node 24",
+      "regression": "introduced by new clean-build script"
+    },
+    {
+      "id": "MAINT-02",
+      "severity": "P2",
+      "path": "scripts/codemod-rename.mjs",
+      "line": 232,
+      "issue": "Sequential replaceAll applies later import rewrites to text produced by earlier rewrites; moving an importer can collapse distinct imports onto the wrong target.",
+      "repro": {
+        "map": [
+          {
+            "from": "src/a.ts",
+            "to": "src/deep/a.ts"
+          }
+        ],
+        "original": "import './b.js';\nimport '../b.js';\n",
+        "files": [
+          "src/b.ts",
+          "b.ts"
+        ],
+        "dryRun": "./b.js -> ../b.js; ../b.js -> ../../b.js",
+        "actual": "import '../../b.js';\nimport '../../b.js';\n",
+        "expected": "import '../b.js';\nimport '../../b.js';\n"
+      },
+      "suggestion": "Apply specifier edits using positions from the original source in descending order, or one replacement callback keyed by original matched specifier. Do not feed rewritten text through subsequent specifier replacements.",
+      "certainty": "isolated temporary git repository --apply probe; main checkout untouched",
+      "regression": "existing apply algorithm is incorrect for newly supported moved-importer relative rewrites"
+    },
+    {
+      "id": "MAINT-03",
+      "severity": "P2",
+      "path": "scripts/lib/mining-eval-runtime.mjs",
+      "line": 48,
+      "issue": "The new receipt helper removed the original Array.isArray guard for candidate.reasoning.sources. Object/number source lists now throw during final report generation instead of being skipped or reported.",
+      "repro": "collectSourceFileReceipts([{candidate:{reasoning:{sources:{bad:true}}}}],'/unused/input.json') throws object is not iterable before any filesystem read.",
+      "suggestion": "Restore array normalization before iteration, or record a malformed-source-list receipt; retain the new per-file missing/outside error handling.",
+      "certainty": "pure helper reproduction with synthetic input",
+      "regression": "introduced during extraction of the previous defensive helper"
+    }
+  ],
+  "checks": [
+    {
+      "group": "Evidence capture and source containment",
+      "paths": [
+        "src/agent/evidence/EvidenceCapture.ts",
+        "src/agent/evidence/EvidenceCollector.ts",
+        "src/agent/evaluation/analysisArtifact.ts",
+        "src/agent/evaluation/MiningJudge.ts",
+        "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+        "src/tools/runtime/handlers/recipeAuthoringGate.ts",
+        "src/tools/runtime/handlers/knowledge.ts",
+        "src/shared/projectPath.ts"
+      ],
+      "verdict": "acceptable in reviewed scope",
+      "evidence": "Capture uses contiguous actual display line numbers, handles nested args, and avoids assigning source ranges to declared derived modes. Judge, live snippet grounding, submit freshness, authoring resolver and rejection feedback reads now share realpath containment. Existing successful evidence and new escape cases passed selected tests."
+    },
+    {
+      "group": "Style-repair provenance refresh",
+      "paths": [
+        "src/tools/runtime/handlers/knowledge.ts",
+        "src/tools/runtime/handlers/recipeProductionAdapter.ts",
+        "test/recipe-production-profile-adapter.test.ts"
+      ],
+      "verdict": "acceptable",
+      "evidence": "Re-prepare occurs after repaired authored fields and before the repeated authoring gate; the adopted item and metadata are updated together. Original unsafe-coreCode diagnostic survives subsequent absent-code prepare; raw removed code is not reintroduced. The focused mocked-provider test passed and verifies Core sourceContentHash against the stored final item."
+    },
+    {
+      "group": "Isolated eval gateway",
+      "paths": [
+        "scripts/lib/mining-eval-runtime.mjs",
+        "scripts/eval-mining.mjs"
+      ],
+      "verdict": "acceptable",
+      "evidence": "createOrStage now returns real pending/id/raw shape with the expected result arrays; evaluateReadiness clearly returns not publish-ready. Two-item pure mock probe captured both candidates and returned distinct IDs, pending lifecycle and ready:false."
+    },
+    {
+      "group": "Calibration source receipts",
+      "paths": [
+        "scripts/lib/mining-eval-runtime.mjs",
+        "scripts/eval-judge-calibration.mjs"
+      ],
+      "verdict": "needs-rework",
+      "findings": [
+        "MAINT-03"
+      ],
+      "evidence": "Missing files are now represented as sha256:null/error receipts and realpath escape checks happen before reading bytes; malformed sources shape still regresses the prior guard."
+    },
+    {
+      "group": "Rename codemod",
+      "paths": [
+        "scripts/codemod-rename.mjs"
+      ],
+      "verdict": "needs-rework",
+      "findings": [
+        "MAINT-02"
+      ],
+      "evidence": "Dry-run visibility, ignored generated directories, root-relative map validation, parent directory creation and moved-importer planning are improvements. Actual application still cascades substitutions, demonstrated with two legitimate local imports in a temporary git repo."
+    },
+    {
+      "group": "Clean build",
+      "paths": [
+        "scripts/build-agent.mjs",
+        "package.json"
+      ],
+      "verdict": "needs-rework",
+      "findings": [
+        "MAINT-01"
+      ],
+      "evidence": "Normal temporary-project probe removed stale output, emitted new output, preserved unrelated sentinel, and propagated mocked compiler exit code 7. dist symlink case deleted the target, reproduced on Node 22 and 24."
+    },
+    {
+      "group": "CI gate composition",
+      "paths": [
+        ".github/workflows/ci.yml",
+        "package.json",
+        "scripts/verify-agent-validation-floor.mjs"
+      ],
+      "verdict": "no new blocking defect found by static review",
+      "evidence": "CI still builds local Core first and installs Agent against it; check:ci includes type/lint/boundary/signature/floor/tests/retired-symbol gates. smoke:public-signatures supplies the Agent build, and public import smoke remains a separate CI step. Excluding the real adjacent Alembic consumer from Agent/Core-only CI is explicit and documented; full local check retains it. This agent did not execute a GitHub CI run."
+    },
+    {
+      "group": "README and effects documentation",
+      "paths": [
+        "README.md",
+        "README.zh-CN.md",
+        "docs/entrypoint-effects.md",
+        "config/side-effect-doctrine.json"
+      ],
+      "verdict": "no additional blocking defect in the reviewed current edits",
+      "evidence": "Preset/profile distinctions, removed Adaptive references, evidence tool, assembly throws, host memory/strict wiring, pending/readiness separation and Node build/CI prerequisites better match code. Historical Census claims were deliberately excluded; root is reconciling the current note. Clean-build wording becomes true only after MAINT-01 is fixed."
+    }
+  ],
+  "validation": {
+    "tests": [
+      {
+        "command": "node node_modules/vitest/vitest.mjs run test/recipe-production-profile-adapter.test.ts -t 'refreshes retrieval provenance' --reporter=dot",
+        "result": "1 passed, 25 skipped; no real provider"
+      },
+      {
+        "command": "node node_modules/vitest/vitest.mjs run test/EvidenceCapture.test.ts test/evidence-collector-fidelity.test.ts test/mining-eval-harness.test.ts --reporter=dot",
+        "result": "3 files, 52 tests passed"
+      }
+    ],
+    "probes": [
+      "pure eval gateway and malformed source receipts",
+      "temporary git-root codemod dry-run/apply",
+      "temporary clean-build success/exit propagation",
+      "temporary dist-symlink clean on Node 22.23.2 and Node 24.19.0"
+    ],
+    "networkCalls": 0,
+    "productFilesEdited": false,
+    "temporaryRootsCleaned": true,
+    "limits": "No real API or full CI/host acceptance run. Root owns fixes and final validation. Reports identify code observed before root applies these follow-up fixes."
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "kind": "RuntimeArtifactContentSetManifest",
+  "manifestId": "runtime-artifact-content-sets-recipe-coldstart-production-quality-2026-07-15-v1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "hashMethod": "SHA-256 over sorted workspace-relative path + space + file SHA-256 lines, newline-terminated",
+  "contentSets": [
+    {
+      "artifactId": "prompt-sop-evaluator-bundle",
+      "owners": ["AlembicCore", "AlembicAgent"],
+      "fileCount": 20,
+      "byteSize": 328343,
+      "contentSetHash": "sha256:e25db28c1dfe8508d9315026d0c3deca5340dfa51f0be09d1c929e3a11da43a1",
+      "components": [
+        {"repository": "AlembicAgent", "path": "src/agent/prompts", "gitObjectId": "079eae7253d257b2b59b219ffef43b0e4d38d36a"},
+        {"repository": "AlembicAgent", "path": "src/agent/production/StrictProductionPrompts.ts", "gitObjectId": "ce9b19cfd57e29e06385127b6640c28a4c2840e4"},
+        {"repository": "AlembicAgent", "path": "src/agent/evaluation", "gitObjectId": "6fec60475453685ba7c70795bb7ad2fc31168518"},
+        {"repository": "AlembicAgent", "path": "test/fixtures/mining-eval/golden.json", "gitObjectId": "bbc8e9917c39306b1bf6987f16009ca24bbb988e", "sha256": "f66d0e9d0a693c0f4a70869207ff58d0a5425d1c86b8a7b2fcbc4aac36f2b446"},
+        {"repository": "AlembicAgent", "path": "test/fixtures/strict-production/golden.json", "gitObjectId": "6addba2b7a02b0f0337d1af65f15ba9acb86357b", "sha256": "90329055f7792e8ac7cb5252ee218a0cec0d1ca93686fa789623ebefeb421bac"},
+        {"repository": "AlembicCore", "path": "src/domain/dimension/DimensionSop.ts", "gitObjectId": "f834928a4cd2c047caa886b424d91f5c10436eb5"}
+      ],
+      "compatibility": "Bound to core-package-dist and agent-package-dist at 0.3.0; production prompts/evaluators load from Agent dist, SOP from Core dist, and goldens remain immutable acceptance fixtures."
+    },
+    {
+      "artifactId": "fact-query-pack-code-fact-backends",
+      "owners": ["AlembicCore"],
+      "fileCount": 47,
+      "byteSize": 19579408,
+      "contentSetHash": "sha256:ac6ff61dd475718e22df73ce565b57a361a4c274c4f06b34e31a4b3b0d1937e8",
+      "components": [
+        {"path": "src/service/plan/facts", "gitObjectId": "373da6a0f03503935484e618635d039fa06b0be6"},
+        {"path": "src/core/ast", "gitObjectId": "9e764e590a0b99d8f1d5deab0f38bf13fa8b8a52"},
+        {"path": "src/core/discovery/parsers", "gitObjectId": "41892edcf9f331575c0a44536b20822509111da2"},
+        {"path": "resources/grammars", "gitObjectId": "80d75846796be62d49d7bd593c4a7cb30962a480"},
+        {"path": "src/service/project-context/foundation/canonical.ts", "gitObjectId": "b2354aa161ec8ab27b05cba5e55fce2e7c6149df"},
+        {"path": "src/service/source-graph/SourceGraphQueryService.ts", "gitObjectId": "1d3dc5b5d5cf2a47fbb3d4acd105de56baf0d9d3"},
+        {"path": "src/service/plan/intent", "gitObjectId": "4423cbd1f0d4c8feaffa910d4ffe4ce4e7aa7fcb"},
+        {"path": "src/service/production/StrictAnalysisContracts.ts", "gitObjectId": "8fa7351910c4770c0e281ddf4f508ea94bc29006"},
+        {"path": "src/service/production/ProductionPersistenceContracts.ts", "gitObjectId": "568e1a06ca763da70177cd8e7c2e42f7efe2c5d9"}
+      ],
+      "fixtureCoverage": ["positive", "negative", "edge", "counterexample", "canonicalizer"],
+      "applicability": "Only parsers/grammars shipped in the exact Core package are supported; no unlisted backend or repository is inferred.",
+      "compatibility": "Loaded/executed by the exact Alembic runtime release; its package and embedded Core dist hashes must match the Core artifact."
+    },
+    {
+      "artifactId": "migration-bundle",
+      "owners": ["AlembicCore", "Alembic"],
+      "fileCount": 14,
+      "byteSize": 35740,
+      "contentSetHash": "sha256:24d1f06498844b0cf276def6ec5698af5af7c20f3ff2b5525e083af4460945ff",
+      "components": [
+        {"repository": "AlembicCore", "path": "src/infrastructure/database/migrations", "gitObjectId": "a26907872e8018130ac520a78da000098cfadfe7"}
+      ],
+      "orderedVersions": [1, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17],
+      "compatibility": "Core owns ordered migrations; Alembic loads the bundled Core copy. Migration 017 is required."
+    },
+    {
+      "artifactId": "vector-adapter",
+      "owners": ["AlembicCore", "Alembic", "AlembicPlugin"],
+      "fileCount": 37,
+      "byteSize": 369718,
+      "contentSetHash": "sha256:eaa079ac48de09da5c400ed8a26d7a3faf4f8adceb60af5f19eef44bc3162249",
+      "components": [
+        {"repository": "AlembicCore", "path": "src/infrastructure/vector", "gitObjectId": "6894bc659b92211a98daef60bf48bbf7b4d33f8a"},
+        {"repository": "AlembicCore", "path": "src/service/vector", "gitObjectId": "1eff8205b2662d80fe48de3e96cd451e4de98101"},
+        {"repository": "Alembic", "path": "lib/service/vector", "gitObjectId": "726d1b9b558d7e06f3cb2c950a94f7a554a14fb9"},
+        {"repository": "Alembic", "path": "lib/recipe-pipeline/generate/execution/consumers/RecipeVectorGenerationConsumer.ts", "gitObjectId": "03938773f0282d546c9cbfd8b887fabfc55c817d"},
+        {"repository": "AlembicPlugin", "path": "lib/recipe-pipeline/vector", "gitObjectId": "9f5c9e5780c3da5ff91b270436f5069728042a17"},
+        {"repository": "AlembicPlugin", "path": "lib/host-runtime/mcp/host/read-only-hnsw-vector-reader.ts", "gitObjectId": "3cd1c728e74d1286515ea5c021beeb6f745c92b0"},
+        {"repository": "AlembicPlugin", "path": "lib/host-runtime/mcp/host/read-only-json-vector-reader.ts", "gitObjectId": "6244619a19ff36dbf62fe947a2c9045061ba2ce6"}
+      ],
+      "compatibility": "Core manager/contracts, Main generation/runtime and Plugin public readers are fixed owners. Effective provider/model/dimensions/store are supplied by the sanitized RuntimeConfigLoadReceiptV1, not guessed here."
+    }
+  ],
+  "manifestHash": "sha256:ac5e2be36b11420e94579ba7a5a8bd81440bc8b4d21e556f0090f684c33ddf81"
+}

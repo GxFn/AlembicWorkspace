@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+  "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p13-core-canonical-retrieval-stability-refill-t1",
+  "status": "completed",
+  "summary": "AlembicCore commit 10e43a66fac8748b1da176844bd77505aa949b0e preserves the accepted 0fff37d stability-refill algorithm and repairs the q7/q8 legacy sparse-production regression. Canonical Recipe documents now expose intent/boundary/support roles to SearchEngine; FieldWeightedScorer grants existing trigger-level priority only to tokens corroborated by at least two roles, preventing flattened title/directive repetition from dominating evidence-grounded module/package boundaries. RED reproduced both competitor families at public producer/search seams; GREEN passes. Exact linked-Core copy-only BiliDili runtime ranks are [1,1,1,1,1,1,2,2], every target carries dense+sparse+RRF evidence, q1-q6 do not regress, and protected live DB/WAL/SHM/config/vector/recipes remain unchanged. This does not claim final Plugin/public MCP acceptance.",
+  "evidenceRefs": [
+    "AlembicCore commit 10e43a66fac8748b1da176844bd77505aa949b0e parent 0fff37dbbb8bd311bc99b455bbc9a22431b063bb",
+    "/private/tmp/alembic-p13-rework-copy-only-eight-query.json",
+    "AlembicCore/src/service/knowledge/RecipeRetrieval.ts",
+    "AlembicCore/src/service/search/FieldWeightedScorer.ts",
+    "AlembicCore/src/service/search/SearchEngine.ts",
+    "AlembicCore/test/RecipeRetrievalProduction.test.ts",
+    "AlembicCore/test/SearchEngine.test.ts"
+  ],
+  "verification": [
+    "RED: npx vitest run test/SearchEngine.test.ts -t 'ranks legacy' => 2 failed; both target indices were 3 while Top-3 required index < 3.",
+    "GREEN focused: npx vitest run test/SearchEngine.test.ts test/RecipeRetrievalProduction.test.ts test/KnowledgeRetrievalPolicy.test.ts => 3 files / 81 tests passed.",
+    "Full: npm run test => 184 files / 1751 tests passed; npm run build:check passed; npm run lint passed.",
+    "Boundary: CoreDeliveryBoundary + CoreToolSystemBoundary + CoreCodexBoundary + CorePackage => 4 files / 22 tests passed.",
+    "Public/structure gates through npm run check passed until inherited src/infrastructure/vector/ASTChunker.ts:32 doctrine violation; lint:naming and lint:retired-symbols passed separately.",
+    "Copy-only report sha256 7f9f70c6216fd07966314127f139dbdf2ca355d80c222379f8930dd79c49d040; target ranks [1,1,1,1,1,1,2,2]; raw dense/sparse/RRF present; protected roots equal.",
+    "git status --short is empty at 10e43a66fac8748b1da176844bd77505aa949b0e."
+  ],
+  "risks": [
+    "npm run check still stops at the inherited untouched ASTChunker.ts:32 Doctrine violation; all gates before it pass and remaining naming/test/lint/retired-symbol gates were run separately.",
+    "Final Plugin rebuild/Search-Prime parity acceptance remains a controller/Plugin integration step; this Core result only proves the assigned Core and copy-only canonical retrieval boundary."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "10e43a66fac8748b1da176844bd77505aa949b0e",
+      "verify": "single rework commit with parent 0fff37dbbb8bd311bc99b455bbc9a22431b063bb; accepted stability commit preserved"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "Legacy sparse serialization repeated intent text, but tokenize() deduplicates all tokens; role weight was therefore a no-op while raw title/trigger/tags retained high weight. q7/q8 remained dense rank 1 but sparse ranks 28/9.",
+      "verify": "reviewed RecipeRetrieval serializer, FieldWeightedScorer token Set behavior, SearchEngine meta path, and copy-only corpus component scores"
+    },
+    {
+      "kind": "red-green",
+      "value": "Two generic corpus-shaped fixtures cover SwiftPM/package independence and direct feature import/AppModule competitors. RED target index 3 in both; GREEN both Top-3 without query/UUID/title branches.",
+      "verify": "npx vitest run test/SearchEngine.test.ts -t 'ranks legacy'"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/SearchEngine.test.ts",
+      "verify": "focused 81/81; full 1751/1751; boundary 22/22; build:check/lint/naming/retired-symbol gates pass"
+    },
+    {
+      "kind": "real-probe",
+      "ref": "/private/tmp/alembic-p13-rework-copy-only-eight-query.json",
+      "verify": "sha256 7f9f70c6216fd07966314127f139dbdf2ca355d80c222379f8930dd79c49d040; exact Core 10e43a66; ranks [1,1,1,1,1,1,2,2]; protected roots unchanged"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: scope limited to Core Recipe projector/sparse scorer and tests; 0fff refill, alpha/rrfK/windows/budgets, queries, data and outer repos untouched. Stage 2: corroboration needs two canonical roles, support/dense facts remain intact, original metadata and filters remain compatible, plural normalization reuses existing schema-wide logic, runtime remains bounded.",
+      "verify": "git diff 0fff37d..10e43a6, full gates, real copy-only probe"
+    },
+    {
+      "kind": "scope-diff",
+      "value": "5 Core files changed: RecipeRetrieval projector contract, FieldWeightedScorer role consumption, SearchEngine meta wiring, and two test files; no other repository or data writes.",
+      "verify": "git show --stat 10e43a66fac8748b1da176844bd77505aa949b0e"
+    },
+    {
+      "kind": "runtime-provenance",
+      "ref": "/private/tmp/alembic-p13-rework-copy-only-eight-query.json",
+      "verify": "Plugin bdcb3de linked @alembic/core realpath to Core 10e43a66; executeReadOnlySearch per-request snapshots with readonly SQLite/query_only and read-only HNSW; exact qwen fixture hashes recorded"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p13-core-canonical-retrieval-stability-refill-rework1-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p13-core-canonical-retrieval-stability-refill-rework1-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1.json",
+    "deliveryRunId": "run-delivery-p13-core-canonical-retrieval-stability-refill-rework1-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1",
+    "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p13-core-canonical-retrieval-stability-refill-rework1-p1__AlembicCore__p13-core-canonical-retrieval-stability-refill-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 84,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+    "targetTaskId": "p13-core-canonical-retrieval-stability-refill-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-rework1-p1",
+    "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+    "createdAt": "2026-07-14T00:11:28.239Z"
+  },
+  "createdAt": "2026-07-14T00:11:28.239Z",
+  "stateRevisionObserved": 84,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 3,
+  "supersedes": {
+    "resultId": "tr-p13-core-canonical-retrieval-stability-refill-t1",
+    "dispatchGroup": "p13-core-canonical-retrieval-stability-refill-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p13-core-canonical-retrieval-stability-refill-t1__p13-core-canonical-retrieval-stability-refill-p1__current-r0002.json"
+  }
+}

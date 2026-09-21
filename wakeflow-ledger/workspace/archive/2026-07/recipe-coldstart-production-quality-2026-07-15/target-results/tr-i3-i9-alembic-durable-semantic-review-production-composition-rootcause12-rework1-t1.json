@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1",
+  "dispatchGroup": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1",
+  "status": "completed",
+  "summary": "Alembic Main trust-root rework completed in one exact-base commit: partial custody can no longer self-authorize, unsafe registry modes and symlinked parent chains fail closed, and the real V5 15-receipt/8-group Facade recovery remains complete without remint or reviewer replay.",
+  "evidenceRefs": [
+    "commit:044c952e4a0bf3e82d1d8484f914725676bfc5aa",
+    "tree:c0043ba368c21f18fa3d7450dc96d2f1f6f87fae",
+    "parent:e8610b504498cd85cb06a4e31fb48e5dfe84f005",
+    "guard:guard-public-ms57t3nc-1",
+    "alembic-finish:finish-public-ms57vfi3-1",
+    "wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1/execution-plan.md",
+    "lib/infrastructure/config/SemanticReviewTrustStore.ts",
+    "test/unit/SemanticReviewTrustStore.test.ts",
+    "test/integration/StrictRecipePipelineFacade.integration.test.ts"
+  ],
+  "verification": [
+    "Focused suite passed: 4 files, 39 tests",
+    "npm run build and npm run build:check passed; post-commit build:check passed",
+    "Built dist registry-delete probe: POLICY_REGISTRY_MISSING, registryRecreated=false, keyUnchanged=true",
+    "Built dist registry-mode-0666 probe: TRUST_FILE_INVALID, accepted=false",
+    "Built dist parent-symlink probe: data-root/.asd/custody all CUSTODY_PATH_INVALID with zero outside writes",
+    "Built two-process public-policy recovery: samePolicyHash=true, custodyBytesUnchanged=true, no private-key read required",
+    "npm run check passed: unit 1203; integration 480 + 10 skipped; coverage 11; all repository guards green",
+    "npm test passed: 1705 + 10 skipped",
+    "Shared-asset drift passed: 17 checks, 0 drift, 0 pending sync",
+    "Alembic Guard guard-public-ms57t3nc-1 passed: 3 files, 0 violations",
+    "Exact parent/head/tree and clean Main/Core/Agent/Plugin checks passed"
+  ],
+  "risks": [
+    "No remaining task-scope risk. npm run lint still reports the same five pre-existing noExplicitAny warnings in AgentRunProjections.ts and handler-runtime.ts; neither file is in this commit."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "044c952e4a0bf3e82d1d8484f914725676bfc5aa",
+      "ref": "tree:c0043ba368c21f18fa3d7450dc96d2f1f6f87fae",
+      "verify": "One clean Alembic Main commit with exact parent e8610b504498cd85cb06a4e31fb48e5dfe84f005. Exactly three Main files changed. Core c0a6633d9570178494cb208b42a268f2f3899911 and Agent a882f61cad34eed873db5ac52870475e6d71da52 remained exact and clean; Plugin stayed clean."
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1/execution-plan.md",
+      "verify": "Documents the three controller causes: registry-null alone misclassified partial custody as bootstrap, a zero registry permission mask accepted 0666, and recursive mkdir plus leaf-only lstat followed ancestor symlinks. Maps them to pair-state classification, 0o022 rejection/O_NOFOLLOW, and component-wise non-symlink plus realpath confinement. V5 group/attestation production code is untouched."
+    },
+    {
+      "kind": "negative-probe",
+      "ref": "test/unit/SemanticReviewTrustStore.test.ts",
+      "verify": "RED then GREEN covers registry deletion without recreation or key mutation, expected-policy empty-root refusal before artifacts, registry 0666 refusal, configured data-root/.asd/custody symlinks with zero outside writes, and preserves existing missing/unsafe key, rotation, registry tamper, replacement/self-authorization, and revoked enrollment coverage. Built dist probes reproduce all three controller cases fail-closed."
+    },
+    {
+      "kind": "runtime-fixture",
+      "ref": "test/integration/StrictRecipePipelineFacade.integration.test.ts",
+      "verify": "Real RecipePipelineFacade/StrictColdStartOrchestrator remains FINALIZED with five consumed V5 records; each record has one physical Ledger/witness root, complete 15-receipt/8-Core-group union including multi-scale reuse, one load, one witness resolution, and one provider invocation. Registry deletion during PUBLIC_CAS_PREPARED recovery fails without remint or replay; restoring the same registry recovers and replays with invocation count fixed at five."
+    },
+    {
+      "kind": "boundary",
+      "ref": "lib/infrastructure/config/SemanticReviewTrustStore.ts",
+      "verify": "Uses only existing Main host dataRoot/.asd/semantic-review-trust. No second authority, journal, in-memory sentinel, fallback, task-provided key/policy, V5 regrouping, sibling/vendor/Test/Wakeflow change, or outside-root write. Parent chain is non-symlink and exact realpath-confined before trust I/O."
+    },
+    {
+      "kind": "command",
+      "ref": "guard:guard-public-ms57t3nc-1",
+      "verify": "Focused 4 files/39 tests; build and build:check; built registry-delete/0666/three-parent-symlink/two-process recovery probes; npm run check unit 1203, integration 480 + 10 skipped, coverage 11 plus all import/layer/ring/retired/naming/shared guards; npm test 1705 + 10 skipped; diff/head/sibling/clean checks; Guard 3 files/0 violations."
+    },
+    {
+      "kind": "test-first",
+      "ref": "wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1/execution-plan.md",
+      "verify": "Accepted baseline passed 21 tests. First RED had 4 failures across the three controller defects; security-review RED then caught expected-policy empty-root key creation. Final unit matrix passed 9/9."
+    },
+    {
+      "kind": "self-review",
+      "ref": "wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1/execution-plan.md",
+      "verify": "Two stages completed: package compliance against every controller finding, then security/code-quality review of durable pair state, permissions, O_NOFOLLOW, parent confinement, recovery, compatibility, counts, and scope. No task-scope findings remain."
+    },
+    {
+      "kind": "compatibility",
+      "ref": "test/integration/StrictRecipePipelineFacade.integration.test.ts",
+      "verify": "Existing V5 selection, canonical group order, serialization, attestation lineage, Core consumption, G3/G4, serving validation, and public CAS assertions remain unchanged and green. Exact counts remain 15 receipts, 8 groups, 5 loads/resolutions/invocations."
+    },
+    {
+      "kind": "guard",
+      "ref": "guard:guard-public-ms57t3nc-1",
+      "verify": "Alembic Guard reviewed all three changed Main files and passed with 0 violations."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1__Alembic__i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1__Alembic__i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1__Alembic__i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1",
+    "dispatchGroup": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1__Alembic__i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 302,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1",
+    "targetTaskId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1",
+    "resultId": "tr-i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1",
+    "createdAt": "2026-07-28T22:18:34.093Z"
+  },
+  "createdAt": "2026-07-28T22:18:34.093Z",
+  "stateRevisionObserved": 302,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

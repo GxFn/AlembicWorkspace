@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "rollback-strict-test-agent-p1",
+  "demandKey": "strict-test-split-removal-2026-08-03",
+  "summary": "移除 Agent 中被否决的 strict-test-dimension receipt 与执行集成",
+  "status": "pending",
+  "sourceRef": null,
+  "contextVersion": 1,
+  "workType": "implementation",
+  "objective": "在 Alembic Main 回滚被接受后，精确逆向 AlembicAgent 的 strict-test-dimension authority、same-run receipt、runtime binding、prompt scope、公共导出、探针和 fixtures/tests，同时保留普通 Agent 生产管线。",
+  "contextSummary": [
+    "控制器已在干净临时克隆中按顺序模拟回滚 8688311、4a2649f、077f4f6、7dfb4ba，无冲突且 git diff --check 通过。",
+    "必须保留交错的 Wakeflow 指令刷新提交 248d1ed；只删除产品分叉提交。",
+    "当前 AlembicAgent 基线为 8688311c3970054c68a74b0ce30d8f3db4f15be6。"
+  ],
+  "requirementRefs": [
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#user-decision",
+      "role": "goal",
+      "label": "用户否决与删除授权"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#verified-rollback-authority",
+      "role": "evidence",
+      "label": "提交归因与无冲突回滚模拟"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#dependency-order",
+      "role": "constraint",
+      "label": "消费者优先的回滚顺序"
+    },
+    {
+      "ref": "wakeflow-ledger/AlembicWorkspace/strict-test-split-removal-2026-08-03/rollback-decision.md#completion-definition",
+      "role": "completion",
+      "label": "纯删除验收定义"
+    }
+  ],
+  "boundaries": {
+    "inScope": [
+      "按顺序 revert 8688311c3970054c68a74b0ce30d8f3db4f15be6、4a2649f0d758a43f0884af5377c8b8531eed0b41、077f4f6f08da731a40547c90f085460f434087f1、7dfb4bada72d78a5bc9e65cafa54574cb36ae698",
+      "删除 dedicated strict-test authority、same-run execution receipt、runtime/service binding、prompt scope、public export、probe、fixtures/tests",
+      "运行 Agent 全量检查与公共 API/包脚本零残留扫描"
+    ],
+    "outOfScope": [
+      "Alembic Main、Dashboard、Core、Plugin 代码",
+      "正确测试模式设计或 DaemonJob/legacy 调整",
+      "普通 Agent pipeline 的功能变更"
+    ],
+    "forbidden": [
+      "设计或实现替代测试模式",
+      "恢复 legacy bootstrap、ALEMBIC_TEST_MODE、Plugin testMode 或 DaemonJob 路径",
+      "把历史 Wakeflow 证据改写成已接受或已完成",
+      "修改本任务包未列出的其他仓库",
+      "回滚 248d1ed 或其他 Wakeflow/AGENTS/CLAUDE 文档刷新",
+      "删除或弱化与被否决分叉无关的普通生产 Agent 行为"
+    ]
+  },
+  "completionExpectations": [
+    "提交四个提交的精确回滚，列出新 commit SHA 与原 SHA 对应关系。",
+    "报告全量检查、公共表面零残留扫描与普通生产管线测试证据。",
+    "提供干净工作树并确认 248d1ed/规则文档未回滚。"
+  ],
+  "dependsOnTaskIds": [
+    "rollback-strict-test-main-t1"
+  ],
+  "commitExpectation": "commit",
+  "acceptanceAnchors": [
+    {
+      "id": "agent-exact-revert-lineage",
+      "claim": "四个产品提交被精确逆向，交错文档提交保留",
+      "probe": "审查 revert commit、父链、git show --name-status，并确认 248d1ed 内容仍在",
+      "expected": "只有指定产品分叉逆向差异；规则文档和无关提交不变"
+    },
+    {
+      "id": "agent-strict-receipt-lane-absent",
+      "claim": "Agent 不再暴露或生成独立 strict-test-dimension receipt 执行链",
+      "probe": "扫描 public API、contract、AgentService/RuntimeBuilder/PipelineStrategy、prompt stage、probe/package script、fixtures/tests",
+      "expected": "专用 authority/receipt/runtime binding/探针/测试零残留且类型检查通过"
+    },
+    {
+      "id": "agent-production-preserved",
+      "claim": "普通 Agent 生产执行管线保持完整",
+      "probe": "运行仓库 full check 及覆盖 AgentService 和 production pipeline 的现有测试",
+      "expected": "全量检查通过，非 strict-test-dimension 行为没有回归"
+    }
+  ],
+  "createdAt": "2026-08-03T14:46:34.209Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "rollback-strict-test-agent-t1",
+      "taskPackageId": "rollback-strict-test-agent-p1",
+      "targetWindow": "AlembicAgent",
+      "summary": "移除 Agent 中被否决的 strict-test-dimension receipt 与执行集成",
+      "status": "pending",
+      "createdAt": "2026-08-03T14:46:34.209Z",
+      "dependsOnTaskIds": [
+        "rollback-strict-test-main-t1"
+      ]
+    }
+  ]
+}

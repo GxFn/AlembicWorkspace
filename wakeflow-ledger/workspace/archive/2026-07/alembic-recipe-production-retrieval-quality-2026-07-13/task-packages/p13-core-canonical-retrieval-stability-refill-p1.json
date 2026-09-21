@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "Continue the same confirmed Recipe production/retrieval-quality demand after controller review accepted the Plugin-owned Prime projection fix but preserved the unmet q2 Top3 gate.\n\nAccepted upstream evidence:\n- AlembicPlugin commit bdcb3de1d6aa35732a141cbd699b4007b6bbafa6 fixes oversized Prime detail summaries and returns a strict Prime-shaped fallback. Controller reviewed the three-file diff and reran AgentPublicToolsContract 6/6.\n- AlembicCore baseline is clean at 5106e8a9f47a12a52614d77cb5e3908462a4a49c.\n- Fresh BiliDili public Search/Prime evidence remains q2 target rank 8 with sparseRank=3 and no dense contribution; target Recipe is <redacted>.\n- Exhaustive read-only vector inspection found the target's best dense region at raw vector rank 42 / unique Recipe rank 17.\n- Plugin createReadOnlySearchContainer supplies the real read-only HNSW reader and sparse retriever directly to Core HybridCandidateRetriever; it performs no second rerank.\n- Core KnowledgeRetrievalPolicy starts at max(32, topK*4) and currently stops as soon as the projected live Recipe count reaches topK, even when both lanes are not exhausted and missing evidence beyond the current raw window can still change RRF membership/order. For q2 limit=8, the initial window 32 therefore excludes the target's dense evidence and returns the unstable rank 8.\n\nRequired Core repair:\n1. Replace the \"candidate count >= topK\" early stop with a principled, bounded stability/refill decision. Continue lane collection when unseen dense/sparse evidence could still move a current or unseen Recipe into Top-K; stop only when Top-K membership/order is defensibly stable, both lanes/index are exhausted, or the configured candidate budget is reached with an explicit diagnostic.\n2. Preserve authoritative Recipe truth lookup, lifecycle/filter/orphan handling, per-Recipe region aggregation, raw dense/sparse ranks and similarities, RRF contributions, abort propagation, Search/Prime shared ordering, sparse-only degradation, and the existing max candidate budget.\n3. The fix must be algorithmic and schema-wide. Do not merely raise initialCandidateWindow/maxCandidateBudget, tune alpha/rrfK, add target/query/title/UUID/synonym branches, edit Recipe/profile/vector data, add query-time writes/maintenance, or leak provider/Plugin/Alembic host concerns into Core.\n4. Keep public interfaces compatible unless a minimal diagnostic field is necessary; any new field must be consumed by real callers/tests in this package.\n\nRequired RED/GREEN:\n- Reproduce the real failure shape at the Core seam: topK=8, target sparse rank 3, target dense raw rank 42 with duplicate regions aggregating to a later unique-Recipe rank, at least eight live Recipes already present within window 32. RED must show the current premature stop/rank 8; GREEN must refill and place the target Top3 without special casing.\n- Cover stability-aware early stop, refill to the next window, both-lane exhaustion, candidate-budget exhaustion diagnostics, missing-lane evidence upper bounds, duplicate regions, orphan/deprecated truth filtering, sparse-only fallback, and AbortSignal.\n- Preserve the frozen eight-query BiliDili-style fixture and AlembicWorkspace control fixtures without rewriting expected queries after the fix.\n\nRuntime evidence:\n- Run a read-only/copy-only BiliDili canonical retrieval probe using copied DB/vector/config artifacts, report all eight target ranks and raw dense/sparse/RRF evidence, and fingerprint the protected live roots before/after. Never open a write-capable service on the real knowledge root and do not modify real DB/WAL/SHM/config/vector/recipes.\n- Do not claim final public MCP acceptance; after Core is accepted, the controller will send one Plugin integration package to rebuild against the exact Core commit and rerun the fresh-process Search/Prime matrix.\n\nRepository gates:\n- Commit only AlembicCore with exact parent 5106e8a9f47a12a52614d77cb5e3908462a4a49c.\n- Run focused retrieval/vector tests plus all AlembicCore test/check/build/public-surface gates required by AlembicCore/AGENTS.md.\n- Provide exact changed symbols, RED/GREEN output, runtime probe output, clean status, and two-stage self-review (requirement compliance, then correctness/failure/performance/scope).\n- No Plugin/Alembic/Agent/Dashboard/Test/Wakeflow/vendor/release/data edits and no Test window.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "Preserve the shared read-only Recipe candidate truth and raw lane evidence while making bounded refill stop on defensible ranking stability or exhaustion, not merely because the current projection already contains topK live Recipes.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "clean AlembicCore commit with exact parent 5106e8a9f47a12a52614d77cb5e3908462a4a49c"
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "trace unstable early stop from raw lane window through truth aggregation/RRF and explain the general stability criterion"
+      },
+      {
+        "kind": "red-green",
+        "verify": "same focused Core fixture fails before and passes after the refill/stability repair"
+      },
+      {
+        "kind": "tests",
+        "verify": "focused retrieval/vector plus full Core repository gates"
+      },
+      {
+        "kind": "real-probe",
+        "verify": "copy-only BiliDili eight-query canonical retrieval report with raw lanes and protected live fingerprints"
+      },
+      {
+        "kind": "self-review",
+        "verify": "requirement compliance and separate correctness/failure/performance/scope review"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "runtime-provenance"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T23:04:22.891Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p13-core-canonical-retrieval-stability-refill-t1",
+      "taskPackageId": "p13-core-canonical-retrieval-stability-refill-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Repair Core canonical hybrid retrieval so bounded refill continues when unseen lane evidence can still change Top-K membership/order, then prove q2 and protected matrices without query/data hardcoding.",
+      "status": "pending",
+      "createdAt": "2026-07-13T23:04:22.891Z"
+    }
+  ]
+}

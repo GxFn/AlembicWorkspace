@@ -1,0 +1,56 @@
+[
+  {
+    "label": "build",
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "exitCode": 0,
+    "log": "build.log"
+  },
+  {
+    "label": "coverage-entry-tests",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "test/CoverageLedgerRepository.test.ts",
+      "test/CoverageLedgerWriteWorkflow.test.ts",
+      "--maxWorkers=2"
+    ],
+    "exitCode": 0,
+    "log": "coverage-entry-tests.log"
+  },
+  {
+    "label": "public-api",
+    "command": [
+      "npm",
+      "run",
+      "lint:public-api-boundary"
+    ],
+    "exitCode": 0,
+    "log": "public-api.log"
+  },
+  {
+    "label": "changed-lint",
+    "command": [
+      "node",
+      "node_modules/@biomejs/biome/bin/biome",
+      "check",
+      "src/repository/coverage/index.ts"
+    ],
+    "exitCode": 0,
+    "log": "changed-lint.log"
+  },
+  {
+    "label": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "diff-check.log"
+  }
+]

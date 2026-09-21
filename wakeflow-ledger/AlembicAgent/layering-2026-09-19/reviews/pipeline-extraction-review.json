@@ -1,0 +1,454 @@
+{
+  "title": "ToolExecutionPipeline 拆分后 spec + quality 双轮只读复审",
+  "date": "2026-09-20",
+  "scope": {
+    "files": 10,
+    "sourceLines": 1417,
+    "baselineCommit": "0caa65cddb6e4190db4488026509c76a90609340",
+    "priorValidatedBaseline": "1b394ce",
+    "mode": "bounded-read-only",
+    "excluded": [
+      "不修改产品代码或配置",
+      "不提交",
+      "不新增缓存策略",
+      "不运行重型测试或全量check",
+      "不复审并行中的 layer-contract scanner 实现"
+    ]
+  },
+  "summary": {
+    "specReview": "pass",
+    "qualityReview": "pass",
+    "actionableFindings": 0,
+    "blockingFindings": 0,
+    "conclusion": "本次拆分的函数归属、依赖方向、引用身份、默认顺序及公开入口符合已确认设计；未发现新增回归或未闭合问题。"
+  },
+  "files": [
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/accessGates.ts",
+      "reviewedFullText": true,
+      "lineCount": 174,
+      "sha256": "a6379ca62a4089eaac54253a484f581da6b6b5f23a39521b7f59fdb0e423145a",
+      "role": "通用 capability/action 白名单、参数字节上限、安全策略与 terminal 命令权限；均先于缓存和 host。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/callNormalization.ts",
+      "reviewedFullText": true,
+      "lineCount": 49,
+      "sha256": "0ce7354f08782d90b0d6ca67e256b3495ba0cf3f128643433908c3d6d03bd4af",
+      "role": "共享 action/params 读取与唯一 note_finding→memory 转换；不拥有执行或策略。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/contracts.ts",
+      "reviewedFullText": true,
+      "lineCount": 88,
+      "sha256": "a77ff7674e21bee78580e9e2e93ff28672f30c76c71f0e96526990e7f9d1052c",
+      "role": "仅类型：内部窄端口、公开完整 context 默认、middleware/executor contracts、公共 metadata 的内部扩展。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/duplicateCache.ts",
+      "reviewedFullText": true,
+      "lineCount": 190,
+      "sha256": "93d0c97b10eaf010c4b8ded81df1e906d1575da008cfd82be044638f88516550",
+      "role": "只读 snapshot 缓存准入/键/克隆/复用；保存已独立提交的失败不准入修复。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+      "reviewedFullText": true,
+      "lineCount": 83,
+      "sha256": "566b07bf531fe2a8d3ab768a85d9587c718e0c72d936c005d8651e98e11c07f7",
+      "role": "正序 before→executor→after 和一次效率记录；executor 注入，没有运行时 import。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/observations.ts",
+      "reviewedFullText": true,
+      "lineCount": 155,
+      "sha256": "e88a514c3e9cd1c9bbb07b5227710f30a1a21ed3dc15c393c4047bb19bc96d11",
+      "role": "evidence 标注→memory→tracker→trace 的观察处理及未默认启用的 progress/eventBus 兼容中间件。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/phaseGates.ts",
+      "reviewedFullText": true,
+      "lineCount": 211,
+      "sha256": "2ea0db99758e663fffab8d5850aad83db105a25626ebd6230cca500e3c14ddf6",
+      "role": "Evolution、record repair、Analyst VERIFY、Producer PRODUCE/SUMMARIZE 动作规则。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+      "reviewedFullText": true,
+      "lineCount": 152,
+      "sha256": "d965c93218955e996fabf7aac9a0b91af46467ca0a1071f299de1ede20e7915e",
+      "role": "唯一 host ToolCallRequest 投影与 router 调用；保留共享引用、envelope、耗时和错误归一化。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/submissionLedger.ts",
+      "reviewedFullText": true,
+      "lineCount": 238,
+      "sha256": "8d72c72bae6f2f9b5540823954c7faef73c1e874a37b32a0ae83f5563ca1e755",
+      "role": "只对真实持久化提交登记 sets 与 producer ledger；不越过 Gateway 执行提交或权限判断。",
+      "spec": "pass",
+      "quality": "pass"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+      "reviewedFullText": true,
+      "lineCount": 77,
+      "sha256": "108f6f1bff741cdf46b783d44c013b5dd3a8f6498267937bdb7a353dae54c9a4",
+      "role": "保留公开 class 的私有注册表/use/execute；注入真实 bridge executor；13 个默认中间件装配与原符号 re-export。",
+      "spec": "pass",
+      "quality": "pass"
+    }
+  ],
+  "specReview": [
+    {
+      "id": "SPEC-01",
+      "topic": "实际能力完整迁移",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 47
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+          "line": 61
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+          "line": 31
+        }
+      ],
+      "detail": "入口依然拥有 registry/use/execute，engine 真实运行所有生命周期，bridge 真实调用 toolRouter.execute。没有把 runtime/tools 改为空壳。"
+    },
+    {
+      "id": "SPEC-02",
+      "topic": "逐函数迁移等价",
+      "result": "pass",
+      "detail": "独立 git show 0caa65c 原文件后进行 TypeScript 擦除与 AST 打印，移除 export 修饰差异：60/60 个原运行时函数/变量声明实现一致；没有依赖 root 报告的 hashes 直接下结论。class execute 的注入化额外由源码、生命周期测试和本次引用探针验证。",
+      "referenceArtifact": "../../../AlembicAgent/tmp/layering-2026-09-19/relocation-equivalence.json"
+    },
+    {
+      "id": "SPEC-03",
+      "topic": "职责分组",
+      "result": "pass",
+      "detail": "accessGates 与 phaseGates 分离通用访问边界和场景阶段规则，callNormalization 供 gates/cache/bridge 复用，cache 与 producer 分别拥有其 sharedState 字段类型，observers 保留真实证据/记忆/信号调用。"
+    },
+    {
+      "id": "SPEC-04",
+      "topic": "公开 class 与导出兼容",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 30
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 47
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/index.ts",
+          "line": 153
+        }
+      ],
+      "detail": "独立 AST 提取原/新入口导出名单，16 个值导出完全相同；runtime barrel 仍从旧路径 re-export。零参数 class、私有 registry、链式 use 的 this 返回以及 execute(call,context) 形状保持。未添加 package subpath。"
+    },
+    {
+      "id": "SPEC-05",
+      "topic": "公开完整上下文与 metadata 单源",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/contracts.ts",
+          "line": 54
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/contracts.ts",
+          "line": 61
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/contracts.ts",
+          "line": 71
+        },
+        {
+          "path": "../../../AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 103
+        }
+      ],
+      "detail": "ToolExecContext 仍是完整 AgentRuntime/LoopContext；ToolMiddleware 默认 Context 是该完整类型，公共 use 不把用户回调的 runtime.abort/reactLoop 与 loop.prompt 收窄掉。内部 helpers 使用 Pick 窄端口。ToolMetadata extends AgentRuntimeTypes 的原公开类型，仅增加 cacheKey。"
+    },
+    {
+      "id": "SPEC-06",
+      "topic": "默认中间件与 after 顺序",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 62
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+          "line": 23
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+          "line": 48
+        }
+      ],
+      "detail": "13 项注册顺序与 baseline factory AST 相同；gates 先于 cache；cache snapshot 先于 evidence；evidence→memory→tracker→trace→submit 保留。before 短路后所有 after 仍正序执行，falsey 结果不误判。"
+    },
+    {
+      "id": "SPEC-07",
+      "topic": "真实消费者兼容",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+          "line": 1465
+        },
+        {
+          "path": "../../../AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 926
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/LLMInputAssembly.ts",
+          "line": 418
+        }
+      ],
+      "detail": "AgentRuntime 调用与结果消费未改；handler 所需共享 _sessionCounters 引用和 producerLedger 对 prompt 的既有字段投影保留。邻仓 @alembic/agent/runtime createToolPipeline 使用方式无需变更。"
+    },
+    {
+      "id": "SPEC-08",
+      "topic": "事件所有权",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 58
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/observations.ts",
+          "line": 98
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+          "line": 1520
+        }
+      ],
+      "detail": "progressEmitter/eventBusPublisher 仍仅可选导出，未装入默认工厂；Runtime 继续在字符裁剪后发布默认结束事件，未引入重复事件链。"
+    }
+  ],
+  "qualityReview": [
+    {
+      "id": "QUALITY-01",
+      "topic": "运行时依赖方向",
+      "result": "pass",
+      "detail": "独立 AST 扫描 10 文件所有 import：engine 只有 type imports，没有 runtime import；contracts 的 AgentRuntime/LoopContext/metadata 也都是 type-only。子模块无对旧入口的 runtime back edge。具体业务模块依赖 callNormalization/contracts 或既有 kernel/policy/evidence/utils，不依赖默认工厂。"
+    },
+    {
+      "id": "QUALITY-02",
+      "topic": "共享引用身份",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+          "line": 60
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+          "line": 88
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/submissionLedger.ts",
+          "line": 116
+        }
+      ],
+      "detail": "独立执行当前 engine+bridge 的内存探针：每次 request/runtime 投影都是新对象，但 sharedState、3 个 submitted sets、evidenceLedger、memoryCoordinator/cache、fileCache、AbortSignal 和 history entry.args 均保持 === 原引用；_sessionCounters 两次调用累计为 2。"
+    },
+    {
+      "id": "QUALITY-03",
+      "topic": "metadata/envelope 生命周期",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+          "line": 66
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+          "line": 143
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/observations.ts",
+          "line": 23
+        }
+      ],
+      "detail": "同次 before/execute/after 共享一个 metadata/context；相邻 execute 的 metadata 不共用。probe 返回的 result 与 envelope.structuredContent 保持同一对象，metadata.envelope 与 host 返回对象相同。证据标注继续被 memory/trace/Runtime 看见。"
+    },
+    {
+      "id": "QUALITY-04",
+      "topic": "异常路径与先前失败缓存修复",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+          "line": 43
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/duplicateCache.ts",
+          "line": 174
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/engine.ts",
+          "line": 32
+        }
+      ],
+      "detail": "0caa65c 已独立加入 Error/string/unknown 的 host 异常归一化及可观察警告；缓存准入仍调用完整 readToolObservation，不把无 envelope 的 error 当成功。before/after 自定义异常仍传播，只有 evidenceCapture 的既有局部 catch 降级；拆分没有偷偷更改错误策略。"
+    },
+    {
+      "id": "QUALITY-05",
+      "topic": "取消、超时及阶段权限",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+          "line": 74
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/runtimeBridge.ts",
+          "line": 137
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/accessGates.ts",
+          "line": 123
+        }
+      ],
+      "detail": "AbortSignal 原样转发，blocking envelope 状态投影与 diagnostics 保持，未新增第二套 timer/scheduler。安全与阶段 gate 均完整移动，仍先于宿主和缓存执行。"
+    },
+    {
+      "id": "QUALITY-06",
+      "topic": "功能耦合收敛而非新增框架",
+      "result": "pass",
+      "detail": "仅引入真实调用使用的泛型 executor 与窄类型端口；没有额外 service/container/mock-only adapter。最大实现模块 238 行，旧入口 77 行，各模块拥有连贯职责。contracts 对 concrete Runtime 的剩余依赖仅为 type-level Pick，符合此次兼容边界。"
+    },
+    {
+      "id": "QUALITY-07",
+      "topic": "观察和提交结果优先级",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/observations.ts",
+          "line": 69
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/toolPipeline/submissionLedger.ts",
+          "line": 49
+        }
+      ],
+      "detail": "metadata.blocked 和完整 envelope/business failure 优先于内层 created，成功 tracker 仍接收原业务结果；提交仅登记真实 persisted submission，不在 Gateway 前短路。"
+    }
+  ],
+  "findings": [],
+  "defaultOrder": [
+    "allowlistGate",
+    "toolArgumentBoundsGate",
+    "runtimeSafetyGate",
+    "evolutionDecisionGate",
+    "recordRepairOnlyGate",
+    "analystVerifyOnlyGate",
+    "producerSubmitOnlyGate",
+    "deterministicDuplicateGuard",
+    "evidenceCapture",
+    "observationRecord",
+    "trackerSignal",
+    "traceRecord",
+    "submitDedup"
+  ],
+  "independentVerification": {
+    "astComparison": {
+      "baseline": "0caa65c",
+      "runtimeDeclarations": 60,
+      "identical": 60,
+      "mismatches": [],
+      "oldEntryExportCount": 16,
+      "entryExportsIdentical": true,
+      "engineRuntimeImportCount": 0,
+      "submoduleToFacadeRuntimeBackEdges": 0
+    },
+    "referenceProbe": {
+      "actualModules": [
+        "toolPipeline/engine.ts",
+        "toolPipeline/runtimeBridge.ts",
+        "toolPipeline/callNormalization.ts"
+      ],
+      "stubbedBoundary": "kernel output projector、SafetyPolicy token、DEPTH_SLOT_PROPS 作为外围替身；使用普通 code 调用，不走别名/策略细节。",
+      "requestFreshPerCall": true,
+      "sharedStateSame": true,
+      "setsSame": true,
+      "ledgerSame": true,
+      "memorySame": true,
+      "fileCacheSame": true,
+      "abortSignalSame": true,
+      "historyArgsSame": true,
+      "observerContextSame": true,
+      "sameEnvelope": true,
+      "metadataFreshBetweenCalls": true,
+      "resultIsStructuredContent": true,
+      "sessionCounterAfterTwoCalls": 2,
+      "efficiencyCalls": 2,
+      "source": {
+        "kind": "runtime",
+        "name": "analyze"
+      }
+    },
+    "writes": "只写本 JSON 审查产物；探针不写文件、不调用网络/API。"
+  },
+  "existingValidationRead": [
+    {
+      "path": "../../../AlembicAgent/tmp/layering-2026-09-19/extraction-tests.log",
+      "observed": "6 test files passed, 123 tests passed；runtime-efficiency、EvidenceCapture、evidence-recording-phase-chain、ExplorationStrategies、tool-v2-contract、agent-lifecycle。",
+      "runByReviewer": false
+    },
+    {
+      "path": "../../../AlembicAgent/tmp/layering-2026-09-19/extraction-typecheck.log",
+      "observed": "tsc -p tsconfig.json --noEmit，无错误输出；与 root 提供的通过状态一致。",
+      "runByReviewer": false
+    },
+    {
+      "path": "../../../AlembicAgent/tmp/layering-2026-09-19/contracts-typecheck.log",
+      "observed": "tsc -p tsconfig.json --noEmit，无错误输出；公开完整 context fixture 已读，但本子代理未另行运行 strict-consumer build。",
+      "runByReviewer": false
+    },
+    {
+      "path": "../../../AlembicAgent/test/runtime-efficiency.test.ts",
+      "observed": "新增生命周期用例已全文审读：证据→memory→tracker→trace顺序、异步 before、五类 falsey/blocked 短路、before/after throw 传播；host failure Error/string/null 重试测试保留。",
+      "runByReviewer": false
+    }
+  ],
+  "limits": [
+    "本次仅对指定 10 源文件及直接验证/消费者做双轮复审，未重跑完整 suite。",
+    "当前工作区有 root 并行的 layer-contract/AGENTS 等修改；没有把这些未审范围纳入通过结论。",
+    "读到的测试日志属于 root 的验证，未冒称是本子代理重跑。",
+    "最终提交与完整 check 仍由 root 执行。"
+  ],
+  "disposition": {
+    "TP-CACHE-01": "已在 0caa65c 独立修复，拆分保留该实现；不是当前 open finding。",
+    "newDefects": "none identified in this bounded extraction review",
+    "readyForRootFinalVerification": true
+  }
+}

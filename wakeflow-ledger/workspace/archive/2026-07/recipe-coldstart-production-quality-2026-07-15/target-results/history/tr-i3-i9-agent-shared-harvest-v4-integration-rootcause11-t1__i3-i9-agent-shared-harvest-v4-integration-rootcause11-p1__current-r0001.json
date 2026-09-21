@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i9-agent-shared-harvest-v4-integration-rootcause11-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1",
+  "dispatchGroup": "i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "i3-i9-agent-shared-harvest-v4-integration-rootcause11-t1",
+  "status": "completed",
+  "summary": "AlembicAgent now consumes Core V4 expectedExecutionReceiptBindings as the sole shared-harvest grouping authority, authenticates one existing production Evidence Ledger snapshot/witness per evidence authority, invokes the independent reviewer once, emits a serialized V4 attestation covering both file/repository receipts, and exposes the real runtime contract from @alembic/agent/production without exporting raw Core adapters or private authority state.",
+  "evidenceRefs": [
+    "AlembicAgent commit 07efa7ef7aef638900c62e3efa68c03afdeee95e; parent 2bf05831bc95a89347df7e4035bfeadbc93c3c09; tree 35f551cd9ca80497a76fb7dfd69d2afe60c48b0c; 10 changed files; clean worktree",
+    "AlembicCore exact upstream 8602b9e6dd03a362736118a92cfd4ae24e35661e; clean sibling worktree",
+    "RED: focused shared-harvest runtime test on pre-repair selector failed ALEMBIC_AGENT_SEMANTIC_REVIEW_EVIDENCE_EXECUTION_MISMATCH with found 2; temporary RED object a427a4bf1ddf002b368533f50b5e0dc639a2146e was amended into the required one clean final commit",
+    "Runtime fixture: npm run smoke:strict-consumer passed via built @alembic/agent/production and real production Ledger: schemaVersion 4, two distinct receipt bindings, one shared harvest/file, one witness load, one provider call, fresh-process Ledger reopen plus Core V4 assert/consume",
+    "Negative probes in test/durable-semantic-review-runtime.test.ts cover missing/extra/duplicate/reordered/truncated binding universe; mixed harvest/file/witness/blob/source/ledger authority; partial execution; fake facet; reuse/concurrency; malformed reviewer/provider/permission/cancel/timeout, while asserting Ledger snapshot equality",
+    "Boundary: production facade signature hash 8901434ceb4e072ce234a7777b91a1d32bcbc1cb394b77143dc4eae9f3d800af; public boundary exact-export scan passed; raw Core mint/store adapters, private keys, registries and second store remain private",
+    "Validation: focused 4 files/49 tests passed; npm run check passed 73 files/608 tests; public signatures 15 exports/451 bindings; Core import boundary 319 files/92 imports; scoped Biome and git diff --check passed",
+    "Alembic lifecycle finish finish-public-ms4z44uc-1; Guard guard-public-ms4z72p1-2 passed 8 files with 0 violations after resolving first-pass complexity/length findings"
+  ],
+  "verification": [
+    "npm test -- test/durable-semantic-review-runtime.test.ts test/production-evidence-ledger-authority.test.ts test/AgentRuntime.test.ts test/public-strict-facades.test.ts => 4 files, 49 tests passed",
+    "npm run build:check => passed",
+    "npm run smoke:strict-consumer => built public consumer, V4 2-binding shared harvest, one witness load/provider call, fresh-process V4 verify/consume passed",
+    "npm run smoke:public-signatures => 15 exports, 451 bindings passed",
+    "npm run lint:public-api-boundary => 15 exact exports, no wildcard exports",
+    "npm run lint:core-import-boundary => 319 files, 92 @alembic/core imports passed",
+    "npx biome check <8 scoped TS/JS files> and git diff --check => passed",
+    "npm run check => 73 test files, 608 tests passed; all build/lint/boundary/smoke/validation-floor/retired-symbol gates passed",
+    "alembic_code_guard guard-public-ms4z72p1-2 => 8 files, 0 violations",
+    "git verification => HEAD 07efa7ef7aef638900c62e3efa68c03afdeee95e, parent exact 2bf05831bc95a89347df7e4035bfeadbc93c3c09, Core exact 8602b9e6dd03a362736118a92cfd4ae24e35661e, both worktrees clean"
+  ],
+  "risks": [
+    "Main integration remains downstream and was not modified, as required.",
+    "The existing @alembic/agent/evaluation runtime export remains as an explicitly compatible legacy path; @alembic/agent/production is now the production owner facade.",
+    "Full Biome emits 21 pre-existing warnings only in unchanged files; the scoped changed-file Biome pass is clean and npm run check exits successfully."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "07efa7ef7aef638900c62e3efa68c03afdeee95e",
+      "verify": "Parent is exactly 2bf05831bc95a89347df7e4035bfeadbc93c3c09; tree 35f551cd9ca80497a76fb7dfd69d2afe60c48b0c; exactly 10 Agent files changed; Agent/Core worktrees clean; Core HEAD 8602b9e6dd03a362736118a92cfd4ae24e35661e."
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "2bf05831bc95a89347df7e4035bfeadbc93c3c09:src/agent/evaluation/DurableSemanticReviewRuntime.ts selectExactExecution",
+      "verify": "The old selector flat-mapped all accepted matching file executions, so legitimate file+repository receipts produced two matches and matches.length !== 1 rejected them; V3 then required the Agent store result to return one executionReceipt/fileExecutionHash. The repair consumes Core V4 expectedExecutionReceiptBindings and only validates that all supplied bindings share the accepted harvest/file/witness coordinates."
+    },
+    {
+      "kind": "runtime-fixture",
+      "ref": "scripts/fixtures/strict-public-connected-probe.mjs; scripts/probe-agent-public-strict-consumer.mjs; test/durable-semantic-review-runtime.test.ts",
+      "verify": "Built public production facade plus real production Ledger produces two distinct obligation/receipt hashes sharing one harvestKey/harvestReceiptHash/fileExecution/evidence entry, performs one witness authority load and one reviewer call, serializes V4 union of both bindings, and passes fresh-process Core V4 assert/consume after Ledger reopen."
+    },
+    {
+      "kind": "negative-probe",
+      "ref": "test/durable-semantic-review-runtime.test.ts",
+      "verify": "Covers missing/extra/duplicate/reordered/truncated bindings; mixed harvest/file/witness/blob/source/ledger snapshot/entry; partial execution; witness mismatch; fake facet; reuse/concurrent; malformed reviewer; provider/permission/cancel/timeout. Failure cases assert production Ledger snapshot remains unchanged."
+    },
+    {
+      "kind": "boundary",
+      "ref": "src/production.ts; config/agent-public-api-boundary.json; config/agent-public-api-signatures.json",
+      "verify": "Agent owns provider/key custody/Ledger/witness orchestration; Core owns binding-set/gateway/signature/verifier; production facade exposes runtime factory/types but not raw Core adapters/private keys/registries/store."
+    },
+    {
+      "kind": "command",
+      "ref": "repository validation transcript",
+      "verify": "Focused 4/49, build:check, build/public/fresh-process, signatures, public boundary, Core import boundary 319/92, full check 73/608, scoped Biome, diff check and Guard all passed."
+    },
+    {
+      "kind": "test-first",
+      "ref": "temporary RED object a427a4bf1ddf002b368533f50b5e0dc639a2146e",
+      "verify": "Before implementation, the public production-ledger two-scale fixture failed with expected exactly one accepted file execution; found 2. The temporary RED commit was amended into the required single final commit."
+    },
+    {
+      "kind": "self-review",
+      "ref": "task package reread plus final diff from exact parent",
+      "verify": "Rechecked end-to-end behavior, edge cases, public facade restrictions, sibling boundaries, exact parent/Core commits, changed-file scope, and clean worktrees."
+    },
+    {
+      "kind": "compatibility",
+      "ref": "src/evaluation.ts and src/production.ts",
+      "verify": "Existing evaluation facade remains compatible while the production facade now exposes the real runtime; no legacy Core V3 scalar gateway remains in the production runtime."
+    },
+    {
+      "kind": "guard",
+      "ref": "guard-public-ms4z72p1-2",
+      "verify": "Alembic Guard passed 8 explicitly scoped code files with zero violations after first-pass complexity and long-method findings were repaired."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1__AlembicAgent__i3-i9-agent-shared-harvest-v4-integration-rootcause11-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1__AlembicAgent__i3-i9-agent-shared-harvest-v4-integration-rootcause11-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1__AlembicAgent__i3-i9-agent-shared-harvest-v4-integration-rootcause11-t1",
+    "dispatchGroup": "i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1__AlembicAgent__i3-i9-agent-shared-harvest-v4-integration-rootcause11-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 282,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1",
+    "targetTaskId": "i3-i9-agent-shared-harvest-v4-integration-rootcause11-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "i3-i9-agent-shared-harvest-v4-integration-rootcause11-p1",
+    "resultId": "tr-i3-i9-agent-shared-harvest-v4-integration-rootcause11-t1",
+    "createdAt": "2026-07-28T18:17:10.032Z"
+  },
+  "createdAt": "2026-07-28T18:17:10.032Z",
+  "stateRevisionObserved": 282,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

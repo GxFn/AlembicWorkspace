@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "Repair the accepted Main V5 production composition's trust-root fail-open defects without changing the V5 cross-harvest chain: make initial bootstrap distinguishable from lost/corrupt registry, reject key-present/registry-absent self-authorization, reject group/world-writable policy registry, and reject symlinked or out-of-root custody parent paths. Add controller-reproduced regression coverage and re-prove real Facade/built fresh-process V5 behavior. Main-only; no Core/Agent/Plugin/Test/vendor changes and no fallback or second authority platform.",
+  "status": "pending",
+  "sourceRef": "Original Plan completion bullets 6-10; Requirement Design §§10.5, 11.2-11.8, 13.2-13.4, 17, 18.1-18.3, 18.6, 21; prior Main result commit e8610b504498cd85cb06a4e31fb48e5dfe84f005; controller rework decision evt-20260728215653-0300; raw probes registry-delete=>REAUTHORIZED, registry-mode-0666=>ACCEPTED_WORLD_WRITABLE_REGISTRY, custody-parent-symlink=>FOLLOWED_SYMLINK",
+  "evidenceContract": {
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "self-review"
+      },
+      {
+        "kind": "compatibility"
+      },
+      {
+        "kind": "guard"
+      }
+    ],
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "One clean Alembic commit whose parent is exactly accepted Main commit e8610b504498cd85cb06a4e31fb48e5dfe84f005. Report parent/commit/tree/changed files; do not edit AlembicCore, AlembicAgent, AlembicPlugin, Test, Wakeflow, vendor, or sibling repositories."
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "Explain why SemanticReviewTrustStore treated key-present/registry-absent as first bootstrap, why approved-policies.json mode 0666 passed, and why a symlinked .asd/semantic-review-trust parent escaped dataRoot. Map each cause to the repaired invariant and preserve the existing V5 cross-harvest group/attestation call chain without fallback or authority relocation."
+      },
+      {
+        "kind": "negative-probe",
+        "verify": "RED then GREEN proof for all three controller reproductions: deleting approved-policies.json while signing-key.pk8 remains must fail closed and must not recreate/approve policy; group- or other-writable registry (including 0666) must fail closed; any symlink in the .asd/custody parent chain must fail closed before reads/writes and no key/registry may be created outside the configured dataRoot. Include missing/replaced/revoked/self-authorized policy and unsafe key regression coverage."
+      },
+      {
+        "kind": "runtime-fixture",
+        "verify": "Through the real RecipePipelineFacade/StrictColdStartOrchestrator and built entrypoint, re-prove the V5 15-receipt/8-harvest-group complete-union fixture, one Ledger/witness load and one reviewer invocation per evidence root, Core verification/consumption before closure, persistence, G3/G4 and CAS, plus fresh-process finalized recovery without remint or review replay. The trust-root repair must not change group selection, ordering, serialization, or attestation lineage."
+      },
+      {
+        "kind": "boundary",
+        "verify": "Use only the existing host data/config/secrets root and SemanticReviewTrustStore; do not add a second trust platform, task/journal-provided key/policy injection, in-memory-only sentinel, permissive fallback, or path outside dataRoot. First bootstrap versus interrupted/corrupt bootstrap must be durable and auditable; existing key with absent registry is never silently self-authorized. Registry and key parent chain must be non-symlink and realpath-confined."
+      },
+      {
+        "kind": "command",
+        "verify": "Run focused SemanticReviewTrustStore and StrictRecipePipelineFacade tests, explicit built probes for registry deletion, registry 0666, and parent symlink, build:check/build, full npm run check and npm test, public-package/import/layer/ring/retired/naming/shared-asset guards, git diff checks, exact upstream/head/clean-worktree checks, and Alembic Guard on scoped Main changes. Report exact test/group/receipt/load/reviewer counts and separate pre-existing warnings."
+      }
+    ],
+    "version": 1
+  },
+  "createdAt": "2026-07-28T21:57:38.402Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-t1",
+      "taskPackageId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework1-p1",
+      "targetWindow": "Alembic",
+      "summary": "Fix and prove the three SemanticReviewTrustStore fail-closed defects found by controller review while preserving the existing real Main V5 15-receipt/8-group production and recovery chain.",
+      "status": "pending",
+      "createdAt": "2026-07-28T21:57:38.402Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

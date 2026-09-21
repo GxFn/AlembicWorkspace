@@ -1,0 +1,767 @@
+diff --git a/src/repository/knowledge/KnowledgeRepositoryImpl.ts b/src/repository/knowledge/KnowledgeRepositoryImpl.ts
+index ae0489c..9aee5c2 100644
+--- a/src/repository/knowledge/KnowledgeRepositoryImpl.ts
++++ b/src/repository/knowledge/KnowledgeRepositoryImpl.ts
+@@ -1,5 +1,5 @@
+ import type { Database } from 'better-sqlite3';
+-import { and, asc, count, desc, eq, gt, inArray, isNotNull, like, ne, or, sql } from 'drizzle-orm';
++import { and, asc, count, desc, eq, gte, inArray, isNotNull, like, ne, or, sql } from 'drizzle-orm';
+ import type { Logger as WinstonLogger } from 'winston';
+ import { inferKind, KnowledgeEntry } from '../../domain/knowledge/index.js';
+ import { COUNTABLE_LIFECYCLES } from '../../domain/knowledge/Lifecycle.js';
+@@ -277,9 +277,11 @@ export class KnowledgeRepositoryImpl {
+     }
+ 
+     if (_tagLike) {
+-      conditions.push(`tags LIKE ?`);
+-      const escaped = _tagLike.replace(/[%_\\]/g, (ch: string) => `\\${ch}`);
+-      params.push(`%"${escaped}"%`);
++      // 先按 JSON 字符串编码标签，再转义 LIKE 元字符；SQL 必须声明相同的转义符。
++      // 保持既有大小写/分页语义，但下划线、百分号、引号和反斜杠都按标签字面量匹配。
++      conditions.push(`tags LIKE ? ESCAPE '\\'`);
++      const escaped = JSON.stringify(_tagLike).replace(/[%_\\]/g, (ch: string) => `\\${ch}`);
++      params.push(`%${escaped}%`);
+     }
+ 
+     if (_search) {
+@@ -1173,6 +1175,8 @@ export class KnowledgeRepositoryImpl {
+ 
+   /* ═══════════════════════════════════════════════════════
+    *  SearchEngine 用同步方法
++   *  scope / dimensionId / tags 是过滤事实，四个投影须与 raw adapter 保持一致；
++   *  若建索引或增量刷新时先丢字段，后续 hard filter 会把真实命中误删。
+    * ═══════════════════════════════════════════════════════ */
+ 
+   /** 查询所有非 deprecated 条目（buildIndex 用） */
+@@ -1183,6 +1187,8 @@ export class KnowledgeRepositoryImpl {
+         title: knowledgeEntries.title,
+         description: knowledgeEntries.description,
+         language: knowledgeEntries.language,
++        dimensionId: knowledgeEntries.dimensionId,
++        scope: knowledgeEntries.scope,
+         category: knowledgeEntries.category,
+         knowledgeType: knowledgeEntries.knowledgeType,
+         kind: knowledgeEntries.kind,
+@@ -1218,11 +1224,14 @@ export class KnowledgeRepositoryImpl {
+         title: knowledgeEntries.title,
+         description: knowledgeEntries.description,
+         language: knowledgeEntries.language,
++        dimensionId: knowledgeEntries.dimensionId,
++        scope: knowledgeEntries.scope,
+         category: knowledgeEntries.category,
+         knowledgeType: knowledgeEntries.knowledgeType,
+         kind: knowledgeEntries.kind,
+         lifecycle: knowledgeEntries.lifecycle,
+         content: knowledgeEntries.content,
++        tags: knowledgeEntries.tags,
+         trigger: knowledgeEntries.trigger,
+         headers: knowledgeEntries.headers,
+         moduleName: knowledgeEntries.moduleName,
+@@ -1258,6 +1267,8 @@ export class KnowledgeRepositoryImpl {
+         moduleName: knowledgeEntries.moduleName,
+         tags: knowledgeEntries.tags,
+         language: knowledgeEntries.language,
++        dimensionId: knowledgeEntries.dimensionId,
++        scope: knowledgeEntries.scope,
+         category: knowledgeEntries.category,
+         updatedAt: knowledgeEntries.updatedAt,
+         createdAt: knowledgeEntries.createdAt,
+@@ -1278,6 +1289,7 @@ export class KnowledgeRepositoryImpl {
+ 
+   /** 查询指定时间之后更新的条目（refreshIndex 用） */
+   findUpdatedSinceSync(sinceIso: string) {
++    // 与 raw SearchRepoAdapter 同口径：秒精度水位必须包含边界秒，索引更新按 id 幂等。
+     const sinceEpoch = Math.floor(new Date(sinceIso).getTime() / 1000);
+     return this.#drizzle
+       .select({
+@@ -1285,6 +1297,8 @@ export class KnowledgeRepositoryImpl {
+         title: knowledgeEntries.title,
+         description: knowledgeEntries.description,
+         language: knowledgeEntries.language,
++        dimensionId: knowledgeEntries.dimensionId,
++        scope: knowledgeEntries.scope,
+         category: knowledgeEntries.category,
+         knowledgeType: knowledgeEntries.knowledgeType,
+         kind: knowledgeEntries.kind,
+@@ -1308,7 +1322,7 @@ export class KnowledgeRepositoryImpl {
+         createdAt: knowledgeEntries.createdAt,
+       })
+       .from(knowledgeEntries)
+-      .where(gt(knowledgeEntries.updatedAt, sinceEpoch))
++      .where(gte(knowledgeEntries.updatedAt, sinceEpoch))
+       .all();
+   }
+ }
+diff --git a/src/service/search/FieldWeightedScorer.ts b/src/service/search/FieldWeightedScorer.ts
+index c1615b0..13406d2 100644
+--- a/src/service/search/FieldWeightedScorer.ts
++++ b/src/service/search/FieldWeightedScorer.ts
+@@ -70,8 +70,9 @@ export class FieldWeightedScorer implements Scorer {
+   constructor() {
+     this.documents = [];
+     this.totalDocs = 0;
+-    this.docFreq = {};
+-    this.topicDocFreq = {};
++    // token 可以是 constructor 等合法代码词，词频字典不能继承 Object.prototype 的同名值。
++    this.docFreq = Object.create(null);
++    this.topicDocFreq = Object.create(null);
+     this._idIndex = new Map();
+     this._totalLength = 0;
+     this.avgLength = 0;
+@@ -225,8 +226,8 @@ export class FieldWeightedScorer implements Scorer {
+   /** 清空索引 */
+   clear() {
+     this.documents = [];
+-    this.docFreq = {};
+-    this.topicDocFreq = {};
++    this.docFreq = Object.create(null);
++    this.topicDocFreq = Object.create(null);
+     this.totalDocs = 0;
+     this._totalLength = 0;
+     this.avgLength = 0;
+diff --git a/src/service/search/KnowledgeRetrieval.ts b/src/service/search/KnowledgeRetrieval.ts
+index a5751d5..0eb2e0b 100644
+--- a/src/service/search/KnowledgeRetrieval.ts
++++ b/src/service/search/KnowledgeRetrieval.ts
+@@ -184,16 +184,19 @@ export class HybridCandidateRetriever {
+       knownIndexSize,
+       collect: async (window) => {
+         request.signal?.throwIfAborted();
++        // 合同允许同步 sparse port；将调用本身放进 Promise，保证同步抛错也只降级该检索通道。
+         const [denseResult, sparseResult] = await Promise.allSettled([
+           queryVector && this.#reader
+-            ? this.#reader.searchVector(queryVector, {
+-                filter: request.candidateFilter,
+-                topK: window,
+-              })
++            ? Promise.resolve().then(() =>
++                this.#reader!.searchVector(queryVector, {
++                  filter: request.candidateFilter,
++                  topK: window,
++                })
++              )
+             : Promise.resolve([]),
+           this.#sparse
+-            ? Promise.resolve(
+-                this.#sparse(request.query, {
++            ? Promise.resolve().then(() =>
++                this.#sparse!(request.query, {
+                   filter: request.filter,
+                   limit: window,
+                   signal: request.signal,
+diff --git a/src/service/search/SearchEngine.ts b/src/service/search/SearchEngine.ts
+index bd14ae3..2dd1c47 100644
+--- a/src/service/search/SearchEngine.ts
++++ b/src/service/search/SearchEngine.ts
+@@ -302,12 +302,19 @@ export class SearchEngine {
+       };
+     }
+ 
+-    // 带 sessionHistory 的上下文搜索不缓存（个性化结果）
+-    const hasSessionContext = (context?.sessionHistory?.length ?? 0) > 0;
++    // language/intent/category/tags 等也会影响排序；上下文契约允许扩展字段，
++    // 因此有上下文的请求统一绕过共享缓存，避免新排序信号遗漏在缓存键之外。
++    const hasRankingContext = context != null && Object.keys(context).length > 0;
+     const filterCacheKey = this.#metadataFilterCacheKey(metadataFilters);
+-    const cacheKey = hasSessionContext
++    const cacheKey = hasRankingContext
+       ? null
+       : `${query}:${type}:${limit}:${mode}:${shouldRank ? 'r' : ''}:${options.groupByKind ? 'g' : ''}:${filterCacheKey}`;
++    if (hasRankingContext) {
++      this.logger.debug('Search cache bypassed for ranking context', {
++        contextKeys: Object.keys(context),
++        mode,
++      });
++    }
+     if (cacheKey) {
+       const cached = this._getCache(cacheKey);
+       if (cached) {
+@@ -560,18 +567,21 @@ export class SearchEngine {
+     if ((context?.sessionHistory?.length ?? 0) > 0) {
+       ranked = contextBoost(ranked as SearchItem[], context) as SearchResultItem[];
+     }
+-    return ranked.map((r: SearchResultItem) => {
+-      const baseScore = r.contextScore || r.rankerScore || r.coarseScore || r.recallScore || 0;
+-      // G-C P1:源锚漂移降权(active 优先)。漂移≠错误(可能只是行号动了),故只降级
+-      // 消费而不排除——乘性小惩罚保持相对序,仅在同分附近让 active 上浮。透出交现场判断。
+-      const score =
+-        r.sourceRefStatus === 'drifted' ? baseScore * DRIFTED_SOURCE_REF_SCORE_FACTOR : baseScore;
+-      return {
+-        ...r,
+-        recallScore: r.recallScore || 0,
+-        score,
+-      };
+-    });
++    // 降权必须作用于最终返回顺序，随后 search() 的 limit 才不会保留低分漂移项。
++    return ranked
++      .map((r: SearchResultItem) => {
++        const baseScore = r.contextScore || r.rankerScore || r.coarseScore || r.recallScore || 0;
++        // G-C P1:源锚漂移降权(active 优先)。漂移≠错误(可能只是行号动了),故只降级
++        // 消费而不排除——乘性小惩罚保持相对序,仅在同分附近让 active 上浮。透出交现场判断。
++        const score =
++          r.sourceRefStatus === 'drifted' ? baseScore * DRIFTED_SOURCE_REF_SCORE_FACTOR : baseScore;
++        return {
++          ...r,
++          recallScore: r.recallScore || 0,
++          score,
++        };
++      })
++      .sort((left, right) => right.score - left.score);
+   }
+ 
+   /**
+@@ -714,13 +724,7 @@ export class SearchEngine {
+     let results = this.scorer.search(query, limit * 2);
+ 
+     if (type !== 'all') {
+-      // All types now map to 'recipe' since everything is unified
+-      results = results.filter((r: ScorerResult) => {
+-        if (type === 'rule') {
+-          return (r.meta as Record<string, unknown>).knowledgeType === 'boundary-constraint';
+-        }
+-        return (r.meta as Record<string, unknown>).type === 'recipe';
+-      });
++      results = results.filter((r: ScorerResult) => this.#matchesTypeFilter(r.meta, type));
+     }
+     results = results.filter((r) =>
+       this.#matchesMetadataRecord(r.meta as Record<string, unknown>, filters)
+@@ -879,12 +883,7 @@ export class SearchEngine {
+           }
+           results = projection.items;
+           if (type !== 'all') {
+-            results = results.filter((r: SearchResultItem) => {
+-              if (type === 'rule') {
+-                return r.kind === 'rule';
+-              }
+-              return r.type === 'recipe';
+-            });
++            results = results.filter((r: SearchResultItem) => this.#matchesTypeFilter(r, type));
+           }
+           results = this.#applyMetadataFilters(results, filters);
+           results = results.slice(0, limit);
+@@ -987,12 +986,7 @@ export class SearchEngine {
+             }
+             results = projection.items;
+             if (type !== 'all') {
+-              results = results.filter((r: SearchResultItem) => {
+-                if (type === 'rule') {
+-                  return r.kind === 'rule';
+-                }
+-                return r.type === 'recipe';
+-              });
++              results = results.filter((r: SearchResultItem) => this.#matchesTypeFilter(r, type));
+             }
+             results = this.#applyMetadataFilters(results, filters);
+             results = results.slice(0, limit);
+@@ -1441,7 +1435,7 @@ export class SearchEngine {
+    *
+    * 策略:
+    *  1. 如果尚未构建索引 → 全量 buildIndex()
+-   *  2. 否则只加载 updatedAt > lastIndexTime 的条目 + 已删除(deprecated)条目
++   *  2. 否则加载 updatedAt >= lastIndexTime 所在秒的条目（含 deprecated，按 id 幂等）
+    *     - 新增/更新 → scorer.updateDocument()
+    *     - 已删除    → scorer.removeDocument()
+    *  3. 清空缓存以确保搜索结果刷新
+@@ -1632,7 +1626,13 @@ export class SearchEngine {
+       // 2026-07-06 真机定案：type:'all' 被当真实条件传进向量道，而向量 metadata
+       // 没有 type 字段 → 全部候选被灭、语义检索恒 0。哨兵进 filter 一律剔除。
+       if (key === 'type') {
+-        values = values.filter((value) => value !== 'all');
++        // recipe/solution/knowledge 都是 V3 统一知识集合的旧入口别名，不是物理 type 值。
++        // 数组按 OR 解释，任一全集别名已覆盖其余项；不能删掉别名后错误缩窄成仅 rule。
++        values = values.some(
++          (value) => value === 'recipe' || value === 'solution' || value === 'knowledge'
++        )
++          ? []
++          : values.filter((value) => value !== 'all');
+       }
+       if (values.length > 0) {
+         filters[key] = values;
+diff --git a/test/KnowledgeRetrievalPolicy.test.ts b/test/KnowledgeRetrievalPolicy.test.ts
+index 164998c..74759b5 100644
+--- a/test/KnowledgeRetrievalPolicy.test.ts
++++ b/test/KnowledgeRetrievalPolicy.test.ts
+@@ -20,6 +20,53 @@ const FROZEN_QUERIES = [
+ ] as const;
+ 
+ describe('KnowledgeRetrievalPolicy', () => {
++  it.each([
++    'dense',
++    'sparse',
++  ] as const)('retains the healthy lane when the %s port throws synchronously', async (failedLane) => {
++    const policy = new KnowledgeRetrievalPolicy(
++      new HybridCandidateRetriever({
++        embedding: {
++          describeCapabilities: vi.fn(),
++          embedDocuments: vi.fn(),
++          embedQuery: async () => [1],
++        },
++        reader: {
++          getById: vi.fn(),
++          getStats: vi.fn(),
++          listIds: vi.fn(),
++          searchVector: () => {
++            if (failedLane === 'dense') {
++              throw new Error('dense offline');
++            }
++            return Promise.resolve([{ item: { id: 'live-recipe' }, score: 0.9 }]);
++          },
++        },
++        sparse: () => {
++          if (failedLane === 'sparse') {
++            throw new Error('sparse offline');
++          }
++          return [{ id: 'live-recipe', score: 8 }];
++        },
++      }),
++      new KnowledgeTruthProjector({
++        findByIds: (ids) => ids.map((id) => ({ id, lifecycle: 'active' })),
++      })
++    );
++
++    const result = await policy.retrieve({ query: 'find recipe', topK: 1 });
++    expect(result.candidates.map((candidate) => candidate.recipeId)).toEqual(['live-recipe']);
++    expect(result.candidates[0]).toMatchObject({
++      denseLaneUsed: failedLane !== 'dense',
++      sparseLaneUsed: failedLane !== 'sparse',
++    });
++    expect(result.diagnostics.fallbackReason).toBe(
++      failedLane === 'dense'
++        ? 'vector-reader-failed:dense offline'
++        : 'sparse-retriever-failed:sparse offline'
++    );
++  });
++
+   it('refills when missing dense evidence can reorder a full Top-K projection', async () => {
+     const denseOnly = ['dense-one', 'dense-two'];
+     const dualLane = ['dual-c', 'dual-d', 'dual-e'];
+diff --git a/test/SearchEngine.test.ts b/test/SearchEngine.test.ts
+index 49b83d7..ff99159 100644
+--- a/test/SearchEngine.test.ts
++++ b/test/SearchEngine.test.ts
+@@ -2,6 +2,10 @@ import fs from 'node:fs';
+ import os from 'node:os';
+ import path from 'node:path';
+ import { vi } from 'vitest';
++import { type AlembicDatabaseRuntime, openAlembicDatabase } from '../src/database.js';
++import { pathGuard } from '../src/io.js';
++import { createAlembicRepositories } from '../src/repositories.js';
++import { createSearchEngine } from '../src/search.js';
+ import {
+   buildSearchResponseMeta,
+   FieldWeightedScorer,
+@@ -10,6 +14,270 @@ import {
+   tokenize,
+ } from '../src/service/search/SearchEngine.js';
+ 
++async function withSearchDatabase(
++  run: (runtime: AlembicDatabaseRuntime) => Promise<void>
++): Promise<void> {
++  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'alembic-search-ranking-'));
++  const oldQuiet = process.env.ALEMBIC_QUIET;
++  process.env.ALEMBIC_QUIET = '1';
++  pathGuard.configure({ projectRoot: root, knowledgeBaseDir: 'Alembic' });
++  let runtime: AlembicDatabaseRuntime | undefined;
++  try {
++    runtime = await openAlembicDatabase({ path: '.asd/alembic.db' });
++    await run(runtime);
++  } finally {
++    runtime?.close();
++    pathGuard._reset();
++    fs.rmSync(root, { recursive: true, force: true });
++    if (oldQuiet === undefined) {
++      delete process.env.ALEMBIC_QUIET;
++    } else {
++      process.env.ALEMBIC_QUIET = oldQuiet;
++    }
++  }
++}
++
++describe('search index timestamp consistency', () => {
++  test.each([
++    'raw-adapter',
++    'knowledge-repository',
++  ] as const)('refreshes same-second inserts, edits and deprecations through %s', async (adapter) => {
++    vi.useFakeTimers({ toFake: ['Date'] });
++    vi.setSystemTime(1_800_000_000_500);
++    try {
++      await withSearchDatabase(async (runtime) => {
++        const repository = createAlembicRepositories(runtime.connection).knowledgeRepository;
++        const engine = new SearchEngine(
++          runtime.sqlite,
++          adapter === 'raw-adapter' ? {} : { knowledgeRepo: repository }
++        );
++        engine.buildIndex();
++        runtime.sqlite
++          .prepare(
++            `INSERT INTO knowledge_entries (id, title, lifecycle, createdAt, updatedAt) VALUES ('new', 'Uniqueinsert guidance', 'active', 1800000000, 1800000000)`
++          )
++          .run();
++        engine.refreshIndex();
++        expect(
++          (await engine.search('Uniqueinsert', { mode: 'weighted' })).items.map((item) => item.id)
++        ).toContain('new');
++
++        runtime.sqlite
++          .prepare("UPDATE knowledge_entries SET title = 'Uniqueedit guidance' WHERE id = 'new'")
++          .run();
++        engine.refreshIndex();
++        expect(
++          (await engine.search('Uniqueedit', { mode: 'weighted' })).items.map((item) => item.id)
++        ).toContain('new');
++
++        runtime.sqlite
++          .prepare("UPDATE knowledge_entries SET lifecycle = 'deprecated' WHERE id = 'new'")
++          .run();
++        engine.refreshIndex();
++        expect((await engine.search('Uniqueedit', { mode: 'weighted' })).items).toEqual([]);
++      });
++    } finally {
++      vi.useRealTimers();
++    }
++  });
++});
++
++describe('search vocabulary dictionary boundaries', () => {
++  test('retrieves a constructor-tagged recipe through the public engine and real SQLite', async () => {
++    await withSearchDatabase(async (runtime) => {
++      runtime.sqlite
++        .prepare(
++          `INSERT INTO knowledge_entries (id, title, tags, content, lifecycle, createdAt, updatedAt)
++           VALUES (?, ?, ?, ?, 'active', 1800000000, 1800000000)`
++        )
++        .run(
++          'constructor-recipe',
++          'constructor',
++          JSON.stringify(['constructor']),
++          JSON.stringify({ markdown: 'constructor dependency injection' })
++        );
++      const engine = createSearchEngine(runtime.sqlite);
++      for (const mode of ['weighted', 'auto']) {
++        const response = await engine.search('constructor', { mode, rank: false });
++        expect(response.items.map((item) => item.id)).toEqual(['constructor-recipe']);
++        expect(Number.isFinite(response.items[0].score)).toBe(true);
++      }
++      // 重建走 clear()，不能把已经修正的词频字典重新变回有原型的对象。
++      engine.refreshIndex({ force: true });
++      expect((await engine.search('constructor', { mode: 'weighted' })).items[0]?.id).toBe(
++        'constructor-recipe'
++      );
++    });
++  });
++});
++
++describe('search knowledge collection type aliases', () => {
++  function insertKnowledgeCollection(runtime: AlembicDatabaseRuntime) {
++    const insert = runtime.sqlite.prepare(
++      `INSERT INTO knowledge_entries (id, title, kind, knowledgeType, scope, dimensionId, tags, lifecycle, createdAt, updatedAt)
++       VALUES (?, ?, ?, ?, ?, ?, ?, 'active', 1800000000, 1800000000)`
++    );
++    insert.run(
++      'pattern-entry',
++      'Factory pattern',
++      'pattern',
++      'code-pattern',
++      'universal',
++      'patterns',
++      '["factory-pattern"]'
++    );
++    insert.run(
++      'rule-entry',
++      'Factory boundary',
++      'rule',
++      'boundary-constraint',
++      'project',
++      'boundaries',
++      '["factory-rule"]'
++    );
++  }
++
++  test.each([
++    'raw-adapter',
++    'knowledge-repository',
++  ] as const)('preserves collection aliases and rule filters through %s', async (adapter) => {
++    await withSearchDatabase(async (runtime) => {
++      insertKnowledgeCollection(runtime);
++      const repository = createAlembicRepositories(runtime.connection).knowledgeRepository;
++      const engine = createSearchEngine(
++        runtime.sqlite,
++        adapter === 'raw-adapter' ? {} : { knowledgeRepo: repository }
++      );
++
++      for (const mode of ['keyword', 'weighted', 'auto', 'semantic']) {
++        for (const type of ['all', 'recipe', 'solution', 'knowledge']) {
++          const result = await engine.search('Factory', { mode, type, rank: false });
++          expect(result.items.map((item) => item.id).sort()).toEqual([
++            'pattern-entry',
++            'rule-entry',
++          ]);
++          expect(result.items.every((item) => item.type === 'knowledge')).toBe(true);
++        }
++        expect(
++          (await engine.search('Factory', { mode, type: 'rule', rank: false })).items.map(
++            (item) => item.id
++          )
++        ).toEqual(['rule-entry']);
++        // type 数组是 OR：全知识集合别名已覆盖 rule，不能剔除别名后错误缩窄成只有 rule。
++        for (const alias of ['recipe', 'solution', 'knowledge']) {
++          const result = await engine.search('Factory', {
++            mode,
++            rank: false,
++            filters: { type: [alias, 'rule'] },
++          });
++          expect(result.items.map((item) => item.id).sort()).toEqual([
++            'pattern-entry',
++            'rule-entry',
++          ]);
++          expect(result.searchMeta?.appliedFilters).toBeUndefined();
++        }
++        expect((await engine.search('Factory', { mode, type: 'unknown-type' })).items).toEqual([]);
++        expect(
++          (
++            await engine.search('Factory', {
++              mode,
++              type: 'recipe',
++              scope: 'project',
++              rank: false,
++            })
++          ).items.map((item) => item.id)
++        ).toEqual(['rule-entry']);
++      }
++    });
++  });
++
++  test.each([
++    'raw-adapter',
++    'knowledge-repository',
++  ] as const)('preserves facets before and after incremental refresh through %s', async (adapter) => {
++    await withSearchDatabase(async (runtime) => {
++      insertKnowledgeCollection(runtime);
++      const repository = createAlembicRepositories(runtime.connection).knowledgeRepository;
++      const engine = createSearchEngine(
++        runtime.sqlite,
++        adapter === 'raw-adapter' ? {} : { knowledgeRepo: repository }
++      );
++      const assertFacets = async () => {
++        for (const mode of ['keyword', 'weighted']) {
++          const response = await engine.search('Factory', {
++            mode,
++            rank: false,
++            type: 'recipe',
++            scope: 'project',
++            dimensionId: 'boundaries',
++            tags: ['factory-rule'],
++          });
++          expect(response.items.map((item) => item.id)).toEqual(['rule-entry']);
++          expect(response.items[0]).toMatchObject({
++            scope: 'project',
++            dimensionId: 'boundaries',
++            tags: ['factory-rule'],
++          });
++        }
++      };
++      await assertFacets();
++      runtime.sqlite
++        .prepare('UPDATE knowledge_entries SET updatedAt = ? WHERE id = ?')
++        .run(Math.floor(Date.now() / 1000), 'rule-entry');
++      engine.refreshIndex();
++      await assertFacets();
++    });
++  });
++
++  test.each([
++    'vector-service',
++    'legacy-vector-store',
++  ] as const)('keeps aliases on the real injected semantic %s lane', async (lane) => {
++    await withSearchDatabase(async (runtime) => {
++      insertKnowledgeCollection(runtime);
++      const hits = [
++        {
++          id: 'entry_pattern-entry',
++          score: 0.9,
++          metadata: { entryId: 'pattern-entry', kind: 'pattern' },
++        },
++        {
++          id: 'entry_rule-entry',
++          score: 0.8,
++          metadata: { entryId: 'rule-entry', kind: 'rule' },
++        },
++      ];
++      const search = vi.fn(async () =>
++        hits.map((hit) => ({ item: { id: hit.id, metadata: hit.metadata }, score: hit.score }))
++      );
++      const engine = createSearchEngine(
++        runtime.sqlite,
++        lane === 'vector-service'
++          ? { vectorService: { search, hybridSearch: vi.fn(async () => []) } }
++          : {
++              aiProvider: { embed: async () => [1] },
++              vectorStore: { query: async () => hits },
++            }
++      );
++      for (const type of ['recipe', 'solution', 'knowledge']) {
++        const result = await engine.search('Factory', { mode: 'semantic', type, rank: false });
++        expect(result.items.map((item) => item.id)).toEqual(['pattern-entry', 'rule-entry']);
++        expect(result.items.every((item) => item.type === 'recipe')).toBe(true);
++        expect(result.searchMeta?.vectorUsed).toBe(true);
++      }
++      if (lane === 'vector-service') {
++        expect(search).toHaveBeenLastCalledWith('Factory', { topK: 40, filter: null });
++      }
++      const rules = await engine.search('Factory', {
++        mode: 'semantic',
++        type: 'rule',
++        rank: false,
++      });
++      expect(rules.items.map((item) => item.id)).toEqual(['rule-entry']);
++    });
++  });
++});
++
+ /* ────────────────────────────────────────────
+  *  tokenize()
+  * ──────────────────────────────────────────── */
+@@ -59,9 +327,16 @@ describe('tokenize', () => {
+     expect(result).toContain('ef');
+   });
+ 
+-  test('should handle Chinese text', () => {
+-    const result = tokenize('错误处理 网络请求');
+-    expect(result.length).toBeGreaterThan(0);
++  test('supports Chinese unigrams and bigrams', () => {
++    expect(tokenize('网络请求')).toEqual(
++      expect.arrayContaining(['网', '络', '网络', '络请', '请求'])
++    );
++  });
++
++  test('keeps Chinese tokens around camel-case English identifiers', () => {
++    expect(tokenize('使用URLSession发送请求')).toEqual(
++      expect.arrayContaining(['url', 'session', '发送', '请求'])
++    );
+   });
+ 
+   test('should strip punctuation', () => {
+@@ -81,6 +356,20 @@ describe('FieldWeightedScorer', () => {
+     scorer = new FieldWeightedScorer();
+   });
+ 
++  test('tracks constructor token frequencies through add, remove and clear', () => {
++    scorer.addDocument('constructor-doc', 'constructor', { tags: ['constructor'] });
++    expect(scorer.docFreq.constructor).toBe(1);
++    expect(scorer.topicDocFreq.constructor).toBe(1);
++    expect(scorer.search('constructor').map((item) => item.id)).toEqual(['constructor-doc']);
++    scorer.removeDocument('constructor-doc');
++    expect(scorer.search('constructor')).toEqual([]);
++    expect(scorer.docFreq.constructor).toBeUndefined();
++    expect(scorer.topicDocFreq.constructor).toBeUndefined();
++    scorer.clear();
++    scorer.addDocument('recreated', 'constructor', { tags: ['constructor'] });
++    expect(scorer.search('constructor').map((item) => item.id)).toEqual(['recreated']);
++  });
++
+   test('should start with 0 documents', () => {
+     expect(scorer.totalDocs).toBe(0);
+     expect(scorer.documents).toHaveLength(0);
+@@ -141,15 +430,6 @@ describe('FieldWeightedScorer', () => {
+     const results = scorer.search('swift');
+     expect(results[0].meta).toEqual({ type: 'recipe', title: 'Net' });
+   });
+-
+-  test('clear should reset all state', () => {
+-    scorer.addDocument('doc1', 'hello world');
+-    scorer.clear();
+-    expect(scorer.totalDocs).toBe(0);
+-    expect(scorer.documents).toHaveLength(0);
+-    expect(scorer.avgLength).toBe(0);
+-    expect(Object.keys(scorer.docFreq)).toHaveLength(0);
+-  });
+ });
+ 
+ /* ────────────────────────────────────────────
+@@ -346,6 +626,34 @@ describe('SearchEngine', () => {
+     expect(engine.getStats().cacheSize).toBe(1);
+   });
+ 
++  test('cached searches preserve the ranking of each language context', async () => {
++    await withSearchDatabase(async (runtime) => {
++      const insert = runtime.sqlite.prepare(
++        `INSERT INTO knowledge_entries (id, title, lifecycle, language, createdAt, updatedAt)
++         VALUES (?, 'Logging guidance', 'active', ?, 1000, 1000)`
++      );
++      insert.run('ts', 'typescript');
++      insert.run('py', 'python');
++      const engine = new SearchEngine(runtime.sqlite);
++      const options = { mode: 'weighted', limit: 2 };
++      const typescript = await engine.search('Logging', {
++        ...options,
++        context: { language: 'typescript' },
++      });
++      const python = await engine.search('Logging', {
++        ...options,
++        context: { language: 'python' },
++      });
++      const freshPython = await new SearchEngine(runtime.sqlite).search('Logging', {
++        ...options,
++        context: { language: 'python' },
++      });
++      expect(typescript.items[0].id).toBe('ts');
++      expect(freshPython.items[0].id).toBe('py');
++      expect(python.items.map((item) => item.id)).toEqual(freshPython.items.map((item) => item.id));
++    });
++  });
++
+   function legacyBoundaryRule() {
+     return {
+       id: 'layer-boundary-rule',
+@@ -667,6 +975,7 @@ describe('SearchEngine', () => {
+ 
+     const result = await engine.search('swift', { mode: 'semantic' });
+     expect(result.mode).toBe('weighted'); // falls back to FieldWeighted
++    expect(result.items.map((item) => item.id)).toEqual(['r1']);
+     expect(result.searchMeta).toEqual(
+       expect.objectContaining({
+         requestedMode: 'semantic',
+@@ -1236,18 +1545,31 @@ describe('SearchEngine', () => {
+       expect(items[0].sourceRefStatus).toBe('drifted');
+     });
+ 
+-    test('_applyRanking: drifted item 相对同分 active item 被降权(active 优先)', async () => {
+-      const engine = new SearchEngine(makeMockDb());
+-      // 两条几乎同分,只有源锚态不同;降权后 active 应排在 drifted 前。
+-      const items = [
+-        { id: 'drift', title: 'x', coarseScore: 1, rankerScore: 1, sourceRefStatus: 'drifted' },
+-        { id: 'fresh', title: 'x', coarseScore: 1, rankerScore: 1, sourceRefStatus: 'active' },
+-      ];
+-      const ranked = await engine._applyRanking(items, 'x', {});
+-      const drift = ranked.find((r) => r.id === 'drift');
+-      const fresh = ranked.find((r) => r.id === 'fresh');
+-      // drifted 乘性降权 → 分数严格低于 active。
+-      expect(drift.score).toBeLessThan(fresh.score);
++    test('search orders active refs before equally relevant drifted refs before truncating', async () => {
++      await withSearchDatabase(async (runtime) => {
++        const insert = runtime.sqlite.prepare(
++          `INSERT INTO knowledge_entries (id, title, lifecycle, createdAt, updatedAt)
++           VALUES (?, 'Logging guidance', 'active', 1000, 1000)`
++        );
++        insert.run('drift');
++        insert.run('fresh');
++        const refs = createAlembicRepositories(runtime.connection).recipeSourceRefRepository;
++        refs.upsert({
++          recipeId: 'drift',
++          sourcePath: 'src/drift.ts',
++          status: 'drifted',
++          verifiedAt: 1,
++        });
++        refs.upsert({ recipeId: 'fresh', sourcePath: 'src/fresh.ts', verifiedAt: 1 });
++        const engine = new SearchEngine(runtime.sqlite);
++        const result = await engine.search('Logging', { mode: 'weighted', limit: 2 });
++        expect(result.items.find((item) => item.id === 'drift')?.score).toBeLessThan(
++          result.items.find((item) => item.id === 'fresh')!.score
++        );
++        expect(result.items.map((item) => item.id)).toEqual(['fresh', 'drift']);
++        const top = await engine.search('Logging', { mode: 'weighted', limit: 1 });
++        expect(top.items.map((item) => item.id)).toEqual(['fresh']);
++      });
+     });
+   });
+ });

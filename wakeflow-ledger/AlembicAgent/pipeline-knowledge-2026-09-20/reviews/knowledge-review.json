@@ -1,0 +1,1312 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-20",
+  "status": "review-complete-advisory",
+  "scope": {
+    "baseline": "230c635",
+    "agentRoot": "AlembicWorkspace/AlembicAgent",
+    "coreRoot": "AlembicWorkspace/AlembicCore",
+    "coreCommit": "f39e139",
+    "productEdits": false,
+    "externalRepositoryEdits": false,
+    "realApiCalls": false,
+    "commitCreated": false,
+    "noCommitReason": "只读审查子任务；唯一写入为指定 ignored tmp JSON，root 负责产品修复和最终验证。",
+    "limitation": "Core 仅审查公共 production/gate/readiness contract 与必要调用点，不声称全读 1950+ 行 gateway 内部实现。完整 named function inventory 基于 230c635，避免 root 并行修改改变行号。"
+  },
+  "summary": {
+    "confirmedFindings": 5,
+    "priorityCounts": {
+      "P1": 2,
+      "P2": 2,
+      "P3": 1
+    },
+    "architecture": "把读/管理动作、提交准备、持久化及后处理三条边界明确化；不复制 Core gate/DB，不削弱现有证据与取消能力。"
+  },
+  "fileReviews": [
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+      "baseline": "230c635",
+      "lines": 1583,
+      "reviewed": true,
+      "coverage": "entire source file; named functions plus named nested closures listed, unnamed callbacks reviewed within parent function",
+      "functions": [
+        {
+          "name": "readRefRangeCode",
+          "line": 60,
+          "endLine": 114,
+          "reviewed": true,
+          "role": "从已声明 sourceRefs 读取项目内的最多 12 行修复提示；错误换下一个 ref，仅诊断不改候选。",
+          "findings": []
+        },
+        {
+          "name": "normalizeBareSourceRefs",
+          "line": 121,
+          "endLine": 156,
+          "reviewed": true,
+          "role": "把裸 sourceRefs/reasoning.sources 用 Analyst 已接地范围补齐；不创造新的文件证据。",
+          "findings": []
+        },
+        {
+          "name": "normalizeRef",
+          "line": 132,
+          "endLine": 143,
+          "reviewed": true,
+          "role": "normalizeBareSourceRefs 内部逐引用补齐；已有行号保留。",
+          "findings": []
+        },
+        {
+          "name": "buildSnippetRepairHint",
+          "line": 162,
+          "endLine": 168,
+          "reviewed": true,
+          "role": "格式化 bounded range 提示，与生产 payload 分离。",
+          "findings": []
+        },
+        {
+          "name": "handle",
+          "line": 170,
+          "endLine": 189,
+          "reviewed": true,
+          "role": "兼容公开动作分发入口：search/prime/submit/detail/manage。",
+          "findings": []
+        },
+        {
+          "name": "handleSearch",
+          "line": 195,
+          "endLine": 234,
+          "reviewed": true,
+          "role": "调用宿主 SearchEngine，投影 id/title/kind/score/preview，返回紧凑搜索结果。",
+          "findings": []
+        },
+        {
+          "name": "handlePrime",
+          "line": 244,
+          "endLine": 323,
+          "reviewed": true,
+          "role": "检索后依次读取 KnowledgeRepo 详情，投影任务相关 do/dont/sources；详情单条失败退回搜索摘要。",
+          "findings": []
+        },
+        {
+          "name": "projectPersistedRecipeReview",
+          "line": 354,
+          "endLine": 363,
+          "reviewed": true,
+          "role": "从 gateway.created.raw 选择 reviewer 所需字段；不从原始候选伪造持久化输出。",
+          "findings": []
+        },
+        {
+          "name": "handleSubmit",
+          "line": 365,
+          "endLine": 920,
+          "reviewed": true,
+          "role": "贯穿输入归一、证据展开/修复、Core gate、软风格处理、生产 port、readiness 与输出的主编排。",
+          "findings": [
+            "K-01",
+            "K-02",
+            "K-03",
+            "K-05"
+          ]
+        },
+        {
+          "name": "pickString",
+          "line": 922,
+          "endLine": 924,
+          "reviewed": true,
+          "role": "非空字符串 trim 归一。",
+          "findings": []
+        },
+        {
+          "name": "sessionCounterBox",
+          "line": 937,
+          "endLine": 953,
+          "reviewed": true,
+          "role": "获取 sharedState._sessionCounters 嵌套稳定对象，抵抗 runtime 临时投影与阶段浅拷贝。",
+          "findings": []
+        },
+        {
+          "name": "bumpSubmitRepairStat",
+          "line": 963,
+          "endLine": 974,
+          "reviewed": true,
+          "role": "累加稳定会话盒 submitRepairStats。",
+          "findings": []
+        },
+        {
+          "name": "stripProjectNamePrefix",
+          "line": 982,
+          "endLine": 996,
+          "reviewed": true,
+          "role": "移除标题中的当前项目名前缀。",
+          "findings": []
+        },
+        {
+          "name": "normalizeStringArray",
+          "line": 998,
+          "endLine": 1003,
+          "reviewed": true,
+          "role": "过滤非字符串/空白项（保留原有字符串文本）。",
+          "findings": []
+        },
+        {
+          "name": "uniqueStrings",
+          "line": 1005,
+          "endLine": 1007,
+          "reviewed": true,
+          "role": "按原字符串去重，剔除空白项。",
+          "findings": []
+        },
+        {
+          "name": "buildDefaultUsageGuide",
+          "line": 1009,
+          "endLine": 1014,
+          "reviewed": true,
+          "role": "由 when/do/dont 生成兼容 usageGuide。",
+          "findings": []
+        },
+        {
+          "name": "validateSubmitParams",
+          "line": 1016,
+          "endLine": 1082,
+          "reviewed": true,
+          "role": "提交的低成本 presence/structure 前检；权威谓词仍由 Core gate 决定。",
+          "findings": [
+            "K-04"
+          ]
+        },
+        {
+          "name": "handleDetail",
+          "line": 1088,
+          "endLine": 1113,
+          "reviewed": true,
+          "role": "按 id 读取真实知识实体并估算返回 token。",
+          "findings": []
+        },
+        {
+          "name": "handleActiveTransition",
+          "line": 1188,
+          "endLine": 1251,
+          "reviewed": true,
+          "role": "approve/publish 先读 Core readiness，再调用 Core publish；结构化保留 Core readiness 拒绝。",
+          "findings": [
+            "K-02"
+          ]
+        },
+        {
+          "name": "handleManage",
+          "line": 1253,
+          "endLine": 1371,
+          "reviewed": true,
+          "role": "分发 review 队列/记录、active transition、evolution 与普通 repo 管理动作。",
+          "findings": []
+        },
+        {
+          "name": "handleEvolutionManage",
+          "line": 1373,
+          "endLine": 1431,
+          "reviewed": true,
+          "role": "把 evolve/deprecate/skip_evolution 归一为 proposal gateway update/deprecate/valid。",
+          "findings": []
+        },
+        {
+          "name": "resolveEvolutionSource",
+          "line": 1433,
+          "endLine": 1438,
+          "reviewed": true,
+          "role": "白名单验证 sharedState evolution source，缺省 alembic-agent。",
+          "findings": []
+        },
+        {
+          "name": "defaultEvolutionDescription",
+          "line": 1440,
+          "endLine": 1448,
+          "reviewed": true,
+          "role": "按 evolution operation 补默认说明。",
+          "findings": []
+        },
+        {
+          "name": "evolutionStatus",
+          "line": 1450,
+          "endLine": 1461,
+          "reviewed": true,
+          "role": "将 proposal outcome 投影为旧工具 status。",
+          "findings": []
+        },
+        {
+          "name": "buildEvolutionEvidence",
+          "line": 1463,
+          "endLine": 1488,
+          "reviewed": true,
+          "role": "合并数组/单对象 evidence 与 inline evidence。",
+          "findings": []
+        },
+        {
+          "name": "collectInlineEvidence",
+          "line": 1490,
+          "endLine": 1509,
+          "reviewed": true,
+          "role": "收集明确白名单的 evolution 证据字段。",
+          "findings": []
+        },
+        {
+          "name": "recordValue",
+          "line": 1511,
+          "endLine": 1515,
+          "reviewed": true,
+          "role": "普通非数组对象类型守卫。",
+          "findings": []
+        },
+        {
+          "name": "stringValue",
+          "line": 1517,
+          "endLine": 1519,
+          "reviewed": true,
+          "role": "非空字符串守卫（保留原字节）。",
+          "findings": []
+        },
+        {
+          "name": "numberValue",
+          "line": 1521,
+          "endLine": 1523,
+          "reviewed": true,
+          "role": "有限数值守卫。",
+          "findings": []
+        },
+        {
+          "name": "truncateText",
+          "line": 1555,
+          "endLine": 1560,
+          "reviewed": true,
+          "role": "搜索/prime 输出的定长文本裁剪。",
+          "findings": []
+        },
+        {
+          "name": "evaluatePreparedItem",
+          "line": 1563,
+          "endLine": 1583,
+          "reviewed": true,
+          "role": "调用同一 Core gate；当不安全 coreCode 已移除时过滤指定源码/snippet 拒因，让独立 profile 的 Core readiness 决定后续资格。",
+          "findings": [
+            "K-05"
+          ]
+        }
+      ],
+      "anonymousCallbacks": "按所属父函数的 map/filter/try/catch/await 路径逐句核对。"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/recipeAuthoringGate.ts",
+      "baseline": "230c635",
+      "lines": 183,
+      "reviewed": true,
+      "coverage": "entire source file; named functions plus named nested closures listed, unnamed callbacks reviewed within parent function",
+      "functions": [
+        {
+          "name": "createInProcessSourceRefResolver",
+          "line": 46,
+          "endLine": 136,
+          "reviewed": true,
+          "role": "Agent 宿主源码引用解析端口：lexical + symlink containment、存在/文件/范围验证，返回 Core evidence/violation。",
+          "findings": []
+        },
+        {
+          "name": "isInsideRoot",
+          "line": 139,
+          "endLine": 142,
+          "reviewed": true,
+          "role": "lexical containment 辅助检查。",
+          "findings": []
+        },
+        {
+          "name": "runInProcessRecipeAuthoringGate",
+          "line": 153,
+          "endLine": 169,
+          "reviewed": true,
+          "role": "Core resolveAuthoringProfile + validateAgainst(stage all, path in-process)，注入本地 fs resolver。",
+          "findings": []
+        },
+        {
+          "name": "formatRecipeAuthoringViolations",
+          "line": 175,
+          "endLine": 183,
+          "reviewed": true,
+          "role": "将 Core violation 的定位、code、message、nextAction 组成既有 fail 文本。",
+          "findings": []
+        }
+      ],
+      "anonymousCallbacks": "按所属父函数的 map/filter/try/catch/await 路径逐句核对。"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/recipeProductionAdapter.ts",
+      "baseline": "230c635",
+      "lines": 237,
+      "reviewed": true,
+      "coverage": "entire source file; named functions plus named nested closures listed, unnamed callbacks reviewed within parent function",
+      "functions": [
+        {
+          "name": "record",
+          "line": 34,
+          "endLine": 38,
+          "reviewed": true,
+          "role": "非数组对象守卫。",
+          "findings": []
+        },
+        {
+          "name": "text",
+          "line": 40,
+          "endLine": 42,
+          "reviewed": true,
+          "role": "字符串 trim。",
+          "findings": []
+        },
+        {
+          "name": "stringArray",
+          "line": 44,
+          "endLine": 52,
+          "reviewed": true,
+          "role": "字符串数组归一。",
+          "findings": []
+        },
+        {
+          "name": "distinctSorted",
+          "line": 54,
+          "endLine": 58,
+          "reviewed": true,
+          "role": "去重排序，稳定 profile provenance。",
+          "findings": []
+        },
+        {
+          "name": "sourceRefsFromItem",
+          "line": 60,
+          "endLine": 63,
+          "reviewed": true,
+          "role": "合并 sourceRefs 与 reasoning.sources 作为有界证据输入。",
+          "findings": []
+        },
+        {
+          "name": "logicalLines",
+          "line": 65,
+          "endLine": 71,
+          "reviewed": true,
+          "role": "按 LF 分行并去掉末尾换行的空伪行。",
+          "findings": []
+        },
+        {
+          "name": "isDocumentationPath",
+          "line": 73,
+          "endLine": 80,
+          "reviewed": true,
+          "role": "识别文档扩展名/目录，允许 profile 接地但禁止 coreCode。",
+          "findings": []
+        },
+        {
+          "name": "readProjectSourceEvidence",
+          "line": 82,
+          "endLine": 137,
+          "reviewed": true,
+          "role": "精确 bounded ref 解析，范围上限160行、真实路径 containment、文档/整文件标识。",
+          "findings": []
+        },
+        {
+          "name": "factProvenanceRefs",
+          "line": 139,
+          "endLine": 152,
+          "reviewed": true,
+          "role": "读取 concepts/scenarios/exclusions 的 provenanceRefs。",
+          "findings": []
+        },
+        {
+          "name": "buildRetrievalProfile",
+          "line": 154,
+          "endLine": 189,
+          "reviewed": true,
+          "role": "确定性填 Core schemaVersion/generator/hash/provenance；事实文本仍来自 authored profile。",
+          "findings": []
+        },
+        {
+          "name": "prepareRecipeProductionItem",
+          "line": 198,
+          "endLine": 237,
+          "reviewed": true,
+          "role": "coreCode 独立准入（120行/12000字符、逐字匹配、非文档/非整文件）；不安全代码剥离，保留可独立评估 profile。",
+          "findings": []
+        }
+      ],
+      "anonymousCallbacks": "按所属父函数的 map/filter/try/catch/await 路径逐句核对。"
+    },
+    {
+      "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+      "baseline": "230c635",
+      "lines": 498,
+      "reviewed": true,
+      "coverage": "entire source file; named functions plus named nested closures listed, unnamed callbacks reviewed within parent function",
+      "functions": [
+        {
+          "name": "uniqueMerge",
+          "line": 29,
+          "endLine": 47,
+          "reviewed": true,
+          "role": "合并源数组与机械标签，保留顺序去重。",
+          "findings": []
+        },
+        {
+          "name": "push",
+          "line": 32,
+          "endLine": 37,
+          "reviewed": true,
+          "role": "uniqueMerge 内部字符串过滤与追加。",
+          "findings": []
+        },
+        {
+          "name": "expandEvidenceRefsForSubmit",
+          "line": 49,
+          "endLine": 139,
+          "reviewed": true,
+          "role": "解析 evidenceRefs，校验带 range 条目新鲜度，从真实条目生成引用标签；resolvedRefs 与 file 标签数分开。",
+          "findings": []
+        },
+        {
+          "name": "ledgerDistinctFiles",
+          "line": 148,
+          "endLine": 158,
+          "reviewed": true,
+          "role": "读取台账所有条目，收集 distinct 文件。",
+          "findings": []
+        },
+        {
+          "name": "basenameOf",
+          "line": 160,
+          "endLine": 163,
+          "reviewed": true,
+          "role": "取得路径末段，用于唯一 basename 矫正。",
+          "findings": []
+        },
+        {
+          "name": "sanitizeSubmissionEvidence",
+          "line": 175,
+          "endLine": 290,
+          "reviewed": true,
+          "role": "引用净化、唯一 basename 矫正、行号补齐以及证据广度 scope 收窄；不接管 Core gate。",
+          "findings": []
+        },
+        {
+          "name": "sanitizeList",
+          "line": 193,
+          "endLine": 220,
+          "reviewed": true,
+          "role": "sanitizeSubmissionEvidence 内部引用列表净化，全部无效时保留原列表交权威门禁。",
+          "findings": []
+        },
+        {
+          "name": "backfillLine",
+          "line": 231,
+          "endLine": 264,
+          "reviewed": true,
+          "role": "sanitizeSubmissionEvidence 内部从被引用台账条目补裸路径行号。",
+          "findings": []
+        },
+        {
+          "name": "buildViolationRepairTemplates",
+          "line": 296,
+          "endLine": 318,
+          "reviewed": true,
+          "role": "根据 Core 违规代码和动词单源生成修复反馈。",
+          "findings": []
+        },
+        {
+          "name": "isStyleRepairable",
+          "line": 329,
+          "endLine": 331,
+          "reviewed": true,
+          "role": "限定允许 LLM 文案修复的 code 集合；GRAPH_REF_INVALID 仅允许移除/改写无背书调用链断言。",
+          "findings": []
+        },
+        {
+          "name": "extractFirstJsonObject",
+          "line": 333,
+          "endLine": 342,
+          "reviewed": true,
+          "role": "调用共享 extractJSON 提取窄对象响应。",
+          "findings": []
+        },
+        {
+          "name": "repairStyleViolations",
+          "line": 350,
+          "endLine": 420,
+          "reviewed": true,
+          "role": "绑定 provider.chat，用窄 JSON 修复可写字段；任何普通解析/provider 失败返回 null 并诊断。",
+          "findings": [
+            "K-02"
+          ]
+        },
+        {
+          "name": "pick",
+          "line": 395,
+          "endLine": 398,
+          "reviewed": true,
+          "role": "repairStyleViolations 内部非空字符串字段提取。",
+          "findings": []
+        },
+        {
+          "name": "inferEvidenceRefsFromSources",
+          "line": 432,
+          "endLine": 461,
+          "reviewed": true,
+          "role": "同文件 exact 台账映射，每文件首个真实条目，上限5，不编造 E-id。",
+          "findings": []
+        },
+        {
+          "name": "buildEvidenceCandidatesHint",
+          "line": 463,
+          "endLine": 498,
+          "reviewed": true,
+          "role": "从真实台账最多50条构建带范围优先的候选提示。",
+          "findings": []
+        }
+      ],
+      "anonymousCallbacks": "按所属父函数的 map/filter/try/catch/await 路径逐句核对。"
+    }
+  ],
+  "corePublicBoundary": {
+    "exports": [
+      {
+        "path": "AlembicWorkspace/AlembicCore/src/index.ts",
+        "line": 63
+      },
+      {
+        "path": "AlembicWorkspace/AlembicCore/src/service/index.ts",
+        "line": 3
+      },
+      {
+        "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/index.ts",
+        "line": 12
+      },
+      {
+        "path": "AlembicWorkspace/AlembicCore/src/knowledge.ts",
+        "line": 205,
+        "endLine": 211
+      }
+    ],
+    "contract": {
+      "source": "RecipeProductionPort",
+      "refs": [
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/RecipeProductionGateway.ts",
+          "line": 332,
+          "endLine": 372
+        }
+      ],
+      "methods": [
+        "createOrStage(input.items/options, ProducerContext source/userId/capability) → created/rejected/merged/blocked/duplicates/pendingSemanticReview + production evidence",
+        "evaluateReadiness(recipeId) → RetrievalReadinessReport",
+        "publish(recipeId, {userId}) → persisted production record"
+      ],
+      "noAbortSignal": true,
+      "strictBoundary": "StrictPreparedRecipePersistencePortV1 / persistPreparedReviewedCandidate 是独立 strict 凭证链，不应在知识工具普通 createOrStage 分层时混入或替换。"
+    },
+    "implementationRead": [
+      {
+        "ref": {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/RecipeProductionGateway.ts",
+          "line": 701,
+          "endLine": 733
+        },
+        "meaning": "createOrStage admission 后委托 create；readiness/publish 各委托 KnowledgeService。readiness 端口缺失能真实抛 recipe-production-readiness-unavailable。"
+      },
+      {
+        "ref": {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/RecipeProductionGateway.ts",
+          "line": 792,
+          "endLine": 827
+        },
+        "meaning": "统一 schema/uniqueness gate 位于 Core；Agent 前置 gate 不替代实际创建 boundary。"
+      },
+      {
+        "ref": {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/RecipeProductionGateway.ts",
+          "line": 1019,
+          "endLine": 1078
+        },
+        "meaning": "KnowledgeService.create 返回 saved 后将真实 saved.id/title/lifecycle/raw 写 created receipt；质量评分为 best effort。"
+      },
+      {
+        "ref": {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/RecipeProductionGateway.ts",
+          "line": 1204,
+          "endLine": 1240
+        },
+        "meaning": "Core 构造最终持久化字段，含 moduleName 派生、source/metadata 兼容；Agent 不用原始 candidate 代替 persisted raw。"
+      },
+      {
+        "ref": {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/RecipeRetrieval.ts",
+          "line": 70,
+          "endLine": 87
+        },
+        "meaning": "ready/violations/hash 是 Core readiness 真值；provider/vector 可用性仅作为 diagnostics warning。"
+      },
+      {
+        "ref": {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/RecipeRetrieval.ts",
+          "line": 113,
+          "endLine": 142
+        },
+        "meaning": "profile source hash 依赖最终 authored 字段。graphRefs/styleWaiver/styleAdvisories 不在 identity；style 改 title/do/markdown 后必须重算。"
+      }
+    ],
+    "resolverReuseBoundary": {
+      "publicFactory": {
+        "path": "AlembicWorkspace/AlembicCore/src/knowledge.ts",
+        "line": 159,
+        "endLine": 161
+      },
+      "coreImplementation": {
+        "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/FsSourceRefResolver.ts",
+        "line": 29,
+        "endLine": 100
+      },
+      "agentAdditionalContainment": {
+        "path": "AlembicAgent/src/tools/runtime/handlers/recipeAuthoringGate.ts",
+        "line": 97,
+        "endLine": 110
+      },
+      "decision": "保留 Agent resolver adapter；当前 Core public factory 缺 symlink realpath containment，不能仅因重复结构直接替换。邻仓收敛需要另行授权和边界 parity 测试。"
+    }
+  },
+  "actualFlow": {
+    "submit": [
+      {
+        "phase": "presence precheck + host defaults",
+        "refs": [
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+            "line": 377,
+            "endLine": 454
+          }
+        ],
+        "responsibility": "Agent 输入归一/项目语言维度标签/source身份，不负责 Core持久化。"
+      },
+      {
+        "phase": "title budget + ledger expansion + inference + sanitize",
+        "refs": [
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+            "line": 468,
+            "endLine": 573
+          },
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+            "line": 49,
+            "endLine": 138
+          },
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+            "line": 175,
+            "endLine": 289
+          }
+        ],
+        "responsibility": "证据来源和新鲜度是 Agent runtime / ledger 端口编排；不编造代码，不复制 Core谓词。"
+      },
+      {
+        "phase": "bounded code/profile preparation + authoritative gate",
+        "refs": [
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+            "line": 574,
+            "endLine": 610
+          },
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/recipeProductionAdapter.ts",
+            "line": 198,
+            "endLine": 237
+          },
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/recipeAuthoringGate.ts",
+            "line": 153,
+            "endLine": 168
+          }
+        ],
+        "responsibility": "adapter 负责 source/provenance/wire；Core 决定事实/风格门禁。"
+      },
+      {
+        "phase": "waiver + optional LLM style repair + soft advisory",
+        "refs": [
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+            "line": 618,
+            "endLine": 704
+          },
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+            "line": 350,
+            "endLine": 420
+          }
+        ],
+        "responsibility": "Core 提供 soft/waiver 单源；Agent 控制 LLM预算、取消、修复次数与重新验证。"
+      },
+      {
+        "phase": "createOrStage once",
+        "refs": [
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+            "line": 777,
+            "endLine": 797
+          }
+        ],
+        "responsibility": "真实副作用边界；Core 返回持久化 receipt。"
+      },
+      {
+        "phase": "readiness + session notes + return persisted projection",
+        "refs": [
+          {
+            "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+            "line": 799,
+            "endLine": 844
+          }
+        ],
+        "responsibility": "附加读取与观察必须和已提交事实区分；不自行 publish。"
+      }
+    ],
+    "manage": "review-queue/review → stagingManager；evolution三动作 → proposalGateway；approve/publish → Core readiness + publish；reject/update/score/validate → KnowledgeRepo。",
+    "importantBranches": [
+      "无 evidenceRefs 允许旧 reasoning.sources 流；有 refs 而无 ledger 明确拒绝。",
+      "ledger 在场时 resolvedRefs 必须大于0；无 file 的真实 search/graph/terminal 引用仍有效，不能与零证据混同。",
+      "file+range 的 freshness stale 拒绝；file-only 搜索条目可派生命中行标签，不能声称其拥有完整片段的 freshness 证明。",
+      "不安全 coreCode 被移除与独立 profile 能否合格是两件事；由 readiness 展示最终资格。",
+      "ready=false 的 pending/staging candidate 仍是 created；submit 不 publish。",
+      "Graph措辞修复只可消除/改述无背书调用链断言，不能生成新 graph 证据。"
+    ]
+  },
+  "consumers": [
+    {
+      "kind": "actual production handler wiring",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/registry.ts",
+          "line": 308,
+          "endLine": 374
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/router.ts",
+          "line": 50,
+          "endLine": 93
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/adapter/ToolRouterAdapter.ts",
+          "line": 80,
+          "endLine": 129
+        }
+      ],
+      "note": "registry.handler 引用 handle；submit single/write；router 负责 schema/capability/调度，adapter 转 envelope。"
+    },
+    {
+      "kind": "persisted receipt truth",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/utils/toolOutcomes.ts",
+          "line": 59,
+          "endLine": 72
+        },
+        {
+          "path": "AlembicAgent/src/agent/runs/scan/ScanRunProjection.ts",
+          "line": 84,
+          "endLine": 105
+        },
+        {
+          "path": "AlembicAgent/src/agent/runtime/toolPipeline/submissionLedger.ts",
+          "line": 62
+        }
+      ],
+      "note": "消费者要求真实 created/id/pending或staging，不得让 readiness 后处理失败清掉 identity。"
+    },
+    {
+      "kind": "session metrics",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 219,
+          "endLine": 255
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 337,
+          "endLine": 339
+        }
+      ],
+      "note": "_sessionCounters 在策略入口预建，并被修复计数与 readiness 结果投影读取。"
+    },
+    {
+      "kind": "compatibility exports",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 48,
+          "endLine": 51
+        },
+        {
+          "path": "AlembicAgent/test/recipe-authoring-inprocess-flatten.test.ts",
+          "line": 680,
+          "endLine": 682
+        }
+      ],
+      "note": "applyStyleWaiver/isSoftAuthoringViolation 重导出与 Core 函数身份一致，测试明确消费。handle 与 source helper 导出保持，不用缺少邻仓直接import作为删除依据。"
+    },
+    {
+      "kind": "adjacent public Core port consumers",
+      "refs": [
+        {
+          "path": "AlembicWorkspace/AlembicPlugin/lib/host-runtime/mcp/handlers/tool-router.ts",
+          "line": 370,
+          "endLine": 395
+        },
+        {
+          "path": "AlembicWorkspace/Alembic/lib/http/routes/knowledge.ts",
+          "line": 215,
+          "endLine": 224
+        }
+      ],
+      "note": "Plugin 通过公共 createOrStage/evaluateReadiness 消费；Alembic HTTP 提供独立 readiness 读面。它们不授权 Agent 修改邻仓/吸收宿主协议。"
+    }
+  ],
+  "findings": [
+    {
+      "id": "K-01",
+      "severity": "P1",
+      "title": "持久化后的附加读取/记录异常抹掉已创建身份",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 777,
+          "endLine": 844
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 914,
+          "endLine": 918
+        }
+      ],
+      "issue": "createOrStage 已返回 created 后，evaluateReadiness 或 sessionStore.save 的异常进入统一提交 catch，返回 Submit failed 且没有 created id。消费者因此把实际落库候选当失败，可能重新提交或漏计成果。",
+      "repro": {
+        "mode": "实际四个 Agent 源码模块经 TypeScript transpile 内存加载 + 当前 Core 公共 validateAgainst；仅 gateway/provider/session store 为内存 mock。",
+        "baseline": "同候选常规路径通过真实 Core gate 且 status created。",
+        "cases": [
+          {
+            "mock": "createOrStage 返回 persisted-1，evaluateReadiness 抛 readiness unavailable",
+            "observed": {
+              "createCalls": 1,
+              "result": {
+                "ok": false,
+                "error": "Submit failed: readiness unavailable"
+              },
+              "createdIdMissing": true
+            }
+          },
+          {
+            "mock": "readiness 正常，sessionStore.save 抛 session save failed",
+            "observed": {
+              "createCalls": 1,
+              "result": {
+                "ok": false,
+                "error": "Submit failed: session save failed"
+              },
+              "createdIdMissing": true
+            }
+          }
+        ]
+      },
+      "impactConsumers": [
+        {
+          "path": "AlembicAgent/src/agent/utils/toolOutcomes.ts",
+          "line": 59,
+          "endLine": 72
+        },
+        {
+          "path": "AlembicAgent/src/agent/runs/scan/ScanRunProjection.ts",
+          "line": 84,
+          "endLine": 105
+        },
+        {
+          "path": "AlembicAgent/src/agent/runtime/toolPipeline/submissionLedger.ts",
+          "line": 62
+        }
+      ],
+      "suggestion": "以 createOrStage.created 作为不可逆边界；先形成真实 persisted receipt，再把 readiness 与本地会话记录当独立后处理。后处理失败仍保留 ok/status created/id/lifecycle，增加明确 degraded/readiness-unavailable 诊断，不能伪造 Core ready=true，也不能再次 create。",
+      "minimalTests": [
+        "create 成功 + readiness 抛错仍返回 created 身份，且 create 恰好一次。",
+        "readiness 正常 + sessionStore.save 抛错仍保留 created/readiness；诊断记录附加失败。",
+        "submit 的 created 且 ready=false 仍计为已持久化 pending，维持原语义。"
+      ],
+      "contractImpact": "ToolResult 是开放对象，可加结构化后处理诊断；保持现有 status/id/lifecycle 与 readiness 成功形状。Core port 无需变更。"
+    },
+    {
+      "id": "K-02",
+      "severity": "P1",
+      "title": "异步准备期间取消后仍继续执行知识写入/发布",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 643,
+          "endLine": 683
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 777,
+          "endLine": 797
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 1201,
+          "endLine": 1229
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+          "line": 350,
+          "endLine": 418
+        },
+        {
+          "path": "AlembicAgent/src/ai/AiProvider.ts",
+          "line": 61,
+          "endLine": 66
+        },
+        {
+          "path": "AlembicAgent/src/ai/AiProvider.ts",
+          "line": 456,
+          "endLine": 470
+        }
+      ],
+      "issue": "handler 不检查 ctx.abortSignal；style chat 返回后仍 createOrStage；manage readiness 返回后仍 publish。style helper 没有等待上限/取消，chat 也未得到 signal。外层 router 只负责入场检查，不能在 handler 已进入后阻止后续副作用。",
+      "repro": {
+        "cases": [
+          {
+            "scenario": "阻塞 style chat；收到调用后 abort；释放修复 JSON",
+            "observed": {
+              "signalAborted": true,
+              "createCalls": 1,
+              "status": "created",
+              "providerContextKeys": [
+                "maxTokens",
+                "temperature"
+              ]
+            }
+          },
+          {
+            "scenario": "manage publish 的 evaluateReadiness 阻塞；abort；释放 ready=true",
+            "observed": {
+              "signalAborted": true,
+              "publishCalls": 1,
+              "status": "published",
+              "lifecycle": "active"
+            }
+          }
+        ],
+        "red": true
+      },
+      "suggestion": "handle/子动作在入场检查取消，所有可等待准备步骤结束后、每个新持久化/发布动作前再次检查。为 style repair 增加可选 signal/deadline 的有界等待并清理 timer/listener，迟到结果不再进入 gate/create。若要求底层 provider HTTP 真取消，还需 ChatContext 可选 abortSignal + _gatewayChat 传入 gateway；旧 chat 忽略 signal 时只保证 bounded wait/抛弃迟到结果。",
+      "minimalTests": [
+        "预取消不调用 provider/production/publish。",
+        "取消发生在 style chat 中，handle 及时结束，迟到 JSON 不触发 create。",
+        "取消发生在 readiness 中，late ready=true 不触发 publish。",
+        "超时和正常完成后 timer/listener 清除；signal 传至真实 provider mock transport。",
+        "Core create 已启动后取消不能声称事务回滚；保留已知 committed 身份或明确未知执行状态。"
+      ],
+      "contractImpact": "RecipeProductionPort 没有 signal 入参，本轮 Agent 可在写前阻断；真实中断 create 需要 Core 另行扩展。ChatContext 增可选 abortSignal 是加性公共契约；style helper 保留原四参调用兼容。"
+    },
+    {
+      "id": "K-03",
+      "severity": "P2",
+      "title": "风格修复次数仍写入一次性 runtime 投影",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 644,
+          "endLine": 650
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 926,
+          "endLine": 952
+        }
+      ],
+      "issue": "修复预算写 ctx.runtime._styleRepairAttempts；Runtime 每次工具调用创建新投影，sharedState 稳定但直接 runtime 字段随调用丢弃。相同标题最多两次的代码限额在真实调用方式下可被连续触发三次（标题总止损第四次才阻止）。",
+      "repro": {
+        "scenario": "同 sharedState，每次构造新 runtime；相同标题 + 可修复 soft violation；chat 返回不可解析 JSON；调用3次。",
+        "observed": {
+          "chatCalls": 3,
+          "configuredThreshold": 2,
+          "titleAttempts": 3,
+          "sharedCountersHaveStyleRepairBudget": false
+        },
+        "red": true
+      },
+      "suggestion": "把 per-title style 修复计数放到 sessionCounterBox 的稳定嵌套记录，明确实际预算值；兼容旧四参 helper 与既有 repair-hit 统计。",
+      "minimalTests": [
+        "连续3次工具调用共享同一个 _sessionCounters 但 runtime 对象不同，最多2次 chat。",
+        "阶段 sharedState 浅拷贝仍共享修复计数；不同标题各自预算独立。"
+      ],
+      "contractImpact": "内部会话状态位置修复，不需要删除/改变公开函数；既有 _sessionCounters 成果投影保持。"
+    },
+    {
+      "id": "K-04",
+      "severity": "P3",
+      "title": "提交低成本前检对错误类型抛出 TypeError",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 377,
+          "endLine": 386
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 1016,
+          "endLine": 1081
+        }
+      ],
+      "issue": "validateSubmitParams 在 try 外使用 as string + trim，title/description/trigger/whenClause/doClause 及 content 字段传 truthy 非字符串时抛出；公开 handle 没有统一转 fail。标准 router schema 可在此前挡住，所以主要影响直接 handle 调用边界与防御性契约。",
+      "repro": {
+        "scenario": "合法基础候选改 title:123，通过公开 handle(\"submit\") 调用。",
+        "observed": {
+          "promiseRejected": true,
+          "message": "title.trim is not a function",
+          "gatewayCreateCalls": 0
+        },
+        "red": true
+      },
+      "suggestion": "前检使用真实 typeof/record 守卫而非类型断言，content/reasoning 排除数组；返回验证 fail。不要仅把 TypeError 改为泛用 Submit failed，保留具体字段定位。",
+      "minimalTests": [
+        "表驱动：title/description/trigger/whenClause/doClause/content.markdown/content.rationale 非字符串都 resolve 为 fail，不调用 gateway。",
+        "标准 router 对同样 malformed 输入继续通过 schema fail；direct handle 也不泄漏 TypeError。"
+      ],
+      "contractImpact": "不改 handle 签名，只把错误形状统一；正常输入保持。"
+    },
+    {
+      "id": "K-05",
+      "severity": "P2",
+      "title": "Graph 证据自动补齐绕过统一 prepared gate 的降级语义",
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 582,
+          "endLine": 608
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 1563,
+          "endLine": 1583
+        }
+      ],
+      "issue": "初次和 style retry 走 evaluatePreparedItem，graph retry 却直接 runInProcessRecipeAuthoringGate。coreCode 已剥离的独立 profile 候选，在 graphRefs 是原始显式字段时允许交 Core readiness；同样 refs 由 Analyst 自动注入时重新引入原先被过滤的源码/snippet 违规而拒绝。",
+      "repro": {
+        "baseline": "230c635",
+        "scenario": "fact 候选含调用链措辞，越界 source（src/shared/projectPath.ts:9999-10000）、不安全 coreCode、独立 field-grounded retrievalProfile。两次只区别 graphRefs 预先给定或由 _analystGraphEvidence 补同值。",
+        "observed": {
+          "explicitGraphRefs": {
+            "ok": true,
+            "createCalls": 1
+          },
+          "sameRefsAutoInjected": {
+            "ok": false,
+            "errorContains": "SOURCE_REF_LINE_OUT_OF_RANGE",
+            "createCalls": 0
+          }
+        },
+        "red": true
+      },
+      "suggestion": "把 graph 修复也经过同一个 prepared evaluation helper；更新 effective item 时保留首次 codeEvidence，必要时统一重新 prepare profile 身份。不得复活剥离代码，也不要新增一套违规白名单。",
+      "minimalTests": [
+        "显式 graphRefs 与同值自动注入得到相同 gate/persistence 结果。",
+        "graph 修复和 style 修复组合仍保留 codeEvidence.accepted=false，coreCode 始终为空。",
+        "无 Analyst graphEvidence 仍不编造 refs，保留 GRAPH_REF_INVALID 路径。"
+      ],
+      "contractImpact": "内部控制流一致性修复；保持现有 unsafe-code diagnostic 和 Core readiness 协议。"
+    }
+  ],
+  "architectureRecommendations": [
+    {
+      "id": "KA-1",
+      "title": "保留统一 façade，把只读与生命周期动作从提交状态机移出",
+      "proposal": "knowledge.ts 保持 handle(action, params, ctx) 和两个 Core authority 兼容 exports；search/prime/detail 放 query handler；manage/evolution 放 lifecycle handler。共享 ToolResult/小型记录守卫可收敛，但不要把授权/持久化语义压成通用 CRUD。",
+      "benefit": "提交文件不再同时承担搜索格式化、staging review、proposal适配；每条动作有独立错误/取消边界。",
+      "tests": "原 handle + registry 动作路径成功/失败/取消一致；approve/publish 仍只走 Core production port，不回退 repo.update lifecycle。",
+      "contractImpact": "兼容 façade 保留，不增加新的对外入口要求。"
+    },
+    {
+      "id": "KA-2",
+      "title": "把提交准备变成同一条可复查的候选转换链",
+      "proposal": "独立 PreparedSubmission 状态包含 effectiveItem/codeEvidence/violations/repair diagnostics；normalize → ledger evidence → adapter prepare → Core gate；Graph/风格修复均回到同一 prepare/evaluate 函数，稳定会话预算单独 helper。",
+      "benefit": "闭合 K-03/K-05；避免 graph retry 和 style retry 各自维护变体语义；核心规则仍由 @alembic/core/knowledge 提供。",
+      "tests": "同一证据的显式/自动 graphRefs 等价；unsafe code 永不复活；style改变 authored 字段 hash重算；不同runtime投影预算共享。",
+      "contractImpact": "内部类型可收敛；现有 prepareRecipeProductionItem / gate / expansion / repair helper exports 继续兼容，避免扩大新抽象框架。"
+    },
+    {
+      "id": "KA-3",
+      "title": "明确持久化之前与之后的错误/取消界线",
+      "proposal": "提交 orchestration 只在准备完成且未取消后调用 createOrStage 一次；一旦取得 created receipt，后续 readiness/notes/metrics 独立收集结果与失败，不再落回“未提交”的错误。active transition 在 readiness等待后重新检查取消再 publish。",
+      "benefit": "闭合 K-01/K-02，让 scan/quality/trace 的已创建身份可靠，并把Core端口不可撤销行为说清楚。",
+      "tests": "created 后 readiness/save失败保留身份；style/readiness等待期间取消不产生新write；取消已开始的 Core 操作不伪称回滚。",
+      "contractImpact": "若新增真实 provider取消为 ChatContext 可选字段 +转发；Core production port 保持原签名，本轮不迁入DB或网关内核。"
+    }
+  ],
+  "cleanupNotes": [
+    {
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 689,
+          "endLine": 729
+        }
+      ],
+      "note": "纯软违规在前段已全部转 advisory 且清空；后面的 appealEligible/appealHint 纯软反馈分支不可达。可移除这段死反馈构造并保留显式 waiver 处理与兼容 exports；先用当前 soft-advisory 测试锁定。"
+    },
+    {
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 466,
+          "endLine": 476
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 641,
+          "endLine": 647
+        }
+      ],
+      "note": "注释称第3次硬停/每title修复1次，但实际 tried>=3 停第4次，repair<2允许2次。先明确保留运行值，再修正文案，不凭注释自行改变预算。"
+    },
+    {
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 397,
+          "endLine": 399
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 495,
+          "endLine": 567
+        },
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+          "line": 955,
+          "endLine": 958
+        }
+      ],
+      "note": "旧注释“无修复/不做过程分类”与现有证据推断/净化，以及 coreCode回填修复统计说明已不同步。更新职责说明，不据旧注释删除真实证据链。"
+    },
+    {
+      "refs": [
+        {
+          "path": "AlembicAgent/src/tools/runtime/handlers/recipeAuthoringGate.ts",
+          "line": 46,
+          "endLine": 135
+        },
+        {
+          "path": "AlembicWorkspace/AlembicCore/src/service/knowledge/FsSourceRefResolver.ts",
+          "line": 29,
+          "endLine": 100
+        }
+      ],
+      "note": "与Core resolver重复有明确安全差异，暂不作为可删除冗余。"
+    }
+  ],
+  "validation": {
+    "probeMode": "Node 22；实际源码在内存转译，Core gate/public deterministic functions 为真实实现，provider/gateway/sessionStore仅内存mock；读取现有 src/shared/projectPath.ts 作为可解析来源，无临时源码/DB/网络。",
+    "probeResults": [
+      {
+        "case": "baseline candidate through actual Core gate",
+        "result": "created"
+      },
+      {
+        "case": "post-create readiness exception",
+        "result": "RED K-01: create=1 but ok=false and id absent"
+      },
+      {
+        "case": "post-create session save exception",
+        "result": "RED K-01: create=1 but ok=false and id absent"
+      },
+      {
+        "case": "abort during style repair",
+        "result": "RED K-02: create=1 after abort"
+      },
+      {
+        "case": "abort during active-transition readiness",
+        "result": "RED K-02: publish=1 after abort"
+      },
+      {
+        "case": "style budget across fresh runtime projections",
+        "result": "RED K-03: chat=3 although code limit=2"
+      },
+      {
+        "case": "malformed direct submit title",
+        "result": "RED K-04: title.trim TypeError escapes"
+      },
+      {
+        "case": "explicit vs auto graphRefs parity",
+        "result": "RED K-05: explicit creates, auto rejects same repaired candidate"
+      }
+    ],
+    "fullTestsRun": false,
+    "existingTestsInspected": [
+      {
+        "path": {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 199,
+          "endLine": 240
+        },
+        "coverage": "style repair refreshes profile hash"
+      },
+      {
+        "path": {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 244,
+          "endLine": 388
+        },
+        "coverage": "readiness + publish success/failure contracts"
+      },
+      {
+        "path": {
+          "path": "AlembicAgent/test/recipe-production-profile-adapter.test.ts",
+          "line": 672,
+          "endLine": 863
+        },
+        "coverage": "created pending, provider independence, unsafe core code, documentation/profile, root escape"
+      },
+      {
+        "path": {
+          "path": "AlembicAgent/test/SubmissionSanitize.test.ts",
+          "line": 136,
+          "endLine": 198
+        },
+        "coverage": "repair JSON extraction/field merge/provider fallback"
+      },
+      {
+        "path": {
+          "path": "AlembicAgent/test/recipe-authoring-inprocess-flatten.test.ts",
+          "line": 438,
+          "endLine": 542
+        },
+        "coverage": "Core gate source/snippet grounding and prompt contract"
+      },
+      {
+        "path": {
+          "path": "AlembicAgent/test/pipeline-outcome-abandoned.test.ts",
+          "line": 174,
+          "endLine": 208
+        },
+        "coverage": "stable session counter shape; references localized, not full-file rereview"
+      }
+    ]
+  },
+  "nextStep": "root 根据已发优先问题实施修复与分层，做针对性RED/GREEN后运行总门禁；本报告不声称产品已修复。",
+  "implementationClosure": {
+    "status": "fixed-ready-for-root-review",
+    "verificationReport": "AlembicAgent/tmp/pipeline-knowledge-2026-09-20/knowledge-fix-verification.json",
+    "confirmedFindingIds": [
+      "K-01",
+      "K-02",
+      "K-03",
+      "K-04",
+      "K-05"
+    ],
+    "additionalAuthorizedCase": "prototype-shaped title counters",
+    "filesFrozen": true
+  }
+}

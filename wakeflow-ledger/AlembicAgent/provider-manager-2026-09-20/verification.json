@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "status": "completed-with-host-followups",
+  "scope": "Agent provider manager lifecycle and usage tracking only",
+  "commit": "b303b3538d1b392d51461efc8aea69a0de2fe45b",
+  "baseCommit": "8f58bdedfe1ce31c52779f3805c40f026f765197",
+  "branch": "codex/llm-sdk-adapters",
+  "files": [
+    "config/layer-contract.json",
+    "docs/llm-adapters.md",
+    "src/ai/AiProviderManager.ts",
+    "src/ai/management/ProviderUsageTracker.ts",
+    "src/ai/management/contracts.ts",
+    "src/ai/management/observers.ts",
+    "test/ai-provider-manager.test.ts",
+    "test/ai-provider.test.ts"
+  ],
+  "verification": {
+    "fullCommand": "npm run check",
+    "fullExitCode": 0,
+    "node": "22.23.2",
+    "testFiles": 76,
+    "tests": 1218,
+    "publicEntrypoints": 15,
+    "runtimeBindings": 451,
+    "existingLintWarnings": 17,
+    "warningFiles": [
+      "scripts/eval-judge-calibration.mjs",
+      "scripts/eval-mining.mjs",
+      "scripts/lint-provider-neutral-kernel.mjs",
+      "scripts/smoke-agent-public-signatures.mjs",
+      "scripts/verify-agent-validation-floor.mjs",
+      "test/mining-e2e-pipeline.test.ts",
+      "test/runtime-terminal-safety.test.ts"
+    ],
+    "warningsInChangedFiles": false,
+    "postReviewCommands": [
+      "npm run build:check",
+      "npm test -- test/ai-provider-manager.test.ts test/ai-provider.test.ts test/LLMGateway.test.ts test/provider-facades.test.ts",
+      "biome check changed source and tests",
+      "git diff --check"
+    ],
+    "postReviewExitCode": 0,
+    "postReviewFiles": 4,
+    "postReviewTests": 58,
+    "postReviewChange": "Removed an unreachable previousBinding branch after full validation.",
+    "coreDependency": "file:../AlembicCore",
+    "coreSymlink": "../../../AlembicCore",
+    "liveModelCalls": false
+  },
+  "baseline": {
+    "command": "npm test -- test/ai-provider.test.ts test/provider-facades.test.ts test/LLMGateway.test.ts",
+    "files": 3,
+    "tests": 40,
+    "exitCode": 0
+  },
+  "regressions": [
+    {
+      "id": "prepare",
+      "behavior": "候选准备失败保留旧路由和 hooks",
+      "red": {
+        "ref": "prepare-red.log",
+        "digest": "sha256:e78f0ed439aab4bd7f74da15b4a52f6cd042953e5a8b5a41781ea3a0ddf9159b"
+      },
+      "green": {
+        "ref": "prepare-green.log",
+        "digest": "sha256:e7223b4d7e530f879b569be72db588c80a9bbe13842bbfe69cdea9d8387ccb02"
+      }
+    },
+    {
+      "id": "compensation",
+      "behavior": "同步/失效失败补偿及补偿失败标记",
+      "red": {
+        "ref": "compensation-red.log",
+        "digest": "sha256:939825674cf9ee215c9f55984c4554c07307d0c4a1d45342fdcd35826bfa5801"
+      },
+      "green": {
+        "ref": "compensation-green.log",
+        "digest": "sha256:22966802e43dc7fa900aa6f6690699ea502113a605d582af9382fb1d698e270a"
+      }
+    },
+    {
+      "id": "events",
+      "behavior": "重入防护、订阅快照和 DTO 隔离",
+      "red": {
+        "ref": "events-red.log",
+        "digest": "sha256:6ba44b73209bdb9a0f7d510a64ea82a8ec0cdcdb737af1db70fc53de2f9d5559"
+      },
+      "green": {
+        "ref": "events-green.log",
+        "digest": "sha256:af62e81aa6cef7ffc63af7342582e7015c3be651ef9b8a5b50eff27e8b076f65"
+      }
+    },
+    {
+      "id": "usage",
+      "behavior": "真实 SDK 旧请求归属、原观察者、embedding 事件、非法 token",
+      "red": {
+        "ref": "usage-red.log",
+        "digest": "sha256:dc2ce637a9d025834ed1c89544d07d4f8d0edefe48e76963cf0be2c79d817106"
+      },
+      "green": {
+        "ref": "usage-green.log",
+        "digest": "sha256:7bede5d9b1d2914784f87df66ebc4b63d6a98f750d0a3f4dd9939ce0b0c7154b"
+      }
+    },
+    {
+      "id": "async-hooks",
+      "behavior": "异步 DI 合同违规阻断及观察者异常隔离",
+      "red": {
+        "ref": "async-hooks-red.log",
+        "digest": "sha256:2ccc766cc3bc24959275ed06b8e1e7c495a6f1532ed64228032a66ea04967b6f"
+      },
+      "green": {
+        "ref": "async-hooks-green.log",
+        "digest": "sha256:7cbfcaf8aa1940cdfce5401cc209626efe0bfc17343e6215a8ea00b9f5bdd2de"
+      }
+    },
+    {
+      "id": "decorated-hook",
+      "behavior": "宿主装饰 hook 不重计且 DTO 可复用",
+      "red": {
+        "ref": "decorated-hook-red.log",
+        "digest": "sha256:c21a403f1d5b4d4e7f60eadbb4a5dcaac81d678b9a8a7c8bad9ae63706fc22de"
+      },
+      "green": {
+        "ref": "decorated-hook-green.log",
+        "digest": "sha256:bb41f743610f09525d9ddd070efbc6071a773fd9a5640824dc98425ed5f99677"
+      }
+    },
+    {
+      "id": "ownership-capability",
+      "behavior": "失败后装饰 hook 所有权与异步能力 Promise",
+      "red": {
+        "ref": "ownership-capability-red.log",
+        "digest": "sha256:2449f0d9e23de704fa4988594d455535218c8171befa321a0127c29439f2da0d"
+      },
+      "green": {
+        "ref": "ownership-capability-green.log",
+        "digest": "sha256:0134ce7f72b125680c93cf9e78df136a6c956095f6337dc91b532a4e49fe61ad"
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "ref": "async-hooks-green.log",
+      "digest": "sha256:7cbfcaf8aa1940cdfce5401cc209626efe0bfc17343e6215a8ea00b9f5bdd2de"
+    },
+    {
+      "ref": "async-hooks-red.log",
+      "digest": "sha256:2ccc766cc3bc24959275ed06b8e1e7c495a6f1532ed64228032a66ea04967b6f"
+    },
+    {
+      "ref": "baseline.log",
+      "digest": "sha256:8fb981c7b8d96b02b929f174e1620bbed302eabf907f4e1328b6c085f7171f32"
+    },
+    {
+      "ref": "compensation-green.log",
+      "digest": "sha256:22966802e43dc7fa900aa6f6690699ea502113a605d582af9382fb1d698e270a"
+    },
+    {
+      "ref": "compensation-red.log",
+      "digest": "sha256:939825674cf9ee215c9f55984c4554c07307d0c4a1d45342fdcd35826bfa5801"
+    },
+    {
+      "ref": "consumer-scan.txt",
+      "digest": "sha256:e0731896a979260f974ac60a9abb6d01277a0b2d8a32dbae98f5192781916cc2"
+    },
+    {
+      "ref": "decorated-hook-green.log",
+      "digest": "sha256:bb41f743610f09525d9ddd070efbc6071a773fd9a5640824dc98425ed5f99677"
+    },
+    {
+      "ref": "decorated-hook-red.log",
+      "digest": "sha256:c21a403f1d5b4d4e7f60eadbb4a5dcaac81d678b9a8a7c8bad9ae63706fc22de"
+    },
+    {
+      "ref": "events-green.log",
+      "digest": "sha256:af62e81aa6cef7ffc63af7342582e7015c3be651ef9b8a5b50eff27e8b076f65"
+    },
+    {
+      "ref": "events-red.log",
+      "digest": "sha256:6ba44b73209bdb9a0f7d510a64ea82a8ec0cdcdb737af1db70fc53de2f9d5559"
+    },
+    {
+      "ref": "full-check-final.log",
+      "digest": "sha256:103764b80dfaa97a39dc365c30b6274fb83229d2aa72dc78eb01c517e83479eb"
+    },
+    {
+      "ref": "full-check-first.log",
+      "digest": "sha256:ff7656d8858ae0504505e849b5cc5f325a0efe3788a7720413eb65bae357a540"
+    },
+    {
+      "ref": "host-followup.md",
+      "digest": "sha256:714015942261e6e3727c0b708c060e9cc818505549a7d320efa24b95a5e57df4"
+    },
+    {
+      "ref": "ownership-capability-green.log",
+      "digest": "sha256:0134ce7f72b125680c93cf9e78df136a6c956095f6337dc91b532a4e49fe61ad"
+    },
+    {
+      "ref": "ownership-capability-red.log",
+      "digest": "sha256:2449f0d9e23de704fa4988594d455535218c8171befa321a0127c29439f2da0d"
+    },
+    {
+      "ref": "plan.md",
+      "digest": "sha256:97a470ad391099a16b3dc30bf0c44f89068493aadea872a7e0137d32ed9f9dc4"
+    },
+    {
+      "ref": "post-review-check.log",
+      "digest": "sha256:882a94ebd4d864dd7b3d19898cd09c6b4c5843c6bd511b90861ca4fe42a66e05"
+    },
+    {
+      "ref": "prepare-green.log",
+      "digest": "sha256:e7223b4d7e530f879b569be72db588c80a9bbe13842bbfe69cdea9d8387ccb02"
+    },
+    {
+      "ref": "prepare-red.log",
+      "digest": "sha256:e78f0ed439aab4bd7f74da15b4a52f6cd042953e5a8b5a41781ea3a0ddf9159b"
+    },
+    {
+      "ref": "review.md",
+      "digest": "sha256:18678875a425699174ef8b1b74e8b60f27e57853ee007df07c1f0e139e0d5ae1"
+    },
+    {
+      "ref": "types-first.log",
+      "digest": "sha256:8ab682c844bb97d9b5bef9a5b964b6ee6ff8d575a813314f27c65645ceb81b0b"
+    },
+    {
+      "ref": "usage-green.log",
+      "digest": "sha256:7bede5d9b1d2914784f87df66ebc4b63d6a98f750d0a3f4dd9939ce0b0c7154b"
+    },
+    {
+      "ref": "usage-red.log",
+      "digest": "sha256:dc2ce637a9d025834ed1c89544d07d4f8d0edefe48e76963cf0be2c79d817106"
+    }
+  ],
+  "preexistingUncommittedFiles": [
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "sources": [
+    "https://nodejs.org/download/release/v22.23.2/docs/api/events.html",
+    "https://opentelemetry.io/docs/specs/otel/error-handling/"
+  ],
+  "hostFollowups": {
+    "ref": "host-followup.md",
+    "status": "read-only findings; implementation not authorized in this repository",
+    "issues": [
+      "Main hot switch drops dedicated embedding selection.",
+      "Main first activation after unconfigured startup misses recorder and embedding setup."
+    ]
+  },
+  "evidenceNormalization": "Only local absolute paths replaced with portable repository/home markers; assertions and outcomes unchanged."
+}

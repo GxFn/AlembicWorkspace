@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i7-core-production-contracts-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "执行同一 demand、同一 AlembicCore 窗口的 post-PCF NEXT combined package。开工基线必须是干净的 AlembicCore@4a3e8bab3fc7aa05ef7b680593599634422513aa/tree c7941aff9e489b65ce0b80765e26a803bfa75d76，并逐项复验 PCFBaselineReceipt 的 capabilityContract manifest hash sha256:4d3ecdc70227cd3cc613c9df26ca04107a6327aec7eebc5eae3a5856c614f008；不一致即停止，不得重建或降级 PC-F。\n\n唯一目标：实现 Requirement §18.1 的 Core producer contracts，为后续 Agent→Alembic→Plugin 顺序提供真实可执行、可验证、可恢复的单源合同与原语，不进入其他仓库职责。\n\n完成合同：\n1. 复用现有 plan/intent/PlanNextAction，生成并封存 26 项 DimensionCatalogSnapshot；实现 ModulePlanningFactsV1、10 类 AnatomyLensCatalogSnapshot、RequiredFactApplicabilityUniverseV1、fact-query catalog、PlanningRoleVocabularyV1、strict config provenance 和纯函数 compileColdStartPlan。编译器必须对 complete module×dimension universe、eligible/excluded、typed reason、cell/lens/schedule 守恒，deferredCells=[]，无 top-N/floor/静默缩范围；缺事实/后端/config/wire 明确 fail closed。\n2. 扩展现有 PlanIntent 为 PlanCognitionReceipt/Lineage 与问题 DAG、subject/scale、tool/query、support/counterevidence、priority、stop/escalate、within-cap budget/reserve 合同；实现 ColdStartPlanSelectionV2 与 ColdStartExecutionProjectionV2 的确定性校验/规范化，保留 Plan 策略但不替 LLM 发明项目问题。相同事实/认知在乱序和 fresh process 下 byte-identical；未知 ref、漏 required lens、环、饥饿、scope/cap 越权、first-N 均拒绝。\n3. 在现有 ProjectContextRef/Evidence Ledger/AnalysisArtifact 上实现 dimension-free canonical subject FactRecord、direct/derived witness、multiscale HostAgentAnalysisUnit、ObservationPopulation、KnowledgeCluster、Induction/Falsification、purpose-tagged expansion 和 final schedule 的最小 schema/canonicalizer/validator；直接事实跨 view/scale/dimension 唯一，derived 必须 premise witness，schema edge 不得冒充 loaded producer。\n4. 实现 §18.1 后续消费者需要的 Core 原语：TypedGateReturn、HypothesisExpressionSet、串行 admission/terminal fate；PrivateCorpusRevisionInit/Handle 的 restricted internal root factory 与跨 revision fail-closed；复用 openAlembicDatabase、Repository/Gateway/KnowledgeService/WriteZone 的 prepared deterministic-ID crash recovery；obligation-aware immutable coverage、existing vector explicit-entry inspect/build、public route/snapshot/strict-marker contracts。不得新建第二 store/DB/graph/proof/Plan/corpus service、通用 data-root override 或把未连接接口称为完成。\n5. 所有严格 authoring/gate/coverage 合同遵守 evidence-bounded-no-floor：attempt/candidate 是上限不是数量目标；canonical batch barrier 全批失败而非 first-N；修复≤2；每个 non-pass 只有一个 owner/resume；replacement fixpoint 使用新的 absent-before-create revision root且旧 root 后续 open/read=0；prepared-ID crash replay不产生第二 Recipe且无 public caller ID 注入。\n6. 真实落地到 public package/export 与现有内部实现，给出 consumer compatibility probes；不得只交 type/schema/fixture。回填 parent/commit/tree、changed symbols、public API/package hashes、RED/GREEN、运行报告及 SHA-256、两阶段自审与剩余风险，只提交一个干净 Core commit。\n\n验收至少覆盖：npm run build:check、npm run check、完整 Core tests；Plan anatomy/decomposition/tool/priority/budget conservation；catalog 26 与 25/26 drift；universe/lens/fact schedule；fact ID/witness/population/cluster singleton-many-zero；backend missing/truncated；query/counterexample；clean-vs-incremental；serial admission、fate conservation、revision root isolation、Gateway prepared-ID crash、coverage/vector/public-route；public API/package/consumer imports；PC-F full regression与 git diff --check。任何现有无关基线必须给 parent/HEAD 对照，不得豁免。\n\n禁止修改 AlembicAgent/Alembic/AlembicPlugin/AlembicDashboard/Test/Wakeflow、Design、Ghost 真实数据或 vendor/cache；禁止真实 destructive reset、LLM 调用/prompt/SOP、Main strict journal orchestration、Plugin five-tool serving、发布与 Test。完成仅返回 controller 复验，不自行接受、派发下游或声称 I3-I7 全链完成。",
+  "status": "pending",
+  "sourceRef": "wakeflow-ledger/AlembicWorkspace/recipe-coldstart-production-quality-2026-07-15/pcf-baseline-receipt.json sha256:ee67374be793953728d391eee3dc7710380ccb40708ece8a02c9636525959af6; Design Requirement §§4, 6, 10-15, 18.1; Original Plan I3-I7",
+  "designIntent": "在 Core 现有 ProjectContext、PlanIntent、Evidence Ledger、Repository/Gateway/KnowledgeService、coverage/vector 基础上实现后续链路所需的单源生产合同与实际纯编译/校验/恢复原语；不复制 Plan/Graph/store，不承担 Agent 认知、Main 编排或 Plugin serving。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "single-clean-core-commit"
+      },
+      {
+        "kind": "tests",
+        "verify": "focused-and-full-controller-rerunnable"
+      },
+      {
+        "kind": "runtime-report",
+        "verify": "hash-identified-fresh-process-and-fault-evidence"
+      },
+      {
+        "kind": "negative-tests",
+        "verify": "scope-cap-backend-revision-and-crash-fail-closed"
+      },
+      {
+        "kind": "compatibility",
+        "verify": "public-api-package-and-consumer-imports"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "execution-plan"
+      },
+      {
+        "kind": "baseline"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "self-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-16T03:51:05.696Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i7-core-production-contracts-t1",
+      "taskPackageId": "i3-i7-core-production-contracts-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "在已接受 PC-F 基线上实现 AlembicCore post-PCF 单源 producer contracts 与实际 compiler/gate/recovery primitives；保留 PC-F，不跨仓、不新增第二平台。",
+      "status": "pending",
+      "createdAt": "2026-07-16T03:51:05.696Z"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "在 Alembic 干净基线 ac4921580ec1bbfb644886b6a201baeb1c1a2921 上完成本需求唯一的主程序合并落地，消费已接受 AlembicCore 4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4 与 AlembicAgent cc85887c0cd88fd5d004c2d1f965eec0d8747caa。先盘点真实 caller 并给出替换证据，再把模块扫描及四类已确认生产能力中的 Alembic 进程内路径接到 Core RecipeProductionPort：候选只能进入 pending/staging 并返回真实 id，active/publish 必须消费 Core RetrievalReadiness 结构结论。连接 cold-start/incremental/daemon 的 generation 维护，提供显式且可验证的 dry-run、shadow rebuild、验证后切换和 rollback 运维面；dry-run 必须零写，失败不得破坏当前 generation。迁移 AiScanService 等 caller，删除其直接 KnowledgeService.create/自动 publish；在 caller 已替换后退役 POST /api/v1/knowledge 的 Recipe 创建能力，使其 typed zero-write，并从生成的 API/provider 文档中移除广告，同时保留 GET/PATCH/lifecycle/quality 能力。证明没有隐藏的第五生产入口、没有 query-time 写入、没有对真实 BiliDili/AlembicWorkspace 数据的修改。不得修改 AlembicPlugin、AlembicCore、AlembicAgent、AlembicDashboard、Test 或真实知识库；不得删除仍有真实 caller 的能力。完成 Alembic 所属代码、测试、构建、全量仓库门禁和干净单一提交，并回填原始命令输出、调用链、失败/回滚场景、自审与边界。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "让 Alembic 主程序消费已接受的 Core/Agent 生产契约，将模块扫描、生命周期与 generation 运维收口到唯一生产链，并在真实 caller replacement 之后退役可写的旧 Recipe 创建入口，不能产生第五个生产入口。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "提供 Alembic 单一干净提交 hash、parent、git status 与范围 diff。"
+      },
+      {
+        "kind": "tests",
+        "verify": "提供定向测试、构建及仓库全量门禁原始结果，覆盖模块扫描、readiness、旧 POST 零写、generation dry-run/shadow/switch/rollback。"
+      },
+      {
+        "kind": "self-review",
+        "verify": "逐项核对真实 caller replacement、无第五生产入口、无 query-time 写、真实数据零修改与仓库边界。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility"
+      },
+      {
+        "kind": "root-cause"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T17:32:18.284Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p5-alembic-runtime-legacy-recipe-production-cleanup-t1",
+      "taskPackageId": "p5-alembic-runtime-legacy-recipe-production-cleanup-p1",
+      "targetWindow": "Alembic",
+      "summary": "完成 Alembic 主程序 P3：唯一 Recipe 生产契约接入、旧可写入口按 caller replacement 顺序退役、generation 运维接入与零写/回滚证明；只改 Alembic 仓库并提交可审查证据。",
+      "status": "pending",
+      "createdAt": "2026-07-13T17:32:18.284Z"
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p5-plugin-core-swiftpm-truth-integration-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p5-plugin-core-swiftpm-truth-integration-p1",
+  "dispatchGroup": "p5-plugin-core-swiftpm-truth-integration-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p5-plugin-core-swiftpm-truth-integration-t1",
+  "status": "needs-review",
+  "summary": "Core-only consumer integration resolves the exact real Graph failure without any AlembicPlugin source change. AlembicPlugin remains at a1f3282e2f29af9fb25ff1c7a12125814b757a19 with a clean tracked worktree; its final dist manifest consumes accepted AlembicCore ce1a29a16bbc7239b3fdfedc466fef6c45e02c44. Fresh-process public alembic_graph map calls against real AlembicWorkspace and BiliDili both returned ready, bounded 18-node outputs with complete 5/5 repository coverage, zero ProjectContext errors, no diagnostics, and exact file plus same-name symbol representation for both requested identifiers; BiliDili returned zero AOXPlayer nodes. Project Git state, named source hashes, and both data roots' DB/WAL/SHM/vector/index content hashes were unchanged. Focused 52-test, full unit, check, build, runtime-package, distribution, and plugin verification passed. Canonical reload was attempted against the actual installed Codex cache; build and package preparation passed, but cache rewrite was denied by this target sandbox with EPERM, so installed-cache refresh/readback remains a controller action and this result is needs-review rather than completed.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12/task-packages/p5-plugin-core-swiftpm-truth-integration-p1.json",
+    ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12/target-results/tr-p4-core-swiftpm-target-path-truth-t1.json",
+    "AlembicPlugin/dist/.build-manifest.json",
+    "AlembicPlugin/scratch/p5-core-swiftpm-truth-integration-probe.mjs",
+    "AlembicPlugin/scratch/p5-core-swiftpm-truth-integration-probe-report.json",
+    "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+    "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+    "AlembicPlugin/test/unit/PublicOrphanVectorTruth.test.ts",
+    "AlembicPlugin/test/unit/RecipeMapTool.test.ts",
+    "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+    "AlembicCore/src/core/discovery/SpmDiscoverer.ts",
+    "AlembicCore/test/ProjectContextRepoContext.test.ts"
+  ],
+  "verification": [
+    "git status --short --branch: AlembicPlugin clean at a1f3282e2f29af9fb25ff1c7a12125814b757a19; AlembicCore clean at ce1a29a16bbc7239b3fdfedc466fef6c45e02c44.",
+    "npm run build:core: passed; logged exact sibling Core ce1a29a16bbc7239b3fdfedc466fef6c45e02c44.",
+    "npm run build: passed; dist/.build-manifest.json records Plugin a1f3282 and Core ce1a29a.",
+    "npx vitest run --config vitest.unit.config.ts test/unit/ProjectGraphTool.test.ts: 1 file, 27/27 passed baseline.",
+    "fresh-process P5 public HostMcpServer probe: AlembicWorkspace and BiliDili both ready; each 18 bounded nodes, 5/5 complete repository coverage, errorCount=0, diagnostics=[], exact file+symbol pairs present; readOnly.ok=true.",
+    "npx vitest run --config vitest.unit.config.ts test/unit/ProjectGraphTool.test.ts test/unit/PublicOrphanVectorTruth.test.ts test/unit/RecipeMapTool.test.ts test/unit/ReadOnlySearchFingerprint.test.ts: 4 files, 52/52 passed.",
+    "npm run test:unit: passed (exit 0).",
+    "npm run check: passed; Biome emitted 15 pre-existing noConsole warnings only and all boundary/drift/doctrine/naming/ring gates passed.",
+    "npm_config_cache=/tmp/alembic-p5-npm-cache npm run verify:codex-runtime-package: passed; initial default-cache run reproduced unrelated ~/.npm EPERM.",
+    "npm_config_cache=/tmp/alembic-p5-npm-cache npm run verify:plugin-distribution: passed.",
+    "npm_config_cache=/tmp/alembic-p5-npm-cache npm run verify:codex-plugin: passed.",
+    "npm_config_cache=/tmp/alembic-p5-npm-cache npm run dev:codex-plugin:reload -- --project-root <AlembicPlugin>: build and prepare passed; actual installed-cache rewrite failed EPERM at ~/.codex/plugins/cache, recorded in scratch/codex-plugin-dev-reload-report.json.",
+    "git diff --check and git diff --stat: no tracked Plugin diff; no new commit required because Core integration alone resolved the public failure."
+  ],
+  "risks": [
+    "The actual installed Codex plugin cache was not rewritten in this sandbox and may still advertise/load Core 9e49980; controller must run canonical reload from a writable host context and read back Plugin a1f3282/Core ce1a29a before installed-cache acceptance.",
+    "The user-level default npm cache is not writable in this sandbox; runtime packaging passes with an isolated /tmp npm cache, proving a local environment ownership issue rather than a package defect.",
+    "No AlembicPlugin commit was created: the assigned completion rule explicitly requires retaining a1f3282 when the corrected Core alone closes the failure."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "The second Plugin rework failed because Core collapsed root-package SwiftPM target refs to '.', starving exact BiliDili modules before Plugin ranking. Accepted Core ce1a29a preserves Sources/Features/Home and Sources/Features/VideoPlay; consuming that truth makes the unchanged Plugin a1f3282 public query pass. No further Plugin heuristic is warranted.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Pin Plugin/Core and data fingerprints; build exact Core through file dependency; run unchanged focused fixture and two fresh-process real public Graph calls; only trace/edit Plugin if the same call still fails; then run full/package/reload gates and return honest evidence.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "change-scope",
+      "value": "No tracked source, test, lockfile, vendor, marketplace, release, Core, AlembicWorkspace, or BiliDili change. Only ignored scratch probe/report artifacts were created for evidence.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "core-provenance",
+      "commit": "ce1a29a16bbc7239b3fdfedc466fef6c45e02c44",
+      "ref": "AlembicPlugin/dist/.build-manifest.json",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+      "value": "Focused Graph/Search/Prime/Recipe/read-only suite 4 files 52/52 passed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "full-suite",
+      "value": "npm run test:unit passed exit 0; npm run check and npm run build passed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "runtime-probe",
+      "ref": "AlembicPlugin/scratch/p5-core-swiftpm-truth-integration-probe-report.json",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "plugin-reload",
+      "ref": "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json",
+      "value": "Canonical real-cache reload attempted; build/prepare passed, cache write blocked by sandbox EPERM. Controller reload/readback required.",
+      "verify": "artifact-present"
+    },
+    {
+      "kind": "commit",
+      "commit": "a1f3282e2f29af9fb25ff1c7a12125814b757a19",
+      "value": "No new commit by explicit package rule: Core integration alone resolved the exact calls and Plugin tracked tree is clean.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: exact provenance, both real public queries, bounded/complete/error-free output, no-write fingerprints, regression/package checks, and all non-goals satisfied; only installed-cache reload remains. Stage 2: no tracked diff, so no blocker/major/minor code findings; probe is ignored evidence-only. Status is needs-review because cache rewrite is unproven.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "alembicworkspace-graph-proof",
+      "ref": "AlembicPlugin/scratch/p5-core-swiftpm-truth-integration-probe-report.json",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "bilidili-graph-proof",
+      "ref": "AlembicPlugin/scratch/p5-core-swiftpm-truth-integration-probe-report.json",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "read-only-no-write-proof",
+      "ref": "AlembicPlugin/scratch/p5-core-swiftpm-truth-integration-probe-report.json",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "public-json-samples",
+      "ref": "AlembicPlugin/scratch/p5-core-swiftpm-truth-integration-probe-report.json",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "no-change-proof",
+      "commit": "a1f3282e2f29af9fb25ff1c7a12125814b757a19",
+      "value": "git diff empty after final probes and all validations.",
+      "verify": "self-attested"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p5-plugin-core-swiftpm-truth-integration-p1__AlembicPlugin__p5-plugin-core-swiftpm-truth-integration-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-core-swiftpm-truth-integration-p1__AlembicPlugin__p5-plugin-core-swiftpm-truth-integration-t1.json",
+    "deliveryRunId": "run-delivery-p5-plugin-core-swiftpm-truth-integration-p1__AlembicPlugin__p5-plugin-core-swiftpm-truth-integration-t1-readback-retry1",
+    "dispatchGroup": "p5-plugin-core-swiftpm-truth-integration-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-core-swiftpm-truth-integration-p1__AlembicPlugin__p5-plugin-core-swiftpm-truth-integration-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 27,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p5-plugin-core-swiftpm-truth-integration-p1",
+    "targetTaskId": "p5-plugin-core-swiftpm-truth-integration-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p5-plugin-core-swiftpm-truth-integration-p1",
+    "resultId": "tr-p5-plugin-core-swiftpm-truth-integration-t1",
+    "createdAt": "2026-07-12T17:33:50.346Z"
+  },
+  "createdAt": "2026-07-12T17:33:50.346Z",
+  "stateRevisionObserved": 27,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

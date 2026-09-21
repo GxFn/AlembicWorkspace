@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "执行 AlembicPlugin MCP clean-output transport root-cause NEXT combined package。基线必须为干净的 AlembicPlugin@d901f6236843a43765297dda500e71aac80fe2c6，并保留此前已接受的 strict public resolver、route-null isolation、pointed snapshot/vector/final-coverage、Graph live-source/Recipe-free 与五工具 handler/schema 成果。本阶段只解决真实 MCP 调用的顶层 _meta 输出契约冲突，不修改 Recipe 生产、冷启动 Plan/FACT/coverage/CAS，也不启动 Test。\n\n已复现根因：EmbeddedToolExecutor 在 clean response 上附加顶层 _meta.alembicPublication；HostMcpServer 随后把该对象交给 serializeMcpToolResult/projectMcpToolOutput，Prime/Work 等严格 output schema 只声明 meta，不接受 _meta，真实传输报 unrecognized_keys。现有 StrictPublicFiveToolCompatibility 只直接调用 executor.execute 并断言 _meta，未经过 HostMcpServer CallToolRequest serialization，因此是假绿。\n\n完成合同：\n1. 先增加最小 RED：必须经过 HostMcpServer 注册的 CallToolRequest/serializeMcpToolResult 等价真实 transport seam，稳定复现 _meta 被 strict projector 拒绝；不能只测 EmbeddedToolExecutor。\n2. 统一 clean structured payload 与 MCP CallToolResult transport metadata 的归属。publication provenance 必须保留且 schema/SDK 合法，Prime/Work/Search/Graph/Recipe Map/Guard 不得靠静默删除未知字段通过；错误结果也不得重新制造同型冲突。\n3. 最小修复现有 attachExecutionContext、output projector/serializer 边界，不增加第二套输出协议、fallback serializer、特殊工具白名单或宽泛 passthrough；保持 clean output 的严格字段校验。\n4. GREEN 覆盖：Prime 和 Work 的真实 transport；正式五工具的 ready publication provenance；route-null/corrupt publication error path；CallToolResult structuredContent/content/isError 与 metadata 均可被 MCP schema 接受。既有 EmbeddedToolExecutor 兼容性测试若需调整，必须说明唯一规范表示在哪里。\n5. 运行 focused transport/output-contract/AgentPublicTools/StrictPublicFiveToolCompatibility tests、npm run build:check、npm run check、npm run test:unit、必要的 runtime package/distribution/plugin probes 与 git diff --check。提交一个干净 AlembicPlugin commit并回填 parent/commit/tree、changed symbols、RED/GREEN 原始命令摘要、真实 transport 返回样例、runtime package/load证据、两阶段自审和剩余风险。\n\n强边界：不得修改 AlembicCore/Alembic/AlembicAgent/Dashboard/Design/Test/Wakeflow/vendor/gitlink/cache；不得读取 run-private candidate、增加 path override、改变 public CAS/serving semantics、启动 MR/SP/BiliDili/Alembic 真实 Test，或顺手处理本轮审计发现的其他冷启动缺陷。完成只返回 controller 复验。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§16,18.4,20; AlembicPlugin/lib/host-runtime/mcp/host/embedded-executor.ts; AlembicPlugin/lib/host-runtime/mcp/HostMcpServer.ts; AlembicPlugin/lib/host-runtime/mcp/output-contract.ts; controller code-truth audit 2026-07-26",
+  "designIntent": "收拢 _meta 注入与 clean output projection 到一个 schema/SDK 合法的 transport 边界，使 EmbeddedToolExecutor 与 HostMcpServer 共享同一可验证输出契约。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "mcp-transport-red-green",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "prime-work-transport-tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "public-five-transport-tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-package",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "boundary-scan",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "baseline"
+      },
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "minimal-change"
+      },
+      {
+        "kind": "transport-sample"
+      }
+    ]
+  },
+  "createdAt": "2026-07-26T07:01:44.746Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+      "taskPackageId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "修复正式 MCP transport 的 _meta/clean-output schema 冲突，以真实 HostMcpServer transport RED/GREEN 和 Prime/Work/五工具回归证明。",
+      "status": "pending",
+      "createdAt": "2026-07-26T07:01:44.746Z"
+    }
+  ]
+}

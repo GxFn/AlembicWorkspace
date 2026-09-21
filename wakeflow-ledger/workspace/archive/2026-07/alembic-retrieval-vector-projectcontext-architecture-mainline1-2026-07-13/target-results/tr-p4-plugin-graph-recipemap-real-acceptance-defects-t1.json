@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+  "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "taskPackageId": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+  "dispatchGroup": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin 已在单一提交 d26fe67b3b25c653fddcca517b27de04a90ed7af 中修复 Graph canonical/project-confined module seed、Recipe Map nodeId 唯一 rollup，以及完整 bounded 结果先持久化后按页预算的 continuation 真相；BiliDili 公共入口达到 Graph 5/5、Recipe Map 18 页精确并集、共享 fact session、零写入和零临时残留。",
+  "evidenceRefs": [
+    ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13/task-packages/p4-plugin-graph-recipemap-real-acceptance-defects-p1.json",
+    "AlembicPlugin/lib/host-runtime/mcp/handlers/recipe-map.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/contracts/AlembicRecipeMapOutput.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/project/ProjectGraphProvider.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/recipe-map/RecipeMapProvider.ts",
+    "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+    "AlembicPlugin/test/unit/RecipeMapTool.test.ts"
+  ],
+  "verification": [
+    "RED: newly added regression cases failed on duplicate root rollup, missing resolveBoundedRecipeMap, and distorted-case path before implementation.",
+    "GREEN: 5 focused files / 158 tests passed.",
+    "npm run build:check passed; npm run build passed with AlembicCore d17db939ed49ea30bdbf380f400b783530b6d6a8.",
+    "Targeted Biome check passed for all six changed files; git diff --check passed.",
+    "BiliDili Graph: 13 pages, 1/5 progressive first page, 5/5 complete terminal, failed=0, timeoutCount=0, invalid-scope=0, duplicates=0.",
+    "BiliDili Recipe Map: 18 pages, shared fact session, 172 stable keys, duplicates=0, terminal mounted/displayed=41/41, omitted=0, completeness=complete, hasMore=false.",
+    "Reader-only fingerprints unchanged for DB/WAL/SHM/config/vector; continuation cleanup addedTempRoots=[].",
+    "Final Alembic Guard guard-public-mrj0wn7j-3 covered 6/6 files with 0 errors and 33 warning-only pre-existing/test-fixture findings."
+  ],
+  "risks": [
+    "Advisory full unit suite still has three unrelated Search fixture failures in PublicOrphanVectorTruth and ReadOnlySearchFingerprint because their synthetic schema lacks dontClause; this task did not alter Search or fixture schema.",
+    "Alembic Guard verdict is warning-only failed: 33 findings are existing production sync I/O/Promise patterns and synchronous test fixture operations; final explicit scope has 0 errors and no new request-path sync I/O.",
+    "BiliDili terminal Recipe Map status=partial and region.truncated=true remain the truthful bounded ProjectContext region state; pagination itself is complete (displayedMounts=mountedTotal=41, omittedMounts=0, conservation completeness=complete)."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "d26fe67b3b25c653fddcca517b27de04a90ed7af",
+      "value": "One clean AlembicPlugin commit with exactly six task-scoped files.",
+      "verify": "parent=cbcda68722daf14fd35ef688a98c40db9f4ba420; git status clean; no push"
+    },
+    {
+      "kind": "tests",
+      "value": "RED exposed duplicate root rollup, absent raw bounded provider path, and case-distorted canonical path; GREEN: 5 files / 158 tests passed.",
+      "verify": "npx vitest run test/unit/ProjectGraphTool.test.ts test/unit/RecipeMapTool.test.ts test/unit/ProjectContextBuildSession.test.ts test/integration/ZodSchemas.test.ts test/integration/ZodToMcpSchema.test.ts; npm run build:check; npm run build; targeted Biome check"
+    },
+    {
+      "kind": "real-repro",
+      "value": "BiliDili built public EmbeddedToolExecutor chain: Graph 13 pages, first 1/5 to terminal 5/5 complete with 0 failed/timeout/invalid-scope and 80 stable keys/0 duplicates; Recipe Map 18 pages, 172 stable keys/0 duplicates, same factSessionRef, terminal displayedMounts=41 omittedMounts=0 completeness=complete.",
+      "verify": "Executed alembic_graph and alembic_recipe_map through dist public entry for <workspace-root>/BiliDili; every Recipe Map page <=20 KiB; terminal hasMore=false"
+    },
+    {
+      "kind": "reader-only-proof",
+      "value": "BiliDili DB/WAL/SHM/config/vector before/after fingerprints were identical and continuation cleanup added no alembic-project-context temp roots.",
+      "verify": "changed=[]; db sha256=9748ffbfce92f028068dc0cb4366b59587bfb751db4418fc2cce049ce66dbf77; WAL empty sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; SHM sha256=fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb; config sha256=d8263fe10d7abf887df9a0791f0b922b506aa9d90df214334306a46748188eb4; vector sha256=a98c48807ba8a8cca93f761797d2f765775417c0a9c319ace6277aee14063f63; addedTempRoots=[]"
+    },
+    {
+      "kind": "self-review",
+      "ref": "guard-public-mrj0wn7j-3",
+      "value": "Two-stage review covered scope/failure paths/status-conservation/cursor confinement, added AbortSignal checks and cross-repository exclusion, and confirmed no Core/data/ranking/vendor drift.",
+      "verify": "Alembic Guard explicit 6/6 scope: 0 errors, 33 warning-only whole-file findings; newly introduced synchronous request-path findings were removed (initial 36 -> final 33)"
+    },
+    {
+      "kind": "full-unit-suite",
+      "value": "Advisory full unit suite run completed with three unrelated existing Search fixture failures.",
+      "verify": "PublicOrphanVectorTruth.test.ts (2) and ReadOnlySearchFingerprint.test.ts (1) fail because their fixture DB lacks dontClause; no changed file or Graph/Recipe Map path involved"
+    },
+    {
+      "kind": "runtime-package-entry-proof",
+      "value": "Final dist package entry was rebuilt and used for the BiliDili public probe.",
+      "verify": "npm run build passed using ../AlembicCore @ d17db939ed49ea30bdbf380f400b783530b6d6a8; dist/lib/host-runtime/mcp/host/embedded-executor.js executed real calls"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p4-plugin-graph-recipemap-real-acceptance-defects-p1__AlembicPlugin__p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-graph-recipemap-real-acceptance-defects-p1__AlembicPlugin__p4-plugin-graph-recipemap-real-acceptance-defects-t1.json",
+    "deliveryRunId": "run-p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+    "dispatchGroup": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-plugin-graph-recipemap-real-acceptance-defects-p1__AlembicPlugin__p4-plugin-graph-recipemap-real-acceptance-defects-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+    "stateRevision": 25,
+    "demandKey": "alembic-retrieval-vector-projectcontext-architecture-mainline1-2026-07-13",
+    "taskPackageId": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+    "targetTaskId": "p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p4-plugin-graph-recipemap-real-acceptance-defects-p1",
+    "resultId": "tr-p4-plugin-graph-recipemap-real-acceptance-defects-t1",
+    "createdAt": "2026-07-13T09:32:38.266Z"
+  },
+  "createdAt": "2026-07-13T09:32:38.266Z",
+  "stateRevisionObserved": 25,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

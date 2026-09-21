@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i8-core-tool-neutral-serving-manifest-redesign1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i8-core-tool-neutral-serving-manifest-redesign1-p1",
+  "dispatchGroup": "dg-i3-i8-core-tool-neutral-serving-manifest-redesign1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i8-core-tool-neutral-serving-manifest-redesign1-t1",
+  "status": "completed",
+  "summary": "AlembicCore 在现有 ServingSnapshotManifestV1/createServingSnapshotManifestV1 单源内原位移除 candidateOracleHash，改为必填且 canonical SHA-256 校验的 servingSnapshotValidationHash；exact-key 与 canonical manifest hash 同步，PublicKnowledgeRouteV1/CAS recovery 未改。新增 focused RED/GREEN 覆盖旧字段、遗漏、额外字段、空值、非 canonical 值、manifest-hash 绑定与 route 隔离；提交 5ad2e0a04d27000a27927acc4de0d83418b2420a。",
+  "evidenceRefs": [
+    "AlembicCore@5ad2e0a04d27000a27927acc4de0d83418b2420a",
+    "AlembicCore/src/service/production/ProductionPersistenceContracts.ts",
+    "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+    "AlembicCore/src/knowledge.ts",
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/task-packages/i3-i8-core-tool-neutral-serving-manifest-redesign1-p1.json",
+    "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md"
+  ],
+  "verification": [
+    "Baseline: clean AlembicCore@737ac265dc50b8ccf788c1b9103ead537d94ff06/tree 386679d2bd8ccb55236436222c30de76dc78dee7; focused 18/18 and npm run build:check passed.",
+    "RED: npx vitest run test/ProductionPersistenceContracts.test.ts failed only at new tool-neutral serving validation test with SERVING_SNAPSHOT_FIELDS_INVALID (1 failed, 18 passed) before production edit.",
+    "GREEN: npx vitest run test/ProductionPersistenceContracts.test.ts passed 19/19.",
+    "npm run build:check passed; npm run build passed.",
+    "Built-package probe imported createServingSnapshotManifestV1 from @alembic/core/knowledge; new field present, old/blank rejected, changed validation hash changed manifestHash. dist JS sha256 572a1b3ba57bf1653f2406119b9ce0d97a3e94acad61627c5ed77ae70c881edf.",
+    "Boundary: candidateOracleHash source/dist count=0; only 3 explicit negative test assertions remain; servingSnapshotValidationHash source/test/d.ts/JS present; 60 exact public API imports passed.",
+    "npm test passed 190 files / 1854 tests; npm run lint passed 771 files; public API/layer/consumer/scope/naming/retired/output-budget/space-edge gates passed.",
+    "git diff --check passed; final Core working tree clean."
+  ],
+  "risks": [
+    "The local Alembic Main strict finalizer still constructs candidateOracleHash and must migrate to the confirmed tool-neutral ServingSnapshotValidationReceipt in its sequenced NEXT package; no released/tagged/npm consumer contains this strict-v1 contract, so Core intentionally exposes no alias or dual authority.",
+    "dist is ignored build evidence and was not committed; downstream acceptance must rebuild Core at commit 5ad2e0a04d27000a27927acc4de0d83418b2420a."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "5ad2e0a04d27000a27927acc4de0d83418b2420a",
+      "verify": "parent 737ac265dc50b8ccf788c1b9103ead537d94ff06; tree 9cc8ed0966ad71320c792765b4c0a2a3fd1f869d; single clean Core commit"
+    },
+    {
+      "kind": "public-contract-probe",
+      "ref": "AlembicCore/src/knowledge.ts",
+      "verify": "built @alembic/core/knowledge import succeeded; new field exported through ServingSnapshotManifestV1/createServingSnapshotManifestV1; old/blank rejected and validation hash bound to manifestHash"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "focused 19/19; full Core 190 files/1854 tests"
+    },
+    {
+      "kind": "boundary-scan",
+      "ref": "AlembicCore/src/service/production/ProductionPersistenceContracts.ts",
+      "verify": "candidateOracleHash source/dist authority count 0; no parallel manifest/service/transport; consumer import gate 0 issues"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: all package clauses mapped to the existing manifest/type/constructor/exact-key/test single source; PublicKnowledgeRoute/CAS unchanged and no cross-repo/platform implementation. Stage 2: no blocker/high/medium findings; SHA-256 validation uses the existing helper/error code, exact keys fail closed, canonical hash includes the new field. Known downstream Main migration is sequenced, not hidden by compatibility alias."
+    },
+    {
+      "kind": "baseline",
+      "value": "clean 737ac265dc50b8ccf788c1b9103ead537d94ff06/tree 386679d2bd8ccb55236436222c30de76dc78dee7; focused 18/18 and build:check pass"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "authority/compatibility scan -> baseline -> focused RED -> in-place manifest GREEN -> build/public probe/boundary/full suite -> two-stage self-review -> one commit"
+    },
+    {
+      "kind": "test-first",
+      "ref": "AlembicCore/test/ProductionPersistenceContracts.test.ts",
+      "verify": "interactive RED observed before production edit; final single-commit task constraint preserved; GREEN 19/19"
+    },
+    {
+      "kind": "change-scope",
+      "value": "2 files only: ProductionPersistenceContracts.ts and ProductionPersistenceContracts.test.ts; 56 insertions/13 deletions; no other repository or public route/CAS edit"
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed"
+    },
+    {
+      "kind": "lint",
+      "value": "Biome 771 files plus public API/layer/consumer/scope/naming/retired/output-budget/space-edge gates passed"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i3-i8-core-tool-neutral-serving-manifest-redesign1__AlembicCore__i3-i8-core-tool-neutral-serving-manifest-redesign1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i8-core-tool-neutral-serving-manifest-redesign1__AlembicCore__i3-i8-core-tool-neutral-serving-manifest-redesign1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i3-i8-core-tool-neutral-serving-manifest-redesign1__AlembicCore__i3-i8-core-tool-neutral-serving-manifest-redesign1-t1",
+    "dispatchGroup": "dg-i3-i8-core-tool-neutral-serving-manifest-redesign1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i8-core-tool-neutral-serving-manifest-redesign1__AlembicCore__i3-i8-core-tool-neutral-serving-manifest-redesign1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 99,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i8-core-tool-neutral-serving-manifest-redesign1-p1",
+    "targetTaskId": "i3-i8-core-tool-neutral-serving-manifest-redesign1-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "dg-i3-i8-core-tool-neutral-serving-manifest-redesign1",
+    "resultId": "tr-i3-i8-core-tool-neutral-serving-manifest-redesign1-t1",
+    "createdAt": "2026-07-16T12:34:24.392Z"
+  },
+  "createdAt": "2026-07-16T12:34:24.392Z",
+  "stateRevisionObserved": 99,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

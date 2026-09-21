@@ -1,0 +1,557 @@
+{
+  "scope": "Original 22 provider/context/memory findings final disposition and closure of three bounded final-review findings",
+  "baseCommit": "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05",
+  "status": "all original findings fixed at observed working-tree state",
+  "counts": {
+    "fixed": 22,
+    "retained-with-reason": 0,
+    "still-open": 0
+  },
+  "dispositions": [
+    {
+      "id": "PC-01",
+      "severity": "P1",
+      "originalPath": "src/agent/context/ConversationStore.ts",
+      "originalLine": 401,
+      "disposition": "fixed",
+      "summary": "集中校验id；append/delete的WriteZone与普通fs分支均先走同一校验。",
+      "implementation": {
+        "path": "src/agent/context/ConversationStore.ts",
+        "line": 410,
+        "needle": "Invalid conversation id"
+      },
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 523,
+        "needle": "rejects conversation ids that escape the store"
+      },
+      "verification": "代码diff及路径逃逸回归测试已复核；原漏洞的slash/backslash/NUL路径不能进入fs调用。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-02",
+      "severity": "P1",
+      "originalPath": "src/agent/utils/Redaction.ts",
+      "originalLine": 14,
+      "disposition": "fixed",
+      "summary": "JSON整值先脱敏，保留合法JSON及后续既有厂商/普通赋值规则。",
+      "implementation": {
+        "path": "src/agent/utils/Redaction.ts",
+        "line": 11,
+        "needle": "JSON 值可以含空格"
+      },
+      "regressionTest": {
+        "path": "test/Redaction.test.ts",
+        "line": 15,
+        "needle": "redacts JSON-encoded"
+      },
+      "verification": "本轮内存探针：含转义引号及空格的password解析后为[redacted]。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-03",
+      "severity": "P1",
+      "originalPath": "src/agent/context/ContextWindow.ts",
+      "originalLine": 637,
+      "disposition": "fixed",
+      "summary": "移除按标题单独删除tool call的去重分支，保留每次调用及其对应结果。",
+      "implementation": {
+        "path": "src/agent/context/ContextWindow.ts",
+        "line": 366,
+        "needle": "#compactL2Merge()"
+      },
+      "regressionTest": {
+        "path": "test/ContextWindow.test.ts",
+        "line": 5,
+        "needle": "keeps repeated tool calls paired"
+      },
+      "verification": "本轮内存三轮重复knowledge+code探针，L2后orphanCount=0。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-04",
+      "severity": "P1",
+      "originalPath": "src/ai/shared/structuredOutput.ts",
+      "originalLine": 40,
+      "disposition": "fixed",
+      "summary": "共用字符串感知修复；AI旧入口保留re-export，字符串内逗号/围栏不再被删除。",
+      "implementation": {
+        "path": "src/shared/structuredOutput.ts",
+        "line": 69,
+        "needle": "function stripTrailingCommas"
+      },
+      "regressionTest": {
+        "path": "test/shared-ai-utils.test.ts",
+        "line": 17,
+        "needle": "preserves JSON string content"
+      },
+      "verification": "本轮内存探针：literal,}和内嵌代码围栏在完整JSON、截断数组回收两条路径均逐字保留。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-05",
+      "severity": "P2",
+      "originalPath": "src/ai/AiProvider.ts",
+      "originalLine": 424,
+      "disposition": "fixed",
+      "summary": "await动态import后第二次检查gateway实例，首次并发共享同一闸门。",
+      "implementation": {
+        "path": "src/ai/AiProvider.ts",
+        "line": 431,
+        "needle": "首次并发请求可能一起等待"
+      },
+      "regressionTest": {
+        "path": "test/OpenAiProvider.test.ts",
+        "line": 34,
+        "needle": "shares the concurrency gate"
+      },
+      "verification": "本轮Promise.all双_getGateway引用相同；新增真实Provider→stub fetch并发测试钉住peak=1。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-06",
+      "severity": "P2",
+      "originalPath": "src/ai/AiProvider.ts",
+      "originalLine": 226,
+      "disposition": "fixed",
+      "summary": "nullish缺省保留显式零次重试。",
+      "implementation": {
+        "path": "src/ai/AiProvider.ts",
+        "line": 226,
+        "needle": "this.maxRetries = config.maxRetries ?? 3"
+      },
+      "regressionTest": {
+        "path": "test/OpenAiProvider.test.ts",
+        "line": 30,
+        "needle": "honors an explicit zero retry limit"
+      },
+      "verification": "本轮内存构造maxRetries:0实际仍0。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-07",
+      "severity": "P2",
+      "originalPath": "src/ai/transport/LLMTransport.ts",
+      "originalLine": 234,
+      "disposition": "fixed",
+      "summary": "内部超时独立记录并抛ETIMEDOUT；外部取消继续保留AbortError路径。",
+      "implementation": {
+        "path": "src/ai/transport/LLMTransport.ts",
+        "line": 237,
+        "needle": "let timedOut = false"
+      },
+      "regressionTest": {
+        "path": "test/OpenAiTransportResponses.test.ts",
+        "line": 41,
+        "needle": "classifies a transport deadline"
+      },
+      "verification": "上一轮当前代码Gateway→Transport mock探针返回ETIMEDOUT且仅1次fetch（maxRetries=0）；本轮对应实现未改变。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-08",
+      "severity": "P2",
+      "originalPath": "src/ai/transport/LLMTransport.ts",
+      "originalLine": 236,
+      "disposition": "fixed",
+      "summary": "请求发出前检查已取消signal。",
+      "implementation": {
+        "path": "src/ai/transport/LLMTransport.ts",
+        "line": 234,
+        "needle": "Provider request cancelled before dispatch"
+      },
+      "regressionTest": {
+        "path": "test/OpenAiTransportResponses.test.ts",
+        "line": 27,
+        "needle": "does not fetch when the caller signal"
+      },
+      "verification": "上一轮当前代码预abort探针返回AbortError，newFetches=0；本轮对应实现未改变。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-09",
+      "severity": "P2",
+      "originalPath": "src/agent/context/ContextWindow.ts",
+      "originalLine": 850,
+      "disposition": "fixed",
+      "summary": "两种reset都清collapseThreshold，避免旧投影索引作用于新阶段。",
+      "implementation": {
+        "path": "src/agent/context/ContextWindow.ts",
+        "line": 826,
+        "needle": "resetToPromptOnly()"
+      },
+      "regressionTest": {
+        "path": "test/ContextWindow.test.ts",
+        "line": 33,
+        "needle": "clears stale compression projections"
+      },
+      "verification": "本轮L3→resetForNewStage→新四轮消息探针，projected与raw深等；回归表同时覆盖resetToPromptOnly。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-10",
+      "severity": "P1",
+      "originalPath": "src/agent/context/ConversationStore.ts",
+      "originalLine": 265,
+      "disposition": "fixed",
+      "summary": "摘要写回前重读快照；有新增/删除/替换则放弃旧摘要而不覆盖。",
+      "implementation": {
+        "path": "src/agent/context/ConversationStore.ts",
+        "line": 267,
+        "needle": "summary skipped: conversation changed"
+      },
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 536,
+        "needle": "does not overwrite messages appended"
+      },
+      "verification": "代码diff和并发append回归测试已复核，测试要求summarize=false且新消息/7条历史仍在。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-11",
+      "severity": "P2",
+      "originalPath": "src/agent/memory/SessionStore.ts",
+      "originalLine": 597,
+      "disposition": "fixed",
+      "summary": "完整稳定请求key，兼容params/扁平和path/filePath；顶层action权威，维持只读缓存。",
+      "implementation": {
+        "path": "src/agent/memory/SessionStore.ts",
+        "line": 943,
+        "needle": "normalizeCacheArgs(args: ToolArgs)"
+      },
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 317,
+        "needle": "keys cached reads and searches"
+      },
+      "verification": "本轮FPR-03原复现：write+内层read不能被正常read命中，readHit=null；参数/范围隔离回归仍在。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-12",
+      "severity": "P2",
+      "originalPath": "src/agent/memory/SessionStore.ts",
+      "originalLine": 778,
+      "disposition": "fixed",
+      "summary": "序列化真实Finding列表；新快照以显式evidenceStore为准，缺字段才重建旧报告索引。",
+      "implementation": {
+        "path": "src/agent/memory/SessionStore.ts",
+        "line": 770,
+        "needle": "evidenceStore: Object.fromEntries"
+      },
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 377,
+        "needle": "preserves evidence through JSON and checkpoint"
+      },
+      "verification": "上一轮当前代码新证据JSON往返深等；legacy文件恢复1条证据且保留接收者projectContext，明确空证据不重建的回归仍在。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-13",
+      "severity": "P2",
+      "originalPath": "src/agent/memory/SessionStore.ts",
+      "originalLine": 737,
+      "disposition": "fixed",
+      "summary": "统一深度校验/clone后恢复；load用纯归一化结果原子替换，不创建临时带timer实例。",
+      "implementation": {
+        "path": "src/agent/memory/SessionStoreSchema.ts",
+        "line": 192,
+        "needle": "function validateWorkingMemory"
+      },
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 301,
+        "needle": "rejects malformed nested session data"
+      },
+      "verification": "本轮FPR-01两种坏嵌套值均在fromJSON前拒绝；timers余额0。上一轮null报告load=false且旧状态深等，legacy load不新增timer。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-14",
+      "severity": "P2",
+      "originalPath": "src/ai/providers/ClaudeProvider.ts",
+      "originalLine": 59,
+      "disposition": "fixed",
+      "summary": "Claude明确声明embedding不支持，宿主可继续走既有fallback。",
+      "implementation": {
+        "path": "src/ai/providers/ClaudeProvider.ts",
+        "line": 60,
+        "needle": "override supportsEmbedding()"
+      },
+      "regressionTest": {
+        "path": "test/ai-provider.test.ts",
+        "line": 60,
+        "needle": "reports Claude embedding as unsupported"
+      },
+      "verification": "本轮当前ClaudeProvider实例supportsEmbedding()=false。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-15",
+      "severity": "P2",
+      "originalPath": "src/ai/AiFactory.ts",
+      "originalLine": 152,
+      "disposition": "fixed",
+      "summary": "fallback排除基于实际primary标准身份，不用auto/别名环境原文。",
+      "implementation": {
+        "path": "src/ai/AiFactory.ts",
+        "line": 152,
+        "needle": "const currentProvider = primary.name"
+      },
+      "regressionTest": {
+        "path": "test/AiFactory.test.ts",
+        "line": 47,
+        "needle": "excludes the actual auto-detected provider"
+      },
+      "verification": "代码diff与mock Google geo失败→OpenAI fallback回归已复核；不扩展备用provider新增探测策略。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-16",
+      "severity": "P2",
+      "originalPath": "src/ai/gateway/LLMGateway.ts",
+      "originalLine": 179,
+      "disposition": "fixed",
+      "summary": "chat复用完整响应通道并提取text；JSON格式/schema随工具请求路径透传，usage只报一次。",
+      "implementation": {
+        "path": "src/ai/gateway/LLMGateway.ts",
+        "line": 171,
+        "needle": "async chat(request: GatewayChatRequest)"
+      },
+      "regressionTest": {
+        "path": "test/LLMGateway.test.ts",
+        "line": 16,
+        "needle": "records usage once for %s"
+      },
+      "verification": "上一轮当前代码4个mock路径（OpenAI chat/Responses、Google、DeepSeek）均返回value42、usageCount1；Google schema保留且清default；本轮实现未改变。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-17",
+      "severity": "P2",
+      "originalPath": "src/agent/memory/ActiveContext.ts",
+      "originalLine": 593,
+      "disposition": "fixed",
+      "summary": "按重要性逐条选择能放入的发现，不再因整个scratchpad超限全丢弃。",
+      "implementation": {
+        "path": "src/agent/memory/ActiveContext.ts",
+        "line": 583,
+        "needle": "let scratchTokens ="
+      },
+      "regressionTest": {
+        "path": "test/ActiveContext.test.ts",
+        "line": 43,
+        "needle": "keeps a high-priority finding"
+      },
+      "verification": "本轮高优先短发现+低优先800字符发现、budget100，重要发现仍在context。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-18",
+      "severity": "P2",
+      "originalPath": "src/agent/memory/MemoryCoordinator.ts",
+      "originalLine": 231,
+      "disposition": "fixed",
+      "summary": "重算既有profile并清surplus；预算传PM/SS，实际PM/SS渲染使用token预算且含裁剪footer。",
+      "implementation": {
+        "path": "src/agent/memory/MemoryCoordinator.ts",
+        "line": 236,
+        "needle": "this.allocateBudget(this.#allocationMode)"
+      },
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 197,
+        "needle": "recomputes the active allocation profile"
+      },
+      "verification": "本轮FPR-02真实中文SessionStore：分配55、estimateTokens实际55，0预算空字符串；PM文本预算与端口透传回归已复核。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-19",
+      "severity": "P2",
+      "originalPath": "src/agent/context/ExplorationTracker.ts",
+      "originalLine": 347,
+      "disposition": "fixed",
+      "summary": "统一持久化提交判定，knowledge读取/重复/未创建不计数，仅真实created+id+lifecycle计生产进度。",
+      "implementation": {
+        "path": "src/agent/context/ExplorationTracker.ts",
+        "line": 347,
+        "needle": "isPersistedSubmission({ tool: toolName"
+      },
+      "regressionTest": {
+        "path": "test/ExplorationStrategies.test.ts",
+        "line": 13,
+        "needle": "counts only persisted candidate submissions"
+      },
+      "verification": "本轮共享判定探针detail=false、created+pending=true；tracker回归覆盖search/detail/manage/duplicate_blocked计0。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-20",
+      "severity": "P2",
+      "originalPath": "src/agent/memory/MemoryRetriever.ts",
+      "originalLine": 283,
+      "disposition": "fixed",
+      "summary": "AppendEntry可选importance透传新记忆，去重时显式更高重要性可提升已有值。",
+      "implementation": {
+        "path": "src/agent/memory/MemoryRetriever.ts",
+        "line": 295,
+        "needle": "importance: entry.importance ?? 5"
+      },
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 64,
+        "needle": "preserves explicit importance"
+      },
+      "verification": "代码及真实SQLite回归已复核：初始8、重复提升9且条目仍1；本代理未重新运行native SQLite，总门禁由root执行。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-21",
+      "severity": "P2",
+      "originalPath": "src/agent/memory/MemoryConsolidator.ts",
+      "originalLine": 95,
+      "disposition": "fixed",
+      "summary": "冲突更新、普通合并、capacity在同一事务；冲突写错误传播触发回滚。",
+      "implementation": {
+        "path": "src/agent/memory/MemoryConsolidator.ts",
+        "line": 98,
+        "needle": "冲突替换、普通合并与容量淘汰"
+      },
+      "regressionTest": {
+        "path": "test/memory-context.test.ts",
+        "line": 37,
+        "needle": "rolls back conflict replacements"
+      },
+      "verification": "代码及真实SQLite回归已复核：后续add失败时已执行冲突update整体回滚；本代理未重复运行native SQLite。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    },
+    {
+      "id": "PC-22",
+      "severity": "P2",
+      "originalPath": "src/ai/gateway/LLMGateway.ts",
+      "originalLine": 415,
+      "disposition": "fixed",
+      "summary": "显式凭证分支同样执行global timeout override，保留其他transport配置。",
+      "implementation": {
+        "path": "src/ai/gateway/LLMGateway.ts",
+        "line": 399,
+        "needle": "return { ...explicit, timeout: this.#config.timeout ?? explicit.timeout }"
+      },
+      "regressionTest": {
+        "path": "test/LLMGateway.test.ts",
+        "line": 42,
+        "needle": "applies the global timeout"
+      },
+      "verification": "上一轮当前代码mock探针provider100/global3触发3ms ETIMEDOUT；新增回归provider200/global5验证5ms；本轮实现未改变。",
+      "validationBoundary": "源码/回归测试独立复核及注明的本代理内存probe；整套测试与总门禁结果由root汇总，不在本报告虚称已完成。"
+    }
+  ],
+  "finalReviewClosures": {
+    "FPR-01": {
+      "disposition": "fixed",
+      "related": [
+        "PC-13"
+      ],
+      "evidence": "workingMemory.keyFindings={}与reflection.topFindings=[null]都在恢复前被SessionStore schema拒绝；未创建残留timer。"
+    },
+    "FPR-02": {
+      "disposition": "fixed",
+      "related": [
+        "PC-18"
+      ],
+      "evidence": "真实中文session prompt分配55 tokens，修复前115，当前55；tokenBudget0返回空字符串。"
+    },
+    "FPR-03": {
+      "disposition": "fixed",
+      "related": [
+        "PC-11"
+      ],
+      "evidence": "顶层write/内层read不再写入read缓存；getCachedResult正常read返回null。"
+    }
+  },
+  "observedFiles": [
+    {
+      "path": "src/agent/context/ContextWindow.ts",
+      "sha256": "f7455414d58528b2f2bb8d9953be6a4e09c66afa4ba4ff9c7c9f46f544c61831"
+    },
+    {
+      "path": "src/agent/context/ConversationStore.ts",
+      "sha256": "97f12ed24b7ae016d738f424c68ed1ad16114fe3d737356326663bee1cea268d"
+    },
+    {
+      "path": "src/agent/context/ExplorationTracker.ts",
+      "sha256": "6af5fe6a6fe6b5241fe851898dd39f73b11cb417f412884a7560ab91ae974c8f"
+    },
+    {
+      "path": "src/agent/memory/ActiveContext.ts",
+      "sha256": "f2b2bbbdbfbc8d003b3aa05f17ceaed8c96a2702b3b971f273de341e95718b14"
+    },
+    {
+      "path": "src/agent/memory/MemoryConsolidator.ts",
+      "sha256": "c5e8855c580ce0771a5f0cc6eeb631a5be321c1d369fa86e02930f0614f4f6e9"
+    },
+    {
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "sha256": "39732124b255163cb6d2ce6d2b2a4ed7291b78843bbc4c5852f2dc865df33a50"
+    },
+    {
+      "path": "src/agent/memory/MemoryRetriever.ts",
+      "sha256": "b8d526ebe4e8924f046e478615607c4f742e91106b2c803f2ac321235c0e1d51"
+    },
+    {
+      "path": "src/agent/memory/SessionStore.ts",
+      "sha256": "258105c519068873980c2572a55b7b8bbe80628d40d5d869ba47ad7a8e340882"
+    },
+    {
+      "path": "src/agent/memory/SessionStoreSchema.ts",
+      "sha256": "b0ae35d79bae0b5ec67297adc535e3b0c0d8ca55180daab5132e3709a5dec3f7"
+    },
+    {
+      "path": "src/agent/utils/Redaction.ts",
+      "sha256": "7bd75581867781463251a758a6d57fdab04eaa88fe92b422baab3696f5388605"
+    },
+    {
+      "path": "src/agent/utils/toolOutcomes.ts",
+      "sha256": "13eaff9dbd46b254514070d98939260d6f12485ca7370297e7b3251b6b736cc2"
+    },
+    {
+      "path": "src/ai/AiFactory.ts",
+      "sha256": "fa05141ec42ba8c1771093e9fb0aeccfa6f1186e067b571932ce13cb85c69163"
+    },
+    {
+      "path": "src/ai/AiProvider.ts",
+      "sha256": "8dc752064286995e40d270951d1d55508a1a218f8bc7c863f0c4dd4db36a5751"
+    },
+    {
+      "path": "src/ai/gateway/LLMGateway.ts",
+      "sha256": "102f455b0125539d90f0e31bd9d134af81ca31eea0d7d09ee8b6d5a448356f93"
+    },
+    {
+      "path": "src/ai/providers/ClaudeProvider.ts",
+      "sha256": "04857e2e36dfe6cf9dc1960d6b4114277b184efc7e76fc925495b8bd4ce68ee6"
+    },
+    {
+      "path": "src/ai/transport/LLMTransport.ts",
+      "sha256": "7f90784823ce1c905d4b8988ceef68b3bdec6932d83445759a44c24854369e76"
+    },
+    {
+      "path": "src/shared/structuredOutput.ts",
+      "sha256": "cf22a9b65c895507866dd62fc55ce94c0b656c91362177f2e30f4386d9f23c55"
+    }
+  ],
+  "retainedBehaviorNotes": [
+    "Public provider/transport/memory exports remain available; AI structuredOutput path remains a compatibility re-export of the shared implementation.",
+    "SessionStore keeps get/set and filePath compatibility, version1/version2 and legacy filename, explicit empty evidence semantics and injected host project context.",
+    "Optional schema/importance/evidenceStore type fields are additive; no runtime named export was added solely for these fixes.",
+    "Original optional advice to add new batch/fallback capability was not promoted into new requirements; current registry submit contract is preserved."
+  ],
+  "validation": {
+    "thisTurnProbes": "Current-source in-memory transpilation with mocked logging/timers/fs boundaries; no external APIs. Confirmed FPR-01/02/03 and PC-02/03/04/05/06/09/14/17/19.",
+    "earlierFinalPassProbes": "Current implementation of Gateway/Transport usage+JSON/schema/cancellation, valid evidence roundtrip, V1 legacy restore and invalid snapshot atomicity were verified in final-provider-review.json.",
+    "fullSuite": "Root is running final green/total gates in parallel; not independently re-run by this reviewer.",
+    "productFilesEdited": false
+  }
+}

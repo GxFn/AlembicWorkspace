@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-core-swiftpm-target-path-truth-p1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "summary": "Phase P4 producer repair: fix the verified Core ProjectContext RepoContext truth defect that blocks the existing five-tool Graph completion. In a real SwiftPM root package, Package.swift target declarations with explicit paths (for example Home -> Sources/Features/Home and VideoPlay -> Sources/Features/VideoPlay) currently project target refs with filePath `.` while only a broad `Sources` sourceRoot survives. Preserve each main-package target's normalized declared path in RepoContext target refs so downstream consumers can construct module/file-flow candidates without parsing Package.swift again.\n\nRequired behavior:\n- Add a BiliDili-shaped deterministic Core regression with multiple root-package targets under nested `Sources/Features/*`, several local path packages under `Packages/*`, test targets, and noisy AOXPlayer files.\n- `ProjectContextCapabilities.execute(kind=repo)` must return Home/VideoPlay target refs scoped to their real declared target paths, not `.`; target names, repoId/sourceFolder, local-package target refs, sourceRoots, entrypoints, and existing Node/Swift/Rust/etc behavior must remain compatible.\n- Determine and fix the actual Core parser/projector seam that loses SwiftPM target paths. Do not add a Plugin-side Package.swift parser, Graph ranking workaround, knowledge gate, Git gate, rescan, or live-project mutation.\n- Keep ProjectContext read-only and bounded. No AlembicPlugin, BiliDili, vendor, database, vector index, marketplace, Test, or release pointer edits.\n\nValidation:\n- Commit the Core change.\n- Show RED/GREEN on the new exact RepoContext target-path regression and relevant repo/module ProjectContext suites.\n- Run focused tests, full Core test suite, build, check/public API/layer/scope verification, and a read-only direct ProjectContextCapabilities probe against the existing BiliDili checkout proving Home and VideoPlay refs use `Sources/Features/Home` and `Sources/Features/VideoPlay`.\n- Return changed files/symbols, raw command results, public JSON summary, compatibility/failure-path review, commit, and two-stage self-review.\n\nCompletion means the Core producer truth is ready for Plugin consumer integration; it does not accept the Plugin task or complete the demand.",
+  "status": "pending",
+  "sourceRef": "Controller fresh-cache BiliDili Graph failure at state revision 21 plus direct Core ProjectContextCapabilities repo probe: Package.swift has explicit Home/VideoPlay paths but RepoContext target refs collapse to filePath='.'.",
+  "designIntent": "ProjectContext Core should preserve declared SwiftPM target ownership paths as repository truth; Plugin Graph should consume that truth instead of reparsing manifests or compensating with more ranking heuristics.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "root-cause-note",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "execution-plan",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "change-scope",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "full-suite",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-probe",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "commit",
+        "verify": "self-attested"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "swiftpm-target-path-proof"
+      },
+      {
+        "kind": "repo-context-compatibility-proof"
+      },
+      {
+        "kind": "read-only-no-write-proof"
+      },
+      {
+        "kind": "public-json-samples"
+      }
+    ]
+  },
+  "createdAt": "2026-07-12T17:01:18.857Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-core-swiftpm-target-path-truth-t1",
+      "taskPackageId": "p4-core-swiftpm-target-path-truth-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Repair Core SwiftPM RepoContext target-path truth for main-package targets and prove it against the real BiliDili shape without writes.",
+      "status": "pending",
+      "createdAt": "2026-07-12T17:01:18.857Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

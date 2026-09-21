@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i7-i8-alembic-main-public-serving-bundle-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i7-i8-alembic-main-public-serving-bundle-rootcause1-p1",
+  "dispatchGroup": "dg-i7-i8-alembic-main-public-serving-bundle-rootcause1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "Alembic",
+  "targetTaskId": "i7-i8-alembic-main-public-serving-bundle-rootcause1-t1",
+  "status": "completed",
+  "summary": "Alembic Main now publishes the strict result to the fixed .asd/context/recipe-publications namespace as a sealed, physically loadable SQLite/Recipe/vector/sanitized-config bundle with append-only coverage/validation/lineage/Core manifest metadata. A durable Core marker binds project and migration identity; exact canonical compare-null CAS publishes active.json only after independent data and metadata verification. Tamper, symlink, traversal, marker mismatch, semantic-only route equality, and post-seal recovery paths fail closed. Product commit 5a92ec24c24ba0992515fae884a510dc6c0a61f4 is clean.",
+  "evidenceRefs": [
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/i7-i8-alembic-main-public-serving-bundle-rootcause1-t1/public-bundle-probe.json",
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/i7-i8-alembic-main-public-serving-bundle-rootcause1-t1/marker.json",
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/i7-i8-alembic-main-public-serving-bundle-rootcause1-t1/public-route.json",
+    ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/i7-i8-alembic-main-public-serving-bundle-rootcause1-t1/runtime-report.json",
+    "Alembic/lib/infrastructure/database/StrictResetDatabaseAdapter.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictAuthorization.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictColdStartOrchestrator.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictFinalizationRuntime.ts",
+    "Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts",
+    "Alembic/test/unit/StrictResetAndPublicCas.test.ts",
+    "AlembicCore/package.json"
+  ],
+  "verification": [
+    "Final npm run build exited 0 against local AlembicCore d4de7edd6bbfaeb36a01b3cc243ba1617c001f65.",
+    "Focused strict unit/integration set passed 22/22.",
+    "Full Alembic suite passed 184/184 files, 1614 tests passed and 10 skipped.",
+    "Final physical facade probe passed and produced a fixed marker/route plus a sealed snapshot with 12 data files and 6 metadata files.",
+    "Independent read-only evidence verification recomputed all hashes, validated marker/route canonical bindings, and returned SQLite quick_check=ok with zero foreign-key violations.",
+    "Repository, layer, Core import, Agent extraction, shared-asset drift, retired-symbol, and ring-direction checks passed.",
+    "Biome lint exited 0 with five existing warnings only in unchanged AgentRunProjections.ts and handler-runtime.ts.",
+    "Alembic Guard passed the nine task files with zero violations; git diff --check passed; Main and Core worktrees are clean after commit."
+  ],
+  "risks": [
+    "The downstream AlembicPlugin fixed-path consumer remains a controller-owned follow-up and was intentionally not implemented or dispatched by this Main task.",
+    "The publication design is fail-closed: post-seal corruption is never repaired in place; a resumed pre-CAS operation rejects that snapshot and allocates a new snapshot id."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "5a92ec24c24ba0992515fae884a510dc6c0a61f4",
+      "value": {
+        "parent": "bee8272f9ef2f959829577d38f27447a492e75e7",
+        "tree": "6dbd8155b4c30fb49b8b195e0d45a93834639e72",
+        "changedFileCount": 9
+      },
+      "verify": "git -C Alembic show --stat --oneline 5a92ec24c24ba0992515fae884a510dc6c0a61f4 && git -C Alembic status --short"
+    },
+    {
+      "kind": "exact-core-artifact",
+      "commit": "d4de7edd6bbfaeb36a01b3cc243ba1617c001f65",
+      "value": {
+        "tree": "3739ceb11f270fea595b631c45f308166951a8cb",
+        "imports": [
+          "createCandidateCoverageReceiptV1",
+          "createFinalCoverageBindingReceiptV1",
+          "createServingSnapshotManifestV1",
+          "createStrictPublicationMarkerV1",
+          "preparePublicKnowledgeRouteV1"
+        ]
+      },
+      "verify": "git -C AlembicCore rev-parse HEAD HEAD^{tree}; from Alembic import the five named functions from @alembic/core/knowledge"
+    },
+    {
+      "kind": "public-bundle-runtime-probe",
+      "ref": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/evidence/i7-i8-alembic-main-public-serving-bundle-rootcause1-t1/public-bundle-probe.json",
+      "value": {
+        "dataFiles": 12,
+        "metadataFiles": 6,
+        "databaseQuickCheck": "ok",
+        "foreignKeyViolationCount": 0,
+        "tableCount": 23,
+        "markerVerified": true,
+        "allHashesVerified": true
+      },
+      "verify": "Recompute every probe byte hash and size; canonical-hash active.json and marker; open the copied SQLite read-only and run PRAGMA quick_check and foreign_key_check"
+    },
+    {
+      "kind": "marker-cas-negative-tests",
+      "ref": "Alembic/test/unit/StrictResetAndPublicCas.test.ts",
+      "value": "Covers missing/corrupt/mismatched marker, fixed publication lock, path traversal/symlink, compare-null conflict, exact-byte crash recovery, semantic-only route conflict, sealed tamper invalidation, route-null preservation, and new snapshot allocation.",
+      "verify": "npx vitest run test/unit/StrictAuthorization.test.ts test/unit/StrictResetAndPublicCas.test.ts test/unit/StrictServingSnapshotValidation.test.ts test/integration/StrictRecipePipelineFacade.integration.test.ts --testTimeout=60000 --silent=passed-only --reporter=dot (22/22)"
+    },
+    {
+      "kind": "tests",
+      "ref": "Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts",
+      "value": {
+        "focused": "22 passed",
+        "fullSuite": "184 files passed; 1614 passed; 10 skipped",
+        "evidenceProbe": "1 passed; 2 skipped"
+      },
+      "verify": "npm test -- --testTimeout=60000 --silent=passed-only --reporter=dot; STRICT_EVIDENCE_DIR=<task evidence dir> npx vitest run the named physical integration test"
+    },
+    {
+      "kind": "boundary-scan",
+      "ref": "Alembic/package.json",
+      "value": "No Main-to-Plugin/MCP/candidate-reader/path-override additions; repo/layer/Core/Agent boundaries, shared asset drift, retired symbols, and ring direction all passed.",
+      "verify": "npm run lint:repo-boundary && npm run lint:layer-contract && npm run lint:core-import-boundary && npm run lint:agent-extraction-boundary && npm run check:shared-asset-drift && npm run lint:retired-symbols && npm run lint:ring-direction"
+    },
+    {
+      "kind": "self-review",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictFinalizationRuntime.ts",
+      "value": {
+        "stage1": "Contract/scope review confirmed fixed namespace, physical bundle, exact metadata, compare-null CAS, recovery, and no forbidden repository changes.",
+        "stage2": "Quality review confirmed build, full tests, boundary scans, diff check, independent artifact hash/SQLite probe, and Alembic Guard 9 files/0 violations.",
+        "guardResultRef": "guard-public-mrnp5a97-2"
+      },
+      "verify": "git -C Alembic diff bee8272f9ef2f959829577d38f27447a492e75e7..5a92ec24c24ba0992515fae884a510dc6c0a61f4 --check; alembic_code_guard same nine files"
+    },
+    {
+      "kind": "baseline",
+      "commit": "bee8272f9ef2f959829577d38f27447a492e75e7",
+      "value": {
+        "mainTree": "c255770449cf4a9c68227f67730861a2db1d3801",
+        "coreCommit": "d4de7edd6bbfaeb36a01b3cc243ba1617c001f65",
+        "clean": true
+      },
+      "verify": "Captured before edits with git rev-parse and git status in both repositories"
+    },
+    {
+      "kind": "test-first",
+      "ref": "Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts",
+      "value": "Pre-change focused baseline passed while the physical publication probe was RED because fixed marker/snapshot/receipts were absent (ENOENT); implementation then made the same real facade chain produce and independently reopen the public bundle.",
+      "verify": "Review task integration test and final physical evidence directory"
+    },
+    {
+      "kind": "change-scope",
+      "ref": "Alembic/lib/recipe-pipeline/generate/strict/StrictColdStartOrchestrator.ts",
+      "value": "Exactly nine Alembic files changed; AlembicCore, AlembicPlugin, AlembicAgent, Design, Test, Wakeflow, vendor, and gitlinks were not modified.",
+      "verify": "git -C Alembic diff --name-only bee8272f9ef2f959829577d38f27447a492e75e7..5a92ec24c24ba0992515fae884a510dc6c0a61f4; git -C AlembicCore status --short"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i7-i8-alembic-main-public-serving-bundle-rootcause1__Alembic__i7-i8-alembic-main-public-serving-bundle-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i7-i8-alembic-main-public-serving-bundle-rootcause1__Alembic__i7-i8-alembic-main-public-serving-bundle-rootcause1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i7-i8-alembic-main-public-serving-bundle-rootcause1__Alembic__i7-i8-alembic-main-public-serving-bundle-rootcause1-t1",
+    "dispatchGroup": "dg-i7-i8-alembic-main-public-serving-bundle-rootcause1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i7-i8-alembic-main-public-serving-bundle-rootcause1__Alembic__i7-i8-alembic-main-public-serving-bundle-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 118,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i7-i8-alembic-main-public-serving-bundle-rootcause1-p1",
+    "targetTaskId": "i7-i8-alembic-main-public-serving-bundle-rootcause1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "dg-i7-i8-alembic-main-public-serving-bundle-rootcause1",
+    "resultId": "tr-i7-i8-alembic-main-public-serving-bundle-rootcause1-t1",
+    "createdAt": "2026-07-16T16:09:00.779Z"
+  },
+  "createdAt": "2026-07-16T16:09:00.779Z",
+  "stateRevisionObserved": 118,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

@@ -1,0 +1,321 @@
+{
+  "title": "StrictProductionPipeline 最后只读迁移复审",
+  "date": "2026-09-20",
+  "baselineCommit": "2da01ef91e25e0bc9c0d1fa2f7978f7e93768cb3",
+  "status": "passed-bounded-extraction-review",
+  "findings": [],
+  "scope": {
+    "mode": "read-only",
+    "productOrTestEdits": false,
+    "committedByReviewer": false,
+    "onlyWrittenArtifact": "tmp/strict-management-2026-09-20/strict-extraction-review.json",
+    "excluded": [
+      "管理工具修复",
+      "新缓存/新权限策略",
+      "基线已有能力的重新设计",
+      "整仓check重跑"
+    ]
+  },
+  "snapshots": [
+    {
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "sha256": "644da145231c610aa1bbdaa4aa05f6351adcdcdcb952e83507c760c05dd34a86",
+      "lineCount": 51
+    },
+    {
+      "path": "AlembicAgent/src/agent/production/strict/analysisLoop.ts",
+      "sha256": "cd267b527b8ed341ba3c7befddd1e77c84431d05a986266ca148d04757e5af5b",
+      "lineCount": 656
+    },
+    {
+      "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+      "sha256": "ddf5eece33c6b582d4e569743e8c02f021f3bf4e8566f85c864e12c1fea5d1be",
+      "lineCount": 612
+    },
+    {
+      "path": "AlembicAgent/src/agent/production/strict/lineage.ts",
+      "sha256": "e5ffb27db6199880b3804bba45fbfafc2bcdddbd36b668dd09c510cfc2123db9",
+      "lineCount": 384
+    },
+    {
+      "path": "AlembicAgent/src/agent/production/strict/expressions.ts",
+      "sha256": "ab86d467c1c1f397f523fa6b0b26451a6ae33c6824a1ec050f034f286edac9c4",
+      "lineCount": 423
+    },
+    {
+      "path": "AlembicAgent/src/agent/production/strict/gates.ts",
+      "sha256": "cf8fb9ad570b1b048bf078cba25ece112c1530c5845bc751bc9eec39cd53ab63",
+      "lineCount": 55
+    },
+    {
+      "path": "AlembicAgent/src/agent/production/strict/primitives.ts",
+      "sha256": "626f34aa1168cbc05b36f1b7f310b22efcc24b6718e9402c9506e3563fac6f95",
+      "lineCount": 88
+    }
+  ],
+  "coverage": [
+    {
+      "file": "src/agent/production/StrictProductionPipeline.ts",
+      "coverage": "51行兼容出口全文，逐项核对原公开类型/值类别。"
+    },
+    {
+      "file": "src/agent/production/strict/primitives.ts",
+      "coverage": "88行全文，含不同hash编码、ID集合校验、WeakSet深冻结。"
+    },
+    {
+      "file": "src/agent/production/strict/gates.ts",
+      "coverage": "55行全文，Core typed gate委托及strict tool准入。"
+    },
+    {
+      "file": "src/agent/production/strict/analysisLoop.ts",
+      "coverage": "imports、275–656的transition/class/receipt校验；其余context/epoch声明独立AST与2da01ef逐项对照，不冒称本轮逐字重读全部656行。"
+    },
+    {
+      "file": "src/agent/production/strict/analyst.ts",
+      "coverage": "imports及104–612全部运行时实现，重点Core constructors、disposition守恒、跨进程rebuild。"
+    },
+    {
+      "file": "src/agent/production/strict/lineage.ts",
+      "coverage": "1–190、215–384，覆盖全部运行时实现与Core fixpoint/证据绑定；中间纯类型另以AST核对。"
+    },
+    {
+      "file": "src/agent/production/strict/expressions.ts",
+      "coverage": "423行全文，含0/1/N cardinality、完整authored fingerprint、前驱与terminal receipt。"
+    }
+  ],
+  "independentAstAudit": {
+    "method": "重新git show 2da01ef原文件，使用TypeScript AST printer（去注释/export修饰）独立比对所有top-level function/class/interface/type/variable。未直接复用root脚本的hash。",
+    "originalDeclarations": 94,
+    "movedDeclarations": 94,
+    "missing": [],
+    "changed": [],
+    "duplicateDeclarations": [],
+    "originalSourceExports": 43,
+    "currentSourceExports": 43,
+    "typeOrValueExportChanges": [],
+    "runtimeCycles": [],
+    "submoduleToCompatibilityFacadeRuntimeImports": [],
+    "formalProductionFacadeUnchanged": true,
+    "stageFactoryUnchanged": true
+  },
+  "manualChecks": [
+    {
+      "topic": "Core population/cluster/induction/falsification/review权威链",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 104
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 162
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 208
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 271
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 575
+        }
+      ],
+      "detail": "仍调用公开Core canonicalizeObservationPopulationV1/canonicalizeKnowledgeClustersV1/createInductionReceiptV1/createFalsificationReceiptV1/assertKnowledgeDispositionReviewV1，未改成只看平行hash或字符串reviewer。"
+    },
+    {
+      "topic": "跨进程重建",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 404
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 415
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/lineage.ts",
+          "line": 73
+        }
+      ],
+      "detail": "assertStrictAnalystEpochIntegrity先rebuildStrictAnalystEpoch，再比较外层epochHash；rebuild重新喂executionReceipts、population、cluster、induction、falsification与完整disposition review进入真实validator。lineage构建仍从该路径进入，不因内部helper export而绕开。"
+    },
+    {
+      "topic": "不同hash合同保留",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "AlembicAgent/src/agent/production/strict/primitives.ts",
+          "line": 54
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/primitives.ts",
+          "line": 60
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/lineage.ts",
+          "line": 293
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/expressions.ts",
+          "line": 214
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 607
+        }
+      ],
+      "detail": "Agent canonical对象hash仍为裸64位hex；hashCoreCanonical添加sha256:，用于Core authored fingerprint/fixpoint完整性；证据contentHash仍直接hash原文，未误换成JSON canonical hash。requireCoreHash仍要求Core前缀。"
+    },
+    {
+      "topic": "seal与freeze新修复保留",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analysisLoop.ts",
+          "line": 395
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/primitives.ts",
+          "line": 78
+        }
+      ],
+      "detail": "seal先由Core算receipt，再核expected hash，最后提交私有finalSchedule；无参/idempotent行为和类身份不变。freeze继续穿过已经冻结的容器，用WeakSet避免循环重复遍历。"
+    },
+    {
+      "topic": "fixpoint与前驱/终态守恒",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "AlembicAgent/src/agent/production/strict/analyst.ts",
+          "line": 355
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/expressions.ts",
+          "line": 159
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/expressions.ts",
+          "line": 279
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/strict/expressions.ts",
+          "line": 348
+        }
+      ],
+      "detail": "fixpoint继续调用Core createAnalysisFixpointReceiptV1并核review context；expressions保留parentSet完整重验、0/1/N约束、版本/repair depth和Agent派生fingerprint，最终返回Core validateHypothesisExpressionSetReceiptV1结果。"
+    },
+    {
+      "topic": "真实stagefactory接线",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 1
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 199
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 208
+        },
+        {
+          "path": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 31
+        }
+      ],
+      "detail": "Stage factory和Pipeline仍消费同一旧兼容入口。factory字节内容与2da01ef相同，完整transition在seal前、取消checkpoint、G2 Main兼容及拒绝输入正规化均未改。源码动态装载probe运行G1/G2真实evaluator均pass。"
+    },
+    {
+      "topic": "公开与内部export边界",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+          "line": 1
+        },
+        {
+          "path": "AlembicAgent/src/production.ts",
+          "line": 23
+        },
+        {
+          "path": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1
+        }
+      ],
+      "detail": "43个原source出口名称及type/value属性保持；src/production.ts和原内部barrel/package.json无改动。assertStrictContextIntegrity等只为内部跨模块消费export，未从兼容入口或正式production facade泄漏。实际probe中freeze和assertStrictAnalystEpochIntegrity不在facade。"
+    },
+    {
+      "topic": "依赖方向与配置登记",
+      "result": "pass",
+      "evidence": [
+        {
+          "path": "AlembicAgent/config/layer-contract.json",
+          "line": 147
+        }
+      ],
+      "detail": "primitives只依赖node:crypto；analysisLoop/analyst/gates→primitives+Core；lineage→analysisLoop/analyst/primitives；expressions→lineage/primitives+Core（analyst仅type）；facade只向下re-export。6个内部文件逐一登记，未有循环或反向依赖facade/Runtime。"
+    }
+  ],
+  "sourceRuntimeProbe": {
+    "method": "将当前9个实际source模块（6个strict、facade、StageFactory、Prompt）在Node内存转译到data URL并按原相对边解析，Core通过正式@alembic/core/production加载；不写产物、不mock Core validators、不调用AI/API。",
+    "results": {
+      "sourceModulesLoaded": 9,
+      "facadeFactoryIdentity": true,
+      "classIdentity": true,
+      "sealError": "STRICT_ANALYSIS_FIXPOINT_SCHEDULE_MISMATCH",
+      "failedSealLeavesOpen": true,
+      "sealIsIdempotent": true,
+      "sealHashIsCoreFormat": true,
+      "deepFrozenChild": true,
+      "cycleFrozen": true,
+      "agentHashBare": true,
+      "coreHashPrefix": true,
+      "bareCoreRejected": true,
+      "gate1Action": "pass",
+      "transitionHashBare": true,
+      "gate2Action": "pass",
+      "forbiddenToolRejected": true,
+      "internalHelpersNotInFacade": true
+    },
+    "limits": "该小probe覆盖真实接线/hash/freeze/seal，不将其冒称完整epoch语义重建测试；重建链另由源码抽查与root既有回归支撑。"
+  },
+  "existingValidationRead": [
+    {
+      "path": "AlembicAgent/tmp/strict-management-2026-09-20/extraction-green.log",
+      "observed": "5文件99项通过：strict-production-chain、strict-iterative-analysis、strict-production-rework、public-strict-facades、layer-contract。",
+      "rerunByReviewer": false
+    },
+    {
+      "path": "AlembicAgent/tmp/strict-management-2026-09-20/extraction-types.log",
+      "observed": "tsc --noEmit无错误输出；与root的通过状态一致。",
+      "rerunByReviewer": false
+    },
+    {
+      "path": "AlembicAgent/test/strict-production-rework.test.ts",
+      "specificChecks": [
+        "freezes nested population payloads behind an already frozen container",
+        "derives immutable roots from semantic receipts and cannot reset the repair depth",
+        "fails partial populations, string authority, and orphan disposition reviews closed",
+        "uses the exact Core cluster hash and rejects review-context rebound at seal",
+        "verifies the complete parent set rather than trusting a caller-supplied parent id"
+      ]
+    },
+    {
+      "path": "AlembicAgent/test/public-strict-facades.test.ts",
+      "specificChecks": [
+        "declares exactly three new top-level dist package exports",
+        "classifies the new facades as stable with exact runtime signatures",
+        "keeps strict implementation and evaluator internals forbidden"
+      ]
+    }
+  ],
+  "conclusion": "限定迁移复审通过，未发现新增回归或Core验证丢失。可交root继续整仓check和文档/管理模块收尾；不扩大为基线能力重新设计。"
+}

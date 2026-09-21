@@ -1,0 +1,650 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-18",
+  "scope": "仅关闭已报告tools/runtime findings与最后四项复审，不扩新审查，不修改产品文件。",
+  "summary": {
+    "originalFindings": 35,
+    "fixed": 35,
+    "retainedWithReasonFindings": 0,
+    "stillOpen": 0,
+    "retainedScopeDecisions": 5,
+    "finalFollowupsClosed": 4
+  },
+  "dispositions": [
+    {
+      "id": "TOOLS-001",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "只读命令白名单可被换行及子程序执行选项绕过。",
+      "status": "fixed",
+      "reason": "只读命令检查拒绝CR/LF/变量展开，并禁止find子程序/写文件、rg --pre等已复现绕过参数。",
+      "evidence": [
+        "src/tools/runtime/handlers/terminalSafety.ts",
+        "test/runtime-terminal-safety.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-002",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "delta cache unchanged 在显式读取范围之前短路，阻止第二段源码与大文件 outline 后的补读。",
+      "status": "fixed",
+      "reason": "unchanged短路仅用于无显式范围请求；startLine/endLine/maxLines补读返回真实范围并继续维护指纹。",
+      "evidence": [
+        "src/tools/runtime/handlers/code.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-003",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "exclusive 锁只互斥其他 exclusive，parallel/single 均不等待，实际并非全局独占。",
+      "status": "fixed",
+      "reason": "统一scheduler计入parallel/single活动，exclusive形成队列屏障；已验证取消屏障、异常和handler前取消释放。",
+      "evidence": [
+        "src/tools/runtime/router.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-004",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "文件和 cwd 边界只检查词法路径，符号链接可越过项目根或别名绕过受保护路径。",
+      "status": "fixed",
+      "reason": "resolveProjectPath统一校验词法与realpath，新增文件校验最近存在祖先；code/terminal cwd/authoring和证据引用接入，保护路径使用真实相对路径。",
+      "evidence": [
+        "src/shared/projectPath.ts",
+        "src/tools/runtime/handlers/code.ts",
+        "src/tools/runtime/handlers/terminal.ts",
+        "src/tools/runtime/handlers/recipeAuthoringGate.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-005",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "搜索 cache key 缺影响结果的 maxResults/contextLines，窄查询污染后续扩容查询。",
+      "status": "fixed",
+      "reason": "code.search缓存键加入projectRoot、pattern、glob、regex、maxResults和contextLines，窄结果不再污染扩容请求。",
+      "evidence": [
+        "src/tools/runtime/handlers/code.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-006",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "pytest 正则的计数组全部可选，先匹配 session 标题并伪造零测试零失败。",
+      "status": "fixed",
+      "reason": "pytest仅匹配真实结果计数摘要并取最后一条，支持failed/pass顺序和error/errors，session标题不再伪造0测试。",
+      "evidence": [
+        "src/tools/runtime/compressor/parsers/TestOutputParser.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-007",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "已匹配的 unmerged git 状态未入任何 bucket，冲突可被压缩为空输出。",
+      "status": "fixed",
+      "reason": "七种unmerged状态统一进入conflicted桶，UU等不再被丢成空字符串。",
+      "evidence": [
+        "src/tools/runtime/compressor/parsers/GitStatusParser.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-008",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "retrievalProfile sourceContentHash 在 style repair 前计算，修复改变事实字段后未重建而提交过期 hash。",
+      "status": "fixed",
+      "reason": "采用风格修复后重新prepare candidate/profile hash，并使用共同authoring评估入口；不覆盖首次unsafe-code诊断。",
+      "evidence": [
+        "src/tools/runtime/handlers/knowledge.ts",
+        "test/recipe-production-profile-adapter.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-009",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "ordinary output 仅清理 structuredContent，adapter 的 JSON text 仍保留被禁止的私有字段。",
+      "status": "fixed",
+      "reason": "ordinary output的可解析JSON text与structuredContent使用同一字段清理，合并redacted字段摘要。",
+      "evidence": [
+        "src/tools/kernel/result.ts",
+        "test/tool-system.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-010",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "继承 unregister 仅删 manifest，handler definitions/expanded 状态仍保留，且 registerDefinition 先写 defs 后注册 manifest 会在重复失败后留下半注册。",
+      "status": "fixed",
+      "reason": "unregister同步清除manifest/definition/expanded状态；registerDefinition在manifest成功后写defs，失败不会留下半注册。",
+      "evidence": [
+        "src/tools/catalog/UnifiedToolCatalog.ts",
+        "test/tool-system.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-011",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "通用执行入口和等待锁后均未检查 abortSignal，已取消/排队期间取消的有副作用 handler 仍可执行。",
+      "status": "fixed",
+      "reason": "router调度前、排队取消、获得slot后handler前均处理取消；adapter明确投影aborted，已执行partial输出保留。",
+      "evidence": [
+        "src/tools/runtime/router.ts",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-012",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "局部 JSON 提取器按每个花括号计深度，不识别 JSON 字符串/转义，拒绝合法风格修复输出。",
+      "status": "fixed",
+      "reason": "风格修复委托shared structuredOutput JSON提取器，消除不识别字符串花括号的局部扫描器。",
+      "evidence": [
+        "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+        "src/shared/structuredOutput.ts",
+        "test/SubmissionSanitize.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-013",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "首次并发调用在 parser import 完成前把 loaded 设 true，后来者跳过实际加载。",
+      "status": "fixed",
+      "reason": "异步首次parser初始化共享Promise，compress等待后复用compressSync处理逻辑。",
+      "evidence": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-014",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "参数校验忽略已声明的基础类型，错误形状能持久写入宿主会话 store 并破坏后续调用。",
+      "status": "fixed",
+      "reason": "参数根形状及已声明基础类型在handler前校验，数字/数组/对象memory key不再进入store；未擅自把静态sources要求应用于evidenceRefs-only有效提交。",
+      "evidence": [
+        "src/tools/runtime/router.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "TOOLS-X01",
+      "sourceReport": "tools-review.json",
+      "originalIssue": "Evolution commandAllowlist 只在直接给 ToolRouter 配 capability 的单测中兑现；真实宿主无此接线。",
+      "status": "fixed",
+      "reason": "runtimeSafetyGate在调用host router前使用当前LoopContext capability命令白名单；不再依赖宿主单例ToolRouter配置。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "test/runtime-efficiency.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-001",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "abort() 只改状态/发事件，无法取消execute中的局部AbortController，在途provider/tool继续运行。",
+      "status": "fixed",
+      "reason": "当前execute controller保存在实例，abort真实触发signal；provider迟到响应被丢弃，完成分支统一取消状态，abort事件不重复。",
+      "evidence": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/agent-lifecycle.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-002",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "正常返回仅按reply非空判success，取消、policy拒绝、strict失败、fallback错误文本被误报成功。",
+      "status": "fixed",
+      "reason": "Service消费终止诊断/管线结局，明确aborted最优先；policy拒绝、provider终止、fallback、strict失败正确区分；历史timeout仅在最终阶段未恢复时决定timeout。",
+      "evidence": [
+        "src/agent/service/AgentService.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/agent-lifecycle.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-003",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "execution.timeoutMs 在buildRuntimeOptions完全丢弃，公开运行时选项也无对应字段。",
+      "status": "fixed",
+      "reason": "AgentRuntimeRunOptions加入timeoutMs，Service透传，Runtime execute实际建立相应timeout保护。",
+      "evidence": [
+        "src/agent/service/AgentRunContracts.ts",
+        "src/agent/service/AgentService.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/agent-lifecycle.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-004",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "非tracker首轮iteration先加到1，Policy用>=maxIterations提前终止；translation-json配置1会零模型调用。",
+      "status": "fixed",
+      "reason": "ExitController把已完成轮数iteration-1传给Policy；真实BudgetPolicy最大1轮时允许首个model调用。",
+      "evidence": [
+        "src/agent/runtime/ExitController.ts",
+        "test/agent-lifecycle.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-005",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "声明式SafetyPolicy编译时所有约束字段丢失。",
+      "status": "fixed",
+      "reason": "声明式safety policy去掉type后透传完整构造配置。",
+      "evidence": [
+        "src/agent/profiles/AgentProfileCompiler.ts",
+        "test/agent-surface-floor.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-006",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "工具安全策略仅识别terminal args.bin旧形态，当前action/params.command不触发自定义命令黑名单。",
+      "status": "fixed",
+      "reason": "PolicyEngine识别params.command和旧bin形式；runtimeSafetyGate在host前执行策略，代码相对路径基于runtime.projectRoot归一化。",
+      "evidence": [
+        "src/agent/policies/PolicyEngine.ts",
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "test/runtime-efficiency.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-007",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "无ContextWindow的工具配额返回值与内部remaining状态不一致。",
+      "status": "fixed",
+      "reason": "无ContextWindow分支同样初始化和重置roundMaxChars/used/maxMatches。",
+      "evidence": [
+        "src/agent/runtime/BudgetController.ts",
+        "test/BudgetController.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-008",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "按tier排序执行后的结果数组与原输入顺序不一致，merger按下标将结果归错dim/module。",
+      "status": "fixed",
+      "reason": "tier执行结果按原始child对象保存并按原输入顺序重建，merger下标归属保持正确。",
+      "evidence": [
+        "src/agent/coordination/AgentRunCoordinator.ts",
+        "test/agent-surface-floor.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-009",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "parent合并只识别error/aborted，timeout和blocked均提升为success。",
+      "status": "fixed",
+      "reason": "parent聚合覆盖error/aborted/timeout/blocked全部非成功状态。",
+      "evidence": [
+        "src/agent/coordination/AgentRunCoordinator.ts",
+        "test/agent-surface-floor.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-010",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "request发布的请求自身因同correlationId被当作reply，未响应也立即成功。",
+      "status": "fixed",
+      "reason": "pending request记录requestType，同type请求发布不再自解；真正不同类型response可响应，无人回复会timeout。",
+      "evidence": [
+        "src/agent/runtime/AgentEventBus.ts",
+        "test/hook-system.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-011",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "直呼note_finding桥接丢弃schema公开的所有深度槽，RECORD阶段无法保存深度发现。",
+      "status": "fixed",
+      "reason": "直呼note_finding按DEPTH_SLOT_PROPS单源key透传全部可选深度槽。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "test/runtime-efficiency.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-012",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "Producer阶段gate未允许evidence.get/search，阻断capability已声明的证据自救通道。",
+      "status": "fixed",
+      "reason": "Producer gate允许既有evidence.get/search；RECORD schema和record-repair工具集同步保留证据只读入口。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "test/runtime-efficiency.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-013",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "可变状态读取被默认session缓存永久短路，绕开真实重读与写前新鲜度恢复。",
+      "status": "fixed",
+      "reason": "code/memory/knowledge/evidence及meta.review退出外层缓存；其它工具仅在明确只读manifest及真实snapshot下复用，移除session/文件长度伪snapshot。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "test/runtime-efficiency.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-014",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "公开可阻断tool:execute:before hook被Runtime用emitSync调用，false返回值完全无效。",
+      "status": "fixed",
+      "reason": "Runtime await可阻断hook并消费false，记录blocked且不调用router；await后复查signal。",
+      "evidence": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "test/agent-lifecycle.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-015",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "provider预算估计把system/runtime sections重复计入，导致未超预算的请求被误拒。",
+      "status": "fixed",
+      "reason": "总input估算只计systemPrompt/providerMessages/tools一次；sections保留作分项和重复分析。",
+      "evidence": [
+        "src/agent/runtime/LLMInputMeasurement.ts",
+        "test/llm-input-layering.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-016",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "强制摘要仍消费旧扁平参数并将所有knowledge调用计为已提交候选。",
+      "status": "fixed",
+      "reason": "forcedSummary统一解包当前params/path形态，并通过toolOutcomes只统计真实created/id/lifecycle提交；scan finalize同样使用该语义。",
+      "evidence": [
+        "src/agent/runtime/forcedSummary.ts",
+        "src/agent/utils/toolOutcomes.ts",
+        "src/agent/runtime/AgentRuntime.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-017",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "两条强制摘要provider调用未传abortSignal，取消/timeout后摘要HTTP仍继续。",
+      "status": "fixed",
+      "reason": "两条强制摘要provider调用均透传abortSignal；execute取消收束会覆盖迟到/降级摘要，防止取消提升为success。",
+      "evidence": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/forcedSummary.ts",
+        "test/agent-lifecycle.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-018",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "任何knowledge查询都被当成submit，从而跳过文件证据数量门。",
+      "status": "fixed",
+      "reason": "QualityGatePolicy仅以isPersistedSubmission成功提交绕过文件引用门，knowledge查询/失败提交不再视为持久化。",
+      "evidence": [
+        "src/agent/policies/QualityGatePolicy.ts",
+        "src/agent/utils/toolOutcomes.ts",
+        "test/agent-surface-floor.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-019",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "emitSync调用async观察者但不处理其rejected Promise，可能产生unhandled rejection。",
+      "status": "fixed",
+      "reason": "emitSync对async Promise附加reject处理并记录HOOK_HANDLER_FAILED。",
+      "evidence": [
+        "src/agent/runtime/HookSystem.ts",
+        "test/hook-system.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    },
+    {
+      "id": "RUNTIME-020",
+      "sourceReport": "runtime-review.json",
+      "originalIssue": "Pipeline循环不检查父取消，已取消stage正常返回停止文本后仍运行后续gate/promptBuilder/stage。",
+      "status": "fixed",
+      "reason": "每个stage/gate入口检查父signal，取消后不调后续stage/gate；管线和Runtime最终都记录aborted outcome，Service明确优先消费。",
+      "evidence": [
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/service/AgentService.ts",
+        "test/pipeline-outcome-abandoned.test.ts"
+      ],
+      "verification": "current-code-reviewed; existing/new regression tests referenced, not independently rerun by reviewer"
+    }
+  ],
+  "retainedDecisions": [
+    {
+      "item": "公开WorkflowRegistry/UnifiedToolCatalog及kernel handler/router contracts",
+      "status": "retained-with-reason",
+      "reason": "此前已确认Alembic真实宿主消费，不能因本仓未new或只在barrel出现删除。"
+    },
+    {
+      "item": "ExitController未接线post-*方法与FanOut/Coordinator双入口的进一步合并",
+      "status": "retained-with-reason",
+      "reason": "涉及公开兼容和控制语义，不是本轮确认缺陷修复所必需；保留既有入口，未扩架构重构。"
+    },
+    {
+      "item": "完整abortPolicy及Runtime并发/复用策略",
+      "status": "retained-with-reason",
+      "reason": "原报告列为契约决策而非确认的自动执行要求；本轮完成已授权的单次运行取消传播与排序/状态修复。"
+    },
+    {
+      "item": "完整递归JSON Schema验证",
+      "status": "retained-with-reason",
+      "reason": "本轮修复已复现的根形状/基础类型污染；更严格递归required会误拒真实evidenceRefs-only维度提交，不引入第二套schema权威。"
+    },
+    {
+      "item": "PCV observe-only默认和sourceRef门控范围",
+      "status": "retained-with-reason",
+      "reason": "保持原确认行为，不把观测分类升级成新控制门。"
+    }
+  ],
+  "finalFollowupDisposition": [
+    {
+      "id": "FINAL-RUNTIME-01",
+      "status": "fixed",
+      "reason": "Service核对每个超时阶段的最终非超时非空输出且pipeline completed才认恢复；明确outcome=aborted最先返回，已恢复后的用户取消不再被历史timeout覆盖。",
+      "evidence": [
+        "src/agent/service/AgentService.ts:240",
+        "src/agent/runtime/AgentRuntime.ts:357",
+        "test/agent-lifecycle.test.ts:36",
+        "test/agent-lifecycle.test.ts:118"
+      ]
+    },
+    {
+      "id": "FINAL-RUNTIME-02",
+      "status": "fixed",
+      "reason": "Tracker根据完整观察的ok与meta.blocked决定失败wrapper，成功仍传raw业务结果；envelope失败status不再丢失。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts:977",
+        "test/runtime-efficiency.test.ts:135"
+      ]
+    },
+    {
+      "id": "FINAL-RUNTIME-03",
+      "status": "fixed",
+      "reason": "submitDedup在meta.blocked时最先返回，不登记title/isSubmit/ledger。",
+      "evidence": [
+        "src/agent/runtime/ToolExecutionPipeline.ts:1010",
+        "test/runtime-efficiency.test.ts:135"
+      ]
+    },
+    {
+      "id": "FINAL-RUNTIME-04",
+      "status": "fixed",
+      "reason": "producer gate的toolCalls输入改为readonly unknown[]并统一交normalizer验证，旧窄结果壳已移除。",
+      "evidence": [
+        "src/agent/evaluation/gateEvaluators.ts:293"
+      ]
+    }
+  ],
+  "snapshot": [
+    {
+      "path": "src/tools/runtime/handlers/terminalSafety.ts",
+      "sha256": "4f7d938a65dceb8f24b072e8a2f5259d39cd8cbd4a2ab2988c075eb59c0224c2"
+    },
+    {
+      "path": "src/tools/runtime/handlers/code.ts",
+      "sha256": "05b1785c262c01904b0798dff06a4402882d46e8991df0ea1c8f60dde7642067"
+    },
+    {
+      "path": "src/tools/runtime/router.ts",
+      "sha256": "6e74fbe0467442774796c24dbafbaea7fdd0596a27f8d3b58bcd9a765855f60f"
+    },
+    {
+      "path": "src/shared/projectPath.ts",
+      "sha256": "53033022ebe42ee07c963a30847213d6a0c2ec03249946149438a6e9a11e2a11"
+    },
+    {
+      "path": "src/tools/runtime/handlers/terminal.ts",
+      "sha256": "2f9a3a45de21e13317e0461f88a7f0022a918de818b356582d54e05085e0a290"
+    },
+    {
+      "path": "src/tools/runtime/handlers/recipeAuthoringGate.ts",
+      "sha256": "7f98f5834664de797fd2c568c068e843a542c5b7bcd24ade72c0a3da1a3a8c09"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/TestOutputParser.ts",
+      "sha256": "bafbb4c34b7ce16af4c2a608e43bcf05fe1f63bb25d10b0a37298566740af573"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/GitStatusParser.ts",
+      "sha256": "5570f7641093e9130523fc354caf225865a1e16a3412d5c66580bc366b8a7206"
+    },
+    {
+      "path": "src/tools/runtime/handlers/knowledge.ts",
+      "sha256": "d270102c050e9ae55d3bb5f20ef4928ebdb3aa5850c072cc4ce47117827afdd4"
+    },
+    {
+      "path": "src/tools/kernel/result.ts",
+      "sha256": "03b8072b9e7c3d44ab4e4601a467fdf7bdef4796d8e85ed7a6eb12822eb6060b"
+    },
+    {
+      "path": "src/tools/catalog/UnifiedToolCatalog.ts",
+      "sha256": "1057a71b81900bb06fc457fae85e4f906fa95bea1341ee647e65dcc5d924b3f1"
+    },
+    {
+      "path": "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+      "sha256": "2453a5eeb6af952311c9fea93277708fc0f9209f58bcdfe117fdb8e5a10869da"
+    },
+    {
+      "path": "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+      "sha256": "6b91c8bacefbc2b8225a3b078a07f00aa74b8c607078b8e046094db3530e51c0"
+    },
+    {
+      "path": "src/shared/structuredOutput.ts",
+      "sha256": "cf22a9b65c895507866dd62fc55ce94c0b656c91362177f2e30f4386d9f23c55"
+    },
+    {
+      "path": "src/tools/runtime/compressor/OutputCompressor.ts",
+      "sha256": "505794210a77337b4b32189d32388434ed40d2e83a2f48d40fcda1f7cfc29391"
+    },
+    {
+      "path": "src/agent/runtime/ToolExecutionPipeline.ts",
+      "sha256": "7e7e9d68c85f67ff94e555ac6d824253cfb64d7b300f77de2b8bdb3fa227fcb0"
+    },
+    {
+      "path": "src/agent/runtime/AgentRuntime.ts",
+      "sha256": "ed7b31a3c7a45a67031bd2b4dfc5ad1f03ca4501338bdf03b376e03caa017b82"
+    },
+    {
+      "path": "src/agent/service/AgentService.ts",
+      "sha256": "32c75924cfc38805d804d57fdb426c4f7b20b44aa4a5dda6ef83f20a69f450eb"
+    },
+    {
+      "path": "src/agent/service/AgentRunContracts.ts",
+      "sha256": "489dd55c0f78b4476de87b7715fdbf6f6f2833966fd453beaef38ef7b9cbafc9"
+    },
+    {
+      "path": "src/agent/runtime/ExitController.ts",
+      "sha256": "a67598cad09777fbc5fa269fa8ed3c6567f2c5b18a3168f56657dbc3b2b0a1fd"
+    },
+    {
+      "path": "src/agent/profiles/AgentProfileCompiler.ts",
+      "sha256": "063a6e0f0b00fe9f92d76a53eddb93bc2ee9eea324ce7986cbdaff8e615e9308"
+    },
+    {
+      "path": "src/agent/policies/PolicyEngine.ts",
+      "sha256": "306daeebe81e1523e46c7552d920afd7bf6bcf361e4d6188903d2e9bb7f216a9"
+    },
+    {
+      "path": "src/agent/runtime/BudgetController.ts",
+      "sha256": "36b5532c0b8d1585eb1fe32dba8f0902a54b112a640e5e361b8134605626f22a"
+    },
+    {
+      "path": "src/agent/coordination/AgentRunCoordinator.ts",
+      "sha256": "355ced9e0835d7228ea80014d72f89c78253cc38f8acbc1a97db35e8149a91bb"
+    },
+    {
+      "path": "src/agent/runtime/AgentEventBus.ts",
+      "sha256": "75acef20f998e18a82d68f601baa9688fe4cf7db67808171fea67f1795239f20"
+    },
+    {
+      "path": "src/agent/strategies/PipelineStrategy.ts",
+      "sha256": "bcf7f7d5142ee8177bc5a1d8d40ffebffee8d32aee080cadc824efb262c9d557"
+    },
+    {
+      "path": "src/agent/runtime/LLMInputMeasurement.ts",
+      "sha256": "7b5465f34784672997c0fc24366c7c3ac9465e42523973eccd059a9e98b51a84"
+    },
+    {
+      "path": "src/agent/runtime/forcedSummary.ts",
+      "sha256": "48ed13485558e5dd67b313e944224be1239173d2ec12cf7e0920402d6808a2bf"
+    },
+    {
+      "path": "src/agent/utils/toolOutcomes.ts",
+      "sha256": "13eaff9dbd46b254514070d98939260d6f12485ca7370297e7b3251b6b736cc2"
+    },
+    {
+      "path": "src/agent/policies/QualityGatePolicy.ts",
+      "sha256": "76ffc0cb0912c4e130d6b2b0dc0c49826f4073ad875abe3d03437967211e951a"
+    },
+    {
+      "path": "src/agent/runtime/HookSystem.ts",
+      "sha256": "a8dc3c20ab48787dfe010fff4fd6fd56a1a15880f3382b58c34534fdb25edcd6"
+    }
+  ],
+  "verificationNotes": [
+    "审阅当前补丁及新增真实PipelineStrategy fake-timer timeout/recovery测试和三个middleware失败状态参数化用例。",
+    "本轮额外source probe核对recovered→success、terminal timeout→timeout；发现取消后历史timeout优先级残余后root已补outcome=aborted最先返回，并将测试扩为两行参数化。最终源码已复核该分支。",
+    "没有把GREEN运行中或最终check运行中称为已通过；最终全量验证结果由root提供。",
+    "原报告中的扩展建议单独保留，不伪报为本轮未完成缺陷。"
+  ],
+  "testsRunByReviewer": []
+}

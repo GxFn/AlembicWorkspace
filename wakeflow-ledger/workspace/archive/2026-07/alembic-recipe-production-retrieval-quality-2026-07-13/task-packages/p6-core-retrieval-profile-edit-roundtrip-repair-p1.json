@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "在 AlembicCore 干净基线 4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4 上修复已接受 Recipe 生产合同的一个确定性缺口：KnowledgeService.update 当前 UPDATABLE 与持久化分支不接收 retrievalProfile，导致 Alembic HTTP PATCH 无法为 Dashboard P4 提供完整 profile 编辑回写。只修改 AlembicCore：让 retrievalProfile 作为 Recipe 真相的增量字段可被 update 明确验证和保存，保持 Markdown↔domain↔SQLite wire 无损，更新后 readiness/projector 使用新 profile，发出既有 knowledge changed 生命周期信号但不得自动 publish、不得调用 provider/排名/向量门禁。必须拒绝结构错误或不受支持 schema，保留未编辑字段与 lifecycle；existing legacy null/compatibility 继续可读。不得新增第二数据库、side-channel profile API、第五生产入口或 Dashboard/Alembic/Plugin/Agent 改动。添加真实 update→reload→Markdown/SQLite/API wire→readiness/projector 的 RED/GREEN 测试，覆盖只更新 profile、与其它字段混合更新、非法 profile 不写、pending/staging 保留、active 条目编辑不触发新 active transition/自动发布，并运行 Core 全量测试、构建、类型、public/layer gates，提交单一干净 commit 和原始证据。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "补齐已确认但当前缺失的 Recipe retrievalProfile 编辑持久化合同，让 Dashboard 后续能在不新建 Recipe、不绕过 lifecycle 的前提下完整审阅和修正 profile。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "提供单一 AlembicCore commit、parent、范围 diff 与 clean status。"
+      },
+      {
+        "kind": "tests",
+        "verify": "提供 update→reload→Markdown/SQLite wire→readiness/projector RED/GREEN，以及 Core 全量 tests/build/type/public/layer 原始结果。"
+      },
+      {
+        "kind": "self-review",
+        "verify": "逐项证明无自动 publish、无 provider/rank gate、无第二存储、未编辑字段/lifecycle 保留且只改 Core。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green"
+      },
+      {
+        "kind": "root-cause"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T18:30:45.822Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "p6-core-retrieval-profile-edit-roundtrip-repair-t1",
+      "taskPackageId": "p6-core-retrieval-profile-edit-roundtrip-repair-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "补齐 Core retrievalProfile 的合法 update、持久化、reload 与 readiness/projector 回归合同；只改 Core，不触碰 lifecycle 发布或其它仓库。",
+      "status": "pending",
+      "createdAt": "2026-07-13T18:30:45.822Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

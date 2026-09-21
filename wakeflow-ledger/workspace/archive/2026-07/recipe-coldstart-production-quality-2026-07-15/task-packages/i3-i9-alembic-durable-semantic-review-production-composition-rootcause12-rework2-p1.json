@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework2-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "修复 Alembic production semantic-review trust enrollment 的完整替换 fail-open：必须可靠区分真实首次安装与已登记后的 key+registry 全丢失/替换，后者 fail closed 且不得自生成、自批准；同时拒绝 group/world-writable custody 路径并保留既有 V5 真实链路。",
+  "status": "pending",
+  "sourceRef": "controller decision evt-20260728222713-0304; commit 044c952e4a0bf3e82d1d8484f914725676bfc5aa; probes PAIR_REPLACEMENT_REAUTHORIZED and ACCEPTED_WORLD_WRITABLE_CUSTODY",
+  "designIntent": "保留 044c952 已修复的 partial-pair、registry 文件权限和 symlink 防护；在 Alembic 既有生产配置/秘密/登记边界中建立不可由 key+registry 同时替换所自证的 durable enrollment authority，或显式操作员 re-enrollment gate，并收紧 custody 路径权限。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "Alembic Main 基于 044c952e4a0bf3e82d1d8484f914725676bfc5aa 的单一可审查提交，回填 commit/tree/parent 与 clean worktree。"
+      },
+      {
+        "kind": "root-cause-note",
+        "verify": "说明首次 bootstrap 与已登记后完整 pair 丢失为何此前不可区分，定位真实 production caller、authority 来源及原子/崩溃恢复边界。"
+      },
+      {
+        "kind": "negative-probe",
+        "verify": "built artifact 两进程/重启探针证明：完整 key+registry 删除或替换后 fail closed，不生成新 key、不写入/批准新 policy；0777 custody 或适用父目录 fail closed。"
+      },
+      {
+        "kind": "runtime-fixture",
+        "verify": "真实 StrictRecipePipelineFacade production composition 回归证明首次合法 bootstrap 可用、正常重启稳定、受控恢复不误判，并保持 V5 15-receipt/8-group chain。"
+      },
+      {
+        "kind": "boundary",
+        "verify": "只修改 Alembic Main 所需 production composition/trust-store/测试；不修改 AlembicCore、AlembicAgent、AlembicPlugin、Test、vendor、Wakeflow，不另造第二 trust platform 或内存 sentinel。"
+      },
+      {
+        "kind": "command",
+        "verify": "记录 RED→GREEN 单测、build:check、目标集成测试、built probe、npm run check 与 npm test 的精确命令及结果；若主链失败立即停止扩展。"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "test-first"
+      },
+      {
+        "kind": "self-review"
+      },
+      {
+        "kind": "compatibility"
+      },
+      {
+        "kind": "alembic-guard"
+      }
+    ]
+  },
+  "createdAt": "2026-07-28T22:27:37.449Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework2-t1",
+      "taskPackageId": "i3-i9-alembic-durable-semantic-review-production-composition-rootcause12-rework2-p1",
+      "targetWindow": "Alembic",
+      "summary": "在 Alembic Main 当前基线 044c952 上完成同链路 rework2。先用 RED 测试和 built 两进程探针复现完整 trust pair 删除/替换导致重新 bootstrap、自生成 key、自批准 policy，以及 custody 目录 0777 仍被接受。追踪 StrictSemanticReviewRuntimeFactory 到 resolveDataRoot 的真实生产调用，复用现有 host-owned durable config/secrets/enrollment authority，或设置明确且可审计的 operator re-enrollment gate；不能继续以 pair both-absent 作为无条件首次 bootstrap。完整 pair 丢失/替换必须 fail closed，且失败前后不得生成 key、registry 或批准记录；真实首次 bootstrap、正常重启、PUBLIC_CAS_PREPARED 恢复必须仍可用。custody 根及适用父目录拒绝 group/world writable，并保持 O_NOFOLLOW/realpath/leaf file mode 防护。增加 unit、built artifact 两进程探针、真实 StrictRecipePipelineFacade recovery regression；证明 V5 15-receipt/8-group chain 不回退。运行 build:check、目标测试、npm run check、npm test 和 Alembic Guard。不得另造第二 trust platform、内存 sentinel、空接口或测试专用路径；不得修改 sibling/Test/vendor/Wakeflow。回填 commit/tree/parent、原始命令输出、探针 JSON、边界、风险和执行计划。",
+      "status": "pending",
+      "createdAt": "2026-07-28T22:27:37.449Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i6-agent-public-strict-facade-rework1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i6-agent-public-strict-facade-rework1-p1",
+  "dispatchGroup": "dg-i3-i6-agent-public-strict-facade-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "i3-i6-agent-public-strict-facade-rework1-t1",
+  "status": "completed",
+  "summary": "在指定基线之上以单一提交新增 @alembic/agent/runs、/production、/evaluation 三个顶层精选严格 façade；公开面精确为 15 个入口/442 个运行时绑定，真实 Alembic checkout 可加载 10 个批准绑定并解析全部批准类型，src/dist/deep 与内部权威成员保持不可消费；全量 70 文件/555 测试、边界、签名、打包均通过。",
+  "evidenceRefs": [
+    "commit:b2888aab463ae996341f9eeaba6d2bf91a6a11c0",
+    "parent:e2aa051500cc9fc5c43f1085afd5072c5981f26f",
+    "tree:bb0b63aeec698a2b37a25f189ab453b254d549c2",
+    "core:737ac265dc50b8ccf788c1b9103ead537d94ff06",
+    "../../../AlembicAgent/package.json",
+    "../../../AlembicAgent/src/runs.ts",
+    "../../../AlembicAgent/src/production.ts",
+    "../../../AlembicAgent/src/evaluation.ts",
+    "../../../AlembicAgent/scripts/probe-agent-public-strict-consumer.mjs",
+    "../../../AlembicAgent/test/public-strict-facades.test.ts",
+    "../../../AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+    "../../../AlembicAgent/config/agent-public-api-boundary.json",
+    "../../../AlembicAgent/config/agent-public-api-signatures.json",
+    "tests:70-files-555-passed",
+    "pack:567-entries-shasum-27761c82ac93a1abba1159aa7225dd223d8b98d0",
+    "compatibility:12-legacy-exports-432-bindings-unchanged-db2a96ca1727c23751d289948f92cde56c1b7a946fe7cdb1f7802e44d7c6cf96"
+  ],
+  "verification": [
+    "npm run check => exit 0; 70 test files and 555 tests passed; boundary/signature/consumer/floor/retirement gates passed",
+    "npm run smoke:public-imports => 15 subpaths imported; 11 forbidden subpaths rejected",
+    "npm run build:check && npm run smoke:public-signatures && npm run smoke:strict-consumer => exit 0 post-commit",
+    "npm run release:pack-preview => exit 0 post-commit; Agent b2888aab... clean; Core 737ac265... clean; 567 entries",
+    "git diff --check => exit 0; git status --porcelain=v1 => empty",
+    "Two-stage self-review closed contract, consumer, private-surface, compatibility, and release checks"
+  ],
+  "risks": [
+    "下游 Main 对新 façade 的采用与端到端编排属于其后续生产者/消费者顺序，本任务未修改 Main，也未把内部 stage/gate/repair authority 暴露给 Main。"
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "b2888aab463ae996341f9eeaba6d2bf91a6a11c0",
+      "verify": "single-clean-agent-commit-on-e2aa0515; parent=e2aa051500cc9fc5c43f1085afd5072c5981f26f, tree=bb0b63aeec698a2b37a25f189ab453b254d549c2, worktree clean"
+    },
+    {
+      "kind": "public-api",
+      "ref": "../../../AlembicAgent/package.json",
+      "verify": "built exact runs/production/evaluation exports and approved runtime/type symbols; top-level dist targets exist, 15 exact exports, 442 runtime bindings, no wildcard"
+    },
+    {
+      "kind": "consumer-import",
+      "ref": "../../../AlembicAgent/scripts/probe-agent-public-strict-consumer.mjs",
+      "verify": "real Alembic checkout loaded the linked built package with plain Node and NodeNext type resolution; 10 runtime bindings, approved types resolved"
+    },
+    {
+      "kind": "negative-tests",
+      "ref": "../../../AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+      "verify": "src/dist/deep/wildcard imports remain ERR_PACKAGE_PATH_NOT_EXPORTED; 7 real-consumer deep paths rejected and 8 private members remain absent"
+    },
+    {
+      "kind": "tests",
+      "ref": "../../../AlembicAgent/test/public-strict-facades.test.ts",
+      "verify": "npm run check exit 0; 70 files and 555 tests passed; public boundary/signature/consumer/validation-floor/retired-symbol gates passed"
+    },
+    {
+      "kind": "compatibility",
+      "ref": "../../../AlembicAgent/config/agent-public-api-signatures.json",
+      "verify": "original 12 export mappings and signature entries deep-equal baseline; 432 legacy bindings unchanged; legacy signature hash db2a96ca1727c23751d289948f92cde56c1b7a946fe7cdb1f7802e44d7c6cf96"
+    },
+    {
+      "kind": "baseline",
+      "commit": "e2aa051500cc9fc5c43f1085afd5072c5981f26f",
+      "verify": "Agent matched required clean baseline; Core 737ac265dc50b8ccf788c1b9103ead537d94ff06 remained clean and read-only"
+    },
+    {
+      "kind": "repro",
+      "value": "All three new package subpaths initially returned ERR_PACKAGE_PATH_NOT_EXPORTED; focused test failed 3/3 and real Alembic consumer failed at @alembic/agent/runs",
+      "verify": "RED observed before implementation"
+    },
+    {
+      "kind": "regression",
+      "ref": "../../../AlembicAgent/test/public-strict-facades.test.ts",
+      "verify": "Exact mappings, signatures, stable list, and forbidden deep paths pinned"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "baseline and RED -> curated facades -> real consumer and full verification -> two-stage review -> single commit and pack",
+      "verify": "Executed in order within AlembicAgent only"
+    },
+    {
+      "kind": "test-first",
+      "ref": "../../../AlembicAgent/test/public-strict-facades.test.ts",
+      "verify": "RED output captured before implementation in the same session; the explicit single-commit contract precluded a separate RED commit"
+    },
+    {
+      "kind": "two-stage-self-review",
+      "value": "contract/scope review plus consumer/private-surface/release review",
+      "verify": "Stage 1 fixed README omission; Stage 2 added per-member private type locks; full check rerun passed"
+    },
+    {
+      "kind": "self-review",
+      "value": "no unresolved in-scope findings",
+      "verify": "Confirmed no implementation copy, no root expansion, no Main/Core/controller-state edits"
+    },
+    {
+      "kind": "change-scope",
+      "commit": "b2888aab463ae996341f9eeaba6d2bf91a6a11c0",
+      "verify": "15 files, all within AlembicAgent; one commit on the exact parent"
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check",
+      "verify": "exit 0 post-commit"
+    },
+    {
+      "kind": "lint",
+      "value": "npm run lint plus boundary lint suite",
+      "verify": "exit 0; only 21 baseline warning-class diagnostics"
+    },
+    {
+      "kind": "verification",
+      "ref": "../../../AlembicAgent/config/agent-public-api-boundary.json",
+      "verify": "post-commit public smoke 15 approved and 11 forbidden; pack includes all six facade artifacts with 567 entries and clean source receipt"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i3-i6-agent-public-strict-facade-rework1__AlembicAgent__i3-i6-agent-public-strict-facade-rework1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i6-agent-public-strict-facade-rework1__AlembicAgent__i3-i6-agent-public-strict-facade-rework1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i3-i6-agent-public-strict-facade-rework1__AlembicAgent__i3-i6-agent-public-strict-facade-rework1-t1",
+    "dispatchGroup": "dg-i3-i6-agent-public-strict-facade-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i3-i6-agent-public-strict-facade-rework1__AlembicAgent__i3-i6-agent-public-strict-facade-rework1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 88,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i6-agent-public-strict-facade-rework1-p1",
+    "targetTaskId": "i3-i6-agent-public-strict-facade-rework1-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "dg-i3-i6-agent-public-strict-facade-rework1",
+    "resultId": "tr-i3-i6-agent-public-strict-facade-rework1-t1",
+    "createdAt": "2026-07-16T08:59:01.637Z"
+  },
+  "createdAt": "2026-07-16T08:59:01.637Z",
+  "stateRevisionObserved": 88,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i3-i6-agent-public-strict-facade-rework1-t1",
+    "dispatchGroup": "dg-i3-i6-agent-public-strict-facade-rework1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i3-i6-agent-public-strict-facade-rework1-t1__dg-i3-i6-agent-public-strict-facade-rework1__current-r0001.json"
+  }
+}

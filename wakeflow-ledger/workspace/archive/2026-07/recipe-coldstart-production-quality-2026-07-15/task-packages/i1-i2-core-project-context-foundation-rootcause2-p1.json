@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i1-i2-core-project-context-foundation-rootcause2-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "AlembicCore PC-F root-cause re-derivation combined package。原任务 recurringProblem=true，本包不是第三次普通 point-fix；必须用新的根因模型收敛 controller 在 commit 5414d681c1fb1a34578d4f55fa829115364900fe 上独立复现的两项缺陷。只允许修改 AlembicCore 对应 foundation/audit/tests/evidence；不进入 I3+，不修改 Alembic/Plugin/Agent/Dashboard，不启动 Test，不重做已通过的 store/cache 设计，不修 ASTChunker。\n\n根因假设 A — ownership namespace 不完整：\n- 当前 audit 的 directory ownerModuleIds 与真实 import/package namespace 脱节；MR repositories 未提供 @alembic/* package/export aliases，classifier 又不能识别 current repo self-package imports，造成至少 170 条已认证范围内依赖被归为 expected-external。\n- 重新建立可审计的 canonical dependency ownership：aliases/exports 必须从真实 package metadata或显式、版本化、逐 repo 冻结的 ownership 输入派生，绑定 repoId/module owner，不得按字符串前缀把所有 @alembic/* 放行。\n- current repo self-package/subpath 必须归入 declared internal；若 ProjectContext 仍无法用真实 seeds/ownership解析，必须是 confirmed defect并让 readiness/openConfirmedDefects失败。已批准 sibling repo 必须标出 relatedRepoId并守恒，真正第三方才可 expected-external。\n- MR 五仓与 SP root+4 均重新生成九请求矩阵；报告给出 internal-resolved、approved-sibling、expected-external、confirmed-defect 的 counts/samples/ownership evidence。禁止仅修改标签而不证明 request output、module seeds和dependency graph可用。\n\n根因假设 B — pre-read revision 不能认证 read content：\n- 当前每轮 captureRepositories 只在读文件前 observeRevision；重复两次同样流程仍允许 source 在两轮 observe 后、read 中变更，最终签出 git-clean commit/tree + dirty blob 且 readiness=passed。\n- 设计并实现真正的 coherent snapshot protocol。每轮必须有读取前后 revision/content fence；git-clean 声明还必须证明被读取 eligible bytes 与所声明 tree一致，不能只比较两次 pre-read commit/tree。dirty/content 模式必须把最终完整 content hash与稳定观察绑定。capture 结束后只能认证一个有明确边界的状态。\n- 将 controller 对抗探针加入 RED/GREEN：两次 observe 均返回同 clean revision、两次 read 均切入同一 dirty bytes、最终 dirty；修复后必须抛 PROJECT_CONTEXT_SOURCE_STATE_DRIFT。另覆盖 transient clean→dirty→clean、add/delete/modify、dirty→dirty 和 abort，避免把取消误报 drift。\n- 若需要扩展 host-port observation contract，保持公共子路径向后兼容或提供显式版本迁移；不得把锁或宿主专用 Git 实现硬编码进纯 Core contract。\n\n证据与验证：\n- 在 5414d681… 上保留这两个 controller probe 的 failing-before，提交一个新的清晰 repair commit。\n- 重跑 build:check、focused suite、完整 npm test、public API/layer/consumer import/scope/smoke/output-budget/space/naming/Biome/retired-symbol gates；npm run check 的 ASTChunker 基线只可用不变 hash waiver，不得修改。\n- 重新运行双项目 fresh-process audit和 parent loaded-artifact reproduction；报告不得以 openConfirmedDefects=[] 掩盖任何 internal/sibling 未解析项。\n- 两阶段自审必须先逐条回答根因 A/B，再审 compatibility、TOCTOU/failure/replay、性能与报告诚实性。返回 parent/commit/tree、diff、命令、报告 hash、逐项 probe 输出和剩余风险。\n- 返回 TargetResultEnvelope 只触发 controller 最后一轮同根因复验；不解锁下游。",
+  "status": "pending",
+  "sourceRef": "Requirement Design §§7, 18.0; Original Plan I1–I2; controller decision tc-20260715083135-0009; recurringProblem root-cause brake",
+  "designIntent": "放弃“已有 alias 分类与双快照足够”的旧假设，重新证明 ProjectContext 依赖归属和 capture 原子边界：package/module alias 必须来自可审计 ownership，clean revision 必须与被签名内容属于同一稳定状态。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T08:32:50.949Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i1-i2-core-project-context-foundation-rootcause2-t1",
+      "taskPackageId": "i1-i2-core-project-context-foundation-rootcause2-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "用新的 ownership namespace 与 coherent snapshot 根因模型修复 MR 内部依赖假外部化、git-clean revision+dirty content 可被认证两项缺陷，并重新生成诚实的双项目 PC-F 证据。",
+      "status": "pending",
+      "createdAt": "2026-07-15T08:32:50.949Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

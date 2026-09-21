@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-p1",
+  "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rework1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+  "status": "completed",
+  "summary": "Completed rework1 on top of the accepted `_meta` transport split. Replaced the broad success=false/data.status=unavailable compatibility fallback with strict, versioned known-unavailable and canonical producer-failure schemas. Exact single STRICT_PUBLICATION_* producer errors survive HostMcpServer transport; malformed or unknown fields fail closed as AGENT_PUBLIC_OUTPUT_PROJECTION_REJECTED with Zod field diagnostics. Added real SDK HostMcpServer transport negatives for Prime, Work, and Guard, plus corrupt-publication Graph liveness coverage.",
+  "evidenceRefs": [
+    "commit:857226cc00790afb2ffdcae11912d3d37cfbb3e1",
+    "lib/host-runtime/mcp/public-tools/output.ts",
+    "test/unit/StrictPublicFiveToolCompatibility.test.ts"
+  ],
+  "verification": [
+    "RED: real Client -> InMemoryTransport -> HostMcpServer tests initially produced 4 failures: corrupt Prime/Guard lost exact errors and malformed Prime/Work/Guard producer failures degraded to generic handler-error.",
+    "GREEN direct transport: test/unit/StrictPublicFiveToolCompatibility.test.ts passed 19/19, covering ready, route-null, corrupt, canonical exact failures, malformed failures, unavailable+unknown failures, ambiguous strict-code messages, and live Graph.",
+    "GREEN focused: six transport/output-contract/public-tool/schema-honesty suites passed 57/57.",
+    "npm run check passed; only 15 pre-existing Biome noConsole warnings were reported.",
+    "npm run build:check passed.",
+    "npm run test:unit passed: 150 files / 1641 tests.",
+    "npm run build passed.",
+    "npm run smoke:codex-plugin passed: runtime boundary, startup, install, shell bootstrap, and stdio.",
+    "npm run verify:codex-plugin passed.",
+    "npm run verify:plugin-distribution passed.",
+    "npm run verify:codex-runtime-package passed: npm install and entrypoint probe, no file dependencies, forbidden old shape rejected.",
+    "Exact-file Biome check, git diff --check, credential/absolute-path scan, and final clean worktree check passed."
+  ],
+  "risks": [
+    "The currently loaded installed Alembic Guard runtime still contains the prior `_meta` transport defect: alembic_code_guard rejected its own top-level `_meta` with unrecognized_keys/CODEX_MCP_ERROR. No installed cache reload or cache edit was performed; fixed-source transport, full unit, build, smoke, distribution, and runtime-package gates passed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "857226cc00790afb2ffdcae11912d3d37cfbb3e1",
+      "verify": "parent 1da4ef03ff988c8f99d864a470625e2d44fa8ea6; tree af6f8a10f0776f6a5cf4e54ba2898e070a083b87; final worktree clean"
+    },
+    {
+      "kind": "mcp-transport-red-green",
+      "ref": "test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "value": "RED exposed exact-error loss and malformed fallback over real HostMcpServer transport; GREEN is 19/19 with explicit fail-closed diagnostics.",
+      "verify": "npm test -- test/unit/StrictPublicFiveToolCompatibility.test.ts"
+    },
+    {
+      "kind": "prime-work-transport-tests",
+      "ref": "test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "value": "Prime and Work canonical STRICT_PUBLICATION_TEST_FAILURE survive Client/InMemoryTransport/HostMcpServer; malformed and unavailable+unknown objects return AGENT_PUBLIC_OUTPUT_PROJECTION_REJECTED.",
+      "verify": "CallToolResultSchema, isError, structured error code, diagnostic field names, and top-level publication metadata assertions"
+    },
+    {
+      "kind": "public-five-transport-tests",
+      "ref": "test/unit/StrictPublicFiveToolCompatibility.test.ts",
+      "value": "Formal five tools retain legal ready/route-null/corrupt CallToolResult transport; corrupt Graph remains live and carries strict-v1 ready publication metadata.",
+      "verify": "Focused six-file suite 57/57 and full unit suite 1641/1641"
+    },
+    {
+      "kind": "runtime-package",
+      "value": "Build, plugin smoke, plugin verification, distribution verification, and runtime-package install/entrypoint probes all passed.",
+      "verify": "npm run build; npm run smoke:codex-plugin; npm run verify:codex-plugin; npm run verify:plugin-distribution; npm run verify:codex-runtime-package"
+    },
+    {
+      "kind": "tests",
+      "value": "Focused 57/57 and unit 1641/1641 passed; npm run check and npm run build:check passed.",
+      "verify": "Six focused Vitest files; npm run check; npm run build:check; npm run test:unit"
+    },
+    {
+      "kind": "boundary-scan",
+      "value": "Exactly two AlembicPlugin files changed; no cross-repository, Test, Wakeflow source, vendor, cache, or state-document product edits; no user absolute paths or credential-like assignments.",
+      "verify": "git show --stat 857226cc; git status --short --branch; git diff --check; rg boundary scan"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 matched every controller rework point: preserved top-level `_meta`, removed broad success/status triggers, preserved exact strict errors, diagnosed malformed unknowns, added Prime/Work/Guard negatives and corrupt Graph transport. Stage 2 addressed both advisory reviews: strict nested runtime schema, exact unavailable invariants, Work canonical coverage, unavailable+unknown coverage, unique-message-code inference, and aggregate Zod diagnostics. No alternate protocol or passthrough added.",
+      "verify": "Manual diff review plus exact-file Biome, focused/full tests, and package gates"
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean AlembicPlugin main at accepted prior fix before rework.",
+      "verify": "HEAD 1da4ef03ff988c8f99d864a470625e2d44fa8ea6 before edits"
+    },
+    {
+      "kind": "test-first",
+      "value": "Real HostMcpServer negative tests were added before production correction and failed on the controller-reported paths.",
+      "verify": "Initial focused RED showed 4 failures on exact error preservation and malformed fallback behavior"
+    },
+    {
+      "kind": "minimal-change",
+      "value": "Only the existing agent-public output projector and its real transport compatibility test changed; accepted output-contract `_meta` split was untouched.",
+      "verify": "2-file commit; no cross-boundary changes"
+    },
+    {
+      "kind": "transport-sample",
+      "value": "Canonical producer failure returns isError=true, clean structuredContent with exact STRICT_PUBLICATION_TEST_FAILURE, and protocol-level _meta.alembicPublication; malformed output returns isError=true with AGENT_PUBLIC_OUTPUT_PROJECTION_REJECTED and offending field names.",
+      "verify": "CallToolResultSchema.parse and explicit structuredContent/_meta assertions"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rework1__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rework1__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1.json",
+    "deliveryRunId": "run-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rework1-host-send-1",
+    "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rework1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rework1__AlembicPlugin__i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 169,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-p1",
+    "targetTaskId": "i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1-rework1",
+    "resultId": "tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "createdAt": "2026-07-26T08:10:26.491Z"
+  },
+  "createdAt": "2026-07-26T08:10:26.491Z",
+  "stateRevisionObserved": 169,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1",
+    "dispatchGroup": "dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i8r-alembic-plugin-mcp-meta-transport-rootcause1-t1__dg-i8r-alembic-plugin-mcp-meta-transport-rootcause1__current-r0001.json"
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "scope": "M3 限定只读复审：向量 sidecar v2/旧 API、原子写和失败 dirty、dispose、Retriever 回填 deadline/取消/正文新鲜度、PersistentMemory 转发。未复审 Coordinator，也未设计新功能。",
+  "reviewedAt": "2026-09-19",
+  "sourceSnapshotSha256": {
+    "src/agent/memory/MemoryEmbeddingStore.ts": "72ca20089160a4f4a1f86ff08de60d60f029f24c5fb75378b8bf712e1bcdab39",
+    "src/agent/memory/MemoryRetriever.ts": "bcdcc6549ccb988b152bce90f06c2972fe8cb582933cdeee2491c2e45baa826b",
+    "src/agent/memory/PersistentMemory.ts": "7712a13290e8482e654f3aa8931534d56990bf605a4fe43f7987b369e13b7faa",
+    "src/agent/memory/MemoryReadPolicy.ts": "a279100ab5b69678783011156430cc5ba53503ed42283e9cd78dae347ac0331c",
+    "src/agent/memory/index.ts": "5f5d4ef5249f92514024fea75ce1d8e8670527b05d1456b95cdec541d4abcd43",
+    "test/memory-context.test.ts": "08a5444b09072fdb54cc543d3ff34806b99907012b54fe663d5980f6bf2a226f"
+  },
+  "reviewedFiles": [
+    {
+      "path": "../../../AlembicAgent/src/agent/memory/MemoryEmbeddingStore.ts",
+      "coverage": "全文；v2 hash、旧格式加载、输入/加载校验、复制向量、原子 staging、WriteZone 路径、失败 dirty、timer/dispose"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+      "coverage": "全文；重点 query 排序/内容核对、embedAllMemories/computeEmbeddingRelevance；源码在复审期间由 root 更新"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/memory/PersistentMemory.ts",
+      "coverage": "全文；旧 facade 方法保留，read options 和 EmbeddingFn 直接转发"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/memory/MemoryReadPolicy.ts",
+      "coverage": "全文作为 deadline/abort 依赖；root 同时修改该模块的请求边界，最终结果以 root 验证为准"
+    },
+    {
+      "path": "../../../AlembicAgent/src/agent/memory/index.ts",
+      "coverage": "全文；类公共导出保持"
+    },
+    {
+      "path": "../../../AlembicAgent/test/memory-context.test.ts",
+      "coverage": "本轮只读 MemoryEmbeddingStore 相关用例及新增查询新鲜度用例；未声称全文件重新审阅"
+    },
+    {
+      "path": "../../../AlembicCore/src/infrastructure/io/WriteZone.ts",
+      "coverage": "全文，只读；writeFile、rename、remove 均为同步，staging 与最终目标同一 context 目录"
+    },
+    {
+      "path": "../../../Alembic/lib/recipe-pipeline/generate/execution/RuntimeInitializer.ts",
+      "coverage": "165–200；真实 host 的 text-only embeddingFn 和 sidecar 实例构造"
+    }
+  ],
+  "findings": [
+    {
+      "id": "SIDECAR-R01",
+      "severity": "P2",
+      "issue": "query embedding 等待期间正文变更后，旧快照仍可匹配旧向量并返回旧正文",
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+        "line": 160
+      },
+      "reproduction": "真实 MemoryRetriever + 内存 store/sidecar：起始 old policy，embeddingFn 在返回向量前把数据库正文改成 new policy；初始探针 resultContent=old policy、databaseContent=new policy、relevance=1。",
+      "minimalFix": "embedding await 后重新获取当前活跃行用于打分和 get(id, content)，保留前置空集短路。",
+      "disposition": "fixed-by-root-and-confirmed-by-post-fix-probe",
+      "resolutionEvidence": "当前 #rank 在 await 后重新 getAllActive({source,type})；修复后独立探针 database=new policy、returned=new policy，旧正文不再返回。"
+    },
+    {
+      "id": "SIDECAR-R02",
+      "severity": "P2",
+      "issue": "最终正文核对的诊断回调触发取消后，仍会写入本批有效向量",
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/memory/MemoryRetriever.ts",
+        "line": 433
+      },
+      "reproduction": "两条记忆 good/stale；第二次 embedding 修改 stale 的正文；final filter 通过 good 后对 stale 上报 stale，onDiagnostic 同步 controller.abort()。探针结果 aborted=true、written=1、goodCached=[1,0]。",
+      "minimalFix": "在 currentEntries 校验/诊断完成后、batchSet 前再次检查 abortSignal；增加 callback-triggered abort 回归。",
+      "disposition": "fixed-by-root-and-confirmed-by-post-fix-probe",
+      "boundary": "onDiagnostic 是正常宿主回调；当前补丁已覆盖其同步触发取消的路径。",
+      "resolutionEvidence": "当前 batchSet 前新增最终 abort 检查；同一 callback-triggered abort 探针修复后 aborted=true、count=0、cached=0。"
+    }
+  ],
+  "verifiedBehavior": [
+    {
+      "name": "legacy get/set/batchSet/JSON 兼容",
+      "result": "pass-mock-probe",
+      "details": "旧 id→vector JSON get(id) 可读；get(id,currentContent) 对无 provenance 返回 null；补写内容后序列化 schemaVersion=2 且重载匹配正文。旧单/双参数调用仍合法。"
+    },
+    {
+      "name": "直接文件部分写失败与 dirty 重试",
+      "result": "pass-mock-probe",
+      "details": "实际类 + 内存 node:fs 替身；temp 部分写后模拟 EACCES，旧目标保持、temp 清理为 0；第二次显式 flush 成功，write attempts=2。实际 OS 权限行为未由本探针模拟以外验证。"
+    },
+    {
+      "name": "WriteZone rename 权限错误与 dirty 重试",
+      "result": "pass-mock-probe",
+      "details": "实际类 + 同步 WriteZone 替身；rename 模拟 EPERM，旧目标保持、temp 清理为 0；重试写出 v2。已读真实 Core WriteZone 实现，接口与同目录路径一致。"
+    },
+    {
+      "name": "损坏 entry 容错",
+      "result": "pass-mock-probe",
+      "details": "混合 good、零向量、非数值项、错误 hash 的 v2 文件只接受 good；size=1，产生 invalid-sidecar-entries-skipped。JSON parse/版本失败在 catch 降为空缓存并有诊断。"
+    },
+    {
+      "name": "内容绑定与数组所有权",
+      "result": "pass-source-and-probe",
+      "details": "get(id,currentContent) 使用 SHA-256；正文不匹配返回 null。set 和 get 都复制向量，外部数组不能绕过 dirty 修改缓存。"
+    },
+    {
+      "name": "dispose",
+      "result": "pass-source-and-mock-probe",
+      "details": "dispose 同步 flush 并清除 timer，标为 disposed；后续 mutation 抛出 Error，读取保留。失败仍可 flushSync 重试；定时器 unref，不独自阻止进程退出。"
+    },
+    {
+      "name": "共享 deadline 和部分结果",
+      "result": "pass-mock-probe",
+      "details": "3 条待回填，第一条立即成功，第二条挂起；20ms deadline 下只调用 first/late，约 23ms 返回 count=1，传入第二条的 signal 已 abort。随后第二条迟到 resolve 不进入 sidecar，lateCached=null。"
+    },
+    {
+      "name": "最终正文复核",
+      "result": "pass-source",
+      "details": "所有 await 完成后逐条重读 store.get(id)，过滤已删除、正文不一致及已过期项；contentHash 来自 embedding 当时正文。final filter/诊断结束后再检查 signal，修复后回调取消探针 count=0、cached=0。"
+    },
+    {
+      "name": "PersistentMemory 公共 facade",
+      "result": "pass-source",
+      "details": "embedAllMemories(batchSize=20,options?) 与 computeEmbeddingRelevance(query,content,options?) 将 options 直接转发；retrieve/toPromptSection 同样转发。ProjectSemanticMemory alias 和旧参数形态保留。"
+    }
+  ],
+  "retainedBoundaries": [
+    {
+      "topic": "真实宿主取消",
+      "evidence": "../../../Alembic/lib/recipe-pipeline/generate/execution/RuntimeInitializer.ts:174–184",
+      "conclusion": "现有 embeddingFn 仅接收 text 并调用 provider.embed(text)，兼容新增可选 options，但不会转发 abortSignal。Agent 能界定等待并丢弃迟到结果；不能声称现有宿主 HTTP 请求实际被中断。"
+    },
+    {
+      "topic": "WriteZone 与 filePath 同时指定",
+      "conclusion": "现在读写统一使用 wz.runtime 的目标；filePath 只在直接文件模式有效。实际 host 未同时提供二者；这是对旧读写目标不一致的修正。"
+    },
+    {
+      "topic": "内容 hash 的能力边界",
+      "conclusion": "保证正文版本关联；不携带宿主未提供的 model identity，不能保证同维度换模型后的向量兼容。未要求扩大 M3 范围。"
+    },
+    {
+      "topic": "原子性和并发",
+      "conclusion": "同目录 temp→rename 避免部分文件替换；不是跨多个 sidecar 实例的合并事务。SQLite 仍是真实数据源，sidecar 可重建。"
+    },
+    {
+      "topic": "回填超时",
+      "conclusion": "同一 deadline 允许保留 deadline 前成功且在最终校验时仍有效的部分向量；取消返回 0 丢弃本批。两种结果语义需保持区分。"
+    },
+    {
+      "topic": "dispose 所有权",
+      "conclusion": "类释放自身 timer；PersistentMemory 不持有/处置宿主注入对象的所有权。未提出新增 host 生命周期接口。"
+    }
+  ],
+  "validation": {
+    "executed": "单次 Node 进程内 TypeScript transpile + data URL 模块探针；执行真实 MemoryEmbeddingStore/MemoryRetriever/MemoryReadPolicy，替换外部 logger、fs、DB 和 search/token 依赖以保持局部可控。",
+    "productWrites": false,
+    "realNetworkOrApiCalls": false,
+    "fullCheckStarted": false,
+    "testLogsObserved": "sidecar-red.log 4 失败对应原始 M3 测试；早期 sidecar-green.log 的旧 JSON 形状断言尚有 1 失败/44 通过，该日志不是最终 GREEN。root 正修改回归与实现；本报告不宣称其完整验证完成。",
+    "concurrency": "root 在复审期间继续编辑同一文件；snapshotSha256 标记报告时状态，后续修复可覆盖 open finding。",
+    "postFixProbe": "再次运行当前 MemoryRetriever/MemoryReadPolicy 的局部内存探针：query 更新后返回新正文；最终 stale 诊断触发 abort 后回填为 0 且缓存为空。没有启动全量 check 或 Vitest。"
+  },
+  "summary": {
+    "confirmedFindings": 2,
+    "fixedAndLocallyRevalidated": 2,
+    "stillOpen": 0,
+    "overall": "限定复审未发现仍未闭合的阻塞问题；完整套件结果由 root 的最终验证提供。"
+  }
+}

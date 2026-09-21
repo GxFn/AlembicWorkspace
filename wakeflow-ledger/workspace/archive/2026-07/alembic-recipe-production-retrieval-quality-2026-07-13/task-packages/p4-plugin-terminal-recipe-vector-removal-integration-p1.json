@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "summary": "Resume the authorized AlembicPlugin generation integration from clean commit 3cb93137e040c3491605945f466fe01febcc3aaf after accepted AlembicCore commit 4e0124e1fd76e9b8a1a8da7eaad23d0371c5dea4. Implement the public RecipeVectorTruthRemover contract in the Plugin-owned vector generation runtime so removeRecipeByIdentity(recipeId) is provider-independent, awaited, and removes legacy/base canonical residue plus that Recipe's documents from every known generation, including generations that are not active and cases where the active reader never exposes the target. Inject this implementation through the real Plugin host/VectorService lifecycle path for knowledge:deleted and deprecated transitions. Preserve live update replacement, atomic generation pointer/CAS behavior, cold-start/rescan maintenance, Search/Prime zero-write behavior, and Plugin independence from Alembic main runtime. Do not infer terminal intent from entry_<id> removal, current-generation absence, or query visibility. Add a real-coordinator RED/GREEN regression with target only in an old rollback generation, unrelated Recipe in current generation, base residue present and provider offline; after delete and deprecate, prove all target vectors are absent and rollback cannot resurrect them. Prove failure is surfaced/retryable without erasing a newer same-Recipe event. Correct the existing CAS regression to assert exactly one successful activator regardless of caller order, and repeat it enough to reject the prior flake. Run focused/full Plugin gates, build/check/distribution/public-boundary checks appropriate to the changed surface, two-stage self-review, and return one clean Plugin commit with exact parent/commit and residual risks. No Core/Agent/Alembic/Dashboard/Test/real-data/plugin-cache edits.",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md",
+  "designIntent": "Consume the accepted Core terminal Recipe identity contract in Plugin-owned base/all-generation storage while preserving Search/Prime read-only behavior and live-update replacement.",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      },
+      {
+        "kind": "root-cause-note"
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T17:09:24.440Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "p4-plugin-terminal-recipe-vector-removal-integration-t1",
+      "taskPackageId": "p4-plugin-terminal-recipe-vector-removal-integration-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Implement Core RecipeVectorTruthRemover in Plugin base/all-generation storage and prove rollback non-resurrection plus order-independent CAS.",
+      "status": "pending",
+      "createdAt": "2026-07-13T17:09:24.440Z"
+    }
+  ]
+}

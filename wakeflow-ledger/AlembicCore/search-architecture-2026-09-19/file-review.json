@@ -1,0 +1,130 @@
+[
+  {
+    "file": "src/service/search/CoarseRanker.ts",
+    "role": "粗排/诊断",
+    "action": "retain",
+    "reviewScope": "全文：权重、归一化、时间衰减；与精排不同语义",
+    "lines": 163,
+    "sha256": "b2d2ed7ad08b20a839cab0845c12cae7ce52d2e3b76ea88979790d2e2855d926"
+  },
+  {
+    "file": "src/service/search/FieldWeightedScorer.ts",
+    "role": "词法索引/字段评分",
+    "action": "simplify",
+    "reviewScope": "全文：update复用upsert；保留统计与压缩",
+    "lines": 515,
+    "sha256": "1b81ad2be66199d866b5c192399b486d4f6e028add45fff6d5cf9a642b2272a7"
+  },
+  {
+    "file": "src/service/search/MultiSignalRanker.ts",
+    "role": "场景信号评分",
+    "action": "fix-simplify",
+    "reviewScope": "全文：死订阅/状态删除、配置字典普通键安全",
+    "lines": 338,
+    "sha256": "36fdc806b663baabe59e254f73bc04fa3d0f3226828bbcc532accf5b8bff57d4"
+  },
+  {
+    "file": "src/service/search/contextBoost.ts",
+    "role": "会话上下文乘法加成",
+    "action": "retain",
+    "reviewScope": "全文：空历史行为与排序不变",
+    "lines": 74,
+    "sha256": "3e3f378a946112f976b29e9a3a0c36bbf0791d43090b145f5336b1284909af90"
+  },
+  {
+    "file": "src/service/search/tokenizer.ts",
+    "role": "分词",
+    "action": "retain",
+    "reviewScope": "全文：大小写/CJK/stopwords不混用其他词法合同",
+    "lines": 214,
+    "sha256": "edd4d4fc315e9bc0f2be6cea42012aecd8dcec606a1d6de7a6af7d0c291bc81a"
+  },
+  {
+    "file": "src/service/search/SearchEngine.ts",
+    "role": "搜索编排",
+    "action": "consolidate",
+    "reviewScope": "复用前次全文审查，本轮消费链/全部差异/文档与dense路径差分",
+    "lines": 1804,
+    "sha256": "ab70d494ba7d36cb499a3dc27a860996ec3c2549379ad96ff56455149a4129f8"
+  },
+  {
+    "file": "src/service/search/SearchTypes.ts",
+    "role": "DTO与响应兼容辅助",
+    "action": "fix-consolidate",
+    "reviewScope": "复用前次全文审查，本轮职责/实际出口/共享分组",
+    "lines": 622,
+    "sha256": "72cf7143c497d4073916352e1765a841fe3fc650fe3ca67d2e371914570f6475"
+  },
+  {
+    "file": "src/service/search/HybridRetriever.ts",
+    "role": "旧RRF融合合同",
+    "action": "retain",
+    "reviewScope": "复用前次全文审查，本轮消费者和与canonical差异",
+    "lines": 165,
+    "sha256": "38fd87badfa05480d36e3e3145e5cda2461bcdf0a477713bb550b2dca7742f23"
+  },
+  {
+    "file": "src/service/search/KnowledgeRetrieval.ts",
+    "role": "canonical truth/预算/扩窗",
+    "action": "retain",
+    "reviewScope": "复用前次全文审查，本轮入口与预算/真相边界",
+    "lines": 702,
+    "sha256": "46ba4c1b4abfa139daded53fb79424fd0d173aeabd943882ea35d6869575206d"
+  },
+  {
+    "file": "src/service/search/index.ts",
+    "role": "公共root转发",
+    "action": "retain",
+    "reviewScope": "完整转发链核对",
+    "lines": 9,
+    "sha256": "ccd4543862202360cfa854743250d3965578396415e53c112acf34fd078f8e84"
+  },
+  {
+    "file": "src/types/search-wire.ts",
+    "role": "旧公开搜索DTO",
+    "action": "retain",
+    "reviewScope": "本轮全文/消费者：不等同现代score DTO",
+    "lines": 70,
+    "sha256": "0529b8f5ffb41988bdcf7c6aaaa9b042ab991dc560962cfd5cd0f5cd3089f51a"
+  },
+  {
+    "file": "src/search.ts",
+    "role": "稳定facade/工厂",
+    "action": "retain",
+    "reviewScope": "本轮入口/真实消费者检查",
+    "lines": 115,
+    "sha256": "8180e632ae08b5b77fc93e802815eb7bfd6af25a15d21f5f8e7d5c8f2821303e"
+  },
+  {
+    "file": "src/repository/search/SearchRepoAdapter.ts",
+    "role": "raw SQL适配",
+    "action": "consolidate",
+    "reviewScope": "全文：单次schema读取、旧默认、公共ports",
+    "lines": 234,
+    "sha256": "be515b00d110a7c656a47c9432ec3fc25d206837ba9e4f9965f8eb97e070c831"
+  },
+  {
+    "file": "src/repository/knowledge/KnowledgeRepositoryImpl.ts",
+    "role": "知识仓储",
+    "action": "fix-consolidate",
+    "reviewScope": "本轮只审四个search同步方法及其选列/where条件",
+    "lines": 1313,
+    "sha256": "afbc5fc7eecfa356e137463b20b9ae4914cc52eb4b5bbf3de10d974d694ae37d"
+  },
+  {
+    "file": "src/repository/search/KnowledgeSearchProjection.ts",
+    "role": "共享索引列投影",
+    "action": "new-internal",
+    "reviewScope": "新增文件全文、27字段与旧映射比对",
+    "lines": 64,
+    "sha256": "91c73aa9e1279ec6db723a43db914657f660db2efaedb60eab34c0b5883f4421"
+  },
+  {
+    "file": "src/service/search/SearchDocumentProjection.ts",
+    "role": "行到scorer文档纯投影",
+    "action": "new-internal",
+    "reviewScope": "新增文件全文、6组旧新结果/异常差分",
+    "lines": 101,
+    "sha256": "bf3222eaf4b96c8fccffad06f473d39f0aa6900a8d9704a53681981e51f73f23"
+  }
+]

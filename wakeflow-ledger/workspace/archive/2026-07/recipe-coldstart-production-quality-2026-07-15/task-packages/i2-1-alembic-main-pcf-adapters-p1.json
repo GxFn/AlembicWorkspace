@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i2-1-alembic-main-pcf-adapters-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "执行同一 demand 的 I2.1 / PC-F2 Alembic Main combined package。基线必须是干净的 Alembic@e0cd0f018c3b6b436325da94769c3a99482616e1，并实际加载控制器已接受的 AlembicCore@f82bfec58e36ea71e575a23bee356623a7a28381；若仓库、分支、依赖加载或 hash 不一致，停止回填 blocker。\n\n唯一目标：Main 的 Plan、Recipe generation、dependency graph、module coverage 四个真实生产消费者，只能从一次已持久化并重新打开的 strict-v2 CertifiedProjectFactsArtifact 派生。四个 actual loaded adapters 必须通过 Core CertifiedProjectFactsConsumerPort 产生各自 deterministic ProjectContextConsumerProjectionReceiptV2；四行共享相同且非空的 artifactId/sourceVectorHash/factsContentHash/certificationBindingHash，projectionContentHash 各自按载荷确定，base certification 在 put/readback 后保持不变。实际 cold-start/Generate session 的 create→persist→fresh reload 必须携带并校验该 binding；缺失、partial、scope/vector/hash drift 或 stale binding 一律 fail closed。\n\n必须替换 strict 路径中的旁路，而非新增兼容层：\n1. PlanSelectionGate 不得再同时 buildProjectContextWorkflowFacts + collectPlanProjectContext；Plan 投影从 reopen artifact 产生。\n2. ProjectContextWorkflowFacts / ProjectContextConsumerFacts 不得直接调用 ProjectContextCapabilities、合成 ProjectScope repo、二次 repo/map/graph 采集；四类投影均从同一 reopen artifact 纯适配。\n3. AiDimensionPreparation 与 Main ModuleService 不得直接 projectContextDependencyGraph，也不得 catch 后以 null/空图继续 strict cold-start。\n4. ProjectMapModules 的 Package.swift 解析、live filesystem scan 与 80 cap、Main 的 12-owned-files/module-seeds 及 6/3/8 detail caps不得参与 strict completeness；展示/detail 可以有界，但 completeness 来自 frozen inventory/continuation。\n5. IncrementalRescanWorkflow、legacy snapshot/consumer entrypoints逐一记录 applicable 或 typed-unreachable N/A + reachability evidence；任何 applicable 路径不得成为第二 producer/capture。\n\n验收必须由实际 loaded entrypoints 证明，不是接口/fixture存在：四类 strict lineage rows；cold-start session persist+fresh reload；MR5 与 SP root+4 复用 accepted scope/vector；>12 与 >80 fixtures inventory/module/owned-file守恒；删除/复制/partial/hash/scope/vector/stale-binding mutation均拒绝；strict counters directProjectContextCallCount=0、rawFilesystemFallbackCount=0、synthesizedProjectScopeFactCount=0、cappedModuleProjectionCount=0。输出 Main PC-F evidence report/receipt，绑定 Alembic parent/commit/tree、实际 Core package/dist/load hash、入口 call trace、四 receipt、counter/conservation/mutation 结果及文件/semantic hash；明确 global PC-F 仍等待 Plugin 与 Graph/Map、不得声称 PCFBaselineReceipt 或进入 I3+。\n\n验证：先保留当前双采集/合成/直接 graph/Package.swift/12/80 的 RED 或等价可复现证据，再 GREEN；运行 npm run build:check、focused PC-F/ProjectContext/plan/session/ModuleService tests、npm run check、完整 npm run test、git diff --check，并按 Alembic/AGENTS.md 两阶段自审（先逐条 Requirement §§7.1–7.3/18.0/18.3，再审 correctness、fail-closed、session reload、性能/兼容性/范围）。只提交 Alembic 一个干净 commit；返回 parent/commit/tree、changed files/symbols、原始命令摘要、evidence 路径/hash、RED/GREEN、兼容性与剩余风险。\n\n禁止修改 AlembicCore/AlembicPlugin/AlembicAgent/AlembicDashboard/Test、Ghost/data root 和 Wakeflow；禁止 I2.2 Plugin/Graph/Map、I3+ Plan cognition/fact mining/Recipe gates/persistence/vector/publication、第二 store/registry/parser/graph/Plan 平台及顺手重构。若 accepted Core API 无法支持实际 Main adapter，停止并以精确缺口回填，不得在 Main 复制 Core authority。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§7.1–7.3, 18.0, 18.3",
+  "designIntent": "复用已接受的 Core Foundation 和 consumer port，在 Main 现有入口做最小迁移；不建第二套采集或框架，不进入 I3+。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T18:13:03.762Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i2-1-alembic-main-pcf-adapters-t1",
+      "taskPackageId": "i2-1-alembic-main-pcf-adapters-p1",
+      "targetWindow": "Alembic",
+      "summary": "把 Alembic Main 四个真实 ProjectContext 消费者迁移到同一个 reopen strict-v2 Core artifact，归零直接/原始/合成/截断旁路，并证明 session 持久化重开与 fail-closed。",
+      "status": "pending",
+      "createdAt": "2026-07-15T18:13:03.762Z"
+    }
+  ]
+}

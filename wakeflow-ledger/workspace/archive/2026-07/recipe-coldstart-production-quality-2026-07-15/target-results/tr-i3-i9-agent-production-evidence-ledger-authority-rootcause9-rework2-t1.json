@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1",
+  "dispatchGroup": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicAgent",
+  "targetTaskId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-t1",
+  "status": "completed",
+  "summary": "Closed the remaining public production Evidence Ledger error-authority spoof in one Agent-only follow-up commit. validateCaptureInput no longer authenticates validation failures by caller-visible message prefix: each capture call creates a private token, and only Error objects registered by the module for that same invocation in a private WeakMap preserve their Agent-owned reason. Arbitrary Proxy ownKeys/property getter Errors, including capture-prefixed CALLER_SPOOF messages and replayed prior errors, normalize to the exact ALEMBIC_AGENT_EVIDENCE_LEDGER_CAPTURE_INVALID:UNREADABLE_INPUT reason before EvidenceLedgerStore.append, E-n allocation, in-memory mutation, or JSONL creation. Source and built-public probes prove both spoof cases leave file existence/byte hash, snapshot, and private store stats unchanged and the next valid entry remains E-1. The prior 26 malformed cases, public factory/facets, single private store, redaction, strict snapshot/hydration, AgentRuntime sharing, fresh-process reopen identity, serialized V3 attestation, and 11 strict fault cards remain intact.",
+  "evidenceRefs": [
+    "commit:2bf05831bc95a89347df7e4035bfeadbc93c3c09",
+    "parent:5d62e9e662eff045097f2da3707709cbd88f56ce",
+    "tree:35714decfd7fd84066939bb0a2277c05504052a6",
+    "core-readonly:d0d33e49cab732ec541bcfc3fb35447b6e2ad58d",
+    "main-readonly:1c16269796f270ec95ab8a3b1ae9c129573b9ee6",
+    "src/agent/evidence/ProductionEvidenceLedgerAuthority.ts",
+    "test/production-evidence-ledger-authority.test.ts",
+    "scripts/fixtures/strict-public-connected-probe.mjs",
+    "scripts/probe-agent-public-strict-consumer.mjs",
+    "public-probe:proxy-ownKeys-and-getter-spoof-exact-UNREADABLE_INPUT-zero-mutation-next-E-1",
+    "fresh-process:26-plus-2-rejections-reopen-v3-attestation-11-fault-cards",
+    "alembic-finish:finish-public-ms4u0zqj-2",
+    "guard:guard-public-ms4u166a-2"
+  ],
+  "verification": [
+    "Baseline at clean 5d62e9e: npm run build:check passed; four focused test files passed 56/56.",
+    "RED source regression before production edit: production-evidence-ledger-authority test failed 1/13 because Proxy ownKeys returned caller-forged ALEMBIC_AGENT_EVIDENCE_LEDGER_CAPTURE_INVALID:CALLER_SPOOF instead of UNREADABLE_INPUT; 12 tests passed.",
+    "RED built public consumer before production edit: npm run smoke:strict-consumer failed in Main cwd at proxy-own-keys-caller-prefix-spoof with the caller-forged CALLER_SPOOF reason.",
+    "GREEN focused: npm run build:check and npm run build passed; production ledger/EvidenceLedgerStore/durable semantic runtime/AgentRuntime passed 4 files, 56/56 tests.",
+    "Built public/fresh-process: npm run smoke:strict-consumer passed with original invalidCaseCount=26 plus spoofCaseCount=2; both spoof cases have exact UNREADABLE_INPUT, identical before/after file exists/byteLength/sha256 and snapshot state, ledger absent, next valid E-1, same authority chain, serialized V3 attestation, and all 11 fault cards rejected.",
+    "Full: npm run check passed; 73 files and 604/604 tests; build/typecheck, Biome, Agent/public/Core boundaries, space/layer/doctrine/naming/provider-neutral, signatures, strict consumer, validation floor and retired-symbol gates passed. Whole-repository Biome retained the same 21 pre-existing unrelated warnings and no errors.",
+    "Public imports: npm run smoke:public-imports passed with 15 subpaths imported and 11 forbidden subpaths rejected.",
+    "Public signatures: npm run smoke:public-signatures passed with 15 exports and 449 bindings.",
+    "Scoped lint/format: npx biome check on the four changed files passed with zero diagnostics.",
+    "Whitespace/staging: git diff --check and git diff --cached --check passed; post-commit AlembicAgent status is clean.",
+    "Alembic Guard guard-public-ms4u166a-2 passed 2 recommended files with 0 violations."
+  ],
+  "risks": [
+    "No known in-scope residual defect. The module-private per-invocation WeakMap token also rejects replay of a previously returned internal Error because its old token cannot match a new capture invocation.",
+    "The 21 whole-repository Biome warnings pre-existed at parent 5d62e9e and remain outside the four-file task scope; all changed files are clean.",
+    "Core and Main remained read-only at their pinned heads. Downstream Main continuation remains controller-owned and is not claimed by this Agent result."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "2bf05831bc95a89347df7e4035bfeadbc93c3c09",
+      "verify": "One clean AlembicAgent follow-up based exactly on parent 5d62e9e662eff045097f2da3707709cbd88f56ce; tree 35714decfd7fd84066939bb0a2277c05504052a6; exactly four Agent files changed; Core d0d33e49 and Main 1c16269 stayed read-only and clean."
+    },
+    {
+      "kind": "negative-probe",
+      "ref": "scripts/probe-agent-public-strict-consumer.mjs",
+      "verify": "Built @alembic/agent/production in a fresh Main-cwd process rejects Proxy ownKeys and property getter caller-prefix spoof Errors with exact UNREADABLE_INPUT. Each spoof receipt includes identical before/after file exists/byteLength/sha256 and snapshot states; unit regression additionally proves private store.stats() unchanged; no JSONL exists and next valid evidence is E-1."
+    },
+    {
+      "kind": "runtime-fixture",
+      "ref": "scripts/fixtures/strict-public-connected-probe.mjs",
+      "verify": "Retains original 26 malformed cases and adds two separately counted spoof cases while preserving valid capture/read, fresh-process reopen, same store/snapshot/evidence identity, serialized V3 attestation, strict execution chain, and prior 11 fault cards."
+    },
+    {
+      "kind": "command",
+      "value": "build:check/build; focused 56/56; strict built consumer 26+2 with next E-1; public imports 15/11; public signatures 15/449; full npm run check 73 files 604/604; scoped Biome 4 clean; git diff checks; Guard 2 files/0 violations.",
+      "verify": "All required commands passed after final edits; whole-repository lint has the same 21 pre-existing warnings and zero errors."
+    },
+    {
+      "kind": "boundary",
+      "ref": "src/agent/evidence/ProductionEvidenceLedgerAuthority.ts",
+      "verify": "Only the existing public capture validation/error-authentication boundary and existing tests/probes changed. Public signatures, single private EvidenceLedgerStore, factory/facets, valid reason codes, redaction, strict hydration/snapshot, AgentRuntime sharing and Core contracts are unchanged; no downstream Main implementation or sibling edits."
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The prior catch treated any Error whose public message started with ALEMBIC_AGENT_EVIDENCE_LEDGER_CAPTURE_INVALID as internally generated. A caller-controlled Proxy ownKeys trap or property getter could therefore throw Error('ALEMBIC_AGENT_EVIDENCE_LEDGER_CAPTURE_INVALID:CALLER_SPOOF'), pass the prefix test, and escape unchanged, forging Agent-owned error authority even though append remained untouched. The replacement creates one opaque token per validateCaptureInput invocation and records internally created validation Error identities with that token in a module-private WeakMap. Only an error registered for the current token retains its specific validation reason; arbitrary caller exceptions and errors replayed from earlier calls cannot match and are converted to UNREADABLE_INPUT. This entire classification occurs inside capture validation before store.append, so E-n allocation, in-memory state and JSONL mutation remain unreachable on rejection.",
+      "verify": "RED source and built-public probes returned CALLER_SPOOF; GREEN probes return exact UNREADABLE_INPUT with identical before/after state and next E-1."
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean parent 5d62e9e; npm run build:check passed and four focused files passed 56/56 before test/source edits.",
+      "verify": "Pinned pre-change behavior and repository cleanliness."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "1) confirm package/envelope and clean baseline; 2) add ownKeys/getter built-public RED; 3) replace prefix trust with per-invocation private token; 4) run focused/public/full/Guard gates; 5) self-review, one commit, result and controller return.",
+      "verify": "Executed in order with no cross-repository edits."
+    },
+    {
+      "kind": "repro",
+      "value": "Unit and built @alembic/agent/production entrypoints both returned caller-forged ...:CALLER_SPOOF for a Proxy ownKeys trap before the source fix.",
+      "verify": "Exact controller-reported public behavior reproduced before production edit."
+    },
+    {
+      "kind": "regression",
+      "ref": "test/production-evidence-ledger-authority.test.ts",
+      "verify": "The same ownKeys/getter cases failed before and pass after; they assert exact public reason plus file bytes/existence, private store stats, strict snapshot state and next E-1."
+    },
+    {
+      "kind": "test-first",
+      "ref": "test/production-evidence-ledger-authority.test.ts",
+      "verify": "Regression and built-public probe changes were made and observed RED before the production source edit; the task's stricter single-follow-up-commit contract was preserved."
+    },
+    {
+      "kind": "tests",
+      "ref": "test/production-evidence-ledger-authority.test.ts",
+      "verify": "Focused 56/56 and full 604/604 passed."
+    },
+    {
+      "kind": "self-review",
+      "value": "Rework response: agree with the controller that public message-prefix matching made error authority forgeable; replaced it rather than suppressing the test. Stage 1: exact ownKeys/getter reason, zero side effects, E-1, original 26 cases, public authority/fresh-process/V3/11-card chain and Agent-only boundary are covered. Stage 2: reviewed token identity, old Error replay, malicious Proxy identity checks, append ordering and receipt assertions; WeakMap identity lookup invokes no caller trap and the per-call token prevents old internal errors from authenticating in a new call. No remaining P0/P1/P2 findings.",
+      "verify": "Final four-file diff, raw public receipt, full gates and Guard reviewed."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Exactly four AlembicAgent files changed: one existing authority source, one existing unit test, one existing public runtime fixture, and one existing strict-consumer driver; 195 insertions/53 deletions. No sibling or vendor files changed.",
+      "verify": "git show --stat 2bf05831; clean post-commit status."
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed after final edits.",
+      "verify": "TypeScript NodeNext contracts and public types remain valid."
+    },
+    {
+      "kind": "lint",
+      "value": "Scoped Biome passed four changed files with zero diagnostics; full check passed with 21 unchanged pre-existing warnings and no errors.",
+      "verify": "No new lint/format issue."
+    },
+    {
+      "kind": "verification",
+      "value": "Full repository check, 604 tests, strict fresh-process public consumer, public imports/signatures, boundary gates and git diff checks all passed.",
+      "verify": "No required verification failure."
+    },
+    {
+      "kind": "guard",
+      "ref": "guard-public-ms4u166a-2",
+      "verify": "Alembic Guard passed the two recommended source/test files with 0 violations."
+    },
+    {
+      "kind": "compatibility",
+      "value": "Public factory/type signatures and frozen identity/capture/read facets, valid validation reason codes, private store, redaction, strict snapshot/reopen, AgentRuntime sharing and existing 11 negative fault cards are unchanged.",
+      "verify": "Public import/signature smokes, focused tests and built strict consumer passed."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1__AlembicAgent__i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1__AlembicAgent__i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1__AlembicAgent__i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-t1",
+    "dispatchGroup": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1__AlembicAgent__i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 270,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1",
+    "targetTaskId": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-t1",
+    "targetWindow": "AlembicAgent",
+    "dispatchGroup": "i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-p1",
+    "resultId": "tr-i3-i9-agent-production-evidence-ledger-authority-rootcause9-rework2-t1",
+    "createdAt": "2026-07-28T15:52:03.304Z"
+  },
+  "createdAt": "2026-07-28T15:52:03.304Z",
+  "stateRevisionObserved": 270,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

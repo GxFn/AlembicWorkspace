@@ -1,0 +1,474 @@
+{
+  "schemaVersion": 1,
+  "study": "tool-ports",
+  "date": "2026-09-20",
+  "baseline": "69ee567624bc119bf05edcc739d890056e297c9c",
+  "mode": "read-only architecture/interface study; no implementation or commit",
+  "referenceBase": "AlembicAgent repository root; ../Alembic is Main; ../AlembicCore is Core",
+  "conclusion": [
+    "当前是 kernel 契约 + runtime 执行器的一套工具系统；不存在需要再次合并的 core/v2 两套现存执行栈。",
+    "保留外层 ToolCallRequest/ToolResultEnvelope、内层 ParsedToolCall/ToolResult、宿主 ToolContextFactory 三个真实边界；值得收敛的是重复投影和散落的接口定义，不是把所有 shape 压成一个对象。",
+    "优先候选是 schema 查询端口及其 action allowlist 单源；其次明确 handler 结果分类、宿主依赖可用性和调用 scope。Main 的 scope/HTTP 授权装配需要后续明确跨仓授权，不能在 Agent 内伪造已接入。",
+    "本轮只有源码阅读和调用方扫描；未修改产品、测试、相邻仓，也未运行网络/API 或新测试。scope probe 为根线程提供的已完成内存证据。"
+  ],
+  "currentLayers": [
+    {
+      "layer": "kernel",
+      "authority": "request/context/decision/result/handler/registry 的公开形状；不执行 Core 确定性业务",
+      "refs": [
+        "src/tools/kernel/index.ts:4",
+        "src/tools/kernel/request.ts:18",
+        "src/tools/kernel/registry.ts:19"
+      ]
+    },
+    {
+      "layer": "runtime registry + router",
+      "authority": "TOOL_REGISTRY 是 7 个内置工具的 action/schema/handler/cache/concurrency 数据源；ToolRouter 负责解析、轻量 schema 检查、可选 capability、调度及 handler 调用",
+      "refs": [
+        "src/tools/runtime/registry.ts:727",
+        "src/tools/runtime/router.ts:50",
+        "src/tools/runtime/router.ts:138",
+        "src/tools/runtime/router.ts:297"
+      ]
+    },
+    {
+      "layer": "runtime adapter",
+      "authority": "将公开调用请求转成内层调用，委托宿主组装上下文，再把 handler ToolResult 包成 ToolResultEnvelope",
+      "refs": [
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:21",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:75",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:160"
+      ]
+    },
+    {
+      "layer": "catalog",
+      "authority": "RuntimeCapabilityCatalog 由 TOOL_REGISTRY 投影给模型；CapabilityCatalog/UnifiedToolCatalog 承载 manifest、兼容 definition/model/lazy schema 能力。当前 Main 的 UnifiedToolCatalog 仅注册 Dashboard/Skill manifest",
+      "refs": [
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:19",
+        "src/tools/catalog/CapabilityCatalog.ts:15",
+        "src/tools/catalog/UnifiedToolCatalog.ts:131",
+        "../Alembic/lib/injection/modules/AgentModule.ts:51"
+      ]
+    },
+    {
+      "layer": "scenario capability registry",
+      "authority": "按场景名称构造 Capability 实例，提供 prompt、工具 action 集及 hooks；不是工具执行注册表，也不是 manifest catalog",
+      "refs": [
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts:12",
+        "src/tools/runtime/toolsets/RuntimeCapability.ts:13",
+        "src/agent/service/AgentRuntimeBuilder.ts:72"
+      ]
+    }
+  ],
+  "actualCallChains": [
+    {
+      "name": "Main runtime/ReAct",
+      "stages": [
+        "../Alembic/lib/injection/modules/AgentModule.ts:30 — singleton RuntimeCapabilityCatalog",
+        "../Alembic/lib/injection/modules/AgentModule.ts:33 — singleton Main ToolContextFactory",
+        "../Alembic/lib/injection/modules/AgentModule.ts:43 — ToolRouterAdapter({contextFactory})，没有固定 capability",
+        "../Alembic/lib/injection/modules/AgentModule.ts:94 — AgentRuntimeBuilder 接收显式 toolRouter 与单独 toolRegistry",
+        "src/agent/service/AgentRuntimeBuilder.ts:72 — CapabilityRegistry.create；:88 显式 router 优先、catalog.getRouter 为兼容 fallback",
+        "src/agent/runtime/AgentRuntime.ts:2065 — 合并本阶段能力；:2122 schema 查询；:1465 ToolExecutionPipeline.execute",
+        "src/agent/runtime/toolPipeline/accessGates.ts:48 — stage 工具/action 权限；:123 SafetyPolicy/terminal allowlist",
+        "src/agent/runtime/toolPipeline/runtimeBridge.ts:60 — ToolCallRequest + runtime reference 投影",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:93 — parseToolCall；:102 Main context factory；:106 router.execute",
+        "src/tools/runtime/router.ts:57 — 静态 registry；:65 轻量验证；:70 可选 capability；:76 调度；:93 action.handler",
+        "src/tools/runtime/registry.ts:727 — code/terminal/knowledge/graph/memory/meta/evidence → 各 handler",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:160 — Envelope；src/agent/runtime/toolPipeline/runtimeBridge.ts:137 保留原 envelope，再投影业务输出"
+      ]
+    },
+    {
+      "name": "Main HTTP / DAG direct entry",
+      "stages": [
+        "../Alembic/lib/http/routes/ai.ts:600 — /agent/tool body validation + requireAiReady + ensureDirectToolAllowed",
+        "../Alembic/lib/http/routes/ai.ts:613 — 直接 router.execute(surface=http)，不经 Agent ToolExecutionPipeline",
+        "../Alembic/lib/http/routes/ai.ts:664 — DAG invokeToolEnvelope 直接 router.execute(surface=system)",
+        "../Alembic/lib/http/routes/ai.ts:738 — direct runtime context 仅 aiProvider/dataRoot/logger"
+      ],
+      "boundary": "该入口的宿主身份/访问控制不等同于 Agent 阶段能力。RuntimeCapabilityCatalog.getManifest 总是 null，ensureDirectToolAllowed 对 null 返回 true。这里只确认局部 guard 不提供 manifest 限制；本轮未审全局认证/网络暴露，不能断言生产安全漏洞。",
+      "refs": [
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:61",
+        "../Alembic/lib/http/routes/ai.ts:179"
+      ]
+    },
+    {
+      "name": "knowledge submission → Core",
+      "stages": [
+        "../Alembic/lib/injection/modules/KnowledgeModule.ts:377 — Main 装配 Core RecipeProductionGateway",
+        "../Alembic/lib/tools/ToolContextFactory.ts:150 — recipeProductionGateway 注入 ToolContext.recipeGateway",
+        "src/tools/runtime/handlers/knowledge/contracts.ts:34 — RecipeGatewayLike 直接 alias Core RecipeProductionPort",
+        "src/tools/runtime/handlers/knowledge/submission.ts:41 — 最后取消检查；:47 createOrStage",
+        "../AlembicCore/src/service/knowledge/RecipeProductionGateway.ts:365 — Core 正式生产 port",
+        "src/tools/runtime/handlers/knowledge/operation.ts:24 — 已确认写入后取消保留结果并记录 warning"
+      ],
+      "boundary": "Core port 无 signal；Agent 只能停止下一步及保留真实回执，不能承诺撤销已开始的 Core 写入。Core 负责生产规则和持久化，Agent 只组装输入、调度及投影。"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "TP-1",
+      "name": "调用请求、解析结果和 router port",
+      "disposition": "必须保留外部/内部两层；可收敛解析实现与文档语义，不能把 alias、权限检查和 host adapter 机械合并",
+      "priority": "after TP-4/TP-5",
+      "definitions": [
+        "src/tools/kernel/request.ts:18 — ToolCallRequest",
+        "src/tools/kernel/request.ts:53 — ToolRouterContract",
+        "src/tools/kernel/registry.ts:53 — ParsedToolCall",
+        "src/tools/kernel/registry.ts:200 — ActionHandler",
+        "src/tools/kernel/request.ts:47 — ToolExecutionAdapter（公开接口能力）"
+      ],
+      "producers": [
+        "Agent runtimeBridge 构造 surface/actor/source/signal/runtime 元数据",
+        "Main HTTP 与 DAG 直接构造 ToolCallRequest",
+        "ToolRouter.parseToolCall 产出 ParsedToolCall"
+      ],
+      "consumers": [
+        "ToolRouterAdapter.execute/explain",
+        "ToolRouter.execute",
+        "TOOL_REGISTRY action.handler"
+      ],
+      "transforms": [
+        "Runtime 的 ToolCall{name,args} → ToolCallRequest{toolId,args,...}；note_finding 在 runtime 专用归一化中转成 memory.note_finding，不应无意扩展为 HTTP 新别名权限。",
+        "router 将字符串 JSON 或对象中的 {action,params} 解析成 {tool,action,params}；本次请求外层身份字段不进入 handler 参数。",
+        "history 中 {tool,args} 另投影为 runtime.sessionToolCalls 的 {tool,params}，这是消费约定而非第二份执行记录。"
+      ],
+      "ownership": {
+        "normalization": "runtime callNormalization 负责 runtime alias；router.parseToolCall 负责内置 action 语法/存在性",
+        "validation": "router 做顶层 required/type/enum 的轻量检查，handler/Core 做语义验证；不能宣称完整 JSON Schema validator",
+        "authorization": "runtime Pipeline 做阶段与 SafetyPolicy；router 仅执行显式配置 capability；Main 负责 direct 入口身份和访问控制",
+        "errors": "router 将解析/执行异常返回 error/fail；adapter 捕获 factory/router 异常并返回 envelope；runtimeBridge 兜底拒绝的 host Promise",
+        "cancellation": "请求提供 signal；adapter pre-abort；router queue/pre-handler 检查及 finally 释放；运行中的 handler/host 合作取消。router 无通用 call timeout"
+      },
+      "observedContractGaps": [
+        "explain 只检查 tool/action 存在，然后返回 allowed:true/stage:execute；不是完整授权预演。",
+        "executeChildCall 仅委托 execute，当前生成的 envelope 不带 request.parentCallId；实际 src/Main 未发现依赖此回传的生产调用，不据此扩成本轮修复。",
+        "ToolExecutionRequest/ToolExecutionAdapter 定义仍公开，但扫描 src 与 Main lib 只发现 ToolRouterAdapter implements ToolRouterContract，未发现独立 ToolExecutionAdapter 执行实例。不要描述成当前第二条执行链。"
+      ],
+      "migrationConditions": [
+        "保持公开 ToolRouterContract/ToolCallRequest/ParsedToolCall 及 root/runtime barrel；保留 legacy alias 的当前可用入口范围。",
+        "若澄清 explain 或 parentCallId，先用实际 adapter contract case 固定语义；需要授权或 lineage 消费方时才接入，不能让发现结果冒充授权。",
+        "共享 parser 只抽已有真实调用的纯转换，不引入新的执行层或 host router 空壳。"
+      ],
+      "refs": [
+        "src/agent/runtime/toolPipeline/callNormalization.ts:9",
+        "src/agent/runtime/toolPipeline/runtimeBridge.ts:121",
+        "src/tools/runtime/router.ts:138",
+        "src/tools/runtime/router.ts:297",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:133",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:139",
+        "src/tools/runtime/router.ts:216"
+      ],
+      "minimalContractTests": [
+        "扩展 test/tool-v2-contract.test.ts:280 的真实 router+adapter fixture：对象/JSON、缺 action、非法 params、未知 tool/action、正常调用均通过原公共入口。",
+        "复用 test/runtime-efficiency.test.ts:400 固定 note_finding depth slots/evidence 转译；不得因共享 parser 丢字段。",
+        "复用 test/tool-v2-contract.test.ts:91/:117 的 queued/pre-abort；新增 parentCallId case 先记录当前行为，再由迁移目标决定 RED。",
+        "给 explain 一个被 capability 禁止但存在的 action，明确它当前只提供 discovery；不能把此测试写成已经支持完整授权。"
+      ]
+    },
+    {
+      "id": "TP-2",
+      "name": "handler 结果 → envelope → 业务/普通输出",
+      "disposition": "三种结果语义必须保留；可把分类与诊断转换做单源，不能仅按 ok 抹平业务状态",
+      "priority": "bounded follow-up",
+      "definitions": [
+        "src/tools/kernel/registry.ts:60 — ToolResultMeta",
+        "src/tools/kernel/registry.ts:81 — ToolResult",
+        "src/tools/kernel/result.ts:9 — ToolResultStatus",
+        "src/tools/kernel/result.ts:90 — ToolResultEnvelope",
+        "src/tools/kernel/result.ts:138 — ToolResultOrdinaryOutput"
+      ],
+      "producers": [
+        "内置 handler 通过 ok/fail 产出 ToolResult",
+        "ToolRouterAdapter 加调用身份、计时、cache/trust/diagnostics",
+        "kernel projector 生成可展示的普通输出"
+      ],
+      "consumers": [
+        "runtimeBridge 保留 envelope 到 metadata，structuredContent 存在时作为业务结果",
+        "tool pipeline evidence/cache/tracker 和共享 toolOutcomes 使用 envelope 与业务状态",
+        "Main HTTP 直接返回 envelope"
+      ],
+      "transforms": [
+        "adapter 将 cache:'delta' 投影为 envelope.cache.policy:'session'；handler meta 的 degraded/fallbackUsed/warnings 转为 envelope diagnostics。",
+        "adapter 通常把 ToolResult.ok 映射 success/error；仅 !ok 且 signal 已取消覆盖 aborted。丰富的 blocked/timeout/partial enum 不代表所有内置 handler 已能产出相应 typed 状态。",
+        "terminal 超时或 abort 的 partial output 与非零 exit 目前仍是 ok(data)，另有 degraded/audit failure；知识 duplicate_blocked 也是业务 data 中的状态。",
+        "runtimeBridge 对 structuredContent 直接取业务值，因此消费者要携带 metadata/envelope，不能以 data 非空推断操作成功。",
+        "ordinary projector 做诊断摘要和敏感字段清理，不能以它替代内存中的完整 envelope。"
+      ],
+      "ownership": {
+        "domainOutcome": "handler/Core 回执最了解业务完成、拒绝、duplicate；不得由上层字符串猜测覆写",
+        "envelopeOutcome": "adapter 负责调用协议状态与诊断映射；完整 schema 定义仍在 kernel",
+        "presentation": "kernel result projector/presenter",
+        "cancellation": "未开始操作可 aborted；已确认写入后取消保持确认结果及 KNOWLEDGE_MUTATION_COMPLETED_AFTER_ABORT。timeout/非合作中断不意味着回滚"
+      },
+      "migrationConditions": [
+        "若新增 typed handler outcome，必须可选向后兼容，并说明 transport/domain/cancel 优先级；保留旧 ok/data/error 及 Envelope 公共出口。",
+        "最先固定现有 terminal partial 与 Core confirmed-write-after-abort 的合同，再补强状态投影；不能批量把 signal.aborted 的成功结果改成失败。",
+        "诊断转译不承担业务授权或 Core 持久化规则；也不靠正则解析终端文本恢复结构状态。"
+      ],
+      "refs": [
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:52",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:98",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:117",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:160",
+        "src/agent/runtime/toolPipeline/runtimeBridge.ts:24",
+        "src/agent/runtime/toolPipeline/runtimeBridge.ts:137",
+        "src/tools/kernel/result.ts:166",
+        "src/tools/runtime/handlers/terminal.ts:105",
+        "src/tools/runtime/handlers/terminal.ts:124",
+        "src/tools/runtime/handlers/knowledge/submission.ts:84",
+        "src/tools/runtime/handlers/knowledge/operation.ts:24"
+      ],
+      "minimalContractTests": [
+        "在真实 adapter 入口用 table 覆盖普通成功/handler fail/pre-abort/排队取消/terminal partial/业务 duplicate，断言 status、data、diagnostics、cache。",
+        "复用 test/tool-v2-contract.test.ts:384/:416/:444 固定 partial 与 degradation；不是只 mock envelope。",
+        "复用 test/runtime-efficiency.test.ts:140 保证 after 链读到同一 envelope 对象及 evidence metadata。",
+        "知识 fake Core port 在调用后触发 signal.abort 再返回创建回执：保留确认结果+warning；开始前已 abort：Core 调用次数为 0。"
+      ]
+    },
+    {
+      "id": "TP-3",
+      "name": "宿主 ToolContextFactory、依赖端口及 scope 生命周期",
+      "disposition": "保留 host factory 与 Agent handler port 边界；精简实际端口、明确必需/可选及 scope，不搬 Core 服务或 sandbox 实现",
+      "priority": "availability 可在 Agent 先定合同；scope 装配实现涉及 Main，需后续授权",
+      "definitions": [
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts:21 — ToolContextFactoryContract；:25 同义兼容 alias",
+        "src/tools/kernel/context.ts:134 — ToolRuntimeCallContext",
+        "src/tools/kernel/registry.ts:102 — ToolContext",
+        "src/tools/kernel/context.ts:163 — ToolCallContext（compat family）",
+        "src/tools/kernel/handler.ts:22 — InternalToolHandlerContext（compat family）",
+        "src/tools/runtime/handlers/knowledge/contracts.ts:34 — Core RecipeProductionPort alias"
+      ],
+      "producers": [
+        "runtimeBridge 投影 live runtime metadata/sharedState/sets/ledger/history",
+        "Main singleton ToolContextFactory.create 组装 Core services、sandbox bridge、cache、session store",
+        "router 克隆 context 注入 TOOL_REGISTRY 与配置 commandAllowlist"
+      ],
+      "consumers": [
+        "code/terminal/knowledge/graph/memory/meta/evidence 各 handler 消费自身最小依赖",
+        "Main SandboxExecutorBridge 消费 terminal 提供的 cwd/projectRoot/timeout/signal",
+        "公开 contextFromToolCall 将 compat ToolCallContext 转 legacy handler context；当前扫描未发现 src/Main 生产调用"
+      ],
+      "transforms": [
+        "request.runtime 同一引用传入 ToolContext.runtime，sharedState、submitted sets、memoryCoordinator 等对象身份须保留。",
+        "Main tryGet 将缺服务降为 undefined；graph 固定 projectGraph:null 且未提供 codeEntityGraph。静态 schema 能看见 graph，不代表当前宿主具备图谱端口。",
+        "factory 单例在构造时创建 DeltaCache/SearchCache/SessionStore；每个请求返回同一实例，不按 actor.sessionId/runtime.agentId/dimensionScopeId 分区。",
+        "compat contextFromToolCall 另有 services/underscore runtime fields 投影；不是当前 Main ToolContextFactory 的中间步骤。"
+      ],
+      "ownership": {
+        "lifecycleAndIdentity": "Main 选择 factory/project/session 生命周期；Agent 必须明确消费 scope 语义，不能偷偷拿新的全局 Map 冒充宿主隔离",
+        "dependencyDefinition": "已有 Core port 直接使用 Core 包导出；只把 Agent handler 实际需要的宿主最小端口统一到低层 contracts，禁止 kernel 反向 import handler",
+        "availability": "宿主装配提供依赖；Agent handler 明确缺依赖错误。可用 schema 过滤/启动诊断需根据真实 action 依赖，不能只看名称",
+        "errors": "Main tryGet 缺服务；handler 处理 unavailable/domain failure；adapter 处理 factory throw",
+        "cancellationAndTimeout": "signal 透传；terminal handler 决定 30s 默认/120s cap，Main bridge 将 timeout/signal 交实际 sandbox；Core RecipeProductionPort 无取消参数"
+      },
+      "evidence": [
+        {
+          "fact": "装配生命周期没有请求 scope 分区",
+          "ref": "tmp/interface-study-2026-09-20/scope-probe.json",
+          "observed": "根线程在真实 Main factory 的内存 probe 中，用不同 actor/session/runtime/dimension 身份得到共享 SessionStore/DeltaCache；第二请求能 recall fixture，第二次缓存 read 为 unchanged。",
+          "limitation": "不是运行中产品跨用户泄露证明；实际影响取决于宿主并发/访问/生命周期。未重复探针。"
+        },
+        {
+          "fact": "graph 在当前 Main 装配中无实际端口",
+          "refs": [
+            "../Alembic/lib/tools/ToolContextFactory.ts:148",
+            "src/tools/runtime/handlers/graph.ts:38",
+            "src/tools/runtime/handlers/graph.ts:103"
+          ],
+          "observed": "graph.overview 返回 Project graph not available；query 在二者缺失时返回明确 fail。属于 required-port/availability 接线问题，不应新增假图谱接口掩盖。"
+        }
+      ],
+      "migrationConditions": [
+        "先给每个实际 action 标清 dependency availability 与错误；保留旧可选 ToolContext 字段/工厂 alias，逐消费点窄化。",
+        "scope 改动必须联合 Main factory owner 决定 project/run/session/dimension 身份和清理时机；Agent 本轮只能明确合同，不能修改相邻仓。",
+        "legacy ToolCallContext/InternalToolHandlerContext/ToolExecutionAdapter 仍经 public barrel 导出；src/Main 无消费不等于外部无消费。仅允许兼容 re-export/adapter，不凭旧 V1 文案删除。",
+        "Core 确定性服务仍通过 @alembic/core 注入；保持 RecipeProductionPort 为定义源。"
+      ],
+      "refs": [
+        "src/agent/runtime/toolPipeline/runtimeBridge.ts:75",
+        "../Alembic/lib/tools/ToolContextFactory.ts:129",
+        "../Alembic/lib/tools/ToolContextFactory.ts:142",
+        "../Alembic/lib/tools/ToolContextFactory.ts:173",
+        "../Alembic/lib/tools/ToolContextFactory.ts:62",
+        "src/tools/kernel/handler.ts:64",
+        "src/tools/kernel/registry.ts:92",
+        "../AlembicCore/src/service/knowledge/RecipeProductionGateway.ts:365"
+      ],
+      "minimalContractTests": [
+        "基于 ../Alembic/test/unit/ToolContextFactory.test.ts:19/:36 的真实 factory fixture，断言 signal/runtime/sharedState/set/ledger 引用保持和 required port 缺失诊断；这类 Main 测试只列后续条件，本轮不改。",
+        "Agent adapter fixture：factory throw、缺 graph/knowledge port、sandbox 部分结果，走真实 handler 返回可观察错误而非空成功。",
+        "scope probe 作为现状证据；后续先明确同 scope 复用/不同 scope 隔离目标，再把 session recall + delta unchanged/read freshness 做双 scope 合同测试。",
+        "知识 port 测试断言 typed Core request/source 与真实 createOrStage 调用，复用 test/tool-v2-contract.test.ts:469。"
+      ]
+    },
+    {
+      "id": "TP-4",
+      "name": "schema projection port 与 catalog 职责",
+      "disposition": "最适合先收敛一个真实消费的 schema 查询端口；必须保留执行 registry、manifest catalog、场景 registry 的不同数据职责",
+      "priority": "first bounded Agent optimization",
+      "definitions": [
+        "src/tools/kernel/registry.ts:19 — executable ToolAction",
+        "src/tools/runtime/registry.ts:727 — TOOL_REGISTRY",
+        "src/tools/catalog/CapabilityManifest.ts:48 — ToolExecutionProfile",
+        "src/tools/catalog/CapabilityManifest.ts:108 — ToolSchemaProjection",
+        "src/tools/catalog/UnifiedToolCatalog.ts:39 — ToolDefinition",
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:17 — ToolActionAllowlist"
+      ],
+      "producers": [
+        "TOOL_REGISTRY → generateLightweightSchemas",
+        "RuntimeCapabilityCatalog.normalizeAllowedTools → generateSchemas",
+        "Main Dashboard/Skill adapters → manifests → UnifiedToolCatalog.register"
+      ],
+      "consumers": [
+        "AgentRuntime.#getToolSchemas 使用 5 个 duck-typed 方法的优先级分支",
+        "Main /capabilities 使用 RuntimeCapabilityCatalog schema",
+        "router.getSchemas/meta.tools 自省直接读 TOOL_REGISTRY",
+        "UnifiedToolCatalog 的 definition/model/lazy 能力属于公开兼容面；当前 Main 装配没有 registerDefinition 执行器"
+      ],
+      "transforms": [
+        "RuntimeCapabilityCatalog 5 个 schema 方法最终都走 generateSchemas；model/firstRound 参数目前不改变输出，markExpanded 只累计 count。",
+        "generateSchemas 将 registry schema 重新 map 成相同 name/description/parameters shape。",
+        "UnifiedToolCatalog 从 ToolDefinition 投影 manifest、schema、InternalToolHandlerEntry；owner/surfaces/governance 信息并不来自 runtime ToolAction。",
+        "UnifiedToolCatalog 的 model override/lazy expansion 真有不同语义，不能因为 RuntimeCapabilityCatalog 的方法是 wrapper 就把两者实现合并。",
+        "ToolAction 的 delta/parallel 等执行配置与 manifest 的 scope/persistent/parallel-safe/timeout 等是不同语言；manifest execution 字段当前不会自动被 ToolRouter 执行。"
+      ],
+      "ownership": {
+        "executableRegistration": "runtime TOOL_REGISTRY",
+        "providerProjection": "catalog schema port 纯投影；不授予权限",
+        "metadataRegistration": "CapabilityCatalog/UnifiedToolCatalog + Main manifest producer",
+        "cancellation": "schema 查询同步无 signal；manifest.abortMode/timeout 只是元数据，本执行器未据此运行",
+        "errors": "catalog duplicate 注册抛错；runtime schema 对未知 ids/actions 过滤；runtime 对应缺 schema 有 diagnostics"
+      },
+      "proposedSmallBoundary": "在现有 ToolSchemaProjection 基础上声明一个可被 RuntimeCapabilityCatalog 和 AgentRuntime 共同消费的 schema query contract，包含 ids/action allowlist/model/expansion 需要的现有字段；RuntimeCapabilityCatalog 实现一个规范查询，旧 5 个公开方法委托，旧 catalog 通过小型适配保留原行为。先减少 AgentRuntime 的本地接口复制及分支，不建立新容器/注册中心。",
+      "migrationConditions": [
+        "第一步不改 public catalog 类名、旧 methods、export 或 Main DI key capabilityCatalog；新 contract 必须当天接到真实 AgentRuntime consumer。",
+        "固定 absent/null=全量，[]=空，action map null=该 tool 全动作，[]/未知 action=无可见动作，以及模型/lazy 兼容行为。",
+        "执行权限继续由 TP-5 的同一 action contract 和执行 gates 检查，schema 可见性不能承担权限 owner。",
+        "保留 UnifiedToolCatalog 对 Dashboard/Skill manifest 的实际消费；registerDefinition 等公开兼容 API 仅在外部消费者扫描及迁移证据齐全后才讨论删除。"
+      ],
+      "refs": [
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:23",
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:53",
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:66",
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:79",
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:91",
+        "src/tools/runtime/registry.ts:870",
+        "src/agent/runtime/AgentRuntime.ts:2122",
+        "src/tools/catalog/UnifiedToolCatalog.ts:59",
+        "src/tools/catalog/UnifiedToolCatalog.ts:186",
+        "src/tools/catalog/UnifiedToolCatalog.ts:213",
+        "src/tools/catalog/UnifiedToolCatalog.ts:274",
+        "../Alembic/lib/injection/modules/AgentModule.ts:51"
+      ],
+      "minimalContractTests": [
+        "复用 test/tool-v2-contract.test.ts:166/:181，通过新旧 schema 入口比较结构及 action allowlist；table 覆盖 absent/null/[]/unknown id/action map。",
+        "保留 UnifiedToolCatalog 的 model override、firstRound、expanded 三个差异 case，避免错误等价化。",
+        "用真实 AgentRuntimeBuilder + Main 同等 DI key fixture 证明新端口被消费；可复用 test/mining-e2e-pipeline.test.ts:614 的 schema 空接线诊断。",
+        "公开类型导入合同覆盖 @alembic/agent 与 @alembic/agent/tools/runtime 的旧出口。"
+      ]
+    },
+    {
+      "id": "TP-5",
+      "name": "场景 capability 与阶段 action contract",
+      "disposition": "保留 Capability 类/hooks/场景工厂；可收敛 action allowlist 定义与阶段快照，使 schema 和 execution gate 共享同一契约",
+      "priority": "with TP-4, bounded",
+      "definitions": [
+        "src/tools/runtime/toolsets/Capability.ts:1 — prompt/context/hooks 基类",
+        "src/tools/runtime/toolsets/RuntimeCapability.ts:13 — 声明式 action 工具集",
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts:12 — 场景名称→构造器",
+        "src/tools/kernel/registry.ts:210 — CapabilityDef",
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts:17 — ToolActionAllowlist",
+        "src/agent/runtime/AgentRuntime.ts:151 — 本地 RuntimeToolActionAllowlist/RuntimeToolContract"
+      ],
+      "producers": [
+        "AgentRuntimeBuilder 根据 preset 构造 Capability；阶段覆盖名称在 runtime 解析",
+        "RuntimeCapability.tools/promptFragment/toDef 派生 action map",
+        "AgentRuntime.#collectToolContract 合并 caps、additionalTools、stage override"
+      ],
+      "consumers": [
+        "provider schema projection",
+        "runtime accessGates 的工具/action 和 terminal allowlist",
+        "独立 ToolRouter 可选 CapabilityDef 配置；当前 Main singleton adapter 未使用该配置",
+        "capability buildContext/onBeforeStep/onAfterStep 等 runtime hooks"
+      ],
+      "transforms": [
+        "Capability.allowedTools→ids/actions/restrictedActions；cap 只有 tools 或 additionalTools 时该 tool 的 actions=null 表示全动作。",
+        "RuntimeCapability.toDef 会重取 name/description/promptFragment/allowedTools/commandAllowlist。当前 src/Main 无 .toDef() 生产调用，属于公开投影能力，不能拿它假装 Main router 已被 capability 限制。",
+        "多个 capability 的 action 集并集；阶段 caps=[] 是显式没有工具，null 是复用默认；不允许精简时把空集误成全量。",
+        "schema projection 可过滤未知 action，但执行 gate 与 router 仍要实际验证；模型看到工具不等于被授权执行。"
+      ],
+      "ownership": {
+        "scenarioComposition": "CapabilityRegistry/preset/runtime",
+        "effectiveStageContract": "AgentRuntime 对本次 stage 的合并结果",
+        "runtimeEnforcement": "accessGates/phaseGates/PolicyEngine；terminal handler 再检查执行安全",
+        "directHostEnforcement": "Main direct 入口或显式配置的 router capability；不能由另一个 runtime stage 的 schema 推断",
+        "errorsAndCancellation": "未知场景 registry.create 抛错；权限 gate 返回有诊断的拒绝；signal/deadline 继续由 runtime 执行生命周期承载"
+      },
+      "proposedSmallBoundary": "将现有 RuntimeToolActionAllowlist/ToolActionAllowlist 的共同形状集中为低层 contract，保留外部 alias；把现有收集逻辑产出为本阶段 snapshot，直接喂给 schema 与 access gates。不要把 CapabilityRegistry 合进 catalog，不要废弃具备真实 hooks 的 Capability 实例。",
+      "migrationConditions": [
+        "先锁定 allowlist union/null/empty/additionalTools 的当前行为和命令 allowlist，再抽纯合并函数；每个 stage snapshot 使用独立值，避免修改共享 capability 实例。",
+        "Main router 无 capability 是当前装配事实，不在 Agent 内偷加全局固定场景限制；direct 入口授权需单列后续宿主决策。",
+        "CapabilityDef/toDef 仍保留为外部/独立 router 的声明式配置；没有真实需求不新增第二个 capability manager。"
+      ],
+      "refs": [
+        "src/agent/service/AgentRuntimeBuilder.ts:72",
+        "src/agent/runtime/AgentRuntime.ts:2065",
+        "src/agent/runtime/AgentRuntime.ts:2183",
+        "src/tools/runtime/toolsets/RuntimeCapability.ts:21",
+        "src/tools/runtime/toolsets/RuntimeCapability.ts:29",
+        "src/agent/runtime/toolPipeline/accessGates.ts:48",
+        "src/agent/runtime/toolPipeline/accessGates.ts:123",
+        "src/tools/runtime/router.ts:193",
+        "../Alembic/lib/injection/modules/AgentModule.ts:43"
+      ],
+      "minimalContractTests": [
+        "一个真实 runtime stage：schema 只暴露 code.read；伪造 code.write 调用应在 host handler 前拒绝，证明 schema 与执行权限一致且彼此独立。",
+        "table 覆盖 caps=[]、caps=null、同工具多个 action 并集、additionalTools 放开该工具全动作。",
+        "复用 test/tool-v2-contract.test.ts:181/:219 保留 action schema 与 Evolution command allowlist。",
+        "独立 ToolRouter({capability: cap.toDef()}) 拒绝未授权 action；Main-equivalent 无 capability adapter 的测试明确权限由入口承担，不能误报内置全局策略。"
+      ]
+    }
+  ],
+  "legacyDocumentation": {
+    "evidence": [
+      "AGENTS.md:156-176 仍指向 tools/core、tools/v2、V2ToolRouterAdapter 与旧 retirement 条件。",
+      "git ls-files 'src/tools/core/**' 'src/tools/v2/**' 没有 tracked 结果；rg V2ToolRouterAdapter|LightweightRouter src 没有结果。",
+      "src/tools/kernel/index.ts:4 明确 canonical merged contract；src/tools/kernel/request.ts:4 与 registry.ts 文件头记录原路径。",
+      "src/tools/runtime/index.ts:1 从 kernel 导出类型；src/tools/index.ts:4/:11 导出 kernel 与 runtime 当前入口。",
+      "src/agent/runtime/AgentRuntimeBoundary.ts:84 使用 ToolRouter/ToolRouterAdapter；Main 已导入 @alembic/agent/tools/runtime。"
+    ],
+    "interpretation": "应更新目录/迁移说明与公开兼容分类，而不是依据陈旧登记重新发明双系统或删除仍导出的 contract。AGENTS/CLAUDE 是当前用户已有修改，本轮未编辑。",
+    "compatibilityOnlyInScannedProduction": [
+      "ToolExecutionAdapter/ToolExecutionRequest/preview 合同：未发现实际实现/执行实例。",
+      "UnifiedToolCatalog.registerDefinition/getInternalTool 与 contextFromToolCall：当前 src/Main 只有定义/兼容内部调用，没有 Main 生产执行注册。",
+      "ToolContextProviderContract：ToolContextFactoryContract 同义 type alias。",
+      "RuntimeCapability.toDef：有实现与公开用途，但当前 src/Main 未调用，不等于可删除。"
+    ],
+    "limitation": "consumer 扫描覆盖 Agent src 与 Main lib，并参考相关测试；不是整个已发布生态的无消费者证明。"
+  },
+  "minimalExecutionOrderIfAuthorized": [
+    "先明确 shared schema/action contract，在 RuntimeCapabilityCatalog + AgentRuntime 的实际链闭环，并保留原入口兼容 wrapper。",
+    "再用 adapter/handler 入口合同锁定错误、取消、partial、业务回执，考虑 typed outcome 的小范围单源转换。",
+    "单列 Main scope/required-port/direct authorization 的接口方案与宿主迁移条件；不在 Agent 中搬入宿主/存储/图谱实现。",
+    "文档同步当前 kernel/runtime 路径和兼容表面；任何删除均需额外实际消费方、替代入口与迁移测试证据。"
+  ],
+  "verification": {
+    "performed": [
+      "只读读取当前 kernel/runtime/catalog/capability 关键实现、AgentRuntime 接线、Main AgentModule/ToolContextFactory/HTTP routes/Core gateway port。",
+      "对公开 compat symbols 的 src/Main 消费扫描及旧目录 tracked-file 检查。",
+      "阅读现有定向测试作为最小合同测试基线；未在本轮重跑。",
+      "读取 root 提供的 scope-probe.json，未重复执行。"
+    ],
+    "notPerformed": [
+      "完整测试",
+      "真实 API/网络",
+      "全局 HTTP authentication/部署环境审计",
+      "已发布外部 npm consumer 全生态扫描"
+    ],
+    "productEdits": [],
+    "commit": null,
+    "noCommitReason": "本轮仅研究与方案；根线程明确禁止实施/提交。",
+    "onlyWrittenArtifact": "tmp/interface-study-2026-09-20/tool-ports.json"
+  }
+}

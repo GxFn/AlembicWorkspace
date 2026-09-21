@@ -1,0 +1,208 @@
+{
+  "node": "22.23.2",
+  "coreBaselineCommit": "e274e31",
+  "commits": {
+    "AlembicCore": "fec4b763af7bdedf5aeea8ab3e579e9d745795e9",
+    "Alembic": "4dc86fbb95ae67a86ddf215406ae4767901f3dd8",
+    "AlembicPlugin": "aee9b5572055559d3b30995c0c16534eef0fb425"
+  },
+  "branches": {
+    "AlembicCore": "codex/core-review-cleanup",
+    "Alembic": "codex/core-knowledge-writes",
+    "AlembicPlugin": "codex/core-knowledge-writes"
+  },
+  "core": {
+    "command": "npm run check",
+    "log": "final-core-legacy-compatible.log",
+    "exitCode": 0,
+    "testFiles": {
+      "passed": 194,
+      "skipped": 1
+    },
+    "tests": {
+      "passed": 2155,
+      "skipped": 1,
+      "failed": 0
+    },
+    "gates": [
+      "build",
+      "public-api-boundary",
+      "layer-contract",
+      "consumer-core-imports",
+      "scope-resolution",
+      "smoke-public-api",
+      "output-budgets",
+      "space-edges",
+      "doctrine",
+      "naming",
+      "test",
+      "lint",
+      "retired-symbols"
+    ]
+  },
+  "outer": {
+    "Alembic": {
+      "typecheck": "final-main-typecheck.log",
+      "lint": "final-main-lint.log",
+      "relatedTestFiles": 7,
+      "relatedTests": 44,
+      "status": "passed across the original wiring run and corrected lifecycle rerun",
+      "initialLog": "final-main-wiring.log",
+      "initialPassed": 35,
+      "initialFailed": 9,
+      "unchangedOtherTestsPassed": 28,
+      "rerunLog": "final-main-lifecycle.log",
+      "rerunPassed": 16
+    },
+    "AlembicPlugin": {
+      "typecheck": "final-plugin-typecheck.log",
+      "lint": "final-plugin-lint.log",
+      "relatedTestFiles": 8,
+      "relatedTests": 54,
+      "status": "passed across the original wiring run and corrected lifecycle rerun",
+      "initialLog": "final-plugin-wiring.log",
+      "initialPassed": 45,
+      "initialFailed": 9,
+      "unchangedOtherTestsPassed": 38,
+      "rerunLog": "final-plugin-lifecycle.log",
+      "rerunPassed": 16
+    }
+  },
+  "additionalEvidence": [
+    {
+      "label": "final-core-legacy-compatible",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "exitCode": 0,
+      "seconds": 53.27,
+      "log": "final-core-legacy-compatible.log"
+    },
+    {
+      "label": "final-main-typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "seconds": 19.85,
+      "log": "final-main-typecheck.log"
+    },
+    {
+      "label": "final-plugin-typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "seconds": 19.961,
+      "log": "final-plugin-typecheck.log"
+    },
+    {
+      "label": "final-main-lifecycle",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/unit/lifecycle-supervisor.test.ts"
+      ],
+      "exitCode": 0,
+      "seconds": 1.55,
+      "log": "final-main-lifecycle.log"
+    },
+    {
+      "label": "final-plugin-lifecycle",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/unit/lifecycle-supervisor.test.ts"
+      ],
+      "exitCode": 0,
+      "seconds": 1.55,
+      "log": "final-plugin-lifecycle.log"
+    },
+    {
+      "label": "final-main-lint",
+      "command": [
+        "node",
+        "node_modules/@biomejs/biome/bin/biome",
+        "check",
+        "lib/injection/modules/KnowledgeModule.ts",
+        "lib/injection/modules/GuardModule.ts",
+        "lib/project-scope/ProjectScopeAnalysis.ts",
+        "lib/recipe-pipeline/generate/incremental/IncrementalRescanWorkflow.ts",
+        "test/unit/KnowledgeModuleFileFirst.test.ts",
+        "test/unit/GuardModuleFileFirst.test.ts",
+        "test/unit/KnowledgeModuleEvolutionWiring.test.ts",
+        "test/unit/ProjectScopeAnalysis.test.ts"
+      ],
+      "exitCode": 0,
+      "seconds": 0.179,
+      "log": "final-main-lint.log"
+    },
+    {
+      "label": "final-plugin-lint",
+      "command": [
+        "node",
+        "node_modules/@biomejs/biome/bin/biome",
+        "check",
+        "lib/injection/modules/KnowledgeModule.ts",
+        "lib/injection/modules/GuardModule.ts",
+        "test/unit/KnowledgeModuleFileFirst.test.ts",
+        "test/unit/GuardModuleFileFirst.test.ts"
+      ],
+      "exitCode": 0,
+      "seconds": 0.174,
+      "log": "final-plugin-lint.log"
+    },
+    {
+      "label": "public-api-smoke-negative-control-verified",
+      "command": [
+        "python3",
+        "/tmp/alembic-core-review-20260917/smoke-negative-control.py"
+      ],
+      "exitCode": 0,
+      "seconds": 2.671,
+      "log": "public-api-smoke-negative-control-verified.log"
+    },
+    {
+      "label": "stage3-all-contracts-green",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "test/RecipeAuthoringSpecDrift.test.ts",
+        "test/RecipeGateEnforcementMatrix.test.ts",
+        "test/UnifiedValidatorStage3ByteIdentical.test.ts",
+        "test/RecipeAuthoringSpec.test.ts",
+        "test/RecipeAuthoringSpecExamplesGatePassing.test.ts"
+      ],
+      "exitCode": 0,
+      "seconds": 2.224,
+      "log": "stage3-all-contracts-green.log"
+    }
+  ],
+  "limitations": [
+    "Initial shell Node 24 native SQLite ABI mismatch was isolated by using Node 22; no system runtime or credentials changed.",
+    "No outer-repository full test claim: verification is typecheck, scoped lint and named related suites.",
+    "One pre-existing Core skip remains.",
+    "No deployment, publish, remote push, real user-project scan or live AI request.",
+    "Existing AGENTS.md/CLAUDE.md changes and pre-existing untracked coverage/index.ts excluded."
+  ],
+  "evidenceHashes": {
+    "final-core-legacy-compatible.log": "sha256:8bc8aea22810ca712f983dd080769fc007ec6e64a4e8d86f872fe732d60d9f8a",
+    "final-main-typecheck.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-plugin-typecheck.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-main-lifecycle.log": "sha256:4bdace475012d5ad5b9a477a3331ef574b187273b9bcb450fd1fc75b1f94639d",
+    "final-plugin-lifecycle.log": "sha256:c3a0c85f5fd775ea1f4c79c69e518da566e0946f8b7282780729faf6a04e5921",
+    "final-main-lint.log": "sha256:969dc37b9316a6a02ac823d0fdc24d4567229fc3837dbe96c074aa5307a13c27",
+    "final-plugin-lint.log": "sha256:92a3eec56c62e00aa592f3b58fb4c6de6edf6ae414086ed9e5337fec2a3b4b2f",
+    "public-api-smoke-negative-control-verified.log": "sha256:e009de8bc957f1d3b0997865a1d0ac2a0306341b8acfee3e98c31435cfbd7481",
+    "stage3-all-contracts-green.log": "sha256:e2833eebd61b346acf201665527b7001445e7dd0b78d99f5dae01c4a4b0909f2"
+  }
+}

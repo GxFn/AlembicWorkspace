@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1",
+  "dispatchGroup": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1",
+  "status": "completed",
+  "summary": "AlembicCore rootcause12 completed on exact accepted parent 8602b9e6 with single commit c0a6633d9570178494cb208b42a268f2f3899911. Added a versioned EvidenceAuthorityV4 with one physical EvidenceEntry/snapshot/witness root and canonical harvestGroups, Request/Decision/Execution V4, and Durable Gateway/LoadReceipt/Attestation V5. V5 derives groups from the complete SemanticRequest, loads each evidence root once, conserves the exact final-schedule receipt union, verifies after JSON/fresh-process rehydrate, replays through StrictProductionAuthority, and fails closed on group/root/request/load/signature tampering. Legacy V3/V4 single-group paths remain explicit compatibility contracts and are not V5 fallback.",
+  "evidenceRefs": [
+    "AlembicCore commit c0a6633d9570178494cb208b42a268f2f3899911 (parent 8602b9e6dd03a362736118a92cfd4ae24e35661e)",
+    "<workspace-root>/AlembicCore/test/SharedHarvestSemanticEvidenceAuthority.test.ts",
+    "<workspace-root>/AlembicCore/test/DurableSemanticDispositionFreshProcess.test.ts",
+    "<workspace-root>/AlembicCore/test/CorePackage.test.ts",
+    "Alembic Guard guard-public-ms52frht-1",
+    "Alembic finish finish-public-ms52gy0j-1",
+    "<workspace-root>/wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1/blocker-report.md"
+  ],
+  "verification": [
+    "RED on exact 8602b9e6 parent: npx vitest run test/SharedHarvestSemanticEvidenceAuthority.test.ts --reporter=verbose failed before store load with SEMANTIC_DISPOSITION_REVIEW_EVIDENCE_EXECUTION_SET_INVALID.",
+    "GREEN focused: npm run build:check && npx vitest run test/SharedHarvestSemanticEvidenceAuthority.test.ts test/StrictFactExecution.test.ts test/StrictDispositionReviewExecutionAuthority.test.ts test/StrictSemanticEvidenceAuthority.test.ts test/CorePackage.test.ts --reporter=dot — 5 files, 48/48 tests passed.",
+    "Full regression: npm run test — 194 files passed, 1 skipped; 1905 tests passed, 1 skipped.",
+    "Public build/runtime: npm run build && npm run smoke:public-api — 61 exact public entrypoints imported.",
+    "Quality/boundaries: npm run lint; lint:public-api-boundary; lint:layer-contract; lint:consumer-core-imports; lint:scope-resolution; lint:retired-symbols — all passed.",
+    "Alembic Guard reviewed all 10 changed files: 0 violations (guard-public-ms52frht-1).",
+    "Composite npm run check passed build, public API, layer, consumer imports, scope, smoke, output budgets and space edges, then stopped only at pre-existing unchanged src/infrastructure/vector/ASTChunker.ts:32 doctrine violation; that file has zero diff.",
+    "Final repository proof: HEAD c0a6633d9570178494cb208b42a268f2f3899911, parent 8602b9e6dd03a362736118a92cfd4ae24e35661e, git status clean, git diff HEAD^ --check passed."
+  ],
+  "risks": [
+    "AlembicAgent and Alembic Main still need their separately authorized downstream V5 integrations; this Core target intentionally did not edit or dispatch sibling repositories.",
+    "The full composite check remains red on the accepted-parent doctrine baseline at unchanged src/infrastructure/vector/ASTChunker.ts:32; all task-relevant and full test/boundary gates passed.",
+    "The public production fixture proves the required minimum one-root/two-group/three-receipt shape (including a two-scale group); controller/Main retains the independently observed 15-receipt/8-group real downstream composition as the next integration proof."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "c0a6633d9570178494cb208b42a268f2f3899911",
+      "verify": "Single clean AlembicCore commit on exact accepted parent 8602b9e6dd03a362736118a92cfd4ae24e35661e; worktree clean."
+    },
+    {
+      "kind": "tests",
+      "ref": "npm run test",
+      "verify": "Vitest full regression passed 194 files / 1905 tests with one environment-gated fresh-process suite skipped in the ordinary run; the suite passes when invoked by the parent fixture."
+    },
+    {
+      "kind": "runtime-evidence",
+      "ref": "<workspace-root>/AlembicCore/test/SharedHarvestSemanticEvidenceAuthority.test.ts",
+      "verify": "Real strict schedule fixture executes one file/EvidenceEntry/witness across two harvest groups and three receipt obligations, loads once, produces one V5 authority root, serializes/re-verifies in a fresh process, consumes publicly, and replays through StrictProductionAuthority."
+    },
+    {
+      "kind": "self-review",
+      "ref": "guard-public-ms52frht-1",
+      "verify": "Alembic Guard reviewed all 10 explicit changed files with 0 violations; manual severity review found no P0/P1/P2 residual issue and confirmed no V5-to-V4 fallback or sibling edits."
+    },
+    {
+      "kind": "red-green-note",
+      "value": "Exact baseline RED was SEMANTIC_DISPOSITION_REVIEW_EVIDENCE_EXECUTION_SET_INVALID in createSemanticDispositionReviewExpectedExecutionReceiptBindingsV3 before store load. GREEN uses Core-authored canonical harvestGroups V4 and Durable V5 without schedule reduction or evidence duplication.",
+      "verify": "Focused test first failed on 8602 parent at the reported production gate, then passed unchanged scenario after implementation."
+    },
+    {
+      "kind": "root-cause-note",
+      "ref": "<workspace-root>/wakeflow-ledger/Alembic/i3-i9-alembic-durable-semantic-review-production-composition-rootcause11-t1/blocker-report.md",
+      "verify": "Maps the real Main one-EvidenceEntry/15-receipt/8-harvest failure to Core V3/V4 single-harvest canonicalizer and expected-binding gates."
+    },
+    {
+      "kind": "scope-diff",
+      "ref": "git show --stat c0a6633d9570178494cb208b42a268f2f3899911",
+      "verify": "Only 10 authorized AlembicCore source/test/public-smoke files changed; no Agent/Main/Plugin/Test/Wakeflow/vendor files."
+    },
+    {
+      "kind": "compatibility-review",
+      "ref": "<workspace-root>/AlembicCore/test/SharedHarvestSemanticEvidenceAuthority.test.ts",
+      "verify": "Legacy V4 one-harvest two-scale positive and V3 single-receipt compatibility remain passing; V5 is a separate schema/route and strict dispatch rejects unknown versions rather than falling back."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1__AlembicCore__i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1__AlembicCore__i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1.json",
+    "deliveryRunId": "run-delivery-i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1__AlembicCore__i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1",
+    "dispatchGroup": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1__AlembicCore__i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 290,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1",
+    "targetTaskId": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "i3-i9-core-cross-harvest-evidence-authority-rootcause12-p1",
+    "resultId": "tr-i3-i9-core-cross-harvest-evidence-authority-rootcause12-t1",
+    "createdAt": "2026-07-28T19:47:34.574Z"
+  },
+  "createdAt": "2026-07-28T19:47:34.574Z",
+  "stateRevisionObserved": 290,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

@@ -1,0 +1,1475 @@
+{
+  "scope": "src/ai/**, src/agent/context/**, src/agent/memory/**, src/agent/utils/**; 21 direct test files",
+  "baseCommit": "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05",
+  "reviewMethod": "逐个源码文件读取可执行代码/类型和关键注释，回读21个直接相关测试；仅在内存转译git HEAD源码并stub外部副作用复现，未运行真实provider/API，未改源码或测试。root可能已在并行修复，问题描述和行号对应初审基线。",
+  "sourceFileCount": 56,
+  "testFileCount": 21,
+  "files": [
+    {
+      "path": "src/agent/context/ContextWindow.ts",
+      "role": "Provider 消息缓冲、工具 transcript 原子轮次、分级压缩与工具结果配额。",
+      "reviewed": true,
+      "findings": [
+        "PC-03",
+        "PC-09"
+      ],
+      "cleanup": "修正文件头旧三级压缩说明；limitToolResultBody 的第二个 batchResults 分支不可达，limitSearchResultObj 的 string 分支也被前置非object return吞掉。仅做等价控制流简化。",
+      "tests": [
+        "test/ContextWindow.test.ts"
+      ],
+      "consumers": [
+        "src/agent/context/ExplorationTracker.ts",
+        "src/agent/context/index.ts",
+        "src/agent/runtime/AgentRuntimeTypes.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/MessageAdapter.ts",
+        "src/agent/runtime/SystemRunContext.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/BudgetController.ts",
+        "src/agent/service/SystemRunContextFactory.ts"
+      ]
+    },
+    {
+      "path": "src/agent/context/ConversationStore.ts",
+      "role": "宿主对话索引及 JSONL 读写、预算裁剪和模型摘要。",
+      "reviewed": true,
+      "findings": [
+        "PC-01",
+        "PC-10"
+      ],
+      "cleanup": "_SUMMARY_TARGET_TOKENS 未使用，可移除；解析 JSONL 逻辑在 load/summarize 可内部复用并统一验证。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/context/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/context/ExplorationTracker.ts",
+      "role": "探索阶段状态机、工具证据/提交计数和退出决策。",
+      "reviewed": true,
+      "findings": [
+        "PC-19"
+      ],
+      "cleanup": "onTextResponse 中 VERIFY/RECORD 旧提示仍写 evidence 而当前 handler 要求 evidenceRefs，修正文案避免无效调用；不要删明确阶段边界。",
+      "tests": [
+        "test/memory-note-finding.test.ts",
+        "test/ExplorationStrategies.test.ts"
+      ],
+      "consumers": [
+        "src/agent/context/index.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/SystemRunContext.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/BudgetController.ts",
+        "src/agent/runtime/ExitController.ts",
+        "src/agent/service/SystemRunContextFactory.ts",
+        "src/agent/context/exploration/NudgeGenerator.ts",
+        "src/agent/context/exploration/ExplorationStrategies.ts",
+        "src/agent/context/exploration/PlanTracker.ts"
+      ]
+    },
+    {
+      "path": "src/agent/context/exploration/ExplorationStrategies.ts",
+      "role": "Analyst/Producer/Generate 的声明式阶段转换与配额。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "保持配额与阶段判断原义；不以审查便利改变产品目标、发现阈值或生产提交义务。",
+      "tests": [
+        "test/ExplorationStrategies.test.ts"
+      ],
+      "consumers": [
+        "src/agent/context/ExplorationTracker.ts",
+        "src/agent/context/index.ts",
+        "src/agent/strategies/PipelineStrategy.ts",
+        "src/agent/runtime/SystemRunContext.ts",
+        "src/agent/context/exploration/NudgeGenerator.ts",
+        "src/agent/context/exploration/PlanTracker.ts"
+      ]
+    },
+    {
+      "path": "src/agent/context/exploration/NudgeGenerator.ts",
+      "role": "阶段、停滞、预算和反思提示生成；有限次数 bootstrap nudge。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/ContextWindow.test.ts",
+        "test/ExplorationStrategies.test.ts"
+      ],
+      "consumers": [
+        "src/agent/context/ExplorationTracker.ts",
+        "src/agent/context/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/context/exploration/PlanTracker.ts",
+      "role": "计划提示、重规划、动作与计划步骤的启发式覆盖评分。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/ContextWindow.test.ts",
+        "test/ExplorationStrategies.test.ts"
+      ],
+      "consumers": [
+        "src/agent/context/ExplorationTracker.ts",
+        "src/agent/context/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/context/exploration/SignalDetector.ts",
+      "role": "根据工具动作及目标跟踪新文件、新关键词和新查询。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/ContextWindow.test.ts",
+        "test/ExplorationStrategies.test.ts"
+      ],
+      "consumers": [
+        "src/agent/context/ExplorationTracker.ts",
+        "src/agent/context/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/context/index.ts",
+      "role": "公共 barrel 导出；保留 package export/内部模块访问边界。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/ContextWindow.test.ts",
+        "test/ExplorationStrategies.test.ts"
+      ],
+      "consumers": []
+    },
+    {
+      "path": "src/agent/context/l4MemoryPackage.ts",
+      "role": "L4 摘要的结构化输入包、证据引用与保留校验。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "unresolvedQuestions输入保存在package但render未输出；若维持字段承诺应加入render/validation。L4默认关闭，避免把可选能力移除。",
+      "tests": [
+        "test/ContextWindow.test.ts",
+        "test/ExplorationStrategies.test.ts"
+      ],
+      "consumers": [
+        "src/agent/context/ContextWindow.ts",
+        "src/agent/context/index.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/BudgetController.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/ActiveContext.ts",
+      "role": "单运行工作记忆：发现 scratchpad、观察日志、计划和蒸馏。",
+      "reviewed": true,
+      "findings": [
+        "PC-17"
+      ],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/l4-memory-package.test.ts",
+        "test/ActiveContext.test.ts",
+        "test/memory-note-finding.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/MemoryCoordinator.ts",
+        "src/agent/memory/index.ts",
+        "src/agent/runtime/SystemRunContext.ts",
+        "src/agent/runtime/LoopContext.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/EpisodicConsolidator.ts",
+      "role": "将会话 findings/reflections/文本事实提取为持久记忆候选。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "真实宿主CompletionSteps实际调用，不能因本仓没有调用而删除。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/domain/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/MemoryConsolidator.ts",
+      "role": "持久记忆冲突更新、相似去重/合并及旧 JSONL 迁移。",
+      "reviewed": true,
+      "findings": [
+        "PC-21"
+      ],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/PersistentMemory.ts",
+        "src/agent/memory/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "role": "记忆作用域、三层预算和注入、发现写入、缓存及 checkpoint 协调。",
+      "reviewed": true,
+      "findings": [
+        "PC-18"
+      ],
+      "cleanup": "NON_CACHEABLE_TOOLS 与 SessionStore 重复，明确SessionStore为缓存权限唯一实现后可删重复检查；completeSession只是生命周期钩子，不能以空实现为由自动加入宿主固化。",
+      "tests": [
+        "test/memory-context.test.ts",
+        "test/memory-note-finding.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/index.ts",
+        "src/agent/runtime/SystemRunContext.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/service/SystemRunContextFactory.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/MemoryEmbeddingStore.ts",
+      "role": "记忆向量 JSON sidecar、延迟刷盘和 GC。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "#writeFile吞掉失败但flush仍清dirty，建议保留dirty并可观测重试；embeddingStore保留空向量/外部可变数组问题应在独立存储边界验证中处理。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/MemoryRetriever.ts",
+        "src/agent/memory/PersistentMemory.ts",
+        "src/agent/memory/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/MemoryFlushContract.ts",
+      "role": "工作记忆蒸馏与维度刷新类型契约及高重要性筛选。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "公开跨层类型，不能因局部调用少直接删；Finding投影丢evidenceRefs应与SessionStore完整恢复一起明确。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/ActiveContext.ts",
+        "src/agent/memory/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/MemoryRetriever.ts",
+      "role": "词汇/向量混合检索、时间/重要性评分、prompt 生成及旧 append 兼容。",
+      "reviewed": true,
+      "findings": [
+        "PC-20"
+      ],
+      "cleanup": "stalenessPrefix 的 updatedAt || lastAccessedAt || updatedAt 尾项冗余；按实际文本预算装配可替代固定每条30token估算。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/PersistentMemory.ts",
+        "src/agent/memory/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/MemoryStore.ts",
+      "role": "Core semantic_memories schema 的同步 SQLite 适配、CRUD 和维护。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "Core提供schema，Agent raw-SQL适配仍有真实宿主消费；不搬迁/删除仓储边界。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/MemoryRetriever.ts",
+        "src/agent/memory/PersistentMemory.ts",
+        "src/agent/memory/index.ts",
+        "src/agent/memory/MemoryConsolidator.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/PersistentMemory.ts",
+      "role": "MemoryStore/Retriever/Consolidator 公共门面及宿主 embedding 注入。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "真实宿主RuntimeInitializer/CompletionSteps消费；门面不冗余。保留 public load/append和migrateFromLegacy兼容直到消费扫描与迁移完成。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/MemoryRetriever.ts",
+        "src/agent/memory/MemoryStore.ts",
+        "src/agent/memory/index.ts",
+        "src/agent/memory/MemoryConsolidator.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/SessionStore.ts",
+      "role": "跨维度报告与证据索引、公开只读工具缓存、序列化及 checkpoint。",
+      "reviewed": true,
+      "findings": [
+        "PC-11",
+        "PC-12",
+        "PC-13"
+      ],
+      "cleanup": "cache写法可合并为按规范请求key的共享cache，保留公开 get/set适配；fromJSON与loadCheckpoint统一恢复过程。当前宣称LRU但命中不刷新顺序，需明确FIFO或实现LRU。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/SessionStoreSchema.ts",
+        "src/agent/memory/MemoryCoordinator.ts",
+        "src/agent/memory/MemoryFlushContract.ts",
+        "src/agent/memory/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/SessionStoreSchema.ts",
+      "role": "会话快照顶层形状验证及兼容缺省值。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": [
+        "src/agent/memory/SessionStore.ts",
+        "src/agent/memory/index.ts"
+      ]
+    },
+    {
+      "path": "src/agent/memory/index.ts",
+      "role": "公共 barrel 导出；保留 package export/内部模块访问边界。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/memory-context.test.ts"
+      ],
+      "consumers": []
+    },
+    {
+      "path": "src/agent/utils/Redaction.ts",
+      "role": "开发者可见输入、输出与证据内容中的凭证脱敏。",
+      "reviewed": true,
+      "findings": [
+        "PC-02"
+      ],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/Redaction.test.ts"
+      ],
+      "consumers": [
+        "src/agent/evidence/ProductionEvidenceLedgerAuthority.ts",
+        "src/agent/runtime/AgentRuntime.ts"
+      ]
+    },
+    {
+      "path": "src/ai/AiFactory.ts",
+      "role": "Provider 创建、环境探测、备用 provider 与 embedding provider 选择。",
+      "reviewed": true,
+      "findings": [
+        "PC-15"
+      ],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/AiFactory.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts"
+      ]
+    },
+    {
+      "path": "src/ai/AiProvider.ts",
+      "role": "统一 AI 公共契约、provider 配置、网关委派、摘要和 embedding。",
+      "reviewed": true,
+      "findings": [
+        "PC-05",
+        "PC-06"
+      ],
+      "cleanup": "可去掉无作用的 _gatewayEmbed 三元 []:[] 和 _log 空 else；不要删除公开 provider 基类或其宿主兼容方法。",
+      "tests": [
+        "test/OpenAiProvider.test.ts",
+        "test/transport-proxy.test.ts",
+        "test/embedding-capacity-hint.test.ts"
+      ],
+      "consumers": [
+        "src/ai/deepseekToolCallCompat.ts",
+        "src/ai/index.ts",
+        "src/ai/AiFactory.ts",
+        "src/ai/transport/LLMTransport.ts",
+        "src/ai/transport/GoogleTransport.ts",
+        "src/ai/transport/ClaudeTransport.ts",
+        "src/ai/transport/OpenAiTransport.ts",
+        "src/ai/transport/DeepSeekTransport.ts",
+        "src/ai/providers/OpenAiProvider.ts",
+        "src/ai/providers/ClaudeProvider.ts",
+        "src/ai/providers/OllamaProvider.ts",
+        "src/ai/providers/DeepSeekProvider.ts",
+        "src/ai/providers/GoogleGeminiProvider.ts",
+        "src/ai/shared/usage.ts",
+        "src/ai/gateway/LLMGateway.ts",
+        "src/agent/runtime/LLMInputAssembly.ts",
+        "src/agent/runtime/AgentRuntimeTypes.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/forcedSummary.ts",
+        "src/agent/runtime/LLMInputMeasurement.ts",
+        "src/agent/evaluation/DurableSemanticReviewRuntime.ts",
+        "src/agent/service/SystemRunContextFactory.ts"
+      ]
+    },
+    {
+      "path": "src/ai/AiProviderManager.ts",
+      "role": "宿主 provider 热切换、token recorder、embedding fallback 和 DI 回调。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "真实宿主 AiModule/ServiceContainer 使用此类，禁止因本仓没有 new 就删除；可更新注释说明宿主拥有DI。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts"
+      ]
+    },
+    {
+      "path": "src/ai/deepseekToolCallCompat.ts",
+      "role": "受工具名称白名单约束的 DeepSeek 文本 function_calls 兼容解析。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/transport/DeepSeekTransport.ts"
+      ]
+    },
+    {
+      "path": "src/ai/gateway/LLMGateway.ts",
+      "role": "模型/参数解析、provider 可靠性控制、transport 生命周期和响应归一化。",
+      "reviewed": true,
+      "findings": [
+        "PC-16",
+        "PC-22"
+      ],
+      "cleanup": "chat 与 chatWithTools 的请求装配/可靠性/计量重复可在修复 PC-16 时合并内部路径，保持公开返回类型。",
+      "tests": [
+        "test/LLMGateway.test.ts"
+      ],
+      "consumers": [
+        "src/ai/AiProvider.ts",
+        "src/ai/gateway/index.ts"
+      ]
+    },
+    {
+      "path": "src/ai/gateway/index.ts",
+      "role": "公共 barrel 导出；保留 package export/内部模块访问边界。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": []
+    },
+    {
+      "path": "src/ai/guard/ParameterGuard.ts",
+      "role": "基于模型声明过滤、限幅或降级生成参数。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ]
+    },
+    {
+      "path": "src/ai/index.ts",
+      "role": "公共 barrel 导出；保留 package export/内部模块访问边界。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": []
+    },
+    {
+      "path": "src/ai/providers/ClaudeProvider.ts",
+      "role": "Claude 默认配置及网关委派；当前 embedding 空结果。",
+      "reviewed": true,
+      "findings": [
+        "PC-14"
+      ],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/AiFactory.test.ts",
+        "test/embedding-capacity-hint.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts",
+        "src/ai/AiFactory.ts"
+      ]
+    },
+    {
+      "path": "src/ai/providers/DeepSeekProvider.ts",
+      "role": "DeepSeek 默认模型/推理强度及网关委派。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/DeepSeekProvider.test.ts",
+        "test/embedding-capacity-hint.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts",
+        "src/ai/AiFactory.ts"
+      ]
+    },
+    {
+      "path": "src/ai/providers/GoogleGeminiProvider.ts",
+      "role": "Gemini 默认并发、模型、embedding 配置及网关委派。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/embedding-capacity-hint.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts",
+        "src/ai/AiFactory.ts"
+      ]
+    },
+    {
+      "path": "src/ai/providers/OllamaProvider.ts",
+      "role": "Ollama base URL 归一化、本地默认模型和 OpenAI 兼容网关接入。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/embedding-capacity-hint.test.ts",
+        "test/OllamaBaseUrlNormalize.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts",
+        "src/ai/AiFactory.ts"
+      ]
+    },
+    {
+      "path": "src/ai/providers/OpenAiProvider.ts",
+      "role": "OpenAI base URL、Chat/Responses 风格和 embedding 配置。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/OpenAiProvider.test.ts",
+        "test/embedding-capacity-hint.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts",
+        "src/ai/AiFactory.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/ModelDefs.ts",
+      "role": "厂商/模型能力、推理特性、参数规则和配置类型。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts",
+        "src/ai/transport/LLMTransport.ts",
+        "src/ai/registry/ModelRegistry.ts",
+        "src/ai/registry/ProviderConfig.ts",
+        "src/ai/guard/ParameterGuard.ts",
+        "src/ai/gateway/LLMGateway.ts",
+        "src/ai/registry/models/ollama.ts",
+        "src/ai/registry/models/deepseek.ts",
+        "src/ai/registry/models/openai.ts",
+        "src/ai/registry/models/google.ts",
+        "src/ai/registry/models/claude.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/ModelQuirks.ts",
+      "role": "模型特殊行为的共享查询及文本工具调用来源标识。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/model-quirks.test.ts"
+      ],
+      "consumers": [
+        "src/agent/runtime/PcvNodeEvidenceRecorder.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/ProviderToolChoicePolicy.ts",
+        "src/agent/runtime/AnalyzeGroundingGuard.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/ModelRegistry.ts",
+      "role": "内置模型索引、动态模型降级定义和公共注册入口。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts",
+        "src/ai/registry/ModelQuirks.ts",
+        "src/ai/gateway/LLMGateway.ts",
+        "src/agent/context/ContextWindow.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/ProviderConfig.ts",
+      "role": "对外展示的 provider 默认模型、环境变量与 endpoint 元数据。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "与 Factory/Gateway/providers 重复的默认元数据可考虑集中；保留宿主 HTTP 模型列表消费及所有别名。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/index.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/models/claude.ts",
+      "role": "Claude 模型能力与参数限制声明。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/AiFactory.test.ts",
+        "test/ClaudeTransport.test.ts",
+        "test/model-quirks.test.ts"
+      ],
+      "consumers": [
+        "src/ai/registry/ModelRegistry.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/models/deepseek.ts",
+      "role": "DeepSeek 模型能力与 V4 tool_choice 限制声明。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/AiFactory.test.ts",
+        "test/DeepSeekProvider.test.ts",
+        "test/DeepSeekTransport.test.ts",
+        "test/model-quirks.test.ts"
+      ],
+      "consumers": [
+        "src/ai/registry/ModelRegistry.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/models/google.ts",
+      "role": "Gemini 模型能力和上下文声明。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/AiFactory.test.ts",
+        "test/transport-proxy.test.ts",
+        "test/embedding-capacity-hint.test.ts",
+        "test/Redaction.test.ts"
+      ],
+      "consumers": [
+        "src/ai/registry/ModelRegistry.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/models/ollama.ts",
+      "role": "本地 Ollama 模型默认能力声明。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/OllamaBaseUrlNormalize.test.ts",
+        "test/LLMGateway.test.ts"
+      ],
+      "consumers": [
+        "src/ai/registry/ModelRegistry.ts"
+      ]
+    },
+    {
+      "path": "src/ai/registry/models/openai.ts",
+      "role": "OpenAI 模型能力和推理参数声明。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/AiFactory.test.ts",
+        "test/transport-proxy.test.ts",
+        "test/embedding-capacity-hint.test.ts",
+        "test/OllamaBaseUrlNormalize.test.ts",
+        "test/LLMGateway.test.ts"
+      ],
+      "consumers": [
+        "src/ai/registry/ModelRegistry.ts"
+      ]
+    },
+    {
+      "path": "src/ai/shared/errorClassify.ts",
+      "role": "LLM 中止、网络、可重试与熔断错误分类。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/shared/index.ts",
+        "src/ai/shared/reliability.ts"
+      ]
+    },
+    {
+      "path": "src/ai/shared/index.ts",
+      "role": "公共 barrel 导出；保留 package export/内部模块访问边界。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": []
+    },
+    {
+      "path": "src/ai/shared/reliability.ts",
+      "role": "Provider 独立并发、限流窗口、可取消重试和熔断状态。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/reliability.test.ts"
+      ],
+      "consumers": [
+        "src/ai/shared/index.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ]
+    },
+    {
+      "path": "src/ai/shared/structuredOutput.ts",
+      "role": "JSON 提取、围栏容错和截断数组回收。",
+      "reviewed": true,
+      "findings": [
+        "PC-04"
+      ],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/AiProvider.ts",
+        "src/ai/shared/index.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ]
+    },
+    {
+      "path": "src/ai/shared/usage.ts",
+      "role": "不同厂商 token 字段归一化。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "各 transport 当前重复手写 usage 映射；可复用此归一化器，但要保留 DeepSeek 嵌套reasoning/cache字段，不能直接替换丢字段。",
+      "tests": [
+        "test/OpenAiProvider.test.ts",
+        "test/DeepSeekProvider.test.ts",
+        "test/GoogleTransport.test.ts",
+        "test/ClaudeTransport.test.ts",
+        "test/OpenAiTransportResponses.test.ts",
+        "test/DeepSeekTransport.test.ts",
+        "test/shared-ai-utils.test.ts",
+        "test/LLMGateway.test.ts",
+        "test/ContextWindow.test.ts"
+      ],
+      "consumers": [
+        "src/ai/transport/OpenAiTransport.ts",
+        "src/ai/shared/index.ts"
+      ]
+    },
+    {
+      "path": "src/ai/toolTranscript.ts",
+      "role": "不完整 Chat Completions 工具轮次安全转换为文本。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": [
+        "src/ai/transport/DeepSeekTransport.ts"
+      ]
+    },
+    {
+      "path": "src/ai/transport/ClaudeTransport.ts",
+      "role": "Anthropic HTTP 协议、连续 tool_result 合并及统一响应。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/ClaudeTransport.test.ts"
+      ],
+      "consumers": [
+        "src/ai/transport/index.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ]
+    },
+    {
+      "path": "src/ai/transport/DeepSeekTransport.ts",
+      "role": "DeepSeek HTTP 协议、V4 thinking transcript 和文本调用兼容。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/DeepSeekTransport.test.ts"
+      ],
+      "consumers": [
+        "src/ai/transport/index.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ]
+    },
+    {
+      "path": "src/ai/transport/GoogleTransport.ts",
+      "role": "Gemini generateContent/embedding 协议、schema 清理和 thoughtSignature。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/GoogleTransport.test.ts"
+      ],
+      "consumers": [
+        "src/ai/transport/index.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ]
+    },
+    {
+      "path": "src/ai/transport/LLMTransport.ts",
+      "role": "共享 HTTP、代理 dispatcher、取消/超时、错误和 API key 检查。",
+      "reviewed": true,
+      "findings": [
+        "PC-07",
+        "PC-08"
+      ],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/transport-proxy.test.ts"
+      ],
+      "consumers": [
+        "src/ai/transport/GoogleTransport.ts",
+        "src/ai/transport/ClaudeTransport.ts",
+        "src/ai/transport/OpenAiTransport.ts",
+        "src/ai/transport/index.ts",
+        "src/ai/transport/DeepSeekTransport.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ]
+    },
+    {
+      "path": "src/ai/transport/OpenAiTransport.ts",
+      "role": "OpenAI Chat/Responses/embedding 协议转换和工具结果回传。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/OpenAiTransportResponses.test.ts",
+        "test/transport-proxy.test.ts"
+      ],
+      "consumers": [
+        "src/ai/transport/index.ts",
+        "src/ai/gateway/LLMGateway.ts"
+      ]
+    },
+    {
+      "path": "src/ai/transport/index.ts",
+      "role": "公共 barrel 导出；保留 package export/内部模块访问边界。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "未发现可安全删除的实现；保留已声明能力与公开接口。",
+      "tests": [
+        "test/LLMGateway.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "consumers": []
+    },
+    {
+      "path": "test/AiFactory.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/OpenAiProvider.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/DeepSeekProvider.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/GoogleTransport.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/ClaudeTransport.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/OpenAiTransportResponses.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/DeepSeekTransport.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/shared-ai-utils.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/reliability.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/transport-proxy.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/embedding-capacity-hint.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/OllamaBaseUrlNormalize.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/LLMGateway.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/model-quirks.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/ContextWindow.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/l4-memory-package.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/ActiveContext.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/memory-context.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/memory-note-finding.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/ExplorationStrategies.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    },
+    {
+      "path": "test/Redaction.test.ts",
+      "role": "直接相关单元/协议/存储行为回归；已阅读测试输入、断言和fixture。",
+      "reviewed": true,
+      "findings": [],
+      "cleanup": "只建议合并重复setup/参数化同契约案例；保留失败、取消、证据完整性和真实持久化断言。",
+      "tests": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "PC-01",
+      "severity": "P1",
+      "path": "src/agent/context/ConversationStore.ts",
+      "line": 401,
+      "issue": "conversationId 未校验，默认无 WriteZone 时可逃逸 conversations 目录读写/删除其他 JSONL；真实 HTTP chat 的 conversationId 仅校验为 string。",
+      "repro": "对 /project 下的 store 调用 load/append/delete(\"../../victim\")，内存 fs 捕获目标 /project/victim.jsonl。宿主证据 Alembic/lib/http/routes/ai.ts:495,507-509；lib/shared/schemas/http-requests.ts:345-350。",
+      "suggestion": "集中校验会话标识符并校验 resolved path containment；全部 WriteZone 与普通 fs 分支均先校验；恶意 id 不应触及文件。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-02",
+      "severity": "P1",
+      "path": "src/agent/utils/Redaction.ts",
+      "line": 14,
+      "issue": "通用凭证正则不支持带引号 JSON key，证据持久化和开发者事件会留下普通格式的密码/token。",
+      "repro": "redactDeveloperText(JSON.stringify({password:\"example_fake_value\"})) 原样输出。实际消费在 ProductionEvidenceLedgerAuthority.ts:85、AgentRuntime.ts 的开发者输入输出。",
+      "suggestion": "支持 JSON 键两侧引号及普通赋值；现有各厂商专用替换保留；表驱动覆盖引号键、转义值和普通文本。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-03",
+      "severity": "P1",
+      "path": "src/agent/context/ContextWindow.ts",
+      "line": 637,
+      "issue": "L2 去重只删 assistant.toolCalls 中的重复 knowledge call，没有删对应 tool result，破坏原子轮次。",
+      "repro": "三轮 transcript：第一轮 submit T；第二轮 submit T+code；第三轮 code。强制 L2 后 call k2 被删，toolCallId k2 的结果仍在。",
+      "suggestion": "避免按标题丢弃调用；如确需去重必须成对处理 call+result 且保持 Gemini/Claude/OpenAI 轮次约束。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-04",
+      "severity": "P1",
+      "path": "src/ai/shared/structuredOutput.ts",
+      "line": 40,
+      "issue": "JSON 修复在解析前全局删除围栏/尾逗号，静默修改合法字符串内容；截断回收也有同类问题。",
+      "repro": "extractJSON(\"{\\\"text\\\":\\\"literal,}\\\"}\") 实际返回 text=literal}。含三反引号的合法 JSON 字符串也被重写。",
+      "suggestion": "先尝试原样 JSON.parse；仅处理外围围栏，并在字符串外做尾逗号修复；截断回收复用同一字符串感知算法。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-05",
+      "severity": "P2",
+      "path": "src/ai/AiProvider.ts",
+      "line": 424,
+      "issue": "首次并发 _getGateway 调用会各建一个 gateway，拆开 concurrency/rate-limit/circuit state。",
+      "repro": "Promise.all([p._getGateway(),p._getGateway()]) 的两个实例引用不同；同一个 provider 的冷启动并发请求绕过其共用闸门。",
+      "suggestion": "缓存初始化 Promise 或在 await import 后二次检查实例；失败清理 pending 状态并允许下次初始化。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-06",
+      "severity": "P2",
+      "path": "src/ai/AiProvider.ts",
+      "line": 226,
+      "issue": "maxRetries:0 被 || 默认值改成3，宿主不能关闭 OpenAI/DeepSeek/Gemini 的重试。",
+      "repro": "new AiProvider({maxRetries:0}).maxRetries===3；Claude 子类硬写0才例外。",
+      "suggestion": "采用 ?? 默认值，验证非负整数；保留 Claude 现有默认但尊重显式配置。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-07",
+      "severity": "P2",
+      "path": "src/ai/transport/LLMTransport.ts",
+      "line": 234,
+      "issue": "内部请求超时与主动取消都被归成 AbortError，timeout 不会走现有 ETIMEDOUT 的重试/熔断路径。",
+      "repro": "mock fetch 在 signal abort 时 reject(signal.reason)，transport timeout=10 返回 AbortError(code20)，reliability 按 isAbort 立即退出。",
+      "suggestion": "区分内部 timeout 和外部 abort；内部超时抛可分类 timeout code，外部取消不可重试；测试串联 transport 与 ReliabilityController。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-08",
+      "severity": "P2",
+      "path": "src/ai/transport/LLMTransport.ts",
+      "line": 236,
+      "issue": "post 只监听未来 abort，没有检查已取消 signal；直接 transport 调用仍会发请求。",
+      "repro": "signal.abort() 先于 t.post；mock fetch 被调用1次且其 signal.aborted=false。",
+      "suggestion": "进请求前检查 signal.aborted，合并信号时保留外部原因；应在 fetch 前拒绝。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-09",
+      "severity": "P2",
+      "path": "src/agent/context/ContextWindow.ts",
+      "line": 850,
+      "issue": "resetToPromptOnly/resetForNewStage 未清 collapseThreshold，旧投影下标会重新作用于新消息。",
+      "repro": "旧阶段3轮触发 L3，resetForNewStage 后加入新 prompt+3轮，raw=7/projected=6 且 new0 被隐藏，未再触发任何压缩。",
+      "suggestion": "所有清空/重排原始消息的入口同步维护或重置投影下标；阶段重置保留有意跨阶段的 submitted 标题即可。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-10",
+      "severity": "P1",
+      "path": "src/agent/context/ConversationStore.ts",
+      "line": 265,
+      "issue": "summarize await AI 后使用旧快照重写文件，会永久丢掉等待期间 append 的新消息。",
+      "repro": "内存 fs：6条消息开始 summarize，挂起 chat，append NEW_DURING_SUMMARY，resolve chat；重写后的文件不再包含该消息。",
+      "suggestion": "提交前验证快照版本并保留期间追加的完整尾部，或发现变化则放弃旧摘要；索引 messageCount 同步真实写入。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-11",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "line": 597,
+      "issue": "公开工具缓存 key 未包含查询作用域/参数；read 仅识别 filePath 且不区分行区间。当前 V2 code handler 自有缓存已包含更多参数，此问题属于 SessionStore 组件接口。",
+      "repro": "cacheToolResult code.search pattern=needle glob=src/a/** 后查询同 pattern glob=src/b/** 返回 result A。",
+      "suggestion": "共享稳定请求 key，涵盖 action+全部有效读取参数；兼容 path/filePath 并避免不同读取区间交叉命中。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-12",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "line": 778,
+      "issue": "JSON/checkpoint 往返丢失 evidenceStore，恢复后已有维度报告无法经 searchEvidence 找到。",
+      "repro": "storeDimensionReport 含 evidence 后 searchEvidence=1；SessionStore.fromJSON(store.toJSON()) 后为0；checkpoint 仅保存 evidenceIndex 键，load 未恢复。",
+      "suggestion": "在公共序列化中保留证据内容，或从已验证 reports 重建索引；同样处理独立 addEvidence 写入与兼容旧快照。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-13",
+      "severity": "P2",
+      "path": "src/agent/memory/SessionStore.ts",
+      "line": 737,
+      "issue": "loadCheckpoint 没有调用现有形状校验，且解析中直接逐字段改状态；坏快照可返回成功或留下部分状态。",
+      "repro": "version=2,savedAt=Date.now(),dimensionReports:{x:null} 可装入 null；之后 getStats 读取 r.findings 抛错。fromJSON 当前也只验证顶层容器，未验证 report。",
+      "suggestion": "统一深度校验 required report/array 字段，构建临时完整状态后原子应用；无效快照返回false且保留旧状态。",
+      "reproducedWithInMemoryStub": false
+    },
+    {
+      "id": "PC-14",
+      "severity": "P2",
+      "path": "src/ai/providers/ClaudeProvider.ts",
+      "line": 59,
+      "issue": "Claude embed 返回空数组，但继承 supportsEmbedding()=true；宿主认为支持 embedding，跳过真实 fallback。",
+      "repro": "new ClaudeProvider(...).supportsEmbedding()===true 且 embed 返回[]。Alembic/lib/injection/modules/AiModule.ts:121-125 正以此返回值短路 fallback。",
+      "suggestion": "Claude override supportsEmbedding 返回false；新增能力声明与行为一致性测试，避免把容量提示当能力宣告。",
+      "reproducedWithInMemoryStub": false
+    },
+    {
+      "id": "PC-15",
+      "severity": "P2",
+      "path": "src/ai/AiFactory.ts",
+      "line": 152,
+      "issue": "fallback 排除对象取环境原值而非实际探测到 provider；auto/别名/缺钥回退时可能重新选择同一个失败厂商。",
+      "repro": "ALEMBIC_AI_PROVIDER=auto，同时 Google/OpenAI 配置：primary 是google；google probe 抛 geo 错误，排除auto后第一 fallback 又是google。",
+      "suggestion": "用 primary.name 作为标准 identity；规范化 getAvailableFallbacks 输入；probe/fallback 行为保持现有授权范围。",
+      "reproducedWithInMemoryStub": false
+    },
+    {
+      "id": "PC-16",
+      "severity": "P2",
+      "path": "src/ai/gateway/LLMGateway.ts",
+      "line": 179,
+      "issue": "chat/chatStructured 的 transport.chat 返回 string，完全绕开 #emitUsage；Provider structured output 调用也没有 token recorder 事件。",
+      "repro": "mock 响应含 usage；gateway.chatStructured 返回对象而 onUsage 从未调用。唯一 #emitUsage 调用在 chatWithTools:161。",
+      "suggestion": "在保留公共 string 返回类型下统一内部响应/usage 路径，确保 structured 请求与无工具 chat 都上报一次且不丢 JSON/schema 选项。",
+      "reproducedWithInMemoryStub": false
+    },
+    {
+      "id": "PC-17",
+      "severity": "P2",
+      "path": "src/agent/memory/ActiveContext.ts",
+      "line": 593,
+      "issue": "scratchpad 整体超预算就整段舍弃，低重要长发现可让最高重要短发现也消失，反而给低优先观察日志留预算。",
+      "repro": "添加 importance10 的短发现及 importance1 的800字符发现；buildContext(100) 返回空串。",
+      "suggestion": "按重要性逐条预算装配，保留能放入的高优先发现；必要时对单条有界摘要，原始 scratchpad 不变。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-18",
+      "severity": "P2",
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "line": 231,
+      "issue": "configure 只改 totalBudget 不重算 allocation；静态 PM/SS 注入也未传实际预算，名义预算与真实输入脱节。",
+      "repro": "默认 coordinator.configure({totalContextBudget:8000}) 后 total=1000，但 allocation 仍为1800+1400+600+200=4000。",
+      "suggestion": "保存当前 budget profile 并在 configure 后重分配/清 surplus；把预算与 taskContext 透传对应 PM/SS prompt builder。",
+      "reproducedWithInMemoryStub": true
+    },
+    {
+      "id": "PC-19",
+      "severity": "P2",
+      "path": "src/agent/context/ExplorationTracker.ts",
+      "line": 347,
+      "issue": "所有非 rejected 的 knowledge 动作都会计为提交，detail/search 及部分失败形状可使状态机过早收敛。",
+      "repro": "tracker.recordToolCall(\"knowledge\",{action:\"detail\"},{}) 后 totalSubmits=1。当前 Producer pipeline 屏蔽detail，但 Generate/其它公开使用不能依赖该外层保证。",
+      "suggestion": "仅计明确成功 submit/submit_batch，兼容真实返回契约并使用批次accepted数量；失败、duplicate与读取操作不计数。",
+      "reproducedWithInMemoryStub": false
+    },
+    {
+      "id": "PC-20",
+      "severity": "P2",
+      "path": "src/agent/memory/MemoryRetriever.ts",
+      "line": 283,
+      "issue": "PersistentMemory.append 忽略调用者 importance；MemoryCoordinator 写入 decision 明确传7，最终 SQLite 永远5。",
+      "repro": "MemoryCoordinator.extractFromConversation 匹配决定语句传importance7，但 AppendEntry 没有importance字段且 MemoryRetriever.append 硬编码5。",
+      "suggestion": "在兼容 AppendEntry 中加入可选 importance 并传递到 MemoryStore；未传时维持5。",
+      "reproducedWithInMemoryStub": false
+    },
+    {
+      "id": "PC-21",
+      "severity": "P2",
+      "path": "src/agent/memory/MemoryConsolidator.ts",
+      "line": 95,
+      "issue": "冲突替换发生在 transaction 外，后续普通候选写入失败时，冲突更新已永久生效而整个 consolidate 抛错。",
+      "repro": "已存一个与新候选相矛盾的fact；同批第二个候选触发db写失败，普通事务回滚但第一个冲突替换不回滚。",
+      "suggestion": "把冲突解析的读写和后续合并纳入同一事务；失败不报告部分成功，容量维护边界明确。",
+      "reproducedWithInMemoryStub": false
+    },
+    {
+      "id": "PC-22",
+      "severity": "P2",
+      "path": "src/ai/gateway/LLMGateway.ts",
+      "line": 415,
+      "issue": "显式 apiKey 存在时提前 return config，使 GatewayConfig.timeout 全局覆盖配置失效。",
+      "repro": "new LLMGateway({timeout:10,providers:{openai:{apiKey:\"fixture\"}}}) 创建 transport 时使用120000默认；无显式key分支却应用global timeout。",
+      "suggestion": "统一合并配置后返回，并明确定义 global timeout 与 provider timeout 优先级；测试显式key和env key两条分支。",
+      "reproducedWithInMemoryStub": false
+    }
+  ],
+  "testSimplifications": [
+    {
+      "paths": [
+        "test/ExplorationStrategies.test.ts"
+      ],
+      "lines": [
+        217,
+        243,
+        269,
+        295,
+        328,
+        356
+      ],
+      "suggestion": "6个Producer完成措辞测试重复创建tracker/记录accepted提交/tick/endRound/三项断言，可改it.each({label,text,targetSubmits,acceptedCount})。保持所有原措辞数据；保留提前完成拒绝测试与pipeline阻断测试。",
+      "reason": "删除重复脚手架而不减少场景。"
+    },
+    {
+      "paths": [
+        "test/DeepSeekProvider.test.ts",
+        "test/DeepSeekTransport.test.ts"
+      ],
+      "lines": [
+        28,
+        44,
+        76,
+        135
+      ],
+      "suggestion": "Provider层两条测试可合并为一条真实 Provider→Gateway→Transport综合回归，同时验证required过滤、thinking、compat functionCalls和usage；Transport层保留详细协议/坏消息分支。",
+      "reason": "同一fixture和断言重复，但必须保留一条全链路接线验证。"
+    },
+    {
+      "paths": [
+        "test/OpenAiProvider.test.ts",
+        "test/OpenAiTransportResponses.test.ts"
+      ],
+      "lines": [
+        63,
+        84,
+        106,
+        146,
+        181
+      ],
+      "suggestion": "Provider层保留配置/endpoint透传和一次完整multi-turn function_call roundtrip；response输出聚合及JSON wire格式详细断言归Transport层，避免两个层重复全套协议。",
+      "reason": "公共委派与协议单元职责清晰；不能只留下直接Transport测试。"
+    },
+    {
+      "paths": [
+        "test/memory-context.test.ts"
+      ],
+      "lines": [
+        353,
+        364,
+        375,
+        386
+      ],
+      "suggestion": "staleness四种时间情况用表驱动，复用SQLite fixture/close；最后一个lastAccessedAt fallback仍需真实deserialize覆盖。",
+      "reason": "共享可读的输入矩阵，保留所有边界。"
+    },
+    {
+      "paths": [
+        "test/embedding-capacity-hint.test.ts"
+      ],
+      "lines": [
+        31,
+        51,
+        59,
+        68,
+        82
+      ],
+      "suggestion": "各厂商默认值与env优先级改it.each(providerFactory,env,config,expected)，保留冻结/源标识与真实provider实例。",
+      "reason": "多份重复构造可压缩。"
+    },
+    {
+      "paths": [
+        "test/Redaction.test.ts",
+        "test/shared-ai-utils.test.ts"
+      ],
+      "suggestion": "纯输入→输出案例使用it.each；凭证覆盖增加JSON quoted keys，structured JSON增加字符串内逗号/围栏，但保留至少一个无变化case。",
+      "reason": "与本次bug直接相关；非实现镜像。"
+    },
+    {
+      "paths": [
+        "test/ContextWindow.test.ts"
+      ],
+      "lines": [
+        265,
+        273,
+        281,
+        294
+      ],
+      "suggestion": "L1同fixture的首尾/marker/原子性断言可合并为一个行为测试，保留独立幂等多次压缩案例；新增L2 pairing/reset回归无需复制大段上下文搭建。",
+      "reason": "减少四次相同准备而维持有意义边界。"
+    }
+  ],
+  "externalConsumers": [
+    {
+      "path": "../Alembic/lib/http/routes/ai.ts",
+      "lines": [
+        494,
+        506,
+        508,
+        509
+      ],
+      "uses": [
+        "ConversationStore"
+      ]
+    },
+    {
+      "path": "../Alembic/lib/shared/schemas/http-requests.ts",
+      "lines": [
+        345,
+        350
+      ],
+      "uses": [
+        "conversationId:string"
+      ]
+    },
+    {
+      "path": "../Alembic/lib/injection/modules/AiModule.ts",
+      "lines": [
+        121,
+        194,
+        199,
+        208,
+        226
+      ],
+      "uses": [
+        "AiProviderManager",
+        "supportsEmbedding",
+        "AiFactory"
+      ]
+    },
+    {
+      "path": "../Alembic/lib/recipe-pipeline/generate/execution/RuntimeInitializer.ts",
+      "lines": [
+        98,
+        134,
+        151,
+        187
+      ],
+      "uses": [
+        "MemoryCoordinator",
+        "SessionStore",
+        "PersistentMemory",
+        "MemoryEmbeddingStore"
+      ]
+    },
+    {
+      "path": "../Alembic/lib/recipe-pipeline/generate/completion/CompletionSteps.ts",
+      "lines": [
+        100,
+        106,
+        131,
+        142
+      ],
+      "uses": [
+        "PersistentMemory",
+        "EpisodicConsolidator"
+      ]
+    }
+  ],
+  "limitations": [
+    "未验证外部厂商当前模型参数规格，仅对本地实现与契约作事实审查。",
+    "未删除公开接口；公开兼容门面与宿主调用已核实。",
+    "与root并行工作，报告不是修复后最终测试结果。"
+  ]
+}

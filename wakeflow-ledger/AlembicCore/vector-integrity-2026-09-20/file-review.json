@@ -1,0 +1,158 @@
+{
+  "baseline": "9e8d033ac4dbab4e3555d243fc711269b48eeab9",
+  "records": [
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/Chunker.ts",
+      "depth": "full",
+      "status": "changed",
+      "decision": "策略和metadata；已知分块策略共用前置预算规则，fixed投影由内部跨度提供。",
+      "sha256": "d5e3e255d4febb7a55ef6e0441ba1ef3d372a537642f3b9d77c3e2768d645765"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/ASTChunker.ts",
+      "depth": "full",
+      "status": "changed",
+      "decision": "AST节点/源跨度/行号与树释放；叶子及preamble统一有界物化。",
+      "sha256": "035e1be822f2b227724d4c0f95a0bf335872922e17538110196af8ff6258158e"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/TextChunkRanges.ts",
+      "depth": "full",
+      "status": "new internal",
+      "decision": "统一估算预算、码点边界、重叠和终止，不新增包出口。",
+      "sha256": "868bcb32e6cc99a14f3e46cc33785a69fda30b6146b9d49ed35a6aaa56148f57"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/shared/tokenUtils.ts",
+      "depth": "full",
+      "status": "retained",
+      "decision": "保持现有估算器，修复调用方四字符假设而不改变全仓token定义。",
+      "sha256": "012bc3addf5906af841192dc3311a7e4b4041cb490f177851014fe69baf5cf15"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/BinaryPersistence.ts",
+      "depth": "full",
+      "status": "changed",
+      "decision": "同一输入类型、解码/validity单源、结构范围、原子发布及mode。",
+      "sha256": "3b76545aa509f6dea54776e8d91e4c8210099f3660625ffe8cf86cf92ab510bb"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/VectorMigration.ts",
+      "depth": "full",
+      "status": "changed",
+      "decision": "读取解析容错与存储失败分离；成功批次后才归档。",
+      "sha256": "d8a700f98bd16de368d4ceaf4df995a848cf06323bf70a6cf37cccf50fb5e402"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/ScalarQuantizer.ts",
+      "depth": "full implementation review by quantization reviewer",
+      "status": "comments only",
+      "decision": "量化数学/训练不变，移除无基准的召回/总内存承诺。",
+      "sha256": "5adc1ccdfcb4a756605e318f446989e6a074326d04cbeb23083d7d8cd713440b"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/HnswIndex.ts",
+      "depth": "quantized search, node lifecycle, serialize/deserialize targeted",
+      "status": "retained",
+      "decision": "验证qvector重建/排序及graph层数来源，未改ANN算法。",
+      "sha256": "088164c13bb01f8a7786ae32a22dacc9f4ff66fc03d74941c04f86082ac8de03"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/HnswVectorAdapter.ts",
+      "depth": "initialization, quantization, migration, persistence paths + entire changed diff",
+      "status": "changed",
+      "decision": "统一snapshot恢复；遵守none；忽略历史零维模型；JSON归档不提前。",
+      "sha256": "fce8b3f3bc4d1441f1c29eafbc9d72e7a9c8a28297f060e43115505b008c8f1d"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/AsyncPersistence.ts",
+      "depth": "WAL restore/flush/destroy targeted",
+      "status": "retained",
+      "decision": "不改变WAL协议；更强测试明确旧快照之外的日志数据。",
+      "sha256": "efd664e5ad96cacb46ebf83f1f9aadc4e40b19d2c6d913d18d7377efb6fd0624"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/vector/IndexingPipeline.ts",
+      "depth": "chunk invocation/AST initialization/sourceHash incremental boundary targeted",
+      "status": "retained",
+      "decision": "真实使用新分块器；旧索引内容不变时需force/fullBuild应用新切块。",
+      "sha256": "736b14095ee86101f78d30bf7adbe488649dccad9889c54c6e27d6b2598a67b8"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/infrastructure/io/WriteZone.ts",
+      "depth": "write/rename/remove and permissions boundary targeted",
+      "status": "retained",
+      "decision": "原子保存继续借用受控IO，不新增WriteZone接口。",
+      "sha256": "745ff76926e260fc5be239685f024b65cbde2185f93a7e0d3a6dcb482b1557f2"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "src/core/AstAnalyzer.ts",
+      "depth": "parseToTree ownership targeted",
+      "status": "retained",
+      "decision": "树所有权及错误释放来源；通过真实grammar instrumentation验证。",
+      "sha256": "13a73fae081541a39dcae0379b43b4d7e21ae1d7ecba4a8f3d16f07bc18a2bfd"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "test/VectorPipeline.test.ts",
+      "depth": "all changed cases + prior integration reading",
+      "status": "changed",
+      "decision": "以真实overlap/Unicode预算/源跨度/行号替换弱断言。",
+      "sha256": "fdffe2da56618723096ee10617f1ae1f1e3a3a13591d27acf87593cdb89d4b11"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "test/VectorPersistence.test.ts",
+      "depth": "full baseline + changed cases",
+      "status": "changed",
+      "decision": "格式/IO故障矩阵、真实level300、WAL新于快照的数据恢复。",
+      "sha256": "258924b2ba2491094336a76eced72da188e4dc50ae221f15569b6d5c0fd68675"
+    },
+    {
+      "repository": "AlembicCore",
+      "file": "test/HnswVector.test.ts",
+      "depth": "quantization groups/init/persistence changed fixtures",
+      "status": "changed",
+      "decision": "真实训练/重开、单次读与EISDIR后JSON恢复；其他HNSW算法组保持。",
+      "sha256": "e0cf7401a8e3f980f41b2a01c0d891acd45e693841f617597fd8243add1c7699"
+    },
+    {
+      "repository": "AlembicPlugin",
+      "file": "lib/host-runtime/mcp/host/read-only-search-executor.ts",
+      "depth": "vector graph factory + complete changed diff",
+      "status": "changed",
+      "decision": "一次reader构造完成load/校验；保留缺失/损坏降级及strict分支。",
+      "sha256": "bf204305cbb4c7e0322c42aa274d87d2db25b1ef0c391fb6f2d126206084dff2"
+    },
+    {
+      "repository": "AlembicPlugin",
+      "file": "lib/host-runtime/mcp/host/read-only-hnsw-vector-reader.ts",
+      "depth": "constructor/query/config boundary targeted",
+      "status": "retained",
+      "decision": "读请求副本不接管WAL/写入；已有固定量化阈值记录为后续边界。",
+      "sha256": "eb441c77c36411e2ed7e331965913bbb1caf63b7b667493679bfcfe5c33896a6"
+    },
+    {
+      "repository": "AlembicPlugin",
+      "file": "test/unit/ReadOnlySearchFingerprint.test.ts",
+      "depth": "full",
+      "status": "changed",
+      "decision": "valid/corrupt/missing三态读取次数、无writer图及活跃文件指纹不变。",
+      "sha256": "218be4dede96911885c2dfdd2efec8cc906097df80dcbdcee01b53d08175fef4"
+    }
+  ],
+  "note": "仅报告实际全文/局部范围，其他宿主装配和配置追踪见consumer-boundaries.md；不声称完整仓库审计。"
+}

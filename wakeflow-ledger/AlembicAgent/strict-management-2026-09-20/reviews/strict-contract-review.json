@@ -1,0 +1,5102 @@
+{
+  "title": "StrictProductionPipeline 逐声明架构与Core边界审查",
+  "date": "2026-09-20",
+  "baseline": "56900c5",
+  "scope": {
+    "primary": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+    "baselineLines": 2123,
+    "namedDeclarations": 94,
+    "reviewed": "目标全文、相关src消费者、四组主要严格测试与既有semantic fixture；Core仅只读参考公开production与canonical实现。",
+    "noNeighborEdits": true,
+    "modeEvolution": "最初只读审查；root随后授权只修非法hypothesis disposition枚举及对应rework测试。其他产品行为修复/迁移由root或tool_flow负责。",
+    "editedByThisAgent": [
+      {
+        "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+        "scope": "resolveStrictHypothesisDispositions入口6行枚举检查"
+      },
+      {
+        "path": "AlembicAgent/test/strict-production-rework.test.ts",
+        "scope": "非法disposition真实RED与合法unknown兼容两例"
+      }
+    ],
+    "noCommitReason": "root统一提交行为修复，再基于新commit做纯职责迁移；本代理不提交。"
+  },
+  "recommendedPlans": [
+    {
+      "rank": 1,
+      "status": "recommended-current-round",
+      "name": "四业务族加gates/primitives，保留原facade",
+      "action": "先提交现有freeze、disposition及root/tool_flow负责的独立行为修复；再将94声明按本报告六模块迁出。StrictProductionPipeline.ts保留精确具名重导出，src/production.ts和包签名不扩大。",
+      "modules": {
+        "analysisLoop": {
+          "count": 28,
+          "role": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口",
+          "declarations": [
+            "StrictAnalysisContextProjectionV1",
+            "StrictAnalysisContextInputV1",
+            "REQUIRED_CONTEXT_TEXT_FIELDS",
+            "CONTEXT_ARRAY_FIELDS",
+            "createStrictAnalysisContextProjectionV1",
+            "StrictAnalysisLoopLimitsV1",
+            "StrictAnalysisEpochSnapshotInputV1",
+            "StrictAnalysisEpochSnapshotV1",
+            "createStrictAnalysisEpochSnapshotV1",
+            "StrictAnalysisGateOutcomeInputV1",
+            "StrictAnalysisGateOutcomeV1",
+            "createStrictAnalysisGateOutcomeV1",
+            "StrictAnalysisEpochTransitionV1",
+            "StrictAnalysisEpochSummaryV1",
+            "validateStrictAnalysisEpochTransitionV1",
+            "StrictAnalysisExpansionPortInputV1",
+            "StrictAnalysisExpansionPortV1",
+            "createStrictAnalysisExpansionPortV1",
+            "assertStrictAnalysisEpochSnapshotIntegrity",
+            "assertStrictAnalysisGateOutcomeIntegrity",
+            "assertStrictAnalysisLoopLimits",
+            "assertStrictAnalysisIdentityStable",
+            "validateStrictAnalysisRetryTransition",
+            "validateStrictAnalysisPassTransition",
+            "summarizeStrictAnalysisEpoch",
+            "assertAppendOnlyIds",
+            "getAddedIds",
+            "assertStrictContextIntegrity"
+          ]
+        },
+        "analyst": {
+          "count": 25,
+          "role": "Agent组织population/cluster/induction/falsification并委托Core权威构造，封闭语义epoch/fixpoint",
+          "declarations": [
+            "StrictInductionInputV1",
+            "StrictHypothesisDispositionV1",
+            "StrictFalsificationInputV1",
+            "StrictAnalystEpochInputV1",
+            "ProducerEligibleHypothesisV1",
+            "StrictAnalystEpochV1",
+            "validateStrictAnalystEpochV1",
+            "validateStrictPopulationAuthority",
+            "createStrictClusterSet",
+            "createStrictInductions",
+            "indexStrictHypotheses",
+            "createStrictFalsifications",
+            "resolveStrictHypothesisDispositions",
+            "CreateStrictAnalysisFixpointInputV1",
+            "createStrictAnalysisFixpointV1",
+            "assertStrictAnalystEpochIntegrity",
+            "rebuildStrictAnalystEpoch",
+            "rebuildClusterInputs",
+            "rebuildNonClusteredDispositions",
+            "rebuildInductionInputs",
+            "rebuildFalsificationInputs",
+            "findDispositionReview",
+            "rejectLegacySemanticAuthority",
+            "validateDispositionReviewConservation",
+            "assertAnalysisFixpointIntegrity"
+          ]
+        },
+        "lineage": {
+          "count": 10,
+          "role": "Agent将已验证epoch/fixpoint/冻结证据绑定到Producer根与因果修复链",
+          "declarations": [
+            "StrictProducerEvidenceProjectionV1",
+            "StrictProducerLineageReceiptV1",
+            "CreateStrictProducerLineageReceiptInputV1",
+            "createStrictProducerLineageReceiptV1",
+            "CausalRepairNodeV1",
+            "CreateCausalRepairNodeInputV1",
+            "createCausalRepairNodeV1",
+            "assertEvidenceProjectionIntegrity",
+            "assertStrictProducerLineageIntegrity",
+            "assertCausalRepairNodeIntegrity"
+          ]
+        },
+        "expressions": {
+          "count": 17,
+          "role": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配",
+          "declarations": [
+            "FullAuthoredProjectionV1",
+            "StrictProducerProposalInputV1",
+            "StrictProducerProposalV1",
+            "StrictProducerZeroDispositionV1",
+            "StrictProducerExpressionSetV1",
+            "CreateStrictProducerExpressionSetInputV1",
+            "createStrictProducerExpressionSetV1",
+            "rejectProducerCallerLineageFields",
+            "resolveStrictProducerPredecessor",
+            "validateProducerExpressionCardinality",
+            "normalizeStrictProducerProposals",
+            "createStrictProducerZeroDisposition",
+            "StrictExpressionTerminalResolutionV1",
+            "CreateStrictHypothesisExpressionSetReceiptInputV1",
+            "createStrictHypothesisExpressionSetReceiptV1",
+            "assertStrictProducerExpressionSetIntegrity",
+            "validateAuthoredProjection"
+          ]
+        },
+        "gates": {
+          "count": 4,
+          "role": "Agent运行阶段的工具权限与Core typed return薄适配",
+          "declarations": [
+            "createStrictTypedGateReturnV1",
+            "validateStrictStageToolCallsV1",
+            "readToolName",
+            "readRecord"
+          ]
+        },
+        "primitives": {
+          "count": 10,
+          "role": "Agent既有hash/ID/冻结与错误基础函数；保持既有字节语义",
+          "declarations": [
+            "assertSameIds",
+            "assertContainsIds",
+            "normalizeIds",
+            "requireText",
+            "requireCoreHash",
+            "fail",
+            "hashCanonical",
+            "hashCoreCanonical",
+            "sortCanonical",
+            "freeze"
+          ]
+        }
+      },
+      "safety": "本代理从源码独立生成声明/引用图后与root extraction-groups对照，归组完全一致；含type依赖图无环。原函数body优先保持，helpers不变成空壳，也不删Core构造/验证。",
+      "checks": "重做类似knowledge迁移的94声明AST映射；仅接受路径/import/export/类型收窄和有证据的独立行为补丁。跑现有strict测试、public signatures/consumer及已安装fileBoundaries。"
+    },
+    {
+      "rank": 2,
+      "status": "bounded-fallback-not-additional-scope",
+      "name": "先迁analysisLoop、gates、primitives",
+      "action": "若希望一次只审较小diff，先移42声明（28+4+10），其余52声明原地；facade兼容入口和全部Core边界仍保留。下一次再按同一DAG迁analyst/lineage/expressions。",
+      "tradeoff": "第一步能独立清晰隔离PipelineStrategy最直接消费的控制合同，但暂时保留剩余语义与Producer大文件；不靠删校验减行数。",
+      "avoid": "不同时更换canonical字节、不改公开出口、不引入新持久化/权威注册框架。"
+    }
+  ],
+  "findings": [
+    {
+      "id": "STRICT-01",
+      "severity": "P2",
+      "status": "fixed-by-root-and-covered-in-focused-green",
+      "baselinePath": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "baselineLine": 2115,
+      "issue": "旧freeze把Object.isFrozen(container)当作整棵树已冻结，浅冻输入的子项仍可修改，破坏已封印snapshot内容/hash一致性。",
+      "actualProbe": "真实源码经TypeScript在内存加载createStrictAnalysisEpochSnapshotV1；populations=[Object.freeze({nested:{facts:['fact-1']}})]；返回outer/entry均frozen，但nested/array未frozen，push后快照可见fact变化且重建snapshotHash不同。",
+      "fix": "root改为WeakSet访问控制，独立遍历已冻结容器的子项。",
+      "regression": {
+        "path": "AlembicAgent/test/strict-production-rework.test.ts",
+        "name": "freezes nested population payloads behind an already frozen container"
+      },
+      "validation": "本代理随后完整rework16/16 GREEN包含该回归；未改root的freeze实现或测试。",
+      "currentLine": 2121
+    },
+    {
+      "id": "STRICT-02",
+      "severity": "P2",
+      "status": "fixed-by-this-agent; red-green-complete",
+      "baselinePath": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "baselineLine": 700,
+      "issue": "未知hypothesis disposition标签未被验证；非法status被保留但不进入Producer，也不命中字面unknown失败，实际能继续创建Core fixpoint。",
+      "actualProbe": "复用真实createSingleHypothesisEpochFixture；status='not-a-disposition'时validateStrictAnalystEpochV1成功、producerEligible=0、createStrictAnalysisFixpointV1仍成功。",
+      "fix": "resolveStrictHypothesisDispositions入口只允许survived/narrowed/refuted/unknown，非法标签抛STRICT_ANALYST_HYPOTHESIS_DISPOSITION_INVALID；不改变有效状态映射。",
+      "tests": [
+        {
+          "path": "AlembicAgent/test/strict-production-rework.test.ts",
+          "name": "rejects an invalid hypothesis disposition before an epoch can reach fixpoint"
+        },
+        {
+          "path": "AlembicAgent/test/strict-production-rework.test.ts",
+          "name": "keeps unknown hypotheses unresolved until the fixpoint gate rejects them"
+        }
+      ],
+      "red": {
+        "path": "AlembicAgent/tmp/strict-management-2026-09-20/disposition-red.log",
+        "result": "1 failed / 1 passed / 14 skipped；旧代码非法status未抛错，unknown旧语义已通过。"
+      },
+      "green": {
+        "path": "AlembicAgent/tmp/strict-management-2026-09-20/disposition-green.log",
+        "result": "完整文件16 passed；unknown仍在fixpoint报STRICT_ANALYSIS_FIXPOINT_HYPOTHESIS_UNRESOLVED。"
+      },
+      "scope": "仅改函数入口与两例测试；未格式化整份生产文件，未覆盖root其他修改，未提交。",
+      "currentLine": 700
+    }
+  ],
+  "declarationMap": [
+    {
+      "name": "StrictAnalysisContextProjectionV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 37,
+      "baselineEndLine": 69,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "CreateStrictProducerLineageReceiptInputV1",
+        "StrictAnalysisContextInputV1",
+        "StrictAnalysisEpochSnapshotInputV1",
+        "assertStrictAnalysisIdentityStable",
+        "assertStrictContextIntegrity",
+        "createStrictAnalysisContextProjectionV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+          "line": 7,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            23,
+            24,
+            70,
+            78
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 48,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            142
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/strict-production/projects/alembic-workspace-single-file/src/agent/production/StrictProductionStages.ts",
+          "line": 3,
+          "mode": "fixture-source-text",
+          "typeOnly": true,
+          "useLines": [
+            16
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 28,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            1263
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/memory/MemoryFlushContract.ts",
+          "line": 8,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            42
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/memory/ActiveContext.ts",
+          "line": 27,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            236,
+            285,
+            652
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 40,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        },
+        {
+          "file": "AlembicAgent/src/agent/evaluation/analysisArtifact.ts",
+          "line": 28,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            58
+          ]
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 37
+    },
+    {
+      "name": "StrictAnalysisContextInputV1",
+      "kind": "TypeAliasDeclaration",
+      "baselineLine": 71,
+      "baselineEndLine": 74,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的类型映射，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictAnalysisContextProjectionV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisContextProjectionV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 47,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            141
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 39,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 71
+    },
+    {
+      "name": "REQUIRED_CONTEXT_TEXT_FIELDS",
+      "kind": "VariableDeclaration",
+      "baselineLine": 76,
+      "baselineEndLine": 88,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的字段白名单/常量，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictAnalysisContextProjectionV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 76
+    },
+    {
+      "name": "CONTEXT_ARRAY_FIELDS",
+      "kind": "VariableDeclaration",
+      "baselineLine": 90,
+      "baselineEndLine": 103,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的字段白名单/常量，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictAnalysisIdentityStable",
+        "createStrictAnalysisContextProjectionV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 90
+    },
+    {
+      "name": "createStrictAnalysisContextProjectionV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 105,
+      "baselineEndLine": 143,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "只投影允许的Core坐标/IDs/hash；规范ID集合、拒derived finding，再生成Agent contextHash。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictContextIntegrity"
+      ],
+      "localDependencies": [
+        "CONTEXT_ARRAY_FIELDS",
+        "REQUIRED_CONTEXT_TEXT_FIELDS",
+        "StrictAnalysisContextInputV1",
+        "StrictAnalysisContextProjectionV1",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+          "line": 3,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            25,
+            80,
+            102,
+            249,
+            343,
+            440,
+            800
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/strict-production-chain.test.ts",
+          "line": 20,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            214,
+            312,
+            315
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/strict-production-rework.test.ts",
+          "line": 6,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            46
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 25,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            120
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/strict-production/projects/alembic-workspace-single-file/src/agent/production/StrictProductionStages.ts",
+          "line": 2,
+          "mode": "fixture-source-text",
+          "typeOnly": false,
+          "useLines": [
+            133
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/memory/ActiveContext.ts",
+          "line": 26,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            657
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 29,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        },
+        {
+          "file": "AlembicAgent/src/agent/evaluation/StrictProductionFixtureEvaluation.ts",
+          "line": 5,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            147
+          ]
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 105
+    },
+    {
+      "name": "StrictAnalysisLoopLimitsV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 145,
+      "baselineEndLine": 148,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisEpochTransitionV1",
+        "assertStrictAnalysisLoopLimits",
+        "validateStrictAnalysisEpochTransitionV1",
+        "validateStrictAnalysisRetryTransition"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 56,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            143
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionPrompts.ts",
+          "line": 3,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            10
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 6,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            20
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 48,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 145
+    },
+    {
+      "name": "StrictAnalysisEpochSnapshotInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 150,
+      "baselineEndLine": 156,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisEpochSnapshotV1",
+        "createStrictAnalysisEpochSnapshotV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisContextProjectionV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 49,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            144
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 41,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 150
+    },
+    {
+      "name": "StrictAnalysisEpochSnapshotV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 162,
+      "baselineEndLine": 165,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictAnalysisEpochSnapshotIntegrity",
+        "createStrictAnalysisEpochSnapshotV1",
+        "summarizeStrictAnalysisEpoch",
+        "validateStrictAnalysisEpochTransitionV1",
+        "validateStrictAnalysisPassTransition",
+        "validateStrictAnalysisRetryTransition"
+      ],
+      "localDependencies": [
+        "StrictAnalysisEpochSnapshotInputV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+          "line": 8,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            59,
+            92,
+            94,
+            114
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 50,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            145
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionPrompts.ts",
+          "line": 2,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            9
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 3,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            22,
+            26,
+            168,
+            169,
+            205
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 42,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 162
+    },
+    {
+      "name": "createStrictAnalysisEpochSnapshotV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 167,
+      "baselineEndLine": 196,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "校验context和epoch，约束terminal/outstanding集合守恒并封印populations快照。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictAnalysisEpochSnapshotIntegrity"
+      ],
+      "localDependencies": [
+        "StrictAnalysisEpochSnapshotInputV1",
+        "StrictAnalysisEpochSnapshotV1",
+        "assertSameIds",
+        "assertStrictContextIntegrity",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds"
+      ],
+      "runtimeCalls": [
+        "assertSameIds",
+        "assertStrictContextIntegrity",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+          "line": 4,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            60,
+            100,
+            214,
+            247,
+            341,
+            438,
+            510,
+            538,
+            667,
+            735,
+            798
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/strict-production-chain.test.ts",
+          "line": 21,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            246
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/strict-production-rework.test.ts",
+          "line": 7,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            135,
+            139
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 26,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            121
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 2,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            214
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 26,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            1281,
+            1292
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 30,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        },
+        {
+          "file": "AlembicAgent/src/agent/evaluation/StrictProductionFixtureEvaluation.ts",
+          "line": 6,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            182,
+            228
+          ]
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 167
+    },
+    {
+      "name": "StrictAnalysisGateOutcomeInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 198,
+      "baselineEndLine": 205,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisGateOutcomeV1",
+        "createStrictAnalysisGateOutcomeV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 54,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            146
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 46,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 198
+    },
+    {
+      "name": "StrictAnalysisGateOutcomeV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 211,
+      "baselineEndLine": 222,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisEpochTransitionV1",
+        "assertStrictAnalysisGateOutcomeIntegrity",
+        "createStrictAnalysisGateOutcomeV1",
+        "validateStrictAnalysisEpochTransitionV1",
+        "validateStrictAnalysisRetryTransition"
+      ],
+      "localDependencies": [
+        "StrictAnalysisGateOutcomeInputV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+          "line": 9,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            838
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 55,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            147
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 5,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            27
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 47,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 211
+    },
+    {
+      "name": "createStrictAnalysisGateOutcomeV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 224,
+      "baselineEndLine": 261,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "构造typed gate outcome；retry登记/执行ID必须守恒，非retry不得携带新增义务。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictAnalysisGateOutcomeIntegrity"
+      ],
+      "localDependencies": [
+        "StrictAnalysisGateOutcomeInputV1",
+        "StrictAnalysisGateOutcomeV1",
+        "assertSameIds",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "assertSameIds",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+          "line": 6,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            234,
+            258,
+            370,
+            379,
+            467,
+            476,
+            557,
+            566,
+            616,
+            682,
+            750,
+            809
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/strict-production-chain.test.ts",
+          "line": 24,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            274
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 29,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            123
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 33,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        },
+        {
+          "file": "AlembicAgent/src/agent/evaluation/StrictProductionFixtureEvaluation.ts",
+          "line": 8,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            253
+          ]
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 224
+    },
+    {
+      "name": "StrictAnalysisEpochTransitionV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 263,
+      "baselineEndLine": 275,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisEpochTransitionV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisEpochSummaryV1",
+        "StrictAnalysisGateOutcomeV1",
+        "StrictAnalysisLoopLimitsV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 51,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            148
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 29,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            502,
+            1345,
+            1346,
+            1357,
+            1362
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 43,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 263
+    },
+    {
+      "name": "StrictAnalysisEpochSummaryV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 277,
+      "baselineEndLine": 290,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisEpochTransitionV1",
+        "summarizeStrictAnalysisEpoch"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 277
+    },
+    {
+      "name": "validateStrictAnalysisEpochTransitionV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 292,
+      "baselineEndLine": 334,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent跨轮次身份不漂移、append-only进展、最大轮次/义务边界；生成可审计transition。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [],
+      "localDependencies": [
+        "StrictAnalysisEpochSnapshotV1",
+        "StrictAnalysisEpochTransitionV1",
+        "StrictAnalysisGateOutcomeV1",
+        "StrictAnalysisLoopLimitsV1",
+        "assertStrictAnalysisEpochSnapshotIntegrity",
+        "assertStrictAnalysisGateOutcomeIntegrity",
+        "assertStrictAnalysisIdentityStable",
+        "assertStrictAnalysisLoopLimits",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "summarizeStrictAnalysisEpoch",
+        "validateStrictAnalysisPassTransition",
+        "validateStrictAnalysisRetryTransition"
+      ],
+      "runtimeCalls": [
+        "assertStrictAnalysisEpochSnapshotIntegrity",
+        "assertStrictAnalysisGateOutcomeIntegrity",
+        "assertStrictAnalysisIdentityStable",
+        "assertStrictAnalysisLoopLimits",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "summarizeStrictAnalysisEpoch",
+        "validateStrictAnalysisPassTransition",
+        "validateStrictAnalysisRetryTransition"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 69,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            125
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 7,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            146
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 61,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 292
+    },
+    {
+      "name": "StrictAnalysisExpansionPortInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 336,
+      "baselineEndLine": 354,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent严格上下文白名单、epoch/gate transition与append-only扩展端口的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisExpansionPortV1",
+        "createStrictAnalysisExpansionPortV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 52,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            149
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 44,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 336
+    },
+    {
+      "name": "StrictAnalysisExpansionPortV1",
+      "kind": "ClassDeclaration",
+      "baselineLine": 360,
+      "baselineEndLine": 437,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "会话内append-only扩展登记/执行授权/封印状态；Core校验每条扩展和最终日程，不存第二套事实库。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "validateAnalysisScheduleExpansionV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 2479
+          }
+        },
+        {
+          "name": "FinalExpandedMiningScheduleReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "AnalysisScheduleExpansionRowV1",
+          "kind": "type"
+        },
+        {
+          "name": "createFinalExpandedMiningScheduleReceiptV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 2538
+          }
+        }
+      ],
+      "internalCallers": [
+        "createStrictAnalysisExpansionPortV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisExpansionPortInputV1",
+        "fail",
+        "freeze",
+        "normalizeIds",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "freeze",
+        "normalizeIds",
+        "requireText"
+      ],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 53,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            150
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+          "line": 4,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            21
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 45,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 360
+    },
+    {
+      "name": "createStrictAnalysisExpansionPortV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 439,
+      "baselineEndLine": 443,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "保留公开factory，返回具体扩展端口实例。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [],
+      "localDependencies": [
+        "StrictAnalysisExpansionPortInputV1",
+        "StrictAnalysisExpansionPortV1"
+      ],
+      "runtimeCalls": [
+        "StrictAnalysisExpansionPortV1"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+          "line": 5,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            93,
+            118,
+            128,
+            183,
+            294,
+            400,
+            497,
+            588,
+            637,
+            704,
+            772
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/strict-production-chain.test.ts",
+          "line": 22,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            205,
+            261,
+            333
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 27,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            122
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 31,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        },
+        {
+          "file": "AlembicAgent/src/agent/evaluation/StrictProductionFixtureEvaluation.ts",
+          "line": 7,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            139,
+            229
+          ]
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 439
+    },
+    {
+      "name": "StrictInductionInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 445,
+      "baselineEndLine": 451,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "Agent组织population/cluster/induction/falsification并委托Core权威构造，封闭语义epoch/fixpoint的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "HypothesisV1",
+          "kind": "type"
+        },
+        {
+          "name": "InductionReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "KnowledgeDispositionReviewV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "StrictAnalystEpochInputV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 62,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            151
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 54,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 445
+    },
+    {
+      "name": "StrictHypothesisDispositionV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 453,
+      "baselineEndLine": 457,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "Agent组织population/cluster/induction/falsification并委托Core权威构造，封闭语义epoch/fixpoint的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalystEpochInputV1",
+        "StrictAnalystEpochV1",
+        "resolveStrictHypothesisDispositions"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 61,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            152
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 53,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 453
+    },
+    {
+      "name": "StrictFalsificationInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 459,
+      "baselineEndLine": 468,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "Agent组织population/cluster/induction/falsification并委托Core权威构造，封闭语义epoch/fixpoint的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "CounterqueryExecutionV1",
+          "kind": "type"
+        },
+        {
+          "name": "FalsificationReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "KnowledgeDispositionReviewV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "StrictAnalystEpochInputV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 60,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            153
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 52,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 459
+    },
+    {
+      "name": "StrictAnalystEpochInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 470,
+      "baselineEndLine": 493,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "Agent组织population/cluster/induction/falsification并委托Core权威构造，封闭语义epoch/fixpoint的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "ObservationPopulationInputV1",
+          "kind": "type"
+        },
+        {
+          "name": "KnowledgeClusterInputV1",
+          "kind": "type"
+        },
+        {
+          "name": "KnowledgeDispositionReviewV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "createStrictClusterSet",
+        "createStrictFalsifications",
+        "createStrictInductions",
+        "rebuildFalsificationInputs",
+        "rebuildInductionInputs",
+        "rebuildNonClusteredDispositions",
+        "rejectLegacySemanticAuthority",
+        "resolveStrictHypothesisDispositions",
+        "validateDispositionReviewConservation",
+        "validateStrictAnalystEpochV1",
+        "validateStrictPopulationAuthority"
+      ],
+      "localDependencies": [
+        "StrictFalsificationInputV1",
+        "StrictHypothesisDispositionV1",
+        "StrictInductionInputV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 57,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            154
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/strict-semantic-authority.ts",
+          "line": 14,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            151
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 49,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 470
+    },
+    {
+      "name": "ProducerEligibleHypothesisV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 495,
+      "baselineEndLine": 499,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "Agent组织population/cluster/induction/falsification并委托Core权威构造，封闭语义epoch/fixpoint的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "HypothesisV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "StrictAnalystEpochV1",
+        "StrictProducerExpressionSetV1",
+        "StrictProducerLineageReceiptV1",
+        "resolveStrictHypothesisDispositions"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 38,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            156
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 38,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 495
+    },
+    {
+      "name": "StrictAnalystEpochV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 501,
+      "baselineEndLine": 514,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "Agent组织population/cluster/induction/falsification并委托Core权威构造，封闭语义epoch/fixpoint的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "FactQueryExecutionReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "ObservationPopulationV1",
+          "kind": "type"
+        },
+        {
+          "name": "KnowledgeClusterSetV1",
+          "kind": "type"
+        },
+        {
+          "name": "InductionReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "FalsificationReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "KnowledgeDispositionReviewV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "CreateStrictAnalysisFixpointInputV1",
+        "CreateStrictProducerLineageReceiptInputV1",
+        "assertStrictAnalystEpochIntegrity",
+        "rebuildClusterInputs",
+        "rebuildFalsificationInputs",
+        "rebuildInductionInputs",
+        "rebuildNonClusteredDispositions",
+        "rebuildStrictAnalystEpoch",
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "ProducerEligibleHypothesisV1",
+        "StrictHypothesisDispositionV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 58,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            155
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 50,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 501
+    },
+    {
+      "name": "validateStrictAnalystEpochV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 516,
+      "baselineEndLine": 548,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "按固定顺序组织Core population→clusters→induction→falsification，核对review与hypothesis处置守恒。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "rebuildStrictAnalystEpoch"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "StrictAnalystEpochV1",
+        "createStrictClusterSet",
+        "createStrictFalsifications",
+        "createStrictInductions",
+        "freeze",
+        "hashCanonical",
+        "indexStrictHypotheses",
+        "rejectLegacySemanticAuthority",
+        "requireCoreHash",
+        "resolveStrictHypothesisDispositions",
+        "validateDispositionReviewConservation",
+        "validateStrictPopulationAuthority"
+      ],
+      "runtimeCalls": [
+        "createStrictClusterSet",
+        "createStrictFalsifications",
+        "createStrictInductions",
+        "freeze",
+        "hashCanonical",
+        "indexStrictHypotheses",
+        "rejectLegacySemanticAuthority",
+        "requireCoreHash",
+        "resolveStrictHypothesisDispositions",
+        "validateDispositionReviewConservation",
+        "validateStrictPopulationAuthority"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-production-chain.test.ts",
+          "line": 25,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            538
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/strict-production-rework.test.ts",
+          "line": 13,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            40,
+            267,
+            280,
+            311,
+            320,
+            347
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 70,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            126
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 62,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 516
+    },
+    {
+      "name": "validateStrictPopulationAuthority",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 550,
+      "baselineEndLine": 585,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "Agent已知fact范围检查+调用Core population canonicalizer，要求complete及真实execution receipts。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "ObservationPopulationV1",
+          "kind": "type"
+        },
+        {
+          "name": "FactQueryExecutionReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "canonicalizeObservationPopulationV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 1026
+          }
+        }
+      ],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "fail",
+        "normalizeIds"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "normalizeIds"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 550
+    },
+    {
+      "name": "createStrictClusterSet",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 587,
+      "baselineEndLine": 595,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "直接调用Core canonicalizeKnowledgeClustersV1；这是适配委托，不是第二套聚类实现。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "ObservationPopulationV1",
+          "kind": "type"
+        },
+        {
+          "name": "KnowledgeClusterSetV1",
+          "kind": "type"
+        },
+        {
+          "name": "canonicalizeKnowledgeClustersV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 1390
+          }
+        }
+      ],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 587
+    },
+    {
+      "name": "createStrictInductions",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 597,
+      "baselineEndLine": 642,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "按mechanism查真实cluster、约束premise事实范围；逐项Core induction并要求cluster全覆盖。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "ObservationPopulationV1",
+          "kind": "type"
+        },
+        {
+          "name": "KnowledgeClusterSetV1",
+          "kind": "type"
+        },
+        {
+          "name": "InductionReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "createInductionReceiptV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 1874
+          }
+        },
+        {
+          "name": "hashKnowledgeClusterV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 257
+          }
+        }
+      ],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "assertSameIds",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "assertSameIds",
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 597
+    },
+    {
+      "name": "indexStrictHypotheses",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 644,
+      "baselineEndLine": 659,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "跨induction统一索引并拒重复hypothesis ID。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "InductionReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "HypothesisV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 644
+    },
+    {
+      "name": "createStrictFalsifications",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 661,
+      "baselineEndLine": 698,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "限定外部登记counterquery与已知counterexample事实，再委托Core产生verdict并全量覆盖hypotheses。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "HypothesisV1",
+          "kind": "type"
+        },
+        {
+          "name": "FalsificationReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "createFalsificationReceiptV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 1988
+          }
+        }
+      ],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "assertSameIds",
+        "fail",
+        "normalizeIds"
+      ],
+      "runtimeCalls": [
+        "assertSameIds",
+        "fail",
+        "normalizeIds"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 661
+    },
+    {
+      "name": "resolveStrictHypothesisDispositions",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 700,
+      "baselineEndLine": 752,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "验证完整处置集合；当前修复后先验枚举，仅survived/narrowed进入Producer，unknown保留到fixpoint失败。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "HypothesisV1",
+          "kind": "type"
+        },
+        {
+          "name": "FalsificationReceiptV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "ProducerEligibleHypothesisV1",
+        "StrictAnalystEpochInputV1",
+        "StrictHypothesisDispositionV1",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 700
+    },
+    {
+      "name": "CreateStrictAnalysisFixpointInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 754,
+      "baselineEndLine": 758,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "Agent组织population/cluster/induction/falsification并委托Core权威构造，封闭语义epoch/fixpoint的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "FinalExpandedMiningScheduleReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "AnalysisFixpointReceiptV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "createStrictAnalysisFixpointV1"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 19,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            157
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 25,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 760
+    },
+    {
+      "name": "createStrictAnalysisFixpointV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 761,
+      "baselineEndLine": 808,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "重验每个epoch，拒unknown，再用Core schedule-conservation创建fixpoint并核对review context。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "AnalysisFixpointReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "createAnalysisFixpointReceiptV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 2610
+          }
+        }
+      ],
+      "internalCallers": [],
+      "localDependencies": [
+        "CreateStrictAnalysisFixpointInputV1",
+        "assertStrictAnalystEpochIntegrity",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "assertStrictAnalystEpochIntegrity",
+        "fail"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-production-chain.test.ts",
+          "line": 23,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            594
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/strict-production-rework.test.ts",
+          "line": 8,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            41,
+            359
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 28,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            127
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 32,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 767
+    },
+    {
+      "name": "StrictProducerEvidenceProjectionV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 810,
+      "baselineEndLine": 823,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "Agent将已验证epoch/fixpoint/冻结证据绑定到Producer根与因果修复链的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "CreateStrictProducerLineageReceiptInputV1",
+        "assertEvidenceProjectionIntegrity"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 63,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            158
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 55,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 816
+    },
+    {
+      "name": "StrictProducerLineageReceiptV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 829,
+      "baselineEndLine": 848,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "Agent将已验证epoch/fixpoint/冻结证据绑定到Producer根与因果修复链的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "CreateCausalRepairNodeInputV1",
+        "CreateStrictProducerExpressionSetInputV1",
+        "StrictProducerExpressionSetV1",
+        "assertStrictProducerLineageIntegrity",
+        "createStrictProducerLineageReceiptV1"
+      ],
+      "localDependencies": [
+        "ProducerEligibleHypothesisV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-production-rework.test.ts",
+          "line": 12,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            103,
+            370,
+            374,
+            381,
+            388,
+            395,
+            402,
+            409,
+            416,
+            424
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 65,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            160
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 57,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 835
+    },
+    {
+      "name": "CreateStrictProducerLineageReceiptInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 850,
+      "baselineEndLine": 856,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "Agent将已验证epoch/fixpoint/冻结证据绑定到Producer根与因果修复链的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "AnalysisFixpointReceiptV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "createStrictProducerLineageReceiptV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisContextProjectionV1",
+        "StrictAnalystEpochV1",
+        "StrictProducerEvidenceProjectionV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 22,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            159
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 28,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 856
+    },
+    {
+      "name": "createStrictProducerLineageReceiptV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 858,
+      "baselineEndLine": 971,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "从验证后的context/epoch/Core fixpoint/evidence推导唯一hypothesis lineage和knowledgeRootId。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [],
+      "localDependencies": [
+        "CreateStrictProducerLineageReceiptInputV1",
+        "StrictProducerLineageReceiptV1",
+        "assertAnalysisFixpointIntegrity",
+        "assertContainsIds",
+        "assertEvidenceProjectionIntegrity",
+        "assertSameIds",
+        "assertStrictAnalystEpochIntegrity",
+        "assertStrictContextIntegrity",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "assertAnalysisFixpointIntegrity",
+        "assertContainsIds",
+        "assertEvidenceProjectionIntegrity",
+        "assertSameIds",
+        "assertStrictAnalystEpochIntegrity",
+        "assertStrictContextIntegrity",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-production-rework.test.ts",
+          "line": 11,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            92
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 32,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            128
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 36,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 864
+    },
+    {
+      "name": "CausalRepairNodeV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 973,
+      "baselineEndLine": 987,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "Agent将已验证epoch/fixpoint/冻结证据绑定到Producer根与因果修复链的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "CreateCausalRepairNodeInputV1",
+        "StrictProducerExpressionSetV1",
+        "assertCausalRepairNodeIntegrity",
+        "createCausalRepairNodeV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 18,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            161
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 24,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 979
+    },
+    {
+      "name": "CreateCausalRepairNodeInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 989,
+      "baselineEndLine": 998,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "Agent将已验证epoch/fixpoint/冻结证据绑定到Producer根与因果修复链的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createCausalRepairNodeV1"
+      ],
+      "localDependencies": [
+        "CausalRepairNodeV1",
+        "StrictProducerLineageReceiptV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "source-compatibility-only",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        }
+      ],
+      "consumptionAssessment": "source兼容/内部barrel与测试消费；不得因package不导出便删除",
+      "reviewed": true,
+      "currentLine": 995
+    },
+    {
+      "name": "createCausalRepairNodeV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1000,
+      "baselineEndLine": 1056,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "从真实父节点推导根、父IDs与语义深度，限制两次修复；不是持久化或全局attempt存储。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictProducerExpressionSetV1"
+      ],
+      "localDependencies": [
+        "CausalRepairNodeV1",
+        "CreateCausalRepairNodeInputV1",
+        "assertCausalRepairNodeIntegrity",
+        "assertStrictProducerLineageIntegrity",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "assertCausalRepairNodeIntegrity",
+        "assertStrictProducerLineageIntegrity",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "exportStatus": "source-compatibility-only",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        }
+      ],
+      "consumptionAssessment": "source兼容/内部barrel与测试消费；不得因package不导出便删除",
+      "reviewed": true,
+      "currentLine": 1006
+    },
+    {
+      "name": "FullAuthoredProjectionV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 1058,
+      "baselineEndLine": 1072,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "CreateStrictProducerExpressionSetInputV1",
+        "StrictProducerProposalInputV1",
+        "StrictProducerZeroDispositionV1",
+        "validateAuthoredProjection"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 37,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            162
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 37,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        },
+        {
+          "file": "AlembicAgent/src/agent/evaluation/IndependentValueReviewer.ts",
+          "line": 2,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            65,
+            134
+          ]
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 1064
+    },
+    {
+      "name": "StrictProducerProposalInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 1074,
+      "baselineEndLine": 1079,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "CreateStrictProducerExpressionSetInputV1",
+        "StrictProducerProposalV1",
+        "normalizeStrictProducerProposals"
+      ],
+      "localDependencies": [
+        "FullAuthoredProjectionV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 58,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 1080
+    },
+    {
+      "name": "StrictProducerProposalV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 1081,
+      "baselineEndLine": 1084,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictProducerExpressionSetV1",
+        "normalizeStrictProducerProposals"
+      ],
+      "localDependencies": [
+        "StrictProducerProposalInputV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 66,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            163
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 59,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 1087
+    },
+    {
+      "name": "StrictProducerZeroDispositionV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 1086,
+      "baselineEndLine": 1092,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "KnowledgeDispositionReviewV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "StrictProducerExpressionSetV1",
+        "createStrictProducerZeroDisposition"
+      ],
+      "localDependencies": [
+        "FullAuthoredProjectionV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 60,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 1092
+    },
+    {
+      "name": "StrictProducerExpressionSetV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 1094,
+      "baselineEndLine": 1108,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "CreateStrictHypothesisExpressionSetReceiptInputV1",
+        "CreateStrictProducerExpressionSetInputV1",
+        "assertStrictProducerExpressionSetIntegrity",
+        "createStrictProducerExpressionSetV1"
+      ],
+      "localDependencies": [
+        "CausalRepairNodeV1",
+        "ProducerEligibleHypothesisV1",
+        "StrictProducerLineageReceiptV1",
+        "StrictProducerProposalV1",
+        "StrictProducerZeroDispositionV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 64,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            165
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/StrictProductionPrompts.ts",
+          "line": 4,
+          "mode": "direct-import",
+          "typeOnly": true,
+          "useLines": [
+            31
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 56,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 1100
+    },
+    {
+      "name": "CreateStrictProducerExpressionSetInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 1110,
+      "baselineEndLine": 1121,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "KnowledgeDispositionReviewV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "createStrictProducerExpressionSetV1",
+        "createStrictProducerZeroDisposition",
+        "rejectProducerCallerLineageFields",
+        "resolveStrictProducerPredecessor",
+        "validateProducerExpressionCardinality"
+      ],
+      "localDependencies": [
+        "FullAuthoredProjectionV1",
+        "StrictProducerExpressionSetV1",
+        "StrictProducerLineageReceiptV1",
+        "StrictProducerProposalInputV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 21,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            164
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 27,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 1116
+    },
+    {
+      "name": "createStrictProducerExpressionSetV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1123,
+      "baselineEndLine": 1172,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "阻止caller自填lineage字段；以真实parent推导version/repair depth，生成0/1/N完整表达集。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [],
+      "localDependencies": [
+        "CreateStrictProducerExpressionSetInputV1",
+        "StrictProducerExpressionSetV1",
+        "assertStrictProducerLineageIntegrity",
+        "createCausalRepairNodeV1",
+        "createStrictProducerZeroDisposition",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeStrictProducerProposals",
+        "rejectProducerCallerLineageFields",
+        "requireText",
+        "resolveStrictProducerPredecessor",
+        "validateProducerExpressionCardinality"
+      ],
+      "runtimeCalls": [
+        "assertStrictProducerLineageIntegrity",
+        "createCausalRepairNodeV1",
+        "createStrictProducerZeroDisposition",
+        "fail",
+        "freeze",
+        "hashCanonical",
+        "normalizeStrictProducerProposals",
+        "rejectProducerCallerLineageFields",
+        "requireText",
+        "resolveStrictProducerPredecessor",
+        "validateProducerExpressionCardinality"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-production-rework.test.ts",
+          "line": 10,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            104,
+            107,
+            173,
+            185,
+            441
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 31,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            129
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 35,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 1129
+    },
+    {
+      "name": "rejectProducerCallerLineageFields",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1174,
+      "baselineEndLine": 1188,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "拒model/caller替写setId/version/parent/hypothesis/fixpoint/fingerprint/repairNode。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictProducerExpressionSetV1"
+      ],
+      "localDependencies": [
+        "CreateStrictProducerExpressionSetInputV1",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1180
+    },
+    {
+      "name": "resolveStrictProducerPredecessor",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1190,
+      "baselineEndLine": 1205,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "验证完整parent set、保持同一lineage并由前驱递增version，不相信孤立parent id。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictProducerExpressionSetV1"
+      ],
+      "localDependencies": [
+        "CreateStrictProducerExpressionSetInputV1",
+        "assertStrictProducerExpressionSetIntegrity",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "assertStrictProducerExpressionSetIntegrity",
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1196
+    },
+    {
+      "name": "validateProducerExpressionCardinality",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1207,
+      "baselineEndLine": 1216,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "空proposal必须有zero disposition；非空proposal禁止zero disposition。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictProducerExpressionSetV1"
+      ],
+      "localDependencies": [
+        "CreateStrictProducerExpressionSetInputV1",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1213
+    },
+    {
+      "name": "normalizeStrictProducerProposals",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1218,
+      "baselineEndLine": 1251,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "验证完整authored投影、唯一expression ID与merge/duplicate代表；派生指纹并排序。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictProducerExpressionSetV1"
+      ],
+      "localDependencies": [
+        "StrictProducerProposalInputV1",
+        "StrictProducerProposalV1",
+        "fail",
+        "hashCoreCanonical",
+        "normalizeIds",
+        "validateAuthoredProjection"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "hashCoreCanonical",
+        "normalizeIds",
+        "validateAuthoredProjection"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1224
+    },
+    {
+      "name": "createStrictProducerZeroDisposition",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1253,
+      "baselineEndLine": 1289,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Core审查回执必须pass且绑定本fixpoint/population/hypothesis/zero-disposition proposal。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "assertKnowledgeDispositionReviewV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 2933
+          }
+        },
+        {
+          "name": "hashKnowledgeDispositionProposalV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 588
+          }
+        }
+      ],
+      "internalCallers": [
+        "createStrictProducerExpressionSetV1"
+      ],
+      "localDependencies": [
+        "CreateStrictProducerExpressionSetInputV1",
+        "StrictProducerZeroDispositionV1",
+        "fail",
+        "requireText",
+        "validateAuthoredProjection"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "requireText",
+        "validateAuthoredProjection"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1259
+    },
+    {
+      "name": "StrictExpressionTerminalResolutionV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 1291,
+      "baselineEndLine": 1292,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "HypothesisExpressionRowV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "CreateStrictHypothesisExpressionSetReceiptInputV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 59,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            166
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 51,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 1297
+    },
+    {
+      "name": "CreateStrictHypothesisExpressionSetReceiptInputV1",
+      "kind": "InterfaceDeclaration",
+      "baselineLine": 1294,
+      "baselineEndLine": 1304,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "Agent表达集0/1/N、不可变前驱与Core terminal receipt适配的输入/输出结构，与消费它的函数同模块保留。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "HypothesisExpressionSetReceiptV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "createStrictHypothesisExpressionSetReceiptV1"
+      ],
+      "localDependencies": [
+        "StrictExpressionTerminalResolutionV1",
+        "StrictProducerExpressionSetV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "package-type",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 20,
+          "mode": "public-consumer",
+          "typeOnly": true,
+          "useLines": [
+            167
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 26,
+          "mode": "re-export",
+          "typeOnly": true,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 1300
+    },
+    {
+      "name": "createStrictHypothesisExpressionSetReceiptV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1310,
+      "baselineEndLine": 1377,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "绑定parent receipt及每个expression身份/Agent指纹，委托Core校验terminal closure；不授予写库/准入权。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "HypothesisExpressionSetReceiptV1",
+          "kind": "type"
+        },
+        {
+          "name": "validateHypothesisExpressionSetReceiptV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 2221
+          }
+        }
+      ],
+      "internalCallers": [],
+      "localDependencies": [
+        "CreateStrictHypothesisExpressionSetReceiptInputV1",
+        "assertStrictProducerExpressionSetIntegrity",
+        "fail",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "assertStrictProducerExpressionSetIntegrity",
+        "fail",
+        "requireText"
+      ],
+      "exportStatus": "package-runtime",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/test/strict-production-rework.test.ts",
+          "line": 9,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            203,
+            215,
+            234,
+            254
+          ]
+        },
+        {
+          "file": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+          "line": 30,
+          "mode": "public-consumer",
+          "typeOnly": false,
+          "useLines": [
+            124
+          ]
+        },
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/production.ts",
+          "line": 34,
+          "mode": "re-export",
+          "typeOnly": false,
+          "useLines": []
+        }
+      ],
+      "consumptionAssessment": "公开宿主接口/类型；本仓无独立业务调用不等于死代码",
+      "reviewed": true,
+      "currentLine": 1316
+    },
+    {
+      "name": "createStrictTypedGateReturnV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1379,
+      "baselineEndLine": 1381,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/gates.ts",
+      "responsibility": "原样委托Core createTypedGateReturnV1，保留Agent内部调用词汇/兼容入口。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "TypedGateReturnInputV1",
+          "kind": "type"
+        },
+        {
+          "name": "TypedGateReturnV1",
+          "kind": "type"
+        },
+        {
+          "name": "createTypedGateReturnV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 2189
+          }
+        }
+      ],
+      "internalCallers": [],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "source-compatibility-only",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 27,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            456,
+            506
+          ]
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 1385
+    },
+    {
+      "name": "validateStrictStageToolCallsV1",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1383,
+      "baselineEndLine": 1415,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/gates.ts",
+      "responsibility": "Producer零工具；Analyst禁止submit/persist/review/knowledge并检查查询已登记。Core不管理Agent阶段工具调用，必须保留。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [],
+      "localDependencies": [
+        "fail",
+        "readRecord",
+        "readToolName"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "readRecord",
+        "readToolName"
+      ],
+      "exportStatus": "source-compatibility-only",
+      "originalSourceExport": true,
+      "currentConsumers": [
+        {
+          "file": "AlembicAgent/src/agent/production/index.ts",
+          "line": 1,
+          "mode": "export-star"
+        },
+        {
+          "file": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+          "line": 30,
+          "mode": "direct-import",
+          "typeOnly": false,
+          "useLines": [
+            1132
+          ]
+        }
+      ],
+      "consumptionAssessment": "有本仓实际src消费方",
+      "reviewed": true,
+      "currentLine": 1389
+    },
+    {
+      "name": "assertStrictAnalysisEpochSnapshotIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1417,
+      "baselineEndLine": 1426,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "从完整snapshot输入重建并核对version/hash，而非只信外层标签。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisEpochTransitionV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisEpochSnapshotV1",
+        "createStrictAnalysisEpochSnapshotV1",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "createStrictAnalysisEpochSnapshotV1",
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1423
+    },
+    {
+      "name": "assertStrictAnalysisGateOutcomeIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1428,
+      "baselineEndLine": 1437,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "验typed kind/version，再重建outcome并对账hash/pass。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisEpochTransitionV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisGateOutcomeV1",
+        "createStrictAnalysisGateOutcomeV1",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "createStrictAnalysisGateOutcomeV1",
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1434
+    },
+    {
+      "name": "assertStrictAnalysisLoopLimits",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1439,
+      "baselineEndLine": 1446,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "Agent循环上限必须为正安全整数。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisEpochTransitionV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisLoopLimitsV1",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1445
+    },
+    {
+      "name": "assertStrictAnalysisIdentityStable",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1448,
+      "baselineEndLine": 1479,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "轮次间稳定核心坐标，所有context ID集合append-only。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisEpochTransitionV1"
+      ],
+      "localDependencies": [
+        "CONTEXT_ARRAY_FIELDS",
+        "StrictAnalysisContextProjectionV1",
+        "assertAppendOnlyIds",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "assertAppendOnlyIds",
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1454
+    },
+    {
+      "name": "validateStrictAnalysisRetryTransition",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1481,
+      "baselineEndLine": 1548,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "retry必须推进单个epoch、未封印、日程推进、新登记/执行差集精确相等、既有outstanding不被旁路处理。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisEpochTransitionV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisEpochSnapshotV1",
+        "StrictAnalysisGateOutcomeV1",
+        "StrictAnalysisLoopLimitsV1",
+        "assertAppendOnlyIds",
+        "assertSameIds",
+        "fail",
+        "getAddedIds"
+      ],
+      "runtimeCalls": [
+        "assertAppendOnlyIds",
+        "assertSameIds",
+        "fail",
+        "getAddedIds"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1487
+    },
+    {
+      "name": "validateStrictAnalysisPassTransition",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1550,
+      "baselineEndLine": 1589,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "pass不可偷偷推进轮次或改变事实/义务集合，所有义务已终结且已获得最终日程/fixpoint。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisEpochTransitionV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisEpochSnapshotV1",
+        "assertSameIds",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "assertSameIds",
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1556
+    },
+    {
+      "name": "summarizeStrictAnalysisEpoch",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1591,
+      "baselineEndLine": 1608,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "为transition产生有限审计投影，保留快照/上下文/日程hash和义务状态。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisEpochTransitionV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisEpochSnapshotV1",
+        "StrictAnalysisEpochSummaryV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1597
+    },
+    {
+      "name": "assertAppendOnlyIds",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1610,
+      "baselineEndLine": 1619,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "只允许后态包含全部前态ID。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictAnalysisIdentityStable",
+        "validateStrictAnalysisRetryTransition"
+      ],
+      "localDependencies": [
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1616
+    },
+    {
+      "name": "getAddedIds",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1621,
+      "baselineEndLine": 1624,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "计算before→after真实新增ID，支撑registration/execution差集校验。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalysisRetryTransition"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1627
+    },
+    {
+      "name": "assertStrictContextIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1626,
+      "baselineEndLine": 1635,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analysisLoop.ts",
+      "responsibility": "重用原context构造器校验version/hash；保留白名单和derived-finding禁令。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictAnalysisEpochSnapshotV1",
+        "createStrictProducerLineageReceiptV1"
+      ],
+      "localDependencies": [
+        "StrictAnalysisContextProjectionV1",
+        "createStrictAnalysisContextProjectionV1",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "createStrictAnalysisContextProjectionV1",
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1632
+    },
+    {
+      "name": "assertStrictAnalystEpochIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1637,
+      "baselineEndLine": 1642,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "经rebuildStrictAnalystEpoch重验Core语义后再核对epochHash。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictAnalysisFixpointV1",
+        "createStrictProducerLineageReceiptV1"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochV1",
+        "fail",
+        "rebuildStrictAnalystEpoch"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "rebuildStrictAnalystEpoch"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1643
+    },
+    {
+      "name": "rebuildStrictAnalystEpoch",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1648,
+      "baselineEndLine": 1677,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "从完整epoch重建Core输入并调用validateStrictAnalystEpoch；外层自算hash不替代execution/review authority。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictAnalystEpochIntegrity"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochV1",
+        "rebuildClusterInputs",
+        "rebuildFalsificationInputs",
+        "rebuildInductionInputs",
+        "rebuildNonClusteredDispositions",
+        "validateStrictAnalystEpochV1"
+      ],
+      "runtimeCalls": [
+        "rebuildClusterInputs",
+        "rebuildFalsificationInputs",
+        "rebuildInductionInputs",
+        "rebuildNonClusteredDispositions",
+        "validateStrictAnalystEpochV1"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1654
+    },
+    {
+      "name": "rebuildClusterInputs",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1679,
+      "baselineEndLine": 1687,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "从Core cluster恢复明确输入字段，避免携带派生id/hash当权威。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "KnowledgeClusterInputV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "rebuildStrictAnalystEpoch"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochV1"
+      ],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1685
+    },
+    {
+      "name": "rebuildNonClusteredDispositions",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1689,
+      "baselineEndLine": 1709,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "用review receipt ID定位完整review对象，保留unresolved owner/resume。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "rebuildStrictAnalystEpoch"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "StrictAnalystEpochV1",
+        "findDispositionReview"
+      ],
+      "runtimeCalls": [
+        "findDispositionReview"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1695
+    },
+    {
+      "name": "rebuildInductionInputs",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1711,
+      "baselineEndLine": 1739,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "关联真实cluster并恢复zero-hypothesis的完整review回执。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "rebuildStrictAnalystEpoch"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "StrictAnalystEpochV1",
+        "fail",
+        "findDispositionReview"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "findDispositionReview"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1717
+    },
+    {
+      "name": "rebuildFalsificationInputs",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1741,
+      "baselineEndLine": 1758,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "恢复counterquery与完整review对象，不保留caller字符串reviewer authority。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "rebuildStrictAnalystEpoch"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "StrictAnalystEpochV1",
+        "findDispositionReview"
+      ],
+      "runtimeCalls": [
+        "findDispositionReview"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1747
+    },
+    {
+      "name": "findDispositionReview",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1760,
+      "baselineEndLine": 1769,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "在精确review ledger查完整回执，缺失即失败。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "KnowledgeDispositionReviewV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "rebuildFalsificationInputs",
+        "rebuildInductionInputs",
+        "rebuildNonClusteredDispositions"
+      ],
+      "localDependencies": [
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1766
+    },
+    {
+      "name": "rejectLegacySemanticAuthority",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1771,
+      "baselineEndLine": 1792,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "禁止四类仅字符串reviewer/zeroReview标识旁路独立Core review。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1777
+    },
+    {
+      "name": "validateDispositionReviewConservation",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1794,
+      "baselineEndLine": 1838,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "对已消费/声明review做Core完整性校验与绑定；拒重用、orphan和同id换绑。",
+      "authority": "Agent orchestration + public Core authority delegation",
+      "coreDependencies": [
+        {
+          "name": "KnowledgeDispositionReviewV1",
+          "kind": "type"
+        },
+        {
+          "name": "assertKnowledgeDispositionReviewV1",
+          "kind": "runtime",
+          "source": {
+            "path": "AlembicAgent/node_modules/@alembic/core/src/service/production/StrictAnalysisContracts.ts",
+            "line": 2933
+          }
+        }
+      ],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "StrictAnalystEpochInputV1",
+        "assertSameIds",
+        "fail"
+      ],
+      "runtimeCalls": [
+        "assertSameIds",
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1800
+    },
+    {
+      "name": "assertAnalysisFixpointIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1840,
+      "baselineEndLine": 1845,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/analyst.ts",
+      "responsibility": "校验传入Core fixpoint版本及既有带前缀hash；本函数不重实现Core schedule构造。",
+      "authority": "Agent contract/check consuming Core types",
+      "coreDependencies": [
+        {
+          "name": "AnalysisFixpointReceiptV1",
+          "kind": "type"
+        }
+      ],
+      "internalCallers": [
+        "createStrictProducerLineageReceiptV1"
+      ],
+      "localDependencies": [
+        "fail",
+        "hashCoreCanonical"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "hashCoreCanonical"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1846
+    },
+    {
+      "name": "assertEvidenceProjectionIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1847,
+      "baselineEndLine": 1892,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "验冻结证据内容hash、范围、ID唯一性与整体投影hash；消费现有投影而非读取live source。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictProducerLineageReceiptV1"
+      ],
+      "localDependencies": [
+        "StrictProducerEvidenceProjectionV1",
+        "fail",
+        "hashCanonical",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "hashCanonical",
+        "requireText"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1853
+    },
+    {
+      "name": "assertStrictProducerLineageIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1894,
+      "baselineEndLine": 1944,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "核对hypothesis hash、固定root投影和整体lineage；供parent/expression接入检查。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictProducerExpressionSetIntegrity",
+        "createCausalRepairNodeV1",
+        "createStrictProducerExpressionSetV1"
+      ],
+      "localDependencies": [
+        "StrictProducerLineageReceiptV1",
+        "fail",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "hashCanonical",
+        "normalizeIds",
+        "requireText"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1900
+    },
+    {
+      "name": "assertCausalRepairNodeIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1946,
+      "baselineEndLine": 1956,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/lineage.ts",
+      "responsibility": "验causal node版本/hash、根/父ID集合与非负安全深度。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertStrictProducerExpressionSetIntegrity",
+        "createCausalRepairNodeV1"
+      ],
+      "localDependencies": [
+        "CausalRepairNodeV1",
+        "fail",
+        "hashCanonical",
+        "normalizeIds"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "hashCanonical",
+        "normalizeIds"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1952
+    },
+    {
+      "name": "assertStrictProducerExpressionSetIntegrity",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 1958,
+      "baselineEndLine": 2010,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "验证完整parent set、authored指纹、lineage/repair节点绑定与version-depth关系。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictHypothesisExpressionSetReceiptV1",
+        "resolveStrictProducerPredecessor"
+      ],
+      "localDependencies": [
+        "StrictProducerExpressionSetV1",
+        "assertCausalRepairNodeIntegrity",
+        "assertStrictProducerLineageIntegrity",
+        "fail",
+        "hashCanonical",
+        "hashCoreCanonical"
+      ],
+      "runtimeCalls": [
+        "assertCausalRepairNodeIntegrity",
+        "assertStrictProducerLineageIntegrity",
+        "fail",
+        "hashCanonical",
+        "hashCoreCanonical"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 1964
+    },
+    {
+      "name": "assertSameIds",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2012,
+      "baselineEndLine": 2018,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "normalize后精确集合守恒；不是简单includes。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictAnalysisEpochSnapshotV1",
+        "createStrictAnalysisGateOutcomeV1",
+        "createStrictFalsifications",
+        "createStrictInductions",
+        "createStrictProducerLineageReceiptV1",
+        "validateDispositionReviewConservation",
+        "validateStrictAnalysisPassTransition",
+        "validateStrictAnalysisRetryTransition"
+      ],
+      "localDependencies": [
+        "fail",
+        "normalizeIds"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "normalizeIds"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2018
+    },
+    {
+      "name": "assertContainsIds",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2020,
+      "baselineEndLine": 2029,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "normalize后包含性校验，与完整集合相等的合同不同。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictProducerLineageReceiptV1"
+      ],
+      "localDependencies": [
+        "fail",
+        "normalizeIds"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "normalizeIds"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2026
+    },
+    {
+      "name": "validateAuthoredProjection",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2031,
+      "baselineEndLine": 2052,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/expressions.ts",
+      "responsibility": "要求完整标题/类别/clauses/正文/usage/profile/negative intent/scope/evidence投影。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "createStrictProducerZeroDisposition",
+        "normalizeStrictProducerProposals"
+      ],
+      "localDependencies": [
+        "FullAuthoredProjectionV1",
+        "fail",
+        "requireText"
+      ],
+      "runtimeCalls": [
+        "fail",
+        "requireText"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2037
+    },
+    {
+      "name": "readToolName",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2054,
+      "baselineEndLine": 2056,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/gates.ts",
+      "responsibility": "兼容tool/name的调用名读取，仅用于阶段权限诊断。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictStageToolCallsV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2060
+    },
+    {
+      "name": "readRecord",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2058,
+      "baselineEndLine": 2062,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/gates.ts",
+      "responsibility": "有界object guard，不接纳数组。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictStageToolCallsV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2064
+    },
+    {
+      "name": "normalizeIds",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2064,
+      "baselineEndLine": 2073,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "trim/sort并拒空值及重复ID，保持当前失败码。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisExpansionPortV1",
+        "assertCausalRepairNodeIntegrity",
+        "assertContainsIds",
+        "assertSameIds",
+        "assertStrictProducerLineageIntegrity",
+        "createCausalRepairNodeV1",
+        "createStrictAnalysisContextProjectionV1",
+        "createStrictAnalysisEpochSnapshotV1",
+        "createStrictAnalysisGateOutcomeV1",
+        "createStrictFalsifications",
+        "createStrictProducerLineageReceiptV1",
+        "normalizeStrictProducerProposals",
+        "validateStrictPopulationAuthority"
+      ],
+      "localDependencies": [
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2070
+    },
+    {
+      "name": "requireText",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2075,
+      "baselineEndLine": 2079,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "非空字符串边界。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisExpansionPortV1",
+        "assertEvidenceProjectionIntegrity",
+        "assertStrictProducerLineageIntegrity",
+        "createCausalRepairNodeV1",
+        "createStrictAnalysisContextProjectionV1",
+        "createStrictAnalysisGateOutcomeV1",
+        "createStrictHypothesisExpressionSetReceiptV1",
+        "createStrictProducerExpressionSetV1",
+        "createStrictProducerLineageReceiptV1",
+        "createStrictProducerZeroDisposition",
+        "validateAuthoredProjection"
+      ],
+      "localDependencies": [
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2081
+    },
+    {
+      "name": "requireCoreHash",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2081,
+      "baselineEndLine": 2085,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "要求sha256:加64位hex格式；不证明来源权威。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "fail"
+      ],
+      "runtimeCalls": [
+        "fail"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2087
+    },
+    {
+      "name": "fail",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2087,
+      "baselineEndLine": 2089,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "抛稳定错误码的Error。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisExpansionPortV1",
+        "assertAnalysisFixpointIntegrity",
+        "assertAppendOnlyIds",
+        "assertCausalRepairNodeIntegrity",
+        "assertContainsIds",
+        "assertEvidenceProjectionIntegrity",
+        "assertSameIds",
+        "assertStrictAnalysisEpochSnapshotIntegrity",
+        "assertStrictAnalysisGateOutcomeIntegrity",
+        "assertStrictAnalysisIdentityStable",
+        "assertStrictAnalysisLoopLimits",
+        "assertStrictAnalystEpochIntegrity",
+        "assertStrictContextIntegrity",
+        "assertStrictProducerExpressionSetIntegrity",
+        "assertStrictProducerLineageIntegrity",
+        "createCausalRepairNodeV1",
+        "createStrictAnalysisContextProjectionV1",
+        "createStrictAnalysisEpochSnapshotV1",
+        "createStrictAnalysisFixpointV1",
+        "createStrictAnalysisGateOutcomeV1",
+        "createStrictFalsifications",
+        "createStrictHypothesisExpressionSetReceiptV1",
+        "createStrictInductions",
+        "createStrictProducerExpressionSetV1",
+        "createStrictProducerLineageReceiptV1",
+        "createStrictProducerZeroDisposition",
+        "findDispositionReview",
+        "indexStrictHypotheses",
+        "normalizeIds",
+        "normalizeStrictProducerProposals",
+        "rebuildInductionInputs",
+        "rejectLegacySemanticAuthority",
+        "rejectProducerCallerLineageFields",
+        "requireCoreHash",
+        "requireText",
+        "resolveStrictHypothesisDispositions",
+        "resolveStrictProducerPredecessor",
+        "validateAuthoredProjection",
+        "validateDispositionReviewConservation",
+        "validateProducerExpressionCardinality",
+        "validateStrictAnalysisEpochTransitionV1",
+        "validateStrictAnalysisPassTransition",
+        "validateStrictAnalysisRetryTransition",
+        "validateStrictPopulationAuthority",
+        "validateStrictStageToolCallsV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2093
+    },
+    {
+      "name": "hashCanonical",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2091,
+      "baselineEndLine": 2095,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "Agent既有hex摘要：递归localeCompare键排序后SHA-256；与Core通用canonical不是同一字节合同。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertCausalRepairNodeIntegrity",
+        "assertEvidenceProjectionIntegrity",
+        "assertStrictProducerExpressionSetIntegrity",
+        "assertStrictProducerLineageIntegrity",
+        "createCausalRepairNodeV1",
+        "createStrictAnalysisContextProjectionV1",
+        "createStrictAnalysisEpochSnapshotV1",
+        "createStrictAnalysisGateOutcomeV1",
+        "createStrictProducerExpressionSetV1",
+        "createStrictProducerLineageReceiptV1",
+        "hashCoreCanonical",
+        "validateStrictAnalysisEpochTransitionV1",
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [
+        "sortCanonical"
+      ],
+      "runtimeCalls": [
+        "sortCanonical"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2097
+    },
+    {
+      "name": "hashCoreCanonical",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2097,
+      "baselineEndLine": 2099,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "在Agent既有摘要前加sha256:；本轮按root决定保持字节，不机械替换Core helper。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "assertAnalysisFixpointIntegrity",
+        "assertStrictProducerExpressionSetIntegrity",
+        "normalizeStrictProducerProposals"
+      ],
+      "localDependencies": [
+        "hashCanonical"
+      ],
+      "runtimeCalls": [
+        "hashCanonical"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2103
+    },
+    {
+      "name": "sortCanonical",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2101,
+      "baselineEndLine": 2113,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "Agent递归对象键排序，保留数组顺序；与另外两处Agent helper在基线同实现。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "hashCanonical"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [
+        "sortCanonical"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2107
+    },
+    {
+      "name": "freeze",
+      "kind": "FunctionDeclaration",
+      "baselineLine": 2115,
+      "baselineEndLine": 2123,
+      "source": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "src/agent/production/strictPipeline/primitives.ts",
+      "responsibility": "当前已修复为WeakSet访问控制：浅冻容器仍递归冻子项；不改变对象引用。",
+      "authority": "Agent-owned contract/orchestration/helper",
+      "coreDependencies": [],
+      "internalCallers": [
+        "StrictAnalysisExpansionPortV1",
+        "createCausalRepairNodeV1",
+        "createStrictAnalysisContextProjectionV1",
+        "createStrictAnalysisEpochSnapshotV1",
+        "createStrictAnalysisGateOutcomeV1",
+        "createStrictProducerExpressionSetV1",
+        "createStrictProducerLineageReceiptV1",
+        "validateStrictAnalysisEpochTransitionV1",
+        "validateStrictAnalystEpochV1"
+      ],
+      "localDependencies": [],
+      "runtimeCalls": [
+        "freeze"
+      ],
+      "exportStatus": "private",
+      "originalSourceExport": false,
+      "currentConsumers": [],
+      "consumptionAssessment": "由上列内部声明消费，按调用族迁移",
+      "reviewed": true,
+      "currentLine": 2121
+    }
+  ],
+  "classMemberMap": [
+    {
+      "name": "#input",
+      "kind": "PropertyDeclaration",
+      "line": 361,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "冻结端口配置"
+    },
+    {
+      "name": "#receipts",
+      "kind": "PropertyDeclaration",
+      "line": 362,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "只累计Core验证过的扩展回执"
+    },
+    {
+      "name": "#finalSchedule",
+      "kind": "PropertyDeclaration",
+      "line": 363,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "最终Core日程回执缓存"
+    },
+    {
+      "name": "constructor",
+      "kind": "Constructor",
+      "line": 365,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "规范输入与cap，保留调用隔离"
+    },
+    {
+      "name": "enroll",
+      "kind": "MethodDeclaration",
+      "line": 381,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "调用Core validateAnalysisScheduleExpansionV1，再append一次"
+    },
+    {
+      "name": "assertExecutionAllowed",
+      "kind": "MethodDeclaration",
+      "line": 401,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "只准查询真实已登记row"
+    },
+    {
+      "name": "seal",
+      "kind": "MethodDeclaration",
+      "line": 411,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "Core最终日程封印；后续expectedHash行为修复由tool_flow/root单独负责"
+    },
+    {
+      "name": "receipts",
+      "kind": "GetAccessor",
+      "line": 420,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "返回数组副本，保留回执引用"
+    },
+    {
+      "name": "obligationCap",
+      "kind": "GetAccessor",
+      "line": 424,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "读取声明cap"
+    },
+    {
+      "name": "enrolledObligationIds",
+      "kind": "GetAccessor",
+      "line": 428,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "从回执推导登记ID"
+    },
+    {
+      "name": "finalSchedule",
+      "kind": "GetAccessor",
+      "line": 434,
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "proposedModule": "analysisLoop",
+      "role": "读取封印结果"
+    }
+  ],
+  "dependencyProof": {
+    "comparisonWithRoot": "独立图与root declarations.json/extraction-groups.json的94项归组一致；root将assertAnalysisFixpointIntegrity归analyst、四个stage gate声明单列gates，职责更清楚。",
+    "runtimeEdges": {
+      "analysisLoop": [
+        "primitives"
+      ],
+      "analyst": [
+        "primitives"
+      ],
+      "lineage": [
+        "analysisLoop",
+        "analyst",
+        "primitives"
+      ],
+      "expressions": [
+        "lineage",
+        "primitives"
+      ],
+      "gates": [
+        "primitives"
+      ],
+      "primitives": []
+    },
+    "includingTypesEdges": {
+      "analysisLoop": [
+        "primitives"
+      ],
+      "analyst": [
+        "primitives"
+      ],
+      "lineage": [
+        "analysisLoop",
+        "analyst",
+        "primitives"
+      ],
+      "expressions": [
+        "analyst",
+        "lineage",
+        "primitives"
+      ],
+      "gates": [
+        "primitives"
+      ],
+      "primitives": []
+    },
+    "cycles": [],
+    "privateHelpersNeedingInternalExport": [
+      "assertAnalysisFixpointIntegrity",
+      "assertCausalRepairNodeIntegrity",
+      "assertContainsIds",
+      "assertSameIds",
+      "assertStrictAnalystEpochIntegrity",
+      "assertStrictContextIntegrity",
+      "assertStrictProducerLineageIntegrity",
+      "fail",
+      "freeze",
+      "hashCanonical",
+      "hashCoreCanonical",
+      "normalizeIds",
+      "requireCoreHash",
+      "requireText"
+    ],
+    "exportRule": "这些private helper仅为内部跨模块import而export，不能在原facade中用export*全部抬出，也不能增加src/production.ts/package公开surface。",
+    "fileBoundaryReuse": "使用现有fileBoundaries.requiredUnder覆盖新目录；primitives仅node:crypto；analysisLoop/analyst/gates允许既有@alembic/core/production和primitives；lineage只向analysisLoop/analyst/primitives；expressions只向lineage/primitives及原Core入口（analyst类型桥继续豁免）。由root按实际import生成精确文件白名单，不造新linter。"
+  },
+  "coreAuthorityReview": [
+    {
+      "agent": "validateStrictPopulationAuthority",
+      "core": "canonicalizeObservationPopulationV1",
+      "assessment": "Core决定分母、执行receipt、事实lineage和complete；Agent额外限制本context已知fact及complete要求。保留，不是复制Core算法。"
+    },
+    {
+      "agent": "createStrictClusterSet",
+      "core": "canonicalizeKnowledgeClustersV1",
+      "assessment": "仅委托。可随analyst迁移；三行wrapper不是第二套authority。"
+    },
+    {
+      "agent": "createStrictInductions / createStrictFalsifications",
+      "core": "createInductionReceiptV1 / createFalsificationReceiptV1",
+      "assessment": "Core决定语义收据；Agent做跨集合覆盖、scope和已登记查询约束，Core单条constructor缺少这些Agent上下文，不能删。"
+    },
+    {
+      "agent": "validateDispositionReviewConservation",
+      "core": "assertKnowledgeDispositionReviewV1",
+      "assessment": "重复核验已消费/声明review有明确目的：Core验每条回执，Agent阻止orphan、重用和换绑。按hash缓存跳过验证会把调用方自算hash重新当权威。"
+    },
+    {
+      "agent": "assertStrictAnalystEpochIntegrity / rebuildStrictAnalystEpoch",
+      "core": "公开population/cluster/induction/falsification constructors",
+      "assessment": "跨进程重建语义而非只看epochHash。必须保留完整executionReceipts和review ledger，不能收敛成平行hash数组。"
+    },
+    {
+      "agent": "createStrictAnalysisFixpointV1",
+      "core": "createAnalysisFixpointReceiptV1",
+      "assessment": "Core负责日程守恒/fixpoint；Agent再封闭本轮hypothesis与review context；两个层面不能合并为一次布尔检查。"
+    },
+    {
+      "agent": "createStrictHypothesisExpressionSetReceiptV1",
+      "core": "validateHypothesisExpressionSetReceiptV1",
+      "assessment": "Agent提供其proposal identity/fingerprint精确映射，Core判terminal closure及非draft审查；不授予persist/admission。"
+    },
+    {
+      "agent": "createStrictTypedGateReturnV1",
+      "core": "createTypedGateReturnV1",
+      "assessment": "薄委托可留gates，保留原source兼容符号；不要为了省wrapper改变外部绑定身份或扩大Core导出。"
+    }
+  ],
+  "duplicateAnalysis": [
+    {
+      "item": "Agent canonical helpers",
+      "evidence": [
+        "StrictProductionPipeline:2091/2101",
+        "IndependentValueReviewer:386/390",
+        "PlanAgentRun:344/348"
+      ],
+      "conclusion": "基线递归sortCanonical正文相同，三个hash实现均以该排序后的JSON生成hex SHA-256（另外两处经sha256/hashText薄函数）。本轮提取primitives可以保持目标模块字节；跨到reviewer/plan的共享化不必与职责迁移混在一起。",
+      "doNot": "不要直接替换为stableStringify或Core canonical，仅因名字近似就假定等价。"
+    },
+    {
+      "item": "hashCoreCanonical并非Core hashCanonicalJson字节等价",
+      "coreSource": {
+        "path": "AlembicAgent/node_modules/@alembic/core/src/service/project-context/foundation/canonical.ts",
+        "line": 11
+      },
+      "probe": "同一{schemaVersion:1,authored:{retrievalProfile:{Z:1,a:2}}}，Agent=sha256:2e96395df44cdf1cf92890630f81d1b93ac583fb489916b346cfcada13f72ef6；公开@alembic/core/project-context-foundation hashCanonicalJson=sha256:34d0f1e6c86c080781b2dcc41ba8bf5a72fa2f0ebfab65f6e905ea5b12084207。",
+      "cause": "Agent用localeCompare键排序；Core用Object.keys.sort并拒绝non-finite/不支持的JSON值。前缀相同不代表canonical字节相同。",
+      "disposition": "root已明确本轮保持原字节，因已有主消费者合同不能直接共用；记录为有证据的非等价，不在本轮扩大修复。"
+    },
+    {
+      "item": "Producer knowledge-root semantic projection",
+      "evidence": [
+        "createStrictProducerLineageReceiptV1:928",
+        "assertStrictProducerLineageIntegrity:1920"
+      ],
+      "conclusion": "两处明确字段白名单内容等价，可在lineage模块内部用一个固定投影builder复用；但建议先保持body纯迁移，后续再小步提取并保留root id拒换绑测试。",
+      "doNot": "不能用rest/spread排除几个字段替代固定白名单，未知字段参与hash会改变合同。"
+    },
+    {
+      "item": "Evidence constructor vs integrity validator",
+      "evidence": [
+        "IndependentValueReviewer.createFrozenEvidenceProjection:83",
+        "assertEvidenceProjectionIntegrity:1847"
+      ],
+      "conclusion": "都检查content/range/hash，但不是完全等价：constructor要求entries非空、复制entry并创建hash，integrity validator验证传入hash且错误码/返回语义不同。不能机械合并/互相替换。"
+    },
+    {
+      "item": "Epoch入口重验",
+      "evidence": [
+        "StrictProductionStages.readStrictAnalysisEpoch",
+        "PipelineStrategy的strict epoch读取",
+        "assertStrictAnalysisEpochSnapshotIntegrity"
+      ],
+      "conclusion": "存在可共享的重建/schema/hash骨架，但消费者还分别管entry limits或Agent调用绑定。最多共享实现，不减少边界校验次数；本轮与root PipelineStrategy变更保持独立。"
+    }
+  ],
+  "publicSurface": {
+    "runtimeCount": 10,
+    "packageRuntime": [
+      "createStrictAnalysisContextProjectionV1",
+      "createStrictAnalysisEpochSnapshotV1",
+      "createStrictAnalysisGateOutcomeV1",
+      "validateStrictAnalysisEpochTransitionV1",
+      "createStrictAnalysisExpansionPortV1",
+      "validateStrictAnalystEpochV1",
+      "createStrictAnalysisFixpointV1",
+      "createStrictProducerLineageReceiptV1",
+      "createStrictProducerExpressionSetV1",
+      "createStrictHypothesisExpressionSetReceiptV1"
+    ],
+    "packageTypes": [
+      "StrictAnalysisContextProjectionV1",
+      "StrictAnalysisContextInputV1",
+      "StrictAnalysisLoopLimitsV1",
+      "StrictAnalysisEpochSnapshotInputV1",
+      "StrictAnalysisEpochSnapshotV1",
+      "StrictAnalysisGateOutcomeInputV1",
+      "StrictAnalysisGateOutcomeV1",
+      "StrictAnalysisEpochTransitionV1",
+      "StrictAnalysisExpansionPortInputV1",
+      "StrictAnalysisExpansionPortV1",
+      "StrictInductionInputV1",
+      "StrictHypothesisDispositionV1",
+      "StrictFalsificationInputV1",
+      "StrictAnalystEpochInputV1",
+      "ProducerEligibleHypothesisV1",
+      "StrictAnalystEpochV1",
+      "CreateStrictAnalysisFixpointInputV1",
+      "StrictProducerEvidenceProjectionV1",
+      "StrictProducerLineageReceiptV1",
+      "CreateStrictProducerLineageReceiptInputV1",
+      "CausalRepairNodeV1",
+      "FullAuthoredProjectionV1",
+      "StrictProducerProposalInputV1",
+      "StrictProducerProposalV1",
+      "StrictProducerZeroDispositionV1",
+      "StrictProducerExpressionSetV1",
+      "CreateStrictProducerExpressionSetInputV1",
+      "StrictExpressionTerminalResolutionV1",
+      "CreateStrictHypothesisExpressionSetReceiptInputV1"
+    ],
+    "sourceRuntimeCompatibilityOnly": [
+      "StrictAnalysisExpansionPortV1（值）",
+      "createCausalRepairNodeV1",
+      "createStrictTypedGateReturnV1",
+      "validateStrictStageToolCallsV1"
+    ],
+    "sourceExports": "原StrictProductionPipeline.ts的14个runtime值仍须保留；class在package facade仅type-export，工厂才是public runtime。",
+    "publicEvidence": [
+      {
+        "path": "AlembicAgent/src/production.ts",
+        "line": 22
+      },
+      {
+        "path": "AlembicAgent/test/public-strict-facades.test.ts",
+        "line": 84
+      },
+      {
+        "path": "AlembicAgent/test/fixtures/public-strict-consumer/strict-facades.ts",
+        "line": 84
+      }
+    ],
+    "constraints": "保留public-strict-facades的禁止deep import、禁止repair/stage/gate/tool authority公开导出负例；不新增public子路径。"
+  },
+  "actualWiring": [
+    {
+      "consumer": "AlembicAgent/src/agent/production/StrictProductionStages.ts",
+      "role": "真实阶段工厂消费snapshot/transition/expansionPort；enabled端口仍由宿主注入。"
+    },
+    {
+      "consumer": "AlembicAgent/src/agent/strategies/PipelineStrategy.ts",
+      "role": "真实执行循环消费typed gate return、stage tool authority和strict epoch快照。"
+    },
+    {
+      "consumer": "AlembicAgent/src/agent/memory/ActiveContext.ts",
+      "role": "bind/fromJSON重建context whitelist；不能从Markdown/live source补语义权威。"
+    },
+    {
+      "consumer": "AlembicAgent/src/agent/evaluation/analysisArtifact.ts",
+      "role": "携带严格context；旧scratchpad不产生derived facts。"
+    },
+    {
+      "consumer": "AlembicAgent/src/agent/evaluation/StrictProductionFixtureEvaluation.ts",
+      "role": "评估fixture端口构造；是可控测评接线，不是生产host完整语义实现。"
+    },
+    {
+      "consumer": "AlembicAgent/src/production.ts",
+      "role": "对宿主提供语义epoch/fixpoint/lineage/expression构造器；部分公开构造器本仓只有测试使用，因为宿主负责组装strict ports，不能据此判死代码。"
+    }
+  ],
+  "testCoverageAndCleanup": [
+    {
+      "file": "AlembicAgent/test/strict-production-chain.test.ts",
+      "actual": "真实Core receipts +Agent语义链、ActiveContext白名单、严格StageFactory/PipelineStrategy权限、独立reviewer；混合边界但并非重复同一测试。",
+      "retain": [
+        "round-trips the entire whitelist and forbids Markdown/live-read derivation",
+        "enrolls counterqueries before execution and preserves variants/outliers",
+        "blocks Producer submit/review/persist tools at the existing production strategy boundary",
+        "routes the real generateDimensionPipeline factory through the existing strict stage chain"
+      ],
+      "cleanup": "可复用fixture已存在的receipt工厂减少重复准备，但不能用single-hypothesis fixture替换variants/outliers多尺度场景。"
+    },
+    {
+      "file": "AlembicAgent/test/strict-production-rework.test.ts",
+      "actual": "0/1/N、真实父链version/depth、Core review/cluster hash、旧hash替换拒绝、完整parent和caller重置拒绝；本轮补不可变性与非法disposition/合法unknown。",
+      "retain": [
+        "derives immutable roots from semantic receipts and cannot reset the repair depth",
+        "uses the exact Core cluster hash and rejects review-context rebound at seal",
+        "rejects %s substitution even when a caller preserves the old lineage hash",
+        "verifies the complete parent set rather than trusting a caller-supplied parent id"
+      ],
+      "cleanup": "大首例可按0/1/N terminal closure与repair depth拆清断言归属并共享已有createLineageFixture；不删独立Core hash/receipt断言，不用生产helper生成expected hash导致自证。"
+    },
+    {
+      "file": "AlembicAgent/test/strict-iterative-analysis.test.ts",
+      "actual": "真实Strategy+strict factory与可控port，验证append-only epoch、影子obligation、declared subset、outstanding旁路、界限、seal与legacy兼容。",
+      "retain": [
+        "rejects a pre-authorized shadow obligation omitted from the typed retry outcome",
+        "authorizes every appended obligation instead of trusting the typed declaration subset",
+        "rejects an undeclared terminal transition that resolves prior outstanding work in parallel",
+        "preserves the existing non-strict analysis_retry behavior"
+      ],
+      "cleanup": "相似setup可局部复用，但失败各自跨不同authority，不应合并为仅几个predicate表格。"
+    },
+    {
+      "file": "AlembicAgent/test/public-strict-facades.test.ts",
+      "actual": "package exports与exact runtime manifest；与typed public consumer fixture互补。",
+      "retain": [
+        "classifies the new facades as stable with exact runtime signatures",
+        "keeps strict implementation and evaluator internals forbidden"
+      ],
+      "cleanup": "不因模块搬迁更改这些外部验收入口，也不把它们替换成检查新模块文件名的镜像测试。"
+    }
+  ],
+  "verification": {
+    "sourceReview": "原2123行全文与94声明完成；Core只读比对12个公开权威函数，代码来源坐标随每行coreDependencies列出。",
+    "probes": [
+      "真实源码公开snapshot入口的浅冻输入可变性复现",
+      "真实semantic fixture的非法status→epoch→fixpoint错误成功复现",
+      "公开Core canonical函数与Agent hashCoreCanonical的混合大小写key差异复现"
+    ],
+    "regressionCommands": [
+      {
+        "command": "Node22 vitest run test/strict-production-rework.test.ts -t 'invalid hypothesis disposition|keeps unknown hypotheses'",
+        "result": "RED 1 fail / 1 pass / 14 skipped"
+      },
+      {
+        "command": "Node22 vitest run test/strict-production-rework.test.ts",
+        "result": "GREEN 16 passed"
+      },
+      {
+        "command": "biome check test/strict-production-rework.test.ts",
+        "result": "PASS；未format整份source"
+      },
+      {
+        "command": "git diff --check",
+        "result": "PASS"
+      }
+    ],
+    "notRun": "未运行竞争性全量check、真实API或邻仓写入。后续迁移和最终完整check由root执行。"
+  },
+  "stillOpenP1P2": [],
+  "pendingOtherOwnerWork": "ExpansionPort.seal的expectedHash行为修复由tool_flow/root负责，本报告不替代其RED/GREEN；纯迁移须以行为修复后的提交为基线。",
+  "nextStep": "root提交本轮有独立RED/GREEN的行为修复，随后按六模块DAG作纯迁移；原facade的精确exports、Core调用顺序、错误码、hash字节与现有独立边界测试全部保留。",
+  "snapshots": [
+    {
+      "path": "AlembicAgent/src/agent/production/StrictProductionPipeline.ts",
+      "sha256": "5e679415f8e5eebb185e232e7f57e4181c213ae812844abd762eb5cf6db92a22"
+    },
+    {
+      "path": "AlembicAgent/test/strict-production-rework.test.ts",
+      "sha256": "a817057bfea8988f2fc09850ec11dd3e7fe1cf5b09513ed6631d905fc42dc4f3"
+    }
+  ]
+}

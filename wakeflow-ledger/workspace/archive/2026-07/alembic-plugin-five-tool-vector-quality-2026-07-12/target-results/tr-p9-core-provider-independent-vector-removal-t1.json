@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p9-core-provider-independent-vector-removal-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p9-core-provider-independent-vector-removal-p1",
+  "dispatchGroup": "p9-core-provider-independent-vector-removal-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p9-core-provider-independent-vector-removal-t1",
+  "status": "completed",
+  "summary": "P9 Core provider-independent vector removal complete at 6b7de17494bac4236822d8a0baaa61cc3b01b670. VectorService now binds maintenance with no embed provider; delete/deprecate remove entry+regions, authoritative cleanup prunes absent Recipes before generation while retaining live old chunks, reconcile verifies actual store writes and reports deferred/degraded honestly, and later provider installation re-enables event upserts.",
+  "evidenceRefs": [
+    "AlembicCore/package.json",
+    "test/VectorService.test.ts",
+    "test/SyncCoordinator.test.ts",
+    "test/RecipeRegionVectorIndex.test.ts",
+    "AlembicCore commit range 4633beb..6b7de17"
+  ],
+  "verification": [
+    "Baseline focused suites: PASS, 5 files / 106 tests",
+    "Focused final suites: PASS, 5 files / 111 tests",
+    "npm run build:check: PASS",
+    "npm run build: PASS",
+    "npm run lint:public-api-boundary: PASS",
+    "npm run lint:layer-contract: PASS",
+    "npm run lint:scope-resolution: PASS",
+    "npm run lint && npm run lint:naming && npm run lint:retired-symbols: PASS",
+    "npm test: PASS, 177 files / 1670 tests",
+    "Public dist/vector.js JSON probe: provider=null, autoSyncEnabled=true, deleted/deprecated entry+region vectors removed, live old chunk retained, zero batchUpserts; authoritative absent region removed with degraded status and live old chunk retained",
+    "npm run check: inherited FAIL only at src/infrastructure/vector/ASTChunker.ts:32; blob unchanged at 6e88dab655821ed72e9389a7c274b87d07fbecde"
+  ],
+  "risks": [
+    "P8 Plugin must consume the accepted Core commit in its own rework; P9 intentionally made no Plugin changes and performed no real index cleanup.",
+    "Repository-wide npm run check remains blocked by the pre-existing ASTChunker.ts doctrine violation; the file was not changed by P9."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "VectorService.initialize required a truthy embedProvider before creating SyncCoordinator, so provider-null runtimes had no delete/deprecate/reconcile listeners. Authoritative region cleanup also ran after the provider gate, and reconcile counted queued missing entries as synced before proving persistence.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Baseline and audit -> RED provider-null lifecycle removal -> nullable removal coordinator -> RED authoritative prune -> split absent/live cleanup phases -> RED reconcile deferral and embed-failure overclaim -> store-truth verification -> provider migration propagation -> full verification and review.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "change-scope",
+      "value": "Changed only AlembicCore src/service/vector/{VectorService,SyncCoordinator,RecipeRegionVectorIndex}.ts and their three focused test files. No Plugin, Search, Prime, Graph, Guard, live DB/vector data, Test, gates, or host-selection changes.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "tests",
+      "ref": "test/VectorService.test.ts",
+      "value": "RED/GREEN coverage spans provider-null delete/deprecate, deferred live update, unavailable provider reconcile, embed failure reconcile, authoritative prune/live safety, provider migration, and null-provider concurrent drain. Final focused run: 5 files / 111 tests passed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "full-suite",
+      "ref": "AlembicCore/package.json",
+      "value": "From AlembicCore: npm test passed 177 files / 1670 tests; build, public API, layer, scope, formatting, naming, and retired-symbol gates passed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "runtime-probe",
+      "ref": "AlembicCore/package.json",
+      "value": "Run the recorded node --input-type=module probe against dist/vector.js after npm run build. Raw JSON proved lifecycle provider=null removed exactly two entry and two matching region ids, retained unrelated live region, batchUpserts=0; authoritative provider=null removed the absent region, status=degraded/embed-provider-unavailable, retained live old chunk, batchUpserts=0.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "commit",
+      "commit": "6b7de17494bac4236822d8a0baaa61cc3b01b670",
+      "value": "Final Core HEAD; RED/GREEN history spans 4633beb..6b7de17.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: all six task requirements and validation boundaries covered. Stage 2: fixed misleading upsert logs, provider migration propagation, configured-unavailable probing, late embed-failure overclaim, cleanup ordering, and stale comments. No blocker/high/medium findings remain; only inherited doctrine risk is external to P9.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "provider-null-delete-proof",
+      "value": "Unit and public runtime probe show delete/deprecate remove entry_* plus matching recipe_region_* with embedProvider=null while autoSyncEnabled remains true and embedProviderAvailable false."
+    },
+    {
+      "kind": "provider-null-authoritative-prune-proof",
+      "value": "Provider-null authoritative sync removes authority-absent region ids before returning degraded, with removed count and no batch upsert."
+    },
+    {
+      "kind": "live-replacement-safety-proof",
+      "value": "Provider-null or failed embedding preserves old live Recipe chunks; obsolete live chunks are removed only after successful replacement upsert. Subset mode never removes unrelated Recipes."
+    },
+    {
+      "kind": "reconcile-degradation-proof",
+      "value": "Null/unavailable providers return missingSynced=0, missingDeferred count and embed-provider-unavailable; provider late failure is verified against post-flush store ids and returns vector-sync-incomplete instead of false success."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p9-core-provider-independent-vector-removal-p1__AlembicCore__p9-core-provider-independent-vector-removal-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-core-provider-independent-vector-removal-p1__AlembicCore__p9-core-provider-independent-vector-removal-t1.json",
+    "deliveryRunId": "run-delivery-p9-core-provider-independent-vector-removal-p1__AlembicCore__p9-core-provider-independent-vector-removal-t1",
+    "dispatchGroup": "p9-core-provider-independent-vector-removal-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-core-provider-independent-vector-removal-p1__AlembicCore__p9-core-provider-independent-vector-removal-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 46,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p9-core-provider-independent-vector-removal-p1",
+    "targetTaskId": "p9-core-provider-independent-vector-removal-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p9-core-provider-independent-vector-removal-p1",
+    "resultId": "tr-p9-core-provider-independent-vector-removal-t1",
+    "createdAt": "2026-07-13T01:51:15.971Z"
+  },
+  "createdAt": "2026-07-13T01:51:15.971Z",
+  "stateRevisionObserved": 46,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

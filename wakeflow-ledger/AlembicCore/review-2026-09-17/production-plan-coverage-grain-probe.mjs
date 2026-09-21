@@ -1,0 +1,6 @@
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+const {projectPlanGenerationStateFromRecords}=await import(pathToFileURL(path.join(process.cwd(),'src/service/plan/status/recipeStatus.ts')).href);
+const intent={generationStage:'moduleMining',projectProfile:{primaryLanguage:'typescript'},dimensions:[{dimensionId:'architecture',priority:1,rationale:'Review boundaries',targetRecipes:3}],scale:{totalRecipeBudget:3,depthLevels:['module']},moduleBindings:[{modulePath:'src',dimensions:['architecture'],targetRecipes:3,priority:1}],plannedNextActions:[{tool:'code.read',reason:'Inspect source',order:1}],evidenceRefs:[{kind:'human',ref:'review-fixture'}]};
+const state=projectPlanGenerationStateFromRecords({intent,recipes:[{id:'recipe-one',title:'One recipe across three files',lifecycle:'active',dimensionId:'architecture'}],sourceRefs:['a.ts','b.ts','c.ts'].map(name=>({recipeId:'recipe-one',sourcePath:`src/${name}`,status:'active'}))});
+console.log(JSON.stringify({probe:'plan-coverage-recipe-grain',globalGenerated:state.coverage.generated,byDimension:state.coverage.byDimension.architecture,byModule:state.coverage.byModule.src,byModuleDimension:state.coverage.byModuleDimension.src.architecture,expectedGeneratedPerBucket:1,expectedMissingPerBucket:2,status:state.coverage.byDimension.architecture.generated===1?'GREEN':'RED'},null,2));

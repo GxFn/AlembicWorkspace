@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i1-i2-core-content-terminal-fence-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "AlembicCore PC-F 最小 content terminal fence 包。基线为 443ab564623cc6f3a5ee70451feb67d5e9d338a3；只关闭 revision.kind=content 且 host 未提供 verifySnapshot 时，Core fallback 把候选直接视为 verified 的缺口。\n\n唯一实现目标：\n1. 在 fallback 成功前，用现有 ports、inventory policy、规范化与 hash 逻辑执行一次终态完整 eligible inventory/content 重读；逐项比较 path、mode、owner、size/blob、eligibleInventoryHash 与 workingTreeContentHash。任何新增、删除、修改或内容不一致都抛 PROJECT_CONTEXT_SOURCE_STATE_DRIFT。\n2. 保留稳定 legacy content host 兼容性；不把 verifySnapshot 改为必填，不新增锁、重试器、snapshot 子系统、公共 contract/type、缓存或通用框架。优先只改 capture.ts 与 ProjectContextFoundation.test.ts；若需局部 helper，留在同模块。\n3. 先保留 RED：两轮均认证 A，但每轮 post-observation 后终态为 B，A/B hash 不同，当前错误返回 readiness=passed；修复后该探针必须确定性失败。另验证稳定 content 继续通过、terminal add/delete/modify 失败、AbortError 不被改写。\n4. 回归现有 clean-Git/dirty-Git、ownership、artifact integrity、store/cache/durability 测试，证明没有重做或回退既有成果。\n5. 只提交一个小而清晰的 AlembicCore commit。重跑 build:check、focused suite、完整 npm test 与现有边界门禁；机械重生成 PC-F audit/evidence 仅用于绑定新 commit/tree/dist/runtime hash及双 fresh-process，不扩展报告 schema或重写已通过的 ownership 逻辑。\n\n明确非目标：不修改 node Git verifier、dependency ownership/classifier、store/lease/durability、其他仓、ASTChunker、I3+、Test、Wakeflow；不做顺手重构。完成仅允许总控重新验证 PC-F，不能自行解锁下游。",
+  "status": "pending",
+  "sourceRef": "Requirement Design §§7/18.0；controller revision 14 blocked reason；user decision: 采用兼容旧 host 的 Core 内终态完整重读，保持简洁准确、禁止过度设计。",
+  "designIntent": "用一个局部终态重读/hash 比较关闭 content revision 的认证窗口；复用现有捕获结构，不新增公共契约或旁路系统。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T11:34:47.275Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i1-i2-core-content-terminal-fence-t1",
+      "taskPackageId": "i1-i2-core-content-terminal-fence-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "只修复 content/no-verifier fallback 的终态完整重读与 hash fence；保持 legacy content host 兼容，并用 A/B 终态错位探针证明 fail closed。",
+      "status": "pending",
+      "createdAt": "2026-07-15T11:34:47.275Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

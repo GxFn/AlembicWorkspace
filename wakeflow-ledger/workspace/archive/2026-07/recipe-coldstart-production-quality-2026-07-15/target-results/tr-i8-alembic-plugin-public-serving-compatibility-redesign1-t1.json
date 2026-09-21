@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8-alembic-plugin-public-serving-compatibility-redesign1-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8-alembic-plugin-public-serving-compatibility-redesign1-p1",
+  "dispatchGroup": "dg-i8-alembic-plugin-public-serving-compatibility-redesign1",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8-alembic-plugin-public-serving-compatibility-redesign1-t1",
+  "status": "blocked",
+  "summary": "I8 在 exact accepted artifacts 上被上游 public snapshot 物理合同阻塞。Core 只提供 route/manifest/final-coverage 对象合同；Main 只把 route bytes 写到授权指定的 confined path，manifest/final coverage/validation 留在 run-private checkpoint，Recipe DB/files/vector 留在 private revision，未发布 strict marker 或可由 snapshotId 推导的 immutable public bundle。Plugin 被禁止读取 candidate/checkpoint、导入 Main 或猜路径，因此不能合法构造 positive versioned fixture/ordinary resolver。未修改 Plugin，未提交，三仓保持 clean。此 revision 仅修正 evidenceRefs 为真实文件路径，语义结论不变。",
+  "evidenceRefs": [
+    "AlembicCore/src/service/production/ProductionPersistenceContracts.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictAuthorization.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictColdStartOrchestrator.ts",
+    "Alembic/lib/recipe-pipeline/generate/strict/StrictFinalizationRuntime.ts",
+    "Alembic/test/integration/StrictRecipePipelineFacade.integration.test.ts",
+    "AlembicPlugin/lib/host-runtime/context/ProjectRuntimeContext.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/host/read-only-search-snapshot.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/handlers/recipe-map.ts",
+    "/tmp/alembic-main-i8-evidence.QjBQV6/public-route.json",
+    "/tmp/alembic-main-i8-evidence.QjBQV6/checkpoint.json",
+    "/tmp/alembic-main-i8-evidence.QjBQV6/runtime-report.json",
+    "/tmp/alembic-main-i8-evidence.QjBQV6/journal.jsonl"
+  ],
+  "verification": [
+    "Baseline identity: Plugin aba8c511be2a0de812fb8e9976062090fe49998d/tree 692dfa44f2b9b8cead5adde2755cc6396b75a643; Core 5ad2e0a04d27000a27927acc4de0d83418b2420a/tree 9cc8ed0966ad71320c792765b4c0a2a3fd1f869d; Main bee8272f9ef2f959829577d38f27447a492e75e7/tree c255770449cf4a9c68227f67730861a2db1d3801; worktrees clean.",
+    "Core evidence locations: ProductionPersistenceContracts.ts lines 1009, 1110, 1129, 1173 define FinalCoverageBindingReceiptV1, StrictPublicationMarkerV1, ServingSnapshotManifestV1 and PublicKnowledgeRouteV1; no outer production writer for StrictPublicationMarkerV1 exists.",
+    "Main evidence locations: StrictAuthorization.ts lines 10-18 accepts caller-authorized publicRoutePath; StrictColdStartOrchestrator.ts lines 430-506 keeps finalization in private checkpoint and commits only prepared route bytes; StrictFinalizationRuntime.ts lines 147-239 creates receipt objects and a hash-only route.",
+    "Plugin evidence locations: ProjectRuntimeContext.ts lines 1-75 resolves legacy dataRoot/databasePath only; read-only-search-snapshot.ts lines 48-82 reads legacy DB/config/vector leaves; recipe-map.ts around lines 588-603 derives a PC-F probe-shaped finalCoverageReceipt rather than the exact publication receipt.",
+    "Target Main integration reproduction passed 1/1. Captured SHA-256: public-route afcebcdb7a9969e0f9ab45bce34713e4c927bf03bfb32ab62d7d770d1d7279b6; checkpoint 9961b67b1b0a099b5165a4050d365d118c5da961f54e20d8cc918c3ab84c593e; runtime report 8a17c5ae88bf3c8abe156ec1b72c57f7f500b6cfd879e159a5e1c33b09096209; journal 25be8727624f0e53ad96497ce584a08e2a5a3ab997228496eb833827f77204f0.",
+    "Controller independently inspected the captured route: it has no path/snapshotPath/manifestPath/dataPath and no finalCoverage object; only the private checkpoint holds servingManifest/finalCoverage/servingSnapshotValidation. runtime compatibility.pluginServingImplemented=false.",
+    "Plugin npm run build:check passed and focused baseline 6 files/74 tests passed; these prove current legacy/read-only behavior only, not I8 compatibility.",
+    "Boundary scan found no Main marker writer/public snapshot bundle and no Plugin public route/manifest/final-coverage/vector-generation resolver. Graph remains live-source and Recipe-free.",
+    "No files changed and no commit created; all three worktrees remain clean."
+  ],
+  "risks": [
+    "Inventing Plugin fixture leaf names or snapshot paths would create a second, unaccepted public protocol.",
+    "Reading Main operation checkpoint/private revision would violate the no-private-candidate boundary.",
+    "Without a persistent strict marker and ordinary route location, route-null cannot be distinguished from legacy DB fallback when a legacy database exists.",
+    "Without the immutable public bundle and vector manifest/store layout, exact generation and cross-generation rejection cannot be implemented.",
+    "The authorized repair owner is Alembic Main, with Core only if the existing consumer-neutral contract needs a minimal physical-layout canonicalizer."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "baseline",
+      "value": "All three exact accepted commits/trees verified clean; Plugin build and 74 focused tests passed."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Contract tracing stopped at the missing producer-to-consumer physical handoff before speculative fixture/resolver edits."
+    },
+    {
+      "kind": "test-first",
+      "value": "RED is the accepted Main integration artifact: hash-only route, private-only manifest/final coverage, and no public bundle/marker/layout."
+    },
+    {
+      "kind": "change-scope",
+      "value": "No product files changed because implementation would require an upstream physical publication contract."
+    },
+    {
+      "kind": "commit",
+      "value": "not-created: blocked before authorized implementation; Plugin remains clean at aba8c511be2a0de812fb8e9976062090fe49998d."
+    },
+    {
+      "kind": "exact-artifact-compatibility",
+      "verify": "blocked-by-missing-public-artifact",
+      "value": "Exact Core/Main source, dist, route and checkpoint artifacts prove object-shape compatibility but no consumer-resolvable public snapshot bundle."
+    },
+    {
+      "kind": "public-five-handler-fixture-tests",
+      "verify": "blocked-precondition",
+      "value": "Cannot author legitimate positive EmbeddedToolExecutor fixtures without inventing the absent physical contract; existing formal handler baseline is 74/74 green."
+    },
+    {
+      "kind": "route-null-isolation",
+      "verify": "red-confirmed",
+      "value": "Four knowledge executors resolve legacy databasePath and cannot distinguish strict route-null from legacy fallback without the persistent marker."
+    },
+    {
+      "kind": "boundary-scan",
+      "verify": "source-reviewed",
+      "value": "Zero Main marker writer/public bundle and zero Plugin publication resolver; Graph remains live-source/Recipe-free."
+    },
+    {
+      "kind": "tests",
+      "verify": "command-output",
+      "value": "Plugin build:check passed; Plugin focused 6 files/74 tests passed; Main strict integration 1/1 passed and exposed blocker."
+    },
+    {
+      "kind": "self-review",
+      "value": "Spec review found all I8 clauses share the same missing public handoff; quality review rejected private checkpoint access, guessed paths, Main dependency, and second protocol."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8-alembic-plugin-public-serving-compatibility-redesign1__AlembicPlugin__i8-alembic-plugin-public-serving-compatibility-redesign1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8-alembic-plugin-public-serving-compatibility-redesign1__AlembicPlugin__i8-alembic-plugin-public-serving-compatibility-redesign1-t1.json",
+    "deliveryRunId": "run-delivery-dg-i8-alembic-plugin-public-serving-compatibility-redesign1__AlembicPlugin__i8-alembic-plugin-public-serving-compatibility-redesign1-t1",
+    "dispatchGroup": "dg-i8-alembic-plugin-public-serving-compatibility-redesign1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8-alembic-plugin-public-serving-compatibility-redesign1__AlembicPlugin__i8-alembic-plugin-public-serving-compatibility-redesign1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 110,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8-alembic-plugin-public-serving-compatibility-redesign1-p1",
+    "targetTaskId": "i8-alembic-plugin-public-serving-compatibility-redesign1-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dg-i8-alembic-plugin-public-serving-compatibility-redesign1",
+    "resultId": "tr-i8-alembic-plugin-public-serving-compatibility-redesign1-t1",
+    "createdAt": "2026-07-16T14:25:22.464Z"
+  },
+  "createdAt": "2026-07-16T14:25:22.464Z",
+  "stateRevisionObserved": 110,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-i8-alembic-plugin-public-serving-compatibility-redesign1-t1",
+    "dispatchGroup": "dg-i8-alembic-plugin-public-serving-compatibility-redesign1",
+    "historyFile": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15/target-results/history/tr-i8-alembic-plugin-public-serving-compatibility-redesign1-t1__dg-i8-alembic-plugin-public-serving-compatibility-redesign1__current-r0001.json"
+  }
+}

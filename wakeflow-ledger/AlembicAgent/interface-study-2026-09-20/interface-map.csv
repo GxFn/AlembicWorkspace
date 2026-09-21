@@ -1,0 +1,13 @@
+id,interface,producer_to_consumer,owner,current_state,decision,evidence,change_boundary
+RUN,AgentRunInput / AgentRunResult,Main callers → AgentService,Agent service,已接通；外层错误与runtime结果政策不同,保留公开入口，归一化有效上下文,AgentRunContracts.ts; AgentService.ts,Agent-only consumer wiring; Main projection migration needs Main
+BUILD,CompiledAgentProfile / RuntimeBuilder,ProfileCompiler → RuntimeBuilder → Runtime,Agent profiles/service,build options仍有unknown，legacy构造形态需保留,窄化依赖，保留真实capability/policy组装,AgentProfileCompiler.ts; AgentRuntimeBuilder.ts,Agent
+SCOPE,SystemRunContext / strategyContext / sharedState,Main input builders → AgentService → PipelineStrategy,Main assembly + Agent scope,多份投影；顶层/嵌套sharedState行为不同，两个Main compactor相同,一次有效上下文解析和一个兼容投影,context-probe.json,Agent + Main
+LIFETIME,ToolContextFactory resources,Main singleton factory → per-call ToolContext,Main,不同fixture身份仍共享sessionStore/deltaCache,按服务/父会话/run或view/call分域,scope-probe.json,Main + Agent semantic contract
+TOOL_CALL,ToolCallRequest / ParsedToolCall,runtime/HTTP/DAG → adapter → router → handler,kernel / router / host,一套执行链；不同入口guard路径不同,保留信封与内部语法，明确各入口授权owner,tool-ports.json TP-1,Agent + Main entrypoint audit
+SCHEMA,schema query / ToolActionAllowlist,TOOL_REGISTRY → catalog → runtime/schema/gates,tools + runtime,重复query wrapper和allowlist词汇,单一查询port和allowlist定义，保留旧wrapper,tool-ports.json TP-4/TP-5,Agent first
+TOOL_RESULT,ToolResult / Envelope / OrdinaryOutput,handler → adapter → pipeline/host/presenter,handler / adapter / kernel,业务、调用、展示含不同信息，status并非全部由typed分支产出,集中分类/诊断映射，保留partial和confirmed write,tool-ports.json TP-2,Agent
+KNOWLEDGE,query / production / management ports,Main services → knowledge handlers → Core,Core semantic contract; Agent consumer ports; Main wiring,production已接；原始repo与read/manage方法不等价,受控Core服务adapter，启用前验证required ports,ToolContextFactory.ts; knowledge/contracts.ts,Agent + Main
+GRAPH,projectGraph / codeEntityGraph,Main factory → graph handler,Main/Core + Agent consumer,当前factory未提供实际graph端口,补真实port或明确availability，不给成功占位,ToolContextFactory.ts; handlers/graph.ts,Main + Agent
+MODEL,Provider / Gateway / Transport DTO,Main AI module → provider → gateway → transport,AI,主链统一，DTO/error引入反向依赖,先leaf contracts，再按vendor收敛重复转换,ai-ports.json AI-I01/03,Agent
+CONFIG,provider config/defaults/env,"Main bootstrap, Factory, constructors, Gateway",composition/config resolver,多个合法入口有不同precedence,先矩阵，再resolved config；入口不新增触网,ai-ports.json AI-I02,"Agent, with Main caller validation"
+USAGE,response usage / observer / run budget,transport → gateway → provider/manager and runtime,per-call response + independent consumers,全局账本/run预算不同，旧structured/embed取消能力有限,统一纯映射；逐调用关联，不用lastUsage侧信道,ai-ports.json AI-I04,Agent

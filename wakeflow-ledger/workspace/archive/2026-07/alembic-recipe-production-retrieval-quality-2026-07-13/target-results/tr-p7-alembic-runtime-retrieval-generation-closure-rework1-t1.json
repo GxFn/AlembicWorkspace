@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+  "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "Alembic",
+  "targetTaskId": "p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+  "status": "completed",
+  "summary": "Alembic exposes GET /api/v1/knowledge/:id/retrieval-readiness as a zero-write pass-through to RecipeProductionGateway.evaluateReadiness, with a closed provider/OpenAPI schema, generated Dashboard contract, native/compatibility/404/diagnostic fixtures, and real HTTP zero-write evidence. Commit 849766b56a10c6e808a0a75ffbb2a8b8f938c791; parent a3db6fdc88006820f86891bc821abe539f9c041d.",
+  "evidenceRefs": [
+    "Alembic/lib/http/routes/knowledge.ts",
+    "Alembic/lib/http/provider-contracts.ts",
+    "Alembic/lib/generated/dashboard-api-types.ts",
+    "Alembic/test/integration/HttpApi.test.ts",
+    "Alembic/test/unit/KnowledgeRouteEntrypointSafetyAo3.test.ts",
+    "Alembic/test/unit/AlembicProviderContracts.test.ts"
+  ],
+  "verification": [
+    "RED focused route/contract tests: 3 target failures because no Express route/provider operation existed",
+    "Post-commit npm run build:check: passed",
+    "Post-commit focused suite: 4 files, 36 tests passed",
+    "npm run build: passed; Dashboard artifact regenerated",
+    "npm run check: passed all type/lint/boundary/unit/integration/coverage/drift/retired-symbol/ring gates",
+    "Alembic Guard guard-public-mrjmkn7n-5: 6 files, 0 violations",
+    "git diff --check/cached check passed; post-commit worktree clean"
+  ],
+  "risks": [
+    "No Alembic blocker; Dashboard consumption remains downstream-owned.",
+    "Five inherited noExplicitAny lint warnings remain outside this diff; npm run check exits 0 and scoped Guard has 0 violations."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "849766b56a10c6e808a0a75ffbb2a8b8f938c791",
+      "value": "parent a3db6fdc88006820f86891bc821abe539f9c041d; clean Alembic worktree",
+      "verify": "git rev-parse HEAD && git rev-parse HEAD^ && git status --short"
+    },
+    {
+      "kind": "tests",
+      "value": "Focused HTTP/provider/generated contract 36/36 passed post-commit; npm run check passed including 31 integration files / 462 passed / 10 skipped plus coverage/boundary/drift gates.",
+      "verify": "npm run check && npm run build:check && npx vitest run test/unit/KnowledgeRouteEntrypointSafetyAo3.test.ts test/unit/AlembicProviderContracts.test.ts test/unit/DashboardApiTypesDrift.test.ts test/integration/HttpApi.test.ts"
+    },
+    {
+      "kind": "self-review",
+      "value": "Requirement review: all six report fields, native/compatibility truth, structural violation report, warning-only runtime diagnostics, typed 404, zero-write GET, same-source publish rejection, and typed 410 old create are covered. Code review: one existing router, one direct public Core gateway call, closed route-specific schema/fixtures and generated drift artifact; no copied readiness, service, state, producer, or gate.",
+      "verify": "git show --stat --oneline 849766b && git diff a3db6fd..849766b -- Alembic/lib/http/routes/knowledge.ts Alembic/lib/http/provider-contracts.ts"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "Accepted Core and Alembic publish already shared KnowledgeService retrieval readiness, but Alembic lacked an HTTP/provider/generated Dashboard read surface, so reviewers saw structured gaps only after publish failed. The new GET exposes RecipeProductionGateway.evaluateReadiness directly and adds no decision logic or writer.",
+      "verify": "rg -n \"evaluateReadiness|retrieval-readiness|getKnowledgeRetrievalReadiness\" Alembic/lib/http/routes/knowledge.ts Alembic/lib/http/provider-contracts.ts Alembic/lib/generated/dashboard-api-types.ts AlembicCore/src/service/knowledge/RecipeProductionGateway.ts"
+    },
+    {
+      "kind": "red-green",
+      "value": "RED: no route and no manifest operation. GREEN: focused plus real HTTP integration passed.",
+      "verify": "npx vitest run test/unit/KnowledgeRouteEntrypointSafetyAo3.test.ts test/unit/AlembicProviderContracts.test.ts"
+    },
+    {
+      "kind": "api-contract",
+      "value": "getKnowledgeRetrievalReadiness is rest-query at /knowledge/{knowledgeId}/retrieval-readiness with a closed six-field 200 schema, typed 404, five fixtures and generated Dashboard schema/route.",
+      "verify": "npx vitest run test/unit/AlembicProviderContracts.test.ts test/unit/DashboardApiTypesDrift.test.ts"
+    },
+    {
+      "kind": "zero-write",
+      "value": "Real GET preserves SQLite rows, Markdown bytes, audit/lifecycle counts, emitted events, base vector index hashes, active generation pointer and generation hashes; unit route requests only recipeProductionGateway.",
+      "verify": "npx vitest run test/integration/HttpApi.test.ts test/unit/KnowledgeRouteEntrypointSafetyAo3.test.ts"
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Exactly six Alembic files changed; no Core/Agent/Plugin/Dashboard/Test/real-data files, migration, producer, state or query-time writer.",
+      "verify": "git diff --name-only a3db6fdc88006820f86891bc821abe539f9c041d..849766b56a10c6e808a0a75ffbb2a8b8f938c791 && git status --short"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p7-alembic-runtime-retrieval-generation-closure-rework1-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-alembic-runtime-retrieval-generation-closure-rework1-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-rework1-t1.json",
+    "deliveryRunId": "run-delivery-p7-alembic-runtime-retrieval-generation-closure-rework1-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+    "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-alembic-runtime-retrieval-generation-closure-rework1-p1__Alembic__p7-alembic-runtime-retrieval-generation-closure-rework1-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 54,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+    "targetTaskId": "p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+    "targetWindow": "Alembic",
+    "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+    "resultId": "tr-p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+    "createdAt": "2026-07-13T19:42:10.443Z"
+  },
+  "createdAt": "2026-07-13T19:42:10.443Z",
+  "stateRevisionObserved": 54,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 2,
+  "supersedes": {
+    "resultId": "tr-p7-alembic-runtime-retrieval-generation-closure-rework1-t1",
+    "dispatchGroup": "p7-alembic-runtime-retrieval-generation-closure-rework1-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p7-alembic-runtime-retrieval-generation-closure-rework1-t1__p7-alembic-runtime-retrieval-generation-closure-rework1-p1__current-r0001.json"
+  }
+}

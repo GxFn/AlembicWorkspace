@@ -1,0 +1,1761 @@
+{
+  "title": "ToolExecutionPipeline 逐函数职责拆分设计",
+  "date": "2026-09-19",
+  "scope": {
+    "source": {
+      "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+      "line": 1
+    },
+    "sourceLineCount": 1302,
+    "sha256": "9f6c38358fb41a58c58fa4221bb0ebbb60ad4cf91cfcc31e7c2ffa7619c744f6",
+    "gitHeadObserved": "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05",
+    "mode": "read-only-design",
+    "noCommitReason": "子代理仅提交审查设计产物，root 独立管理产品编辑与提交。",
+    "excluded": [
+      "不移动 Core/host 持久化或权限执行",
+      "不改相邻仓库",
+      "不重写 reactLoop、HookSystem、ToolRouter scheduler",
+      "不扩新增 runtime package subpath",
+      "不运行全量 check"
+    ]
+  },
+  "conclusion": "按职责切开实现，同时保留 ToolExecutionPipeline.ts 作为完整引擎的具体绑定与公开兼容入口。通用引擎只负责有序 before/execute/after，不认识阶段、manifest、note_finding、memory 或 producer 事实；真实 host 执行与完整安全门保持接线。",
+  "actualCallChain": [
+    {
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+        "line": 243
+      },
+      "behavior": "AgentRuntime 构造时 createToolPipeline()，每个 runtime 拥有 middleware 列表；缓存/ledger 实际存于 loopCtx.sharedState。"
+    },
+    {
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+        "line": 1406
+      },
+      "behavior": "Runtime 顺序处理模型 calls；工具前检查 abort；发送 start/progress；await HookSystem before，false 则自行生成 blocked 结果而不调用本 pipeline。"
+    },
+    {
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+        "line": 1465
+      },
+      "behavior": "pipeline.execute(fc,{runtime:this,loopCtx:ctx,iteration}) → 完整 gates → bridge toolRouter.execute(request) → cache/evidence/observation/tracker/trace/submit。"
+    },
+    {
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+        "line": 1480
+      },
+      "behavior": "读取 result/metadata，写 ctx.toolCalls 和全局历史；metadata.isNew/isSubmit 影响轮次状态机；envelope 是格式化与失败状态依据。"
+    },
+    {
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+        "line": 1520
+      },
+      "behavior": "Runtime 进行结果字符预算裁剪后发送 tool_end/bus/end hook，appendToolResult；本文件可选进度中间件不能替代或重复该链。"
+    },
+    {
+      "evidence": {
+        "path": "../../../AlembicAgent/src/tools/kernel/handler.ts",
+        "line": 64
+      },
+      "behavior": "ToolCallRequest.runtime 经 contextFromToolCall 转为 handler 上下文；sharedState/sets/memoryCoordinator 原引用进入 handler。"
+    },
+    {
+      "evidence": {
+        "path": "../../../AlembicAgent/src/tools/runtime/handlers/knowledge.ts",
+        "line": 926
+      },
+      "behavior": "knowledge 的 sessionCounterBox 依赖 sharedState._sessionCounters 嵌套引用跨调用/阶段浅拷贝累计；request.runtime 本身每调用新建。"
+    },
+    {
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/runtime/LLMInputAssembly.ts",
+        "line": 418
+      },
+      "behavior": "prompt 消费 _producerSubmitLedger 真实提交事实；compactProducerSubmitLedger 读取既有 createdCount/entries/targetSubmits 字段。"
+    }
+  ],
+  "modules": [
+    {
+      "id": "contracts",
+      "path": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineContracts.ts",
+      "role": "仅通用与具体绑定所需类型；复用 FunctionCall/ToolMetadata，内部扩展 cacheKey；不含策略实现。",
+      "owns": [
+        "ToolCall",
+        "ToolExecContext",
+        "ToolMetadata",
+        "BeforeVerdict",
+        "ToolMiddleware"
+      ],
+      "dependencies": [
+        "type-only AgentRuntimeTypes",
+        "type-only ToolResultEnvelope",
+        "type-only concrete ToolExecContext adapter types"
+      ],
+      "design": "可将 ToolMiddleware<C> 与执行器函数类型泛型化；公开 façade 继续使用现有 ToolExecContext，调用方不必迁移。"
+    },
+    {
+      "id": "engine",
+      "path": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineEngine.ts",
+      "role": "完整有序 middleware 引擎与 short-circuit 状态，真实调用注入的 executor，结束后一次 efficiency 记录。",
+      "owns": [
+        "diagnosticReason",
+        "ToolPipelineResultState",
+        "runBeforeMiddlewares",
+        "runAfterMiddlewares",
+        "ToolExecutionPipeline.use implementation",
+        "ToolExecutionPipeline.execute implementation"
+      ],
+      "dependencies": [
+        "contracts only"
+      ],
+      "design": "内部 ToolPipelineEngine<C> 接收一个真实 executor 函数；最小 context 只需要 diagnostics 的 blocked/efficiency 能力。不要为一次复用引入 scheduler、生命周期 service 或第二个 tool router。"
+    },
+    {
+      "id": "shape",
+      "path": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolCallShape.ts",
+      "role": "被 gate/cache/bridge 共同使用的调用形状与 note_finding 改写规则。",
+      "owns": [
+        "isDirectNoteFindingCall",
+        "toExecutableToolCall",
+        "getToolAction",
+        "getToolParams"
+      ],
+      "dependencies": [
+        "contracts",
+        "DEPTH_SLOT_PROPS"
+      ],
+      "design": "四个有实际多方消费者的纯函数放同一叶模块，避免 gates→host bridge 的反向依赖；不做 schema validator 替代。"
+    },
+    {
+      "id": "bridge",
+      "path": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "role": "唯一 host request/envelope 适配；执行耗时、host 异常归一化、result projection、metadata/blocked诊断。",
+      "owns": [
+        "projectPipelineToolResult",
+        "BLOCKING_ENVELOPE_STATUSES",
+        "executeRuntimeToolCall",
+        "buildRuntimeToolCallRequest",
+        "resolvePipelineSourceName",
+        "resolveProjectLanguage",
+        "resolveDimensionScopeId",
+        "projectSessionToolCalls",
+        "recordExecutedEnvelope"
+      ],
+      "dependencies": [
+        "contracts",
+        "shape",
+        "tools/kernel request/result contracts",
+        "SafetyPolicy token"
+      ],
+      "design": "完整保留 router 调用与所有 runtime 投影字段；不实现权限审批、工具 registry 或文件/网络执行。"
+    },
+    {
+      "id": "gates",
+      "path": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "role": "capability allowlist、参数大小、安全策略、终端命令约束、Evolution/RECORD/VERIFY/PRODUCE 阶段门。",
+      "owns": [
+        "MAX_TOOL_ARG_BYTES",
+        "TOOL_ARGS_INVALID_CODE",
+        "TOOL_ARGS_TOO_LARGE_CODE",
+        "measureToolArgBytes",
+        "allowlistGate",
+        "toolArgumentBoundsGate",
+        "runtimeSafetyGate",
+        "isActionAllowed",
+        "evolutionDecisionGate",
+        "RECORD_REPAIR_MEMORY_ACTIONS",
+        "ANALYST_VERIFY_CODE_ACTIONS",
+        "ANALYST_VERIFY_MEMORY_ACTIONS",
+        "EVIDENCE_READ_ACTIONS",
+        "ANALYST_VERIFY_GRAPH_QUERY_TYPES",
+        "PRODUCER_CODE_ACTIONS",
+        "PRODUCER_KNOWLEDGE_ACTIONS",
+        "PRODUCER_MEMORY_ACTIONS",
+        "PRODUCER_META_ACTIONS",
+        "recordRepairOnlyGate",
+        "analystVerifyOnlyGate",
+        "producerSubmitOnlyGate"
+      ],
+      "dependencies": [
+        "contracts",
+        "shape",
+        "node:path",
+        "stableStringify",
+        "terminalSafety"
+      ],
+      "design": "约 330 行可保留一份 gates 模块；不要拆成每个 gate 一个文件，也不加入通用引擎。"
+    },
+    {
+      "id": "cache",
+      "path": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "role": "显式只读 manifest+真实 snapshot 的会话去重；拥有 cache key、资格和克隆。",
+      "owns": [
+        "CachedToolResult",
+        "ToolEfficiencySharedState",
+        "SIDE_EFFECT_ACTIONS",
+        "getToolManifest",
+        "isReadLikeManifest",
+        "isDeterministicDuplicateCandidate",
+        "getEfficiencyCache",
+        "cloneCacheValue",
+        "resolveProjectSnapshotId",
+        "buildCacheKey",
+        "deterministicDuplicateGuard"
+      ],
+      "dependencies": [
+        "contracts",
+        "shape",
+        "stableStringify",
+        "ToolCapabilityManifest type",
+        "toolOutcomes for failure admission fix"
+      ],
+      "design": "ToolEfficiencySharedState 拆开 cache 与 producer 的字段所有权；缓存仍使用原 sharedState Map。"
+    },
+    {
+      "id": "observers",
+      "path": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "role": "证据采集与正文标注、memory 观察、tracker 信号、trace；同时保留可选 bus/progress 兼容中间件。",
+      "owns": [
+        "evidenceCapture",
+        "observationRecord",
+        "trackerSignal",
+        "traceRecord",
+        "progressEmitter",
+        "eventBusPublisher"
+      ],
+      "dependencies": [
+        "contracts",
+        "EvidenceCapture",
+        "toolOutcomes"
+      ],
+      "design": "不把现有真实观察器改成事件名占位；evidence 后续的具体记忆/台账调用完整保留。"
+    },
+    {
+      "id": "producer",
+      "path": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "role": "已持久化提交的会话去重登记及 producer fact ledger。",
+      "owns": [
+        "ProducerSubmitLedgerEntry",
+        "ProducerSubmitLedger",
+        "submitDedup",
+        "recordProducerSubmitLedger",
+        "isProducerLoop",
+        "hasCompleteSubmitPayload",
+        "submitSourceCount",
+        "stringValue",
+        "numberValue"
+      ],
+      "dependencies": [
+        "contracts",
+        "toolOutcomes"
+      ],
+      "design": "只登记真实成功；Gateway 的提交校验/冲突/持久化保持现有所有者。LLMInputAssembly 的 compact projector 本轮不必迁移。"
+    },
+    {
+      "id": "facade",
+      "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+      "role": "公开零参数类绑定 runtime executor、13 个默认中间件组装、原符号 re-export。",
+      "owns": [
+        "ToolExecutionPipeline",
+        "createToolPipeline"
+      ],
+      "dependencies": [
+        "engine",
+        "bridge",
+        "gates",
+        "cache",
+        "observers",
+        "producer"
+      ],
+      "design": "保留 new ToolExecutionPipeline().use(...).execute(...)。用具体 subclass 绑定引擎即可，不要求宿主提供新依赖；没有执行能力被删除或空壳化。"
+    }
+  ],
+  "functionInventory": [
+    {
+      "name": "ToolCall",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 42,
+        "endLine": 46
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineContracts.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "复用现有 FunctionCall 的 name/args/id 投影；不删 provider thoughtSignature 额外字段，不新增第二套 tool request。"
+    },
+    {
+      "name": "ToolExecContext",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 49,
+        "endLine": 53
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineContracts.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "保留 execute 的 runtime/loopCtx/iteration 输入形态；具体 runtime/LoopContext 仅 type import，通用引擎以泛型 context 使用。"
+    },
+    {
+      "name": "ToolMetadata",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 56,
+        "endLine": 68
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineContracts.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "AgentRuntimeTypes.ts:179 已是公开同名类型；复用该类型并在内部扩展 cacheKey，勿再维护第二份基础字段。"
+    },
+    {
+      "name": "BeforeVerdict",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 71,
+        "endLine": 74
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineContracts.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "diagnosticReason",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 76,
+        "endLine": 81
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineEngine.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "projectPipelineToolResult",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 83,
+        "endLine": 88
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "isDirectNoteFindingCall",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 90,
+        "endLine": 92
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolCallShape.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "toExecutableToolCall",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 94,
+        "endLine": 119
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolCallShape.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "唯一 note_finding→memory 改写入口；继续透传 evidenceRefs/excerpt/旧 evidence 与 DEPTH_SLOT_PROPS。"
+    },
+    {
+      "name": "ToolMiddleware",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 122,
+        "endLine": 135
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineContracts.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "保留 before/after 可同步或异步、before 返回 undefined 的兼容；泛型 context 是内部复用手段，不要求调用方更换用法。"
+    },
+    {
+      "name": "CachedToolResult",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 137,
+        "endLine": 140
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "ToolPipelineResultState",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 142,
+        "endLine": 145
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineEngine.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "ToolEfficiencySharedState",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 147,
+        "endLine": 154
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "拆成 cache 自己拥有的 cache/snapshot 字段与 producer 自己拥有的 ledger 字段；仍使用原 loopCtx.sharedState 对象，不换 store。"
+    },
+    {
+      "name": "ProducerSubmitLedgerEntry",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 156,
+        "endLine": 177
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "ProducerSubmitLedger",
+      "kind": "InterfaceDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 179,
+        "endLine": 183
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "SIDE_EFFECT_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 185,
+        "endLine": 206
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "BLOCKING_ENVELOPE_STATUSES",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 208,
+        "endLine": 213
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "MAX_TOOL_ARG_BYTES",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 214,
+        "endLine": 214
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "TOOL_ARGS_INVALID_CODE",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 215,
+        "endLine": 215
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "TOOL_ARGS_TOO_LARGE_CODE",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 216,
+        "endLine": 216
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "getToolAction",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 218,
+        "endLine": 225
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolCallShape.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "保留 args.action 优先于 params.action/params.operation 的规则；不要在拆分时改变 nested action 安全语义。"
+    },
+    {
+      "name": "getToolManifest",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 227,
+        "endLine": 232
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "isReadLikeManifest",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 234,
+        "endLine": 246
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "isDeterministicDuplicateCandidate",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 248,
+        "endLine": 271
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "getEfficiencyCache",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 273,
+        "endLine": 277
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "cloneCacheValue",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 279,
+        "endLine": 285
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "measureToolArgBytes",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 287,
+        "endLine": 294
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "resolveProjectSnapshotId",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 296,
+        "endLine": 311
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "buildCacheKey",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 313,
+        "endLine": 327
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "runBeforeMiddlewares",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 329,
+        "endLine": 352
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineEngine.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "executeRuntimeToolCall",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 354,
+        "endLine": 381
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "buildRuntimeToolCallRequest",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 383,
+        "endLine": 425
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "保留 surface/actor/source/abortSignal 与 runtime 注入字段及原引用；没有 host 服务定位实现搬入。"
+    },
+    {
+      "name": "resolvePipelineSourceName",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 427,
+        "endLine": 432
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "resolveProjectLanguage",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 434,
+        "endLine": 437
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "resolveDimensionScopeId",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 439,
+        "endLine": 442
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "projectSessionToolCalls",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 444,
+        "endLine": 458
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "继续把历史 {tool,args} 投影为 {tool,params}；只投影历史容器，不复制 sharedState/sets/ledger。"
+    },
+    {
+      "name": "recordExecutedEnvelope",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 460,
+        "endLine": 475
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/RuntimeToolBridge.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "metadata.envelope 使用同一 envelope 对象，缓存/blocked 诊断保持；失败业务状态的统一判定仍复用 toolOutcomes。"
+    },
+    {
+      "name": "runAfterMiddlewares",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 477,
+        "endLine": 489
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineEngine.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "ToolExecutionPipeline",
+      "kind": "ClassDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 491,
+        "endLine": 530
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "保留零参数公开类；其 use/execute 完整实现落通用 engine，可用具体 subclass 绑定 RuntimeToolBridge，保留 instanceof 与链式 use。"
+    },
+    {
+      "name": "ToolExecutionPipeline.use",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 495,
+        "endLine": 498
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineEngine.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "完整方法实现迁往 engine；返回 this，公开 façade 类继承或委托时保持链式返回公开实例。"
+    },
+    {
+      "name": "ToolExecutionPipeline.execute",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 512,
+        "endLine": 529
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolPipelineEngine.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "完整 before→executor→after→efficiency 实现迁往 engine；executor 由公开 façade 内部绑定，无需宿主传新参数。"
+    },
+    {
+      "name": "allowlistGate",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 545,
+        "endLine": 579
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "allowlistGate.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 547,
+        "endLine": 578
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "toolArgumentBoundsGate",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 582,
+        "endLine": 617
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "toolArgumentBoundsGate.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 584,
+        "endLine": 616
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "runtimeSafetyGate",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 620,
+        "endLine": 662
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "runtimeSafetyGate.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 622,
+        "endLine": 661
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "isActionAllowed",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 664,
+        "endLine": 671
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "evolutionDecisionGate",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 679,
+        "endLine": 704
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "evolutionDecisionGate.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 681,
+        "endLine": 703
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "RECORD_REPAIR_MEMORY_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 706,
+        "endLine": 706
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "ANALYST_VERIFY_CODE_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 707,
+        "endLine": 707
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "ANALYST_VERIFY_MEMORY_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 708,
+        "endLine": 708
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "EVIDENCE_READ_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 710,
+        "endLine": 710
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "ANALYST_VERIFY_GRAPH_QUERY_TYPES",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 711,
+        "endLine": 720
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "PRODUCER_CODE_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 721,
+        "endLine": 721
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "PRODUCER_KNOWLEDGE_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 722,
+        "endLine": 722
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "PRODUCER_MEMORY_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 723,
+        "endLine": 723
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "PRODUCER_META_ACTIONS",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 724,
+        "endLine": 724
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "getToolParams",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 726,
+        "endLine": 730
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolCallShape.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "recordRepairOnlyGate",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 738,
+        "endLine": 762
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "recordRepairOnlyGate.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 740,
+        "endLine": 761
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "analystVerifyOnlyGate",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 770,
+        "endLine": 816
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "analystVerifyOnlyGate.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 772,
+        "endLine": 815
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "producerSubmitOnlyGate",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 824,
+        "endLine": 873
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "producerSubmitOnlyGate.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 826,
+        "endLine": 872
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolGates.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "deterministicDuplicateGuard",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 881,
+        "endLine": 921
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "deterministicDuplicateGuard.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 883,
+        "endLine": 904
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "deterministicDuplicateGuard.after",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 905,
+        "endLine": 920
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolResultCache.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "移动之前或独立提交修复已确认的 host throw 错误入缓存；见 confirmedDefects TP-CACHE-01。"
+    },
+    {
+      "name": "evidenceCapture",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 931,
+        "endLine": 954
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "evidenceCapture.after",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 933,
+        "endLine": 953
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "必须早于 observation/trace；仅本中间件局部捕获采集异常并警告，不能由引擎扩成全局吞错。"
+    },
+    {
+      "name": "observationRecord",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 961,
+        "endLine": 972
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "observationRecord.after",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 963,
+        "endLine": 971
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "trackerSignal",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 979,
+        "endLine": 994
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "trackerSignal.after",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 981,
+        "endLine": 993
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "完整观察与 metadata.blocked 优先判失败；成功仍给 tracker 原始业务结果，避免回退此前修复。"
+    },
+    {
+      "name": "traceRecord",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1001,
+        "endLine": 1006
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "traceRecord.after",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1003,
+        "endLine": 1005
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "submitDedup",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1016,
+        "endLine": 1073
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "submitDedup.after",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1019,
+        "endLine": 1072
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "名字是兼容面，实际只做成功后的登记；绝不恢复 Gateway 前的标题/trigger/pattern 拦截。"
+    },
+    {
+      "name": "recordProducerSubmitLedger",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1075,
+        "endLine": 1163
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "维持 runtime 事实字段，不把 producer 业务字段塞入通用 engine；LLMInputAssembly 当前读取此形状。"
+    },
+    {
+      "name": "isProducerLoop",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1165,
+        "endLine": 1171
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "hasCompleteSubmitPayload",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1173,
+        "endLine": 1189
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "submitSourceCount",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1191,
+        "endLine": 1197
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "stringValue",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1199,
+        "endLine": 1201
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "numberValue",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1203,
+        "endLine": 1205
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ProducerSubmitLedger.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "progressEmitter",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1213,
+        "endLine": 1227
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "保持可选且默认不装入；Runtime 已拥有带 resultSize/processEvent 的真实事件链。"
+    },
+    {
+      "name": "progressEmitter.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1215,
+        "endLine": 1217
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "progressEmitter.after",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1218,
+        "endLine": 1226
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "eventBusPublisher",
+      "kind": "VariableDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1235,
+        "endLine": 1264
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "保持可选且默认不装入；不能因拆分向默认管道重复注册。"
+    },
+    {
+      "name": "eventBusPublisher.before",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1237,
+        "endLine": 1248
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "eventBusPublisher.after",
+      "kind": "MethodDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1249,
+        "endLine": 1263
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/tool-pipeline/ToolObservers.ts",
+      "exportedFromOriginalFile": false,
+      "migration": "职责与当前行为按原样移动；辅助函数留在同一职责模块，不另造通用服务。"
+    },
+    {
+      "name": "createToolPipeline",
+      "kind": "FunctionDeclaration",
+      "reviewed": true,
+      "source": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 1287,
+        "endLine": 1302
+      },
+      "target": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+      "exportedFromOriginalFile": true,
+      "migration": "只在这里组装默认中间件，保留 13 项现有顺序；所有实现仍真实运行，不改为空接口。"
+    }
+  ],
+  "dependencyRules": [
+    "facade → engine/bridge/gates/cache/observers/producer；这些模块不能导入 facade，防止组合根回环。",
+    "engine → contracts；engine 不导入 AgentRuntime 实现、LoopContext 实现、SafetyPolicy、manifest、handler、memory 或 evidence。",
+    "gates/cache/bridge → shape → contracts；note_finding 改写在一个地方，安全检查与实际执行使用同一改写。",
+    "observer/producer/cache 可复用现有 toolOutcomes，禁止再写各自的失败/created 判定。",
+    "公开基础 ToolMetadata 继续由 AgentRuntimeTypes 导出；pipeline 内部类型扩展不能反向成为 AgentRuntimeTypes 的 runtime 依赖。",
+    "tools/kernel 保持结构化 contract，不 import agent/tool-pipeline；Core 不新增任何 Agent 状态实现。"
+  ],
+  "publicCompatibility": {
+    "packageSubpath": "@alembic/agent/runtime",
+    "evidence": [
+      {
+        "path": "../../../AlembicAgent/src/agent/runtime/index.ts",
+        "line": 153
+      },
+      {
+        "path": "../../../AlembicAgent/config/agent-public-api-signatures.json",
+        "line": 1056
+      },
+      {
+        "path": "../../../AlembicAgent/test/contract-surface.test.ts",
+        "line": 24
+      }
+    ],
+    "barrelExportsToPreserve": [
+      "ToolExecutionPipeline",
+      "createToolPipeline",
+      "allowlistGate",
+      "analystVerifyOnlyGate",
+      "deterministicDuplicateGuard",
+      "eventBusPublisher",
+      "evolutionDecisionGate",
+      "observationRecord",
+      "progressEmitter",
+      "recordRepairOnlyGate",
+      "submitDedup",
+      "traceRecord",
+      "trackerSignal"
+    ],
+    "additionalOriginalFileExportsToPreserve": [
+      "toolArgumentBoundsGate",
+      "producerSubmitOnlyGate",
+      "evidenceCapture"
+    ],
+    "nonPublicImplementation": "runtimeSafetyGate 继续是内部实现；不借此次拆分扩为公共符号。新内部模块不添加 package exports。",
+    "classContract": "零参数构造；use(middleware) 返回当前实例；execute(call,{runtime,loopCtx,iteration}) 返回 Promise<{result,metadata}>，metadata 可写并在各 middleware 间共享。",
+    "middlewareContract": "before/after 形状、函数参数次序、名字、同步/异步兼容不变；直接 import 原文件的测试与 host source consumers 仍可工作。",
+    "realExternalConsumer": {
+      "path": "../../../Alembic/test/unit/ToolExecutionPipeline.test.ts",
+      "line": 1,
+      "uses": "从正式 @alembic/agent/runtime import createToolPipeline；最小 host router 对象、无 getManifest 的 knowledge submit、decision-only gates。该邻仓只读，不在此任务运行或改测试。"
+    },
+    "actualHostSharedState": {
+      "path": "../../../Alembic/lib/recipe-pipeline/generate/execution/DimensionRuntimeBuilder.ts",
+      "line": 282,
+      "uses": "多个 dimension 注入相同 globalSubmittedTitles/globalSubmittedPatterns/globalSubmittedTriggers；不能在抽象 context 时深拷贝。"
+    },
+    "notPublicRootExport": "src/index.ts 不直接 export runtime barrel；不在重组时顺带把整套 pipeline 暴露到根入口。",
+    "legacyFields": [
+      "metadata.dedupMessage 虽默认 pipeline 当前不写，Runtime 仍读取且 custom middleware 可用，保留。",
+      "ToolCall.id 与 ToolResultEnvelope.callId 的既有关系不在结构拆分时更改。",
+      "actor role=developer、surface=runtime、source 的 phase/source/preset fallback 原样保留。"
+    ]
+  },
+  "exactDefaultOrder": [
+    "allowlistGate",
+    "toolArgumentBoundsGate",
+    "runtimeSafetyGate",
+    "evolutionDecisionGate",
+    "recordRepairOnlyGate",
+    "analystVerifyOnlyGate",
+    "producerSubmitOnlyGate",
+    "deterministicDuplicateGuard",
+    "evidenceCapture",
+    "observationRecord",
+    "trackerSignal",
+    "traceRecord",
+    "submitDedup"
+  ],
+  "invariants": [
+    "每个 execute 创建独立 metadata；middleware 列表属于 pipeline，跨调用共享缓存/台账只属于 loopCtx.sharedState。",
+    "before 按注册顺序 awaited；blocked=true 即使 result=undefined 也短路；result !== undefined 包括 null/false/0/空字符串均短路，不能改为 truthy 判断。",
+    "before 短路后仍按原注册顺序调用全部 after（包括 before 未运行到的中间件），不是 stack unwind 逆序。",
+    "未短路只调用一次 router executor；durationMs 只量 host execute，包括抛错，gate/cache short-circuit 的默认值为 0。",
+    "metadata.envelope 保存 router 返回的同一 envelope。evidenceCapture 改 envelope.text 后，observation/trace 和 Runtime 结果文本应看到同一标注。",
+    "cache.after 在 evidenceCapture 前保存快照；evidence→observation→tracker→trace→submit 的顺序保持，trace 的 isNew 来自 tracker。",
+    "gates 必须在 cache.before 前，权限/阶段变化不能被缓存结果绕过。mutable code/memory/knowledge/evidence/meta.review 不能恢复外层缓存。",
+    "sharedState、submitted sets、memoryCoordinator、evidenceLedger 不复制；source/iteration/language/history 可做每次投影。",
+    "submitDedup 只在真实 persisted submission 后登记，不能提前跳过 Gateway；metadata.blocked/envelope failure 优先于内层 created。",
+    "Runtime 拥有外部 hook/进度/bus/字符裁剪/消息追加；默认 pipeline 不重复发送这些事件。"
+  ],
+  "acceptance": [
+    {
+      "id": "TP-ENGINE-01",
+      "scenario": "自定义 middleware 顺序与异步 before/after",
+      "assertions": [
+        "before 按 A→B，executor 一次，after A→B，同一 metadata 引用",
+        "use 链式返回，独立 execute 不串 metadata"
+      ],
+      "existingCoverage": "需新增小型 engine contract 测试，不重复整个 Runtime fixture"
+    },
+    {
+      "id": "TP-ENGINE-02",
+      "scenario": "blocked / null / false / 0 / empty string / undefined verdict",
+      "assertions": [
+        "仅 undefined 继续执行",
+        "blocked 无 result 也跳过 executor",
+        "short-circuit 后所有 after 仍正序运行",
+        "blocked 与 efficiency 诊断各一次"
+      ],
+      "existingCoverage": "当前 runtime-efficiency 覆盖部分 blocked/cache；falsey verdict 边界未见直接覆盖"
+    },
+    {
+      "id": "TP-ERROR-01",
+      "scenario": "host router 抛 Error、返回 error/blocked/needs-confirmation/timeout/aborted/partial envelope",
+      "assertions": [
+        "保留 executor duration 与 envelope/result 投影",
+        "失败不得计 submission/new success 或入 deterministic cache",
+        "before/after 抛错仍依当前规则 reject；evidenceCapture 专属异常继续 warn+不阻断"
+      ],
+      "existingCoverage": "test/runtime-efficiency.test.ts 失败状态参数化与 safety；新增 host-throw cache regression"
+    },
+    {
+      "id": "TP-CANCEL-01",
+      "scenario": "真实 Runtime 取消/timeout进入 ToolRouter contract",
+      "assertions": [
+        "同一 abortSignal 转发至 request，不能在 bridge 新造未接线 signal",
+        "engine 不另造 timeout scheduler",
+        "正常 cooperative router 返回 timeout/aborted 后，after 记录失败且不登记提交",
+        "Runtime tool:before hook false 跳过 pipeline"
+      ],
+      "existingCoverage": "test/AgentRuntime.test.ts、test/runtime-terminal-safety.test.ts；补 request identity 小测即可"
+    },
+    {
+      "id": "TP-GATE-01",
+      "scenario": "allowlist、action、参数边界、安全策略",
+      "assertions": [
+        "空 allowlist 全拒绝",
+        "direct note_finding 仅 memory.note_finding 获准时绕过别名检查",
+        "256000 UTF-8 字节边界/不可序列化参数拒绝",
+        "代码相对路径以 runtime.projectRoot 校验",
+        "host router 前拦策略/terminal allowlist，cacheHit 不能绕过"
+      ],
+      "existingCoverage": "test/runtime-efficiency.test.ts:172,215,239,267 与 terminal-safety"
+    },
+    {
+      "id": "TP-GATE-02",
+      "scenario": "Evolution/record repair/analyst VERIFY/producer PRODUCE与SUMMARIZE",
+      "assertions": [
+        "Evolution 只接受三个 manage operation+id",
+        "RECORD 放行既有 memory action 与 evidence.get/search",
+        "VERIFY graph query 必须聚焦 entity/path 且 type 在集合",
+        "PRODUCE 可提交/定向补读，SUMMARIZE 全禁"
+      ],
+      "existingCoverage": "邻仓 ToolExecutionPipeline.test.ts 只作契约参考；Agent侧 EvidenceToolAndQuota/runtime-efficiency 及 phase-chain 测试"
+    },
+    {
+      "id": "TP-BRIDGE-01",
+      "scenario": "request projection 与 alias 参数完整度",
+      "assertions": [
+        "source 优先 pipelinePhase；actor/surface/iteration值不变",
+        "evidenceRefs/excerpt/旧evidence/所有depth slot 均通过note_finding改写",
+        "sharedState/sets/ledger/coordinator 引用===原对象",
+        "history 转换 {tool,args}→{tool,params} 且允许无历史"
+      ],
+      "existingCoverage": "test/runtime-efficiency.test.ts finding depth；test/pipeline-outcome-abandoned.test.ts _sessionCounters 引用回归"
+    },
+    {
+      "id": "TP-CACHE-01",
+      "scenario": "snapshot缓存成功/失败/策略变更",
+      "assertions": [
+        "相同snapshot+strategy+args的只读工具调用一次，cacheHit/duplicate/cacheMiss计数一致",
+        "换snapshot/phase/args重执行",
+        "副作用与mutable工具不缓存",
+        "host throws 后下次必须重试，不复用错误"
+      ],
+      "existingCoverage": "test/runtime-efficiency.test.ts:299–402；本次 probe 已确认最后一项失败，需独立修复"
+    },
+    {
+      "id": "TP-EVIDENCE-01",
+      "scenario": "完整 code.read→ledger→annotation→memory/trace→Runtime文本",
+      "assertions": [
+        "标注一次、真实ledger入账并更新tracker统计",
+        "失败 envelope 或无ledger时跳过",
+        "capture异常只输出 EVIDENCE_CAPTURE_FAILED，不丢工具结果",
+        "cache克隆不会把后续 annotation 混回原缓存对象"
+      ],
+      "existingCoverage": "test/EvidenceCapture.test.ts:141、test/EvidenceToolAndQuota.test.ts:140；补 observer顺序小测"
+    },
+    {
+      "id": "TP-PRODUCER-01",
+      "scenario": "created/pending真实存储与拒绝/blocked/timeout",
+      "assertions": [
+        "满足 isPersistedSubmission 才更新sets/ledger/isSubmit",
+        "同title更新ledger而非重复append；createdCount严格按status统计",
+        "sources/evidenceRefs及requiredFieldsComplete/readiness事实保持",
+        "LLMInputAssembly 仍从同sharedState看到payloadStored/requiredFieldsComplete"
+      ],
+      "existingCoverage": "test/runtime-efficiency.test.ts:137；test/llm-input-layering.test.ts:968；邻仓提交契约只读参考"
+    },
+    {
+      "id": "TP-PUBLIC-01",
+      "scenario": "构建与公开面兼容",
+      "assertions": [
+        "runtime barrel旧值/类导出不变",
+        "原ToolExecutionPipeline.ts直接import可用",
+        "package无新增私有subpath",
+        "strict consumer 和 declarations继续接受旧调用"
+      ],
+      "existingCoverage": "test/contract-surface.test.ts:24 + smoke:public-signatures + smoke:strict-consumer"
+    },
+    {
+      "id": "TP-EVENT-01",
+      "scenario": "真实Runtime事件顺序/数量",
+      "assertions": [
+        "start与end不因拆分翻倍",
+        "tool_end仍带字符裁剪后的resultSize",
+        "metadata.isNew/isSubmit继续驱动round统计和阶段转换",
+        "progressEmitter/eventBusPublisher只对显式use调用生效"
+      ],
+      "existingCoverage": "AgentRuntime与hook-system测试；纯中间件测试不足以证明真实接线"
+    }
+  ],
+  "confirmedDefects": [
+    {
+      "id": "TP-CACHE-01",
+      "severity": "P2",
+      "evidence": {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 895
+      },
+      "status": "confirmed-read-only-probe-reported-to-root",
+      "issue": "host execute 抛 Error 被 bridge 转成 {error}、没有 envelope；cache.after 把无 envelope 视为成功，缓存暂时失败并阻断后续重试。",
+      "reproduction": "实际 createToolPipeline + 内存 host：snapshot.lookup 具有只读manifest和snapshot；首调用抛 transient host error，第二次本可成功。观测 hostCalls=1、第二结果仍同error、duplicateShortCircuit=true、cacheSize=1。",
+      "minimalFix": "cache.after 以 readToolObservation({ ...call,result,envelope:meta.envelope }).ok 判定准入，并保持 metadata.blocked 和 envelope/业务失败优先级。",
+      "sequencing": "将此行为修复做独立 RED/GREEN，不与纯函数搬迁混为无法归因的大提交。"
+    }
+  ],
+  "behaviorDecisionsToKeepExplicit": [
+    {
+      "area": "middleware异常",
+      "current": "before/after 非 evidenceCapture 异常传播，后续钩子不保证运行。",
+      "decision": "结构拆分保持，不静默加入 finally-all-after 或全局 swallow。若另要变更必须独立行为测试。"
+    },
+    {
+      "area": "host未知异常",
+      "current": "catch(err:unknown) 后强转 Error.message；非 Error/null 抛出没有可靠归一化。",
+      "decision": "桥接模块是此逻辑正确归属；可另加确定性测试再修，不把未经验证的新错误策略藏在移动中。"
+    },
+    {
+      "area": "可选事件中间件",
+      "current": "只检查 result.error；默认 Runtime 更完整地使用 envelope。",
+      "decision": "保留兼容且默认不用；本轮不顺带改成另一套事件系统。"
+    },
+    {
+      "area": "既有文档",
+      "current": "文件头和 factory JSDoc 只列旧中间件子集。",
+      "decision": "可在拆分中同步描述真实13项顺序，保留责任manifest的原兼容入口，并补新实现引用。"
+    }
+  ],
+  "implementationSlices": [
+    {
+      "order": 1,
+      "goal": "先钉基线与确认缺陷",
+      "changes": "在 Agent 内加最小 engine 行为/bridge引用测试；TP-CACHE-01 独立 RED/GREEN。",
+      "boundary": "不改 Core/邻仓，不重写 Runtime"
+    },
+    {
+      "order": 2,
+      "goal": "统一 contracts 与 engine",
+      "changes": "复用 AgentRuntimeTypes.ToolMetadata；提取 before/after引擎并保留公开零参数类的真实 executor绑定。",
+      "verification": "运行 engine新增测试+runtime-efficiency+contract-surface，并 typecheck"
+    },
+    {
+      "order": 3,
+      "goal": "提取 call shape、bridge、gates",
+      "changes": "按 inventory 机械移动与修正 import，默认排序不变。",
+      "verification": "runtime-efficiency、runtime-terminal-safety、phase-chain、AgentRuntime、hook-system"
+    },
+    {
+      "order": 4,
+      "goal": "提取 cache/observers/producer ledger 与最终组装",
+      "changes": "保留共享引用、完整状态数据与公开re-export。",
+      "verification": "EvidenceCapture/EvidenceToolAndQuota/pipeline-outcome-abandoned/llm-input-layering；最后由 root 运行仓库完整 check"
+    }
+  ],
+  "validationPlan": {
+    "commands": [
+      "npm run typecheck",
+      "npm test -- test/runtime-efficiency.test.ts test/contract-surface.test.ts test/EvidenceCapture.test.ts test/EvidenceToolAndQuota.test.ts test/pipeline-outcome-abandoned.test.ts test/evidence-recording-phase-chain.test.ts test/runtime-terminal-safety.test.ts test/AgentRuntime.test.ts test/hook-system.test.ts test/llm-input-layering.test.ts",
+      "npm run smoke:public-signatures",
+      "npm run smoke:strict-consumer",
+      "npm run lint:layer-contract",
+      "npm run lint:public-api-boundary",
+      "npm run lint:core-import-boundary"
+    ],
+    "executedByThisReview": "仅只读源码/调用方检索及一份实际pipeline的内存探针；未运行上述测试或全量check。",
+    "localProbeLimits": "探针运行当前真实 pipeline；stableStringify 与 policy/evidence/output外围依赖使用最小 stub，场景不触发这些分支。没有真实文件工具/网络/API执行。"
+  }
+}

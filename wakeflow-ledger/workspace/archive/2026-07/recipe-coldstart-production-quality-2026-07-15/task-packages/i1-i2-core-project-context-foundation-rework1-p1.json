@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i1-i2-core-project-context-foundation-rework1-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "AlembicCore PC-F 首轮 rework combined package。以首轮 commit 51e71a5d203f733ace8a5feb71202ac31dd41ed7 为基线，只修复控制器已记录并复现的 I1–I2 缺陷；产出一个边界清晰的 repair commit。不得修改其他仓、不得进入 I3+、不得 reset Ghost/data root、不得启动 Test，也不得顺手修复与本需求无关的 ASTChunker doctrine 基线问题。\n\n必须逐项闭环：\n1. 真实 loaded-artifact RED/根因：在 parent 10e43a66fac8748b1da176844bd77505aa949b0e 或实际配置加载的 package/dist/root 上执行历史 ProjectContext 链路，真实复现或明确证伪 MR 1/5 与 repeatability 问题，保留输入、输出、hash、loaded commit/tree/package/dist/runtime 身份；分类 stale dist/package/config/root identity 与源码缺陷。“新模块当时不存在”不得作为 RED。\n2. 九请求审计诚实性：废除每仓仅单文件 module seed 的伪完整矩阵，按真实 project/module ownership 与适用 scope 为 MR-ALEMBIC 5/5、SP-BILIDILI root+4 建立有意义的九请求覆盖；每条非空 diagnostics/errors 必须归类为 expected typed external/advisory 或 open confirmed defect。readiness 与 openConfirmedDefects 不得忽略 errors；修正内部 BiliDili modules/sibling roots 被 outside-scope/query-unavailable 的错误归属。只有分类和修复后才允许 openConfirmedDefects=[]。\n3. inventory coherence：移除跨 capture 的无限 descriptors cache，或让缓存严格绑定一致 revision/content；同一 host ports 实例上 add/delete/modify 后必须重新枚举且不漏 eligible file。加入等价于 controller probe 的 RED/GREEN 回归。\n4. 单一 source-state capture：capture 全程必须认证同一个 coherent source state；对 capture 期间 add/delete/modify、clean→dirty、dirty/content drift 均 fail closed，不得签发“旧 clean commit/tree + 新 blob hash”且 readiness=passed 的 artifact。加入可重复的 race/漂移 RED/GREEN 测试，并明确重试/失败语义。\n5. crash durability：artifact/store/receipt/run-bound lease 的持久化必须具备真实崩溃安全发布与恢复语义，包括同目录临时写、file fsync、atomic publish/rename、directory fsync、必要 readback，以及 partial temp/final、collision、crash/replay 的处理。不得把直接 final-path wx 或无 fsync 的 rename 称为 durable；用故障注入/重放测试证明。\n6. 证据重生成：重新生成 ProjectContextCapabilityAuditReport Core JSON 与 execution evidence，逐项响应本 rework 原因。静态 raw scanner scan 只能作辅助，raw Plan strict-zero 仍需实际不可达或 artifact-only adapter 证据。openConfirmedDefects=[] 仅在上述分类、探针和回归全部通过后成立。\n\n验证与交付：\n- 先留下上述缺陷可复现的 RED，再实现 GREEN；运行 focused tests、controller-probe 等价回归、fresh-process/runtime probes、build:check、public-api/layer boundary、npm run check 和完整 npm test。\n- 若 npm run check 仍只因 unchanged src/infrastructure/vector/ASTChunker.ts:32 doctrine baseline 失败，必须用 parent/HEAD 对照证明并作为显式 waiver；不得修该无关问题。\n- 两阶段自审：第一阶段逐条对 controller rework 1–6 和 Requirement §§7/18.0；第二阶段审 correctness、source consistency、failure/recovery、crash durability、hash non-circularity、性能/大仓容量、兼容性与 scope。\n- 返回 parent/commit/tree、changed files/symbols、原始命令摘要、evidence 路径与内容 hash、逐条 rework response、兼容性和剩余风险。repair commit 必须干净可审；不得把 fixture/接口可调用/fallback success 当完整验收。\n- 完成后按 wakeflow-target 记录新的 TargetResultEnvelope 并真实 controller-return；返回只触发总控复审，不代表接受，也不解锁 Alembic/Plugin 或 I3+。",
+  "status": "pending",
+  "sourceRef": "Design/docs/current/recipe-coldstart-production-quality-requirement-design-2026-07-15.md §§7, 18.0; Original Plan I1–I2; controller rework decision tc-20260715072819-0005",
+  "designIntent": "保持 PC-F 单源与 I1–I2 范围，在首轮 commit 51e71a5d203f733ace8a5feb71202ac31dd41ed7 上修复控制器已复现的一致性、审计诚实性与崩溃持久化缺陷；不得用表面通过、静态扫描或新增 fixture 代替真实加载产物和双项目完整证据。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "tests",
+        "verify": "controller-rerun"
+      },
+      {
+        "kind": "runtime-evidence",
+        "verify": "artifact-present"
+      },
+      {
+        "kind": "self-review",
+        "verify": "self-attested"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "red-green-note"
+      },
+      {
+        "kind": "root-cause-note"
+      },
+      {
+        "kind": "scope-diff"
+      },
+      {
+        "kind": "compatibility-review"
+      }
+    ]
+  },
+  "createdAt": "2026-07-15T07:30:32.289Z",
+  "reviewRoute": "rework",
+  "targetTasks": [
+    {
+      "targetTaskId": "i1-i2-core-project-context-foundation-rework1-t1",
+      "taskPackageId": "i1-i2-core-project-context-foundation-rework1-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "在 AlembicCore 首轮 PC-F commit 上完成 rework：真实 loaded-artifact 复现、九请求/双项目错误归类、跨捕获缓存失效、source-state 一致性 fail-closed、真正 crash-durable store/lease，并重生成可审计证据与回归测试。",
+      "status": "pending",
+      "createdAt": "2026-07-15T07:30:32.289Z",
+      "reviewRoute": "rework"
+    }
+  ]
+}

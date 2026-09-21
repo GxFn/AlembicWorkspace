@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "taskPackageId": "i8r-alembic-plugin-host-neutral-mcp-errors-p1",
+  "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors",
+  "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin committed one minimal host-neutral shared MCP error repair on exact parent 2a36c9b6c61e. Unknown tool-execution failures now emit authoritative top-level INTERNAL_ERROR and core.failure.internal-error; known strict/timeout/validation/not-found codes remain exact; deprecated CODEX_MCP_ERROR is accepted only as exact compatibility input, including nested details, and is never re-emitted; shared messages are host-neutral; real SDK Codex/Claude Code paths are equivalent; JSON-RPC protocol errors remain separate from CallToolResult execution failures. All required focused/full/check/build/distribution/runtime-install/plugin/smoke gates pass at committed HEAD 60dc36726405 with clean tree and fresh loaded package provenance.",
+  "evidenceRefs": [
+    "AlembicPlugin@60dc367264059f9fe8eef7e09d12f874278936bd",
+    "parent:2a36c9b6c61ec765f54c8660f510c779b2bbc05c",
+    "tree:80bd34b480adcd7a3c59bf425d5112c42cf43357",
+    "runtime-package:sha256:f44e40fc09a2ba19bd28268f1d4ceb4c5eff5b2b5434430d69e66a7459451169",
+    "alembic-finish:finish-public-ms1mlyyo-1",
+    "alembic-guard:guard-public-ms1mi5qz-1"
+  ],
+  "verification": [
+    "Baseline exact parent/tree and clean status: 2a36c9b6c61ec765f54c8660f510c779b2bbc05c / 11438e5a9252bd6d84041faee55c5f16f12692e4.",
+    "RED: new real-SDK host-neutral suite failed 4/4 before implementation: generic producer CODEX_MCP_ERROR, actual embedded throw CODEX_MCP_ERROR, legacy re-emission, and outer catch degrading to SDK -32602.",
+    "GREEN: post-commit focused MCP/strict/dual-host/WrapHandler/registry group passed 12 files / 107 tests.",
+    "npm run test:unit passed 152 files / 1660 tests.",
+    "npm run check passed; typecheck, Biome, Core import/layer/repo/scope/shared/cross-shell/doctrine/naming/retired/ring gates all passed.",
+    "npm run build:check passed; npm run build passed with AlembicCore d4de7edd6bbfaeb36a01b3cc243ba1617c001f65.",
+    "npm run verify:plugin-distribution passed.",
+    "npm run verify:codex-runtime-package passed: npm-install, entrypoint probe, no file dependencies, forbidden old shape rejected, 1408 files, 45,923,835 unpacked bytes.",
+    "npm run verify:codex-plugin passed.",
+    "npm run smoke:codex-plugin passed: runtime boundary, startup, install, shell bootstrap and stdio.",
+    "Post-commit npm run prepare:codex-runtime-package plus check:runtime-pack-freshness passed; clean-build source/commit/loaded entry hash e2ff192fb524.",
+    "Final alembic-runtime-0.3.0.tgz: 5,183,242 bytes, sha256 f44e40fc09a2ba19bd28268f1d4ceb4c5eff5b2b5434430d69e66a7459451169.",
+    "Boundary scan: lib contains CODEX_MCP_ERROR only in the explicitly deprecated decoder/taxonomy alias (3 lines); shared Codex-labelled generic phrase absent; git diff --check passed; final git status clean."
+  ],
+  "risks": [
+    "No unresolved high/medium implementation finding. Alembic Guard advisory guard-public-ms1mi5qz-1 reports full-file pre-existing/test-fixture findings (sync fixture I/O, fake secret strings, a comment false-positive and pre-existing promise pattern); none intersects a changed production hunk or fails repository lint/type/test gates. New test uses the repository's existing synchronous temporary-fixture pattern only.",
+    "The deprecated literal remains intentionally present in one decoder constant and one taxonomy alias for read compatibility; static tests assert it is never emitted."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "60dc367264059f9fe8eef7e09d12f874278936bd",
+      "verify": "exact parent 2a36c9b6c61ec765f54c8660f510c779b2bbc05c; tree 80bd34b480adcd7a3c59bf425d5112c42cf43357; 13 files, +425/-68; final working tree clean"
+    },
+    {
+      "kind": "test-first",
+      "value": "RED before source edits: HostNeutralMcpErrors had 4/4 failures proving CODEX_MCP_ERROR producer leakage, actual embedded generic leakage, legacy re-emission, and outer-catch SDK -32602. GREEN after minimal implementation and nested-detail follow-up; exact regressions now pass.",
+      "verify": "captured failing Vitest assertions followed by focused and full green runs"
+    },
+    {
+      "kind": "mcp-transport-red-green",
+      "ref": "test/unit/HostNeutralMcpErrors.test.ts",
+      "verify": "real @modelcontextprotocol/sdk Client + InMemoryTransport + HostMcpServer asserts isError, legal top-level _meta, structuredContent/diagnostic INTERNAL_ERROR, core.failure.internal-error, fake strict token rejection, exact legacy normalization, TOOL_TIMEOUT preservation, and MethodNotFound separation"
+    },
+    {
+      "kind": "dual-host-parity",
+      "ref": "test/unit/HostNeutralMcpErrors.test.ts",
+      "verify": "same shared HostMcpServer execution through Codex and Claude Code plugin roots produces deeply equal host-neutral content/diagnostic/error/isError views"
+    },
+    {
+      "kind": "boundary-scan",
+      "value": "Only error-taxonomy.ts decoder constant, exact normalization comparison and computed taxonomy alias contain CODEX_MCP_ERROR; no Plugin-owned Codex tool execution failed phrase; no changed path outside AlembicPlugin.",
+      "verify": "rg scans and git diff path/status checks passed"
+    },
+    {
+      "kind": "runtime-package",
+      "ref": "alembic-runtime-0.3.0.tgz",
+      "verify": "sha256:f44e40fc09a2ba19bd28268f1d4ceb4c5eff5b2b5434430d69e66a7459451169; 5,183,242 bytes; fresh committed-HEAD provenance; distribution/runtime npm-install/plugin/smoke gates passed"
+    },
+    {
+      "kind": "tests",
+      "value": "focused 12 files/107; full unit 152 files/1660; check; build:check; build; verify:plugin-distribution; verify:codex-runtime-package; verify:codex-plugin; smoke:codex-plugin; runtime-pack-freshness all pass",
+      "verify": "named task-package commands executed at final committed source/build provenance"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 specification review found and fixed two high-risk gaps before commit: outer error bypass of strict per-tool projector causing SDK -32602, and nested deprecated-code re-emission. Stage 2 quality review checked every failureResult call, projectors, exact-code precedence, no message inference, protocol boundary, tests and package provenance. No unresolved high/medium finding; only disclosed advisory Guard noise/test-fixture I/O remains.",
+      "verify": "affected focused/full/build/package gates re-run after fixes; post-commit focused and provenance gates pass"
+    },
+    {
+      "kind": "minimal-change",
+      "value": "Reused existing Core internal-error taxonomy and existing projectors; added no framework or protocol; retained real host-specific CODEX_* codes; changed no Core/Main/Agent/Dashboard/Test/Wakeflow/vendor/cache or cold-start/CAS/Recipe semantics.",
+      "verify": "13-file AlembicPlugin-only commit diff and boundary scan"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1.json",
+    "deliveryRunId": "run-dg-i8r-alembic-plugin-host-neutral-mcp-errors-20260726t0934",
+    "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-dg-i8r-alembic-plugin-host-neutral-mcp-errors__AlembicPlugin__i8r-alembic-plugin-host-neutral-mcp-errors-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/recipe-coldstart-production-quality-2026-07-15",
+    "stateRevision": 179,
+    "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+    "taskPackageId": "i8r-alembic-plugin-host-neutral-mcp-errors-p1",
+    "targetTaskId": "i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "dg-i8r-alembic-plugin-host-neutral-mcp-errors",
+    "resultId": "tr-i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+    "createdAt": "2026-07-26T10:04:18.710Z"
+  },
+  "createdAt": "2026-07-26T10:04:18.710Z",
+  "stateRevisionObserved": 179,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

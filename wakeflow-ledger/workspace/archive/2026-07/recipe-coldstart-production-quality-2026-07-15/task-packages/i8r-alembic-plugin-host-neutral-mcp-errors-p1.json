@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "taskPackageId": "i8r-alembic-plugin-host-neutral-mcp-errors-p1",
+  "demandKey": "recipe-coldstart-production-quality-2026-07-15",
+  "summary": "在 AlembicPlugin 精确父提交 2a36c9b6c61ec765f54c8660f510c779b2bbc05c 上实现 host-neutral MCP generic-error 优化。真实代码事实：host/results.ts、HostMcpServer.ts、local-tools/output.ts、search-output.ts 与 embedded-executor.ts 的共享路径仍输出 CODEX_MCP_ERROR 或 Codex 专属失败文案，同一 HostMcpServer 同时被 Codex 与 Claude Code 使用，而 errorHandler/error-taxonomy 已有 INTERNAL_ERROR→core.failure.internal-error。实现要求：(1) 新运行时未知工具执行失败统一发出顶层 INTERNAL_ERROR，超时、校验与 STRICT_PUBLICATION_* 等已知码原样保留；(2) failureResult 形成单一显式顶层 code 权威，禁止 data 内竞争 errorCode/覆盖歧义，可选最小签名迁移但不得新增错误平台；(3) Search/local projector 接受新 INTERNAL_ERROR；旧 CODEX_MCP_ERROR 仅作为明确 deprecated compatibility input，读取后归一为 INTERNAL_ERROR且不得重新发出；不得按 message token 推断严格码或宽泛透传；(4) normalized mcpErrorCode 继续为 core.failure.internal-error；(5) 共享可见文案改为 host-neutral“Plugin-owned tool execution failed”；(6) MCP JSON-RPC protocol errors 与 CallToolResult isError 工具执行错误保持分层；(7) 不全局重命名真实 host-specific CODEX_* 码，不改 Core/Main/Agent/Dashboard/Test/Wakeflow/vendor/cache，不改 cold-start/CAS/Recipe 语义，不派发 Test。测试先红后绿：清洁基线证明通用 throw/Claude Code 路径当前泄露 CODEX；真实 SDK Client+InMemoryTransport+HostMcpServer 证明 generic failure 的 isError、合法顶层 _meta、structuredContent/diagnostic INTERNAL_ERROR 与 core.failure.internal-error；严格码精确保留；普通消息含伪 STRICT_PUBLICATION_* 不升级；legacy CODEX_MCP_ERROR 输入归一且不重发；Codex/Claude Code 双宿主输出一致；协议错误分层不退化。静态扫描只允许 CODEX_MCP_ERROR 出现在明确 deprecated decoder/taxonomy alias，且共享文案不再含 Codex。运行 focused 既有 57/57 组与新增测试、ClaudeCodeHostRuntime/WrapHandler/registry adoption，随后 npm run test:unit、npm run check、npm run build:check、npm run build、verify:plugin-distribution、verify:codex-runtime-package、verify:codex-plugin、smoke:codex-plugin。提交一个干净 AlembicPlugin commit，并回填父提交、commit/tree/diff、红绿证据、双宿主 transport 原始断言、静态边界扫描、全套验证、runtime package/hash、两阶段 self-review、遗留风险。",
+  "status": "pending",
+  "sourceRef": "User-authorized controller code-fact optimization on 2026-07-26; requirement design §§15.4, 16, 18.4, 20/21; sequential NEXT after accepted AlembicPlugin commit 2a36c9b6c61ec765f54c8660f510c779b2bbc05c",
+  "designIntent": "收窄共享 Host MCP 的未知失败出口：复用现有 INTERNAL_ERROR/Core internal-error 分类，严格业务码保持精确，旧 CODEX_MCP_ERROR 只作兼容输入；不引入新协议、跨仓依赖或冷启动状态机改动。",
+  "evidenceContract": {
+    "version": 1,
+    "required": [
+      {
+        "kind": "commit",
+        "verify": "one clean AlembicPlugin commit on exact parent 2a36c9b6c61ec765f54c8660f510c779b2bbc05c with commit/tree/diff/status evidence"
+      },
+      {
+        "kind": "test-first",
+        "verify": "record a failing baseline demonstrating CODEX_MCP_ERROR/Codex-labelled shared fallback before implementation, then green after the change"
+      },
+      {
+        "kind": "mcp-transport-red-green",
+        "verify": "real MCP SDK Client + InMemoryTransport + HostMcpServer assertions for isError, top-level _meta legality, INTERNAL_ERROR and core.failure.internal-error, exact known codes, fake strict token rejection and legacy normalization"
+      },
+      {
+        "kind": "dual-host-parity",
+        "verify": "Codex and Claude Code shared HostMcpServer generic failure output is host-neutral and behaviorally equivalent"
+      },
+      {
+        "kind": "boundary-scan",
+        "verify": "runtime source emits no CODEX_MCP_ERROR except explicitly deprecated compatibility decoder/taxonomy alias; no shared Codex-only generic failure text; no scope expansion"
+      },
+      {
+        "kind": "runtime-package",
+        "verify": "plugin distribution/runtime/package/installed smoke gates pass with loaded artifact/hash evidence"
+      },
+      {
+        "kind": "tests",
+        "verify": "focused group including prior 57/57 plus new tests, full test:unit, check, build:check, build and named plugin verification commands pass"
+      },
+      {
+        "kind": "self-review",
+        "verify": "two-stage self-review reports high/medium/low findings, fixes or explicit residual risks, and re-runs affected gates"
+      },
+      {
+        "kind": "minimal-change",
+        "verify": "no new error framework/protocol, no Core/Main/Test changes, no cold-start/CAS/Recipe behavior change, true host-specific CODEX_* codes remain scoped"
+      }
+    ],
+    "advisory": [
+      {
+        "kind": "alembic-guard"
+      }
+    ]
+  },
+  "createdAt": "2026-07-26T09:33:21.966Z",
+  "targetTasks": [
+    {
+      "targetTaskId": "i8r-alembic-plugin-host-neutral-mcp-errors-t1",
+      "taskPackageId": "i8r-alembic-plugin-host-neutral-mcp-errors-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "修复共享 Host MCP 通用错误仍携带 CODEX 品牌的问题：INTERNAL_ERROR 成为唯一新发出的未知失败码，旧码只读兼容；保持严格码、协议分层、双宿主与插件交付验证。",
+      "status": "pending",
+      "createdAt": "2026-07-26T09:33:21.966Z"
+    }
+  ]
+}

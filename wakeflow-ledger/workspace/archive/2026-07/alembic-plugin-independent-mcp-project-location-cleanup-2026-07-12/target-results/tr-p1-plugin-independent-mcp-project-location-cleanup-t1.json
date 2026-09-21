@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-plugin-independent-mcp-project-location-cleanup-t1",
+  "demandKey": "alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+  "taskPackageId": "p1-plugin-independent-mcp-project-location-cleanup-p1",
+  "dispatchGroup": "p1-plugin-independent-mcp-project-location-cleanup-rework3-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p1-plugin-independent-mcp-project-location-cleanup-t1",
+  "status": "needs-review",
+  "summary": "Fixed the bounded final-tree unit failure without reopening MCP architecture: CodexDevReloadScript now normalizes help-output whitespace before asserting the complete statement that AlembicPlugin never manages the current Codex host MCP lifecycle. Final parent commit bf47f9939f0fd455ad1d022faebb12cad5a478f1; unchanged Codex shell 03ed6e6a6e2b676a9faecad5c6188b03ed1e7bc9; unchanged Claude shell 71839ae209de39f217f1647d28ca7e6de7033a5d. All required focused/full/build/plugin gates passed on this exact final HEAD and all worktrees are clean.",
+  "evidenceRefs": [
+    "AlembicPlugin/test/unit/CodexDevReloadScript.test.ts",
+    "AlembicPlugin/scripts/dev-reload-codex-plugin.mjs",
+    "AlembicPlugin/test/unit/IndependentMcpProjectLocation.test.ts",
+    "AlembicPlugin/test/unit/CodexKnowledgeState.test.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/host/tool-catalog.ts",
+    "AlembicPlugin/lib/host-runtime/status/OnboardingContract.ts",
+    "AlembicPlugin/lib/service/knowledge/KnowledgeState.ts",
+    "AlembicPlugin/docs/declared-effects.md"
+  ],
+  "verification": [
+    "Final HEAD git rev-parse — bf47f9939f0fd455ad1d022faebb12cad5a478f1",
+    "git cat-file -t bf47f9939f0fd455ad1d022faebb12cad5a478f1 — commit",
+    "git show --no-patch — bf47f9939f0fd455ad1d022faebb12cad5a478f1 test: tolerate wrapped reload help text",
+    "npx vitest run test/unit/CodexDevReloadScript.test.ts — PASS: 1/1 file, 6/6 tests",
+    "npm run test:unit -- --silent=passed-only --reporter=dot — PASS: 134/134 files, 1521/1521 tests, exit 0",
+    "npm run check — PASS: typecheck, lint, import/layer/repo/scope boundaries, shared/cross-shell drift, doctrine, naming, retired-symbols and ring-direction",
+    "npm run build — PASS on final HEAD using AlembicCore f4275572282a24c45af282a2ef7b435108f74fdd",
+    "npm run verify:codex-runtime-package — PASS: ok=true, entrypointProbe=passed, noFileDependencies=true, forbiddenOldShapeRejected=true, 1346 packed files",
+    "npm run verify:plugin-distribution — PASS: alembic-runtime@0.3.0",
+    "npm run verify:codex-plugin — PASS: alembic-runtime@0.3.0 via ./bin/alembic-start.mjs",
+    "Final git status --short plus Codex/Claude nested status — clean",
+    "Raw unchanged shell hashes: Codex 03ed6e6a6e2b676a9faecad5c6188b03ed1e7bc9 (cat-file=commit); Claude 71839ae209de39f217f1647d28ca7e6de7033a5d"
+  ],
+  "risks": [
+    "This target result remains a review input; controller acceptance and any local Plugin refresh/real-tool verification remain controller-owned.",
+    "The rework3 code change is test-only and deliberately does not alter production help text, MCP runtime, project location, public tools, confinement, destructive protections, or Recipe Git maintenance.",
+    "No remote push or release promotion was performed."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "The production help text preserved the intended lifecycle statement but wrapped it across lines; a brittle contiguous substring assertion failed on the final committed tree. The earlier full-suite claim was stale because it was not captured from that final HEAD.",
+      "verify": "focused-red-green"
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduced the exact focused failure; normalized only test-observed whitespace while asserting the full statement; committed; reran focused, full unit, check, build, and all three plugin verifications on the final commit; copied raw hashes and exit summaries.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "change-scope",
+      "commit": "bf47f9939f0fd455ad1d022faebb12cad5a478f1",
+      "value": "One test file only: test/unit/CodexDevReloadScript.test.ts. No production, documentation, shell, MCP architecture, five-tool, confinement, or maintenance code changed.",
+      "verify": "git-show"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/CodexDevReloadScript.test.ts",
+      "value": "Focused test changed from 1 failure/5 pass to 6/6 pass and was rerun again after the final commit.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "full-suite",
+      "value": "Final-HEAD execution: focused 6/6; full unit 134/134 files and 1521/1521 tests; npm run check PASS; npm run build PASS; runtime-package, distribution, and Codex plugin verifications PASS.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "runtime-probe",
+      "ref": "AlembicPlugin/scripts/verify-codex-runtime-package-boundary.mjs",
+      "value": "Final-HEAD package probe returned ok=true, entrypointProbe=passed, no file dependencies, and forbidden old shape rejected.",
+      "verify": "artifact-present"
+    },
+    {
+      "kind": "commit",
+      "commit": "bf47f9939f0fd455ad1d022faebb12cad5a478f1",
+      "value": "Raw verified unchanged Codex shell 03ed6e6a6e2b676a9faecad5c6188b03ed1e7bc9 and Claude shell 71839ae209de39f217f1647d28ca7e6de7033a5d.",
+      "verify": "git-cat-file"
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: exact failure reproduction and minimal test-only whitespace normalization; no production semantic change. Stage 2: final commit object verified, all required gates rerun on final HEAD, parent/nested worktrees clean, exact hashes copied from command output.",
+      "verify": "controller-review"
+    },
+    {
+      "kind": "deleted-chain-inventory",
+      "value": "Prior implementation inventory remains unchanged: active-host scope gate, runtime-control assertions, selected-project wording, visibility wrapper/ignored args, stale identity-policy checks, public codeDrift projection, and dead serviceBoundary residue remain removed."
+    },
+    {
+      "kind": "production-caller-scan",
+      "value": "No production file changed in rework3; prior zero rejected identity/visibility residue and Recipe-maintenance-only Git checkpoint classification remain intact."
+    },
+    {
+      "kind": "request-root-isolation",
+      "ref": "AlembicPlugin/test/unit/IndependentMcpProjectLocation.test.ts",
+      "value": "Request-root isolation implementation and tests were untouched; the final complete suite including these regressions passed."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-plugin-independent-mcp-project-location-cleanup-rework3-p1__AlembicPlugin__p1-plugin-independent-mcp-project-location-cleanup-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-independent-mcp-project-location-cleanup-rework3-p1__AlembicPlugin__p1-plugin-independent-mcp-project-location-cleanup-t1.json",
+    "deliveryRunId": "run-delivery-p1-plugin-independent-mcp-project-location-cleanup-rework3-p1__AlembicPlugin__p1-plugin-independent-mcp-project-location-cleanup-t1",
+    "dispatchGroup": "p1-plugin-independent-mcp-project-location-cleanup-rework3-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-independent-mcp-project-location-cleanup-rework3-p1__AlembicPlugin__p1-plugin-independent-mcp-project-location-cleanup-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+    "stateRevision": 13,
+    "demandKey": "alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12",
+    "taskPackageId": "p1-plugin-independent-mcp-project-location-cleanup-p1",
+    "targetTaskId": "p1-plugin-independent-mcp-project-location-cleanup-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p1-plugin-independent-mcp-project-location-cleanup-rework3-p1",
+    "resultId": "tr-p1-plugin-independent-mcp-project-location-cleanup-t1",
+    "createdAt": "2026-07-12T11:56:48.058Z"
+  },
+  "createdAt": "2026-07-12T11:56:48.058Z",
+  "stateRevisionObserved": 13,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 5,
+  "supersedes": {
+    "resultId": "tr-p1-plugin-independent-mcp-project-location-cleanup-t1",
+    "dispatchGroup": "p1-plugin-independent-mcp-project-location-cleanup-rework2-p1",
+    "historyFile": ".wakeflow-active/current/alembic-plugin-independent-mcp-project-location-cleanup-2026-07-12/target-results/history/tr-p1-plugin-independent-mcp-project-location-cleanup-t1__p1-plugin-independent-mcp-project-location-cleanup-rework2-p1__current-r0004.json"
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-19",
+  "scope": "AlembicAgent memory架构只读研究；六个指定模块与实际runtime/prompt/host消费点。根线程在调研期间开始实现MemoryReadPolicy，下面明确区分基线事实和优化建议。",
+  "reviewedModules": [
+    "src/agent/memory/MemoryCoordinator.ts",
+    "src/agent/memory/MemoryRetriever.ts",
+    "src/agent/memory/PersistentMemory.ts",
+    "src/agent/memory/SessionStore.ts",
+    "src/agent/memory/MemoryConsolidator.ts",
+    "src/agent/memory/MemoryEmbeddingStore.ts"
+  ],
+  "baselineCallChains": [
+    {
+      "id": "bootstrap-read",
+      "steps": [
+        {
+          "path": "../Alembic/lib/recipe-pipeline/generate/execution/RuntimeInitializer.ts",
+          "line": 94,
+          "role": "创建PersistentMemory、embeddingFn/sidecar，并注入会话级MemoryCoordinator"
+        },
+        {
+          "path": "../Alembic/lib/recipe-pipeline/generate/execution/DimensionRuntimeBuilder.ts",
+          "line": 212,
+          "role": "为每个维度创建scope，并把sessionStore/semanticMemory放入strategyContext"
+        },
+        {
+          "path": "src/agent/profiles/presets/insightPreset.ts",
+          "line": 60,
+          "role": "真实analyze promptBuilder传入semanticMemory/sessionStore"
+        },
+        {
+          "path": "src/agent/prompts/insightAnalyst.ts",
+          "line": 409,
+          "role": "拼入SessionStore上下文和reflections，再await query驱动的bootstrap语义记忆"
+        },
+        {
+          "path": "src/agent/memory/PersistentMemory.ts",
+          "line": 145,
+          "role": "公开facade委托MemoryRetriever.toPromptSection"
+        },
+        {
+          "path": "src/agent/memory/MemoryRetriever.ts",
+          "line": 109,
+          "role": "active rows→query embedding→lexical/vector+importance/recency排序→touchAccess→render"
+        }
+      ]
+    },
+    {
+      "id": "dynamic-scope",
+      "steps": [
+        {
+          "path": "src/agent/strategies/PipelineStrategy.ts",
+          "line": 1473,
+          "role": "把dimensionScopeId与MemoryCoordinator传到reactLoop"
+        },
+        {
+          "path": "src/agent/runtime/AgentRuntime.ts",
+          "line": 872,
+          "role": "每轮buildDynamicMemoryPrompt(scopeId)，当前mode误取source=system而非stage角色"
+        },
+        {
+          "path": "src/agent/memory/MemoryCoordinator.ts",
+          "line": 352,
+          "role": "ActiveContext按分配预算+全局lastSurplus生成动态段"
+        }
+      ]
+    },
+    {
+      "id": "completion-write",
+      "steps": [
+        {
+          "path": "../Alembic/lib/recipe-pipeline/generate/completion/CompletionSteps.ts",
+          "line": 100,
+          "role": "真实宿主完成链重新创建PersistentMemory/sidecar并运行EpisodicConsolidator"
+        },
+        {
+          "path": "src/agent/memory/EpisodicConsolidator.ts",
+          "line": 149,
+          "role": "SessionStore findings/reflections→candidate memories→PersistentMemory.consolidate"
+        },
+        {
+          "path": "src/agent/memory/PersistentMemory.ts",
+          "line": 122,
+          "role": "委托MemoryConsolidator"
+        },
+        {
+          "path": "src/agent/memory/MemoryConsolidator.ts",
+          "line": 99,
+          "role": "真实事务中做conflict/update/merge/add，再调用现有MemoryStore"
+        }
+      ]
+    }
+  ],
+  "baselineFindings": [
+    {
+      "id": "MEM-A01",
+      "path": "src/agent/memory/MemoryRetriever.ts",
+      "line": 123,
+      "fact": "embeddingFn只有text参数；retrieve直接await，未提供取消/deadline，失败静默词汇降级，访问计数在检索返回时更新。",
+      "impact": "embedding挂起会阻止prompt准备；取消/超时后迟到结果可能继续影响读取副作用；调用方无法区分无命中和降级。",
+      "status": "baseline; root已开始MemoryReadPolicy实现"
+    },
+    {
+      "id": "MEM-A02",
+      "path": "src/agent/strategies/PipelineStrategy.ts",
+      "line": 991,
+      "fact": "stagePrompt await先于effectiveBudget解析和#runWithTimeout，buildAnalystPrompt中的异步召回处在stage hard-timeout建立前。",
+      "impact": "只给reactLoop/provider接signal不能控制prompt准备中的embedding。"
+    },
+    {
+      "id": "MEM-A03",
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "line": 299,
+      "fact": "static读取taskContext未进入PersistentMemory.query；一个外层catch包所有tier，persistent失败会跳过健康session；_lastSurplus及budgetAllocation都是实例全局。",
+      "impact": "并行维度互相覆盖预算余量，tier失败耦合，宣称相关性options实际没被使用。",
+      "probe": "并发A/B：B动态预算在A晚完成前3200，之后3800；pm端口从未收到query。"
+    },
+    {
+      "id": "MEM-A04",
+      "path": "src/agent/prompts/insightAnalyst.ts",
+      "line": 409,
+      "fact": "真实prompt读链未传SessionStore/PersistentMemory有限tokenBudget；SessionStore.buildContextForDimension已经拼reflections，prompt随后再append同一reflections。",
+      "impact": "Coordinator现有预算修好但不接真实prompt仍无效；同一reflection重复消耗context。"
+    },
+    {
+      "id": "MEM-A05",
+      "path": "src/agent/memory/MemoryEmbeddingStore.ts",
+      "line": 55,
+      "fact": "向量仅按id缓存，没有content/model版本；MemoryConsolidator merge/replace在原id改content，PersistentMemory.update/delete也不维护sidecar。embedAllMemories只找缺失id。",
+      "impact": "修改过的记忆继续消费旧向量，旧id存在时backfill不会修复；删除后sidecar可残留。"
+    },
+    {
+      "id": "MEM-A06",
+      "path": "src/agent/memory/MemoryEmbeddingStore.ts",
+      "line": 115,
+      "fact": "#writeFile吞写错误，flushSync和timer仍无条件清dirty；没有dispose入口，timer未unref。",
+      "impact": "第二次flush不会重试失败写，和注释所说下次flush重试不符；短任务可能被timer维持，退出无显式owner清理。",
+      "probe": "失败WriteZone下连续flushSync两次只调用writer一次。"
+    },
+    {
+      "id": "MEM-A07",
+      "path": "src/agent/memory/MemoryCoordinator.ts",
+      "line": 24,
+      "fact": "Coordinator的PersistentMemoryLike、prompt的SemanticMemoryLike和Retriever选项分别手写子集；Conversation另要求Coordinator并不存在的同步buildPromptInjection。",
+      "impact": "读选项/返回时序容易再次漂移；补空alias会隐藏未接线而非提供真实记忆。"
+    },
+    {
+      "id": "MEM-A08",
+      "path": "src/agent/memory/MemoryRetriever.ts",
+      "line": 270,
+      "fact": "append在Retriever中做写入/去重，而Consolidator也有相似度更新；二者默认source/type/TTL及MERGE/替换语义不同。",
+      "impact": "有职责交叉，但不能把append机械改成consolidate而悄悄改变用户记忆写入语义。"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "MEMORY-READ-INTEGRATION",
+      "priority": 1,
+      "title": "用小型共享读取契约收束真实召回的取消、预算和诊断",
+      "objective": "在现有PersistentMemory/MemoryRetriever/Coordinator及真实insightAnalyst消费链上兑现一次读取的可取消、有界等待、独立降级和总预算；不新建存储层。",
+      "minimumBoundary": {
+        "files": [
+          "src/agent/memory/MemoryReadPolicy.ts (当前root草稿)",
+          "src/agent/memory/MemoryRetriever.ts",
+          "src/agent/memory/MemoryCoordinator.ts",
+          "src/agent/memory/PersistentMemory.ts (仅选项透传)",
+          "src/agent/prompts/insightAnalyst.ts",
+          "src/agent/profiles/presets/insightPreset.ts",
+          "src/agent/strategies/PipelineStrategy.ts (仅现有stage准备上下文接线)",
+          "src/agent/runtime/AgentRuntime.ts (正确mode/scope)"
+        ],
+        "outOfScope": [
+          "Core SQL/schema/search实现",
+          "宿主memory装配重写",
+          "新MemoryService/代理数据库/空adapter",
+          "把Conversation同步接口伪装成async成功"
+        ]
+      },
+      "design": [
+        "共享一次读取的options/diagnostic，不把三层存储统一成巨型接口；保留PersistentMemory公开facade与旧默认调用。",
+        "EmbeddingFn保持单text调用兼容，可添加可选第二参数传abortSignal。对忽略signal的legacy函数，只保证等待截止和迟到结果隔离，不声称取消HTTP。",
+        "整次操作只计算一次deadline，嵌套/批量读取传剩余预算或由同一外层readMemoryValue包裹，避免20个embedding每项重置5s累积100s。",
+        "区分外部取消与可降级timeout/error：取消不继续访问计数/写回；可选semantic读取失败可返回词汇路径并保留稳定诊断。",
+        "Coordinator taskContext传query；各tier单独处理错误。per-scope保存预算余量，同时按mode生成不可变预算快照，避免另一个维度allocateBudget(producer)修改当前analyze预算。",
+        "Runtime dynamic mode应来自pipelinePhase/tracker角色，不能把source=system强转为analyst/producer。",
+        "真实buildAnalystPrompt传query/source=bootstrap/tokenBudget及signal/deadline。它必须实际消费共享契约，而不只增强未接入生产的Coordinator静态方法。",
+        "旧source过滤保持明确：Coordinator当前source=user与bootstrap prompt当前source=bootstrap代表不同输入；整合时显式传source，不能靠mode暗改来源。",
+        "一个共享CJK感知estimate/clip口径控制返回段（含标题/裁剪提示），不可只相信被注入port服从tokenBudget。",
+        "实际SessionStore已包含reflections，避免第二次原样追加；若保留旧端口，可按完整相同段去重，保持未含reflection的旧实现仍得到该段。"
+      ],
+      "acceptance": [
+        "真实insightPreset→buildAnalystPrompt→PersistentMemory→Retriever（mock embedding）链：正常返回、embedding异常、5s/自定deadline超时都可观察，deadline后不再阻塞stage。",
+        "运行中cancel、预先cancel、legacy embedding忽略signal后迟到resolve：不touchAccess、不计消费、不注入迟到段；没有未处理Promise拒绝。",
+        "同query不同scope并行A/B乱序完成，A完成不改变B剩余预算；A analyst/B producer互不改配额。",
+        "Persistent tier抛错但Session tier可用时仍保留session段；取消则整体停止，不把取消当普通降级继续收集。",
+        "小预算/中文/emoji/零预算/超大port返回值都不越过合同总预算；只对最终实际展示的记忆更新访问计数。",
+        "同一个reflection仅一次出现；旧11参数buildAnalystPrompt和旧one-arg embeddingFn仍可运行。"
+      ],
+      "risks": [
+        "Host RuntimeInitializer.ts:175-185 的embeddingFn会忽略新增signal；真实网络中止需未来host明确转发，Agent本次不跨仓代改。",
+        "如果只加Coordinator静态方法而不修改insightAnalyst，生产流程不会受益。",
+        "如果只把lastSurplus换Map而budgetAllocation仍全局共享，角色并行污染仍在。",
+        "如果clip前retrieve已touch所有topN，未展示记忆也会被人为续新；应保留retrieve公开返回的touch语义，同时给prompt渲染内部使用纯rank候选后只touch选中项。"
+      ]
+    },
+    {
+      "id": "MEMORY-EMBEDDING-CONSISTENCY",
+      "priority": 2,
+      "title": "让现有Agent向量sidecar成为可验证、可恢复的派生缓存",
+      "objective": "content变更不再使用旧embedding；写失败可重试、timer可释放；结构化事实与Core存储保持原位。",
+      "minimumBoundary": {
+        "files": [
+          "src/agent/memory/MemoryEmbeddingStore.ts",
+          "src/agent/memory/MemoryRetriever.ts",
+          "src/agent/memory/PersistentMemory.ts (可选显式dispose委托)",
+          "src/agent/memory/MemoryConsolidator.ts (只有必要的更新影响通知才改)"
+        ],
+        "outOfScope": [
+          "迁移Core数据库或建第二套向量索引",
+          "新远程向量服务",
+          "自动合并多进程sidecar写入",
+          "变更fact/preference合并策略"
+        ]
+      },
+      "design": [
+        "保留get/set/batchSet/flushSync现有调用，新增可选content关联信息；旧id→number[] JSON继续可读，明确legacy/no-provenance降级与backfill规则。",
+        "在Retriever使用向量前把当前content hash与entry版本比较；不匹配按词汇路径并作为需要backfill处理，覆盖Consolidator在同id MERGE/REPLACE和Facade.update。避免为每个write方法另维护失效名单。",
+        "可记录provider/model/dimension身份时一起校验；当前host没有模型身份注入，不能编造model值或宣称已解决所有换模型场景。最小闭环是content hash与向量维度/finite/nonzero校验。",
+        "writer返回成功/失败；失败保持dirty，并暴露稳定诊断，下一次显式flush可重试。派生缓存损坏只触发可见重建，不污染语义记忆事实。",
+        "增加可释放timer的dispose，明确是否flush及失败反馈；timer可unref，保持旧未调用dispose的host行为可用。",
+        "backfill的content快照与写入版本绑定，内容在embedding等待期间变化时不把旧向量登记为新内容版本。"
+      ],
+      "acceptance": [
+        "同id记忆内容更新/merge/replace后，旧向量不参与相似度，backfill重新生成后恢复向量通道。",
+        "从旧JSON读取后旧get仍返回兼容数据，带content校验的真实retrieve使用明确legacy策略；无损升级不要求改Core schema。",
+        "writer第一次失败第二次成功，第二次flush确实重试；失败dirty不丢且diagnostic可见。",
+        "空、NaN、Infinity、非数字、维度不一致向量不产生NaN score，可靠降级。",
+        "dispose清理timer；cancel/deadline使backfill不写迟到结果；重启后合法sidecar可复用。"
+      ],
+      "risks": [
+        "RuntimeInitializer和CompletionSteps会创建不同sidecar实例；派生缓存可丢失重建，但不能保证跨实例更新合并。保持content版本核对可避免旧文件产生错误语义。",
+        "get直接暴露数组/set保存同一引用会让外部变异绕过dirty/version；实现时保留API值形状但采用防御性拷贝。",
+        "不要把append改为consolidate来解决失效，二者写入语义不同。"
+      ]
+    }
+  ],
+  "compatibilityAndSimplification": [
+    {
+      "keep": "PersistentMemory façade / ProjectSemanticMemory alias",
+      "reason": "真实host创建和消费；委托本身不是冗余壳，保持公开方法与参数默认值。"
+    },
+    {
+      "keep": "SessionStore checkpoint与现有MemoryStore/Core边界",
+      "reason": "本次只治理Agent读取/派生缓存，不迁移确定性存储。"
+    },
+    {
+      "avoid": "新增query cache或新MemoryService层",
+      "reason": "当前主要风险是有界读与旧embedding；新增缓存会引入provider/model/source/scope key及写后失效的新复杂性，收益尚无测量。"
+    },
+    {
+      "avoid": "completeSession伪固化桥",
+      "reason": "Coordinator.completeSession当前只收尾；真实固化由Host CompletionSteps→EpisodicConsolidator完成，不能在新alias里重复触发。"
+    },
+    {
+      "retainAsSeparateWork": "Conversation.buildPromptInjection同步历史接口",
+      "reason": "当前Coordinator无此方法，host chat默认也没有coordinator注入；不得以空alias假装完成，新异步读取优先接实际Analyst链。"
+    }
+  ],
+  "probeResults": [
+    {
+      "name": "scope-surplus-race",
+      "result": "B动态预算在A完成前3200，A晚完成后3800；taskContext未传query。",
+      "scope": "实际Coordinator源码+mock persistent/ActiveContext，未写文件。"
+    },
+    {
+      "name": "embedding-flush-retry",
+      "result": "mock WriteZone失败，连续flushSync两次writer只被调用一次；缓存仍有entry。",
+      "scope": "实际EmbeddingStore源码+mock writer，未写sidecar。"
+    },
+    {
+      "name": "retriever-baseline-probe",
+      "result": "未完成：执行时root并行修改了Retriever并新增MemoryReadPolicy，独立data-module harness未映射该新import；不将此工具harness错误当产品缺陷。"
+    }
+  ],
+  "verificationLimits": [
+    "没有运行网络/API、真实embedding或修改产品/相邻仓。",
+    "本子任务只提供本仓源码事实；Tencent Memory项目的外部研究由根任务整合，不在此伪造比较结论。",
+    "根任务正在实现；本报告是实现前基线与兼容/验收建议，不是最终修复验收。"
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p1-core-recipe-retrieval-production-generation-p1",
+  "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework1-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1-core-recipe-retrieval-production-generation-t1",
+  "status": "completed",
+  "summary": "Rework1 completed on top of 6bf67eb. Commit 154e5ed9f5440573dbada12ae2707d9bb5a5c4a3 adds a real consumer-facing RecipeProductionPort on RecipeProductionGateway (createOrStage/evaluateReadiness/publish) backed by the same KnowledgeService persistence and active-transition readiness gate; hard-blocks exact default-only Utility/general/default concepts while keeping weak metadata and meaningful phrases compatible; makes vector IDs explicitly encode projection schema, canonical role and content hash; versions generation manifests with generationId/status/createdFrom/provider/model/dimension/format/corpus identity and per-Recipe expected IDs; and makes exact inspection prove missing, partial, logical duplicate, orphan, hash/dimension mismatch, stale and stale-generation states. Query-time paths and outer repositories remain unchanged.",
+  "evidenceRefs": [
+    "commit:154e5ed9f5440573dbada12ae2707d9bb5a5c4a3",
+    "src/service/knowledge/RecipeProductionGateway.ts",
+    "src/service/knowledge/RecipeRetrieval.ts",
+    "src/service/vector/RecipeRegionVectorIndex.ts",
+    "src/service/vector/RecipeVectorGeneration.ts",
+    "test/RecipeRetrievalProduction.test.ts",
+    "test/RecipeVectorGeneration.test.ts"
+  ],
+  "verification": [
+    "npx vitest run focused 8-file production/vector/persistence/public suite — 8 files, 205 tests passed",
+    "npm test — 184 files, 1721 tests passed",
+    "npm run build:check — passed",
+    "npm run build — passed",
+    "npm run lint — 746 files checked, passed",
+    "Core delivery/tool/Codex/package boundary suite — 4 files, 22 tests passed",
+    "npm run lint:public-api-boundary — 66 exports classified, passed",
+    "npm run lint:layer-contract — passed",
+    "npm run lint:consumer-core-imports — all three consumers passed",
+    "npm run lint:scope-resolution — passed",
+    "npm run smoke:public-api — 59 exact entrypoints imported",
+    "npm run check:output-budgets && npm run check:space-edges — passed",
+    "npm run lint:naming && npm run lint:retired-symbols — passed",
+    "git diff --check passed before commit; post-commit worktree clean",
+    "npm run check stops only at inherited src/infrastructure/vector/ASTChunker.ts:32 Doctrine violation; file is unchanged from parent 6bf67eb and original baseline d17db939"
+  ],
+  "risks": [
+    "npm run check remains blocked only by the inherited Doctrine violation at src/infrastructure/vector/ASTChunker.ts:32; the file is unchanged in both this rework commit and its parent.",
+    "Concrete outer-repository producer/profile authoring and durable generation store/router bindings remain downstream consumer integration; Core now exposes and tests the connected contract without editing those repositories.",
+    "No ranking tuning, hardcoded queries or Recipe IDs, model replacement, Test/Graph work, or query-time maintenance was added."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "154e5ed9f5440573dbada12ae2707d9bb5a5c4a3",
+      "verify": "clean rework commit directly on parent 6bf67eb33d961a280e829636704c4b5d3b1fff53; worktree clean"
+    },
+    {
+      "kind": "tests",
+      "ref": "test/RecipeRetrievalProduction.test.ts",
+      "verify": "controller-rerun; full npm test passed 184 files / 1721 tests and focused rework suite passed 8 files / 205 tests"
+    },
+    {
+      "kind": "self-review",
+      "value": "Two-stage self-review completed. Requirement review mapped each controller verdict to implementation and RED/GREEN evidence. Correctness review checked Gateway dependency compatibility, legacy source-hash acceptance, Markdown/SQLite lifecycle path truth, new+legacy vector ID parsing/removal, generation stamping, logical duplicates under unique-key stores, failed shadow cleanup, CAS activation, real-generation rollback, maintenance-only inspection cost, public exports, and reader-only query boundaries.",
+      "verify": "full tests, build/typecheck, Biome, public/layer/consumer/scope/smoke gates, boundary tests, git diff/check, clean commit"
+    },
+    {
+      "kind": "red-green-note",
+      "ref": "test/RecipeVectorGeneration.test.ts",
+      "value": "RED reproduced all four verdict gaps: createOrStage was absent; default-only concepts remained retrieval facts; IDs/manifests omitted explicit schema/generation truth; unique-key logical duplicates and required exact-state fixtures were not detected. GREEN now proves the real Port persistence/publish loop, stable placeholder violations, schema/model generation changes, manifest building/ready/failed states, missing/partial/logical duplicate/orphan/stale-generation inspection, failed shadow preservation and rollback.",
+      "verify": "focused rework suite passed 8 files / 205 tests"
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Rework commit changes 12 AlembicCore source/test facade files only. No sibling repository, query ranking, query-time writer, Test, Graph, model, synonym or hardcoded acceptance-query changes.",
+      "verify": "commit 154e5ed; clean AlembicCore worktree; parent 6bf67eb"
+    },
+    {
+      "kind": "compatibility-review",
+      "value": "Existing Gateway create consumers remain valid because new readiness/publish dependencies are optional until the new Port methods are called; first-generation ID-bearing source hashes remain accepted; legacy vector IDs remain parseable and provider-independent removal-compatible; corpusHash is retained as a manifest compatibility alias; numeric inspection call sites remain supported.",
+      "verify": "public API smoke, three-consumer import gate, legacy parser/source-hash tests and full test suite passed"
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-core-recipe-retrieval-production-generation-rework1-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-recipe-retrieval-production-generation-rework1-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1.json",
+    "deliveryRunId": "run-p1-core-recipe-retrieval-production-generation-rework1-p1-readback1",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework1-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-recipe-retrieval-production-generation-rework1-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 7,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p1-core-recipe-retrieval-production-generation-p1",
+    "targetTaskId": "p1-core-recipe-retrieval-production-generation-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework1-p1",
+    "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+    "createdAt": "2026-07-13T12:17:34.416Z"
+  },
+  "createdAt": "2026-07-13T12:17:34.416Z",
+  "stateRevisionObserved": 7,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 3,
+  "supersedes": {
+    "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p1-core-recipe-retrieval-production-generation-t1__p1-core-recipe-retrieval-production-generation-p1__current-r0002.json"
+  }
+}

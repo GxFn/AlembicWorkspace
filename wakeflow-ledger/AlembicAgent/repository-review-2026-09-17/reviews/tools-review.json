@@ -1,0 +1,1346 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-17",
+  "scope": [
+    "src/tools/**",
+    "src/shared/**"
+  ],
+  "sourceFileCount": 61,
+  "reviewBoundary": "只读代码与相邻真实消费方检查；未修改 src/test/config 或相邻仓库，未运行网络/API。仅写本报告。父任务负责统一修复和完整验证。",
+  "files": [
+    {
+      "path": "src/shared/concurrency.ts",
+      "role": "无外部依赖的 Promise 并发 limiter，供 AgentRunCoordinator/FanOutStrategy 使用。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/coordination/AgentRunCoordinator.ts",
+        "src/agent/strategies/FanOutStrategy.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "有 AgentRunCoordinator/FanOutStrategy 消费。虽 Core 有同名 limiter，但 Core 模块含全局 IO/CPU limiter 初始化；不要仅按名字合并。",
+      "tests": []
+    },
+    {
+      "path": "src/shared/packageAssets.ts",
+      "role": "定位 @alembic/agent 安装根，为 Conversation 读取可选 SOUL.md 提供路径。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/toolsets/Conversation.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "Conversation 真实使用；可选 SOUL 不存在是显式 best effort，保留。",
+      "tests": []
+    },
+    {
+      "path": "src/shared/tokenUtils.ts",
+      "role": "按字符估算 token 及快速估算，供运行时输入测量与上下文预算使用。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/context/ContextWindow.ts",
+        "src/agent/context/ConversationStore.ts",
+        "src/agent/runtime/LLMInputMeasurement.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "两个算法分别服务精细测量与快速预算，不能无证据合并成 registry 的 length/4。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/catalog/CapabilityCatalog.ts",
+      "role": "manifest 注册、删除、过滤与 provider schema 投影。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/catalog/UnifiedToolCatalog.ts",
+        "src/tools/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/catalog/CapabilityManifest.ts",
+      "role": "宿主/Agent 共享的风险、治理、执行与 schema manifest 类型。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "src/tools/catalog/CapabilityCatalog.ts",
+        "src/tools/catalog/UnifiedToolCatalog.ts",
+        "src/tools/index.ts",
+        "src/tools/kernel/request.ts",
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/catalog/UnifiedToolCatalog.ts",
+      "role": "在 manifest catalog 上叠加 handler definitions、router 绑定、模型覆盖与展开状态。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/runtime/AgentRuntimeTypes.ts",
+        "src/tools/index.ts"
+      ],
+      "externalConsumers": [
+        "../Alembic/lib/injection/modules/AgentModule.ts:54",
+        "../Alembic/lib/injection/ServiceMap.ts:167"
+      ],
+      "findings": [
+        "TOOLS-010"
+      ],
+      "cleanup": "真实宿主把它用于 Dashboard/Skill manifest/self-introspection store，保留公开类；修 unregister 状态一致性即可。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/index.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/kernel/context.ts",
+      "role": "调用身份、服务端口、runtime 元数据与 EvidenceLedgerLike 契约。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "src/tools/kernel/handler.ts",
+        "src/tools/kernel/index.ts",
+        "src/tools/kernel/registry.ts",
+        "src/tools/kernel/request.ts",
+        "src/tools/kernel/routing.ts",
+        "src/tools/runtime/handlers/submitEvidenceExpansion.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/kernel/decision.ts",
+      "role": "允许/拒绝决策类型与构造帮助函数。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "src/tools/kernel/context.ts",
+        "src/tools/kernel/index.ts",
+        "src/tools/kernel/request.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/kernel/handler.ts",
+      "role": "内部 handler/store 契约与 ToolCallContext 到旧形状上下文的映射。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "src/tools/kernel/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "旧形状 context mapping 属公开宿主契约，按真实消费迁移后再精简；无本仓调用不等于无用。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/kernel/index.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/memory/ActiveContext.ts",
+        "src/agent/runtime/AgentInterfaceContract.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/AgentRuntimeTypes.ts",
+        "src/agent/runtime/DiagnosticsCollector.ts",
+        "src/agent/runtime/MessageAdapter.ts",
+        "src/agent/runtime/PcvNodeEvidenceRecorder.ts",
+        "src/agent/runtime/ToolExecutionPipeline.ts",
+        "src/agent/service/AgentRuntimeBuilder.ts",
+        "src/agent/tasks/AgentTaskHandlers.ts",
+        "src/tools/catalog/UnifiedToolCatalog.ts",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+        "src/tools/workflow/WorkflowRegistry.ts",
+        "test/ActiveContext.test.ts",
+        "test/AgentRuntime.test.ts",
+        "test/agent-surface-floor.test.ts",
+        "test/pcv-observe-only-baseline.characterization.test.ts",
+        "test/pcv-observe-only-five-scenario.acceptance.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/ActiveContext.test.ts",
+        "test/AgentRuntime.test.ts",
+        "test/agent-surface-floor.test.ts",
+        "test/pcv-observe-only-baseline.characterization.test.ts",
+        "test/pcv-observe-only-five-scenario.acceptance.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/kernel/presenter.ts",
+      "role": "信封识别和 ordinary output 文本呈现。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "src/tools/kernel/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/kernel/registry.ts",
+      "role": "工具/action/schema/handler/context/capability 类型，以及 ok/fail/token 估算帮助函数。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/kernel/index.ts",
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/handlers/code.ts",
+        "src/tools/runtime/handlers/evidence.ts",
+        "src/tools/runtime/handlers/graph.ts",
+        "src/tools/runtime/handlers/knowledge.ts",
+        "src/tools/runtime/handlers/memory.ts",
+        "src/tools/runtime/handlers/meta.ts",
+        "src/tools/runtime/handlers/terminal.ts",
+        "src/tools/runtime/index.ts",
+        "src/tools/runtime/registry.ts",
+        "src/tools/runtime/router.ts",
+        "src/tools/runtime/toolsets/Evolution.ts",
+        "src/tools/runtime/toolsets/RuntimeCapability.ts",
+        "test/memory-note-finding.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/memory-note-finding.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/kernel/request.ts",
+      "role": "共享 ToolCallRequest、ToolRouterContract 与执行 adapter 契约。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "src/tools/kernel/index.ts",
+        "src/tools/kernel/routing.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/kernel/result.ts",
+      "role": "外部稳定的工具结果信封、普通输出投影、字段清理和诊断摘要。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "src/tools/kernel/context.ts",
+        "src/tools/kernel/index.ts",
+        "src/tools/kernel/presenter.ts",
+        "src/tools/kernel/request.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-009"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/kernel/routing.ts",
+      "role": "通过 serviceContracts 解析 ToolRouterContract。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "src/tools/kernel/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts",
+      "role": "把内置 registry 的 tool/action 白名单投影成模型可见 schema。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/adapter/index.ts",
+        "test/mining-e2e-pipeline.test.ts"
+      ],
+      "externalConsumers": [
+        "../Alembic/lib/injection/modules/AgentModule.ts:30"
+      ],
+      "findings": [],
+      "cleanup": "expandedTools 仅计数，不改变生成 schema；公开 expandedCount 有现有测试，移除需明确 API 边界决定。",
+      "tests": [
+        "test/mining-e2e-pipeline.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+      "role": "宿主 ContextFactory 到内置 ToolRouter 的真实执行桥接并构造统一信封。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/adapter/index.ts",
+        "test/mining-e2e-pipeline.test.ts"
+      ],
+      "externalConsumers": [
+        "../Alembic/lib/injection/modules/AgentModule.ts:46"
+      ],
+      "findings": [
+        "TOOLS-009"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/mining-e2e-pipeline.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/adapter/index.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/cache/DeltaCache.ts",
+      "role": "带文件指纹与简易行 diff 的缓存，用于重复读取与写前新鲜度。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/cache/index.ts"
+      ],
+      "externalConsumers": [
+        "../Alembic/lib/tools/ToolContextFactory.ts:131"
+      ],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/cache/SearchCache.ts",
+      "role": "按调用方 key 的 LRU 搜索结果缓存。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/cache/index.ts"
+      ],
+      "externalConsumers": [
+        "../Alembic/lib/tools/ToolContextFactory.ts:132"
+      ],
+      "findings": [
+        "TOOLS-005"
+      ],
+      "cleanup": "createdAt 当前无消费，若不需要 TTL 可去除内部储存字段，但 SearchCacheEntry 为公开类型需先核查兼容。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/cache/index.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/compressor/OutputCompressor.ts",
+      "role": "延迟装载命令专用 parser，ANSI/重复行清理与预算截断。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/index.ts"
+      ],
+      "externalConsumers": [
+        "../Alembic/lib/tools/ToolContextFactory.ts:133"
+      ],
+      "findings": [
+        "TOOLS-013"
+      ],
+      "cleanup": "compress 与 compressSync 在 parser 选择/预算裁剪逻辑大段重复；修加载竞争时抽取单个纯同步处理函数。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/compressor/index.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/GitDiffParser.ts",
+      "role": "将 git diff/stat 汇总成逐文件增删数。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/parsers/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "FileStat.hunks 收集但最终格式完全不用，可安全删除仅内部的字段/正则/收集分支；输出保持。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/GitLogParser.ts",
+      "role": "解析完整/oneline/custom git log，截取前 20 条。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/parsers/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/GitStatusParser.ts",
+      "role": "解析 porcelain/human git status 并按状态归桶。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/parsers/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-007"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/GrepParser.ts",
+      "role": "解析 rg JSON 或 file:line 文本，按位置去重并上限 30 条。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/parsers/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/LintOutputParser.ts",
+      "role": "识别 ESLint/tsc/Biome diagnostics 并返回计数与前 10 个问题。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/parsers/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "_BIOME_LINE_RE 完全未使用，可删除；现有 Biome 实际输出形状支持不足时应返回 null 保留证据。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/PackageParser.ts",
+      "role": "压缩 npm/pnpm/yarn 安装概要与警告。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/parsers/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/TestOutputParser.ts",
+      "role": "解析 Vitest/Jest/Pytest/Mocha 概要与失败片段。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/parsers/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-006"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/TreeParser.ts",
+      "role": "尝试把 tree/ls -R/find 输出标准化为目录树。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/parsers/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/parsers/index.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [],
+      "testNote": "现有直接 parser 行为覆盖主要为 GitStatus happy path，其他 parser 缺代表性失败输入。"
+    },
+    {
+      "path": "src/tools/runtime/compressor/strip.ts",
+      "role": "ANSI 清理、连续重复折叠、保留头尾的通用输出截断。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/compressor/OutputCompressor.ts",
+        "src/tools/runtime/compressor/index.ts",
+        "src/tools/runtime/handlers/terminal.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/handlers/code.ts",
+      "role": "真实代码搜索/读取/AST outline/目录树/文件写入，与缓存及路径/写前校验集成。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/registry.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-002",
+        "TOOLS-004",
+        "TOOLS-005"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/handlers/evidence.ts",
+      "role": "运行证据台账 get/search，只读并限制返回规模。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/registry.ts",
+        "test/EvidenceToolAndQuota.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/EvidenceToolAndQuota.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/handlers/graph.ts",
+      "role": "调用宿主注入的 projectGraph/codeEntityGraph，Agent 不实现 AST 内核。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/registry.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/handlers/knowledge.ts",
+      "role": "知识查询、候选准备/证据与 authoring gate/风格修复/Core production/生命周期管理。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/registry.ts",
+        "test/SubmissionSanitize.test.ts",
+        "test/recipe-production-profile-adapter.test.ts",
+        "test/scan-run-production-integration.test.ts",
+        "test/style-waiver.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-008"
+      ],
+      "cleanup": "建议把 source/hash 的最终准备顺序收束；_styleRepairAttempts 仍挂一次性 runtime 而非稳定 sessionCounterBox，计数规则存在与其他计数不一致；需结合新回归再调整。",
+      "tests": [
+        "test/SubmissionSanitize.test.ts",
+        "test/recipe-production-profile-adapter.test.ts",
+        "test/scan-run-production-integration.test.ts",
+        "test/style-waiver.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/handlers/memory.ts",
+      "role": "会话保存/召回、引用台账的结构化发现、前序维度证据召回。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/registry.ts",
+        "test/NoteFindingEvidenceRefs.test.ts",
+        "test/insight-depth-retry.test.ts",
+        "test/memory-note-finding.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/NoteFindingEvidenceRefs.test.ts",
+        "test/insight-depth-retry.test.ts",
+        "test/memory-note-finding.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/handlers/meta.ts",
+      "role": "registry 自省、执行计划记录与会话提交汇总。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/registry.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/handlers/recipeAuthoringGate.ts",
+      "role": "注入文件来源解析器，调用 Core validateAgainst 的 in-process 包装。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/handlers/knowledge.ts",
+        "test/evidence-collector-fidelity.test.ts",
+        "test/recipe-authoring-inprocess-flatten.test.ts",
+        "test/recipe-authoring-inprocess-parity.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-004"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/evidence-collector-fidelity.test.ts",
+        "test/recipe-authoring-inprocess-flatten.test.ts",
+        "test/recipe-authoring-inprocess-parity.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/handlers/recipeProductionAdapter.ts",
+      "role": "验证 bounded coreCode；构建 Core retrievalProfile 身份、provenance 和 source hash。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/handlers/knowledge.ts",
+        "test/recipe-production-profile-adapter.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-008"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/recipe-production-profile-adapter.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+      "role": "从台账 refs 展开 sources、检查新鲜度、净化来源与限定风格修复子调用。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/handlers/knowledge.ts",
+        "test/SubmissionSanitize.test.ts",
+        "test/SubmitEvidenceExpansion.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-012"
+      ],
+      "cleanup": "extractFirstJsonObject 与 ai/shared/structuredOutput 的职责重复，已有错误复现，适合收敛。",
+      "tests": [
+        "test/SubmissionSanitize.test.ts",
+        "test/SubmitEvidenceExpansion.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/handlers/terminal.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/registry.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-004"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/handlers/terminalSafety.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/handlers/terminal.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-001"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/index.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "test/llm-input-correctness.test.ts",
+        "test/llm-input-layering.test.ts",
+        "test/runtime-terminal-safety.test.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/llm-input-correctness.test.ts",
+        "test/llm-input-layering.test.ts",
+        "test/runtime-terminal-safety.test.ts",
+        "test/tool-v2-contract.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/recipeProductionContract.ts",
+      "role": "各可提交知识的 Agent 提示共用 retrieval profile 契约文字。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/prompts/insightProducer.ts",
+        "src/agent/prompts/scanPrompts.ts",
+        "src/tools/runtime/toolsets/Conversation.ts",
+        "src/tools/runtime/toolsets/GenerateProduce.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/registry.ts",
+      "role": "7 个内置工具/22 个 action 的 schema、风险、缓存、并发与 handler 注册真相源。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/context/ExplorationTracker.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/tools/runtime/adapter/RuntimeCapabilityCatalog.ts",
+        "src/tools/runtime/index.ts",
+        "src/tools/runtime/router.ts",
+        "src/tools/runtime/toolsets/RuntimeCapability.ts",
+        "test/DimensionSchemaVariant.test.ts",
+        "test/llm-input-layering.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "schema 现在嵌套结构丰富但 router 仅 required/enum；先修真实输入错误，避免引入第二套元数据真相源。",
+      "tests": [
+        "test/DimensionSchemaVariant.test.ts",
+        "test/llm-input-layering.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/router.ts",
+      "role": "解析、参数校验、capability 检查、并发控制、handler 执行和输出预算。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts",
+        "src/tools/runtime/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [
+        "TOOLS-003",
+        "TOOLS-011",
+        "TOOLS-014"
+      ],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/toolsets/Capability.ts",
+      "role": "能力基类和 buildContext/step hook seam。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/runtime/AgentRuntimeTypes.ts",
+        "src/agent/runtime/LoopContext.ts",
+        "src/agent/runtime/SystemPromptBuilder.ts",
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+        "src/tools/runtime/toolsets/RuntimeCapability.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+      "role": "能力名到具体能力类的工厂注册映射。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/index.ts",
+        "src/agent/runtime/AgentRuntime.ts",
+        "src/agent/service/AgentRuntimeBuilder.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "所有注册类共享构造签名可后续精简 as cast；当前真实 runtime 根据名称解析，保留。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/toolsets/Conversation.ts",
+      "role": "会话工具白名单、persona/project briefing/memory 提示注入与步骤后缓存。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/agent/index.ts",
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+        "src/tools/runtime/toolsets/index.ts",
+        "test/llm-input-layering.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/llm-input-layering.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/toolsets/Evolution.ts",
+      "role": "知识进化工具白名单及只读终端命令白名单。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+        "src/tools/runtime/toolsets/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/toolsets/GenerateAnalyze.ts",
+      "role": "冷启动分析工具集与证据/发现记录指引。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+        "src/tools/runtime/toolsets/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/toolsets/GenerateProduce.ts",
+      "role": "常规知识生产工具集/提示及 strict proposal-only 无工具模式。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+        "src/tools/runtime/toolsets/index.ts",
+        "test/SubmitEvidenceExpansion.test.ts",
+        "test/evidence-ledger-baseline.characterization.test.ts",
+        "test/strict-production-chain.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/SubmitEvidenceExpansion.test.ts",
+        "test/evidence-ledger-baseline.characterization.test.ts",
+        "test/strict-production-chain.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/toolsets/RuntimeCapability.ts",
+      "role": "声明式 allowedTools、命令白名单、registry 驱动提示与 CapabilityDef。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/toolsets/Conversation.ts",
+        "src/tools/runtime/toolsets/Evolution.ts",
+        "src/tools/runtime/toolsets/GenerateAnalyze.ts",
+        "src/tools/runtime/toolsets/GenerateProduce.ts",
+        "src/tools/runtime/toolsets/ScanAnalyze.ts",
+        "src/tools/runtime/toolsets/ScanProduce.ts",
+        "src/tools/runtime/toolsets/System.ts",
+        "src/tools/runtime/toolsets/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/toolsets/ScanAnalyze.ts",
+      "role": "增量扫描分析能力的工具集与发现要求。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+        "src/tools/runtime/toolsets/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/toolsets/ScanProduce.ts",
+      "role": "增量扫描生产能力及 strict 无工具模式。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+        "src/tools/runtime/toolsets/index.ts",
+        "test/strict-production-chain.test.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": [
+        "test/strict-production-chain.test.ts"
+      ]
+    },
+    {
+      "path": "src/tools/runtime/toolsets/System.ts",
+      "role": "系统交互工具集，包含代码写入与终端。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/runtime/toolsets/CapabilityRegistry.ts",
+        "src/tools/runtime/toolsets/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/runtime/toolsets/index.ts",
+      "role": "公开或内部模块 barrel；逐个读取并核查 re-export 路由。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts",
+        "src/tools/runtime/index.ts"
+      ],
+      "externalConsumers": [],
+      "findings": [],
+      "cleanup": "未发现有证据的可删除实现；保留既有职责与公开导出。",
+      "tests": []
+    },
+    {
+      "path": "src/tools/workflow/WorkflowRegistry.ts",
+      "role": "WorkflowDefinition 注册/读取/删除容器，具体执行交由宿主。",
+      "reviewed": true,
+      "reviewMode": "full-source-read",
+      "consumers": [
+        "src/tools/index.ts"
+      ],
+      "externalConsumers": [
+        "../Alembic/lib/injection/modules/AgentModule.ts:64"
+      ],
+      "findings": [],
+      "cleanup": "本仓无运行执行消费，但 ../Alembic/lib/injection/modules/AgentModule.ts:64 实际注册该公开类；未获消费者迁移授权前不删除。",
+      "tests": []
+    }
+  ],
+  "findings": [
+    {
+      "severity": "P1",
+      "id": "TOOLS-001",
+      "path": "src/tools/runtime/handlers/terminalSafety.ts",
+      "line": 164,
+      "issue": "只读命令白名单可被换行及子程序执行选项绕过。",
+      "repro": "实际源码纯函数 probe: checkTerminalCommandAllowlist(\"git status\\nrm important.txt\", [\"git\"]) → safe:true；find . -execdir touch changed.txt + 与 rg --pre=./script pattern src 也 safe:true。没有执行这些命令。",
+      "suggestion": "拒绝 CR/LF 命令分隔符；对允许程序的已知执行/写入选项做精确拒绝，覆盖 find -execdir/-ok/-okdir 和 rg --pre。保留非白名单模式既有权限语义。",
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "TOOLS-002",
+      "path": "src/tools/runtime/handlers/code.ts",
+      "line": 462,
+      "issue": "delta cache unchanged 在显式读取范围之前短路，阻止第二段源码与大文件 outline 后的补读。",
+      "repro": "同 DeltaCache 先 read router.ts:1-5 后 read router.ts:50-55，第二次仅返回 [unchanged since last read]。",
+      "suggestion": "显式 startLine/endLine/maxLines 的请求绕过 unchanged/delta 呈现短路，仍维护完整文件指纹。补范围→另一范围及 outline→范围回归。",
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "TOOLS-003",
+      "path": "src/tools/runtime/router.ts",
+      "line": 61,
+      "issue": "exclusive 锁只互斥其他 exclusive，parallel/single 均不等待，实际并非全局独占。",
+      "repro": "保持 exclusive handler 尚未释放，启动 parallel handler，实际 events=[write-enter,read-enter]。",
+      "suggestion": "统一共享/独占调度，exclusive 等待全部活动任务，其余任务也等待 exclusive；保留同工具 single 互斥和 parallel 并行。覆盖双向阻塞、异常释放与取消队列。",
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "TOOLS-004",
+      "path": "src/tools/runtime/handlers/code.ts",
+      "line": 936,
+      "issue": "文件和 cwd 边界只检查词法路径，符号链接可越过项目根或别名绕过受保护路径。",
+      "repro": "实际 code.read(node_modules/@alembic/core/package.json) accepted=true，而 fs.realpath 目标在相邻 Core 仓库；等价的 link→仓库外或 link→.git 用于 write 时也绕过词法判断。写入场景仅代码推演，未执行。",
+      "suggestion": "对存在目标及新文件最近存在祖先做 realpath containment；写入保护同时检查词法和真实相对路径。terminal cwd 与 authoring resolver 使用同样约束；recipeProductionAdapter 已有 realpath 可作本仓参考。",
+      "relatedPaths": [
+        "src/tools/runtime/handlers/terminal.ts",
+        "src/tools/runtime/handlers/recipeAuthoringGate.ts"
+      ],
+      "validation": "read-repro-plus-write-path-inspection"
+    },
+    {
+      "severity": "P2",
+      "id": "TOOLS-005",
+      "path": "src/tools/runtime/handlers/code.ts",
+      "line": 82,
+      "issue": "搜索 cache key 缺影响结果的 maxResults/contextLines，窄查询污染后续扩容查询。",
+      "repro": "同 SearchCache 在 runtime/cache 搜 export，maxResults=1 后改50，cached shown=5；全新 cache 同查询 shown=9。",
+      "suggestion": "cache key 加规范化的输出参数和 projectRoot，或缓存完整规范化搜索结果再按请求切片；避免独立 makeKey 与 handler 字符串实现漂移。",
+      "relatedPaths": [
+        "src/tools/runtime/cache/SearchCache.ts"
+      ],
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "TOOLS-006",
+      "path": "src/tools/runtime/compressor/parsers/TestOutputParser.ts",
+      "line": 27,
+      "issue": "pytest 正则的计数组全部可选，先匹配 session 标题并伪造零测试零失败。",
+      "repro": "含 test session starts 标题和最终 1 failed, 1 passed 的真实形状返回 Tests: 0 passed, 0 failed, 0 total；任意 ==== 非结果标题也返回此值。",
+      "suggestion": "逐 summary 行提取至少一个已知计数，支持任意摘要次序与 error/errors；无法识别返回 null，保留原文。",
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "TOOLS-007",
+      "path": "src/tools/runtime/compressor/parsers/GitStatusParser.ts",
+      "line": 35,
+      "issue": "已匹配的 unmerged git 状态未入任何 bucket，冲突可被压缩为空输出。",
+      "repro": "parse(\"UU conflicted.ts\") → \"\"。",
+      "suggestion": "保留七种 unmerged 状态并明确 conflict；无法分类的已匹配项不可默默丢弃。用状态表覆盖 UU/AA/DD/AU/UA/DU/UD。",
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "TOOLS-008",
+      "path": "src/tools/runtime/handlers/knowledge.ts",
+      "line": 573,
+      "issue": "retrievalProfile sourceContentHash 在 style repair 前计算，修复改变事实字段后未重建而提交过期 hash。",
+      "repro": "提交有 profile 的候选，触发修复更改 title/doClause/dontClause/markdown；effectiveItem 更新于665-682，785提交原 profile。Core RecipeRetrieval.ts:113-141 hash包含这些字段，439-449判 source-hash-mismatch；gateway 保留输入 profile。",
+      "suggestion": "最终候选确定后重新准备 profile/hash，保持 codeEvidence 降级原因和权威 Core gate；补成功风格修复后 hash 与最终 candidate 一致的集成断言。",
+      "relatedPaths": [
+        "src/tools/runtime/handlers/recipeProductionAdapter.ts"
+      ],
+      "validation": "static-real-consumer-trace"
+    },
+    {
+      "severity": "P1",
+      "id": "TOOLS-009",
+      "path": "src/tools/kernel/result.ts",
+      "line": 181,
+      "issue": "ordinary output 仅清理 structuredContent，adapter 的 JSON text 仍保留被禁止的私有字段。",
+      "repro": "实际投影 structuredContent={apiKey:sample-secret,publicValue:1} 且 text=JSON.stringify 同对象：返回 structuredContent={publicValue:1} 但 textLeaks=true。adapter:142-146 正会产生这种形状。",
+      "suggestion": "同源 JSON text 必须由清理后的内容重建，或 adapter 在 stringify 前共享清理；保留纯文本工具的正常语义并加入 adapter→ordinary 投影回归。",
+      "relatedPaths": [
+        "src/tools/runtime/adapter/ToolRouterAdapter.ts"
+      ],
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P2",
+      "id": "TOOLS-010",
+      "path": "src/tools/catalog/UnifiedToolCatalog.ts",
+      "line": 152,
+      "issue": "继承 unregister 仅删 manifest，handler definitions/expanded 状态仍保留，且 registerDefinition 先写 defs 后注册 manifest 会在重复失败后留下半注册。",
+      "repro": "new UnifiedToolCatalog([def]); unregister(id) 后 has=false、getHandler!=null，同 id 再 registerDefinition 抛 duplicate。",
+      "suggestion": "override unregister 同步删除全部状态；registerDefinition 先完成会抛错的 manifest 注册再写 defs（或先检查两套键）。补注册失败无副作用和移除后重注册。",
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P1",
+      "id": "TOOLS-011",
+      "path": "src/tools/runtime/router.ts",
+      "line": 39,
+      "issue": "通用执行入口和等待锁后均未检查 abortSignal，已取消/排队期间取消的有副作用 handler 仍可执行。",
+      "repro": "传入已 abort 的 ctx 执行 code.write/knowledge.submit，router仍直接调 handler；handler本身也没有通用取消检查。或前一 single 持锁时取消后一调用，拿锁后照常执行。",
+      "suggestion": "在校验/调度前及锁获取后检查取消；队列等待支持取消且不破坏锁释放。明确 aborted 结果投影，不把未执行写操作标成功。",
+      "validation": "static-control-flow"
+    },
+    {
+      "severity": "P2",
+      "id": "TOOLS-012",
+      "path": "src/tools/runtime/handlers/submitEvidenceExpansion.ts",
+      "line": 333,
+      "issue": "局部 JSON 提取器按每个花括号计深度，不识别 JSON 字符串/转义，拒绝合法风格修复输出。",
+      "repro": "provider 返回 JSON.stringify({markdown:\"Use an opening brace { as the parser delimiter.\"})，repairStyleViolations 返回 null。",
+      "suggestion": "复用仓库现有经过字符串/转义测试的 JSON 提取边界，或使用 string-aware 扫描；不要再维护第二份简化解析。",
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P2",
+      "id": "TOOLS-013",
+      "path": "src/tools/runtime/compressor/OutputCompressor.ts",
+      "line": 28,
+      "issue": "首次并发调用在 parser import 完成前把 loaded 设 true，后来者跳过实际加载。",
+      "repro": "初次 Promise.all 同时 compress(\" M file.ts\",{command:\"git status\"})，结果为 [\"modified(1): file.ts\",\" M file.ts\"]。",
+      "suggestion": "以共享 Promise 缓存加载过程，所有异步调用等待同一完成；同步 API 保留其已加载前置条件。",
+      "validation": "observed-with-source-probe"
+    },
+    {
+      "severity": "P2",
+      "id": "TOOLS-014",
+      "path": "src/tools/runtime/router.ts",
+      "line": 244,
+      "issue": "参数校验忽略已声明的基础类型，错误形状能持久写入宿主会话 store 并破坏后续调用。",
+      "repro": "memory.save({key:123,content:\"x\"}) 通过 required/enum 校验和 handler 真值检查，host SimpleSessionStore.save 保留数字 key；之后 memory.recall({query:\"x\"}) 执行 entry.key.toLowerCase 时失败。",
+      "suggestion": "先校验调用顶层、params 为非数组对象，再验证已声明基础类型和 array item 类型；不得直接对维度 submit 使用静态 reasoning.required=sources，因为 evidenceRefs-only 是已有有效运行契约。",
+      "validation": "static-real-host-call-trace"
+    }
+  ],
+  "integrationFindings": [
+    {
+      "severity": "P1",
+      "id": "TOOLS-X01",
+      "path": "src/tools/runtime/toolsets/Evolution.ts",
+      "line": 49,
+      "issue": "Evolution commandAllowlist 只在直接给 ToolRouter 配 capability 的单测中兑现；真实宿主无此接线。",
+      "evidence": [
+        "../Alembic/lib/injection/modules/AgentModule.ts:43-48 创建 adapter 不传 capability",
+        "../Alembic/lib/tools/ToolContextFactory.ts:142-169 不注入 commandAllowlist",
+        "src/agent 无 commandAllowlist 消费；runtime request 只传 safetyPolicy",
+        "ToolExecutionPipeline.ts:1239 注释说安全已迁给治理层，但内置 adapter/router 并没有执行 policyValidator"
+      ],
+      "suggestion": "父任务结合 runtime 审查确认；将本次 capability 的命令权限纳入运行请求并在 Agent 调用端/adapter 落地，不能依赖 host 单例默认 capability。相邻仓只读，不在本任务修改。",
+      "validation": "real-host-source-trace; requested-runtime-crosscheck"
+    }
+  ],
+  "testReview": {
+    "fullFiles": [
+      "test/tool-v2-contract.test.ts",
+      "test/tool-system.test.ts",
+      "test/runtime-terminal-safety.test.ts",
+      "test/llm-input-correctness.test.ts",
+      "test/recipe-authoring-inprocess-flatten.test.ts",
+      "test/recipe-authoring-inprocess-parity.test.ts",
+      "test/recipe-production-profile-adapter.test.ts",
+      "test/SubmissionSanitize.test.ts",
+      "test/SubmitEvidenceExpansion.test.ts",
+      "test/style-waiver.test.ts",
+      "test/memory-note-finding.test.ts",
+      "test/NoteFindingEvidenceRefs.test.ts",
+      "test/DimensionSchemaVariant.test.ts",
+      "test/EvidenceToolAndQuota.test.ts",
+      "test/insight-depth-retry.test.ts",
+      "test/scan-run-production-integration.test.ts",
+      "test/evidence-ledger-baseline.characterization.test.ts"
+    ],
+    "partialFiles": [
+      {
+        "path": "test/llm-input-layering.test.ts",
+        "ranges": [
+          "359-419",
+          "861-923"
+        ],
+        "reason": "仅工具 schema/Conversation/runtime capability 集成；其余属于 runtime 模块审查"
+      },
+      {
+        "path": "test/strict-production-chain.test.ts",
+        "ranges": [
+          "616-642"
+        ],
+        "reason": "仅 GenerateProduce/ScanProduce strict 无工具契约"
+      },
+      {
+        "path": "test/mining-e2e-pipeline.test.ts",
+        "ranges": [
+          "358-613"
+        ],
+        "reason": "真实 adapter/factory 装配及端到端用例"
+      }
+    ],
+    "supplementalFiles": [
+      "test/shared-ai-utils.test.ts",
+      "../AlembicCore/test/StyleWaiver.test.ts"
+    ],
+    "testsRun": [],
+    "probes": "11 类只读/纯内存 transpile 源码探针；合成 handlers/结果或读取现有仓库文件，没有落盘代码或执行危险命令。"
+  },
+  "testSimplifications": [
+    {
+      "id": "TESTS-T01",
+      "paths": [
+        "test/style-waiver.test.ts",
+        "../AlembicCore/test/StyleWaiver.test.ts"
+      ],
+      "issue": "Agent 全部 7 个纯函数 case 与 Core 规则单源测试逐字重复；Agent 代码仅 re-export。",
+      "suggestion": "Agent 保留一个与 Core 函数引用一致的边界断言及真正 handler waiver/advisory 接线回归，删除重复规则枚举；不修改 Core。",
+      "confidence": "confirmed-full-read"
+    },
+    {
+      "id": "TESTS-T02",
+      "paths": [
+        "test/recipe-authoring-inprocess-flatten.test.ts",
+        "test/recipe-authoring-inprocess-parity.test.ts"
+      ],
+      "issue": "两个文件重复 cleanRecipe/corpus/临时三文件项目与 opportunistic/cold-start profile 切换断言。",
+      "suggestion": "合并 fixture 与表驱动 corpus，但保留 wrapper→Core、host-label→in-process-label 两种不同边界保证；不要把集成门禁替换成相同函数的自比较。",
+      "confidence": "confirmed-full-read"
+    },
+    {
+      "id": "TESTS-T03",
+      "paths": [
+        "test/tool-v2-contract.test.ts",
+        "test/llm-input-layering.test.ts",
+        "test/DimensionSchemaVariant.test.ts"
+      ],
+      "issue": "submit required fields 字面列表在 catalog 单测、直接 schema 单测和 runtime LLM 投影集成多处重复。",
+      "suggestion": "保留 runtime 集成和独立维度 schema 深拷贝/refs 约束；catalog happy path 只断言筛选动作和必要的不同参数，不再重复整张 required 列表。",
+      "confidence": "full-read-two-files-plus-relevant-layering-cases"
+    },
+    {
+      "id": "TESTS-T04",
+      "paths": [
+        "test/runtime-terminal-safety.test.ts",
+        "test/tool-v2-contract.test.ts"
+      ],
+      "issue": "正常 sandboxExecutor 透传 happy path 重复；危险命令列表用循环导致失败用例名字弱；缺换行/执行参数否例。",
+      "suggestion": "保留一个 terminal handler wiring case 与一个 adapter diagnostics case，危险命令改 table cases，补有实际缺口的安全回归；不要删除取消、并发锁与fallback负例。",
+      "confidence": "confirmed-full-read"
+    },
+    {
+      "id": "TESTS-T05",
+      "paths": [
+        "test/NoteFindingEvidenceRefs.test.ts",
+        "test/EvidenceToolAndQuota.test.ts",
+        "test/SubmitEvidenceExpansion.test.ts",
+        "test/SubmissionSanitize.test.ts",
+        "test/recipe-production-profile-adapter.test.ts"
+      ],
+      "issue": "多份 mkdtemp fixture 没有 afterEach/finally 清理；profile suite 仅真实数据库 case 清理，其余简单case留下目录。",
+      "suggestion": "共享最小 temp-root tracker 并 afterEach 删除本测试创建的根；复用 fixture 但保留各 evidence 生命周期断言。",
+      "confidence": "confirmed-full-read"
+    },
+    {
+      "id": "TESTS-T06",
+      "paths": [
+        "test/evidence-ledger-baseline.characterization.test.ts"
+      ],
+      "issue": "第5项只把静态 fixture 的数值与硬编码常量比较，不覆盖产品行为；多个旧基线断言已被后续 handler/配额集成测试覆盖。",
+      "suggestion": "删除纯静态数字自证 case；历史 fixture 若 eval 仍使用则保留，baseline 容忍性和能力集合断言迁入各归属测试后再移除此混合文件。",
+      "confidence": "confirmed-full-read"
+    },
+    {
+      "id": "TESTS-T07",
+      "paths": [
+        "test/recipe-production-profile-adapter.test.ts",
+        "test/scan-run-production-integration.test.ts"
+      ],
+      "issue": "真实 Core DB 配置/仓库/文件写入 setup 高度相同，但行为一个验证 profile，另一个验证扫描 persisted projection，不能把后一条当重复删。",
+      "suggestion": "抽共享 fixture 生命周期可降样板；保留两条完整调用链，补风格修复后 final hash 一致性。",
+      "confidence": "confirmed-full-read"
+    }
+  ],
+  "notes": [
+    "AGENTS.md 的 V1/V2 路径与当前 kernel/runtime 实现不一致，旧 shim 退役由 tool-system 测试明确固定。",
+    "不以本仓 src 缺少 new 判定公开接口无用；已读取 Alembic AgentModule/ToolContextFactory 真实消费方。",
+    "本报告 findings 是修复前观察；父任务可能已并行修复部分项目，合并报告时应以最终 diff/测试更新处理状态。",
+    "router 目前参数验证仅顶层 required/enum；类型/嵌套结构验证缺口需围绕具体输入失败用例处理，避免泛化成新框架。"
+  ]
+}

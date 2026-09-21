@@ -1,0 +1,919 @@
+{
+  "schemaVersion": 1,
+  "status": "research-complete-advisory",
+  "date": "2026-09-19",
+  "generatedAt": "2026-09-20T06:48:49.224Z",
+  "scope": {
+    "task": "只读研究 Tencent MemoryProxy injection 分层，并与 Alembic ToolExecutionPipeline 比较；参考 Fastify 与 Google ADK 官方文档。",
+    "writes": [
+      "tmp/layering-2026-09-19/middleware-research.json"
+    ],
+    "productChanges": false,
+    "externalRepositoryChanges": false,
+    "realApiCalls": false,
+    "serviceStarted": false,
+    "commitCreated": false,
+    "noCommitReason": "只读研究子任务，唯一输出是 ignored tmp JSON；最终产品编辑与验证由 root 负责。",
+    "limitation": "Alembic 引用来自本轮读取的工作树，root 正在并行拆分，行号用于标识被研究的原实现，不构成对最终 diff 的验收。未审查 Tencent 缓存 repository 的具体持久化实现，也未把其 hook 注释当作最终调用语义。"
+  },
+  "snapshots": {
+    "tencent": {
+      "root": "../../../../TencentDB-Agent-Memory",
+      "commit": "06414ac10766b9bd61e4a69f3cf0ea414afb6d4f"
+    },
+    "alembic": {
+      "root": "../../../AlembicAgent",
+      "head": "00a27d7f12b7478a4f6bdf79aabf48b0ebd00a05",
+      "workingTree": "root concurrent implementation; reference snapshot is pre-split 1292-line ToolExecutionPipeline"
+    }
+  },
+  "conclusions": [
+    "可借鉴的是 contract / registry / runner / concrete hooks / composition 的职责分开，不能照搬 Tencent 的内容注入失败继续策略作为安全门禁策略。",
+    "Tencent 注入 hook 返回内容块；Alembic before 可以决定是否执行真实工具，after 又包含证据变更、状态登记、观察。名称相近不代表控制语义等价。",
+    "本轮安全拆分应先保持 facade、公开导出、默认注册正序、短路后 after 和宿主事件顺序；错误策略或 verdict 类型变更应有独立行为测试。"
+  ],
+  "tencent": {
+    "actualCallChains": [
+      {
+        "flow": "OpenAI handler → getInjectionPipeline(config) → bundle.pipeline.process(body, metadata) → adapter.parse → agent profile lookup → executeHooks → adapter.serialize → replace body/messages",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/handler.ts",
+            "line": 1234,
+            "endLine": 1266
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 436,
+            "endLine": 457
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 80,
+            "endLine": 145
+          }
+        ]
+      },
+      {
+        "flow": "Anthropic handler: sidequery skips injection; fork passes readOnly=true; main allows miss self-heal; same pipeline; exception logs and leaves original body.",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/anthropicHandler.ts",
+            "line": 1154,
+            "endLine": 1190
+          }
+        ]
+      },
+      {
+        "flow": "Newly registered sessions await prewarmFromConfig(clearBefore=true) before request injection; shared bundle registry/cache → prewarmAll → hook.prewarm → putMany.",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/handler.ts",
+            "line": 1006,
+            "endLine": 1038
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/anthropicHandler.ts",
+            "line": 893,
+            "endLine": 926
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 468,
+            "endLine": 485
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/prewarm.ts",
+            "line": 95,
+            "endLine": 218
+          }
+        ]
+      },
+      {
+        "flow": "Active memory example: build registers TdaiProfileMemoryInjector; execute/prewarm both enter renderBlocksForContext; rendering returns ContextBlock[]; pipeline owns placement/caching.",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 324,
+            "endLine": 355
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-profile-memory-injector.ts",
+            "line": 25,
+            "endLine": 59
+          }
+        ]
+      }
+    ],
+    "responsibilities": [
+      {
+        "component": "types.ts",
+        "role": "统一 AgentContext/ContextBlock、InjectionPoint、AnchorTarget、InjectionHook、CacheStrategy 和 HookRegistry contract；hook 只承诺提供内容块。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+            "line": 29,
+            "endLine": 61
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+            "line": 223,
+            "endLine": 229
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+            "line": 258,
+            "endLine": 281
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+            "line": 327,
+            "endLine": 377
+          }
+        ]
+      },
+      {
+        "component": "adapters/interface.ts",
+        "role": "协议对象 ↔ AgentContext；parse/serialize 为同步边界，runner 不直接处理 OpenAI/Anthropic 细节。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/adapters/interface.ts",
+            "line": 12,
+            "endLine": 29
+          }
+        ]
+      },
+      {
+        "component": "registry.ts",
+        "role": "拒绝重复 id，注册/注销，按 point 筛选后按 priority 升序；不执行 hook、不处理缓存。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/registry.ts",
+            "line": 11,
+            "endLine": 34
+          }
+        ]
+      },
+      {
+        "component": "pipeline.ts",
+        "role": "解析、profile 查找、固定 point 顺序执行、缓存路由、anchor/point 放置、序列化、生成执行回执。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 80,
+            "endLine": 145
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 164,
+            "endLine": 254
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 269,
+            "endLine": 327
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 340,
+            "endLine": 380
+          }
+        ]
+      },
+      {
+        "component": "observer.ts",
+        "role": "onPipelineStart/End/Error 与 onHookStart/Done/Error 旁路通知；返回 void，不负责生产/替换内容。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/observer.ts",
+            "line": 25,
+            "endLine": 81
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 503,
+            "endLine": 512
+          }
+        ]
+      },
+      {
+        "component": "index.ts composition",
+        "role": "按 config 注册具体 hook 和协议 adapter，注入 profile/cache/observer；configHash 缓存 bundle，使配置相同的请求共享 pipeline/hook 实例。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 297,
+            "endLine": 355
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 400,
+            "endLine": 457
+          }
+        ]
+      },
+      {
+        "component": "prewarm.ts",
+        "role": "独立的 session 准备流程；并发运行 prewarm 而非请求管线的顺序 hook，处理 clearBefore 和缓存写入。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/prewarm.ts",
+            "line": 107,
+            "endLine": 218
+          }
+        ]
+      }
+    ],
+    "order": {
+      "points": [
+        "system.prefix",
+        "system.before_tools",
+        "system.after_tools",
+        "system.suffix",
+        "tools.prepend",
+        "tools.append",
+        "user.first_turn",
+        "user.before",
+        "user.after"
+      ],
+      "withinPoint": "priority 数值升序，逐个 await；前 hook 修改后的 ctx 可被后 hook 看到。point 顺序优先于 priority，不是所有 hook 的全局 priority 排序。",
+      "anchor": "命中 profile anchor 后该次放置返回；未命中回退 point。before_tools/after_tools 未找到 anchor 时追加 system 末尾。",
+      "refs": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 165,
+          "endLine": 191
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/registry.ts",
+          "line": 26,
+          "endLine": 29
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+          "line": 357,
+          "endLine": 361
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 353,
+          "endLine": 380
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 416,
+          "endLine": 423
+        }
+      ]
+    },
+    "earlyExitAndFailure": [
+      {
+        "case": "execute returns []",
+        "behavior": "只跳过本 hook 内容应用；仍 onHookDone、blockCount=0，后续 hook 继续。没有 deny 工具的含义。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 197,
+            "endLine": 228
+          }
+        ]
+      },
+      {
+        "case": "hook execution / cache get / injection application throws",
+        "behavior": "记录 onHookError 与 error receipt，然后继续后续 hook；之前已写入 ctx 的内容没有 rollback。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 229,
+            "endLine": 250
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 368,
+            "endLine": 369
+          }
+        ]
+      },
+      {
+        "case": "unknown adapter / parse / serialize throws",
+        "behavior": "process 记录 pipeline error 后重抛，由 handler 决定保留原 body；不是 pipeline 自动提供原始请求。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 91,
+            "endLine": 99
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 131,
+            "endLine": 145
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/handler.ts",
+            "line": 1262,
+            "endLine": 1266
+          }
+        ]
+      },
+      {
+        "case": "observer throws synchronously",
+        "behavior": "safeCall 丢弃异常；contract 是 void，此实现没有 await 异步 observer promise，不应宣称能隔离任意 async observer。",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/observer.ts",
+            "line": 48,
+            "endLine": 81
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 507,
+            "endLine": 512
+          }
+        ]
+      }
+    ],
+    "cache": {
+      "identity": "spaceId + userId + agentSource + custom.session.session_id + hook.id；无 repo/session 或 strategy none 时直接 execute。",
+      "sessionInit": "缓存非 null 即命中（[] 也命中）且跳过 execute；null miss 执行，非空且非 readOnly 才 put 自愈；put 失败告警后仍返回 fresh。",
+      "hybrid": "先读 cached，再执行 fresh；合并 cached 在前，metadata.cacheKey 优先、否则 type+content 去重；相同 key 不以 fresh 覆盖 cached。",
+      "getError": "get 抛错不会执行 live fallback；被外层 hook catch 接住后跳过该 hook。小型内存探针已验证。具体 repo 可能把故障转 null，但 runner contract 本身不能保证。",
+      "distinction": "该缓存保存会话稳定的提示内容，不能直接用作 Alembic 有副作用工具的执行结果缓存。",
+      "refs": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 177,
+          "endLine": 186
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 269,
+          "endLine": 327
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 520,
+          "endLine": 542
+        }
+      ]
+    },
+    "cleanupAndConcurrency": {
+      "requestPath": "InjectionHook/process contract 没有 AbortSignal 或每 hook deadline；顺序 await 遇到未结束 hook 会等待，未提供通用 finally/teardown hook。",
+      "prewarm": "targets.map 并发，单 hook 用 timeout race；定时器在底层 promise resolve/reject 时清除，但 timeout 不会取消底层工作。额外 totalBudget+500 全局 timer 未在正常完成后清除。putMany 在 race 之后，所示 deadline 不包含缓存写入。",
+      "useInAgent": "借鉴明确的 observer contract；继续使用 Alembic 已有 signal/deadline/timer cleanup。不要移植 prewarm Promise.race 作为资源取消实现。",
+      "refs": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+          "line": 327,
+          "endLine": 361
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 80,
+          "endLine": 83
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/prewarm.ts",
+          "line": 68,
+          "endLine": 84
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/prewarm.ts",
+          "line": 143,
+          "endLine": 173
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/prewarm.ts",
+          "line": 203,
+          "endLine": 205
+        }
+      ]
+    },
+    "currentVersusLegacy": [
+      {
+        "item": "createInjectionHook + ContextContentProvider",
+        "status": "exported helper; no current src consumer found",
+        "evidence": "rg over MemoryProxy/src finds factory definition and index re-export only; provider.ts 99% use claim does not match current registration code. Current built-in injectors implement InjectionHook classes.",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/provider.ts",
+            "line": 10,
+            "endLine": 12
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/provider.ts",
+            "line": 30,
+            "endLine": 70
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 37,
+            "endLine": 39
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 297,
+            "endLine": 355
+          }
+        ]
+      },
+      {
+        "item": "TdaiL1RecallInjector",
+        "status": "legacy export, not registered in current build",
+        "evidence": "index retains export, but build explicitly stops dynamic L0/L1 user prompt injection and registers memory tools guidance.",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 74,
+            "endLine": 78
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 343,
+            "endLine": 355
+          }
+        ]
+      },
+      {
+        "item": "TdaiToolsInjector name",
+        "status": "compatibility alias used by composition",
+        "evidence": "Actual class is TdaiMemoryToolsInjector; deprecated old name aliases it.",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-tools-injector.ts",
+            "line": 143,
+            "endLine": 150
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/injectors/tdai-tools-injector.ts",
+            "line": 185,
+            "endLine": 186
+          }
+        ]
+      },
+      {
+        "item": "content-scanning profile detection",
+        "status": "active legacy fallback",
+        "evidence": "URL agentSource lookup wins; detectAgent used only if no matching profile. Kept in current bundle.",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 103,
+            "endLine": 119
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+            "line": 410,
+            "endLine": 430
+          }
+        ]
+      },
+      {
+        "item": "prewarm fire-and-forget description",
+        "status": "stale comment relative to inspected handlers",
+        "evidence": "pipeline cache-miss comment still refers to fire-and-forget; OpenAI/Anthropic handlers now await prewarm for justRegistered sessions.",
+        "refs": [
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+            "line": 291,
+            "endLine": 296
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/handler.ts",
+            "line": 1006,
+            "endLine": 1030
+          },
+          {
+            "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/anthropicHandler.ts",
+            "line": 893,
+            "endLine": 919
+          }
+        ]
+      }
+    ]
+  },
+  "alembicComparison": {
+    "actualCallChain": "AgentRuntime constructor createToolPipeline → processToolCalls runtime HookSystem before → abort check → ToolExecutionPipeline.execute → before middlewares → runtime.toolRouter.execute → after middlewares → diagnostics → AgentRuntime history/progress/event/hook after → appendToolResult",
+    "refs": [
+      {
+        "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+        "line": 243
+      },
+      {
+        "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+        "line": 1447,
+        "endLine": 1504
+      },
+      {
+        "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+        "line": 1578,
+        "endLine": 1600
+      },
+      {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 329,
+        "endLine": 369
+      },
+      {
+        "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+        "line": 502,
+        "endLine": 518
+      }
+    ],
+    "currentDefaultOrder": [
+      "allowlistGate",
+      "toolArgumentBoundsGate",
+      "runtimeSafetyGate",
+      "evolutionDecisionGate",
+      "recordRepairOnlyGate",
+      "analystVerifyOnlyGate",
+      "producerSubmitOnlyGate",
+      "deterministicDuplicateGuard",
+      "evidenceCapture",
+      "observationRecord",
+      "trackerSignal",
+      "traceRecord",
+      "submitDedup"
+    ],
+    "behaviorToPreserve": [
+      {
+        "behavior": "before blocked 或 result 短路真实 router；正常短路后仍执行 after。当前非 blocked result 被标 cacheHit；若要增加其他 synthetic result 原因，需显式契约而非继续滥用 cacheHit。",
+        "refs": [
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 339,
+            "endLine": 347
+          },
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 505,
+            "endLine": 510
+          }
+        ]
+      },
+      {
+        "behavior": "after 与注册同向正序，不是 onion 逆序；evidenceCapture 先改 envelope，再 observation；trackerSignal 更新 isNew 后 traceRecord 消费。",
+        "refs": [
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 467,
+            "endLine": 477
+          },
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 916,
+            "endLine": 919
+          },
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 929,
+            "endLine": 995
+          }
+        ]
+      },
+      {
+        "behavior": "router 是唯一真实执行端，AbortSignal/runtime policy/cache/diagnostics 都由 request adapter 传下去；文件拆分不能另造执行器。",
+        "refs": [
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 354,
+            "endLine": 414
+          }
+        ]
+      },
+      {
+        "behavior": "before 抛错目前传播且不会进 after；router 异常在 executeRuntimeToolCall 内归一；after 抛错目前阻止后续 after。分层重排不应默默改成所有失败继续。",
+        "refs": [
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 329,
+            "endLine": 369
+          },
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 467,
+            "endLine": 518
+          }
+        ]
+      },
+      {
+        "behavior": "EventBus/progress 仍公开导出，但默认 factory 故意不注册；AgentRuntime 保留事件次序及 resultStr.length 等上下文。",
+        "refs": [
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+            "line": 1273,
+            "endLine": 1291
+          },
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/index.ts",
+            "line": 153,
+            "endLine": 167
+          },
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+            "line": 1574,
+            "endLine": 1597
+          }
+        ]
+      },
+      {
+        "behavior": "runtime 外层 HookSystem 拒绝会跳过整个 ToolExecutionPipeline，不等于某 before middleware 拒绝；拆分时保持该边界。",
+        "refs": [
+          {
+            "path": "../../../AlembicAgent/src/agent/runtime/AgentRuntime.ts",
+            "line": 1459,
+            "endLine": 1478
+          }
+        ]
+      }
+    ],
+    "nonTransferable": [
+      "Tencent 的 best-effort 内容 hook 异常继续，不适合 allowlist/safety/permission；安全门禁无法完成时不能放行宿主副作用。",
+      "Tencent point/priority 排序解决提示位置问题；Alembic 默认业务阶段顺序已有依赖，不应自动改用全局数字优先级。",
+      "Tencent session_init 直接命中而跳过 hook execute，也跳过其内部条件；Alembic 缓存必须在当前门禁之后，保留 snapshot/phase/argument 范围，不能绕过重新鉴权。",
+      "Tencent hybrid cached-first 不等同“新鲜数据覆盖旧数据”；提示内容缓存不等于幂等工具结果缓存。",
+      "Tencent adapter/profile/HTTP proxy/缓存存储不属于本轮工具执行管线抽取；无需引入 Fastify/ADK 依赖、服务或新存储。"
+    ]
+  },
+  "officialSources": [
+    {
+      "id": "fastify-hooks",
+      "title": "Fastify Hooks — official",
+      "url": "https://fastify.dev/docs/latest/Reference/Hooks/",
+      "accessed": "2026-09-19",
+      "facts": [
+        "生命周期按阶段区分：早期 hook 可提前响应并停止后续请求处理；onResponse 是完成后的观察；onError 用于错误观察而非替换错误。",
+        "异步 promise 与 done callback 不可混用，避免重复执行。"
+      ],
+      "locator": "onError; onResponse; Respond to a request from a hook",
+      "application": "在类型层区分控制/变换与观察；为各阶段规定一次执行，不照搬 HTTP reply 语义。"
+    },
+    {
+      "id": "fastify-lifecycle",
+      "title": "Fastify Lifecycle — official",
+      "url": "https://fastify.dev/docs/latest/Reference/Lifecycle/",
+      "accessed": "2026-09-19",
+      "facts": [
+        "handlerTimeout 触发 request.signal，并在响应完成或 hijack 时清 timer；生命周期明确处理和发送阶段。"
+      ],
+      "locator": "Lifecycle diagram and handlerTimeout paragraph",
+      "application": "借鉴任务级 deadline 和清理归属，不能把取消等待当作底层副作用已回滚。"
+    },
+    {
+      "id": "adk-callbacks",
+      "title": "Google ADK Types of callbacks — official",
+      "url": "https://adk.dev/callbacks/types-of-callbacks/",
+      "accessed": "2026-09-19",
+      "facts": [
+        "before tool 可修改参数；返回替代结果会跳过 tool；after tool 可替换结果。",
+        "文档明确 Python None 与空 dict 的不同，并提示 SDK 语言签名存在差异。"
+      ],
+      "locator": "Tool Execution Callbacks / Before Tool Callback / After Tool Callback",
+      "application": "借鉴明确的 continue/override contract；不用 truthiness 或某语言空值习惯隐式判定工具是否执行。"
+    },
+    {
+      "id": "adk-plugins",
+      "title": "Google ADK Plugins — official",
+      "url": "https://adk.dev/plugins/",
+      "accessed": "2026-09-19",
+      "facts": [
+        "Plugin 区分 observe/intervene/amend；plugin callback 先于对象 callback，返回值可短路后续处理。",
+        "tool error callback 可返回 fallback 恢复 after 流程；runner end callback 用于收尾，不能修改最终结果。"
+      ],
+      "locator": "Build workflows with Plugins; Tool callbacks; Runner end callbacks",
+      "application": "借鉴阶段与作用范围的明确声明；不要无依据认定所有 after 都必然运行或拥有同等控制权。"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "LAYER-R1",
+      "priority": 1,
+      "title": "先做保持行为的五类职责拆分",
+      "proposal": "保留 ToolExecutionPipeline.ts 作为兼容 facade；把共享 contract、顺序 runner、ToolRouter request/result adapter、具体 middleware、默认 composition 分开。runner 不 import 具体安全/记忆/提交策略；composition 固定当前注册顺序。",
+      "evidence": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+          "line": 327,
+          "endLine": 377
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/registry.ts",
+          "line": 11,
+          "endLine": 34
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 55,
+          "endLine": 69
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/index.ts",
+          "line": 410,
+          "endLine": 457
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 1277,
+          "endLine": 1291
+        }
+      ],
+      "contractImpact": "不应删除/改名当前 runtime barrel 已导出的入口；内部文件拆分无需增加新公共 framework。",
+      "tests": [
+        "从原 facade 与 runtime barrel 导入的函数/类保持可用。",
+        "同一默认调用快照保持 before 顺序、router 次数、after 正序和 Runtime 事件顺序。"
+      ]
+    },
+    {
+      "id": "LAYER-R2",
+      "priority": 2,
+      "title": "区分控制结果、业务后处理与纯观察",
+      "proposal": "先在职责/注释中标明 gate/short-circuit、证据与提交状态处理、旁路观察；若本轮改变错误处理，则明确每类的传播策略。安全 gate 抛错应停止工具；已执行副作用不能因 observer 失败重试。不要让泛用 safeCall 包住所有 after。",
+      "evidence": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/observer.ts",
+          "line": 48,
+          "endLine": 81
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 507,
+          "endLine": 512
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 329,
+          "endLine": 369
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 916,
+          "endLine": 919
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 1006,
+          "endLine": 1020
+        }
+      ],
+      "officialSourceIds": [
+        "fastify-hooks",
+        "adk-plugins"
+      ],
+      "contractImpact": "改变 before/after 异常传播或增加显式 discriminated verdict 是行为契约变化；应与纯文件拆分分开验证。",
+      "tests": [
+        "gate throw 时 router 调用 0 次，错误可观测。",
+        "blocked/cached/dedup 后仍按现有 contract 记录正确状态。",
+        "若新设纯 observer 隔离，observer 抛错后其余观察仍可执行，router 总调用仍为 1；不能误吞真实提交/证据业务失败。"
+      ]
+    },
+    {
+      "id": "LAYER-R3",
+      "priority": 2,
+      "title": "缓存与取消继续留在明确边界，不内置到通用 hook runner",
+      "proposal": "ToolRouter adapter 继续传 signal/policy/cache 端口；缓存准入/指纹和重复调用策略维持独立模块，位于门禁之后。保持请求级预算与取消生命周期，所有新增 timeout 的 owner 必须清 timer/listener 并忽略迟到结果。",
+      "evidence": [
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/types.ts",
+          "line": 258,
+          "endLine": 281
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/pipeline.ts",
+          "line": 279,
+          "endLine": 327
+        },
+        {
+          "path": "../../../../TencentDB-Agent-Memory/MemoryProxy/src/injection/prewarm.ts",
+          "line": 143,
+          "endLine": 173
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 313,
+          "endLine": 326
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 373,
+          "endLine": 414
+        }
+      ],
+      "officialSourceIds": [
+        "fastify-lifecycle",
+        "adk-callbacks"
+      ],
+      "contractImpact": "无需复制 Tencent repository、session gateway、prewarm runner 或引入新 DB；若更改缓存故障/取消返回状态，需要显式测试。",
+      "tests": [
+        "当前安全门禁拒绝时即使存在缓存也不得返回成功。",
+        "phase/snapshot/args 变化不复用旧工具结果。",
+        "abort 在 gate 后、router 前发生时无新副作用；timeout 后迟到结果不再写当前请求状态。"
+      ]
+    }
+  ],
+  "probeEvidence": {
+    "commandSummary": "Node 22 + TypeScript.transpileModule + vm；仅读取 Tencent pipeline/context/registry 源文件；fake adapter/cache 与同步 observer；无文件输出/服务/网络。",
+    "result": "PASS; 5 bounded cases",
+    "cases": [
+      {
+        "name": "point_then_priority_empty_and_error_continue",
+        "observed": {
+          "order": [
+            "empty",
+            "error",
+            "early-prefix",
+            "late-prefix",
+            "suffix"
+          ],
+          "receipts": 5,
+          "hookErrors": 1
+        }
+      },
+      {
+        "name": "session_init_empty_cached_array_is_hit",
+        "observed": {
+          "executeCount": 0
+        }
+      },
+      {
+        "name": "readonly_miss_executes_without_self_heal",
+        "observed": {
+          "executeCount": 1,
+          "putCount": 0
+        }
+      },
+      {
+        "name": "cache_get_rejection_skips_execute",
+        "observed": {
+          "additionalExecuteCount": 0,
+          "hookError": "cached:store failed"
+        }
+      },
+      {
+        "name": "hybrid_same_key_retains_cached_payload",
+        "observed": {
+          "systemContents": [
+            "base",
+            "old",
+            "unique"
+          ]
+        }
+      }
+    ],
+    "notRun": [
+      "full Alembic checks",
+      "Tencent service tests",
+      "provider or storage APIs"
+    ]
+  },
+  "existingTestAnchors": [
+    {
+      "purpose": "政策/当前 capability 先于宿主执行",
+      "refs": [
+        {
+          "path": "../../../AlembicAgent/test/runtime-efficiency.test.ts",
+          "line": 269,
+          "endLine": 290
+        }
+      ]
+    },
+    {
+      "purpose": "过大参数在执行与缓存准入前被拒绝",
+      "refs": [
+        {
+          "path": "../../../AlembicAgent/test/runtime-efficiency.test.ts",
+          "line": 292,
+          "endLine": 320
+        }
+      ]
+    },
+    {
+      "purpose": "runtime 公开入口保留",
+      "refs": [
+        {
+          "path": "../../../AlembicAgent/test/contract-surface.test.ts",
+          "line": 26
+        },
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/index.ts",
+          "line": 153,
+          "endLine": 167
+        }
+      ]
+    },
+    {
+      "purpose": "证据后处理有真实数据与顺序依赖，不是纯 telemetry",
+      "refs": [
+        {
+          "path": "../../../AlembicAgent/src/agent/runtime/ToolExecutionPipeline.ts",
+          "line": 916,
+          "endLine": 941
+        },
+        {
+          "path": "../../../AlembicAgent/test/EvidenceCapture.test.ts",
+          "line": 172,
+          "endLine": 202
+        }
+      ]
+    }
+  ],
+  "nextStep": "由 root 对照当前最终拆分执行针对性行为测试与总门禁；本报告不新增产品需求、不授权删除导出或相邻仓修改。"
+}

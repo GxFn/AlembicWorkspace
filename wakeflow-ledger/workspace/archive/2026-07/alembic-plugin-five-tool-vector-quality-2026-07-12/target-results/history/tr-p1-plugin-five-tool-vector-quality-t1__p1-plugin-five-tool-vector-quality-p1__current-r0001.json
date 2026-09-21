@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-plugin-five-tool-vector-quality-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+  "dispatchGroup": "p1-plugin-five-tool-vector-quality-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p1-plugin-five-tool-vector-quality-t1",
+  "status": "needs-review",
+  "summary": "Implemented and committed the AlembicPlugin five-tool vector-quality closure at 5dee91de81bcbf521ec965cde1153b95fbb26db1: local embedding is local-first auto-detected with authoritative opt-outs and a 1.5s probe bound; public alembic_search now executes through the request-scoped Core SearchEngine and emits sanitized route truth; Prime preserves actual route evidence independently of region evidence; Graph normalizes CamelCase identifiers and boosts specific multi-term coverage over request noise; Recipe Map deduplicates equivalent single-line anchors and returns a bounded read-only reconciliation action. Focused tests, final full unit suite, check, build, runtime-package, distribution and plugin verification passed. Canonical local reload built and prepared successfully but installed-cache rewrite was blocked by the Codex filesystem sandbox (EPERM on ~/.codex/plugins/cache), so controller-side unsandboxed reload/readback and the controller-owned real dual-project five-tool validation remain required.",
+  "evidenceRefs": [
+    "AlembicPlugin/lib/recipe-pipeline/vector/LocalEmbedding.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/handlers/search.ts",
+    "AlembicPlugin/lib/service/task/PrimeSearchPipeline.ts",
+    "AlembicPlugin/lib/host-runtime/mcp/handlers/agent-public-tools.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/project/ProjectGraphProvider.ts",
+    "AlembicPlugin/lib/service/project-knowledge-context/recipe-map/RecipeMapProvider.ts",
+    "AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+    "AlembicPlugin/test/unit/SearchEnginePublicRoute.test.ts",
+    "AlembicPlugin/test/unit/PrimeSearchRouteEvidence.test.ts",
+    "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+    "AlembicPlugin/test/unit/RecipeMapTool.test.ts",
+    "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+    "AlembicPlugin/scratch/codex-plugin-dev-reload-report.json"
+  ],
+  "verification": [
+    "Focused regression — 8 files / 73 tests passed",
+    "pnpm vitest run --config vitest.unit.config.ts --reporter=dot — final HEAD 138 files / 1532 tests passed",
+    "pnpm check — passed (15 pre-existing console warnings only)",
+    "pnpm build — passed against sibling AlembicCore f4275572282a24c45af282a2ef7b435108f74fdd",
+    "runtime package freshness/boundary, plugin distribution and Codex plugin verification — passed",
+    "test/unit/ReadOnlySearchFingerprint.test.ts — live SQLite DB/WAL/SHM/vector index SHA-256 family unchanged before/after public Search",
+    "pnpm dev:codex-plugin:reload — build/runtime preparation passed; installed-cache rewrite blocked only by EPERM at ~/.codex/plugins/cache"
+  ],
+  "risks": [
+    "Canonical installed-cache reload/readback is incomplete because this window cannot write ~/.codex/plugins/cache; rerun pnpm dev:codex-plugin:reload from an unsandboxed owner context.",
+    "Controller-owned AlembicWorkspace/BiliDili real five-tool JSON validation and live Ollama availability remain for controller review.",
+    "No real KB rescan/mutation and no current MCP process restart were performed, per task boundary."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "ref": "AlembicPlugin/lib/host-runtime/mcp/handlers/search.ts",
+      "value": "Public search bypassed SearchEngine through KnowledgeService.list; Prime then lacked route truth and regionEvidence absence was misclassified as vector unavailability."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Clean baseline; behavior-by-behavior RED; implementation; focused/full/check/build/package/reload; two-stage review."
+    },
+    {
+      "kind": "change-scope",
+      "ref": "AlembicPlugin/lib/host-runtime/mcp/handlers/search.ts",
+      "value": "Plugin-only config/read-routing/diagnostic/ranking changes and tests; no Core, real KB, rescan, host restart or cross-repo edits."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/SearchEnginePublicRoute.test.ts",
+      "verify": "8 focused files / 73 tests passed."
+    },
+    {
+      "kind": "full-suite",
+      "value": "Final HEAD 5dee91d: 138 files / 1532 tests passed.",
+      "verify": "pnpm vitest run --config vitest.unit.config.ts --reporter=dot"
+    },
+    {
+      "kind": "runtime-probe",
+      "ref": "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+      "value": "Public Search returned a real result with DB/WAL/SHM/vector SHA-256 fingerprints unchanged; runtime package entry probes passed."
+    },
+    {
+      "kind": "commit",
+      "commit": "5dee91de81bcbf521ec965cde1153b95fbb26db1",
+      "verify": "git status clean; 14 Plugin source/test files."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1 fixed raw provider fallbackReason leakage; Stage 2 confirmed schemas, exact graph/get/expand/read-only boundaries and Plugin-only scope. Reload permission risk remains explicit."
+    },
+    {
+      "kind": "vector-default-proof",
+      "ref": "AlembicPlugin/test/unit/LocalEmbedding.test.ts",
+      "verify": "Default, explicit opt-outs, absent daemon/model, available Ollama and bounded timeout passed."
+    },
+    {
+      "kind": "public-search-route-proof",
+      "ref": "AlembicPlugin/test/unit/SearchEnginePublicRoute.test.ts",
+      "verify": "Vector success and sanitized keyword fallback both asserted."
+    },
+    {
+      "kind": "prime-diagnostic-proof",
+      "ref": "AlembicPlugin/test/unit/PrimeSearchRouteEvidence.test.ts",
+      "verify": "Actual vector/fallback route survives zero filtered results independently of region evidence."
+    },
+    {
+      "kind": "graph-ranking-proof",
+      "ref": "AlembicPlugin/test/unit/ProjectGraphTool.test.ts",
+      "verify": "HostMcpServer/ProjectLocationService beat RequestLogger noise."
+    },
+    {
+      "kind": "recipe-map-diagnostic-proof",
+      "ref": "AlembicPlugin/test/unit/RecipeMapTool.test.ts",
+      "verify": ":330 and :330-330 dedupe with bounded optional reconciliation action."
+    },
+    {
+      "kind": "read-only-no-write-proof",
+      "ref": "AlembicPlugin/test/unit/ReadOnlySearchFingerprint.test.ts",
+      "verify": "DB/WAL/SHM/vector hashes unchanged."
+    },
+    {
+      "kind": "public-json-samples",
+      "ref": "AlembicPlugin/test/unit/SearchEnginePublicRoute.test.ts",
+      "value": "Assertions cover requestedMode, actualMode, route, semanticUsed, vectorUsed, fallbackReason, items and diagnostics."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-plugin-five-tool-vector-quality-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-five-tool-vector-quality-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1.json",
+    "deliveryRunId": "run-delivery-p1-plugin-five-tool-vector-quality-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1",
+    "dispatchGroup": "p1-plugin-five-tool-vector-quality-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-five-tool-vector-quality-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 4,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+    "targetTaskId": "p1-plugin-five-tool-vector-quality-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p1-plugin-five-tool-vector-quality-p1",
+    "resultId": "tr-p1-plugin-five-tool-vector-quality-t1",
+    "createdAt": "2026-07-12T13:18:01.580Z"
+  },
+  "createdAt": "2026-07-12T13:18:01.580Z",
+  "stateRevisionObserved": 4,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

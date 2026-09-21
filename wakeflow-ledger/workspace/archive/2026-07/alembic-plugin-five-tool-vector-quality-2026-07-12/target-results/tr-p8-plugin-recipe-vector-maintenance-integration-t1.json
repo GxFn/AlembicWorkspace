@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p8-plugin-recipe-vector-maintenance-integration-t1",
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "taskPackageId": "p8-plugin-recipe-vector-maintenance-integration-p1",
+  "dispatchGroup": "p8-plugin-recipe-vector-maintenance-integration-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "targetWindow": "AlembicPlugin",
+  "targetTaskId": "p8-plugin-recipe-vector-maintenance-integration-t1",
+  "status": "completed",
+  "summary": "AlembicPlugin consumed AlembicCore 627fd7d authoritative Recipe vector lifecycle contract. Final Plugin commit 7d92768 passes authoritative cross-batch/empty-corpus maintenance, awaited direct-sync maintenance, full lifecycle/delete payload coverage, honest degraded/failed diagnostics, vector drain-before-DB-close, and isolated 75-entry/595-stale-region repair with idempotence and subset safety.",
+  "evidenceRefs": [
+    "AlembicPlugin/test/unit/RecipeRegionVectorAvailability.test.ts",
+    "AlembicPlugin/test/unit/KnowledgeVectorMaintenanceWiring.test.ts",
+    "AlembicPlugin/test/unit/RecipeVectorAuthoritativeRepair.test.ts",
+    "AlembicPlugin/test/unit/ServiceContainerShutdown.test.ts",
+    "AlembicPlugin/test/unit/SyncCoordinator.test.ts",
+    "AlembicPlugin/lib/recipe-pipeline/generate/recipe-region-vector.ts",
+    "AlembicPlugin/lib/injection/modules/InfraModule.ts",
+    "AlembicPlugin/lib/injection/ServiceContainer.ts"
+  ],
+  "verification": [
+    "npm run test:unit -> 143 test files passed, 1550 tests passed on final commit",
+    "npm run check -> exit 0; typecheck/lint/boundary/drift/doctrine/naming/retired-symbol/ring checks passed (15 repository-existing console warnings)",
+    "npm run build -> exit 0; Core build used 627fd7d64457c425605493e974dba9211f889098",
+    "NPM_CONFIG_CACHE=/tmp/alembic-plugin-p8-npm-cache npm run verify:codex-runtime-package -> ok=true, entrypointProbe=passed",
+    "NPM_CONFIG_CACHE=/tmp/alembic-plugin-p8-npm-cache npm run verify:plugin-distribution -> passed",
+    "NPM_CONFIG_CACHE=/tmp/alembic-plugin-p8-npm-cache npm run verify:codex-plugin -> passed",
+    "Alembic Guard explicit 14-file re-review -> task-owned Promise warnings removed; 0 errors, 38 pre-existing file-level warnings remain"
+  ],
+  "risks": [
+    "Alembic Guard still reports 38 warning-only full-file findings: 37 pre-existing synchronous-I/O warnings in SetupService/ServiceContainer and one pre-existing method-length warning in recipe-region-vector; P8 introduced none after rework and broad refactoring is out of scope.",
+    "The default user npm cache is not writable because it contains root-owned entries; packaging validation passed with an isolated temporary npm cache and no permission mutation.",
+    "No AlembicWorkspace or BiliDili live DB/WAL/vector/config cleanup was performed; controller must separately decide whether to repair existing real indexes."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "root-cause-note",
+      "value": "Plugin batched Recipe regions without one complete authority set, production KnowledgeSyncService lacked KnowledgeVectorMaintenance, direct rebuild used sync instead of awaited syncAll, and MCP shutdown closed DB without awaiting Core's async VectorService.destroy."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Pin Core provenance and baseline; RED authoritative batches; GREEN shared scope; RED/Green direct-sync DI; isolated 75/595 proof; RED/Green shutdown drain; full validation; two-stage review and Guard."
+    },
+    {
+      "kind": "change-scope",
+      "value": "Only AlembicPlugin source/tests changed (14 files); AlembicCore remained at 627fd7d; no vendor, release, marketplace, other repository, or live data-root writes."
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicPlugin/test/unit/RecipeRegionVectorAvailability.test.ts",
+      "verify": "Focused P8 suite and final full unit suite pass."
+    },
+    {
+      "kind": "full-suite",
+      "value": "npm run test:unit: 143/143 files and 1550/1550 tests passed on 7d92768; npm run check/build and all three packaging checks passed."
+    },
+    {
+      "kind": "runtime-probe",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorAuthoritativeRepair.test.ts",
+      "verify": "Isolated in-memory real Plugin caller removed exactly 595 stale regions for 72 absent IDs, retained 75 entry vectors and live regions, second run removed 0, subset kept unrelated region."
+    },
+    {
+      "kind": "commit",
+      "commit": "7d92768acaaf929d4069bb161c1934ba15b682f3",
+      "value": "Final AlembicPlugin P8 commit; RED commits precede implementation commits."
+    },
+    {
+      "kind": "self-review",
+      "value": "Stage 1: all seven required Plugin behaviors mapped and no live cleanup/Test/cross-repo edits. Stage 2: fixed duplicate canonical maintenance, shutdown cleanup ordering, and task-owned Guard Promise warnings; no error-severity findings remain."
+    },
+    {
+      "kind": "core-provenance-proof",
+      "commit": "627fd7d64457c425605493e974dba9211f889098",
+      "verify": "npm run build printed exact Core provenance."
+    },
+    {
+      "kind": "authoritative-batch-proof",
+      "ref": "AlembicPlugin/test/unit/RecipeRegionVectorAvailability.test.ts"
+    },
+    {
+      "kind": "direct-sync-maintenance-proof",
+      "ref": "AlembicPlugin/test/unit/KnowledgeVectorMaintenanceWiring.test.ts"
+    },
+    {
+      "kind": "shutdown-drain-proof",
+      "ref": "AlembicPlugin/test/unit/ServiceContainerShutdown.test.ts"
+    },
+    {
+      "kind": "isolated-595-orphan-repair-proof",
+      "ref": "AlembicPlugin/test/unit/RecipeVectorAuthoritativeRepair.test.ts"
+    },
+    {
+      "kind": "real-data-no-write-proof",
+      "value": "All repair evidence used temp or in-memory fixtures; no real AlembicWorkspace/BiliDili data paths were opened by the P8 implementation probe."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p8-plugin-recipe-vector-maintenance-integration-p1__AlembicPlugin__p8-plugin-recipe-vector-maintenance-integration-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p8-plugin-recipe-vector-maintenance-integration-p1__AlembicPlugin__p8-plugin-recipe-vector-maintenance-integration-t1.json",
+    "deliveryRunId": "run-delivery-p8-plugin-recipe-vector-maintenance-integration-p1__AlembicPlugin__p8-plugin-recipe-vector-maintenance-integration-t1",
+    "dispatchGroup": "p8-plugin-recipe-vector-maintenance-integration-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p8-plugin-recipe-vector-maintenance-integration-p1__AlembicPlugin__p8-plugin-recipe-vector-maintenance-integration-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "per-target"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "stateRevision": 42,
+    "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+    "taskPackageId": "p8-plugin-recipe-vector-maintenance-integration-p1",
+    "targetTaskId": "p8-plugin-recipe-vector-maintenance-integration-t1",
+    "targetWindow": "AlembicPlugin",
+    "dispatchGroup": "p8-plugin-recipe-vector-maintenance-integration-p1",
+    "resultId": "tr-p8-plugin-recipe-vector-maintenance-integration-t1",
+    "createdAt": "2026-07-13T01:31:08.499Z"
+  },
+  "createdAt": "2026-07-13T01:31:08.499Z",
+  "stateRevisionObserved": 42,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 1
+}

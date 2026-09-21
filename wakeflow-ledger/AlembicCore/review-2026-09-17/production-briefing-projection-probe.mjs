@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { pathToFileURL,fileURLToPath } from 'node:url';
+import { registerHooks,stripTypeScriptTypes } from 'node:module';
+registerHooks({resolve(specifier,context,next){try{return next(specifier,context);}catch(error){if(error.code==='ERR_MODULE_NOT_FOUND'&&specifier.startsWith('.')&&specifier.endsWith('.js')){const candidate=new URL(specifier.slice(0,-3)+'.ts',context.parentURL);if(fs.existsSync(fileURLToPath(candidate)))return{url:candidate.href,shortCircuit:true};}throw error;}},load(url,context,next){if(new URL(url).pathname.endsWith('.ts'))return{format:'module',source:stripTypeScriptTypes(fs.readFileSync(fileURLToPath(url),'utf8'),{mode:'transform'}),shortCircuit:true};return next(url,context);}});
+const {buildProjectContextMissionBriefing,buildMissionBriefing}=await import(pathToFileURL(path.join(process.cwd(),'src/workflows/surfaces/host-agent/briefing/MissionBriefingBuilder.ts')).href);
+const fixtureSource=fs.readFileSync('test/IDEAgentAnalysisPacketBuilder.test.ts','utf8');
+const fixtureFunction=fixtureSource.slice(fixtureSource.indexOf('function makeProjectContextEnvelopes()'),fixtureSource.indexOf('function makeProjectContextTargetFileCountFixture()'));
+const {makeProjectContextEnvelopes}=await import('data:text/javascript;base64,'+Buffer.from(stripTypeScriptTypes('export '+fixtureFunction,{mode:'transform'})).toString('base64'));
+const envelopes=makeProjectContextEnvelopes();
+const map=envelopes.find(item=>item.queryLevel==='map').data;
+map.cycles=[{refs:[map.modules[0].ref,map.layers[0].ref],summary:'service-domain cycle'}];
+const briefing=buildProjectContextMissionBriefing({projectContext:envelopes,activeDimensions:[{id:'architecture'}],session:{toJSON:()=>({id:'probe-session'})}});
+const custom=buildMissionBriefing({projectMeta:{primaryLanguage:'typescript'},activeDimensions:[{id:'project-custom',label:'Project Custom',tierHint:2}],session:{toJSON:()=>({id:'custom-probe'})}});
+console.log(JSON.stringify({probe:'real-project-context-briefing-projection',panoramaInput:{layers:map.layers.length,hotspots:map.hotspots.length,cycles:map.cycles.length},panoramaOutput:briefing.panorama,languageInput:{repoFileCount:envelopes[0].data.languages[0].fileCount,presenterDistinctFiles:briefing.projectContext.sourceFiles.length},languageOutput:briefing.languageStats,customDimensions:custom.dimensions.map(dim=>({id:dim.id,tier:dim.tier})),customExecutionPlan:custom.executionPlan,status:'RED'},null,2));

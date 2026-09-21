@@ -1,0 +1,940 @@
+{
+  "schemaVersion": 1,
+  "demandKey": "alembic-plugin-five-tool-vector-quality-2026-07-12",
+  "title": "AlembicPlugin 五工具向量默认能力与检索质量修复",
+  "interfaceLanguage": "zh",
+  "controllerHost": "codex",
+  "controllerWindow": "AlembicWorkspace",
+  "testDecision": "No Test window. AlembicPlugin must use deterministic unit/subprocess tests with fake Ollama plus a controller-owned read-only real probe against the existing local Ollama model and the two existing knowledge bases. Acceptance must not initialize, rescan, reconcile, or otherwise mutate either real knowledge base.",
+  "state": "archived",
+  "stateReason": "Archive the previously completed five-tool vector quality demand so the confirmed retrieval/vector/projectcontext architecture work can continue sequentially on the main fleet.",
+  "revision": 54,
+  "activeStageId": null,
+  "updatedAt": "2026-07-13T03:29:55.958Z",
+  "allowedActions": [],
+  "blockers": [],
+  "decisionsRequired": [],
+  "stages": [],
+  "taskPackages": [
+    {
+      "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+      "summary": "Implement and commit one AlembicPlugin quality closure for the five knowledge tools.\n\nRequired fixes:\n- Change local embedding from explicit opt-in to default local-first auto-detection. `resolveLocalEmbeddingConfig` and newly generated Plugin config must default enabled; explicit `ALEMBIC_LOCAL_EMBEDDING_ENABLED=0`, config `enabled:false`, or `laneOrder:keyword-only` remains authoritative. Do not package/download a model or call cloud providers. Probe the existing default local Ollama endpoint/model with a bounded timeout; unavailable service/model must immediately and honestly fall back to keyword.\n- Replace public `alembic_search` search-operation table-list/all-token filtering with the already-created request-scoped read-only SearchEngine. Honor `mode=auto|keyword|semantic`, query, filters and budget/limit; keep get/expand bounded through the read-only repository. Project identity and read-only snapshot confinement stay intact. Output must distinguish real semantic/vector use, keyword fallback, zero match, and unavailable vector lane without leaking internal/raw provider data.\n- Carry actual SearchEngine route evidence through PrimeSearchPipeline and build Prime diagnostics from it. Delete the false rule that equates empty regionEvidence with unavailable vector; retain semantic-region evidence as a separate signal if useful.\n- Improve Plugin ProjectGraphProvider ranking: normalize CamelCase/specific identifiers, reward multi-term coverage/rare or specific term matches, and prevent one common term such as `request` from filling the top results ahead of HostMcpServer/ProjectLocationService matches. Do not turn Graph into semantic knowledge search or claim source-of-truth.\n- Deduplicate Recipe Map diagnostics for equivalent path anchors such as `:330` and `:330-330`; add a bounded nextAction explaining source-ref reconciliation/rescan when unresolved/stale refs exist. Query remains read-only and must not repair live knowledge.\n- Preserve Guard semantics, exact graph/file queries, Recipe Map conservation counts, all public schema/output projection gates, request-scoped roots, no-KB truthful results, no revision/host/admin/intent gates, and no main/resident/daemon coupling.\n\nRequired evidence and validation:\n- RED/GREEN tests proving current public semantic Search zero-result bug despite underlying vector success, then public success through SearchEngine.\n- Tests for config absent => auto-detect enabled; explicit disable => no probe/keyword; Ollama absent/model absent => bounded keyword degrade; Ollama available => vector.\n- Prime vector-used and keyword-fallback diagnostic tests based on real route evidence.\n- Graph ranking fixture with HostMcpServer/ProjectLocationService/request terms and Recipe Map duplicate diagnostic fixture.\n- Read-only snapshot/WAL/index hash or fingerprint proof before/after.\n- Focused tests, full `npm run test:unit`, `npm run check`, `npm run build`, `npm run verify:codex-runtime-package`, `npm run verify:plugin-distribution`, `npm run verify:codex-plugin`, and canonical local reload on exact final commit.\n- Return final commit, touched files/symbols, representative public JSON for both roots/modes, route diagnostics, no-write proof, two-stage self-review, and any honest residual limits. No Test dispatch.",
+      "status": "accepted",
+      "sourceRef": "User command on 2026-07-12 plus controller raw evidence: both roots have valid 1024d HNSW indexes; local Ollama qwen3-embedding:0.6b is reachable; BiliDili underlying SearchEngine selected lane=ollama and returned the two expected Recipes, while public alembic_search(mode=semantic) returned zero because handlers/search.ts bypasses SearchEngine; Workspace default selected lane=keyword because localEmbedding default is false; Prime hard-codes regionEvidence=[]; broad Graph common-token ranking displaced specific identifiers; Recipe Map emitted duplicate unresolved-ref diagnostics.",
+      "designIntent": "Repair the already-proven Plugin retrieval chain rather than adding another policy layer: use the existing request-scoped snapshot and Core SearchEngine/vector APIs, make local Ollama auto-detection the default with honest fallback, and improve public evidence/ranking while preserving read-only project isolation.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "runtime-probe",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "vector-default-proof"
+          },
+          {
+            "kind": "public-search-route-proof"
+          },
+          {
+            "kind": "prime-diagnostic-proof"
+          },
+          {
+            "kind": "graph-ranking-proof"
+          },
+          {
+            "kind": "recipe-map-diagnostic-proof"
+          },
+          {
+            "kind": "read-only-no-write-proof"
+          },
+          {
+            "kind": "public-json-samples"
+          }
+        ]
+      },
+      "createdAt": "2026-07-12T12:51:02.023Z"
+    },
+    {
+      "taskPackageId": "p2-core-filter-orphan-vector-search-p1",
+      "summary": "Phase P2: make shared SearchEngine results truthful when a vector index contains orphan/stale entry ids.\n\nIncluded mainline:\n- Add a RED/GREEN Core regression where vector search returns both live and orphan entry ids while findByIdsDetailSync returns only the live database row.\n- Filter semantic and hybrid/auto vector candidates against non-deprecated request-database rows before they can reach Search, Prime, ranking, or public projection. Preserve candidate order and scores for surviving live rows; refill up to the requested limit from over-retrieved live candidates when possible.\n- Return a stable diagnostic/searchMeta signal or bounded count for filtered orphan vector candidates if the existing Core contract supports this without leaking provider internals; do not turn it into a readiness gate.\n- Keep keyword/weighted behavior, vector fallback, filters, budgets, source-ref drift annotations, read-only database behavior, and existing SyncCoordinator reconciliation semantics unchanged.\n\nNon-goals:\n- Do not mutate or rebuild the live vector index during a query.\n- Do not add Git revision/checkpoint, host-project, role/admin, intent, knowledge-state, or tool-visibility gates.\n- Do not change Plugin MCP schemas, Graph, Recipe Map, Prime projection, Alembic main, vendor snapshots, or real project data in this package.\n\nBoundary/dependency:\n- Repository is AlembicCore; expected primary surface is src/service/search/SearchEngine.ts plus focused Core tests. AlembicPlugin integration waits for the accepted Core commit.\n\nValidation and backfill:\n- Commit the Core change in AlembicCore.\n- Run focused SearchEngine tests, full Core test suite, npm run check, and npm run build.\n- Return the commit, exact changed files/symbols, RED/GREEN orphan-vector proof, live-row ordering/limit proof, no-write proof, compatibility/failure-path review, command output summaries, and two-stage self-review.\n\nCompletion advances the demand to the Plugin consumer package; it does not complete the demand and does not dispatch Test.",
+      "status": "accepted",
+      "sourceRef": "User continuation command plus controller raw runtime/SQLite/code evidence on 2026-07-12.",
+      "designIntent": "Use the request-scoped knowledge repository as the read-only truth set at the SearchEngine retrieval seam, filtering orphan vector candidates before ranking/projection rather than mutating the index or adding a policy gate.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "orphan-vector-red-green-proof"
+          },
+          {
+            "kind": "live-result-order-limit-proof"
+          },
+          {
+            "kind": "read-only-no-write-proof"
+          },
+          {
+            "kind": "search-meta-diagnostic-proof"
+          }
+        ]
+      },
+      "continuation": {
+        "continuationId": "continuation-0011",
+        "type": "verified-bug",
+        "reason": "The user explicitly asked to continue resolving the quality problems discovered by controller real-tool acceptance. These are inside the existing five-tool retrieval-quality completion definition: semantic/Prime currently surface vector-index entries that the request-scoped knowledge database cannot retrieve; the same acceptance also proved Plugin Graph candidate preselection misses exact identifiers and Recipe Map misclassifies Core status=drifted as unresolved. The continuation preserves all prior accepted vector-default work and fixes only these evidenced truth/quality defects.",
+        "evidenceRefs": [
+          "user-command:continue-resolving-discovered-quality-problems-2026-07-12",
+          "runtime:BiliDili-semantic-returned-d165b798-and-4112efa7",
+          "runtime:BiliDili-search-get-d165b798-found=false",
+          "db:BiliDili-knowledge_entries-missing-d165b798-and-4112efa7",
+          "runtime:AlembicWorkspace-graph-excludes-HostMcpServer-and-ProjectLocationService",
+          "db:BiliDili-recipe_source_refs-status=drifted",
+          "code:AlembicCore/SearchEngine._supplementDetails-does-not-filter-missing-rows",
+          "code:AlembicPlugin-Graph-preselection-slices-alphabetical-candidates",
+          "code:AlembicPlugin-RecipeRefStatus-omits-drifted"
+        ],
+        "priorCompletionEventId": "evt-20260712135428-0010",
+        "priorCompletionRevision": 10,
+        "createdAt": "2026-07-12T15:14:42.160Z"
+      },
+      "createdAt": "2026-07-12T15:14:42.160Z"
+    },
+    {
+      "taskPackageId": "p3-plugin-five-tool-truth-graph-drift-quality-p1",
+      "summary": "Phase P3: integrate accepted Core vector truth filtering and close the two Plugin quality defects exposed by real five-tool calls.\n\nUpstream dependency:\n- Consume sibling AlembicCore commit 9e499809b3721a0d49e78853db4e115515b281ac through the existing @alembic/core file dependency. Build against that exact Core. Do not update vendor/AlembicCore or release pointers.\n\nIncluded mainline:\n1. Public Search/Prime truth integration\n- Add Plugin public-route tests where the vector index returns a mixture of live and orphan/deprecated entry ids while the request-scoped read-only database contains only live rows.\n- Prove alembic_search semantic/auto and alembic_prime never expose orphan ids/titles, surviving live ordering/limits remain useful, route evidence stays honest, and filtered-orphan metadata/diagnostics are bounded and do not become a gate.\n- Verify public get for a filtered orphan remains not found. Do not repair/rebuild the index during query.\n\n2. Real multi-repository Graph candidate quality\n- Fix ProjectGraphProvider candidate construction, not only final-node scoring: rank module seeds and file-flow targets by exact/full identifier and multi-term coverage before applying bounded target caps.\n- Add a large multi-repo/noise fixture exceeding the existing candidate cap. Query `HostMcpServer ProjectLocationService request` must include the actual HostMcpServer and ProjectLocationService file/symbol nodes within the bounded top results; weak `request`/`service` matches must not exclude them before final ranking.\n- Avoid collecting unrelated module-layer contexts solely because of weak terms when stronger exact candidates exist, so unrelated cyclic/invalid-scope warnings do not degrade this focused query. Preserve exact file queries, budgets, source-of-truth=false, and structural—not semantic knowledge—Graph behavior.\n\n3. Recipe Map drift truth\n- Extend Plugin Recipe source-ref normalization to understand Core `status=drifted` instead of converting it to `unresolved`.\n- A drifted ref means the file exists but anchored content changed: keep it eligible for deterministic path mounting, emit a bounded drift-specific diagnostic/nextAction, and never label it missing/unresolved. Preserve stale, renamed, unresolved and metadata-only semantics.\n- Keep equivalent single-line anchors such as `:330` and `:330-330` deduplicated for the same recipe; do not collapse distinct recipes sharing a source location.\n- Query remains read-only and must not rescan, repair, rewrite or gate knowledge visibility.\n\nNon-goals and boundaries:\n- No Git revision/checkpoint, host-project, current Alembic selection, role/admin, intent, knowledge-state, tool-visibility or no-KB gates.\n- No changes to Alembic main, AlembicCore, AlembicAgent, Dashboard, Test, real project files, live databases/vector indexes, plugin marketplace version, or vendor snapshots.\n- Do not broaden into keyword ranking changes: earlier keyword/semantic disagreement was caused by orphan semantic entries, not proven keyword scorer failure.\n\nValidation/backfill:\n- Commit the AlembicPlugin change.\n- Run focused Search public-route/Prime/Graph/Recipe Map/read-only tests; full unit suite; pnpm check; pnpm build; verify Codex runtime package/plugin distribution/Codex plugin; canonical local reload on the exact final Plugin commit.\n- After reload, controller will run real AlembicWorkspace and BiliDili MCP calls. Target should return fixture public JSON and may run its own safe fresh-process probes, but must not mutate real knowledge.\n- Backfill final commit, exact Core provenance, changed files/symbols, RED/GREEN evidence, public JSON samples, no-write proof, full commands, two-stage self-review, and honest residual limits.\n\nCompletion means the Plugin consumer chain is ready for controller real-project five-tool acceptance; it does not complete the demand and does not dispatch Test.",
+      "status": "accepted",
+      "sourceRef": "Accepted Core package p2 plus controller real BiliDili/AlembicWorkspace runtime, SQLite, and source-code evidence recorded in continuation-0011.",
+      "designIntent": "Keep all five tools request-scoped and read-only: consume Core database-truth filtering, repair Plugin candidate selection before Graph caps, and carry Core drift semantics honestly instead of adding readiness or maintenance gates.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "runtime-probe",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "core-provenance-proof"
+          },
+          {
+            "kind": "public-orphan-filter-proof"
+          },
+          {
+            "kind": "graph-preselection-proof"
+          },
+          {
+            "kind": "recipe-drift-truth-proof"
+          },
+          {
+            "kind": "read-only-no-write-proof"
+          },
+          {
+            "kind": "public-json-samples"
+          }
+        ]
+      },
+      "createdAt": "2026-07-12T15:37:16.350Z"
+    },
+    {
+      "taskPackageId": "p4-core-swiftpm-target-path-truth-p1",
+      "summary": "Phase P4 producer repair: fix the verified Core ProjectContext RepoContext truth defect that blocks the existing five-tool Graph completion. In a real SwiftPM root package, Package.swift target declarations with explicit paths (for example Home -> Sources/Features/Home and VideoPlay -> Sources/Features/VideoPlay) currently project target refs with filePath `.` while only a broad `Sources` sourceRoot survives. Preserve each main-package target's normalized declared path in RepoContext target refs so downstream consumers can construct module/file-flow candidates without parsing Package.swift again.\n\nRequired behavior:\n- Add a BiliDili-shaped deterministic Core regression with multiple root-package targets under nested `Sources/Features/*`, several local path packages under `Packages/*`, test targets, and noisy AOXPlayer files.\n- `ProjectContextCapabilities.execute(kind=repo)` must return Home/VideoPlay target refs scoped to their real declared target paths, not `.`; target names, repoId/sourceFolder, local-package target refs, sourceRoots, entrypoints, and existing Node/Swift/Rust/etc behavior must remain compatible.\n- Determine and fix the actual Core parser/projector seam that loses SwiftPM target paths. Do not add a Plugin-side Package.swift parser, Graph ranking workaround, knowledge gate, Git gate, rescan, or live-project mutation.\n- Keep ProjectContext read-only and bounded. No AlembicPlugin, BiliDili, vendor, database, vector index, marketplace, Test, or release pointer edits.\n\nValidation:\n- Commit the Core change.\n- Show RED/GREEN on the new exact RepoContext target-path regression and relevant repo/module ProjectContext suites.\n- Run focused tests, full Core test suite, build, check/public API/layer/scope verification, and a read-only direct ProjectContextCapabilities probe against the existing BiliDili checkout proving Home and VideoPlay refs use `Sources/Features/Home` and `Sources/Features/VideoPlay`.\n- Return changed files/symbols, raw command results, public JSON summary, compatibility/failure-path review, commit, and two-stage self-review.\n\nCompletion means the Core producer truth is ready for Plugin consumer integration; it does not accept the Plugin task or complete the demand.",
+      "status": "accepted",
+      "sourceRef": "Controller fresh-cache BiliDili Graph failure at state revision 21 plus direct Core ProjectContextCapabilities repo probe: Package.swift has explicit Home/VideoPlay paths but RepoContext target refs collapse to filePath='.'.",
+      "designIntent": "ProjectContext Core should preserve declared SwiftPM target ownership paths as repository truth; Plugin Graph should consume that truth instead of reparsing manifests or compensating with more ranking heuristics.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "runtime-probe",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "swiftpm-target-path-proof"
+          },
+          {
+            "kind": "repo-context-compatibility-proof"
+          },
+          {
+            "kind": "read-only-no-write-proof"
+          },
+          {
+            "kind": "public-json-samples"
+          }
+        ]
+      },
+      "createdAt": "2026-07-12T17:01:18.857Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p5-plugin-core-swiftpm-truth-integration-p1",
+      "summary": "Phase P5 sequential consumer closure: integrate the accepted Core SwiftPM target-path truth into the existing AlembicPlugin five-tool implementation and close the exact real BiliDili Graph failure without another speculative ranking round.\n\nFixed provenance and first action:\n- Plugin baseline is commit a1f3282e2f29af9fb25ff1c7a12125814b757a19.\n- Core producer is accepted commit ce1a29a16bbc7239b3fdfedc466fef6c45e02c44.\n- Use the existing `@alembic/core` local file dependency. Build Core and refresh the Plugin dependency/runtime artifacts so every probe demonstrably uses ce1a29a. Do not update vendor or release pointers.\n- Before changing Plugin source, rerun the focused Graph fixture and fresh-process public Graph probes. If the Core integration alone resolves the failure, make no source edit and return an explicit no-change/no-new-commit conclusion with provenance. Only if the same public call still fails may you trace that exact chain and make the smallest evidenced Plugin correction; do not add another broad ranking heuristic.\n\nRequired real read-only probes:\n1) AlembicWorkspace query `HostMcpServer ProjectLocationService request` must retain exact file plus same-name symbol representation for both identifiers, bounded results, complete repo coverage, no irrelevant weak-scope degradation, and no errors.\n2) BiliDili query `VideoPlayLoadGenerationGate HomeRequestRefreshGate request` must retain exact file plus same-name symbol representation for both identifiers from the real SwiftPM target paths, with bounded results and no AOXPlayer/common-token starvation or irrelevant weak-scope degradation.\n- Capture ProjectContext/Core provenance and public JSON summaries. Do not write/rescan/repair either knowledge base or modify either real project.\n\nRegression and packaging:\n- Preserve accepted public Search/Prime orphan filtering, Recipe drift truth/deduplication, Guard behavior, exact Graph/file queries, request-scoped roots, read-only behavior, budgets and public schemas.\n- Run focused Graph/Search/Prime/Recipe/read-only tests, full Plugin unit suite, check, build, runtime-package/distribution/Codex-plugin verification, canonical local plugin reload, and fresh-process readback of exact Plugin/Core provenance.\n- If a Plugin source change is truly required, commit only that minimal change. Otherwise retain a1f3282 and provide the repository-clean no-commit reason.\n\nForbidden: Test dispatch; Alembic/AlembicCore/BiliDili/AlembicWorkspace source edits; live DB/vector/index writes; Git/host/admin/intent/knowledge-state/tool-visibility gates; new environment chains; new broad ranking work; vendor/marketplace/release changes.\n\nCompletion means the controller can rerun the same two real public Graph queries on the installed plugin and then perform the remaining direct five-tool acceptance. It does not by itself complete or archive the demand.",
+      "status": "accepted",
+      "sourceRef": "Controller acceptance of p4-core-swiftpm-target-path-truth-p1 at state revision 25 plus direct real BiliDili ProjectContextCapabilities proof: Home/VideoPlay target refs are now Sources/Features/Home and Sources/Features/VideoPlay, errors=[], read-only. Previous p3 Plugin result a1f3282 passed AlembicWorkspace but failed real BiliDili before this upstream Core repair.",
+      "designIntent": "Consume the corrected Core repository truth first; do not compensate for an upstream target-path defect with more Plugin ranking heuristics.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "core-provenance",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "runtime-probe",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "plugin-reload",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "alembicworkspace-graph-proof"
+          },
+          {
+            "kind": "bilidili-graph-proof"
+          },
+          {
+            "kind": "read-only-no-write-proof"
+          },
+          {
+            "kind": "public-json-samples"
+          },
+          {
+            "kind": "no-change-proof"
+          }
+        ]
+      },
+      "createdAt": "2026-07-12T17:19:27.853Z"
+    },
+    {
+      "taskPackageId": "p6-plugin-public-guard-readonly-quality-p1",
+      "summary": "Fix verified public MCP Guard no-write and projection-quality failures. Public alembic_code_guard with explicit files and no primeRef/workRef currently changes the real AlembicWorkspace SQLite guard_violations table/WAL, contradicting the demand's all-five-tools request-scoped read-only contract and final acceptance prohibition on live knowledge mutation. Make the public MCP path analyze only a confined read-only snapshot and never persist violationRuns, guardHits, primeAdoptions, or other effects; preserve explicit-scope coverage, violations, applicable Recipe rules, primeAlignment observation, no-KB truth, confinement, and public schemas without falsely reporting persisted feedback. Keep persistence only on real non-public owning surfaces. Refactor the public projection so the same Guard scope genuinely passes ast_method_complexity for projectGuardPublicResult (currently 24 > 20) without suppressing rules. Add RED/GREEN fingerprints for passing, violating, and primeRef calls including DB/WAL/vector/knowledge stats/guard_violations; run focused/full/check/build/package/distribution/plugin verification; commit only AlembicPlugin. No Test, rescan, real-project/live-data/Core/vendor/release/marketplace/gate/environment changes.",
+      "status": "accepted",
+      "sourceRef": "Controller post-restart five-tool isolation: public Guard alone changes guard_violations/WAL; Prime/Search/Recipe Map/Graph remain read-only. Guard also reports projectGuardPublicResult complexity 24 > 20.",
+      "designIntent": "Make public Plugin MCP Guard genuinely request-scoped and read-only while preserving explicit-scope analysis/results, and simplify the public projection without changing its schema.",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "guard-readonly-fingerprint-proof",
+            "verify": "RED/GREEN proves violating, passing, and primeRef public Guard calls do not change live DB, WAL, vector index, knowledge stats, or guard_violations."
+          },
+          {
+            "kind": "public-guard-behavior-proof",
+            "verify": "Explicit-file Guard keeps complete coverage, real violations, applicable Recipe rules, no-KB truth, confinement, and public schemas."
+          },
+          {
+            "kind": "guard-self-guard-proof",
+            "verify": "Guard passes on touched public output/handler files; projectGuardPublicResult complexity is <=20."
+          },
+          {
+            "kind": "full-validation-proof",
+            "verify": "Focused tests, full unit suite, check, build, runtime-package, distribution, and Codex-plugin verification pass."
+          },
+          {
+            "kind": "commit-provenance",
+            "verify": "Exact AlembicPlugin commit, changed files/symbols, and two-stage self-review."
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "compatibility-review"
+          },
+          {
+            "kind": "failure-path-review"
+          }
+        ]
+      },
+      "createdAt": "2026-07-12T23:49:55.769Z"
+    },
+    {
+      "taskPackageId": "p7-core-recipe-vector-lifecycle-consistency-p1",
+      "summary": "Phase P7 producer repair: make Recipe vector production and maintenance lifecycle-consistent so normal full refresh, update, deprecate, reactivate and delete paths do not create or retain orphan semantic-region vectors.\n\nController raw evidence (BiliDili, read-only):\n- The HNSW snapshot contains 1,307 vectors: 75 entry_* vectors and 1,232 recipe_region_* vectors.\n- SQLite contains 75 non-deprecated Recipe rows. All 75 entry_* ids match exactly (0 entry orphan, 0 missing entry vector).\n- Region vectors resolve to 147 distinct recipeIds; 72 recipeIds are absent from SQLite, leaving 595 orphan recipe_region_* vectors. The public query-time count only reports orphan candidates encountered by that query, not the total.\n- Current index mtime is 2026-07-10 23:38:45 +0800. The current live Recipes were created before that sync, proving the full region build appended the current corpus but failed to prune the prior corpus.\n- Root cause in RecipeRegionVectorIndex.syncRecipeSemanticRegionVectors: removeStale only removes a region id when recipeId is present in the current entries batch and the exact chunk id is no longer expected. It intentionally skips recipeIds absent from entries. Plugin full build calls the method in batches, so vanished Recipes are never pruned.\n- Additional same-chain gaps: KnowledgeService lifecycle transitions emit lifecycle:transition but SyncCoordinator listens only knowledge:changed/knowledge:deleted; knowledge:deleted currently removes entry_* only, not recipe_region_*; KnowledgeSyncService direct orphan deprecation bypasses lifecycle events.\n\nRequired Core behavior:\n1. Introduce an explicit, fail-safe distinction between subset refresh and authoritative-corpus maintenance. Subset refresh for one/batched Recipe must never delete unrelated Recipe regions. An authoritative full-corpus call must remove every recipe_region_* whose recipeId is absent from the authoritative non-deprecated Recipe id set, and must also remove obsolete chunks for live Recipes whose region content changed. Do not infer authority merely from a non-empty array.\n2. Make canonical Recipe lifecycle removal close both vector families: physical delete and transition to deprecated remove entry_<id> plus every recipe_region_<id>_* vector. Reactivation/publish/update must have an explicit refresh route that regenerates current entry and region vectors from current DB truth; no query-time mutation.\n3. Bring direct maintenance deprecation (including KnowledgeSyncService orphan detection) onto the same observable lifecycle/vector-maintenance path or provide one canonical post-maintenance authoritative reconciliation that callers can await. Do not leave silent direct SQL writes that bypass vector cleanup.\n4. Extend explicit repair/reconcile proof so existing orphan recipe regions are countable/removable on an isolated fixture/copy. Query-time Search filtering remains defense-in-depth and must stay read-only; it is not the correctness mechanism.\n5. Shutdown/destruction must not silently drop queued removals needed for acknowledged Recipe mutations. Preserve bounded diagnostics for failures.\n6. Preserve existing local embedding, Search, Prime, Graph, Recipe Map, Guard, project confinement, no-Git-gate and no-host-selection semantics. No live BiliDili/AlembicWorkspace DB or vector mutation in target validation.\n\nValidation:\n- RED/GREEN unit/integration fixtures reproducing exactly: 75 live + absent prior recipe regions; authoritative full sync prunes absent ids; subset/batched refresh preserves unrelated live regions; content update replaces old chunks; deprecate/delete remove entry+regions; reactivate/publish regenerate; direct sync orphan deprecation is closed; shutdown/flush does not lose removal.\n- Focused Core vector/knowledge lifecycle suites, full Core test suite, npm run check and npm run build.\n- Return final Core commit, changed symbols, raw count proofs, failure-path analysis, command summaries and two-stage self-review.\n- No Test window and no real knowledge-base writes. Plugin authoritative-caller integration will be a dependent consumer package after this producer is accepted.",
+      "status": "accepted",
+      "sourceRef": "User command 2026-07-13 plus controller read-only BiliDili HNSW/SQLite reconciliation and Core/Plugin call-chain audit.",
+      "designIntent": "把索引正确性放回 Recipe 的生产与生命周期维护链：显式区分子集刷新和权威语料刷新，让所有删除/停用路径同步清理主向量与区域向量，并保留查询过滤仅作防御。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "real-orphan-count-proof"
+          },
+          {
+            "kind": "authoritative-vs-subset-proof"
+          },
+          {
+            "kind": "lifecycle-vector-closure-proof"
+          },
+          {
+            "kind": "shutdown-flush-proof"
+          },
+          {
+            "kind": "read-only-real-data-proof"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T00:33:56.610Z"
+    },
+    {
+      "taskPackageId": "p8-plugin-recipe-vector-maintenance-integration-p1",
+      "summary": "Phase P8 Plugin consumer integration for the accepted Core Recipe vector lifecycle producer.\n\nUpstream:\n- Consume AlembicCore commit 627fd7d64457c425605493e974dba9211f889098 through the existing local @alembic/core dependency.\n- Core now provides explicit subset vs authoritative-corpus Recipe-region maintenance, lifecycle/delete closure for entry+region vectors, region-orphan reconcile counts, an awaited KnowledgeVectorMaintenance boundary for direct KnowledgeSync writes, and async VectorService.destroy() draining.\n\nRequired Plugin behavior:\n1. In buildRecipeSemanticRegionVectors, obtain the complete non-deprecated Recipe corpus once. When batching syncRecipeSemanticRegions, pass the SAME complete nonDeprecatedRecipeIds authority set to every batch through Core maintenanceScope. Never infer authority from a batch. Empty authoritative corpus must be representable and must prune regions only when this path genuinely owns the full corpus.\n2. Inject a real KnowledgeVectorMaintenance implementation into every production KnowledgeSyncService construction that can mutate Recipe rows. After direct file→DB create/update/deprecate work, syncAll must await one canonical authoritative vector maintenance operation built from current DB truth. Reuse the existing Plugin region build/refresh orchestration where appropriate; do not duplicate a second maintenance algorithm.\n3. Ensure normal create/update/lifecycle/delete event wiring uses the accepted Core full-entry payload behavior and remains initialized. Do not add query-time mutation, state gates, Git gates, host-selection coupling, Alembic-main coupling or daemon dependencies.\n4. Update Plugin shutdown so VectorService.destroy() is awaited BEFORE database close and any vector-store final flush/destroy ordering remains safe. Audit all Plugin callers affected by Core's void→Promise destroy contract.\n5. Preserve replacement safety: if embedding is unavailable or replacement generation fails, live old chunks are not deleted. Surface honest bounded diagnostics; no silent success for an unconfigured maintenance port after direct DB mutations.\n6. Add an isolated data-root integration proof reproducing the real shape: 75 live entry vectors plus 595 recipe_region vectors for 72 absent Recipe IDs. Run the real Plugin authoritative maintenance caller and prove exactly 595 stale regions removed, all 75 entry vectors and current live regions retained, a second run is idempotent, and subset refresh cannot delete unrelated regions.\n7. Do not mutate BiliDili or AlembicWorkspace live DB/WAL/vector/config. Controller will separately decide whether/when to repair the existing real index; this package proves the production path on copies/temp fixtures only.\n\nValidation:\n- Focused Plugin tests for region-vector batching, KnowledgeSyncService DI/direct orphan deprecation, lifecycle/delete/update integration, shutdown ordering/drain, and isolated 75/595 repair.\n- Full Plugin unit suite, check, build, runtime-package/distribution/Codex-plugin verification.\n- Commit the Plugin diff and return exact Core provenance, files/symbols, fixture counts, public/diagnostic output, command summaries and two-stage self-review.\n- No Test window. Completion means code prevents the known orphan-production paths; it does not authorize live knowledge cleanup or demand completion without controller verification.",
+      "status": "accepted",
+      "sourceRef": "Accepted Core P7 commit 627fd7d plus controller review evidence; user command 2026-07-13 to fix Recipe production maintenance logic.",
+      "designIntent": "让 Plugin 的真实 bootstrap/rescan/sync/shutdown 调用链消费 Core 的显式权威维护契约；不增加查询门禁，也不通过查询过滤掩盖生产问题。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "runtime-probe",
+            "verify": "artifact-present"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "core-provenance-proof"
+          },
+          {
+            "kind": "authoritative-batch-proof"
+          },
+          {
+            "kind": "direct-sync-maintenance-proof"
+          },
+          {
+            "kind": "shutdown-drain-proof"
+          },
+          {
+            "kind": "isolated-595-orphan-repair-proof"
+          },
+          {
+            "kind": "real-data-no-write-proof"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T00:59:12.934Z"
+    },
+    {
+      "taskPackageId": "p9-core-provider-independent-vector-removal-p1",
+      "summary": "Phase P9 Core repair discovered during controller review of P8: Recipe removal correctness must not depend on an embedding provider.\n\nVerified failure:\n- On accepted Core 627fd7d, VectorService with autoSyncOnCrud=true, a valid EventBus and embedProvider=null initializes with autoSyncEnabled=false.\n- Emitting knowledge:deleted for an index containing entry_dead and recipe_region_dead_* produces removed=[].\n- Plugin correctly degrades to keyword when Ollama/model is unavailable, so this is a normal supported runtime state, not an exceptional test-only condition.\n\nRequired behavior:\n1. Decouple removal listeners from embedding. With autoSyncOnCrud and EventBus configured, delete and lifecycle transition to deprecated must remove entry_<id> and every recipe_region_<id>_* even when embedProvider is null/unavailable. Do not require Ollama for deletion.\n2. Upsert/create/update/reactivate paths may honestly defer/degrade when no provider; they must not fabricate vector success or delete existing live Recipe chunks.\n3. In syncRecipeSemanticRegionVectors authoritative-corpus mode, remove regions whose recipeId is absent from the complete authority set even when pending live chunks cannot be embedded. Preserve old chunks for still-live Recipes until replacement embedding succeeds. Subset mode remains unable to delete unrelated Recipes.\n4. Ensure explicit reconcile/maintenance can remove entry and region orphans without a provider. Missing live vectors must not be falsely reported as synchronized when no embedding can occur; return an honest bounded deferred/degraded signal compatible with existing callers.\n5. Preserve provider-available behavior, event payloads, replacement ordering, Search filtering, query read-only semantics and all no-gate/no-host-selection boundaries.\n6. No Plugin edits, no live BiliDili/AlembicWorkspace mutations, no Test.\n\nValidation:\n- RED/GREEN exact runtime regression: embedProvider=null + delete/deprecate removes both vector families.\n- Authoritative corpus fixture with provider null removes absent Recipe regions while retaining old live Recipe chunks and reports degradation for ungenerated replacements.\n- Subset safety, provider-available update/reactivate regeneration, concurrent flush/destroy, reconcile count/error semantics.\n- Focused vector/lifecycle suites, full Core tests, build/check/public API.\n- Commit Core and return actual full commit hash, changed symbols, raw JSON probe, commands and two-stage self-review.\nCompletion unblocks P8 Plugin rework; it does not accept P8 or authorize real index cleanup.",
+      "status": "accepted",
+      "sourceRef": "Controller P8 review runtime probe on 2026-07-13: Core 627fd7d with embedProvider=null initialized autoSyncEnabled=false and knowledge:deleted removed no vectors.",
+      "designIntent": "把删除正确性与向量生成能力解耦：生成需要 embedding，删除不存在/废弃 Recipe 的派生向量不需要；live Recipe 的旧块只在新块成功后替换。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "runtime-probe",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "provider-null-delete-proof"
+          },
+          {
+            "kind": "provider-null-authoritative-prune-proof"
+          },
+          {
+            "kind": "live-replacement-safety-proof"
+          },
+          {
+            "kind": "reconcile-degradation-proof"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T01:36:01.350Z",
+      "reviewRoute": "rework"
+    },
+    {
+      "taskPackageId": "p10-plugin-provider-independent-authoritative-maintenance-p1",
+      "summary": "Plugin-only companion rework to consume accepted-in-evidence Core P9 commit 6b7de17494bac4236822d8a0baaa61cc3b01b670.\n\nVerified remaining defect:\n- AlembicPlugin HEAD 7d92768f3e143d0e9fa4458788041b4d9f95d00a calls vectorService.getAvailability() and returns before knowledgeService.list() and syncRecipeSemanticRegions() whenever availability is degraded/unavailable.\n- RecipeRegionVectorAvailability.test.ts explicitly expects zero maintenance calls in this state.\n- Therefore Core P9 provider-independent delete/reconcile/authoritative prune cannot run through the Plugin's normal authoritative maintenance caller when Ollama/model is unavailable.\n\nRequired behavior:\n1. Remove availability as a precondition for authoritative maintenance. Keep availability as bounded diagnostic/report data only. Provider missing, unavailable, or availability-probe failure must not prevent reading the complete non-deprecated Recipe corpus and invoking syncRecipeSemanticRegions with maintenanceScope.kind=authoritative-corpus and the same full nonDeprecatedRecipeIds set for every batch (including empty corpus).\n2. Let Core own generation degradation. When embedding is unavailable, Core must remove only regions for deleted/deprecated/authority-absent Recipes, preserve all old chunks for still-live Recipes, perform zero fabricated upserts, and return honest degradedReason/embed-provider-unavailable.\n3. Preserve provider-available generation, batching, semantic-memory behavior, shutdown drain, direct KnowledgeSync maintenance wiring, subset safety, request-scoped project independence, query read-only behavior, and all no-gate/no-Git/no-host-selection boundaries.\n4. Replace the obsolete test that expects maintenance to be skipped. Add RED/GREEN tests for unavailable and availability-probe-error paths proving authority is still listed and cleanup is called; add an integration fixture using the real Core path proving absent regions removed, live old regions retained, zero upserts without provider, and second run idempotent.\n5. Consume the current local Core 6b7de17. Do not edit Core. Do not mutate BiliDili/AlembicWorkspace live knowledge DB/WAL/vector/config. No Test window.\n6. Run focused Plugin tests, full unit suite, check/build/runtime-package/Codex-plugin verification as applicable. Commit Plugin and return the exact full HEAD (verify with git rev-parse HEAD), changed symbols, raw fixture JSON, commands, and two-stage self-review.\n\nCompletion means the normal Plugin authoritative maintenance caller actually invokes provider-independent cleanup in no-Ollama/no-provider states; it does not authorize live index repair or demand completion.",
+      "status": "accepted",
+      "sourceRef": "Controller P9 review on 2026-07-13: Core 6b7de17 passes provider-null removal, but Plugin 7d92768 still exits authoritative maintenance when vector availability is degraded.",
+      "designIntent": "把 availability 降级为诊断信息，不再作为权威清理前置门禁；无 provider 时仍传递完整非废弃 Recipe authority 给 Core，让 Core 只清不存在/废弃派生向量并保留 live 旧块。",
+      "evidenceContract": {
+        "version": 1,
+        "required": [
+          {
+            "kind": "root-cause-note",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "execution-plan",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "change-scope",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "tests",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "full-suite",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "runtime-probe",
+            "verify": "controller-rerun"
+          },
+          {
+            "kind": "commit",
+            "verify": "self-attested"
+          },
+          {
+            "kind": "self-review",
+            "verify": "self-attested"
+          }
+        ],
+        "advisory": [
+          {
+            "kind": "core-provenance-proof"
+          },
+          {
+            "kind": "provider-null-cleanup-proof"
+          },
+          {
+            "kind": "availability-probe-error-proof"
+          },
+          {
+            "kind": "live-replacement-safety-proof"
+          },
+          {
+            "kind": "idempotence-proof"
+          },
+          {
+            "kind": "real-data-no-write-proof"
+          }
+        ]
+      },
+      "createdAt": "2026-07-13T01:58:51.460Z",
+      "reviewRoute": "rework"
+    }
+  ],
+  "targetTasks": [
+    {
+      "targetTaskId": "p1-plugin-five-tool-vector-quality-t1",
+      "taskPackageId": "p1-plugin-five-tool-vector-quality-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Implement and commit one AlembicPlugin quality closure for the five knowledge tools.\n\nRequired fixes:\n- Change local embedding from explicit opt-in to default local-first auto-detection. `resolveLocalEmbeddingConfig` and newly generated Plugin config must default enabled; explicit `ALEMBIC_LOCAL_EMBEDDING_ENABLED=0`, config `enabled:false`, or `laneOrder:keyword-only` remains authoritative. Do not package/download a model or call cloud providers. Probe the existing default local Ollama endpoint/model with a bounded timeout; unavailable service/model must immediately and honestly fall back to keyword.\n- Replace public `alembic_search` search-operation table-list/all-token filtering with the already-created request-scoped read-only SearchEngine. Honor `mode=auto|keyword|semantic`, query, filters and budget/limit; keep get/expand bounded through the read-only repository. Project identity and read-only snapshot confinement stay intact. Output must distinguish real semantic/vector use, keyword fallback, zero match, and unavailable vector lane without leaking internal/raw provider data.\n- Carry actual SearchEngine route evidence through PrimeSearchPipeline and build Prime diagnostics from it. Delete the false rule that equates empty regionEvidence with unavailable vector; retain semantic-region evidence as a separate signal if useful.\n- Improve Plugin ProjectGraphProvider ranking: normalize CamelCase/specific identifiers, reward multi-term coverage/rare or specific term matches, and prevent one common term such as `request` from filling the top results ahead of HostMcpServer/ProjectLocationService matches. Do not turn Graph into semantic knowledge search or claim source-of-truth.\n- Deduplicate Recipe Map diagnostics for equivalent path anchors such as `:330` and `:330-330`; add a bounded nextAction explaining source-ref reconciliation/rescan when unresolved/stale refs exist. Query remains read-only and must not repair live knowledge.\n- Preserve Guard semantics, exact graph/file queries, Recipe Map conservation counts, all public schema/output projection gates, request-scoped roots, no-KB truthful results, no revision/host/admin/intent gates, and no main/resident/daemon coupling.\n\nRequired evidence and validation:\n- RED/GREEN tests proving current public semantic Search zero-result bug despite underlying vector success, then public success through SearchEngine.\n- Tests for config absent => auto-detect enabled; explicit disable => no probe/keyword; Ollama absent/model absent => bounded keyword degrade; Ollama available => vector.\n- Prime vector-used and keyword-fallback diagnostic tests based on real route evidence.\n- Graph ranking fixture with HostMcpServer/ProjectLocationService/request terms and Recipe Map duplicate diagnostic fixture.\n- Read-only snapshot/WAL/index hash or fingerprint proof before/after.\n- Focused tests, full `npm run test:unit`, `npm run check`, `npm run build`, `npm run verify:codex-runtime-package`, `npm run verify:plugin-distribution`, `npm run verify:codex-plugin`, and canonical local reload on exact final commit.\n- Return final commit, touched files/symbols, representative public JSON for both roots/modes, route diagnostics, no-write proof, two-stage self-review, and any honest residual limits. No Test dispatch.",
+      "status": "accepted",
+      "createdAt": "2026-07-12T12:51:02.023Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p1-plugin-five-tool-vector-quality-rework1-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-plugin-five-tool-vector-quality-rework1-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1.json",
+        "deliveryRunId": "run-delivery-p1-plugin-five-tool-vector-quality-rework1-p1__AlembicPlugin__p1-plugin-five-tool-vector-quality-t1",
+        "dispatchGroup": "p1-plugin-five-tool-vector-quality-rework1-p1",
+        "sentAt": "2026-07-12T13:29:22.998Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p1-plugin-five-tool-vector-quality-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p2-core-filter-orphan-vector-search-t1",
+      "taskPackageId": "p2-core-filter-orphan-vector-search-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Implement and commit Core SearchEngine filtering so orphan vector ids absent from the request-scoped knowledge database can never be returned as live knowledge; prove surviving live results keep ordering, budgets, filters, and read-only behavior.",
+      "status": "accepted",
+      "createdAt": "2026-07-12T15:14:42.160Z",
+      "continuationId": "continuation-0011",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p2-core-filter-orphan-vector-search-p1__AlembicCore__p2-core-filter-orphan-vector-search-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p2-core-filter-orphan-vector-search-p1__AlembicCore__p2-core-filter-orphan-vector-search-t1.json",
+        "deliveryRunId": "run-delivery-p2-core-filter-orphan-vector-search-p1__AlembicCore__p2-core-filter-orphan-vector-search-t1",
+        "dispatchGroup": "p2-core-filter-orphan-vector-search-p1",
+        "sentAt": "2026-07-12T15:15:49.728Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p2-core-filter-orphan-vector-search-t1"
+    },
+    {
+      "targetTaskId": "p3-plugin-five-tool-truth-graph-drift-quality-t1",
+      "taskPackageId": "p3-plugin-five-tool-truth-graph-drift-quality-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Integrate Core 9e49980, eliminate orphan vector knowledge from public Search/Prime, make real multi-repo Graph exact identifiers survive candidate caps, and represent drifted Recipe refs truthfully without writes or new gates.",
+      "status": "accepted",
+      "createdAt": "2026-07-12T15:37:16.350Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1__AlembicPlugin__p3-plugin-five-tool-truth-graph-drift-quality-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1__AlembicPlugin__p3-plugin-five-tool-truth-graph-drift-quality-t1.json",
+        "deliveryRunId": "run-delivery-p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1__AlembicPlugin__p3-plugin-five-tool-truth-graph-drift-quality-t1",
+        "dispatchGroup": "p3-plugin-five-tool-truth-graph-drift-quality-rework1-p1",
+        "sentAt": "2026-07-12T16:18:13.560Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p3-plugin-five-tool-truth-graph-drift-quality-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p4-core-swiftpm-target-path-truth-t1",
+      "taskPackageId": "p4-core-swiftpm-target-path-truth-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "Repair Core SwiftPM RepoContext target-path truth for main-package targets and prove it against the real BiliDili shape without writes.",
+      "status": "accepted",
+      "createdAt": "2026-07-12T17:01:18.857Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p4-core-swiftpm-target-path-truth-p1__AlembicCore__p4-core-swiftpm-target-path-truth-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p4-core-swiftpm-target-path-truth-p1__AlembicCore__p4-core-swiftpm-target-path-truth-t1.json",
+        "deliveryRunId": "run-delivery-p4-core-swiftpm-target-path-truth-p1__AlembicCore__p4-core-swiftpm-target-path-truth-t1",
+        "dispatchGroup": "p4-core-swiftpm-target-path-truth-p1",
+        "sentAt": "2026-07-12T17:02:17.387Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p4-core-swiftpm-target-path-truth-t1"
+    },
+    {
+      "targetTaskId": "p5-plugin-core-swiftpm-truth-integration-t1",
+      "taskPackageId": "p5-plugin-core-swiftpm-truth-integration-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Consume Core ce1a29a in Plugin a1f3282, rebuild/reload, and prove the same real AlembicWorkspace/BiliDili Graph queries; change Plugin only if the integrated public call still fails.",
+      "status": "accepted",
+      "createdAt": "2026-07-12T17:19:27.853Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 2,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p5-plugin-core-swiftpm-truth-integration-rework1-p1__AlembicPlugin__p5-plugin-core-swiftpm-truth-integration-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p5-plugin-core-swiftpm-truth-integration-rework1-p1__AlembicPlugin__p5-plugin-core-swiftpm-truth-integration-t1.json",
+        "deliveryRunId": "run-delivery-p5-plugin-core-swiftpm-truth-integration-rework1-p1__AlembicPlugin__p5-plugin-core-swiftpm-truth-integration-t1",
+        "dispatchGroup": "p5-plugin-core-swiftpm-truth-integration-rework1-p1",
+        "sentAt": "2026-07-12T17:39:30.250Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p5-plugin-core-swiftpm-truth-integration-t1",
+      "reviewRoute": "rework"
+    },
+    {
+      "targetTaskId": "p6-plugin-public-guard-readonly-quality-t1",
+      "taskPackageId": "p6-plugin-public-guard-readonly-quality-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "Fix verified public MCP Guard no-write and projection-quality failures. Public alembic_code_guard with explicit files and no primeRef/workRef currently changes the real AlembicWorkspace SQLite guard_violations table/WAL, contradicting the demand's all-five-tools request-scoped read-only contract and final acceptance prohibition on live knowledge mutation. Make the public MCP path analyze only a confined read-only snapshot and never persist violationRuns, guardHits, primeAdoptions, or other effects; preserve explicit-scope coverage, violations, applicable Recipe rules, primeAlignment observation, no-KB truth, confinement, and public schemas without falsely reporting persisted feedback. Keep persistence only on real non-public owning surfaces. Refactor the public projection so the same Guard scope genuinely passes ast_method_complexity for projectGuardPublicResult (currently 24 > 20) without suppressing rules. Add RED/GREEN fingerprints for passing, violating, and primeRef calls including DB/WAL/vector/knowledge stats/guard_violations; run focused/full/check/build/package/distribution/plugin verification; commit only AlembicPlugin. No Test, rescan, real-project/live-data/Core/vendor/release/marketplace/gate/environment changes.",
+      "status": "accepted",
+      "createdAt": "2026-07-12T23:49:55.769Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p6-plugin-public-guard-readonly-quality-p1__AlembicPlugin__p6-plugin-public-guard-readonly-quality-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p6-plugin-public-guard-readonly-quality-p1__AlembicPlugin__p6-plugin-public-guard-readonly-quality-t1.json",
+        "deliveryRunId": "run-delivery-p6-plugin-public-guard-readonly-quality-p1__AlembicPlugin__p6-plugin-public-guard-readonly-quality-t1",
+        "dispatchGroup": "p6-plugin-public-guard-readonly-quality-p1",
+        "sentAt": "2026-07-12T23:50:59.250Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p6-plugin-public-guard-readonly-quality-t1"
+    },
+    {
+      "targetTaskId": "p7-core-recipe-vector-lifecycle-consistency-t1",
+      "taskPackageId": "p7-core-recipe-vector-lifecycle-consistency-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "修复 Core Recipe 向量生产/维护生命周期一致性：权威全量清理孤儿区域向量，子集更新不误删，deprecate/delete/reactivate/update 与 shutdown 闭环。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T00:33:56.610Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p7-core-recipe-vector-lifecycle-consistency-p1__AlembicCore__p7-core-recipe-vector-lifecycle-consistency-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p7-core-recipe-vector-lifecycle-consistency-p1__AlembicCore__p7-core-recipe-vector-lifecycle-consistency-t1.json",
+        "deliveryRunId": "run-delivery-p7-core-recipe-vector-lifecycle-consistency-p1__AlembicCore__p7-core-recipe-vector-lifecycle-consistency-t1",
+        "dispatchGroup": "p7-core-recipe-vector-lifecycle-consistency-p1",
+        "sentAt": "2026-07-13T00:34:22.312Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p7-core-recipe-vector-lifecycle-consistency-t1"
+    },
+    {
+      "targetTaskId": "p8-plugin-recipe-vector-maintenance-integration-t1",
+      "taskPackageId": "p8-plugin-recipe-vector-maintenance-integration-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "接入已验收 Core Recipe 向量生命周期能力：完整权威 ID 跨批传递、直写维护端口注入、关闭等待排空，并用隔离数据根证明不再产生孤儿区域向量。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T00:59:12.934Z",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 2
+      },
+      "delivery": {
+        "deliveryId": "delivery-p8-plugin-recipe-vector-maintenance-integration-p1__AlembicPlugin__p8-plugin-recipe-vector-maintenance-integration-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p8-plugin-recipe-vector-maintenance-integration-p1__AlembicPlugin__p8-plugin-recipe-vector-maintenance-integration-t1.json",
+        "deliveryRunId": "run-delivery-p8-plugin-recipe-vector-maintenance-integration-p1__AlembicPlugin__p8-plugin-recipe-vector-maintenance-integration-t1",
+        "dispatchGroup": "p8-plugin-recipe-vector-maintenance-integration-p1",
+        "sentAt": "2026-07-13T00:59:54.912Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p8-plugin-recipe-vector-maintenance-integration-t1"
+    },
+    {
+      "targetTaskId": "p9-core-provider-independent-vector-removal-t1",
+      "taskPackageId": "p9-core-provider-independent-vector-removal-p1",
+      "targetWindow": "AlembicCore",
+      "summary": "让 Recipe 删除、废弃和权威孤儿清理不依赖 embedding provider，同时保持 live Recipe 替换安全；修复无 Ollama 时仍产生孤儿向量的问题。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T01:36:01.350Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1,
+        "reworkCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p9-core-provider-independent-vector-removal-p1__AlembicCore__p9-core-provider-independent-vector-removal-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p9-core-provider-independent-vector-removal-p1__AlembicCore__p9-core-provider-independent-vector-removal-t1.json",
+        "deliveryRunId": "run-delivery-p9-core-provider-independent-vector-removal-p1__AlembicCore__p9-core-provider-independent-vector-removal-t1",
+        "dispatchGroup": "p9-core-provider-independent-vector-removal-p1",
+        "sentAt": "2026-07-13T01:36:31.540Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p9-core-provider-independent-vector-removal-t1"
+    },
+    {
+      "targetTaskId": "p10-plugin-provider-independent-authoritative-maintenance-t1",
+      "taskPackageId": "p10-plugin-provider-independent-authoritative-maintenance-p1",
+      "targetWindow": "AlembicPlugin",
+      "summary": "删除 Plugin authoritative maintenance 的 availability 前置返回，让无 provider 时仍调用 Core P9 cleanup-only 路径；隔离验证不存在 Recipe 被清、live 旧块保留、零写入且幂等。",
+      "status": "accepted",
+      "createdAt": "2026-07-13T01:58:51.460Z",
+      "reviewRoute": "rework",
+      "reviewDecision": "accept",
+      "counts": {
+        "dispatchCount": 1
+      },
+      "delivery": {
+        "deliveryId": "delivery-p10-plugin-provider-independent-authoritative-maintenance-p1__AlembicPlugin__p10-plugin-provider-independent-authoritative-maintenance-t1",
+        "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p10-plugin-provider-independent-authoritative-maintenance-p1__AlembicPlugin__p10-plugin-provider-independent-authoritative-maintenance-t1.json",
+        "deliveryRunId": "run-delivery-p10-plugin-provider-independent-authoritative-maintenance-p1__AlembicPlugin__p10-plugin-provider-independent-authoritative-maintenance-t1",
+        "dispatchGroup": "p10-plugin-provider-independent-authoritative-maintenance-p1",
+        "sentAt": "2026-07-13T01:59:19.116Z",
+        "readbackOk": true
+      },
+      "resultId": "tr-p10-plugin-provider-independent-authoritative-maintenance-t1"
+    }
+  ],
+  "windows": [
+    {
+      "windowName": "AlembicPlugin",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p1-plugin-five-tool-vector-quality-p1",
+        "p3-plugin-five-tool-truth-graph-drift-quality-p1",
+        "p5-plugin-core-swiftpm-truth-integration-p1",
+        "p6-plugin-public-guard-readonly-quality-p1",
+        "p8-plugin-recipe-vector-maintenance-integration-p1",
+        "p10-plugin-provider-independent-authoritative-maintenance-p1"
+      ],
+      "targetTaskIds": [
+        "p1-plugin-five-tool-vector-quality-t1",
+        "p3-plugin-five-tool-truth-graph-drift-quality-t1",
+        "p5-plugin-core-swiftpm-truth-integration-t1",
+        "p6-plugin-public-guard-readonly-quality-t1",
+        "p8-plugin-recipe-vector-maintenance-integration-t1",
+        "p10-plugin-provider-independent-authoritative-maintenance-t1"
+      ]
+    },
+    {
+      "windowName": "AlembicCore",
+      "windowState": "accepted",
+      "taskPackageIds": [
+        "p2-core-filter-orphan-vector-search-p1",
+        "p4-core-swiftpm-target-path-truth-p1",
+        "p7-core-recipe-vector-lifecycle-consistency-p1",
+        "p9-core-provider-independent-vector-removal-p1"
+      ],
+      "targetTaskIds": [
+        "p2-core-filter-orphan-vector-search-t1",
+        "p4-core-swiftpm-target-path-truth-t1",
+        "p7-core-recipe-vector-lifecycle-consistency-t1",
+        "p9-core-provider-independent-vector-removal-t1"
+      ]
+    }
+  ],
+  "review": {
+    "status": "demand-completed",
+    "readyResultIds": [
+      "tr-p10-plugin-provider-independent-authoritative-maintenance-t1"
+    ],
+    "blockedResultIds": [],
+    "missingResultIds": []
+  },
+  "automation": {
+    "enabled": false,
+    "activeRunIds": [],
+    "lastReviewPack": null
+  },
+  "projection": {
+    "status": "stale",
+    "lastRenderedAt": "2026-07-12T12:51:02.093Z",
+    "interfaceLanguage": "zh",
+    "progressDoc": "developer-progress.md"
+  },
+  "executionPlacement": {
+    "mode": "main",
+    "podId": null
+  },
+  "delivery": {
+    "lastDeliveryId": "delivery-p10-plugin-provider-independent-authoritative-maintenance-p1__AlembicPlugin__p10-plugin-provider-independent-authoritative-maintenance-t1",
+    "lastDeliveryRunId": "run-delivery-p10-plugin-provider-independent-authoritative-maintenance-p1__AlembicPlugin__p10-plugin-provider-independent-authoritative-maintenance-t1",
+    "lastDispatchGroup": "p10-plugin-provider-independent-authoritative-maintenance-p1",
+    "lastTargetTaskId": "p10-plugin-provider-independent-authoritative-maintenance-t1",
+    "lastStatus": "sent",
+    "updatedAt": "2026-07-13T01:59:19.121Z"
+  }
+}

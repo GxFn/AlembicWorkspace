@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+  "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+  "taskPackageId": "p1-core-recipe-retrieval-production-generation-p1",
+  "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework3-p1",
+  "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+  "targetWindow": "AlembicCore",
+  "targetTaskId": "p1-core-recipe-retrieval-production-generation-t1",
+  "status": "completed",
+  "summary": "Recurring-problem rework3 completed in AlembicCore commit b711ea10aa5c67d1d75a58a18c0d56623e26c290 (parent 0918831f25aca263f0fd1948d4d27004742b83c1). Readiness now validates the raw persisted native retrieval profile before normalizeFacts can erase malformed data or shift indices. Blank/whitespace concepts, non-array buckets, non-object facts, non-string values, blank languages, malformed provenance arrays, duplicates, meaningless concepts, and ungrounded refs receive stable violations at original authored indices. Normalization remains the deterministic projection/hash step and now filters structurally invalid facts without rewriting Markdown/SQLite truth. A real KnowledgeService -> Markdown + SQLite -> readiness -> publish test proves malformed authored truth round-trips unchanged, publish is rejected with lifecycle unchanged, and projector documents exclude invalid facts. The accepted four-capability Port and all generation/reconcile/query-reader paths are unchanged.",
+  "evidenceRefs": [
+    "commit:b711ea10aa5c67d1d75a58a18c0d56623e26c290",
+    "parent:0918831f25aca263f0fd1948d4d27004742b83c1",
+    "AlembicCore/src/service/knowledge/RecipeRetrieval.ts",
+    "AlembicCore/test/RecipeRetrievalProduction.test.ts",
+    "Design/docs/current/alembic-recipe-production-retrieval-quality-requirement-design-2026-07-13.md"
+  ],
+  "verification": [
+    "Repro before edits: built-code probe with a valid native profile plus concepts[0].term='' returned ready=true and zero concept violations.",
+    "RED raw index: blank/whitespace placeholder test failed because only 9 normalized concepts were reported instead of all 11 original source indices; GREEN passed.",
+    "RED structural facts: concepts/scenarios/exclusions test received only legacy placeholder/ungrounded diagnostics and missed value/language/structure/provenance codes; GREEN passed with exact raw indices.",
+    "RED real chain: malformed profile round-tripped but projector text contained 'leaked invalid concept' and 'leaked invalid scenario'; GREEN proves Markdown/SQLite preservation, indexed readiness violations, publish rejection, lifecycle unchanged, and projector filtering.",
+    "RED raw bucket shape: non-array concepts/scenarios/exclusions produced ready=true; GREEN reports three retrieval.profile.fact-bucket-invalid violations.",
+    "npx vitest run test/RecipeRetrievalProduction.test.ts: 1 file / 17 tests passed.",
+    "Controller-equivalent focused suite: 8 files / 217 tests passed.",
+    "npm run test: 184 files / 1733 tests passed.",
+    "npm run build:check passed; npm run build passed; npm run lint passed (746 files).",
+    "CoreDeliveryBoundary/CoreToolSystemBoundary/CoreCodexBoundary/CorePackage: 4 files / 22 tests passed.",
+    "npm run check passed build, public API boundary (59 exact entrypoints), layer contract, consumer imports, scope resolution, public smoke, output budgets, and space edges, then stopped only at inherited Doctrine violation src/infrastructure/vector/ASTChunker.ts:32.",
+    "npm run lint:naming passed (656 files); npm run lint:retired-symbols passed; git diff --exit-code 0918831f -- src/infrastructure/vector/ASTChunker.ts passed; git diff --check passed; final worktree clean."
+  ],
+  "risks": [
+    "Repository-wide npm run check remains non-zero solely because the pre-existing Doctrine violation at src/infrastructure/vector/ASTChunker.ts:32 is unchanged from parent 0918831f.",
+    "The new structural readiness codes are additive for malformed pending/staging truth; active valid profiles retain existing codes, hashes, projections, and lifecycle behavior."
+  ],
+  "craftEvidence": [
+    {
+      "kind": "commit",
+      "commit": "b711ea10aa5c67d1d75a58a18c0d56623e26c290",
+      "parent": "0918831f25aca263f0fd1948d4d27004742b83c1",
+      "verify": "artifact-present"
+    },
+    {
+      "kind": "tests",
+      "ref": "AlembicCore/test/RecipeRetrievalProduction.test.ts",
+      "value": "Focused 8/217; full 184/1733; boundaries 4/22; build:check/build/lint and all post-Doctrine gates passed.",
+      "verify": "controller-rerun"
+    },
+    {
+      "kind": "self-review",
+      "value": "Point-by-point response: agreed that validation-after-normalization was the real gap and moved all indexed fact validation to raw persisted buckets; covered blank/whitespace concepts, malformed values/languages/provenance/non-object facts and non-array buckets; preserved source indices; proved raw Markdown/SQLite round-trip, readiness and publish rejection, projector filtering, and meaningful-phrase validity. Stage 1 found every rework3 objective covered with no Port/vector/query changes. Stage 2 found no blocker/high/medium issue; reviewed deterministic ordering, diagnostic overlap, linear complexity, pending/staging compatibility, invalid projection filtering, and clean scope.",
+      "verify": "self-attested"
+    },
+    {
+      "kind": "root-cause-note",
+      "value": "The recurring failure was architectural ordering, not an incomplete placeholder token set: normalizeFacts was a lossy projector helper but readiness treated its output as authored truth. Empty facts disappeared and later fact indices shifted before validation. The fix separates boundaries: raw persisted profile is the validation authority; normalized profile is only deterministic hash/projection material."
+    },
+    {
+      "kind": "repro",
+      "value": "Built commit 0918831f probe: a valid native profile containing one blank concept returned {ready:true, conceptViolations:[]}; test REDs reproduced index loss, structural erasure, projector leakage, and non-array bucket erasure."
+    },
+    {
+      "kind": "regression",
+      "ref": "AlembicCore/test/RecipeRetrievalProduction.test.ts",
+      "value": "17-test file now includes raw-index placeholder matrix, cross-bucket structural diagnostics, non-array bucket rejection, and real persistence/publish/projector chain."
+    },
+    {
+      "kind": "red-green-note",
+      "value": "Four behavioral REDs failed for the intended causes (index loss, missing structural codes, projector leakage, bucket erasure) before their corresponding implementation changes; all are GREEN in the final 17-test file."
+    },
+    {
+      "kind": "baseline",
+      "value": "Clean parent 0918831f; RecipeRetrievalProduction 14/14 and npm run build:check passed before edits."
+    },
+    {
+      "kind": "execution-plan",
+      "value": "Reproduce lossy normalization -> define indexed raw contract -> blank/index RED/GREEN -> structural RED/GREEN -> real persistence/projector RED/GREEN -> bucket-shape RED/GREEN -> two-stage review -> full gates -> commit -> result."
+    },
+    {
+      "kind": "scope-diff",
+      "value": "Two AlembicCore files only: RecipeRetrieval raw validation/normalization and RecipeRetrievalProduction regression/integration tests. No Port, vector generation, reconcile, query path, package export, migration, or outer-repository edits."
+    },
+    {
+      "kind": "change-scope",
+      "value": "git diff parent..commit is confined to src/service/knowledge/RecipeRetrieval.ts and test/RecipeRetrievalProduction.test.ts."
+    },
+    {
+      "kind": "compatibility-review",
+      "value": "Valid native and compatibility profiles keep the same normalized shape and existing readiness codes. New codes apply only where malformed truth was previously silently erased. Markdown/SQLite preserve authored values; only derived projector documents filter structurally invalid facts."
+    },
+    {
+      "kind": "typecheck",
+      "value": "npm run build:check passed."
+    },
+    {
+      "kind": "lint",
+      "value": "npm run lint passed across 746 files; naming and retired-symbol gates passed."
+    }
+  ],
+  "deliveryContext": {
+    "deliveryId": "delivery-p1-core-recipe-retrieval-production-generation-rework3-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1",
+    "deliveryFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-recipe-retrieval-production-generation-rework3-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1.json",
+    "deliveryRunId": "run-p1-core-recipe-retrieval-production-generation-rework3-p1-readback1",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework3-p1",
+    "deliveryEnvelopeFile": ".wakeflow-local/wakeflow-delivery/delivery-envelopes/delivery-p1-core-recipe-retrieval-production-generation-rework3-p1__AlembicCore__p1-core-recipe-retrieval-production-generation-t1.json",
+    "deliveryEnvelopeFound": true,
+    "resolution": "controller-return-required",
+    "returnRoute": "controller",
+    "returnPolicy": {
+      "mode": "group-ready"
+    },
+    "controllerWindow": "AlembicWorkspace",
+    "controllerReturnRequired": true
+  },
+  "controllerActionRequired": true,
+  "wakeflowTrace": {
+    "kind": "WakeflowTrace",
+    "version": 1,
+    "artifactKind": "target-result",
+    "source": "wakeflow-state",
+    "command": "import-target-result",
+    "root": "<workspace-root>",
+    "stateRoot": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13",
+    "stateRevision": 13,
+    "demandKey": "alembic-recipe-production-retrieval-quality-2026-07-13",
+    "taskPackageId": "p1-core-recipe-retrieval-production-generation-p1",
+    "targetTaskId": "p1-core-recipe-retrieval-production-generation-t1",
+    "targetWindow": "AlembicCore",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework3-p1",
+    "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+    "createdAt": "2026-07-13T13:02:22.461Z"
+  },
+  "createdAt": "2026-07-13T13:02:22.461Z",
+  "stateRevisionObserved": 13,
+  "forbiddenConclusions": [
+    "target-result-is-controller-acceptance",
+    "target-result-closes-task-package",
+    "target-result-creates-next-dispatch",
+    "target-result-updates-progress-doc-status"
+  ],
+  "currentResult": true,
+  "resultRevision": 5,
+  "supersedes": {
+    "resultId": "tr-p1-core-recipe-retrieval-production-generation-t1",
+    "dispatchGroup": "p1-core-recipe-retrieval-production-generation-rework2-p1",
+    "historyFile": ".wakeflow-active/current/alembic-recipe-production-retrieval-quality-2026-07-13/target-results/history/tr-p1-core-recipe-retrieval-production-generation-t1__p1-core-recipe-retrieval-production-generation-rework2-p1__current-r0004.json"
+  }
+}
